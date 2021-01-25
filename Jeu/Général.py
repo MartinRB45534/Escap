@@ -2291,6 +2291,7 @@ class Agissant(Entitee): #Tout agissant est un cadavre, tout cadavre n'agit pas.
             regen_pv *= taux
         for taux in self.taux_stats.values() :
             regen_pv *= taux
+        # /!\ Rajouter les effets négatifs du skill de magie infinie /!\
         items = []
         for equippement in self.inventaire.get_equippement():
             item = self.controleur.get_entitee(equippement)
@@ -2516,6 +2517,7 @@ class Agissant(Entitee): #Tout agissant est un cadavre, tout cadavre n'agit pas.
                     cout = essence.utilise(self.pv)
                     if peut_payer(cout):
                         paye(cout)
+                        self.pv = 0
                     else :
                         self.meurt()
                 else :
@@ -3214,7 +3216,7 @@ class Joueur(Agissant,Entitee_superieure):
             elif self.choix_niveaux[CLASSIQUE][2] == ESSENCE_MAGIQUE:
                 self.choix_dispos = [NECROMANCIEN,BOOST_AURA,BOOST_PRIORITE]
             elif self.choix_niveaux[CLASSIQUE][2] in [MAGIE_INFINIE,MAGIE_INFINIE_PAR_DEFAUT]:
-                self.choix_dispos = [ENCHANTEMENT_DEFENSE,ENCHANTEUR,SOUTIEN]
+                self.choix_dispos = [ENCHANTEMENT_DEFENSIF,ENCHANTEUR,SOUTIEN]
 
         elif niveau == 9:
             if self.choix_niveaux[CLASSIQUE][2] in [DEFENSE,DEFENSE_PAR_DEFAUT]:
@@ -3232,7 +3234,7 @@ class Joueur(Agissant,Entitee_superieure):
             elif self.choix_niveaux[CLASSIQUE][2] == LANCER:
                 self.choix_dispos = [FLECHES_LOURDE_LEGERE,BOOST_PRIORITE,BOOST_PORTEE_EXPLOSIFS]
             elif self.choix_niveaux[CLASSIQUE][2] == ESSENCE_MAGIQUE:
-                self.choix_dispos = [ECLAIR_NOIR,BOOST_DEGATS_PROJECTILES,BOOST_MANA]
+                self.choix_dispos = [ECLAIR_NOIR,BOOST_DEGATS_PROJECTILES,BOOST_PM]
             elif self.choix_niveaux[CLASSIQUE][2] in [MAGIE_INFINIE,MAGIE_INFINIE_PAR_DEFAUT]:
                 self.choix_dispos = [BOOST_ENCHANTEMENT,RESURECTION,ECLAIR_NOIR]
 
@@ -3515,7 +3517,7 @@ class Joueur(Agissant,Entitee_superieure):
                 if choix == ELEMENTALISTE:
                     classe = Elementaliste() # Où comment rendre l'arbre des éléments cheaté
                     classe.evo()
-                    self.classe_principale.sous_classe.append(classe)
+                    self.classe_principale.sous_classes.append(classe)
                     self.choix_niveaux[CLASSIQUE][4] = ELEMENTALISTE
                 elif choix == RAYON_THERMIQUE:
                     magie = trouve_skill(self.classe_principale,Skill_magie)
@@ -3809,7 +3811,7 @@ class Joueur(Agissant,Entitee_superieure):
                     creation_fleche = trouve_skill(self.classe_principale,Skill_creation_de_fleches)
                     creation_fleche.ajoute(Cree_fleche_fantome_skill()) #Une fleche qui ignore les murs
                     self.choix_niveaux[CLASSIQUE][9] = FLECHE_FANTOME
-                elif choix == BOOST_PRIRORITE_EXPLOSIF:
+                elif choix == BOOST_PRIORITE_EXPLOSIF:
                     skill = Skill_boost_priorite_explosifs() #Quand est-ce que la priorité des explosifs intervient ?
                     skill.evo()
                     self.classe_principale.skills.append(skill)
@@ -9990,7 +9992,7 @@ class Affichage:
                         elif choi == RAYON_THERMIQUE:
                             skin = SKIN_MAGIE_LASER
                         elif choi == ENCHANTEMENT_DEFENSE:
-                            skin = SKIN_ENCHANTEMENT_DEFENSE
+                            skin = SKIN_MAGIE_ENCHANTEMENT_DEFENSE
                         elif choi == REGEN_PM:
                             skin = SKIN_MAGIE_RESTAURATION_PM
                         elif choi == ANALYSE:
@@ -10641,33 +10643,33 @@ class Affichage:
             elif choi == BOOST_PV:
                 descr = ["Option d'évolution :","Renforcement physique","Augmente la quantité maximale de PVs.","Etat : fonctionnel","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == BOOST_DE_PRIORITE_D_ATTAQUE:
-                descr = ["Option d'évolution :","Augmentation de la priorité d'attaque","La priorité des attaques augmente.","Etat : incertain","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Augmentation de la priorité d'attaque","La priorité des attaques augmente.","Etat : inneffectif","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == CREATION_FLECHES:
                 descr = ["Option d'évolution :","Création de flèches","Acquisition du skill de création de flèches.","Fournit le joueur en flèches à lancer.","Etat : fonctionnel","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == SORT_ACCELERATION:
-                descr = ["Option d'évolution :","Sort d'accélération","Acquisition de la magie d'accélération","La magie d'accélération augmente temporairement la vitesse du joueur (d'un agissant au choix ?)","Etat : incertain","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Sort d'accélération","Acquisition de la magie d'accélération","La magie d'accélération augmente temporairement la vitesse du joueur (d'un agissant au choix ?)","Etat : fait crasher le jeu","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == BOOST_AURA:
-                descr = ["Option d'évolution :","Amélioration des auras","Améliore tous les types d'auras.","Fonctionne aussi sur les auras acquises plus tard.","Etat : incertain","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Amélioration des auras","Améliore tous les types d'auras.","Fonctionne aussi sur les auras acquises plus tard.","Etat : fait crasher le jeu","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == BOOST_PM:
                 descr = ["Option d'évolution :","Renforcement magique","Augmente la quantitée maximale de PM.","Etat : fonctionnel","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == ONDE_DE_CHOC:
-                descr = ["Option d'évolution :","Sort d'onde de choc","Acquisition de la magie d'onde de choc.","Une magie d'attaque","Etat : incertain","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Sort d'onde de choc","Acquisition de la magie d'onde de choc.","Une magie d'attaque","Etat : fait crasher le jeu","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == SORT_DE_SOIN_SUPERIEUR:
                 descr = ["Option d'évolution :","Sort de soin supérieur","Acquisition de la magie de soin supérieur.","Un sort de soin plus efficace, mais plus coûteux","Etat : fonctionnel","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == ENCHANTEMENT_FORCE:
                 descr = ["Option d'évolution :","Enchantement de force","Acquisition de la magie d'enchantement de force.","Augmente la statistique de force d'un agissant pour une longue période.","Etat : fonctionnel","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == PROJECTION_ENERGIE:
-                descr = ["Option d'évolution :","Projection d'energie","Acquisition de la magie de projection d'énergie.","Une magie d'attaque.","Etat : probablement fonctionnel","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Projection d'energie","Acquisition de la magie de projection d'énergie.","Une magie d'attaque.","Etat : fonctionnel","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == ECRASEMENT:
                 descr = ["Option d'évolution :","Ecrasement","Acquisition du skill d'ecrasement.","Permet de détruire les murs sur son chemin.","Etat : fonctionnel","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == OBSERVATION:
                 descr = ["Option d'évolution :","Observation","Acquisition du skill d'observation.","Permet de percevoir des informations sur différentes choses","Etat : fonctionnel, le skill est sans effet","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == MANIPULATION_EPEE:
-                descr = ["Option d'évolution :","Manipulation d'épées","Acquisition du skill de manipulation d'épée.","Permet d'utiliser les épées plus efficacement.","Etat : incertain","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Manipulation d'épées","Acquisition du skill de manipulation d'épée.","Permet d'utiliser les épées plus efficacement.","Etat : fonctionnel, le skill est probablement sans effet","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == BOOST_PORTEE:
                 descr = ["Option d'évolution :","Augmentation de la portée","Permet de lancer des items plus loin.","Etat : fonctionnel","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == SORT_VISION:
-                descr = ["Option d'évolution :","Sort de vision","Acquisition de la magie de vision.","Augmente temporairement la portée de la vue du joueur (d'un agissant au choix ?).","Etat : incertain","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Sort de vision","Acquisition de la magie de vision.","Augmente temporairement la portée de la vue du joueur (d'un agissant au choix ?).","Etat : fonctionnel","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == CREATION_EXPLOSIF:
                 descr = ["Option d'évolution :","Création d'explosifs","Acquisition du skill de création d'explosifs.","Fournit le joueur en explosifs à lancer.","Etat : fonctionnel","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == ELEMENTALISTE:
@@ -10675,15 +10677,15 @@ class Affichage:
             elif choi == RAYON_THERMIQUE:
                 descr = ["Option d'évolution :","Rayon thermique","Acquisition de la magie de rayon thermique.","Une magie d'attaque.","Peut être appelée rayon laser à d'autres endroits.","Etat : fonctionnel","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == ENCHANTEMENT_DEFENSE:
-                descr = ["Option d'évolution :","Enchantement de défense","Acquisition de la magie d'enchantement de défense.","Confère une protection à un agissant pour une longue période.","Etat : incertain","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Enchantement de défense","Acquisition de la magie d'enchantement de défense.","Confère une protection à un agissant pour une longue période.","Etat : fait crasher le jeu","À regarder de bien plus près à l'occasion !","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == REGEN_PM:
-                descr = ["Option d'évolution :","Renforcement magique","Augmente la régénération des PMs.","Etat : fonctionnel","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Magie de transfert de mana","Acquisition de la magie de régénération de mana.","Augmente la régénération des PMs de l'agissant ciblé.","Etat : fait crasher le jeu","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == ANALYSE:
                 descr = ["Option d'évolution :","Analyse","Acquisition du skill d'analyse.","Fournit des informations sur un mot clé ou un terme du système.","Etat : fonctionnel, skill sans effet","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == VOL:
-                descr = ["Option d'évolution :","Vol","Acquisition du skill de vol.","Dérobe un item à un agissant","Etat : fonctionnel, skill probablement sans effet","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Vol","Acquisition du skill de vol.","Dérobe un item à un agissant","Etat : fait crasher le jeu","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == BOOST_ATTAQUE_EPEE:
-                descr = ["Option d'évolution :","Amélioration de l'attaque à l'épée","Améliore les attaques à l'épée (mais encore ?).","Etat : incertain","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Amélioration de l'attaque à l'épée","Améliore les attaques à l'épée (mais encore ?).","Etat : fait crasher le jeu","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == FLECHE_PERCANTE:
                 descr = ["Option d'évolution :","Fleche perçante","Ajout du projectile Flèche Perçante au skill de création de flèches.","Pour l'instant, juste une flèche normale.","Etat : fonctionnel","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == FLECHE_EXPLOSIVE:
@@ -10699,15 +10701,15 @@ class Affichage:
             elif choi == EPEISTE:
                 descr = ["Option d'évolution :","Épéiste","Acquisition de la classe d'épéiste.","Renforce tout un tas de caractéristiques liées aux épées.","Etat : fonctionnel, classe sans effet","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == BOOST_RESTAURATIONS:
-                descr = ["Option d'évolution :","Amélioration des restaurations","Améliore les magies de restauration (restauration de PVs, a.k.a. soin, et restauration de PMs).","Etat : incertain","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Amélioration des restaurations","Améliore les magies de restauration (restauration de PVs, a.k.a. soin, et restauration de PMs).","Etat : fait crasher le jeu","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == MANIPULATION_BOUCLIER:
-                descr = ["Option d'évolution :","Manipulation de bouclier","Acquisition du skill de manipulation de bouclier.","Effets du skill à implémenter.","Etat : incertain","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Manipulation de bouclier","Acquisition du skill de manipulation de bouclier.","Effets du skill à implémenter.","Etat : fonctionnel, skill probablement sans effet","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == BOOST_PRIORITE_OBSERVATION:
-                descr = ["Option d'évolution :","Augmentation de la priorité d'observation","Augmente la priorité de l'action d'observation (permet d'observer plus).","Etat : incertain","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Augmentation de la priorité d'observation","Augmente la priorité de l'action d'observation (permet d'observer plus).","Etat : fait crasher le jeu","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == SORT_AUTO_SOIN:
                 descr = ["Option d'évolution :","Sort d'auto-soin","Acquisition de la magie d'auto-soin.","Permet de se soigner soi-même, plus efficace qu'un soin classique.","Etat : fonctionnel","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == BOOST_DEGATS_FLECHES:
-                descr = ["Option d'évolution :","Augmentation des dégats des flèches","Acquisition du skill d'amélioration des dégats des flèches.","Etat : incertain, probablement sans effet","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Augmentation des dégats des flèches","Acquisition du skill d'amélioration des dégats des flèches.","Etat : fait crasher le jeu","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == CHARGE_LOURDE:
                 descr = ["Option d'évolution :","Charge lourde","Ajout du projectile Charge Lourde au skill de création de projectiles.","Un explosif qui fait plus de dégats, mais plus lourd à lancer","Etat : fonctionnel","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == CHARGE_ETENDUE:
@@ -10717,79 +10719,79 @@ class Affichage:
             elif choi == MAGICIEN:
                 descr = ["Option d'évolution :","Magicien","Acquisition de la classe Magicien.","Améliore les statistiques liées à la magie, permet d'apprendre de nouvelles magies","Etat : fonctionnel, classe sans effet","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == BOOST_DE_PORTEE:
-                descr = ["Option d'évolution :","Augmentation de portée","Augmente la portée (des magies ?).","Détails à déterminer.","Etat : incertain, fait probablement crasher le jeu","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Augmentation de portée","Augmente la portée (des magies ?).","Détails à déterminer.","Etat : fait crasher le jeu","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == BOOST_SOIN:
-                descr = ["Option d'évolution :","Amélioration des soins","Améliore l'efficacité des divers soins.","Etat : incertain, probablement inneffectif","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Amélioration des soins","Améliore l'efficacité des divers soins.","Etat : fait crasher le jeu","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == SORT_DE_VUE:
-                descr = ["Option d'évolution :","Sort de vue","Acquision de la magie de vision.","Augmente temporairement la portée de la vue du joueur (d'un agissant au choix ?).","Etat : probablement fonctionnel","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Sort de vue","Acquision de la magie de vision.","Augmente temporairement la portée de la vue du joueur (d'un agissant au choix ?).","Etat : fait crasher le jeu","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == VOL_PRIORITE:
-                descr = ["Option d'évolution :","Vol de priorité","Acquisition du skill de vol de priorité.","Réduit la statistique de priorité d'un agissant pour augmenter celle du joueur.","Etat : incertain","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Vol de priorité","Acquisition du skill de vol de priorité.","Réduit la statistique de priorité d'un agissant pour augmenter celle du joueur.","Etat : fait crasher le jeu","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == BOOST_ATTAQUE_LANCE:
-                descr = ["Option d'évolution :","Amélioration des attaques à la lance","Améliore les attaques à la lance (mais encore ?).","Etat : incertain","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Amélioration des attaques à la lance","Améliore les attaques à la lance (mais encore ?).","Etat : fonctionnel, probablement sans effet","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == BOOST_PRIORITE_FLECHES:
-                descr = ["Option d'évolution :","Augmentation de la priorité des flèches","Augmente la priorité des flèches, et donc de leurs attaques.","Etat : incertain","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Augmentation de la priorité des flèches","Augmente la priorité des flèches, et donc de leurs attaques.","Etat : fait crasher le jeu","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == ARTIFICIER:
                 descr = ["Option d'évolution :","Artificier","Acquisition de la classe d'Artificier.","Améliore les explosifs et leur utilisation, je suppose.","Etat : fonctionnel, classe sans effet","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == FANTOME:
                 descr = ["Option d'évolution :","Fantôme","Transforme le joueur en fantôme.","Permet de traverser les murs.","Etat : fonctionnel ou inneffectif","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == INSTAKILL:
-                descr = ["Option d'évolution :","Instakill","Acquisition de la magie d'instakill (ou est-ce un skill ?).","Réduit les PVs d'un agissant à 0 instantannément.","Etat : incertain","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Instakill","Acquisition de la magie d'instakill (ou est-ce un skill ?).","Réduit les PVs d'un agissant à 0 instantannément.","Etat : fait crasher le jeu","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == JET_DE_MANA:
                 descr = ["Option d'évolution :","Magie de jet de mana","Acquisition de la magie de jet de mana.","Une attaque magique.","Etat : fonctionnel","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == ENCHANTEMENT_RENFORCEMENT:
                 descr = ["Option d'évolution :","Enchantement de renforcement","Acquisition de la magie d'enchantement de renforcement.","Renforce les statistiques d'un item pour une longue période.","Etat : fonctionnel","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == SORT_DE_PROTECTION:
-                descr = ["Option d'évolution :","Sort de protection","Acquisition de la magie de protection.","Protège un agissant (une zone ?) contre les attaques.","Etat : incertain","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Sort de protection","Acquisition de la magie de protection.","Protège un agissant (une zone ?) contre les attaques.","Etat : fait crasher le jeu","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == BOOST_ATTAQUE:
-                descr = ["Option d'évolution :","Amélioration d'attaque","Améliore les attaques (mais encore ?).","Etat : incertain","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Amélioration d'attaque","Améliore les attaques (mais encore ?).","Etat : fonctionnel, probablement sans effet","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == ARCHER:
                 descr = ["Option d'évolution :","Archer","Acquisition de la classe d'Archer.","Améliore les flèches et leur utilisation, je suppose.","Etat : fonctionnel, classe sans effet","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == FLECHE_FANTOME:
                 descr = ["Option d'évolution :","Flèche fantôme","Ajout du projectile Flèche Fantôme au skill de création de flèches.","Une flèche qui traverse les murs.","Etat : fonctionnel","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == BOOST_DEGAT:
-                descr = ["Option d'évolution :","Augmentation des dégats","Augmente les dégats infligés.","(Cette description a de fortes chances d'être inexacte.)","Etat : incertain","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Augmentation des dégats","Augmente les dégats infligés.","(Cette description a de fortes chances d'être inexacte.)","Etat : fonctionnel","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == NECROMANCIEN:
-                descr = ["Option d'évolution :","Nécromancien","Acquisition de la classe de Nécromancien.","Peut rescussiter des agissants pour les convertir à sa cause.","Etat : incertain","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Nécromancien","Acquisition de la classe de Nécromancien.","Peut rescussiter des agissants pour les convertir à sa cause.","Etat : fonctionnel","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == ENCHANTEUR:
                 descr = ["Option d'évolution :","Enchanteur","Acquisition de la classe d'enchanteur.","Améliore les enchantements, je suppose.","Etat : fonctionnel, classe sans effet","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == SOUTIEN:
                 descr = ["Option d'évolution :","Soutien","Acquisition de la classe de Soutien.","Améliore les soins et assimilés, je suppose.","Etat : fonctionnel, classe sans effet","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == BOOST_PRIORITE_DEPLACEMENT:
-                descr = ["Option d'évolution :","Augmentation de la priorité de déplacement","Augmente la priorité des actions de déplacement.","Etat : incertain","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Augmentation de la priorité de déplacement","Augmente la priorité des actions de déplacement.","Etat : fait crasher le jeu","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == BOOST_PRIORITE_ANALYSE:
-                descr = ["Option d'évolution :","Augmentation de la priorité d'analyse","Augmente la priorité des analyses.","Etat : incertain","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Augmentation de la priorité d'analyse","Augmente la priorité des analyses.","Etat : fait crasher le jeu","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == BOOST_PRIORITE_EXPLOSIF:
-                descr = ["Option d'évolution :","Augmentation de la priorité des explosifs","Augmente la priorité des explosifs, et donc de leurs attaques.","Etat : incertain","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Augmentation de la priorité des explosifs","Augmente la priorité des explosifs, et donc de leurs attaques.","Etat : fait crasher le jeu","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == BOOST_VITESSE_EXPLOSIF:
-                descr = ["Option d'évolution :","Augmentation de la vitesse des explosifs","Augmente la vitesse des explosifs.","Etat : incertain","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Augmentation de la vitesse des explosifs","Augmente la vitesse des explosifs.","Etat : fait crasher le jeu","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == BOOST_PRIORITE_AURA:
-                descr = ["Option d'évolution :","Augmentation de la priorité des auras","Augmente la priorité des auras","Etat : incertain","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Augmentation de la priorité des auras","Augmente la priorité des auras","Etat : fait crasher le jeu","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == AURA_MORTELLE:
-                descr = ["Option d'évolution :","Aura mortelle","Acquisition du skill d'Aura Mortelle.","Lance des attaques de type Instakill sur tous les agissants non-alliés dans l'aura.","Etat : incertain, probablement fonctionnel","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Aura mortelle","Acquisition du skill d'Aura Mortelle.","Lance des attaques de type Instakill sur tous les agissants non-alliés dans l'aura.","Etat : fait crasher le jeu","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == ASSASSIN:
                 descr = ["Option d'évolution :","Assassin","Acquisition de la classe d'Assassin.","Effets de la classe à déterminer","Etat : fonctionnel, classe sans effet","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == BOOST_DE_ZONE_DE_RESTAURATION:
-                descr = ["Option d'évolution :","Augmentation de la portée de restauration","Augmente la portée des restaurations de zone.","Etat : incertain","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Augmentation de la portée de restauration","Augmente la portée des restaurations de zone.","Etat : fait crasher le jeu","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == ANGE:
-                descr = ["Option d'évolution :","Ange","Acquisition de la classe Ange.","Améliore les capacités de soutien.","Etat : fonctionnel, classe presque sans effet","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Ange","Acquisition de la classe Ange.","Améliore les capacités de soutien.","Etat : fait crasher le jeu","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == ENCHANTEMENT_ROUILLE:
                 descr = ["Option d'évolution :","Enchantement de rouille","Acquisition de la magie d'enchantement de rouille","Réduit les statistiques d'un item pour une longue période.","Etat : fonctionnel","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == MANIPULATION_ARME:
-                descr = ["Option d'évolution :","Manipulation d'arme","Acquisition du skill de manipulation d'armes","Améliore les armes, je suppose.","Etat : incertain","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Manipulation d'arme","Acquisition du skill de manipulation d'armes","Améliore les armes, je suppose.","Etat : fonctionnel, probablement sans effet","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == FLECHES_LOURDE_LEGERE:
                 descr = ["Option d'évolution :","Flèche lourde, flèche légère","Ajout du projectile de flèche lourde et du projectile de flèche légère au skill de création de flèches.","Une flèche qui fait plus de dégats, mais plus lourde à lancer, et une flèche plus légère, mais moins dangereuse.","Etat : fonctionnel","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == BOOST_PORTEE_EXPLOSIFS:
-                descr = ["Option d'évolution :","Augmentation de la portée des explosifs","Augmente la portée des explosifs, (ou de leurs explosions ?).","Etat : incertain","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Augmentation de la portée des explosifs","Augmente la portée des explosifs, (ou de leurs explosions ?).","Etat : fait crasher le jeu","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == ECLAIR_NOIR:
                 descr = ["Option d'évolution :","Éclair noir","Acquisition de la magie d'Éclair Noir.","À la fois la magie, l'attaque et le projectile les plus puissants du jeu. Effet garanti, coût démeusuré.","Etat : fonctionnel","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == BOOST_DEGATS_PROJECTILES:
-                descr = ["Option d'évolution :","Augmentation des dégats des projectiles","Augmente les dégats des projectiles.","Etat : incertain","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Augmentation des dégats des projectiles","Augmente les dégats des projectiles.","Etat : fait crasher le jeu","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == BOOST_ENCHANTEMENT:
-                descr = ["Option d'évolution :","Amélioration d'enchantement","Améliore les enchantements (durée, effet ?).","Etat : incertain","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Amélioration d'enchantement","Améliore les enchantements (durée, effet ?).","Etat : fait crasher le jeu","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == RESURECTION:
                 descr = ["Option d'évolution :","Résurection","Acquisition de la magie de résurection.","Permet de rescussiter n'importe quel agissant.","Etat : fonctionnel","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             elif choi == ENCHANTEMENT_DEFENSIF:
-                descr = ["Option d'évolution :","Enchantement défensif","Acquisition de la magie d'enchantement défensif.","Confère des propriétés défensives à un item.","Etat : incertain","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
+                descr = ["Option d'évolution :","Enchantement défensif","Acquisition de la magie d'enchantement défensif.","Confère des propriétés défensives à un item.","Etat : fait crasher le jeu","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
             else:
                 descr = ["Je ne sais pas décrire ça !.","Nous sommes dans l'arbre classique, voici le code fautif :",str(choi),"Bonne chance à moi pour corriger ça !","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
 

@@ -104,7 +104,7 @@ class Skill_essence_magique(Skill):
             #Pas d'autre cadeau ?
 
     def utilise(self,pv):
-        pm=pv*taux #Le nombre de PM qu'il faut pour compenser les PV manquants. Tout (sauf le taux) est en négatif ! D'où les xp en dessous !
+        pm=pv*self.taux #Le nombre de PM qu'il faut pour compenser les PV manquants. Tout (sauf le taux) est en négatif ! D'où les xp en dessous !
         self.xp_new-=pm*0.1 #Plus on dépense de PM, plus le niveau augmente vite, donc le processus ralentit tout seul quand les niveaux augmentent. Peut-être ajuster quand même ?
         return pm #Le controleur veut juste savoir combien de PM il retire, et donc s'il doit tuer l'agissant.
 
