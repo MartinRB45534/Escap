@@ -47,6 +47,7 @@ class Controleur():
         self.entitees_courantes = []
         self.esprits_courants = []
         self.nb_tours = 0
+        self.phase = TOUR
 
     def jeu(self,screen):
 
@@ -126,7 +127,6 @@ class Controleur():
 ##        esprit_jaloux = Esprit("Deuxieme_esprit")
 ##        self.esprits["Premier_esprit"]=esprit_test
 ##        self.esprits["Deuxieme_esprit"]=esprit_jaloux
-        self.active_lab(self.entitees[2].position[0])
 ##        esprit_test.controleur = self
 ##        esprit_test.ajoute_corps([agissant1.ID,agissant2.ID])
 ##        esprit_jaloux.controleur = self
@@ -138,6 +138,9 @@ class Controleur():
         self.esprits["2"] = Esprit_bourrin("2",2,self,("test_esprit",9,4))
         self.esprits["1"].antagonise("2")
         self.esprits["2"].antagonise("1")
+
+        self.esprits["Joueur"] = Esprit_solitaire("Joueur",2,self) #L'esprit du joueur
+        self.active_lab(self.entitees[2].position[0])
 ##        self.esprits["1"] = Esprit_solitaire("1",2,self)
 ##        ennemi = Dps(("test_esprit",9,9),2)
 ##        self.ajoute_entitee(ennemi)
@@ -160,6 +163,13 @@ class Controleur():
         self.esprits["2"].antagonise("1")
         # Quatrième étape : admirer
         self.active_lab("arène")
+
+    def set_phase(self,phase):
+        self.phase = phase # /!\ Rajouter des conditions ici !
+        if phase == TOUR:
+            pygame.key.set_repeat()
+        else:
+            pygame.key.set_repeat(400,200)
 
     def set_barriere_classe(self,position,direction,classe):
         self.active_lab(position[0])
@@ -671,6 +681,7 @@ class Controleur():
             pygame.display.flip()
 
     def select_cible_item(self,magie,joueur):
+        print("check")
         cibles = self.get_cibles_potentielles_items(magie,joueur)
         curseur = 0 #L'indice de la cible sous le curseur.
         cible = []
@@ -785,6 +796,8 @@ class Controleur():
                     entitee = self.get_entitee(ID_entitee)
                     if issubclass(entitee.get_classe(),Item):
                         cibles_potentielles.append(entitee)
+                    else:
+                        cibles_potentielles += entitee.inventaire.get_items() #/!\ Rajouter une condition d'observation ! Mais ne pas l'appliquer à soi-même !
         if isinstance(magie,Portee_limitee):
             poss = self.get_position_touches(joueur.position,magie.portee_limite)
             cibles = []
@@ -2770,117 +2783,114 @@ class Joueur(Agissant,Entitee_superieure):
     def get_skin(self):
         return SKIN_JOUEUR
 
-    def ajoute_skill(self,touche,skill):
-        """Fonction qui ajoute un skill et la touche correspondante. Renvoie un booléen, selon que l'ajout a fonctionné ou pas."""
-        if touche in self.lab:
-            print("Cette touche est déjà utilisée ! Non au cumul des mandats !")
-            res = False
-        elif touche in self.change_affichage:
-            print("Cette touche est utilisée pour changer d'affichage !")
-            res = False
-        else:
-            self.lab[touche]=skill
-            res = True
-        return res
-
-    def retire_skill(self,touche):
-        """Fonction qui retire un skill de sa touche. Peut servir quand on a trop de skills, de magies et de projectiles pour garder un raccourci clavier pour chacun en permanence."""
-        res = self.lab[touche]
-        self.lab.pop(touche)
-        return res
-
-    def deplace_skill(self,touche_actuelle,touche_voulue):
-        """Fonction qui déplace un skill d'une touche à une autre."""
-        skill = self.retire_skill(touche_actuelle)
-        res = self.ajoute_skill(touche_voulue,skill)
-        if not(res):
-            self.ajoute_skill(touche_actuelle,skill) #On remet le skill sur sa touche d'origine si le transfert n'a pas fonctionné.
-        return res
-
-    def ajoute_magie(self,touche,magie):
-        """Fonction qui ajoute une magie et la touche correspondante. Renvoie un booléen, selon que l'ajout a fonctionné ou pas."""
-        res = self.ajoute_skill(touche,Skill_magie)
-        if res :
-            self.magies[touche]=magie
-        return res
-
-    def retire_magie(self,touche):
-        """Fonction qui retire une magie de sa touche. Peut servir quand on a trop de skills, de magies et de projectiles pour garder un raccourci clavier pour chacun en permanence."""
-        res = self.magies[touche]
-        self.lab.pop(touche)
-        self.magies.pop(touche)
-        return res
-
-    def deplace_magie(self,touche_actuelle,touche_voulue):
-        """Fonction qui déplace une magie d'une touche à une autre."""
-        magie = self.retire_magie(touche_actuelle)
-        res = self.ajoute_magie(touche_voulue,magie)
-        if not(res):
-            self.ajoute_magie(touche_actuelle,magie) #On remet la magie sur sa touche d'origine si le transfert n'a pas fonctionné.
-        return res
-
-    def ajoute_fleche(self,touche,fleche):
-        """Fonction qui ajoute une fleche et la touche correspondante. Renvoie un booléen, selon que l'ajout a fonctionné ou pas."""
-        res = self.ajoute_skill(touche,Lancer)
-        if res :
-            self.fleches[touche]=fleche
-        return res
-
-    def retire_fleche(self,touche):
-        """Fonction qui retire une fleche de sa touche. Peut servir quand on a trop de skills, de magies et de projectiles pour garder un raccourci clavier pour chacun en permanence."""
-        res = self.fleches[touche]
-        self.lab.pop(touche)
-        self.fleches.pop(touche)
-        return res
-
-    def deplace_fleche(self,touche_actuelle,touche_voulue):
-        """Fonction qui déplace une fleche d'une touche à une autre."""
-        fleche = self.retire_fleche(touche_actuelle)
-        res = self.ajoute_fleche(touche_voulue,fleche)
-        if not(res):
-            self.ajoute_fleche(touche_actuelle,fleche) #On remet la fleche sur sa touche d'origine si le transfert n'a pas fonctionné.
-        return res
-
-    def ajoute_explosif(self,touche,explosif):
-        """Fonction qui ajoute un explosif et la touche correspondante. Renvoie un booléen, selon que l'ajout a fonctionné ou pas."""
-        res = self.ajoute_skill(touche,Lancer)
-        if res :
-            self.explosifs[touche]=explosif
-        return res
-
-    def retire_explosif(self,touche):
-        """Fonction qui retire un explosif de sa touche. Peut servir quand on a trop de skills, de magies et de projectiles pour garder un raccourci clavier pour chacun en permanence."""
-        res = self.explosifs[touche]
-        self.lab.pop(touche)
-        self.explosifs.pop(touche)
-        return res
-
-    def deplace_explosif(self,touche_actuelle,touche_voulue):
-        """Fonction qui déplace un explosif d'une touche à une autre."""
-        explosif = self.retire_explosif(touche_actuelle)
-        res = self.ajoute_explosif(touche_voulue,explosif)
-        if not(res):
-            self.ajoute_explosif(touche_actuelle,explosif) #On remet l'explosif sur sa touche d'origine si le transfert n'a pas fonctionné.
-        return res
+##    def ajoute_skill(self,touche,skill):
+##        """Fonction qui ajoute un skill et la touche correspondante. Renvoie un booléen, selon que l'ajout a fonctionné ou pas."""
+##        if touche in self.lab:
+##            print("Cette touche est déjà utilisée ! Non au cumul des mandats !")
+##            res = False
+##        elif touche in self.change_affichage:
+##            print("Cette touche est utilisée pour changer d'affichage !")
+##            res = False
+##        else:
+##            self.lab[touche]=skill
+##            res = True
+##        return res
+##
+##    def retire_skill(self,touche):
+##        """Fonction qui retire un skill de sa touche. Peut servir quand on a trop de skills, de magies et de projectiles pour garder un raccourci clavier pour chacun en permanence."""
+##        res = self.lab[touche]
+##        self.lab.pop(touche)
+##        return res
+##
+##    def deplace_skill(self,touche_actuelle,touche_voulue):
+##        """Fonction qui déplace un skill d'une touche à une autre."""
+##        skill = self.retire_skill(touche_actuelle)
+##        res = self.ajoute_skill(touche_voulue,skill)
+##        if not(res):
+##            self.ajoute_skill(touche_actuelle,skill) #On remet le skill sur sa touche d'origine si le transfert n'a pas fonctionné.
+##        return res
+##
+##    def ajoute_magie(self,touche,magie):
+##        """Fonction qui ajoute une magie et la touche correspondante. Renvoie un booléen, selon que l'ajout a fonctionné ou pas."""
+##        res = self.ajoute_skill(touche,Skill_magie)
+##        if res :
+##            self.magies[touche]=magie
+##        return res
+##
+##    def retire_magie(self,touche):
+##        """Fonction qui retire une magie de sa touche. Peut servir quand on a trop de skills, de magies et de projectiles pour garder un raccourci clavier pour chacun en permanence."""
+##        res = self.magies[touche]
+##        self.lab.pop(touche)
+##        self.magies.pop(touche)
+##        return res
+##
+##    def deplace_magie(self,touche_actuelle,touche_voulue):
+##        """Fonction qui déplace une magie d'une touche à une autre."""
+##        magie = self.retire_magie(touche_actuelle)
+##        res = self.ajoute_magie(touche_voulue,magie)
+##        if not(res):
+##            self.ajoute_magie(touche_actuelle,magie) #On remet la magie sur sa touche d'origine si le transfert n'a pas fonctionné.
+##        return res
+##
+##    def ajoute_fleche(self,touche,fleche):
+##        """Fonction qui ajoute une fleche et la touche correspondante. Renvoie un booléen, selon que l'ajout a fonctionné ou pas."""
+##        res = self.ajoute_skill(touche,Lancer)
+##        if res :
+##            self.fleches[touche]=fleche
+##        return res
+##
+##    def retire_fleche(self,touche):
+##        """Fonction qui retire une fleche de sa touche. Peut servir quand on a trop de skills, de magies et de projectiles pour garder un raccourci clavier pour chacun en permanence."""
+##        res = self.fleches[touche]
+##        self.lab.pop(touche)
+##        self.fleches.pop(touche)
+##        return res
+##
+##    def deplace_fleche(self,touche_actuelle,touche_voulue):
+##        """Fonction qui déplace une fleche d'une touche à une autre."""
+##        fleche = self.retire_fleche(touche_actuelle)
+##        res = self.ajoute_fleche(touche_voulue,fleche)
+##        if not(res):
+##            self.ajoute_fleche(touche_actuelle,fleche) #On remet la fleche sur sa touche d'origine si le transfert n'a pas fonctionné.
+##        return res
+##
+##    def ajoute_explosif(self,touche,explosif):
+##        """Fonction qui ajoute un explosif et la touche correspondante. Renvoie un booléen, selon que l'ajout a fonctionné ou pas."""
+##        res = self.ajoute_skill(touche,Lancer)
+##        if res :
+##            self.explosifs[touche]=explosif
+##        return res
+##
+##    def retire_explosif(self,touche):
+##        """Fonction qui retire un explosif de sa touche. Peut servir quand on a trop de skills, de magies et de projectiles pour garder un raccourci clavier pour chacun en permanence."""
+##        res = self.explosifs[touche]
+##        self.lab.pop(touche)
+##        self.explosifs.pop(touche)
+##        return res
+##
+##    def deplace_explosif(self,touche_actuelle,touche_voulue):
+##        """Fonction qui déplace un explosif d'une touche à une autre."""
+##        explosif = self.retire_explosif(touche_actuelle)
+##        res = self.ajoute_explosif(touche_voulue,explosif)
+##        if not(res):
+##            self.ajoute_explosif(touche_actuelle,explosif) #On remet l'explosif sur sa touche d'origine si le transfert n'a pas fonctionné.
+##        return res
 
     def debut_tour(self):
         self.affichage.dessine(self)
         Agissant.debut_tour(self)
 
-    def controle(self,touches):
+    def recontrole(self):
         """La fonction qui réagit aux touches du clavier."""
         # On commence par trouver à quelle catégorie appartient la touche :
-        for touche in self.cat_touches.keys():
+        touches = pygame.key.get_pressed()
+        for touche in self.skill_touches.keys():
             if touches[touche]:
-                cat_touche = self.cat_touches[touche]
-                if cat_touche == "directionelle" : # On a affaire à une touche directionnelle
-                    self.dir_regard = self.dir_touches[touche]
-                elif cat_touche == "skill" : # On a affaire à l'une des touches qui ont été choisies comme raccourci d'un skill
-                    self.skill_courant = self.skill_touches[touche]
-                    if self.skill_courant == Skill_magie : # Le skill magie contient beaucoup de magies différentes !
-                        self.magie_courante = self.magies[touche]
-                    if self.skill_courant == Skill_lancer : # Le skill lancer contient beaucoup d'objets différends
-                        self.projectile_courant = self.projectiles[touche]
+                self.skill_courant = self.skill_touches[touche]
+                if self.skill_courant == Skill_magie : # Le skill magie contient beaucoup de magies différentes !
+                    self.magie_courante = self.magies[touche]
+                if self.skill_courant == Skill_lancer : # Le skill lancer contient beaucoup d'objets différends
+                    self.projectile_courant = self.projectiles[touche]
 
     def utilise_courant(self):
         if self.curseur == "in_inventaire":
@@ -2888,126 +2898,257 @@ class Joueur(Agissant,Entitee_superieure):
         elif self.curseur == "in_classe":
             self.skill_courant = self.classe_principale.utilise_courant()
 
-    def controle_zones(self,touche):
-        if touche in self.cat_touches.keys():
-            if self.cat_touches[touche] == "zone":
-                direction = self.dir_touches[touche]
-                self.change_zone(direction)
-            elif self.cat_touches[touche] == "courant" : # On a affaire à la touche qui utilise le skill ou l'objet courant
-                self.utilise_courant()
-            elif self.cat_touches[touche] == "touches" : # On veut changer les touches
-                self.change_touches()
+    def controle(self,touche):
+        if self.controleur.phase == TOUR:
+            if touche in self.cat_touches.keys():
+                if self.cat_touches[touche] == "zone":
+                    direction = self.dir_touches[touche]
+                    self.change_zone(direction)
+                elif self.cat_touches[touche] == "courant" : # On a affaire à la touche qui utilise le skill ou l'objet courant
+                    self.utilise_courant()
+                elif self.cat_touches[touche] == "touches" : # On veut changer les touches
+                    self.start_change_touches()
+                elif self.cat_touches[touche] == "directionelle" : # On a affaire à une touche directionnelle
+                    self.dir_regard = self.dir_touches[touche]
+                elif self.cat_touches[touche] == "skill" : # On a affaire à l'une des touches qui ont été choisies comme raccourci d'un skill
+                    self.skill_courant = self.skill_touches[touche]
+                    if self.skill_courant == Skill_lancer : # Le skill lancer contient beaucoup d'objets différends
+                        self.projectile_courant = self.projectiles[touche]
+                    elif self.skill_courant == Skill_magie : # Le skill magie contient beaucoup de magies différentes !
+                        self.magie_courante = self.magies[touche]
+                        if isinstance(self.magie_courante,Magie_cible):
+                            pass
+                        if isinstance(self.magie_courante,Magie_cout):
+                            pass
+                        if isinstance(self.magie_courante,Magie_dirigee):
+                            pass
+                        #Vérifier si on a besoin de complémenter la magie
+        elif self.controleur.phase == COMPLEMENT:
+            #Les touches servent alors à choisir le complément
+            pass
+        elif self.controleur.phase == TOUCHE:
+            #On veut modifier les touches
+            self.continue_change_touche(touche)
+        elif self.controleur.phase == EVENEMENT:
+            #Il se passe quelque chose !
+            pass
 
-    def change_touches(self):
+    def start_change_touches(self,etage = -1,element_courant = 0): #On commence le changement de touches
+        self.controleur.set_phase(TOUCHE)
+        self.etage = etage #Pour pouvoir commencer directement sur le skill ou la magie qu'on vient d'acquérir
+        self.element_courant = element_courant
+        self.suspens = False
         zones,skills,magies,lancer = self.get_touches_courantes()
-        element_courant = 0
-        etage = -1
-        attente = False
-        run = True
-        clock = pygame.time.Clock()
-        while run :
-            zones,skills,magies,lancer = self.get_touches_courantes()
-            events = pygame.event.get()
-            for event in events :
-                if event.type == pygame.KEYDOWN :
-                    if attente:
-                        touche = event.key # La touche à attribuer au skill/magie/projectile/controle de zone
-                        if touche == pygame.K_RETURN : # On ne souhaite pas attribuer de nouvelle touche
-                            attente = False
-                        elif touche in self.cat_touches.keys() : # La touche est déjà attribuée !
-                            self.affichage.message("Cette touche est déjà utilisée !")
-                        else :
-                            if etage == 0 :
-                                self.cat_touches[touche] = "zone"
-                                self.dir_touches[touche] = zones[element_courant]
-                            elif etage == 1 :
-                                self.cat_touches[touche] = "skill"
-                                self.skill_touches[touche] = type(skills[element_courant])
-                            elif etage == 2 :
-                                self.cat_touches[touche] = "skill"
-                                self.skill_touches[touche] = Skill_magie
-                                self.magies[touche] = magies[element_courant].nom
-                            elif etage == 3 :
-                                self.cat_touches[touche] = "skill"
-                                self.skill_touches[touche] = Skill_lancer
-                                self.projectiles[touche] = lancer[element_courant]
-                            self.affichage.message("La nouvelle touche a bien été définie.")
-                            attente = False
-                    elif event.key == pygame.K_UP and etage != -1 :
-                        element_courant = etage
-                        etage = -1
-                    elif event.key == pygame.K_DOWN and etage == -1 :
-                        if element_courant != 4:
-                            etage = element_courant
-                            element_courant = 0
-                    elif event.key == pygame.K_RIGHT :
-                        element_courant += 1
-                        if etage == -1 and element_courant > 4 :
-                            element_courant = 0
-                        elif etage == 0 and element_courant > len(zones) :
-                            element_courant = 0
-                        elif etage == 1 and element_courant > len(skills) :
-                            element_courant = 0
-                        elif etage == 2 and element_courant > len(magies) :
-                            element_courant = 0
-                        elif etage == 3 and element_courant > len(lancer) :
-                            element_courant = 0
-                    elif event.key == pygame.K_LEFT :
-                        element_courant -= 1
-                        if etage == -1 and element_courant < 0 :
-                            element_courant = 4
-                        elif etage == 0 and element_courant < 0 :
-                            element_courant = len(zones)
-                        elif etage == 1 and element_courant < 0 :
-                            element_courant = len(skills)
-                        elif etage == 2 and element_courant < 0 :
-                            element_courant = len(magies)
-                        elif etage == 3 and element_courant < 0 :
-                            element_courant = len(lancer)
-                    elif event.key == pygame.K_RETURN :
-                        if (etage == -1 and element_courant == 4) or (etage == 0 and element_courant == len(zones)) or (etage == 1 and element_courant == len(skills)) or (etage == 2 and element_courant == len(magies)) or (etage == 3 and element_courant == len(lancer)):
-                            if self.check_touches():
-                                run = False
-                        else :
-                            if etage != -1 and (etage != 1 or not isinstance(skills[element_courant],(Skill_magie,Skill_lancer))):
-                                attente = True
-                            if etage == 0 :
-                                touche = None
-                                for key in self.dir_touches.keys():
-                                    if self.dir_touches[key] == zones[element_courant] and self.cat_touches[key] == "zone":
-                                        touche = key
-                                if touche !=  None:
-                                    self.cat_touches.pop(key)
-                                    self.dir_touches.pop(key)
-                            elif etage == 1 :
-                                touche = None
-                                for key in self.skill_touches.keys():
-                                    if self.skill_touches[key] == type(skills[element_courant]):
-                                        touche = key
-                                if touche !=  None:
-                                    self.cat_touches.pop(key)
-                                    self.skill_touches.pop(key)
-                            elif etage == 2 :
-                                touche = None
-                                for key in self.magies.keys():
-                                    if self.magies[key] == magies[element_courant]:
-                                        touche = key
-                                if touche !=  None:
-                                    self.cat_touches.pop(key)
-                                    self.skill_touches.pop(key)
-                                    self.magies.pop(key)
-                            elif etage == 3 :
-                                touche = None
-                                for key in self.projectiles.keys():
-                                    if self.projectiles[key] == lancer[element_courant]:
-                                        touche = key
-                                if touche !=  None:
-                                    self.cat_touches.pop(key)
-                                    self.skill_touches.pop(key)
-                                    self.projectiles.pop(key)
-            self.affichage.choix_touche(self,etage,element_courant,zones,skills,magies,lancer)
-            pygame.display.flip()
-            clock.tick(20)
+        self.affichage.choix_touche(self,zones,skills,magies,lancer)
+
+    def continue_change_touche(self,touche):
+        zones,skills,magies,lancer = self.get_touches_courantes()
+        if self.suspens:
+            if touche == pygame.K_RETURN : # On ne souhaite pas attribuer de nouvelle touche
+                self.suspens = False
+            elif touche in self.cat_touches.keys() : # La touche est déjà attribuée !
+                self.affichage.message("Cette touche est déjà utilisée !")
+            else :
+                if self.etage == 0 :
+                    self.cat_touches[touche] = "zone"
+                    self.dir_touches[touche] = zones[self.element_courant]
+                elif self.etage == 1 :
+                    self.cat_touches[touche] = "skill"
+                    self.skill_touches[touche] = type(skills[self.element_courant])
+                elif self.etage == 2 :
+                    self.cat_touches[touche] = "skill"
+                    self.skill_touches[touche] = Skill_magie
+                    self.magies[touche] = magies[self.element_courant].nom
+                elif self.etage == 3 :
+                    self.cat_touches[touche] = "skill"
+                    self.skill_touches[touche] = Skill_lancer
+                    self.projectiles[touche] = lancer[self.element_courant]
+                self.affichage.message("La nouvelle touche a bien été définie.")
+                self.suspens = False
+        elif touche == pygame.K_UP and self.etage != -1 :
+            self.element_courant = self.etage
+            self.etage = -1
+        elif touche == pygame.K_DOWN and self.etage == -1 :
+            if self.element_courant != 4:
+                self.etage = self.element_courant
+                self.element_courant = 0
+        elif touche == pygame.K_RIGHT :
+            self.element_courant += 1
+            if self.etage == -1 and self.element_courant > 4 :
+                self.element_courant = 0
+            elif self.etage == 0 and self.element_courant > len(zones) :
+                self.element_courant = 0
+            elif self.etage == 1 and self.element_courant > len(skills) :
+                self.element_courant = 0
+            elif self.etage == 2 and self.element_courant > len(magies) :
+                self.element_courant = 0
+            elif self.etage == 3 and self.element_courant > len(lancer) :
+                self.element_courant = 0
+        elif touche == pygame.K_LEFT :
+            self.element_courant -= 1
+            if self.etage == -1 and self.element_courant < 0 :
+                self.element_courant = 4
+            elif self.etage == 0 and self.element_courant < 0 :
+                self.element_courant = len(zones)
+            elif self.etage == 1 and self.element_courant < 0 :
+                self.element_courant = len(skills)
+            elif self.etage == 2 and self.element_courant < 0 :
+                self.element_courant = len(magies)
+            elif self.etage == 3 and self.element_courant < 0 :
+                self.element_courant = len(lancer)
+        elif touche == pygame.K_RETURN :
+            if (self.etage == -1 and self.element_courant == 4) or (self.etage == 0 and self.element_courant == len(zones)) or (self.etage == 1 and self.element_courant == len(skills)) or (self.etage == 2 and self.element_courant == len(magies)) or (self.etage == 3 and self.element_courant == len(lancer)):
+                if self.check_touches():
+                    self.controleur.set_phase(TOUR)
+            else :
+                if self.etage != -1 and (self.etage != 1 or not isinstance(skills[self.element_courant],(Skill_magie,Skill_lancer))):
+                    self.suspens = True
+                if self.etage == 0 :
+                    touche = None
+                    for key in self.dir_touches.keys():
+                        if self.dir_touches[key] == zones[self.element_courant] and self.cat_touches[key] == "zone":
+                            touche = key
+                    if touche !=  None:
+                        self.cat_touches.pop(touche)
+                        self.dir_touches.pop(touche)
+                elif self.etage == 1 :
+                    touche = None
+                    for key in self.skill_touches.keys():
+                        if self.skill_touches[key] == type(skills[self.element_courant]):
+                            touche = key
+                    if touche !=  None:
+                        self.cat_touches.pop(touche)
+                        self.skill_touches.pop(touche)
+                elif self.etage == 2 :
+                    touche = None
+                    for key in self.magies.keys():
+                        if self.magies[key] == magies[self.element_courant].nom:
+                            touche = key
+                    if touche !=  None:
+                        self.cat_touches.pop(touche)
+                        self.skill_touches.pop(touche)
+                        self.magies.pop(touche)
+                elif self.etage == 3 :
+                    touche = None
+                    for key in self.projectiles.keys():
+                        if self.projectiles[key] == lancer[self.element_courant]:
+                            touche = key
+                    if touche !=  None:
+                        self.cat_touches.pop(touche)
+                        self.skill_touches.pop(touche)
+                        self.projectiles.pop(touche)
+        self.affichage.choix_touche(self,zones,skills,magies,lancer)
+
+##    def change_touches(self): #Deprecated /!\
+##        zones,skills,magies,lancer = self.get_touches_courantes()
+##        element_courant = 0
+##        etage = -1
+##        attente = False
+##        run = True
+##        clock = pygame.time.Clock()
+##        while run :
+##            zones,skills,magies,lancer = self.get_touches_courantes()
+##            events = pygame.event.get()
+##            for event in events :
+##                if event.type == pygame.KEYDOWN :
+##                    if attente:
+##                        touche = event.key # La touche à attribuer au skill/magie/projectile/controle de zone
+##                        if touche == pygame.K_RETURN : # On ne souhaite pas attribuer de nouvelle touche
+##                            attente = False
+##                        elif touche in self.cat_touches.keys() : # La touche est déjà attribuée !
+##                            self.affichage.message("Cette touche est déjà utilisée !")
+##                        else :
+##                            if etage == 0 :
+##                                self.cat_touches[touche] = "zone"
+##                                self.dir_touches[touche] = zones[element_courant]
+##                            elif etage == 1 :
+##                                self.cat_touches[touche] = "skill"
+##                                self.skill_touches[touche] = type(skills[element_courant])
+##                            elif etage == 2 :
+##                                self.cat_touches[touche] = "skill"
+##                                self.skill_touches[touche] = Skill_magie
+##                                self.magies[touche] = magies[element_courant].nom
+##                            elif etage == 3 :
+##                                self.cat_touches[touche] = "skill"
+##                                self.skill_touches[touche] = Skill_lancer
+##                                self.projectiles[touche] = lancer[element_courant]
+##                            self.affichage.message("La nouvelle touche a bien été définie.")
+##                            attente = False
+##                    elif event.key == pygame.K_UP and etage != -1 :
+##                        element_courant = etage
+##                        etage = -1
+##                    elif event.key == pygame.K_DOWN and etage == -1 :
+##                        if element_courant != 4:
+##                            etage = element_courant
+##                            element_courant = 0
+##                    elif event.key == pygame.K_RIGHT :
+##                        element_courant += 1
+##                        if etage == -1 and element_courant > 4 :
+##                            element_courant = 0
+##                        elif etage == 0 and element_courant > len(zones) :
+##                            element_courant = 0
+##                        elif etage == 1 and element_courant > len(skills) :
+##                            element_courant = 0
+##                        elif etage == 2 and element_courant > len(magies) :
+##                            element_courant = 0
+##                        elif etage == 3 and element_courant > len(lancer) :
+##                            element_courant = 0
+##                    elif event.key == pygame.K_LEFT :
+##                        element_courant -= 1
+##                        if etage == -1 and element_courant < 0 :
+##                            element_courant = 4
+##                        elif etage == 0 and element_courant < 0 :
+##                            element_courant = len(zones)
+##                        elif etage == 1 and element_courant < 0 :
+##                            element_courant = len(skills)
+##                        elif etage == 2 and element_courant < 0 :
+##                            element_courant = len(magies)
+##                        elif etage == 3 and element_courant < 0 :
+##                            element_courant = len(lancer)
+##                    elif event.key == pygame.K_RETURN :
+##                        if (etage == -1 and element_courant == 4) or (etage == 0 and element_courant == len(zones)) or (etage == 1 and element_courant == len(skills)) or (etage == 2 and element_courant == len(magies)) or (etage == 3 and element_courant == len(lancer)):
+##                            if self.check_touches():
+##                                run = False
+##                        else :
+##                            if etage != -1 and (etage != 1 or not isinstance(skills[element_courant],(Skill_magie,Skill_lancer))):
+##                                attente = True
+##                            if etage == 0 :
+##                                touche = None
+##                                for key in self.dir_touches.keys():
+##                                    if self.dir_touches[key] == zones[element_courant] and self.cat_touches[key] == "zone":
+##                                        touche = key
+##                                if touche !=  None:
+##                                    self.cat_touches.pop(key)
+##                                    self.dir_touches.pop(key)
+##                            elif etage == 1 :
+##                                touche = None
+##                                for key in self.skill_touches.keys():
+##                                    if self.skill_touches[key] == type(skills[element_courant]):
+##                                        touche = key
+##                                if touche !=  None:
+##                                    self.cat_touches.pop(key)
+##                                    self.skill_touches.pop(key)
+##                            elif etage == 2 :
+##                                touche = None
+##                                for key in self.magies.keys():
+##                                    if self.magies[key] == magies[element_courant]:
+##                                        touche = key
+##                                if touche !=  None:
+##                                    self.cat_touches.pop(key)
+##                                    self.skill_touches.pop(key)
+##                                    self.magies.pop(key)
+##                            elif etage == 3 :
+##                                touche = None
+##                                for key in self.projectiles.keys():
+##                                    if self.projectiles[key] == lancer[element_courant]:
+##                                        touche = key
+##                                if touche !=  None:
+##                                    self.cat_touches.pop(key)
+##                                    self.skill_touches.pop(key)
+##                                    self.projectiles.pop(key)
+##            self.affichage.choix_touche(self,etage,element_courant,zones,skills,magies,lancer)
+##            pygame.display.flip()
+##            clock.tick(20)
 
     def check_touches(self):
         # On vérifie que les touches indispensables sont bien pourvues
@@ -3083,7 +3224,7 @@ class Joueur(Agissant,Entitee_superieure):
                 self.curseur = "stats"
             elif direction == IN:
                 self.curseur = "in_inventaire"
-            elif self.curseur == OUT:
+            elif direction == OUT:
                 self.curseur = "rectangle_g"
         elif self.curseur == "classe":
             if direction == BAS:
@@ -3368,10 +3509,7 @@ class Joueur(Agissant,Entitee_superieure):
                                     curseur_elem = 0
                     elif event.key == pygame.K_LEFT :
                         if etage == 0:
-                            if arbre :
-                                arbre = "elem"
-                            else :
-                                arbre = "classique"
+                            arbre = not(arbre)
                         elif etage == 1:
                             if arbre :
                                 if curseur == 0:
@@ -5441,6 +5579,13 @@ class Inventaire:
                 clees.append(code)
         return clees
 
+    def get_items(self):
+        items = []
+        for kii in self.kiiz:
+            for ID in self.items[kii]:
+                items.append(self.controleur.get_entitee(ID))
+        return items
+
     def get_item_courant(self):
         cat = self.items[self.kiiz[self.cat_courante]]
         if self.item_courant < len(cat):
@@ -6136,15 +6281,18 @@ class Esprit :
         fuyards = []
         soigneurs = []
         soutiens = []
+        autres = []
         for corp in self.corps.keys():
             if self.corps[corp] == "attaque":
                 bourrins.append(corp)
-            elif self.corps[corp] == "fuite":
+            elif self.corps[corp] == "fuite": 
                 fuyards.append(corp)
             elif self.corps[corp] == "soin":
                 soigneurs.append(corp)
             elif self.corps[corp] == "soutien":
                 soutiens.append(corp)
+            else:
+                autres.append(corp)
         if bourrins == fuyards == soigneurs == [] and soutiens != []:
             bourrins.append(soutiens[0])
             soutiens.pop(0)
@@ -6157,19 +6305,36 @@ class Esprit :
         for corp in bourrins:
             agissant = self.controleur.get_entitee(corp)
             if agissant.latence <= 0 :
-                self.ordonne_bourrin(agissant)
+                if isinstance(agissant,Joueur): #Comment faire pour que le joueur puisse être en autopilote ?
+                    agissant.recontrole()
+                else:
+                    self.ordonne_bourrin(agissant)
         for corp in fuyards:
             agissant = self.controleur.get_entitee(corp)
             if agissant.latence <= 0 :
-                self.ordonne_fuite(agissant)
+                if isinstance(agissant,Joueur):
+                    agissant.recontrole()
+                else:
+                    self.ordonne_fuite(agissant)
         for corp in soigneurs:
             agissant = self.controleur.get_entitee(corp)
             if agissant.latence <= 0 :
-                self.ordonne_soin(agissant,fuyards,bourrins)
+                if isinstance(agissant,Joueur):
+                    agissant.recontrole()
+                else:
+                    self.ordonne_soin(agissant,fuyards,bourrins)
         for corp in soutiens:
             agissant = self.controleur.get_entitee(corp)
             if agissant.latence <= 0 :
-                self.ordonne_soutien(agissant,bourrins)
+                if isinstance(agissant,Joueur):
+                    agissant.recontrole()
+                else:
+                    self.ordonne_soutien(agissant,bourrins)
+        for corp in autres:
+            agissant = self.controleur.get_entitee(corp)
+            if agissant.latence <= 0 :
+                if isinstance(agissant,Joueur):
+                    agissant.recontrole()
 
     def oublie(self):
         for lab in self.vue.values():
@@ -8050,7 +8215,7 @@ class Magie_eclair_noir(Magie_dirigee):
     def get_skin():
         return SKIN_MAGIE_ECLAIR_NOIR
 
-class Magie_enchantement_faiblesse(Magie_cible):
+class Magie_enchantement_faiblesse(Enchante_agissant):
     """La magie qui place un enchantement de faiblesse sur un agissant."""
     nom = "magie faiblesse"
     def __init__(self,niveau):
@@ -8069,7 +8234,7 @@ class Magie_enchantement_faiblesse(Magie_cible):
     def get_skin():
         return SKIN_MAGIE_ENCHANTEMENT_FAIBLESSE
 
-class Magie_enchantement_cecite(Magie_cible):
+class Magie_enchantement_cecite(Enchante_agissant):
     """La magie qui place un enchantement de cécité sur un agissant."""
     nom = "magie cecite"
     def __init__(self,niveau):
@@ -8088,7 +8253,7 @@ class Magie_enchantement_cecite(Magie_cible):
     def get_skin():
         return SKIN_MAGIE_ENCHANTEMENT_CECITE
 
-class Magie_enchantement_perte_de_pv(Magie_cible):
+class Magie_enchantement_perte_de_pv(Enchante_agissant):
     """La magie qui place un enchantement de perte de pv sur un agissant."""
     nom = "magie perte de pv"
     def __init__(self,niveau):
@@ -8107,7 +8272,7 @@ class Magie_enchantement_perte_de_pv(Magie_cible):
     def get_skin():
         return SKIN_MAGIE_ENCHANTEMENT_PERTE_DE_PV
 
-class Magie_enchantement_perte_de_pm(Magie_cible):
+class Magie_enchantement_perte_de_pm(Enchante_agissant):
     """La magie qui place un enchantement de perte de pm sur un agissant."""
     nom = "magie perte de pm"
     def __init__(self,niveau):
@@ -8126,7 +8291,7 @@ class Magie_enchantement_perte_de_pm(Magie_cible):
     def get_skin():
         return SKIN_MAGIE_ENCHANTEMENT_PERTE_DE_PM
 
-class Magie_enchantement_confusion(Magie_cible):
+class Magie_enchantement_confusion(Enchante_agissant):
     """La magie qui place un enchantement de confusion sur un agissant."""
     nom = "magie confusion"
     def __init__(self,niveau):
@@ -8145,7 +8310,7 @@ class Magie_enchantement_confusion(Magie_cible):
     def get_skin():
         return SKIN_MAGIE_ENCHANTEMENT_CONFUSION
 
-class Magie_enchantement_poches_trouees(Magie_cible):
+class Magie_enchantement_poches_trouees(Enchante_agissant):
     """La magie qui place un enchantement de poches trouees sur un agissant."""
     nom = "magie poches trouees"
     def __init__(self,niveau):
@@ -8164,7 +8329,7 @@ class Magie_enchantement_poches_trouees(Magie_cible):
     def get_skin():
         return SKIN_MAGIE_ENCHANTEMENT_POCHES_TROUEES
 
-class Magie_enchantement_force(Magie_cible):
+class Magie_enchantement_force(Enchante_agissant):
     """La magie qui place un enchantement de force sur un agissant."""
     nom = "magie force"
     def __init__(self,niveau):
@@ -8183,7 +8348,7 @@ class Magie_enchantement_force(Magie_cible):
     def get_skin():
         return SKIN_MAGIE_ENCHANTEMENT_FORCE
 
-class Magie_enchantement_vision(Magie_cible):
+class Magie_enchantement_vision(Enchante_agissant):
     """La magie qui place un enchantement de vision sur un agissant."""
     nom = "magie vision"
     def __init__(self,niveau):
@@ -8202,7 +8367,7 @@ class Magie_enchantement_vision(Magie_cible):
     def get_skin():
         return SKIN_MAGIE_ENCHANTEMENT_VISION
 
-class Magie_enchantement_vitalite(Magie_cible):
+class Magie_enchantement_vitalite(Enchante_agissant):
     """La magie qui place un enchantement de vitalité sur un agissant."""
     nom = "magie vitalite"
     def __init__(self,niveau):
@@ -8221,7 +8386,7 @@ class Magie_enchantement_vitalite(Magie_cible):
     def get_skin():
         return SKIN_MAGIE_ENCHANTEMENT_VITALITE
 
-class Magie_enchantement_absorption(Magie_cible):
+class Magie_enchantement_absorption(Enchante_agissant):
     """La magie qui place un enchantement d'absorption sur un agissant."""
     nom = "magie absorption"
     def __init__(self,niveau):
@@ -8240,7 +8405,7 @@ class Magie_enchantement_absorption(Magie_cible):
     def get_skin():
         return SKIN_MAGIE_ENCHANTEMENT_ABSORPTION
 
-class Magie_enchantement_celerite(Magie_cible):
+class Magie_enchantement_celerite(Enchante_agissant):
     """La magie qui place un enchantement de célérité sur un agissant."""
     nom = "magie celerite"
     def __init__(self,niveau):
@@ -8259,7 +8424,7 @@ class Magie_enchantement_celerite(Magie_cible):
     def get_skin():
         return SKIN_MAGIE_ENCHANTEMENT_CELERITE
 
-class Magie_enchantement_immunite(Magie_cible):
+class Magie_enchantement_immunite(Enchante_agissant):
     """La magie qui place un enchantement d'immunité sur un agissant."""
     nom = "magie immunite"
     def __init__(self,niveau):
@@ -8278,7 +8443,7 @@ class Magie_enchantement_immunite(Magie_cible):
     def get_skin():
         return SKIN_MAGIE_ENCHANTEMENT_IMMUNITE
 
-class Magie_enchantement_flamme(Magie_cible):
+class Magie_enchantement_flamme(Enchante_agissant):
     """La magie qui place un enchantement de flamme sur un agissant."""
     nom = "magie flamme"
     def __init__(self,niveau):
@@ -8297,7 +8462,7 @@ class Magie_enchantement_flamme(Magie_cible):
     def get_skin():
         return SKIN_MAGIE_ENCHANTEMENT_FLAMME
 
-class Magie_enchantement_neige(Magie_cible):
+class Magie_enchantement_neige(Enchante_agissant):
     """La magie qui place un enchantement de neige sur un agissant."""
     nom = "magie neige"
     def __init__(self,niveau):
@@ -8316,7 +8481,7 @@ class Magie_enchantement_neige(Magie_cible):
     def get_skin():
         return SKIN_MAGIE_ENCHANTEMENT_NEIGE
 
-class Magie_enchantement_sable(Magie_cible):
+class Magie_enchantement_sable(Enchante_agissant):
     """La magie qui place un enchantement de sable sur un agissant."""
     nom = "magie sable"
     def __init__(self,niveau):
@@ -8335,7 +8500,7 @@ class Magie_enchantement_sable(Magie_cible):
     def get_skin():
         return SKIN_MAGIE_ENCHANTEMENT_SABLE
 
-class Magie_enchantement_tenebre(Magie_cible):
+class Magie_enchantement_tenebre(Enchante_agissant):
     """La magie qui place un enchantement de ténèbre sur un agissant."""
     nom = "magie tenebre"
     def __init__(self,niveau):
@@ -8354,7 +8519,7 @@ class Magie_enchantement_tenebre(Magie_cible):
     def get_skin():
         return SKIN_MAGIE_ENCHANTEMENT_TENEBRE
 
-class Magie_enchantement_rouille(Magie_cible):
+class Magie_enchantement_rouille(Enchante_item):
     """La magie qui place un enchantement de rouille sur un item."""
     nom = "magie rouille"
     def __init__(self,niveau):
@@ -8373,7 +8538,7 @@ class Magie_enchantement_rouille(Magie_cible):
     def get_skin():
         return SKIN_MAGIE_ENCHANTEMENT_ROUILLE
 
-class Magie_enchantement_renforcement(Magie_cible):
+class Magie_enchantement_renforcement(Enchante_item):
     """La magie qui place un enchantement de renforcement sur un item."""
     nom = "magie renforcement"
     def __init__(self,niveau):
@@ -8392,7 +8557,7 @@ class Magie_enchantement_renforcement(Magie_cible):
     def get_skin():
         return SKIN_MAGIE_ENCHANTEMENT_RENFORCEMENT
 
-class Magie_enchantement_bombe(Magie_cible):
+class Magie_enchantement_bombe(Enchante_item):
     """La magie qui place un enchantement de bombe sur un item."""
     nom = "magie bombe"
     def __init__(self,niveau):
@@ -9461,10 +9626,12 @@ class Affichage:
                 marge_gauche += taille_case
             marge_haut += taille_case
 
-    def dessine_choix_touche(self,joueur,etage,element_courant,zones,skills,magies,lancer):
+    def dessine_choix_touche(self,joueur,zones,skills,magies,lancer):
         marge_haut = 10 + self.position_debut_y_rectangles_et_carre
         marge_gauche = 10 + self.position_debut_x_carre
         police = pygame.font.SysFont(None, 20)
+        etage = joueur.etage
+        element_courant = joueur.element_courant
         if etage == -1 :
             if element_courant == 0:
                 pygame.draw.rect(self.screen,(225,225,225),(marge_gauche-2,marge_haut-2,44,44))
@@ -9611,10 +9778,10 @@ class Affichage:
             texte = police.render(descr,True,(255,255,255))
             self.screen.blit(texte,(marge_gauche,marge_haut))
 
-    def choix_touche(self,joueur,etage,element_courant,zones,skills,magies,lancer):
+    def choix_touche(self,joueur,zones,skills,magies,lancer):
         self.dessine_zones(joueur.curseur)
 
-        self.dessine_choix_touche(joueur,etage,element_courant,zones,skills,magies,lancer)
+        self.dessine_choix_touche(joueur,zones,skills,magies,lancer)
         self.dessine_droite(joueur)
         self.dessine_gauche(joueur)
 

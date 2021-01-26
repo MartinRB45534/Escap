@@ -4,7 +4,7 @@ global gain_xp_renforcement
 gain_xp_renforcement = [0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1]
 
 global cout_pm_renforcement
-cout_pm_renforcement = [200,180,160,150,130,118,109,103,100]
+cout_pm_renforcement = [200,180,160,150,130,120,114,109,103,100]
 
 global latence_renforcement
 latence_renforcement = [10,10,10,10,10,10,10,10,10,10]
