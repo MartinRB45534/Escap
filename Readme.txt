@@ -1,18 +1,10 @@
 Work in progress !
 
 
-Note du 26/01:
-J'ai réglé le problème avec les compléments d'enchantements (mauvaise classe), mais ils peuvent encore faire crasher le jeu si on les cast sur le mauvais item, par exemple.
-Objectif pour demain matin : déplacer le choix des compléments chez le joueur, et au moment de l'utilisation de la touche, pour en finir avec le rework des inputs.
-Bonus : adjoindre ces modifications au système des held keys (méthode recontrole() du joueur)
 
-
-
-Nouvel objectif : l'organisation du main, la sauvegarde externe des parties
+Nouvel objectif : l'organisation du main (terminé), la sauvegarde externe des parties
 Travail en cours : la structure du main
-- Penser et structurer le main
 - Sauvegarder les éléments essentiels
-- Uniformiser les inputs
 - Numérotation des frames pour les illustrations
 Au passage :
 - Fin du travail sur l'affichage (arbre élémental, attaques)
@@ -21,43 +13,7 @@ Si j'ai le temps :
 - Créer les premiers humains
 - Créer les premiers monstres
 - Faire utiliser les items par les pnjs
-
-
-Structure du main :
-- Récupération des inputs 
-  Dans quelle boucle les envoyer ? = Variable, dans le main ou le controleur ?
-  - Boucle 'classique' (inputs rentrent vers le milieu du tour)
-  - Boucle de choix d'action (vient du 'fait_agir')
-  - Boucle de choix de niveaux/classes/etc. (fin du tour)
-  - Boucle de modification des commandes
-
-
-
-
-Problème d'input :
-Pygame ne répète qu'une touche à la fois ! Or on veut marche ET s'orrienter, ou attaquer ET s'orrienter
-Pourquoi est-ce que get_pressed() ne convenait pas ?
-Parce qu'on bougeait souvent de deux cases.
-
-Idée 3 :
-Limiter le get_pressed() pour quand le joueur doit agir (l'esprit qui le contient appelle une fonction avec le get_pressed() ?)
-Et continuer à utiliser le KEY_DOWN en permanence
-
-Idée 1 :
-Simuler la répétition des touches, pour que ça répète plusieurs fois ;
-Ou éditer le code de pygame, pour qu'il fonctionne correctement ;
-Ou contacter les gens de pygame, pour qu'ils modifient ça dans leur prochain update.
-
-Idée 2 :
-Garder un trace du dernier skill utilisé (ou de la dernière touche dont le skill a effectivement été utilisé, mais c'est plus compliqué) et surveiller les KEY_UP.
-L'idée étant : la touche est appuyé pendant un temps très court, on veut le savoir !
-               la touche est relachée pendant le tour, on ne veut pas le prendre en compte !
-               la touche est réappuyée, on la reprend en compte même si elle est relachée plus tard !
-Donc : les KEY_DOWN comme d'habitude
-       Les get_pressed() comme d'habitude
-       les KEY_UP en combinaison avec une variable pour savoir si le skill a déjà été utilisé au tour précédent, auquel cas on le lache juste un peu tard
-       la variable est purgée dès que le KEY_UP est détecté, et ne se rerempli qu'à la prochaine action
-       tout ça sans géner les autres inputs
+- Recréer les dialogues, peut-être une copie du tutoriel de la vieille version d'Escape-Master
 
 
 
@@ -81,6 +37,7 @@ pour informer les joueurs sur les maladies, et indiquer que l'observation permet
 
 Notes de trucs à améliorer :
 - Réglage du nombre de tours par seconde. Please.
+- Allonger les temps pour les magies à choix de coût.
 
 
 À réflechir sérieusement :

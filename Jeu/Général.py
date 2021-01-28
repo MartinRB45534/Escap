@@ -5,6 +5,7 @@ from Jeu.Constantes import *
 from Jeu.Skins.Skins import *
 import random
 
+# /!\ Mettre les lignes à jour !
 # Contenu du fichier :
 # La classe Controleur (lignes 0-500) ;
 # La classe Labyrinthe (lignes 500-900), avec :
@@ -48,6 +49,7 @@ class Controleur():
         self.esprits_courants = []
         self.nb_tours = 0
         self.phase = TOUR
+        self.phases = [TOUR]
 
     def jeu(self,screen):
 
@@ -165,11 +167,18 @@ class Controleur():
         self.active_lab("arène")
 
     def set_phase(self,phase):
-        self.phase = phase # /!\ Rajouter des conditions ici !
+        if phase not in self.phases : #On ne veut pas avoir deux fois la même phase !
+            self.phases.append(phase) #La dernière phase est toujours la phase active !
+        self.phase = phase # /!\ Rajouter des conditions ici ! Certaines phases ne peuvent pas être interrompues par d'autres
         if phase == TOUR:
             pygame.key.set_repeat()
         else:
             pygame.key.set_repeat(400,200)
+
+    def unset_phase(self,phase):
+        if phase in self.phases :
+            self.phases.remove(phase)
+        self.phase = self.phases[-1]
 
     def set_barriere_classe(self,position,direction,classe):
         self.active_lab(position[0])
@@ -559,214 +568,147 @@ class Controleur():
         lab.veut_passer(item,direction)
 
     def select_cible(self,magie,agissant):
-        if isinstance(agissant,Joueur):
-            if isinstance(magie,Cible_agissant):
-                self.select_cible_agissant(magie,agissant)
-            elif isinstance(magie,Cible_item):
-                self.select_cible_item(magie,agissant)
-            elif isinstance(magie,Cible_case):
-                self.select_cible_case(magie,agissant)
-        elif random.random() < agissant.talent :
+        if random.random() < agissant.talent :
             magie.cible = agissant.cible_magie
         
     def select_direction(self,magie,agissant):
-        if isinstance(agissant,Joueur):
-            direction = agissant.dir_regard
-            affichage = agissant.affichage
-            affichage.draw_magie_dir(agissant,direction)
-            temps = magie.temps
-            run = True
-            start_time = pygame.time.get_ticks()
-            current_time = start_time
-            too_late = start_time + temps
-            while current_time < too_late and run:
-                events = pygame.event.get()
-                for event in events:
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_UP :
-                            direction = HAUT
-                        elif event.key == pygame.K_DOWN :
-                            direction = BAS
-                        elif event.key == pygame.K_LEFT :
-                            direction = GAUCHE
-                        elif event.key == pygame.K_RIGHT :
-                            direction = DROITE
-                        elif event.key == pygame.K_RETURN :
-                            magie.direction = direction
-                            run = False
-                current_time = pygame.time.get_ticks()
-                proportion_ecoulee = (current_time - start_time)/temps
-                affichage.redraw_magie_dir(direction,proportion_ecoulee) #On ne change pas le reste de l'affichage.
-                pygame.display.flip()
-        elif random.random() < agissant.talent :
-            magie.direction = agissant.direction_magie
+        if random.random() < agissant.talent :
+            magie.direction = agissant.dir_magie
 
     def select_cout(self,magie,agissant):
-        if isinstance(agissant,Joueur):
-            affichage = agissant.affichage
-            precision_cout_magie = 10
-            cout = 0
-            mana_dispo = agissant.get_mana_dispo()
-            affichage.draw_magie_cout(agissant,cout,precision_cout_magie,mana_dispo) #Rajouter tous les autres trucs à afficher, comme les pv et pm, une fois que j'aurai retravaillé affichage.
-            mana_dispo = agissant.get_mana_dispo()
-            temps = magie.temps
-            run = True
-            start_time = pygame.time.get_ticks()
-            current_time = start_time
-            too_late = start_time + temps
-            while current_time < too_late and run:
-                events = pygame.event.get()
-                for event in events:
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_UP and cout < mana_dispo:
-                            cout += precision_cout_magie
-                        elif event.key == pygame.K_DOWN and cout > 0:
-                            cout -= precision_cout_magie
-                        elif event.key == pygame.K_LEFT and precision_cout_magie > 0:
-                            precision_cout_magie -= 1
-                        elif event.key == pygame.K_RIGHT :
-                            precision_cout_magie += 1
-                        elif event.key == pygame.K_RETURN :
-                            magie.cout_pm = cout
-                            run = False
-                current_time = pygame.time.get_ticks()
-                proportion_ecoulee = (current_time - start_time)/temps
-                affichage.redraw_magie_cout(cout,precision_cout_magie,mana_dispo,proportion_ecoulee)
-                pygame.display.flip()
-        else :
-            magie.cout_pm = agissant.cout_magie
+        magie.cout_pm = agissant.cout_magie
 
-    def select_cible_agissant(self,magie,joueur):
-        cibles = self.get_cibles_potentielles_agissants(magie,joueur)
-        curseur = 0 #L'indice de la cible sous le curseur.
-        cible = []
-        affichage = joueur.affichage
-        affichage.draw_magie(joueur,cibles,cible,curseur)
-        multi = isinstance(magie,Multi_cible)
-        temps = magie.temps
-        run = True
-        start_time = pygame.time.get_ticks()
-        current_time = start_time
-        too_late = start_time + temps
-        while current_time < too_late and run:
-            events = pygame.event.get()
-            for event in events:
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_UP :
-                        if curseur == 0:
-                            curseur = len(cibles)
-                        curseur -= 1
-                    elif event.key == pygame.K_DOWN :
-                        curseur += 1
-                        if curseur == len(cibles):
-                            curseur = 0
-                    elif event.key == pygame.K_SPACE :
-                        new_cible = cibles[curseur]
-                        if multi : #Si jamais une magie peut cibler plusieurs cibles.
-                            if new_cible in cible :
-                                cible.remove(new_cible)
-                            else :
-                                cible.append(new_cible)
-                        else:
-                            cible = [new_cible]
-                    elif event.key == pygame.K_RETURN and cible != [] :
-                        if multi :
-                            magie.cible = cible
-                        elif cible != []:
-                            magie.cible = cible[0]
-                        run = False
-            current_time = pygame.time.get_ticks()
-            proportion_ecoulee = (current_time - start_time)/temps
-            affichage.redraw_magie(joueur,cibles,cible,curseur,proportion_ecoulee)
-            pygame.display.flip()
-
-    def select_cible_item(self,magie,joueur):
-        print("check")
-        cibles = self.get_cibles_potentielles_items(magie,joueur)
-        curseur = 0 #L'indice de la cible sous le curseur.
-        cible = []
-        affichage = joueur.affichage
-        affichage.draw_magie(joueur,cibles,cible,curseur)
-        multi = isinstance(magie,Multi_cible)
-        temps = magie.temps
-        run = True
-        start_time = pygame.time.get_ticks()
-        current_time = start_time
-        too_late = start_time + temps
-        while current_time < too_late and run:
-            events = pygame.event.get()
-            for event in events:
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_UP :
-                        if curseur == 0:
-                            curseur = len(cibles)
-                        curseur -= 1
-                    elif event.key == pygame.K_DOWN :
-                        curseur += 1
-                        if curseur == len(cibles):
-                            curseur = 0
-                    elif event.key == pygame.K_SPACE :
-                        new_cible = cibles[curseur]
-                        if multi : #Si jamais une magie peut cibler plusieurs cibles.
-                            if new_cible in cible :
-                                cible.remove(new_cible)
-                            else :
-                                cible.append(new_cible)
-                        else:
-                            cible = [new_cible]
-                    elif event.key == pygame.K_RETURN and cible != [] :
-                        if multi :
-                            magie.cible = cible
-                        else:
-                            magie.cible = cible[0]
-                        run = False
-            current_time = pygame.time.get_ticks()
-            proportion_ecoulee = (current_time - start_time)/temps
-            affichage.redraw_magie(joueur,cibles,cible,curseur,proportion_ecoulee)
-            pygame.display.flip()
-
-    def select_cible_case(self,magie,joueur):
-        cibles = self.get_cibles_potentielles_cases(magie,joueur)
-        curseur = (joueur.position[0],joueur.position[1],joueur.position[2]) #La position de la cible sous le curseur.
-        cible = []
-        affichage = joueur.affichage
-        affichage.draw_magie_case(joueur,cibles,cible,curseur)
-        multi = isinstance(magie,Multi_cible)
-        temps = magie.temps
-        run = True
-        start_time = pygame.time.get_ticks()
-        current_time = start_time
-        too_late = start_time + temps
-        while current_time < too_late and run:
-            events = pygame.event.get()
-            for event in events:
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_UP :
-                        curseur = (curseur[0],curseur[1],curseur[2]-1)
-                    elif event.key == pygame.K_DOWN :
-                        curseur = (curseur[0],curseur[1],curseur[2]+1)
-                    elif event.key == pygame.K_LEFT :
-                        curseur = (curseur[0],curseur[1]-1,curseur[2])
-                    elif event.key == pygame.K_RIGHT :
-                        curseur = (curseur[0],curseur[1]+1,curseur[2])
-                    elif event.key == pygame.K_SPACE and curseur in cibles:
-                        if multi : #Si jamais une magie peut cibler plusieurs cibles.
-                            if curseur in cible :
-                                cible.remove(curseur)
-                            else :
-                                cible.append(curseur)
-                        else:
-                            cible = [curseur]
-                    elif event.key == pygame.K_RETURN and cible != [] :
-                        if multi :
-                            magie.cible = cible
-                        else:
-                            magie.cible = cible[0]
-                        run = False
-            current_time = pygame.time.get_ticks()
-            proportion_ecoulee = (current_time - start_time)/temps
-            affichage.redraw_magie_case(joueur,cibles,cible,curseur,proportion_ecoulee)
-            pygame.display.flip()
+##    def select_cible_agissant(self,magie,joueur):
+##        cibles = self.get_cibles_potentielles_agissants(magie,joueur)
+##        curseur = 0 #L'indice de la cible sous le curseur.
+##        cible = []
+##        affichage = joueur.affichage
+##        affichage.draw_magie(joueur,cibles,cible,curseur)
+##        multi = isinstance(magie,Multi_cible)
+##        temps = magie.temps
+##        run = True
+##        start_time = pygame.time.get_ticks()
+##        current_time = start_time
+##        too_late = start_time + temps
+##        while current_time < too_late and run:
+##            events = pygame.event.get()
+##            for event in events:
+##                if event.type == pygame.KEYDOWN:
+##                    if event.key == pygame.K_UP :
+##                        if curseur == 0:
+##                            curseur = len(cibles)
+##                        curseur -= 1
+##                    elif event.key == pygame.K_DOWN :
+##                        curseur += 1
+##                        if curseur == len(cibles):
+##                            curseur = 0
+##                    elif event.key == pygame.K_SPACE :
+##                        new_cible = cibles[curseur]
+##                        if multi : #Si jamais une magie peut cibler plusieurs cibles.
+##                            if new_cible in cible :
+##                                cible.remove(new_cible)
+##                            else :
+##                                cible.append(new_cible)
+##                        else:
+##                            cible = [new_cible]
+##                    elif event.key == pygame.K_RETURN and cible != [] :
+##                        if multi :
+##                            magie.cible = cible
+##                        elif cible != []:
+##                            magie.cible = cible[0]
+##                        run = False
+##            current_time = pygame.time.get_ticks()
+##            proportion_ecoulee = (current_time - start_time)/temps
+##            affichage.redraw_magie(joueur,cibles,cible,curseur,proportion_ecoulee)
+##            pygame.display.flip()
+##
+##    def select_cible_item(self,magie,joueur):
+##        print("check")
+##        cibles = self.get_cibles_potentielles_items(magie,joueur)
+##        curseur = 0 #L'indice de la cible sous le curseur.
+##        cible = []
+##        affichage = joueur.affichage
+##        affichage.draw_magie(joueur,cibles,cible,curseur)
+##        multi = isinstance(magie,Multi_cible)
+##        temps = magie.temps
+##        run = True
+##        start_time = pygame.time.get_ticks()
+##        current_time = start_time
+##        too_late = start_time + temps
+##        while current_time < too_late and run:
+##            events = pygame.event.get()
+##            for event in events:
+##                if event.type == pygame.KEYDOWN:
+##                    if event.key == pygame.K_UP :
+##                        if curseur == 0:
+##                            curseur = len(cibles)
+##                        curseur -= 1
+##                    elif event.key == pygame.K_DOWN :
+##                        curseur += 1
+##                        if curseur == len(cibles):
+##                            curseur = 0
+##                    elif event.key == pygame.K_SPACE :
+##                        new_cible = cibles[curseur]
+##                        if multi : #Si jamais une magie peut cibler plusieurs cibles.
+##                            if new_cible in cible :
+##                                cible.remove(new_cible)
+##                            else :
+##                                cible.append(new_cible)
+##                        else:
+##                            cible = [new_cible]
+##                    elif event.key == pygame.K_RETURN and cible != [] :
+##                        if multi :
+##                            magie.cible = cible
+##                        else:
+##                            magie.cible = cible[0]
+##                        run = False
+##            current_time = pygame.time.get_ticks()
+##            proportion_ecoulee = (current_time - start_time)/temps
+##            affichage.redraw_magie(joueur,cibles,cible,curseur,proportion_ecoulee)
+##            pygame.display.flip()
+##
+##    def select_cible_case(self,magie,joueur):
+##        cibles = self.get_cibles_potentielles_cases(magie,joueur)
+##        curseur = (joueur.position[0],joueur.position[1],joueur.position[2]) #La position de la cible sous le curseur.
+##        cible = []
+##        affichage = joueur.affichage
+##        affichage.draw_magie_case(joueur,cibles,cible,curseur)
+##        multi = isinstance(magie,Multi_cible)
+##        temps = magie.temps
+##        run = True
+##        start_time = pygame.time.get_ticks()
+##        current_time = start_time
+##        too_late = start_time + temps
+##        while current_time < too_late and run:
+##            events = pygame.event.get()
+##            for event in events:
+##                if event.type == pygame.KEYDOWN:
+##                    if event.key == pygame.K_UP :
+##                        curseur = (curseur[0],curseur[1],curseur[2]-1)
+##                    elif event.key == pygame.K_DOWN :
+##                        curseur = (curseur[0],curseur[1],curseur[2]+1)
+##                    elif event.key == pygame.K_LEFT :
+##                        curseur = (curseur[0],curseur[1]-1,curseur[2])
+##                    elif event.key == pygame.K_RIGHT :
+##                        curseur = (curseur[0],curseur[1]+1,curseur[2])
+##                    elif event.key == pygame.K_SPACE and curseur in cibles:
+##                        if multi : #Si jamais une magie peut cibler plusieurs cibles.
+##                            if curseur in cible :
+##                                cible.remove(curseur)
+##                            else :
+##                                cible.append(curseur)
+##                        else:
+##                            cible = [curseur]
+##                    elif event.key == pygame.K_RETURN and cible != [] :
+##                        if multi :
+##                            magie.cible = cible
+##                        else:
+##                            magie.cible = cible[0]
+##                        run = False
+##            current_time = pygame.time.get_ticks()
+##            proportion_ecoulee = (current_time - start_time)/temps
+##            affichage.redraw_magie_case(joueur,cibles,cible,curseur,proportion_ecoulee)
+##            pygame.display.flip()
 
     def get_cibles_potentielles_agissants(self,magie,joueur):
         cibles_potentielles = []
@@ -2183,6 +2125,12 @@ class Agissant(Entitee): #Tout agissant est un cadavre, tout cadavre n'agit pas.
         #la direction du regard
         self.skill_courant = None
         self.dir_regard = 0
+        self.talent = 1
+        self.magie_courante = None
+        self.cible_magie = None
+        self.dir_magie = None
+        self.cout_magie = 0
+        self.multi = False
         self.latence = 0
         self.hauteur = 0 #Des fois qu'on devienne un item
 
@@ -2618,17 +2566,11 @@ class Soigneur(Agissant):
     def __init__(self,position,niveau):
         if niveau == 1:
             Agissant.__init__(self,position,50,50,0,100,100,0.1,1,1,0.9,1.5,1,1,1,Classe_principale([],[],False,"Soigneur",niveau))
-            self.talent = 1
-            self.magie_courante = None
-            self.cible_magie = None
             magie = trouve_skill(self.classe_principale,Skill_magie)
             magie.ajoute(Magie_soin)
             magie.ajoute(Magie_auto_soin)
         if niveau == 2:
             Agissant.__init__(self,position,75,75,0,120,120,0.2,1,1,0.9,1.5,1,1,1,Classe_principale([],[],False,"Soigneur",niveau))
-            self.talent = 1
-            self.magie_courante = None
-            self.cible_magie = None
             magie = trouve_skill(self.classe_principale,Skill_magie)
             magie.ajoute(Magie_soin)
             magie.ajoute(Magie_auto_soin)
@@ -2660,16 +2602,10 @@ class Renforceur(Agissant):
     def __init__(self,position,niveau):
         if niveau == 1:
             Agissant.__init__(self,position,50,50,0.05,100,100,0.1,1,1,0.6,1.5,1.2,1,1.3,Classe_principale([],[],False,"Soigneur",niveau))
-            self.talent = 1
-            self.magie_courante = None
-            self.cible_magie = None
             magie = trouve_skill(self.classe_principale,Skill_magie)
             magie.ajoute(Magie_enchantement_force())
         if niveau == 2:
             Agissant.__init__(self,position,75,75,0.05,120,120,0.2,1,1,0.7,1.6,1.3,1.1,1.4,Classe_principale([],[],False,"Soigneur",niveau))
-            self.talent = 1
-            self.magie_courante = None
-            self.cible_magie = None
             magie = trouve_skill(self.classe_principale,Skill_magie)
             magie.ajoute(Magie_enchantement_force())
 
@@ -2771,10 +2707,12 @@ class Joueur(Agissant,Entitee_superieure):
                               pygame.K_x:Skill_attaque}
 
         self.magies = {} #Le skill magie contient beaucoup de magie. La touche est associée à la fois au skill magie et à la magie correspondante.
-        self.magie_courante = None
+        self.methode_courante = None
+        magie = Magie_explosion_de_mana
+        skill = trouve_skill(self.classe_principale,Skill_magie)
+        skill.ajoute(magie)
 
-        self.projectiles = {} #Le skill lancer peut s'utiliser de plusieurs façon : en le combinant à un skill de création de projectile, les touches sont associées comme pour les magies
-        self.projectile_courant = None # sur l'item courant de l'inventaire, par le biais d'une touche du skill lancer ou, si l'item est un projectile, directement depuis l'inventaire
+        self.projectiles = {} #Le skill lancer peut s'utiliser de plusieurs façon : en le combinant à un skill de création de projectile, les touches sont associées comme pour les magies# sur l'item courant de l'inventaire, par le biais d'une touche du skill lancer ou, si l'item est un projectile, directement depuis l'inventaire
 
         #self.classe_principale.evo(8)
 
@@ -2782,99 +2720,6 @@ class Joueur(Agissant,Entitee_superieure):
 
     def get_skin(self):
         return SKIN_JOUEUR
-
-##    def ajoute_skill(self,touche,skill):
-##        """Fonction qui ajoute un skill et la touche correspondante. Renvoie un booléen, selon que l'ajout a fonctionné ou pas."""
-##        if touche in self.lab:
-##            print("Cette touche est déjà utilisée ! Non au cumul des mandats !")
-##            res = False
-##        elif touche in self.change_affichage:
-##            print("Cette touche est utilisée pour changer d'affichage !")
-##            res = False
-##        else:
-##            self.lab[touche]=skill
-##            res = True
-##        return res
-##
-##    def retire_skill(self,touche):
-##        """Fonction qui retire un skill de sa touche. Peut servir quand on a trop de skills, de magies et de projectiles pour garder un raccourci clavier pour chacun en permanence."""
-##        res = self.lab[touche]
-##        self.lab.pop(touche)
-##        return res
-##
-##    def deplace_skill(self,touche_actuelle,touche_voulue):
-##        """Fonction qui déplace un skill d'une touche à une autre."""
-##        skill = self.retire_skill(touche_actuelle)
-##        res = self.ajoute_skill(touche_voulue,skill)
-##        if not(res):
-##            self.ajoute_skill(touche_actuelle,skill) #On remet le skill sur sa touche d'origine si le transfert n'a pas fonctionné.
-##        return res
-##
-##    def ajoute_magie(self,touche,magie):
-##        """Fonction qui ajoute une magie et la touche correspondante. Renvoie un booléen, selon que l'ajout a fonctionné ou pas."""
-##        res = self.ajoute_skill(touche,Skill_magie)
-##        if res :
-##            self.magies[touche]=magie
-##        return res
-##
-##    def retire_magie(self,touche):
-##        """Fonction qui retire une magie de sa touche. Peut servir quand on a trop de skills, de magies et de projectiles pour garder un raccourci clavier pour chacun en permanence."""
-##        res = self.magies[touche]
-##        self.lab.pop(touche)
-##        self.magies.pop(touche)
-##        return res
-##
-##    def deplace_magie(self,touche_actuelle,touche_voulue):
-##        """Fonction qui déplace une magie d'une touche à une autre."""
-##        magie = self.retire_magie(touche_actuelle)
-##        res = self.ajoute_magie(touche_voulue,magie)
-##        if not(res):
-##            self.ajoute_magie(touche_actuelle,magie) #On remet la magie sur sa touche d'origine si le transfert n'a pas fonctionné.
-##        return res
-##
-##    def ajoute_fleche(self,touche,fleche):
-##        """Fonction qui ajoute une fleche et la touche correspondante. Renvoie un booléen, selon que l'ajout a fonctionné ou pas."""
-##        res = self.ajoute_skill(touche,Lancer)
-##        if res :
-##            self.fleches[touche]=fleche
-##        return res
-##
-##    def retire_fleche(self,touche):
-##        """Fonction qui retire une fleche de sa touche. Peut servir quand on a trop de skills, de magies et de projectiles pour garder un raccourci clavier pour chacun en permanence."""
-##        res = self.fleches[touche]
-##        self.lab.pop(touche)
-##        self.fleches.pop(touche)
-##        return res
-##
-##    def deplace_fleche(self,touche_actuelle,touche_voulue):
-##        """Fonction qui déplace une fleche d'une touche à une autre."""
-##        fleche = self.retire_fleche(touche_actuelle)
-##        res = self.ajoute_fleche(touche_voulue,fleche)
-##        if not(res):
-##            self.ajoute_fleche(touche_actuelle,fleche) #On remet la fleche sur sa touche d'origine si le transfert n'a pas fonctionné.
-##        return res
-##
-##    def ajoute_explosif(self,touche,explosif):
-##        """Fonction qui ajoute un explosif et la touche correspondante. Renvoie un booléen, selon que l'ajout a fonctionné ou pas."""
-##        res = self.ajoute_skill(touche,Lancer)
-##        if res :
-##            self.explosifs[touche]=explosif
-##        return res
-##
-##    def retire_explosif(self,touche):
-##        """Fonction qui retire un explosif de sa touche. Peut servir quand on a trop de skills, de magies et de projectiles pour garder un raccourci clavier pour chacun en permanence."""
-##        res = self.explosifs[touche]
-##        self.lab.pop(touche)
-##        self.explosifs.pop(touche)
-##        return res
-##
-##    def deplace_explosif(self,touche_actuelle,touche_voulue):
-##        """Fonction qui déplace un explosif d'une touche à une autre."""
-##        explosif = self.retire_explosif(touche_actuelle)
-##        res = self.ajoute_explosif(touche_voulue,explosif)
-##        if not(res):
-##            self.ajoute_explosif(touche_actuelle,explosif) #On remet l'explosif sur sa touche d'origine si le transfert n'a pas fonctionné.
-##        return res
 
     def debut_tour(self):
         self.affichage.dessine(self)
@@ -2915,23 +2760,392 @@ class Joueur(Agissant,Entitee_superieure):
                     if self.skill_courant == Skill_lancer : # Le skill lancer contient beaucoup d'objets différends
                         self.projectile_courant = self.projectiles[touche]
                     elif self.skill_courant == Skill_magie : # Le skill magie contient beaucoup de magies différentes !
-                        self.magie_courante = self.magies[touche]
-                        if isinstance(self.magie_courante,Magie_cible):
-                            pass
-                        if isinstance(self.magie_courante,Magie_cout):
-                            pass
-                        if isinstance(self.magie_courante,Magie_dirigee):
-                            pass
+                        self.magie_courante = self.magies[touche] #self.magie_courante n'est que le nom de la magie
+                        skill = trouve_skill(self.classe_principale,Skill_magie)
+                        self.magie = skill.magies[self.magie_courante](skill.niveau) #Ici on a une magie similaire (juste pour l'initialisation du choix, oubliée après parce que le skill fournira la vrai magie avec utilise())
+                        if isinstance(self.magie,Magie_cible):
+                            self.controleur.set_phase(COMPLEMENT_CIBLE)
+                        if isinstance(self.magie,Magie_cout):
+                            self.controleur.set_phase(COMPLEMENT_COUT)
+                        if isinstance(self.magie,Magie_dirigee):
+                            self.controleur.set_phase(COMPLEMENT_DIR)
                         #Vérifier si on a besoin de complémenter la magie
-        elif self.controleur.phase == COMPLEMENT:
+        elif self.controleur.phase in [COMPLEMENT_CIBLE,COMPLEMENT_COUT,COMPLEMENT_DIR]:
             #Les touches servent alors à choisir le complément
-            pass
+            self.methode_courante(touche)
         elif self.controleur.phase == TOUCHE:
             #On veut modifier les touches
             self.continue_change_touche(touche)
         elif self.controleur.phase == EVENEMENT:
             #Il se passe quelque chose !
-            pass
+            #Option 1 : une cinématique. On ignore tous les inputs SAUF celui pour passer la cinématique
+            #Option 2 : un dialogue. Les inputs servent à choisir les réponses et déclenche la réplique suivante/la fin du dialogue
+            #Option 3 : un choix d'évolution (montée de niveau de la classe principale ou autre avec cadeaux à la clé)
+            #Option 4 : un choix d'évolution (possibilité de réorganisation des skills/classes)
+            #Option 5 : une information d'évolution/accomplissement/etc. (est-ce vraiment un évènement ? est-ce une cinématique ?)
+            #Pour l'instant, on se contente d'implémenter le choix d'évolution :
+            self.choisi_cadeau(touche)
+
+    def complement(self):
+        """Appelée une fois par tour pendant le choix des complements
+           Gère le temps et l'affichage"""
+        if self.methode_courante == None :
+            if self.controleur.phase == COMPLEMENT_DIR:
+                self.start_select_direction(self.magie)
+            elif self.controleur.phase == COMPLEMENT_COUT:
+                self.start_select_cout(self.magie)
+            elif self.controleur.phase == COMPLEMENT_CIBLE:
+                self.start_select_cible(self.magie)
+        current_time = pygame.time.get_ticks()
+        if current_time > self.too_late :
+            #Le temps est écoulé !
+            self.methode_courante = None
+            self.start_time = 0
+            self.too_late = 0
+            self.precision_cout_magie = 0
+            self.choix_cout_magie = 0
+            self.element_courant = 0
+            #Etc.
+            self.controleur.unset_phase(self.controleur.phase)
+        else :
+            proportion_ecoulee = (current_time - self.start_time)/self.temps
+            if self.methode_courante == self.continue_select_direction:
+                self.affichage.redraw_magie_dir(self,proportion_ecoulee)
+            elif self.methode_courante == self.continue_select_cout:
+                self.affichage.redraw_magie_cout(self,proportion_ecoulee)
+            elif self.methode_courante == self.continue_select_cible:
+                self.affichage.redraw_magie_cible(self,proportion_ecoulee)
+            elif self.methode_courante == self.continue_select_case:
+                self.affichage.redraw_magie_case(self,proportion_ecoulee)
+
+    def start_select_direction(self,magie):
+        self.methode_courante = self.continue_select_direction #Est-ce que ça fonctionnera avec le self comme ça ? Hum...
+        self.affichage.draw_magie_dir(self)
+        self.temps = magie.temps
+        self.start_time = pygame.time.get_ticks()
+        self.too_late = self.start_time + self.temps
+
+    def continue_select_direction(self,touche):
+        if touche == pygame.K_UP :
+            self.dir_regard = HAUT
+        elif touche == pygame.K_DOWN :
+            self.dir_regard = BAS
+        elif touche == pygame.K_LEFT :
+            self.dir_regard = GAUCHE
+        elif touche == pygame.K_RIGHT :
+            self.dir_regard = DROITE
+        elif touche == pygame.K_RETURN :
+            self.dir_magie = self.dir_regard
+            self.controleur.unset_phase(COMPLEMENT_DIR)
+            self.methode_courante = None
+        
+##    def select_direction(self,magie,agissant):
+##        if isinstance(agissant,Joueur):
+##            direction = agissant.dir_regard
+##            affichage = agissant.affichage
+##            affichage.draw_magie_dir(agissant,direction)
+##            temps = magie.temps
+##            run = True
+##            start_time = pygame.time.get_ticks()
+##            current_time = start_time
+##            too_late = start_time + temps
+##            while current_time < too_late and run:
+##                events = pygame.event.get()
+##                for event in events:
+##                    if event.type == pygame.KEYDOWN:
+##                        if event.key == pygame.K_UP :
+##                            direction = HAUT
+##                        elif event.key == pygame.K_DOWN :
+##                            direction = BAS
+##                        elif event.key == pygame.K_LEFT :
+##                            direction = GAUCHE
+##                        elif event.key == pygame.K_RIGHT :
+##                            direction = DROITE
+##                        elif event.key == pygame.K_RETURN :
+##                            magie.direction = direction
+##                            run = False
+##                current_time = pygame.time.get_ticks()
+##                proportion_ecoulee = (current_time - start_time)/temps
+##                affichage.redraw_magie_dir(direction,proportion_ecoulee) #On ne change pas le reste de l'affichage.
+##                pygame.display.flip()
+##        elif random.random() < agissant.talent :
+##            magie.direction = agissant.direction_magie
+
+    def start_select_cout(self,magie):
+        self.methode_courante = self.continue_select_cout #Est-ce que ça fonctionnera avec le self comme ça ? Hum...
+        self.precision_cout_magie = 10
+        self.choix_cout_magie = 0
+        self.affichage.draw_magie_cout(self)
+        self.temps = magie.temps
+        self.start_time = pygame.time.get_ticks()
+        self.too_late = self.start_time + self.temps
+
+    def continue_select_cout(self,touche):
+        if touche == pygame.K_UP and self.choix_cout_magie + self.precision_cout_magie <= self.get_total_pm() :
+            self.choix_cout_magie += self.precision_cout_magie
+        elif touche == pygame.K_DOWN and self.choix_cout_magie - self.precision_cout_magie >= 0:
+            self.choix_cout_magie -= self.precision_cout_magie
+        elif touche == pygame.K_LEFT and precision_cout_magie > 0:
+            self.precision_cout_magie -= 1
+        elif touche == pygame.K_RIGHT :
+            self.precision_cout_magie += 1
+        elif touche == pygame.K_RETURN :
+            self.cout_magie = self.choix_cout_magie
+            self.controleur.unset_phase(COMPLEMENT_COUT)
+            self.methode_courante = None
+
+##    def select_cout(self,magie,agissant):
+##        if isinstance(agissant,Joueur):
+##            affichage = agissant.affichage
+##            precision_cout_magie = 10
+##            cout = 0
+##            mana_dispo = agissant.get_mana_dispo()
+##            affichage.draw_magie_cout(agissant,cout,precision_cout_magie,mana_dispo) #Rajouter tous les autres trucs à afficher, comme les pv et pm, une fois que j'aurai retravaillé affichage.
+##            temps = magie.temps
+##            run = True
+##            start_time = pygame.time.get_ticks()
+##            current_time = start_time
+##            too_late = start_time + temps
+##            while current_time < too_late and run:
+##                events = pygame.event.get()
+##                for event in events:
+##                    if event.type == pygame.KEYDOWN:
+##                        if event.key == pygame.K_UP and cout < mana_dispo:
+##                            cout += precision_cout_magie
+##                        elif event.key == pygame.K_DOWN and cout > 0:
+##                            cout -= precision_cout_magie
+##                        elif event.key == pygame.K_LEFT and precision_cout_magie > 0:
+##                            precision_cout_magie -= 1
+##                        elif event.key == pygame.K_RIGHT :
+##                            precision_cout_magie += 1
+##                        elif event.key == pygame.K_RETURN :
+##                            magie.cout_pm = cout
+##                            run = False
+##                current_time = pygame.time.get_ticks()
+##                proportion_ecoulee = (current_time - start_time)/temps
+##                affichage.redraw_magie_cout(cout,precision_cout_magie,mana_dispo,proportion_ecoulee)
+##                pygame.display.flip()
+##        else :
+##            magie.cout_pm = agissant.cout_magie
+
+    def start_select_cible(self,magie):
+        if isinstance(magie,Multi_cible):
+            self.multi = True
+        else:
+            self.multi = False
+        if isinstance(magie,Cible_agissant):
+            self.methode_courante = self.continue_select_cible
+            self.cibles = self.controleur.get_cibles_potentielles_agissants(magie,self)
+            self.element_courant = 0 #Je recycle
+            self.cible = []
+            self.affichage.draw_magie_cible(self)
+            self.temps = magie.temps
+            self.start_time = pygame.time.get_ticks()
+            self.too_late = self.start_time + self.temps
+        elif isinstance(magie,Cible_item):
+            self.methode_courante = self.continue_select_cible
+            self.cibles = self.controleur.get_cibles_potentielles_items(magie,self)
+            self.element_courant = 0 #Je recycle
+            self.cible = []
+            self.affichage.draw_magie_cible(self)
+            self.temps = magie.temps
+            self.start_time = pygame.time.get_ticks()
+            self.too_late = self.start_time + self.temps
+        elif isinstance(magie,Cible_case):
+            self.start_select_cible_case(magie)
+
+    def continue_select_cible(self,touche):
+        if touche == pygame.K_UP :
+            if self.element_courant == 0:
+                self.element_courant = len(self.cibles)
+            self.element_courant -= 1
+        elif touche == pygame.K_DOWN :
+            self.element_courant += 1
+            if self.element_courant == len(self.cibles):
+                self.element_courant = 0
+        elif touche == pygame.K_SPACE :
+            new_cible = self.cibles[self.element_courant]
+            if self.multi : #Si jamais une magie peut cibler plusieurs cibles.
+                if new_cible in self.cible :
+                    self.cible.remove(new_cible)
+                else :
+                    self.cible.append(new_cible)
+            else:
+                self.cible = [new_cible]
+        elif touche == pygame.K_RETURN and self.cible != [] :
+            if self.multi :
+                self.cible_magie = self.cible
+            elif self.cible != []:
+                self.cible_magie = self.cible[0]
+            self.controleur.unset_phase(COMPLEMENT_CIBLE)
+            self.methode_courante = None
+
+##    def select_cible_agissant(self,magie,joueur):
+##        cibles = self.get_cibles_potentielles_agissants(magie,joueur)
+##        curseur = 0 #L'indice de la cible sous le curseur.
+##        cible = []
+##        affichage = joueur.affichage
+##        affichage.draw_magie(joueur,cibles,cible,curseur)
+##        multi = isinstance(magie,Multi_cible)
+##        temps = magie.temps
+##        run = True
+##        start_time = pygame.time.get_ticks()
+##        current_time = start_time
+##        too_late = start_time + temps
+##        while current_time < too_late and run:
+##            events = pygame.event.get()
+##            for event in events:
+##                if event.type == pygame.KEYDOWN:
+##                    if event.key == pygame.K_UP :
+##                        if curseur == 0:
+##                            curseur = len(cibles)
+##                        curseur -= 1
+##                    elif event.key == pygame.K_DOWN :
+##                        curseur += 1
+##                        if curseur == len(cibles):
+##                            curseur = 0
+##                    elif event.key == pygame.K_SPACE :
+##                        new_cible = cibles[curseur]
+##                        if multi : #Si jamais une magie peut cibler plusieurs cibles.
+##                            if new_cible in cible :
+##                                cible.remove(new_cible)
+##                            else :
+##                                cible.append(new_cible)
+##                        else:
+##                            cible = [new_cible]
+##                    elif event.key == pygame.K_RETURN and cible != [] :
+##                        if multi :
+##                            magie.cible = cible
+##                        elif cible != []:
+##                            magie.cible = cible[0]
+##                        run = False
+##            current_time = pygame.time.get_ticks()
+##            proportion_ecoulee = (current_time - start_time)/temps
+##            affichage.redraw_magie(joueur,cibles,cible,curseur,proportion_ecoulee)
+##            pygame.display.flip()
+##
+##    def select_cible_item(self,magie,joueur):
+##        print("check")
+##        cibles = self.get_cibles_potentielles_items(magie,joueur)
+##        curseur = 0 #L'indice de la cible sous le curseur.
+##        cible = []
+##        affichage = joueur.affichage
+##        affichage.draw_magie(joueur,cibles,cible,curseur)
+##        multi = isinstance(magie,Multi_cible)
+##        temps = magie.temps
+##        run = True
+##        start_time = pygame.time.get_ticks()
+##        current_time = start_time
+##        too_late = start_time + temps
+##        while current_time < too_late and run:
+##            events = pygame.event.get()
+##            for event in events:
+##                if event.type == pygame.KEYDOWN:
+##                    if event.key == pygame.K_UP :
+##                        if curseur == 0:
+##                            curseur = len(cibles)
+##                        curseur -= 1
+##                    elif event.key == pygame.K_DOWN :
+##                        curseur += 1
+##                        if curseur == len(cibles):
+##                            curseur = 0
+##                    elif event.key == pygame.K_SPACE :
+##                        new_cible = cibles[curseur]
+##                        if multi : #Si jamais une magie peut cibler plusieurs cibles.
+##                            if new_cible in cible :
+##                                cible.remove(new_cible)
+##                            else :
+##                                cible.append(new_cible)
+##                        else:
+##                            cible = [new_cible]
+##                    elif event.key == pygame.K_RETURN and cible != [] :
+##                        if multi :
+##                            magie.cible = cible
+##                        else:
+##                            magie.cible = cible[0]
+##                        run = False
+##            current_time = pygame.time.get_ticks()
+##            proportion_ecoulee = (current_time - start_time)/temps
+##            affichage.redraw_magie(joueur,cibles,cible,curseur,proportion_ecoulee)
+##            pygame.display.flip()
+
+    def start_select_cible_case(self,magie):
+        self.methode_courante = self.continue_select_case
+        self.cibles = self.controleur.get_cibles_potentielles_cases(magie,self)
+        self.element_courant = (self.position[0],self.position[1],self.position[2]) #Je recycle
+        self.cible = []
+        self.affichage.draw_magie_case(self)
+        self.temps = magie.temps
+        self.start_time = pygame.time.get_ticks()
+        self.too_late = self.start_time + self.temps
+
+    def continue_select_case(self,touche):
+        if touche == pygame.K_UP :
+            self.element_courant = (self.element_courant[0],self.element_courant[1],self.element_courant[2]-1)
+        elif touche == pygame.K_DOWN :
+            self.element_courant = (self.element_courant[0],self.element_courant[1],self.element_courant[2]+1)
+        elif touche == pygame.K_LEFT :
+            self.element_courant = (self.element_courant[0],self.element_courant[1]-1,self.element_courant[2])
+        elif touche == pygame.K_RIGHT :
+            self.element_courant = (self.element_courant[0],self.element_courant[1]+1,self.element_courant[2])
+        elif touche == pygame.K_SPACE and self.element_courant in self.cibles:
+            if self.multi : #Si jamais une magie peut cibler plusieurs cibles.
+                if self.element_courant in self.cible :
+                    self.cible.remove(self.element_courant)
+                else :
+                    self.cible.append(self.element_courant)
+            else:
+                self.cible = [self.element_courant]
+        elif touche == pygame.K_RETURN and self.cible != [] :
+            if self.multi :
+                self.cible_magie = self.cible
+            else:
+                self.cible_magie = self.cible[0]
+            self.controleur.unset_phase(COMPLEMENT_CIBLE)
+            self.methode_courante = None
+
+##    def select_cible_case(self,magie,joueur):
+##        cibles = self.get_cibles_potentielles_cases(magie,joueur)
+##        curseur = (joueur.position[0],joueur.position[1],joueur.position[2]) #La position de la cible sous le curseur.
+##        cible = []
+##        affichage = joueur.affichage
+##        affichage.draw_magie_case(joueur,cibles,cible,curseur)
+##        multi = isinstance(magie,Multi_cible)
+##        temps = magie.temps
+##        run = True
+##        start_time = pygame.time.get_ticks()
+##        current_time = start_time
+##        too_late = start_time + temps
+##        while current_time < too_late and run:
+##            events = pygame.event.get()
+##            for event in events:
+##                if event.type == pygame.KEYDOWN:
+##                    if event.key == pygame.K_UP :
+##                        curseur = (curseur[0],curseur[1],curseur[2]-1)
+##                    elif event.key == pygame.K_DOWN :
+##                        curseur = (curseur[0],curseur[1],curseur[2]+1)
+##                    elif event.key == pygame.K_LEFT :
+##                        curseur = (curseur[0],curseur[1]-1,curseur[2])
+##                    elif event.key == pygame.K_RIGHT :
+##                        curseur = (curseur[0],curseur[1]+1,curseur[2])
+##                    elif event.key == pygame.K_SPACE and curseur in cibles:
+##                        if multi : #Si jamais une magie peut cibler plusieurs cibles.
+##                            if curseur in cible :
+##                                cible.remove(curseur)
+##                            else :
+##                                cible.append(curseur)
+##                        else:
+##                            cible = [curseur]
+##                    elif event.key == pygame.K_RETURN and cible != [] :
+##                        if multi :
+##                            magie.cible = cible
+##                        else:
+##                            magie.cible = cible[0]
+##                        run = False
+##            current_time = pygame.time.get_ticks()
+##            proportion_ecoulee = (current_time - start_time)/temps
+##            affichage.redraw_magie_case(joueur,cibles,cible,curseur,proportion_ecoulee)
+##            pygame.display.flip()
 
     def start_change_touches(self,etage = -1,element_courant = 0): #On commence le changement de touches
         self.controleur.set_phase(TOUCHE)
@@ -2999,7 +3213,7 @@ class Joueur(Agissant,Entitee_superieure):
         elif touche == pygame.K_RETURN :
             if (self.etage == -1 and self.element_courant == 4) or (self.etage == 0 and self.element_courant == len(zones)) or (self.etage == 1 and self.element_courant == len(skills)) or (self.etage == 2 and self.element_courant == len(magies)) or (self.etage == 3 and self.element_courant == len(lancer)):
                 if self.check_touches():
-                    self.controleur.set_phase(TOUR)
+                    self.controleur.unset_phase(TOUCHE)
             else :
                 if self.etage != -1 and (self.etage != 1 or not isinstance(skills[self.element_courant],(Skill_magie,Skill_lancer))):
                     self.suspens = True
@@ -3282,10 +3496,17 @@ class Joueur(Agissant,Entitee_superieure):
         #Insérer toute l'augmentation des stats ici
         self.trouve_choix_possibles() #On actualise les choix possibles de l'arbre classique
         self.trouve_choix_elems() #On actualise les choix possibles de l'arbre élémentaire
-        choix = self.choisi_cadeau() #On sélectionne le cadeau d'évolution
-        self.prend_cadeau(choix) #On prend le cadeau sélectionné
-        self.niveau += 1
-        self.priorite += 1
+        self.arbre = CLASSIQUE
+        self.element_courant = 0
+        self.courant = 0
+        self.etage = 0
+        self.event = LEVELUP
+        self.controleur.set_phase(EVENEMENT)
+
+    def evenement(self):
+        """La fonction qui est appelée à chaque tour au cours d'un événement"""
+        if self.event == LEVELUP:
+            self.affichage.choix_niveau(self)
 
     def trouve_choix_possibles(self):
         """La fonction qui détermine les options disponibles au choix."""
@@ -3476,59 +3697,48 @@ class Joueur(Agissant,Entitee_superieure):
             self.choix_elems = [affinite_terre,magie_terre,affinite_feu,magie_feu,affinite_glace,magie_glace,affinite_ombre,magie_ombre]
         #On cherchera à raccourcir tout ça une autre fois (si si, j'y penserai !)
 
-    def choisi_cadeau(self):
-        run=True
-        curseur=0
-        curseur_elem=0
-        etage=0
-        arbre=CLASSIQUE
-        while run :
-            events = pygame.event.get() #On récupère les touches pressées, principalement
-            for event in events:
-                if event.type == pygame.KEYDOWN :
-                    if event.key == pygame.K_UP :
-                        if arbre and etage == 0:
-                            etage = 1
-                        elif not(arbre) and etage == 0:
-                            if len(self.choix_elems) != 0: #Attention au cas où on n'a plus de choix élémentaux valides
-                                etage = 1
-                    elif event.key == pygame.K_DOWN :
-                        if etage == 1:
-                            etage = 0
-                    elif event.key == pygame.K_RIGHT :
-                        if etage == 0:
-                            arbre = not(arbre)
-                        elif etage == 1:
-                            if arbre :
-                                curseur += 1
-                                if curseur == len(self.choix_dispos):
-                                    curseur = 0
-                            else :
-                                curseur_elem += 1
-                                if curseur_elem == len(self.choix_elems):
-                                    curseur_elem = 0
-                    elif event.key == pygame.K_LEFT :
-                        if etage == 0:
-                            arbre = not(arbre)
-                        elif etage == 1:
-                            if arbre :
-                                if curseur == 0:
-                                    curseur = len(self.choix_dispos)
-                                curseur -= 1
-                            else :
-                                if curseur_elem == 0:
-                                    curseur_elem = len(self.choix_elems)
-                                curseur_elem -= 1
-                    elif event.key == pygame.K_SPACE :
-                        if etage == 1:
-                            run = False
-            self.affichage.choix_niveau(self,arbre,etage,curseur,curseur_elem)
-            pygame.display.flip()
-        if arbre :
-            choix = self.choix_dispos[curseur]
-        else :
-            choix = self.choix_elems[curseur_elem]
-        return choix
+    def choisi_cadeau(self,touche):
+        if touche == pygame.K_UP :
+            if self.arbre and self.etage == 0:
+                self.etage = 1
+            elif not(self.arbre) and self.etage == 0:
+                if len(self.choix_elems) != 0: #Attention au cas où on n'a plus de choix élémentaux valides
+                    self.etage = 1
+        elif touche == pygame.K_DOWN :
+            if self.etage == 1:
+                self.etage = 0
+        elif touche == pygame.K_RIGHT :
+            if self.etage == 0:
+                self.arbre = not(self.arbre)
+            elif self.etage == 1:
+                if self.arbre :
+                    self.courant += 1
+                    if self.courant == len(self.choix_dispos):
+                        self.courant = 0
+                else :
+                    self.element_courant += 1
+                    if self.element_courant == len(self.choix_elems):
+                        self.element_courant = 0
+        elif touche == pygame.K_LEFT :
+            if self.etage == 0:
+                self.arbre = not(self.arbre)
+            elif self.etage == 1:
+                if self.arbre :
+                    if self.courant == 0:
+                        self.courant = len(self.choix_dispos)
+                    self.courant -= 1
+                else :
+                    if self.element_courant == 0:
+                        self.element_courant = len(self.choix_elems)
+                    self.element_courant -= 1
+        elif touche == pygame.K_SPACE :
+            if self.etage == 1:
+                if self.arbre :
+                    choix = self.choix_dispos[self.courant]
+                else :
+                    choix = self.choix_elems[self.element_courant]
+                self.controleur.unset_phase(EVENEMENT)
+                self.prend_cadeau(choix)
 
     def prend_cadeau(self,choix):
         """Fonction qui prend le cadeau choisi"""
@@ -3542,6 +3752,11 @@ class Joueur(Agissant,Entitee_superieure):
                 self.choix_niveaux[CLASSIQUE][1] = MAGIE
             else:
                 self.choix_niveaux[CLASSIQUE][1] = PHYSIQUE_PAR_DEFAUT
+
+            self.pv_max += 10
+            self.pm_max += 10
+            self.niveau += 1
+            self.priorite += 1
 
         elif niveau == 2:
             if choix == DEFENSE:
@@ -3568,6 +3783,11 @@ class Joueur(Agissant,Entitee_superieure):
                 self.choix_niveaux[CLASSIQUE][2] = MAGIE_INFINIE_PAR_DEFAUT
             else:
                 self.choix_niveaux[CLASSIQUE][2] = DEFENSE_PAR_DEFAUT
+
+            self.pv_max += 10
+            self.pm_max += 10
+            self.niveau += 1
+            self.priorite += 1
 
         elif niveau == 3:
             if self.choix_niveaux[CLASSIQUE][2] in [DEFENSE,DEFENSE_PAR_DEFAUT]:
@@ -3619,6 +3839,11 @@ class Joueur(Agissant,Entitee_superieure):
                     magie = trouve_skill(self.classe_principale,Skill_magie)
                     magie.ajoute(Magie_jet_de_mana) #Il me semble que c'est bien la même chose
                     self.choix_niveaux[CLASSIQUE][3] = PROJECTION_ENERGIE
+
+            self.pv_max += 10
+            self.pm_max += 10
+            self.niveau += 1
+            self.priorite += 1
 
         elif niveau == 4:
             if self.choix_niveaux[CLASSIQUE][2] in [DEFENSE,DEFENSE_PAR_DEFAUT]:
@@ -3677,6 +3902,11 @@ class Joueur(Agissant,Entitee_superieure):
                     magie = trouve_skill(self.classe_principale,Skill_magie)
                     magie.ajoute(Magie_regeneration_pm) #Un transfert de pm à quelqu'un d'autre, grosso-modo. À créer, je pense.
                     self.choix_niveaux[CLASSIQUE][4] = REGEN_PM
+
+            self.pv_max += 10
+            self.pm_max += 10
+            self.niveau += 1
+            self.priorite += 1
 
         elif niveau == 5:
             if self.choix_niveaux[CLASSIQUE][2] in [DEFENSE,DEFENSE_PAR_DEFAUT]:
@@ -3748,6 +3978,11 @@ class Joueur(Agissant,Entitee_superieure):
                     self.classe_principale.skills.append(skill)
                     self.choix_niveaux[CLASSIQUE][5] = BOOST_RESTAURATIONS
 
+            self.pv_max += 10
+            self.pm_max += 10
+            self.niveau += 1
+            self.priorite += 1
+
         elif niveau == 6:
             if self.choix_niveaux[CLASSIQUE][2] in [DEFENSE,DEFENSE_PAR_DEFAUT]:
                 if choix == MANIPULATION_BOUCLIER:
@@ -3807,6 +4042,11 @@ class Joueur(Agissant,Entitee_superieure):
                     magie = trouve_skill(self.classe_principale,Skill_magie)
                     magie.ajoute(Magie_onde_de_choc)
                     self.choix_niveaux[CLASSIQUE][6] = ONDE_DE_CHOC
+
+            self.pv_max += 10
+            self.pm_max += 10
+            self.niveau += 1
+            self.priorite += 1
 
         elif niveau == 7:
             if self.choix_niveaux[CLASSIQUE][2] in [DEFENSE,DEFENSE_PAR_DEFAUT]:
@@ -3869,6 +4109,11 @@ class Joueur(Agissant,Entitee_superieure):
                     self.pm_max += 100
                     self.choix_niveaux[CLASSIQUE][7] = BOOST_PM
 
+            self.pv_max += 10
+            self.pm_max += 10
+            self.niveau += 1
+            self.priorite += 1
+
         elif niveau == 8:
             if self.choix_niveaux[CLASSIQUE][2] in [DEFENSE,DEFENSE_PAR_DEFAUT]:
                 if choix == BOOST_ATTAQUE:
@@ -3928,6 +4173,11 @@ class Joueur(Agissant,Entitee_superieure):
                     classe.evo()
                     self.classe_principale.sous_classes.append(classe)
                     self.choix_niveaux[CLASSIQUE][8] = SOUTIEN
+
+            self.pv_max += 10
+            self.pm_max += 10
+            self.niveau += 1
+            self.priorite += 1
 
         elif niveau == 9:
             if self.choix_niveaux[CLASSIQUE][2] in [DEFENSE,DEFENSE_PAR_DEFAUT]:
@@ -3991,6 +4241,11 @@ class Joueur(Agissant,Entitee_superieure):
                     magie.ajoute(Magie_enchantement_rouille) #Il me semble que c'est bien la même chose
                     self.choix_niveaux[CLASSIQUE][9] = ENCHANTEMENT_ROUILLE
 
+            self.pv_max += 10
+            self.pm_max += 10
+            self.niveau += 1
+            self.priorite += 1
+
         elif niveau == 10:
             if self.choix_niveaux[CLASSIQUE][2] in [DEFENSE,DEFENSE_PAR_DEFAUT]:
                 if choix == MANIPULATION_ARME:
@@ -4029,9 +4284,9 @@ class Joueur(Agissant,Entitee_superieure):
                     skill.evo()
                     self.classe_principale.skills.append(skill)
                     self.choix_niveaux[CLASSIQUE][10] = BOOST_DEGATS_PROJECTILES
-                elif choix == BOOST_MANA:
+                elif choix == BOOST_PM:
                     self.pm_max += 100
-                    self.choix_niveaux[CLASSIQUE][10] = BOOST_MANA
+                    self.choix_niveaux[CLASSIQUE][10] = BOOST_PM
             elif self.choix_niveaux[CLASSIQUE][2] in [MAGIE_INFINIE,MAGIE_INFINIE_PAR_DEFAUT]:
                 if choix == BOOST_ENCHANTEMENT:
                     skill = Skill_boost_enchantement() # Non, les boosts intrasecs à la classe enchanteur ne sont pas suffisant...
@@ -4046,6 +4301,11 @@ class Joueur(Agissant,Entitee_superieure):
                     magie = trouve_skill(self.classe_principale,Skill_magie)
                     magie.ajoute(Magie_eclair_noir) # À la fois le sort et le projectile le plus puissant du jeu ! Dévastateur dans toutes les situations, peut annihiler une horde et pousser le boss final à la fuite ! Ok, peut-être pas le boss final...
                     self.choix_niveaux[CLASSIQUE][10] = ECLAIR_NOIR
+
+            self.pv_max += 10
+            self.pm_max += 10
+            self.niveau += 1
+            self.priorite += 1
 
         #Pour les affinités, c'est simple (sauf si on veut rescussiter le skill d'augmentation de l'affinité):
         if choix == affinite_terre :
@@ -8877,50 +9137,50 @@ class Affichage:
         self.dessine_droite(joueur)
         self.dessine_gauche(joueur)
 
-    def draw_magie(self,joueur,cibles,cible,curseur):
+    def draw_magie_cible(self,joueur):
         self.dessine_zones(joueur.curseur)
 
         self.dessine_lab(joueur)
-        self.dessine_droite_magie(joueur,cibles,cible,curseur)
+        self.dessine_droite_magie_cible(joueur)
         self.dessine_gauche(joueur)
 
-    def redraw_magie(self,joueur,cibles,cible,curseur,proportion_ecoulee):
+    def redraw_magie_cible(self,joueur,proportion_ecoulee):
         self.redessine_zone_d()
-        self.dessine_droite_magie(joueur,cibles,cible,curseur,proportion_ecoulee)
+        self.dessine_droite_magie_cible(joueur,proportion_ecoulee)
 
-    def draw_magie_case(self,joueur,cibles,cible,curseur):
+    def draw_magie_case(self,joueur):
         self.dessine_zones(joueur.curseur)
 
-        self.dessine_lab_magie(joueur,cibles,cible,curseur)
-        self.dessine_droite_magie_case()
+        self.dessine_lab_magie(joueur)
+        self.dessine_droite_magie_case(joueur)
         self.dessine_gauche(joueur)
 
-    def redraw_magie_case(self,joueur,cibles,cible,curseur,proportion_ecoulee):
+    def redraw_magie_case(self,joueur,proportion_ecoulee):
         self.redessine_zone_c()
-        self.dessine_lab_magie(joueur,cibles,cible,curseur)
-        self.dessine_droite_magie_case(proportion_ecoulee)
+        self.dessine_lab_magie(joueur)
+        self.dessine_droite_magie_case(joueur,proportion_ecoulee)
 
-    def draw_magie_dir(self,joueur,direction):
+    def draw_magie_dir(self,joueur):
         self.dessine_zones(joueur.curseur)
 
         self.dessine_lab(joueur)
-        self.dessine_droite_magie_dir(direction)
+        self.dessine_droite_magie_dir(joueur)
         self.dessine_gauche(joueur)
 
-    def redraw_magie_dir(self,direction,proportion_ecoulee):
+    def redraw_magie_dir(self,joueur,proportion_ecoulee):
         self.redessine_zone_d()
-        self.dessine_droite_magie_dir(direction,proportion_ecoulee)
+        self.dessine_droite_magie_dir(joueur,proportion_ecoulee)
 
-    def draw_magie_cout(self,joueur,cout,precision_cout,mana_dispo):
+    def draw_magie_cout(self,joueur):
         self.dessine_zones(joueur.curseur)
 
         self.dessine_lab(joueur)
-        self.dessine_droite_magie_cout(cout,precision_cout,mana_dispo,proportion_ecoulee)
+        self.dessine_droite_magie_cout(joueur)
         self.dessine_gauche(joueur)
 
-    def redraw_magie_cout(self,cout,precision_cout,mana_dispo,proportion_ecoulee):
+    def redraw_magie_cout(self,joueur,proportion_ecoulee):
         self.redessine_zone_d()
-        self.dessine_droite_magie_cout(cout,precision_cout,mana_dispo,proportion_ecoulee)
+        self.dessine_droite_magie_cout(joueur,proportion_ecoulee)
 
     def dessine_zones(self,curseur):
         self.screen.fill((0,0,0))
@@ -9452,7 +9712,7 @@ class Affichage:
             if message[1] == 0:
                 self.messages.remove(message)
 
-    def dessine_droite_magie(self,joueur,cibles,cible,curseur,proportion_ecoulee = 0): #La fonction qui dessine le rectangle de droite, pendant les choix de cible
+    def dessine_droite_magie_cible(self,joueur,proportion_ecoulee = 0): #La fonction qui dessine le rectangle de droite, pendant les choix de cible
 
         marge_haut = self.position_debut_y_rectangles_et_carre + 5
         marge_gauche = self.position_debut_x_rectangle_2 + 5
@@ -9462,19 +9722,19 @@ class Affichage:
         if skill != None:
             observation = skill.utilise()
 
-        for i in range(len(cibles)):
-            if i == curseur:
+        for i in range(len(joueur.cibles)):
+            if i == joueur.element_courant:
                 pygame.draw.rect(self.screen,(255,64,0),(marge_gauche,marge_haut,44,44))
-                if cibles[i] in cible:
+                if joueur.cibles[i] in joueur.cible:
                     pygame.draw.rect(self.screen,(130,130,130),(marge_gauche+2,marge_haut+2,40,40))
                 else:
                     pygame.draw.rect(self.screen,(255,255,255),(marge_gauche+2,marge_haut+2,40,40))
             else:
-                if cibles[i] in cible:
+                if joueur.cibles[i] in joueur.cible:
                     pygame.draw.rect(self.screen,(130,130,130),(marge_gauche,marge_haut,44,44))
                 else:
                     pygame.draw.rect(self.screen,(255,255,255),(marge_gauche,marge_haut,44,44))
-            joueur.controleur.get_entitee(cibles[i]).get_skin().dessine_toi(self.screen,(marge_gauche+2,marge_haut+2),40)
+            joueur.controleur.get_entitee(joueur.cibles[i]).get_skin().dessine_toi(self.screen,(marge_gauche+2,marge_haut+2),40)
             marge_haut += 50
         marge_gauche += 50
         marge_haut = self.position_debut_y_rectangles_et_carre + 5
@@ -9490,12 +9750,12 @@ class Affichage:
         pygame.draw.rect(self.screen,(255,255,100),(pos_gauche,pos_haut,longueur_barre_totale,10))
         pygame.draw.rect(self.screen,(255,200,0),(pos_gauche,pos_haut,longueur_barre_temps,10))
 
-    def dessine_droite_magie_dir(self,direction,proportion_ecoulee = 0):
+    def dessine_droite_magie_dir(self,joueur,proportion_ecoulee = 0):
 
         marge_haut = self.position_debut_y_rectangles_et_carre + 5
         marge_gauche = self.position_debut_x_rectangle_2 + 5
 
-        SKIN_DIRECTION.dessine_toi(self.screen,(marge_gauche,marge_haut),40,direction)
+        SKIN_DIRECTION.dessine_toi(self.screen,(marge_gauche,marge_haut),40,joueur.dir_regard)
 
         #On cherche à placer une barre au bas du rectangle de droite
         pos_haut = self.position_debut_y_rectangles_et_carre + self.hauteur_exploitable - 15
@@ -9507,7 +9767,9 @@ class Affichage:
         pygame.draw.rect(self.screen,(255,255,100),(pos_gauche,pos_haut,longueur_barre_totale,10))
         pygame.draw.rect(self.screen,(255,200,0),(pos_gauche,pos_haut,longueur_barre_temps,10))
 
-    def dessine_droite_magie_case(self,proportion_ecoulee = 0):
+    def dessine_droite_magie_case(self,joueur,proportion_ecoulee = 0):
+        #Un jour on mettra plus d'informations /!\
+
         #On cherche à placer une barre au bas du rectangle de droite
         pos_haut = self.position_debut_y_rectangles_et_carre + self.hauteur_exploitable - 15
         pos_gauche = self.position_debut_x_rectangle_2 + 5
@@ -9518,13 +9780,13 @@ class Affichage:
         pygame.draw.rect(self.screen,(255,255,100),(pos_gauche,pos_haut,longueur_barre_totale,10))
         pygame.draw.rect(self.screen,(255,200,0),(pos_gauche,pos_haut,longueur_barre_temps,10))
 
-    def dessine_droite_magie_cout(self,cout,precision_cout,mana_dispo,proportion_ecoulee = 0):
+    def dessine_droite_magie_cout(self,joueur,proportion_ecoulee = 0):
 
         marge_haut = self.position_debut_y_rectangles_et_carre + 5
         marge_gauche = self.position_debut_x_rectangle_2 + 5
 
         longueur_barre_totale = self.largeur_rectangles-10
-        longueur_barre_cout = longueur_barre_totale*(cout/mana_dispo)
+        longueur_barre_cout = longueur_barre_totale*(joueur.choix_cout_magie/joueur.get_total_pm())
         pygame.draw.rect(self.screen,(255,160,160),(marge_gauche,marge_haut,longueur_barre_totale,10))
         pygame.draw.rect(self.screen,(255,0,0),(marge_gauche,marge_haut,longueur_barre_cout,10))
 
@@ -9534,11 +9796,11 @@ class Affichage:
 
         texte = []
 
-        texte.append(police.render("Mana à disposition : " + str(mana_dispo),True,(255,255,255)))
-        texte.append(police.render("Cout_actuel : " + str(cout),True,(255,255,255)))
-        texte.append(police.render("(Utilisez les touches haut et bas pour modifier le coût.)",True,(255,255,255)))
-        texte.append(police.render("Précision du coût : " + str(precision_cout),True,(255,255,255)))
-        texte.append(police.render("(Utilisez les touches gauche et droite pour modifier la précision.)",True,(255,255,255)))
+        texte.append(police.render("Mana à disposition : " + str(joueur.get_total_pm()),True,(0,0,0)))
+        texte.append(police.render("Cout_actuel : " + str(joueur.choix_cout_magie),True,(0,0,0)))
+        texte.append(police.render("(Utilisez les touches haut et bas pour modifier le coût.)",True,(0,0,0)))
+        texte.append(police.render("Précision du coût : " + str(joueur.precision_cout_magie),True,(0,0,0)))
+        texte.append(police.render("(Utilisez les touches gauche et droite pour modifier la précision.)",True,(0,0,0)))
 
         for tex in texte:
             self.screen.blit(tex,(marge_gauche,marge_haut))
@@ -9588,7 +9850,7 @@ class Affichage:
                 marge_gauche += taille_case
             marge_haut += taille_case
 
-    def dessine_lab_magie(self,joueur,cibles,cible,curseur):
+    def dessine_lab_magie(self,joueur):
         vue = joueur.vue
         position = joueur.get_position()
         visible_x = [len(vue)-1,0]
@@ -9615,13 +9877,13 @@ class Affichage:
         for j in range(nb_cases):
             marge_gauche = marge + self.position_debut_x_carre
             for i in range(nb_cases):
-                if (position[0],vue_x+i,vue_y+j) in cibles:
+                if (position[0],vue_x+i,vue_y+j) in joueur.cibles:
                     self.affiche(joueur,vue[vue_x + i][vue_y + j],(marge_gauche,marge_haut),taille_case)
                 else:
                     SKIN_BROUILLARD.dessine_toi(self.screen,(marge_gauche,marge_haut),taille_case)
-                if (position[0],vue_x+i,vue_y+j) == curseur:
+                if (position[0],vue_x+i,vue_y+j) == joueur.element_courant:
                     pygame.draw.rect(self.screen,(255,64,0),(marge_gauche,marge_haut,taille_case,taille_case),2)
-                elif (position[0],vue_x+i,vue_y+j) in cible:
+                elif (position[0],vue_x+i,vue_y+j) in joueur.cible:
                     pygame.draw.rect(self.screen,(170,170,170),(marge_gauche,marge_haut,taille_case,taille_case),2)
                 marge_gauche += taille_case
             marge_haut += taille_case
@@ -9785,16 +10047,16 @@ class Affichage:
         self.dessine_droite(joueur)
         self.dessine_gauche(joueur)
 
-    def choix_niveau(self,joueur,arbre,etage,curseur,curseur_elem):
+    def choix_niveau(self,joueur):
         self.dessine_zones(joueur.curseur)
 
-        self.dessine_choix_niveau(joueur,arbre,etage,curseur,curseur_elem)
-        self.dessine_droite_choix_niveau(joueur,arbre,etage,curseur,curseur_elem)
+        self.dessine_choix_niveau(joueur)
+        self.dessine_droite_choix_niveau(joueur)
         self.dessine_gauche(joueur)
 
-    def dessine_choix_niveau(self,joueur,arbre,etage,curseur,curseur_elem):
+    def dessine_choix_niveau(self,joueur):
         pygame.draw.rect(self.screen,(255,255,255),(self.position_debut_x_carre,self.position_debut_y_rectangles_et_carre,self.hauteur_exploitable,self.hauteur_exploitable))
-        if arbre :
+        if joueur.arbre :
             # On doit afficher les différents choix
             # On aura besoin des choix disponibles (joueur.choix_dispos) et de la largeur de l'affichage (self.hauteur_exploitable), ainsi que la limite gauche (self.position_debut_x_carre)
             # Pour rappel, le carré du centre fait au moins 660 par 660
@@ -9866,10 +10128,10 @@ class Affichage:
                 if niveau == joueur.niveau + 1 :
                     #C'est le niveau du choix courant !
                     for i in range(nb_choix):
-                        if i == curseur :
-                            if etage == 0:
+                        if i == joueur.courant :
+                            if joueur.etage == 0:
                                 pygame.draw.rect(self.screen,(225,225,225),(pos_gauche-2,pos_haut-2,44,44))
-                            elif etage == 1:
+                            elif joueur.etage == 1:
                                 pygame.draw.rect(self.screen,(255,64,0),(pos_gauche-2,pos_haut-2,44,44)) #On essaye de faire un truc un peu rouge
                         if choix[i] == REGEN_HP:
                             skin = SKIN_BOOST_REGEN_HP
@@ -10592,8 +10854,8 @@ class Affichage:
             pos_haut += 20
 
             if elemental_terre in joueur.choix_elems:
-                if joueur.choix_elems[curseur_elem] == elemental_terre:
-                    if etage == 0:
+                if joueur.choix_elems[joueur.element_courant] == elemental_terre:
+                    if joueur.etage == 0:
                         pygame.draw.rect(self.screen,(225,225,225),(pos_gauche-2,pos_haut-2,44,44))
                     else:
                         pygame.draw.rect(self.screen,(255,64,0),(pos_gauche-2,pos_haut-2,44,44))
@@ -10604,8 +10866,8 @@ class Affichage:
             pos_gauche += 160
 
             if elemental_feu in joueur.choix_elems:
-                if joueur.choix_elems[curseur_elem] == elemental_feu:
-                    if etage == 0:
+                if joueur.choix_elems[joueur.element_courant] == elemental_feu:
+                    if joueur.etage == 0:
                         pygame.draw.rect(self.screen,(225,225,225),(pos_gauche-2,pos_haut-2,44,44))
                     else:
                         pygame.draw.rect(self.screen,(255,64,0),(pos_gauche-2,pos_haut-2,44,44))
@@ -10616,8 +10878,8 @@ class Affichage:
             pos_gauche += 160
 
             if elemental_glace in joueur.choix_elems:
-                if joueur.choix_elems[curseur_elem] == elemental_glace:
-                    if etage == 0:
+                if joueur.choix_elems[joueur.element_courant] == elemental_glace:
+                    if joueur.etage == 0:
                         pygame.draw.rect(self.screen,(225,225,225),(pos_gauche-2,pos_haut-2,44,44))
                     else:
                         pygame.draw.rect(self.screen,(255,64,0),(pos_gauche-2,pos_haut-2,44,44))
@@ -10628,8 +10890,8 @@ class Affichage:
             pos_gauche += 160
 
             if elemental_ombre in joueur.choix_elems:
-                if joueur.choix_elems[curseur_elem] == elemental_ombre:
-                    if etage == 0:
+                if joueur.choix_elems[joueur.element_courant] == elemental_ombre:
+                    if joueur.etage == 0:
                         pygame.draw.rect(self.screen,(225,225,225),(pos_gauche-2,pos_haut-2,44,44))
                     else:
                         pygame.draw.rect(self.screen,(255,64,0),(pos_gauche-2,pos_haut-2,44,44))
@@ -10641,8 +10903,8 @@ class Affichage:
             pos_haut += 140
 
             if aura_terre in joueur.choix_elems:
-                if joueur.choix_elems[curseur_elem] == aura_terre:
-                    if etage == 0:
+                if joueur.choix_elems[joueur.element_courant] == aura_terre:
+                    if joueur.etage == 0:
                         pygame.draw.rect(self.screen,(225,225,225),(pos_gauche-2,pos_haut-2,44,44))
                     else:
                         pygame.draw.rect(self.screen,(255,64,0),(pos_gauche-2,pos_haut-2,44,44))
@@ -10653,8 +10915,8 @@ class Affichage:
             pos_gauche += 160
 
             if aura_feu in joueur.choix_elems:
-                if joueur.choix_elems[curseur_elem] == aura_feu:
-                    if etage == 0:
+                if joueur.choix_elems[joueur.element_courant] == aura_feu:
+                    if joueur.etage == 0:
                         pygame.draw.rect(self.screen,(225,225,225),(pos_gauche-2,pos_haut-2,44,44))
                     else:
                         pygame.draw.rect(self.screen,(255,64,0),(pos_gauche-2,pos_haut-2,44,44))
@@ -10665,8 +10927,8 @@ class Affichage:
             pos_gauche += 160
 
             if aura_glace in joueur.choix_elems:
-                if joueur.choix_elems[curseur_elem] == aura_glace:
-                    if etage == 0:
+                if joueur.choix_elems[joueur.element_courant] == aura_glace:
+                    if joueur.etage == 0:
                         pygame.draw.rect(self.screen,(225,225,225),(pos_gauche-2,pos_haut-2,44,44))
                     else:
                         pygame.draw.rect(self.screen,(255,64,0),(pos_gauche-2,pos_haut-2,44,44))
@@ -10677,8 +10939,8 @@ class Affichage:
             pos_gauche += 160
 
             if aura_ombre in joueur.choix_elems:
-                if joueur.choix_elems[curseur_elem] == aura_ombre:
-                    if etage == 0:
+                if joueur.choix_elems[joueur.element_courant] == aura_ombre:
+                    if joueur.etage == 0:
                         pygame.draw.rect(self.screen,(225,225,225),(pos_gauche-2,pos_haut-2,44,44))
                     else:
                         pygame.draw.rect(self.screen,(255,64,0),(pos_gauche-2,pos_haut-2,44,44))
@@ -10690,8 +10952,8 @@ class Affichage:
             pos_haut += 140
 
             if affinite_terre in joueur.choix_elems:
-                if joueur.choix_elems[curseur_elem] == affinite_terre:
-                    if etage == 0:
+                if joueur.choix_elems[joueur.element_courant] == affinite_terre:
+                    if joueur.etage == 0:
                         pygame.draw.rect(self.screen,(225,225,225),(pos_gauche-2,pos_haut-2,44,44))
                     else:
                         pygame.draw.rect(self.screen,(255,64,0),(pos_gauche-2,pos_haut-2,44,44))
@@ -10702,8 +10964,8 @@ class Affichage:
             pos_gauche += 100
 
             if magie_terre in joueur.choix_elems:
-                if joueur.choix_elems[curseur_elem] == magie_terre:
-                    if etage == 0:
+                if joueur.choix_elems[joueur.element_courant] == magie_terre:
+                    if joueur.etage == 0:
                         pygame.draw.rect(self.screen,(225,225,225),(pos_gauche-2,pos_haut-2,44,44))
                     else:
                         pygame.draw.rect(self.screen,(255,64,0),(pos_gauche-2,pos_haut-2,44,44))
@@ -10714,8 +10976,8 @@ class Affichage:
             pos_gauche += 60
 
             if affinite_feu in joueur.choix_elems:
-                if joueur.choix_elems[curseur_elem] == affinite_feu:
-                    if etage == 0:
+                if joueur.choix_elems[joueur.element_courant] == affinite_feu:
+                    if joueur.etage == 0:
                         pygame.draw.rect(self.screen,(225,225,225),(pos_gauche-2,pos_haut-2,44,44))
                     else:
                         pygame.draw.rect(self.screen,(255,64,0),(pos_gauche-2,pos_haut-2,44,44))
@@ -10726,8 +10988,8 @@ class Affichage:
             pos_gauche += 100
 
             if magie_feu in joueur.choix_elems:
-                if joueur.choix_elems[curseur_elem] == magie_feu:
-                    if etage == 0:
+                if joueur.choix_elems[joueur.element_courant] == magie_feu:
+                    if joueur.etage == 0:
                         pygame.draw.rect(self.screen,(225,225,225),(pos_gauche-2,pos_haut-2,44,44))
                     else:
                         pygame.draw.rect(self.screen,(255,64,0),(pos_gauche-2,pos_haut-2,44,44))
@@ -10738,8 +11000,8 @@ class Affichage:
             pos_gauche += 60
 
             if affinite_glace in joueur.choix_elems:
-                if joueur.choix_elems[curseur_elem] == affinite_glace:
-                    if etage == 0:
+                if joueur.choix_elems[joueur.element_courant] == affinite_glace:
+                    if joueur.etage == 0:
                         pygame.draw.rect(self.screen,(225,225,225),(pos_gauche-2,pos_haut-2,44,44))
                     else:
                         pygame.draw.rect(self.screen,(255,64,0),(pos_gauche-2,pos_haut-2,44,44))
@@ -10750,8 +11012,8 @@ class Affichage:
             pos_gauche += 100
 
             if magie_glace in joueur.choix_elems:
-                if joueur.choix_elems[curseur_elem] == magie_glace:
-                    if etage == 0:
+                if joueur.choix_elems[joueur.element_courant] == magie_glace:
+                    if joueur.etage == 0:
                         pygame.draw.rect(self.screen,(225,225,225),(pos_gauche-2,pos_haut-2,44,44))
                     else:
                         pygame.draw.rect(self.screen,(255,64,0),(pos_gauche-2,pos_haut-2,44,44))
@@ -10762,8 +11024,8 @@ class Affichage:
             pos_gauche += 60
 
             if affinite_ombre in joueur.choix_elems:
-                if joueur.choix_elems[curseur_elem] == affinite_ombre:
-                    if etage == 0:
+                if joueur.choix_elems[joueur.element_courant] == affinite_ombre:
+                    if joueur.etage == 0:
                         pygame.draw.rect(self.screen,(225,225,225),(pos_gauche-2,pos_haut-2,44,44))
                     else:
                         pygame.draw.rect(self.screen,(255,64,0),(pos_gauche-2,pos_haut-2,44,44))
@@ -10774,8 +11036,8 @@ class Affichage:
             pos_gauche += 100
 
             if magie_ombre in joueur.choix_elems:
-                if joueur.choix_elems[curseur_elem] == magie_ombre:
-                    if etage == 0:
+                if joueur.choix_elems[joueur.element_courant] == magie_ombre:
+                    if joueur.etage == 0:
                         pygame.draw.rect(self.screen,(225,225,225),(pos_gauche-2,pos_haut-2,44,44))
                     else:
                         pygame.draw.rect(self.screen,(255,64,0),(pos_gauche-2,pos_haut-2,44,44))
@@ -10786,12 +11048,12 @@ class Affichage:
             SKIN_RACINE_ELEMENTS.dessine_toi(self.screen,(marge_gauche,pos_haut))
 
 
-    def dessine_droite_choix_niveau(self,joueur,arbre,etage,curseur,curseur_elem):
+    def dessine_droite_choix_niveau(self,joueur):
         """Dessine le rectangle de droite lors du choix de montée de niveau. Décrit le choix sélectionné."""
 
-        if arbre:
-            choi = joueur.choix_dispos[curseur]
-            if etage == 0:
+        if joueur.arbre:
+            choi = joueur.choix_dispos[joueur.courant]
+            if joueur.etage == 0:
                 descr = ["Arbre d'évolution","Flèche du haut pour naviguer dans cet arbre.","Flèche droite ou gauche pour changer d'arbre."]
             elif choi == REGEN_HP:
                 descr = ["Option d'évolution :","Renforcement physique","Augmente la régénération des PVs.","Etat : fonctionnel","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
@@ -10963,8 +11225,8 @@ class Affichage:
                 descr = ["Je ne sais pas décrire ça !.","Nous sommes dans l'arbre classique, voici le code fautif :",str(choi),"Bonne chance à moi pour corriger ça !","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
 
         else:
-            choi = joueur.choix_elems[curseur_elem]
-            if etage == 0:
+            choi = joueur.choix_elems[joueur.element_courant]
+            if joueur.etage == 0:
                 descr = ["Arbre élémental d'évolution","Flèche du haut pour naviguer dans cet arbre.","Flèche droite ou gauche pour changer d'arbre."]
             elif choi == affinite_terre:
                 descr = ["Option d'évolution :","Affinité à la terre","Augmente sustanciellement l'affinité à la terre.","Réduit un peu l'affinité à l'ombre.","Touche espace pour valider","Flèche du bas pour retourner au choix de l'arbre.","Flèche droite ou gauche pour naviguer dans l'arbre."]
