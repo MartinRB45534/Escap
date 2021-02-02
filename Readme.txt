@@ -2,9 +2,12 @@ Work in progress !
 
 
 
-Nouvel objectif : l'organisation du main (terminé), la sauvegarde externe des parties
+Note du 2 février : sauvegarde terminée (enfin !) mais à retravailler plus tard. Pour demain, on va se contenter de  numéroter les frames et finir le travail d'affichage (tout ça !?).
+
+
+
+Nouvel objectif : l'organisation du main (terminé), la sauvegarde externe des parties (terminé)
 Travail en cours : la structure du main
-- Sauvegarder les éléments essentiels
 - Numérotation des frames pour les illustrations
 Au passage :
 - Fin du travail sur l'affichage (arbre élémental, attaques)
