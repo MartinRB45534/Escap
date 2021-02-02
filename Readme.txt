@@ -17,6 +17,17 @@ Si j'ai le temps :
 
 
 
+
+À propos de la sauvegarde :
+Idée :
+Un fichier par "joueur", avec un objet Main dedans. Le Main contient lui-même des Controleurs, qui ont tout ce qu'il faut pour représenter une 'partie'.
+Le menu principal recherche tous les fichiers de sauvegarde, essaye de les interprêter (nom ou morceau du nom du fichier correspondant au nom de l'utilisateur (on verra plus tard pour les mots de passe).
+Il charge donc les Main, puis les manipule, puis les réécrit (automatiquement à la fermeture du jeu).
+Un Controleur peut être transféré d'un Main à un autre. On peut ouvrir un nouveau Controleur (nouvelle partie).
+
+
+
+
 Messages d'entrée pour certains étages ?
 
 Idée : l'une des améliorations des flèches, voire de tous le projectiles pourrait consister à les faire traverser les alliés sans les toucher

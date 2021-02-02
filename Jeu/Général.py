@@ -920,6 +920,10 @@ class Controleur():
                     poss.append((position[0],i,j))
         return poss
 
+    def clear(self):
+        for ID_entitee in self.entitees.keys():
+            self.entitees[ID].clear()
+
 class Labyrinthe:
     def __init__(self,ID,largeur,hauteur,depart,patterns=None,durete = 1,niveau = 1,element = TERRE):
         #print("Initialisation du labyrinthe")
@@ -11377,3 +11381,9 @@ class Affichage:
                     if effet.phase == "affichage":
                         effet.phase = "terminé"
             #Rajouter des conditions d'observation
+
+    def clear(self):
+        self.screen = None
+
+    def unclear(self,screen):
+        self.screen = screen
