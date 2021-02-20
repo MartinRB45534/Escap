@@ -2,16 +2,14 @@ Work in progress !
 
 
 
-Note du 2 février : sauvegarde terminée (enfin !) mais à retravailler plus tard. Pour demain, on va se contenter de  numéroter les frames et finir le travail d'affichage (tout ça !?).
-
-
-
 Nouvel objectif : l'organisation du main (terminé), la sauvegarde externe des parties (terminé)
+
 Travail en cours : la structure du main
 - Numérotation des frames pour les illustrations
 Au passage :
-- Fin du travail sur l'affichage (arbre élémental, attaques)
+- Fin du travail sur l'affichage (arbre élémental)
 - Rendre fonctionnels tous les choix, puis les conditionner
+
 Si j'ai le temps :
 - Créer les premiers humains
 - Créer les premiers monstres
@@ -21,19 +19,10 @@ Si j'ai le temps :
 
 
 
-À propos de la sauvegarde :
-Idée :
-Un fichier par "joueur", avec un objet Main dedans. Le Main contient lui-même des Controleurs, qui ont tout ce qu'il faut pour représenter une 'partie'.
-Le menu principal recherche tous les fichiers de sauvegarde, essaye de les interprêter (nom ou morceau du nom du fichier correspondant au nom de l'utilisateur (on verra plus tard pour les mots de passe).
-Il charge donc les Main, puis les manipule, puis les réécrit (automatiquement à la fermeture du jeu).
-Un Controleur peut être transféré d'un Main à un autre. On peut ouvrir un nouveau Controleur (nouvelle partie).
-
-
-
-
 Messages d'entrée pour certains étages ?
 
 Idée : l'une des améliorations des flèches, voire de tous le projectiles pourrait consister à les faire traverser les alliés sans les toucher
+
 
 Idées de lore à disperser dans les niveaux :
 
@@ -70,5 +59,6 @@ Notes de trucs à améliorer :
 - Ou encore : passer telle classe du niveau x au niveau y est un des choix de la classe principale.
 - Sauf qu'il faut arriver au bon niveau de la classe principale au bon moment, peu probable. Une dépendance à des objets uniques rend le jeu impossible pour un non-initié, et les objets utiles à une autre construction de personnage sont déjà suffisament ennuyeux en un seul exemplaire.
 - Certaines classes ne peuvent pas se reposer non plus sur leurs alliés humains. Tout ça fait beaucoup d'interdépendances des éléments du jeu à gérer, mais c'est ce qui le rend marrant !
+
 
 Garder une trace du code couleur, pour faciliter les modifications futures.

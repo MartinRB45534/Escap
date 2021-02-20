@@ -900,7 +900,7 @@ class Controleur():
                     cadavres.append(cadavre_possible)
         return cadavres
 
-    def get_cases_touches(self,position,portee=1,propagation = "C__S___",direction = None): #La même, mais pour les effets sur les cases
+    def get_cases_touches(self,position,portee=1,propagation = "C__S___",direction = None,traverse="tout",responsable=0): #La même, mais pour les effets sur les cases
         cases = []
         labyrinthe = self.labs[position[0]]
         labyrinthe.attaque(position,portee,propagation,direction,[])
@@ -910,10 +910,40 @@ class Controleur():
                     cases.append(case)
         return cases
 
-    def get_positions_touches(self,position,portee,propagation = "C__S___",direction = None): #La même, mais pour les positions
+    def get_pos_touches(self,position,portee,propagation = "C__S___",direction = None,traverse="tout",responsable=0): #La même, mais pour les positions
+        #On décide des obstacles:
+        pos_obstacles = []
+        if traverse == "rien":
+            obstacles = self.get_entitees_etage(position[0])
+            for ID_obstacle in obstacle:
+                obstacle = self.get_entitee(ID_obstacle)
+                if not issubclass(obstacle.get_classe(),Item):
+                    pos_obstacles.append(obstacle.get_position())
+        elif traverse == "alliés":
+            obstacles_possibles = self.get_entitees_etage(position[0])
+            nom_esprit = self.get_entitee(responsable).esprit
+            if nom_esprit != None:
+                for ID_obstacle in obstacles_possibles:
+                    obstacle = self.get_entitee(ID_obstacle)
+                    if not issubclass(obstacle.get_classe(),Item):
+                        if obstacle.esprit != nom_esprit:
+                            pos_obstacles.append(obstacle.get_position())
+        elif traverse == "ennemis":
+            obstacles_possibles = self.get_entitees_etage(position[0])
+            nom_esprit = self.get_entitee(responsable).esprit
+            if nom_esprit != None:
+                for ID_obstacle in obstacles_possibles:
+                    obstacle = self.get_entitee(ID_obstacle)
+                    if not issubclass(obstacle.get_classe(),Item):
+                        if obstacle.esprit == nom_esprit:
+                            pos_obstacles.append(obstacle.get_position())
+        elif traverse == "tout":
+            pass
+        else:
+            print("Quelle est cette traversée ?")
         poss = []
         labyrinthe = self.labs[position[0]]
-        labyrinthe.attaque(position,portee,propagation,direction,[])
+        labyrinthe.attaque(position,portee,propagation,direction,pos_obstacles)
         for i in range(len(labyrinthe.matrice_cases)):
             for j in range(len(labyrinthe.matrice_cases[0])):
                 if labyrinthe.matrice_cases[i][j].clarte > 0:
@@ -1560,8 +1590,10 @@ class Case:
             else :
                 self.code += 1
         else:
+            on_attaques = []
+            attaques = []
             priorite_max = 0
-            ID_max = 0
+            IDmax = 0
             auras = {}
 
             for effet in self.effets:
@@ -1573,13 +1605,22 @@ class Case:
                         auras[ID]=[effet]
                     prio = effet.priorite
                     if prio > priorite_max : # On a un nouveau gagnant !
-                        ID_max = ID
+                        IDmax = ID
                         priorite_max = prio
+                elif isinstance(effet,On_attack):
+                    on_attaques.append(effet)
+                elif isinstance(effet,Attaque_case):
+                    attaques.append(effet)
                 elif isinstance(effet,On_post_action): #Les auras non-élémentales sont aussi des On_post_action
                     effet.execute(self,position)
 
-            for aura in auras[ID_max]:
+            for aura in auras[IDmax]:
                 aura.execute(self,position)
+
+            for attaque in attaques:
+                for protection in on_attaques:
+                    protection.execute(attaque)
+                attaque.execute(self,position)
 
     def fin_tour(self):
         for i in range(len(self.effets)-1,-1,-1) :
@@ -2438,7 +2479,7 @@ class Agissant(Entitee): #Tout agissant est un cadavre, tout cadavre n'agit pas.
         attaques = []
         on_attaques = []
         for effet in self.effets:
-            if isinstance(effet,On_pre_attack): #Principalement les effets qui agissent sur les attaques
+            if isinstance(effet,On_attack): #Principalement les effets qui agissent sur les attaques
                 on_attaques.append(effet)
             elif isinstance(effet,Attaque_particulier):
                 attaques.append(effet)
@@ -6763,6 +6804,9 @@ class Effet :
         else:
             self.phase = "terminé"
 
+    def get_skin(self):
+        return SKIN_EFFET
+
 #On distingue les effets par circonstances d'appel.
 class On_tick(Effet) :
     """La classe des effets appelés à chaque tour."""
@@ -6868,7 +6912,11 @@ class Obscurite(Evenement,On_debut_tour):
             self.termine()
             self.action(case)
 
-class Protection_particulier(Evenement,On_post_action):
+class On_attack(Effet):
+    """Classe des effets appelés lors d'une attaque."""
+    pass
+
+class Protection_particulier(Evenement,On_attack):
     """La case protégée par le bouclier est 'entourée' par ce dernier, c'est à dire que pour y rentrer par certains côtés, une attaque doit d'abord être affectée par le bouclier."""
     def __init__(self,temps_restant,bouclier,directions):
         self.affiche = False
@@ -6877,22 +6925,18 @@ class Protection_particulier(Evenement,On_post_action):
         self.bouclier = bouclier #Techniquement c'est le bouclier qui intercepte.
         self.directions = directions
 
-    def action(self,case,position):
-        occupants = case.controleur.trouve_agissants(position)
-        for occupant in occupants:
-            for effet in case.controleur.get_entitee(occupant).effets:
-                if isinstance(effet,Attaque_particulier):
-                    if get_dir_opposee(effet.direction) in self.directions:
-                        self.bouclier.intercepte(effet)
+    def action(self,attaque):
+        if get_dir_opposee(attaque.direction) in self.directions:
+            self.bouclier.intercepte(attaque)
 
-    def execute(self,case,position):
+    def execute(self,attaque):
         self.temps_restant -= 1
         if self.phase == "démarrage" :
             self.phase = "en cours"
         elif self.temps_restant <= 0 :
             self.termine()
         else :
-            self.action(case,position)
+            self.action(attaque)
 
 class Blizzard(Evenement,On_post_action):
     """Evenement de blizzard."""
@@ -7317,10 +7361,6 @@ class Reserve_mana(On_need):
         if self.mana <= 0 :
             self.termine()
 
-class On_attack(Effet):
-    """Classe des effets appelés lors d'une attaque."""
-    pass
-
 class One_shot(Effet):
     """Classe des effets qui n'ont à être appelés qu'une seule fois."""
 
@@ -7418,7 +7458,7 @@ class En_sursis(One_shot,On_fin_tour):
                 item.arret()
         
 class Attaque(One_shot):
-    """L'effet d'attaque dans sa version générale. Pour chaque agissant dans la zone, crée une attaque (version particulière). Attachée au responsable."""
+    """L'effet d'attaque dans sa version générale. Pour chaque case dans la zone, crée une attaque (version intermèdiaire). Attachée au responsable."""
     def __init__(self,responsable=0,degats=0,element=TERRE,portee=1,propagation="C__S___",direction=None,autre=None,taux_autre=None):
         self.affiche = False
         self.phase = "démarrage"
@@ -7433,15 +7473,48 @@ class Attaque(One_shot):
 
     def action(self,controleur):
         position = controleur.get_entitee(self.responsable).get_position()
-        victimes = controleur.get_touches(self.responsable,position,self.portee,self.propagation,self.direction)
-        for victime in victimes :
-            if self.autre == None :
-                victime.effets.append(Attaque_particulier(self.responsable,self.degats,self.element,self.direction))
-            elif self.autre == "piercing":
-                victime.effets.append(Attaque_percante(self.responsable,self.degats,self.element,self.direction,taux_perce))
+        positions_touches = controleur.get_pos_touches(position,self.portee,self.propagation,self.direction,"alliés",self.responsable)
+        for position_touche in positions_touches:
+            controleur.labs[position[0]].matrice_cases[position_touche[1]][position_touche[2]].effets.append(Attaque_case(self.responsable,self.degats,self.element,self.direction,self.autre,self.taux_autre))
+
+class Attaque_case(One_shot):
+    """L'effet d'attaque dans sa version intermédiaire. Créée par une attaque (version générale), chargé d'attacher une attaque particulière aux agissants de la case, en passant d'abord les défenses de la case. Attachée à la case."""
+    def __init__(self,responsable,degats,element,direction = None,autre=None,taux_autre=None):
+        self.affiche = True
+        self.phase = "démarrage"
+        self.responsable = responsable
+        self.degats = degats
+        self.element = element
+        self.direction = direction
+        self.autre = autre
+        self.taux_autre = taux_autre
+
+    def action(self,case,position):
+        victimes_potentielles = case.controleur.trouve_agissants(position)
+        for victime_potentielle in victimes_potentielles:
+            if not victime_potentielle in case.controleur.get_esprit(case.controleur.get_entitee(self.responsable).esprit).get_corps():
+                if self.autre == None :
+                    case.controleur.get_entitee(victime_potentielle).effets.append(Attaque_particulier(self.responsable,self.degats,self.element,self.direction))
+                elif self.autre == "piercing":
+                    case.controleur.get_entitee(victime_potentielle).effets.append(Attaque_percante(self.responsable,self.degats,self.element,self.direction,taux_perce))
+
+    def execute(self,case,position):
+        if self.phase == "démarrage":
+            self.action(case,position)
+            self.termine()
+
+    def get_skin(self):
+        if self.element == TERRE:
+            return SKIN_ATTAQUE_TERRE
+        elif self.element == FEU:
+            return SKIN_ATTAQUE_FEU
+        elif self.element == GLACE:
+            return SKIN_ATTAQUE_GLACE
+        elif self.element == OMBRE:
+            return SKIN_ATTAQUE_OMBRE
 
 class Attaque_particulier(One_shot):
-    """L'effet d'attaque dans sa version particulière. Créée par une attaque (version générale), chargé d'infligé les dégats, en passant d'abord les défenses de la case puis celles de l'agissant. Attachée à la victime."""
+    """L'effet d'attaque dans sa version particulière. Créée par une attaque (version intermèdiaire), chargé d'infligé les dégats, en passant d'abord les défenses de l'agissant. Attachée à la victime."""
     def __init__(self,responsable,degats,element,direction = None):
         self.affiche = True
         self.phase = "démarrage"
@@ -7483,9 +7556,9 @@ class On_hit(Effet):
         self.element = element
 
     def action(self,lanceur,position,controleur):
-        victimes = controleur.get_touches(lanceur,position,self.portee,"Cd_S___",None,False)
-        for victime in victimes :
-            victime.effets.append(Attaque_particulier(lanceur,self.degats,self.element))
+        positions_touches = controleur.get_pos_touches(position,self.portee)
+        for position_touche in positions_touches:
+            controleur.labs[position[0]].matrice_cases[position_touche[1]][position_touche[2]].effets.append(Attaque_case(lanceur,self.degats,self.element))
 
     def execute(self,lanceur,position,controleur):
         self.action(lanceur,position,controleur)
@@ -7575,7 +7648,10 @@ class Mur_plein(On_try_through):
             self.action(mur,entitee)
 
     def get_skin(self):
-        return SKIN_MUR
+        if not(self.casse) :
+            return SKIN_MUR
+        else:
+            return SKIN_MUR_CASSE
 
 class Mur_impassable(On_try_through):
     """L'effet qui correspond à un mur absolument infranchissable."""
@@ -7795,6 +7871,9 @@ class Terre_permanente(Aura_permanente):
         self.responsable = 0
         self.priorite = priorite
         self.affiche = False
+
+    def execute(self,case,position):
+        case.code += 1 #0 ou 1, selon que la case a une aura de Terre ou non
 
 class Feu(Evenement,Aura_elementale):
     """L'effet qui applique l'aura de feu à une case. Laissé ici par un agissant."""
@@ -8237,9 +8316,9 @@ class Magie_soin_de_zone(Cible_case):
         self.affiche = False
 
     def action(self,lanceur):
-        cibles = lanceur.controleur.get_touches_pos(lanceur.ID,self.cible,self.portee) #À finir. Peut-être cibler une position ?
-        for cible in cibles:
-            cible.effets.append(Soin(self.gain_pv))
+        poss = lanceur.controleur.get_pos_touches(self.cible,self.portee)
+        for pos in poss:
+            lanceur.controleur.labs[pos[0]].matrice_cases[pos[1]][pos[2]].effets.append(Soin_case(self.gain_pv),lanceur.ID)
 
     def get_skin():
         return SKIN_MAGIE_SOIN_ZONE
@@ -8260,6 +8339,34 @@ class Magie_auto_soin(Magie):
 
     def get_skin():
         return SKIN_MAGIE_AUTO_SOIN
+
+class Soin_case(On_post_action):
+    """Un effet de soin. À répercuter sur les occupants éventuels de la case."""
+    def __init__(self,gain_pv,responsable=0,cible="alliés"):
+        self.phase = "démarrage"
+        self.gain_pv = gain_pv
+        self.responsable = responsable
+        self.cible = cible
+        self.affiche = True
+
+    def action(self,case,position):
+        cibles_potentielles = case.controleur.trouve_agissants(position)
+        for cible_potentielle in cibles_potentielles:
+            if self.responsable == 0: #Pas de responsable. Sérieusement ?
+                case.controleur.get_entitee(cible_potentielle).effets.append(Soin(self.gain_pv))
+            else:
+                esprit = case.controleur.get_esprit(case.controleur.get_entitee(self.responsable).esprit)
+                if esprit == None: #Pas d'esprit ? Sérieusement ?
+                    case.controleur.get_entitee(cible_potentielle).effets.append(Soin(self.gain_pv))
+                elif self.cible == "alliés" and cible_potentielle in case.controleur.get_esprit(case.controleur.get_entitee(self.responsable).esprit).get_corps():
+                    case.controleur.get_entitee(cible_potentielle).effets.append(Soin(self.gain_pv))
+                elif self.cible == "neutres" and not cible_potentielle in case.controleur.get_esprit(case.controleur.get_entitee(self.responsable).esprit).get_ennemis():
+                    case.controleur.get_entitee(cible_potentielle).effets.append(Soin(self.gain_pv))
+
+    def execute(self,case,position):
+        if self.phase == "démarrage" :
+            self.action(case,position)
+            self.termine()
 
 class Soin(On_fin_tour):
     """Un effet de soin. Généralement placé sur l'agissant par une magie de soin, de soin de zone, ou d'auto-soin."""
@@ -9092,6 +9199,7 @@ class Affichage:
         self.position_debut_y_titre = 0
         self.position_debut_y_rectangles_et_carre = 0
         self.position_fin_y_rectangles_et_carre = 0
+        self.frame = 0
         self.messages = [["Affichage initialisé avec succès",20,0]]
         self.recalcule_zones()
         self.dessine_zones("carré")
@@ -9135,6 +9243,8 @@ class Affichage:
         self.position_fin_y_rectangles_et_carre = self.position_debut_y_rectangles_et_carre + self.hauteur_exploitable
 
     def dessine(self,joueur):
+        """phase de jeu normale"""
+        self.frame += 1
         self.dessine_zones(joueur.curseur)
 
         self.dessine_lab(joueur)
@@ -9142,6 +9252,8 @@ class Affichage:
         self.dessine_gauche(joueur)
 
     def draw_magie_cible(self,joueur):
+        """phase de choix d'une cible"""
+        self.frame += 1
         self.dessine_zones(joueur.curseur)
 
         self.dessine_lab(joueur)
@@ -9149,10 +9261,14 @@ class Affichage:
         self.dessine_gauche(joueur)
 
     def redraw_magie_cible(self,joueur,proportion_ecoulee):
+        """phase de choix d'une cible"""
+        self.frame += 1
         self.redessine_zone_d()
         self.dessine_droite_magie_cible(joueur,proportion_ecoulee)
 
     def draw_magie_case(self,joueur):
+        """phase de choix d'une case"""
+        self.frame += 1
         self.dessine_zones(joueur.curseur)
 
         self.dessine_lab_magie(joueur)
@@ -9160,11 +9276,15 @@ class Affichage:
         self.dessine_gauche(joueur)
 
     def redraw_magie_case(self,joueur,proportion_ecoulee):
+        """phase de choix d'une case"""
+        self.frame += 1
         self.redessine_zone_c()
         self.dessine_lab_magie(joueur)
         self.dessine_droite_magie_case(joueur,proportion_ecoulee)
 
     def draw_magie_dir(self,joueur):
+        """phase de choix d'une direction"""
+        self.frame += 1
         self.dessine_zones(joueur.curseur)
 
         self.dessine_lab(joueur)
@@ -9172,10 +9292,14 @@ class Affichage:
         self.dessine_gauche(joueur)
 
     def redraw_magie_dir(self,joueur,proportion_ecoulee):
+        """phase de choix d'une direction"""
+        self.frame += 1
         self.redessine_zone_d()
         self.dessine_droite_magie_dir(joueur,proportion_ecoulee)
 
     def draw_magie_cout(self,joueur):
+        """phase de choix d'un cout"""
+        self.frame += 1
         self.dessine_zones(joueur.curseur)
 
         self.dessine_lab(joueur)
@@ -9183,6 +9307,8 @@ class Affichage:
         self.dessine_gauche(joueur)
 
     def redraw_magie_cout(self,joueur,proportion_ecoulee):
+        """phase de choix d'un cout"""
+        self.frame += 1
         self.redessine_zone_d()
         self.dessine_droite_magie_cout(joueur,proportion_ecoulee)
 
@@ -10045,6 +10171,8 @@ class Affichage:
             self.screen.blit(texte,(marge_gauche,marge_haut))
 
     def choix_touche(self,joueur,zones,skills,magies,lancer):
+        """phase de choix d'une touche"""
+        self.frame += 1
         self.dessine_zones(joueur.curseur)
 
         self.dessine_choix_touche(joueur,zones,skills,magies,lancer)
@@ -10052,6 +10180,8 @@ class Affichage:
         self.dessine_gauche(joueur)
 
     def choix_niveau(self,joueur):
+        """phase de choix d'un niveau"""
+        self.frame += 1
         self.dessine_zones(joueur.curseur)
 
         self.dessine_choix_niveau(joueur)
@@ -11347,6 +11477,11 @@ class Affichage:
                 for effet in mur.effets:
                     if effet.affiche:
                         effet.get_skin().dessine_toi(self.screen,position,taille,i)
+            for effet in case.effets:
+                if effet.affiche:
+                    effet.get_skin().dessine_toi(self.screen,position,taille)
+                    if effet.phase == "affichage":
+                        effet.phase = "terminé"
             entitees = vue[7]
             agissant = None
             for ID_entitee in entitees : #Puis les items au sol
@@ -11375,11 +11510,6 @@ class Affichage:
                         effet.get_skin().dessine_toi(self.screen,position,taille,direction)
                         if effet.phase == "affichage":
                             effet.phase = "terminé"
-            for effet in case.effets:
-                if effet.affiche:
-                    effet.get_skin().dessine_toi(self.screen,position,taille)
-                    if effet.phase == "affichage":
-                        effet.phase = "terminé"
             #Rajouter des conditions d'observation
 
     def clear(self):

@@ -179,7 +179,7 @@ class Main: #Modifier le nom plus tard pour plus de cohérence
                 self.boucle()
             elif isinstance(res,Controleur):
                 self.controleur = res
-                ID_MAX = max(controleur.entitees.keys())
+                ID_MAX = max(self.controleur.entitees.keys())
                 self.controleur.jeu(screen)
                 self.boucle()
             else:

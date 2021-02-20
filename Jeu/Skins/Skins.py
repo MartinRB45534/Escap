@@ -103,6 +103,8 @@ global SKIN_EFFET
 SKIN_EFFET = Skin("effet.png")
 global SKIN_MUR
 SKIN_MUR = Skin("mur.png")
+global SKIN_MUR_CASSE
+SKIN_MUR_CASSE = Skin("mur_casse.png")
 global SKIN_PORTE
 SKIN_PORTE = Skin("porte.png")
 global SKIN_PORTE_OUVERTE
@@ -127,6 +129,14 @@ global SKIN_QUITTER
 SKIN_QUITTER = Skin("quitter.png")
 global SKIN_ZONES
 SKIN_ZONES = Skin("zones.png")
+global SKIN_ATTAQUE_TERRE
+SKIN_ATTAQUE_TERRE = Skin("attaque_1.png")
+global SKIN_ATTAQUE_FEU
+SKIN_ATTAQUE_FEU = Skin("attaque_2.png")
+global SKIN_ATTAQUE_GLACE
+SKIN_ATTAQUE_GLACE = Skin("attaque_4.png")
+global SKIN_ATTAQUE_OMBRE
+SKIN_ATTAQUE_OMBRE = Skin("attaque_8.png")
 
 # Skills :
 
