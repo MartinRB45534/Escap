@@ -1,6 +1,7 @@
 from Jeu.Systeme.Classe import *
 from Jeu.Systeme.Constantes_magies.Magies import *
 from Jeu.Systeme.Constantes_projectiles.Projectiles import *
+from Jeu.Systeme.Constantes_stats import *
 from Jeu.Constantes import *
 from Jeu.Skins.Skins import *
 import random
@@ -68,7 +69,7 @@ class Controleur():
         self.labs["armurerie"] = Labyrinthe("armurerie",10,10,("armurerie",0,0),[Patern(("armurerie",0,0),10,10,[])])
 
         #On rajoute un joueur ;
-        self.entitees[2] = Joueur(("test_magies",2,2),100,100,1,1000,1000,1,10,10,1,1,1,1,1,Classe_principale([],[],True,"joueur"),screen) #Ne fonctionne que si on vient de faire l'init
+        self.entitees[2] = Joueur(("test_magies",2,2),screen) #Ne fonctionne que si on vient de faire l'init
 
         #On place la barrière du labyrinthe "test_barriere"
         self.set_barriere_classe(("test_barriere",9,6),DROITE,Item)
@@ -2123,35 +2124,35 @@ class Fantome(Entitee):
 
 class Agissant(Entitee): #Tout agissant est un cadavre, tout cadavre n'agit pas.
     """La classe des entitées animées. Capable de décision, de différentes actions, etc. Les principales caractéristiques sont l'ID, les stats, et la classe principale."""
-    def __init__(self,position,pv,pv_max,regen_pv,pm,pm_max,regen_pm,force,priorite,vitesse,affinite_ombre,affinite_feu,affinite_terre,affinite_glace,classe_principale):
-
+    def __init__(self,position,identite,niveau):
         Entitee.__init__(self,position)
-
-        self.pv=pv
-        self.pv_max=pv_max
-        self.regen_pv=regen_pv
+        stats=CONSTANTES_STATS[identite]
+        self.pv=stats['pv'][niveau]
+        self.pv_max=self.pv
+        self.regen_pv=stats['regen_pv'][niveau]
         self.taux_regen_pv = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à la régénération des pv. Correspond aux effets passager sur la régénération des pv.
-        self.pm=pm
-        self.pm_max=pm_max
-        self.regen_pm=regen_pm
+        self.pm=stats['pm'][niveau]
+        self.pm_max=self.pm
+        self.regen_pm=stats['regen_pm'][niveau]
         self.taux_regen_pm = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à la régénération des pm. Correspond aux effets passager sur la régénération des pm.
-        self.force=force
+        self.force=stats['force'][niveau]
         self.taux_force = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à la force. Correspond aux effets passager sur la force.
-        self.priorite=priorite
+        self.priorite=stats['priorite'][niveau]
         self.taux_priorite = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à la priorité. Correspond aux effets passager sur la priorité.
-        self.vitesse = vitesse
+        self.vitesse=stats['vitesse'][niveau]
         self.taux_vitesse = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à la vitesse. Correspond aux effets passager sur la vitesse.
-        self.aff_o=affinite_ombre
+        self.aff_o=stats['aff_o'][niveau]
         self.taux_aff_o = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à l'affinité à l'ombre. Correspond aux effets passager sur l'affinité à l'ombre.
-        self.aff_f=affinite_feu
+        self.aff_f=stats['aff_f'][niveau]
         self.taux_aff_f = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à l'affinité au feu. Correspond aux effets passager sur l'affinité au feu.
-        self.aff_t=affinite_terre
+        self.aff_t=stats['aff_t'][niveau]
         self.taux_aff_t = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à l'affinité à la terre. Correspond aux effets passager sur l'affinité à la terre.
-        self.aff_g=affinite_glace
+        self.aff_g=stats['aff_g'][niveau]
         self.taux_aff_g = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à l'affinité à la glace. Correspond aux effets passager sur l'affinité à la glace.
         self.taux_stats = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer aux statistiques. Correspond aux effets passager sur les statistiques. (Inclure les regen dans les stats ?)
         self.immunites = [] #La liste des éléments auxquels l'entitée est immunisé (très rare)
-        self.classe_principale = classe_principale
+        self.especes=stats['especes']
+        self.classe_principale = Classe_principale(identite,niveau)
         self.classe_principale.evo()
         self.niveau = self.classe_principale.niveau
         self.etat = "vivant"
@@ -2165,7 +2166,7 @@ class Agissant(Entitee): #Tout agissant est un cadavre, tout cadavre n'agit pas.
         self.esprit=None
 
         #possessions de l'agissant
-        self.inventaire = Inventaire(self.ID,10)
+        self.inventaire = Inventaire(self.ID,stats['doigts'])
 
         #la direction du regard
         self.skill_courant = None
@@ -2178,6 +2179,67 @@ class Agissant(Entitee): #Tout agissant est un cadavre, tout cadavre n'agit pas.
         self.multi = False
         self.latence = 0
         self.hauteur = 0 #Des fois qu'on devienne un item
+
+        if stats['special']:
+            #Quelques entitées un peu particulières :
+            pass
+
+##    def __init__(self,position,pv,pv_max,regen_pv,pm,pm_max,regen_pm,force,priorite,vitesse,affinite_ombre,affinite_feu,affinite_terre,affinite_glace,classe_principale,especes = ["humain"]):
+##
+##        Entitee.__init__(self,position)
+##
+##        self.pv=pv
+##        self.pv_max=pv_max
+##        self.regen_pv=regen_pv
+##        self.taux_regen_pv = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à la régénération des pv. Correspond aux effets passager sur la régénération des pv.
+##        self.pm=pm
+##        self.pm_max=pm_max
+##        self.regen_pm=regen_pm
+##        self.taux_regen_pm = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à la régénération des pm. Correspond aux effets passager sur la régénération des pm.
+##        self.force=force
+##        self.taux_force = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à la force. Correspond aux effets passager sur la force.
+##        self.priorite=priorite
+##        self.taux_priorite = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à la priorité. Correspond aux effets passager sur la priorité.
+##        self.vitesse = vitesse
+##        self.taux_vitesse = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à la vitesse. Correspond aux effets passager sur la vitesse.
+##        self.aff_o=affinite_ombre
+##        self.taux_aff_o = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à l'affinité à l'ombre. Correspond aux effets passager sur l'affinité à l'ombre.
+##        self.aff_f=affinite_feu
+##        self.taux_aff_f = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à l'affinité au feu. Correspond aux effets passager sur l'affinité au feu.
+##        self.aff_t=affinite_terre
+##        self.taux_aff_t = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à l'affinité à la terre. Correspond aux effets passager sur l'affinité à la terre.
+##        self.aff_g=affinite_glace
+##        self.taux_aff_g = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à l'affinité à la glace. Correspond aux effets passager sur l'affinité à la glace.
+##        self.taux_stats = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer aux statistiques. Correspond aux effets passager sur les statistiques. (Inclure les regen dans les stats ?)
+##        self.immunites = [] #La liste des éléments auxquels l'entitée est immunisé (très rare)
+##        self.especes = especes
+##        self.classe_principale = classe_principale
+##        self.classe_principale.evo()
+##        self.niveau = self.classe_principale.niveau
+##        self.etat = "vivant"
+##
+##        #vue de l'agissant
+##        self.vue = None
+##        self.position_vue = None
+##        self.vue_nouvelle = False
+##
+##        self.offenses=[]
+##        self.esprit=None
+##
+##        #possessions de l'agissant
+##        self.inventaire = Inventaire(self.ID,10)
+##
+##        #la direction du regard
+##        self.skill_courant = None
+##        self.dir_regard = 0
+##        self.talent = 1
+##        self.magie_courante = None
+##        self.cible_magie = None
+##        self.dir_magie = None
+##        self.cout_magie = 0
+##        self.multi = False
+##        self.latence = 0
+##        self.hauteur = 0 #Des fois qu'on devienne un item
 
     def active(self,controleur):
         self.controleur = controleur
@@ -2384,6 +2446,9 @@ class Agissant(Entitee): #Tout agissant est un cadavre, tout cadavre n'agit pas.
         if self.etat == "oeuf":
             return Oeuf
 
+    def get_especes(self):
+        return self.especes
+
     def get_description(self,observation):
         if self.etat == "vivant":
             return ["Un agissant","Qu'est-ce qu'il fait dans mon inventaire ?"]
@@ -2547,11 +2612,7 @@ class Agissant(Entitee): #Tout agissant est un cadavre, tout cadavre n'agit pas.
 class Tank(Agissant):
     """La classe des agissants forts en défense."""
     def __init__(self,position,niveau):
-        if niveau == 1:
-            Agissant.__init__(self,position,150,150,0,0,0,0,3,1,1,1,1,2,1,Classe_principale([],[],False,"Tank",niveau))
-
-        elif niveau == 2:
-            Agissant.__init__(self,position,200,200,0,0,0,0,3,1,1,1,1,2,1,Classe_principale([],[],False,"Tank",niveau))
+        Agissant.__init__(self,position,"tank",niveau)
 
     def get_offenses(self):
         offenses = self.offenses
@@ -2578,11 +2639,7 @@ class Tank(Agissant):
 class Dps(Agissant):
     """La classe des agissants forts en attaque."""
     def __init__(self,position,niveau):
-        if niveau == 1:
-            Agissant.__init__(self,position,50,50,0,0,0,0,5,1,2.1,1,1,1,1,Classe_principale([],[],False,"Dps",niveau))
-
-        elif niveau == 2:
-            Agissant.__init__(self,position,75,75,0,0,0,0,15,1,2.1,1,1,1,1,Classe_principale([],[],False,"Dps",niveau))
+        Agissant.__init__(self,position,"dps",niveau)
 
     def get_offenses(self):
         offenses = self.offenses
@@ -2609,16 +2666,10 @@ class Dps(Agissant):
 class Soigneur(Agissant):
     """La classe des agissants qui soignent les autres."""
     def __init__(self,position,niveau):
-        if niveau == 1:
-            Agissant.__init__(self,position,50,50,0,100,100,0.1,1,1,0.9,1.5,1,1,1,Classe_principale([],[],False,"Soigneur",niveau))
-            magie = trouve_skill(self.classe_principale,Skill_magie)
-            magie.ajoute(Magie_soin)
-            magie.ajoute(Magie_auto_soin)
-        if niveau == 2:
-            Agissant.__init__(self,position,75,75,0,120,120,0.2,1,1,0.9,1.5,1,1,1,Classe_principale([],[],False,"Soigneur",niveau))
-            magie = trouve_skill(self.classe_principale,Skill_magie)
-            magie.ajoute(Magie_soin)
-            magie.ajoute(Magie_auto_soin)
+        Agissant.__nit__(self,position,'soigneur',niveau)
+        magie = trouve_skill(self.classe_principale,Skill_magie)
+        magie.ajoute(Magie_soin)
+        magie.ajoute(Magie_auto_soin)
 
     def get_offenses(self):
         offenses = self.offenses
@@ -2645,14 +2696,10 @@ class Soigneur(Agissant):
 class Renforceur(Agissant):
     """La classe des agissants qui renforcent les autres."""
     def __init__(self,position,niveau):
-        if niveau == 1:
-            Agissant.__init__(self,position,50,50,0.05,100,100,0.1,1,1,0.6,1.5,1.2,1,1.3,Classe_principale([],[],False,"Soigneur",niveau))
-            magie = trouve_skill(self.classe_principale,Skill_magie)
-            magie.ajoute(Magie_enchantement_force())
-        if niveau == 2:
-            Agissant.__init__(self,position,75,75,0.05,120,120,0.2,1,1,0.7,1.6,1.3,1.1,1.4,Classe_principale([],[],False,"Soigneur",niveau))
-            magie = trouve_skill(self.classe_principale,Skill_magie)
-            magie.ajoute(Magie_enchantement_force())
+        Agissant.__init__(self,position,"soutien",niveau)
+        magie = trouve_skill(self.classe_principale,Skill_magie)
+        magie.ajoute(Magie_enchantement_force())
+
 
     def get_offenses(self):
         offenses = self.offenses
@@ -2664,15 +2711,47 @@ class Renforceur(Agissant):
         else:
             etat = "soutien"
         return offenses, etat
-                
-class Joueur(Agissant,Entitee_superieure):
+
+    def get_skin(self):
+        if self.etat == "vivant":
+            if self.esprit == "1":
+                return SKIN_VERT
+            elif self.esprit == "2":
+                return SKIN_ROUGE
+            else:
+                return SKIN_AGISSANT
+        else:
+            return SKIN_CADAVRE
+##
+##class Gobelin(Agissant):
+##    """Le monstre de base. Faible, souvent en groupe."""
+##    def __init__(self,position,niveau):
+##        Agissant.__init__(self,position,pv_gobelin[niveau],pv_gobelin[niveau],regen_pv_gobelin[niveau],0,0,0,force_gobelin[niveau],priorite_gobelin[niveau],vitess_gobelin[niveau],aff_o_gobelin[niveau],aff_f_gobelin[niveau],aff_t_gobelin[niveau],aff_g_gobelin[niveau],classe_principale([],[],False,"gobelin",niveau),"gobelin")
+##
+
+class Humain(Agissant,Entitee_superieure):
+    """La classe des pnjs et du joueur. A un comportement un peu plus complexe, et une personnalité."""
+    def get_offenses(self):
+        offenses = self.offenses
+        self.offenses = []
+        if self.etat != "vivant" or self.controleur == None:
+            etat = "incapacite"
+        elif self.fuite():
+            etat = "fuite"
+        else:
+            etat = self.role
+        return offenses, etat
+
+class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, c'est le personnage principal !)
     """La classe du joueur."""
-    def __init__(self,position,pv,pv_max,regen_pv,pm,pm_max,regen_pm,force,priorite,vitesse,affinite_ombre,affinite_feu,affinite_terre,affinite_glace,classe_principale,screen):
+    def __init__(self,position,screen):
 
 
         #Le joueur est un agissant (peut-être remplacer par un Humain.__init__ à un moment ?)
-        Agissant.__init__(self,position,pv,pv_max,regen_pv,pm,pm_max,regen_pm,force,priorite,vitesse,affinite_ombre,affinite_feu,affinite_terre,affinite_glace,classe_principale)
+        Agissant.__init__(self,position,'joueur',1)
 
+        self.apreciations = [0,0,0,0,0,0,0,0,0,0]
+        self.role = "independant"
 
         #Il doit afficher tout ce qu'il voit...
         print("Initialisation du joueur")
@@ -2714,8 +2793,6 @@ class Joueur(Agissant,Entitee_superieure):
         self.prem_feu = None
         self.prem_glace = None
         self.prem_ombre = None
-
-
 
         #Il utilise le clavier pour tout controler. Les touches sont liées à des actions, on peut aussi modifier les touches.
         self.cat_touches = {pygame.K_UP:"directionelle", #Les touches directionnelles tournent le joueur
@@ -2765,6 +2842,9 @@ class Joueur(Agissant,Entitee_superieure):
 
     def get_skin(self):
         return SKIN_JOUEUR
+
+    def fuite(self):
+        return False #À modifier pour quand on prend le controle de Dev
 
     def debut_tour(self):
         self.affichage.dessine(self)
@@ -2883,38 +2963,6 @@ class Joueur(Agissant,Entitee_superieure):
             self.dir_magie = self.dir_regard
             self.controleur.unset_phase(COMPLEMENT_DIR)
             self.methode_courante = None
-        
-##    def select_direction(self,magie,agissant):
-##        if isinstance(agissant,Joueur):
-##            direction = agissant.dir_regard
-##            affichage = agissant.affichage
-##            affichage.draw_magie_dir(agissant,direction)
-##            temps = magie.temps
-##            run = True
-##            start_time = pygame.time.get_ticks()
-##            current_time = start_time
-##            too_late = start_time + temps
-##            while current_time < too_late and run:
-##                events = pygame.event.get()
-##                for event in events:
-##                    if event.type == pygame.KEYDOWN:
-##                        if event.key == pygame.K_UP :
-##                            direction = HAUT
-##                        elif event.key == pygame.K_DOWN :
-##                            direction = BAS
-##                        elif event.key == pygame.K_LEFT :
-##                            direction = GAUCHE
-##                        elif event.key == pygame.K_RIGHT :
-##                            direction = DROITE
-##                        elif event.key == pygame.K_RETURN :
-##                            magie.direction = direction
-##                            run = False
-##                current_time = pygame.time.get_ticks()
-##                proportion_ecoulee = (current_time - start_time)/temps
-##                affichage.redraw_magie_dir(direction,proportion_ecoulee) #On ne change pas le reste de l'affichage.
-##                pygame.display.flip()
-##        elif random.random() < agissant.talent :
-##            magie.direction = agissant.direction_magie
 
     def start_select_cout(self,magie):
         self.methode_courante = self.continue_select_cout #Est-ce que ça fonctionnera avec le self comme ça ? Hum...
@@ -2938,40 +2986,6 @@ class Joueur(Agissant,Entitee_superieure):
             self.cout_magie = self.choix_cout_magie
             self.controleur.unset_phase(COMPLEMENT_COUT)
             self.methode_courante = None
-
-##    def select_cout(self,magie,agissant):
-##        if isinstance(agissant,Joueur):
-##            affichage = agissant.affichage
-##            precision_cout_magie = 10
-##            cout = 0
-##            mana_dispo = agissant.get_mana_dispo()
-##            affichage.draw_magie_cout(agissant,cout,precision_cout_magie,mana_dispo) #Rajouter tous les autres trucs à afficher, comme les pv et pm, une fois que j'aurai retravaillé affichage.
-##            temps = magie.temps
-##            run = True
-##            start_time = pygame.time.get_ticks()
-##            current_time = start_time
-##            too_late = start_time + temps
-##            while current_time < too_late and run:
-##                events = pygame.event.get()
-##                for event in events:
-##                    if event.type == pygame.KEYDOWN:
-##                        if event.key == pygame.K_UP and cout < mana_dispo:
-##                            cout += precision_cout_magie
-##                        elif event.key == pygame.K_DOWN and cout > 0:
-##                            cout -= precision_cout_magie
-##                        elif event.key == pygame.K_LEFT and precision_cout_magie > 0:
-##                            precision_cout_magie -= 1
-##                        elif event.key == pygame.K_RIGHT :
-##                            precision_cout_magie += 1
-##                        elif event.key == pygame.K_RETURN :
-##                            magie.cout_pm = cout
-##                            run = False
-##                current_time = pygame.time.get_ticks()
-##                proportion_ecoulee = (current_time - start_time)/temps
-##                affichage.redraw_magie_cout(cout,precision_cout_magie,mana_dispo,proportion_ecoulee)
-##                pygame.display.flip()
-##        else :
-##            magie.cout_pm = agissant.cout_magie
 
     def start_select_cible(self,magie):
         if isinstance(magie,Multi_cible):
@@ -3025,95 +3039,6 @@ class Joueur(Agissant,Entitee_superieure):
             self.controleur.unset_phase(COMPLEMENT_CIBLE)
             self.methode_courante = None
 
-##    def select_cible_agissant(self,magie,joueur):
-##        cibles = self.get_cibles_potentielles_agissants(magie,joueur)
-##        curseur = 0 #L'indice de la cible sous le curseur.
-##        cible = []
-##        affichage = joueur.affichage
-##        affichage.draw_magie(joueur,cibles,cible,curseur)
-##        multi = isinstance(magie,Multi_cible)
-##        temps = magie.temps
-##        run = True
-##        start_time = pygame.time.get_ticks()
-##        current_time = start_time
-##        too_late = start_time + temps
-##        while current_time < too_late and run:
-##            events = pygame.event.get()
-##            for event in events:
-##                if event.type == pygame.KEYDOWN:
-##                    if event.key == pygame.K_UP :
-##                        if curseur == 0:
-##                            curseur = len(cibles)
-##                        curseur -= 1
-##                    elif event.key == pygame.K_DOWN :
-##                        curseur += 1
-##                        if curseur == len(cibles):
-##                            curseur = 0
-##                    elif event.key == pygame.K_SPACE :
-##                        new_cible = cibles[curseur]
-##                        if multi : #Si jamais une magie peut cibler plusieurs cibles.
-##                            if new_cible in cible :
-##                                cible.remove(new_cible)
-##                            else :
-##                                cible.append(new_cible)
-##                        else:
-##                            cible = [new_cible]
-##                    elif event.key == pygame.K_RETURN and cible != [] :
-##                        if multi :
-##                            magie.cible = cible
-##                        elif cible != []:
-##                            magie.cible = cible[0]
-##                        run = False
-##            current_time = pygame.time.get_ticks()
-##            proportion_ecoulee = (current_time - start_time)/temps
-##            affichage.redraw_magie(joueur,cibles,cible,curseur,proportion_ecoulee)
-##            pygame.display.flip()
-##
-##    def select_cible_item(self,magie,joueur):
-##        print("check")
-##        cibles = self.get_cibles_potentielles_items(magie,joueur)
-##        curseur = 0 #L'indice de la cible sous le curseur.
-##        cible = []
-##        affichage = joueur.affichage
-##        affichage.draw_magie(joueur,cibles,cible,curseur)
-##        multi = isinstance(magie,Multi_cible)
-##        temps = magie.temps
-##        run = True
-##        start_time = pygame.time.get_ticks()
-##        current_time = start_time
-##        too_late = start_time + temps
-##        while current_time < too_late and run:
-##            events = pygame.event.get()
-##            for event in events:
-##                if event.type == pygame.KEYDOWN:
-##                    if event.key == pygame.K_UP :
-##                        if curseur == 0:
-##                            curseur = len(cibles)
-##                        curseur -= 1
-##                    elif event.key == pygame.K_DOWN :
-##                        curseur += 1
-##                        if curseur == len(cibles):
-##                            curseur = 0
-##                    elif event.key == pygame.K_SPACE :
-##                        new_cible = cibles[curseur]
-##                        if multi : #Si jamais une magie peut cibler plusieurs cibles.
-##                            if new_cible in cible :
-##                                cible.remove(new_cible)
-##                            else :
-##                                cible.append(new_cible)
-##                        else:
-##                            cible = [new_cible]
-##                    elif event.key == pygame.K_RETURN and cible != [] :
-##                        if multi :
-##                            magie.cible = cible
-##                        else:
-##                            magie.cible = cible[0]
-##                        run = False
-##            current_time = pygame.time.get_ticks()
-##            proportion_ecoulee = (current_time - start_time)/temps
-##            affichage.redraw_magie(joueur,cibles,cible,curseur,proportion_ecoulee)
-##            pygame.display.flip()
-
     def start_select_cible_case(self,magie):
         self.methode_courante = self.continue_select_case
         self.cibles = self.controleur.get_cibles_potentielles_cases(magie,self)
@@ -3148,49 +3073,6 @@ class Joueur(Agissant,Entitee_superieure):
                 self.cible_magie = self.cible[0]
             self.controleur.unset_phase(COMPLEMENT_CIBLE)
             self.methode_courante = None
-
-##    def select_cible_case(self,magie,joueur):
-##        cibles = self.get_cibles_potentielles_cases(magie,joueur)
-##        curseur = (joueur.position[0],joueur.position[1],joueur.position[2]) #La position de la cible sous le curseur.
-##        cible = []
-##        affichage = joueur.affichage
-##        affichage.draw_magie_case(joueur,cibles,cible,curseur)
-##        multi = isinstance(magie,Multi_cible)
-##        temps = magie.temps
-##        run = True
-##        start_time = pygame.time.get_ticks()
-##        current_time = start_time
-##        too_late = start_time + temps
-##        while current_time < too_late and run:
-##            events = pygame.event.get()
-##            for event in events:
-##                if event.type == pygame.KEYDOWN:
-##                    if event.key == pygame.K_UP :
-##                        curseur = (curseur[0],curseur[1],curseur[2]-1)
-##                    elif event.key == pygame.K_DOWN :
-##                        curseur = (curseur[0],curseur[1],curseur[2]+1)
-##                    elif event.key == pygame.K_LEFT :
-##                        curseur = (curseur[0],curseur[1]-1,curseur[2])
-##                    elif event.key == pygame.K_RIGHT :
-##                        curseur = (curseur[0],curseur[1]+1,curseur[2])
-##                    elif event.key == pygame.K_SPACE and curseur in cibles:
-##                        if multi : #Si jamais une magie peut cibler plusieurs cibles.
-##                            if curseur in cible :
-##                                cible.remove(curseur)
-##                            else :
-##                                cible.append(curseur)
-##                        else:
-##                            cible = [curseur]
-##                    elif event.key == pygame.K_RETURN and cible != [] :
-##                        if multi :
-##                            magie.cible = cible
-##                        else:
-##                            magie.cible = cible[0]
-##                        run = False
-##            current_time = pygame.time.get_ticks()
-##            proportion_ecoulee = (current_time - start_time)/temps
-##            affichage.redraw_magie_case(joueur,cibles,cible,curseur,proportion_ecoulee)
-##            pygame.display.flip()
 
     def start_change_touches(self,etage = -1,element_courant = 0): #On commence le changement de touches
         self.controleur.set_phase(TOUCHE)
@@ -3297,117 +3179,6 @@ class Joueur(Agissant,Entitee_superieure):
                         self.skill_touches.pop(touche)
                         self.projectiles.pop(touche)
         self.affichage.choix_touche(self,zones,skills,magies,lancer)
-
-##    def change_touches(self): #Deprecated /!\
-##        zones,skills,magies,lancer = self.get_touches_courantes()
-##        element_courant = 0
-##        etage = -1
-##        attente = False
-##        run = True
-##        clock = pygame.time.Clock()
-##        while run :
-##            zones,skills,magies,lancer = self.get_touches_courantes()
-##            events = pygame.event.get()
-##            for event in events :
-##                if event.type == pygame.KEYDOWN :
-##                    if attente:
-##                        touche = event.key # La touche à attribuer au skill/magie/projectile/controle de zone
-##                        if touche == pygame.K_RETURN : # On ne souhaite pas attribuer de nouvelle touche
-##                            attente = False
-##                        elif touche in self.cat_touches.keys() : # La touche est déjà attribuée !
-##                            self.affichage.message("Cette touche est déjà utilisée !")
-##                        else :
-##                            if etage == 0 :
-##                                self.cat_touches[touche] = "zone"
-##                                self.dir_touches[touche] = zones[element_courant]
-##                            elif etage == 1 :
-##                                self.cat_touches[touche] = "skill"
-##                                self.skill_touches[touche] = type(skills[element_courant])
-##                            elif etage == 2 :
-##                                self.cat_touches[touche] = "skill"
-##                                self.skill_touches[touche] = Skill_magie
-##                                self.magies[touche] = magies[element_courant].nom
-##                            elif etage == 3 :
-##                                self.cat_touches[touche] = "skill"
-##                                self.skill_touches[touche] = Skill_lancer
-##                                self.projectiles[touche] = lancer[element_courant]
-##                            self.affichage.message("La nouvelle touche a bien été définie.")
-##                            attente = False
-##                    elif event.key == pygame.K_UP and etage != -1 :
-##                        element_courant = etage
-##                        etage = -1
-##                    elif event.key == pygame.K_DOWN and etage == -1 :
-##                        if element_courant != 4:
-##                            etage = element_courant
-##                            element_courant = 0
-##                    elif event.key == pygame.K_RIGHT :
-##                        element_courant += 1
-##                        if etage == -1 and element_courant > 4 :
-##                            element_courant = 0
-##                        elif etage == 0 and element_courant > len(zones) :
-##                            element_courant = 0
-##                        elif etage == 1 and element_courant > len(skills) :
-##                            element_courant = 0
-##                        elif etage == 2 and element_courant > len(magies) :
-##                            element_courant = 0
-##                        elif etage == 3 and element_courant > len(lancer) :
-##                            element_courant = 0
-##                    elif event.key == pygame.K_LEFT :
-##                        element_courant -= 1
-##                        if etage == -1 and element_courant < 0 :
-##                            element_courant = 4
-##                        elif etage == 0 and element_courant < 0 :
-##                            element_courant = len(zones)
-##                        elif etage == 1 and element_courant < 0 :
-##                            element_courant = len(skills)
-##                        elif etage == 2 and element_courant < 0 :
-##                            element_courant = len(magies)
-##                        elif etage == 3 and element_courant < 0 :
-##                            element_courant = len(lancer)
-##                    elif event.key == pygame.K_RETURN :
-##                        if (etage == -1 and element_courant == 4) or (etage == 0 and element_courant == len(zones)) or (etage == 1 and element_courant == len(skills)) or (etage == 2 and element_courant == len(magies)) or (etage == 3 and element_courant == len(lancer)):
-##                            if self.check_touches():
-##                                run = False
-##                        else :
-##                            if etage != -1 and (etage != 1 or not isinstance(skills[element_courant],(Skill_magie,Skill_lancer))):
-##                                attente = True
-##                            if etage == 0 :
-##                                touche = None
-##                                for key in self.dir_touches.keys():
-##                                    if self.dir_touches[key] == zones[element_courant] and self.cat_touches[key] == "zone":
-##                                        touche = key
-##                                if touche !=  None:
-##                                    self.cat_touches.pop(key)
-##                                    self.dir_touches.pop(key)
-##                            elif etage == 1 :
-##                                touche = None
-##                                for key in self.skill_touches.keys():
-##                                    if self.skill_touches[key] == type(skills[element_courant]):
-##                                        touche = key
-##                                if touche !=  None:
-##                                    self.cat_touches.pop(key)
-##                                    self.skill_touches.pop(key)
-##                            elif etage == 2 :
-##                                touche = None
-##                                for key in self.magies.keys():
-##                                    if self.magies[key] == magies[element_courant]:
-##                                        touche = key
-##                                if touche !=  None:
-##                                    self.cat_touches.pop(key)
-##                                    self.skill_touches.pop(key)
-##                                    self.magies.pop(key)
-##                            elif etage == 3 :
-##                                touche = None
-##                                for key in self.projectiles.keys():
-##                                    if self.projectiles[key] == lancer[element_courant]:
-##                                        touche = key
-##                                if touche !=  None:
-##                                    self.cat_touches.pop(key)
-##                                    self.skill_touches.pop(key)
-##                                    self.projectiles.pop(key)
-##            self.affichage.choix_touche(self,etage,element_courant,zones,skills,magies,lancer)
-##            pygame.display.flip()
-##            clock.tick(20)
 
     def check_touches(self):
         # On vérifie que les touches indispensables sont bien pourvues
@@ -4060,7 +3831,7 @@ class Joueur(Agissant,Entitee_superieure):
                     self.choix_niveaux[CLASSIQUE][6] = CHARGE_ETENDUE
             elif self.choix_niveaux[CLASSIQUE][2] == ESSENCE_MAGIQUE:
                 if choix == INHUMANITE:
-                    # Bon, les espèces ne sont pas encore implémentées, donc il n'y a rien pour l'instant. Mais basiquement, ça évite de se faire agresser par la plupart des monstres. Les amis humains risquent de ne pas apprécier, par contre...
+                    self.especes.remove('humain') #Ça évite de se faire agresser par la plupart des monstres. Les amis humains risquent de ne pas apprécier, par contre...
                     self.choix_niveaux[CLASSIQUE][6] = INHUMANITE
                 elif choix == MAGICIEN:
                     classe = Magicien() #Un gros boost à tout ce qui est orienté magie.
@@ -4466,6 +4237,263 @@ class Joueur(Agissant,Entitee_superieure):
             self.choix_niveaux[ELEMENTAL][OMBRE][affinite] = False
             self.immunites.append(OMBRE)
 
+class Receptioniste(Humain): #Le deuxième humain du jeu, à l'étage 1 (engage la conversation après la chute, indique les commandes de base)
+    """La classe du récéptionniste."""
+    def __init__(self,position,screen):
+
+        Agissant.__init__(self,position,'receptionniste',5) #À un haut niveau dès le départ
+
+        self.appreciations = [0,3,0,0,0,0,1,3,6,0]
+        self.role = "attaque"
+
+        #Penser à l'équipper, c'est quand-même un épéiste
+
+        #Peut recevoir l'ordre : d'attaquer (chercher et combattre les ennemis),
+        #                        de tuer (éliminer un ennemi ciblé),
+        #                        d'attendre (rester sur place jusqu'à l'arrivée d'ennemis ou un nouvel ordre),
+        #                        de tenir une position (rester sur place à tout prix),
+        #                        d'aller (se diriger vers l'endroit ciblé, en éliminant les ennemis en cours de route, puis y attendre),
+        #                        de fuir (se mettre à l'abri en évitant les combats),
+        #                        d'explorer (chercher la sortie),
+        #                        de suivre (se déplacer avec le joueur, combattre les monstres en chemin, aller vers la sortie lorsque quelqu'un l'a trouvée)
+
+    def fuite(self):
+        #On fuit si on est en danger (pv trop bas) à condition d'avoir un chemin de fuite, et qu'il n'y ait aucun allié en danger au front
+        #Pour l'instant on va juste vérifier les pv :
+        taux_limite = 0.2 + 0.01*self.appreciations[1] #Quand on se hait, on devient plus suicidaire
+        return self.pv // self.pv_max <= taux_limite
+
+    # /!\ Pour améliorer ça : modifier le taux limite en fonction des autres humains en danger au front et de l'appréciation qu'on a pour eux
+    # et ne pas fuir s'il n'y a nulle part où fuir ou si le joueur a donné ordre de ne pas fuir et qu'on a suffisamment d'appréciation pour lui (rajouter un modificateur au taux_limite ?)
+
+    def get_skin(self):
+        return SKIN_RECEPTIONNISTE
+
+class Paume(Humain): #Le troisième humain du jeu, à l'étage 2 (complêtement paumé, rejoint le joueur sauf rares exceptions)
+    """La classe du mec paumé."""
+    def __init__(self,position,screen):
+
+        Agissant.__init__(self,position,'paume',1) #Plutôt faible, de base
+
+        self.appreciations = [1,1,3,2,0,0,0,7,4,-1]
+        self.role = "attaque"
+
+        #Est-ce qu'il a un minimum d'équippement ?
+
+        #Peut recevoir l'ordre : d'attaquer (chercher et combattre les ennemis),
+        #                        de tuer (éliminer un ennemi ciblé),
+        #                        d'attendre (rester sur place jusqu'à l'arrivée d'ennemis ou un nouvel ordre),
+        #                        de tenir une position (rester sur place à tout prix),
+        #                        d'aller (se diriger vers l'endroit ciblé, en éliminant les ennemis en cours de route, puis y attendre),
+        #                        de fuir (se mettre à l'abri en évitant les combats),
+        #                        de suivre (se déplacer avec le joueur, combattre les monstres en chemin, aller vers la sortie lorsque quelqu'un l'a trouvée)
+
+    def fuite(self):
+        #On fuit si on est en danger (pv trop bas) à condition d'avoir un chemin de fuite
+        #Pour l'instant on va juste vérifier les pv :
+        taux_limite = 0.1 + 0.01*self.appreciations[1] #Quand on se hait, on devient plus suicidaire
+        return self.pv // self.pv_max <= taux_limite
+
+    # /!\ Pour améliorer ça : modifier le taux limite en fonction des autres humains en danger au front et de l'appréciation qu'on a pour eux (exceptionnel, pour le cas où le paumé serait amoureux, sinon il obéit et fuit normalement)
+    # et ne pas fuir s'il n'y a nulle part où fuir ou si le joueur a donné ordre de ne pas fuir et qu'on a suffisamment d'appréciation pour lui (rajouter un modificateur au taux_limite ?)
+
+    def get_skin(self):
+        return SKIN_PAUME
+
+class Peureuse(Humain): #La quatrième humaine du jeu, à l'étage 3 (terrorisée par les monstres)
+    """La classe de la peureuse."""
+    def __init__(self,position,screen):
+
+        Agissant.__init__(self,position,'peureuse',1) #Plutôt faible, de base
+
+        self.appreciations = [1,1,0,-1,0,9,1,6,-1,-1]
+        self.role = "soutien"
+
+        #Est-ce qu'elle a un minimum d'équippement ?
+
+        #Peut recevoir l'ordre : d'attendre (rester sur place jusqu'à l'arrivée d'ennemis ou un nouvel ordre),
+        #                        d'aller (se diriger vers l'endroit ciblé, en éliminant les ennemis en cours de route, puis y attendre),
+        #                        de fuir (se mettre à l'abri en évitant les combats),
+        #                        d'explorer (chercher la sortie),
+        #                        de suivre (se déplacer avec le joueur, combattre les monstres en chemin, aller vers la sortie lorsque quelqu'un l'a trouvée)
+
+    def fuite(self):
+        #On fuit si on est en danger (pv trop bas) ou en présence d'un monstre à condition d'avoir un chemin de fuite
+        #Pour l'instant on va juste vérifier les pv :
+        taux_limite = 0.7 + 0.01*self.appreciations[1] #Quand on se hait, on devient plus suicidaire
+        return self.pv // self.pv_max <= taux_limite
+
+    # /!\ Pour améliorer ça : fuire dès qu'il y a un monstre en vue et accessible
+    # et ne pas fuir s'il n'y a nulle part où fuir ou si le joueur a donné ordre de ne pas fuir et qu'on a suffisamment d'appréciation pour lui (rajouter un modificateur au taux_limite ?)
+
+    def get_skin(self):
+        return SKIN_PEUREUSE
+
+class Codeur(Humain): #Le cinquième humain du jeu, à l'étage 4 (répond au nom de Dev, quand Il n'est pas occupé à programmer un autre jeu)
+    """Ma classe."""
+    def __init__(self,position,screen):
+
+        Agissant.__init__(self,position,'codeur',1) #La notion de niveau n'a pas d'emprise sur Dev... Il peut modifier son niveau simple 'self.niveau = '
+        self.role = "incapacite" #Dev ne participe pas aux combats
+
+        self.appreciations = [5,0,0,0,0,0,0,0,0,0]
+
+    def fuite(self):
+        return False
+
+    def get_skin(self):
+        return SKIN_CODEUR
+
+class Encombrant(Humain): #Le sixième humain du jeu, à l'étage 5 (moyennement apprèciable, surtout si on essaye de draguer sa copine)
+    """La classe de l'encombrant."""
+    def __init__(self,position,screen):
+
+        Agissant.__init__(self,position,'encombrant',2) #En plus il a fallu que ce soit un combattant relativement aguerri...
+
+        self.appreciations = [0,1,-1,6,0,5,0,3,3,0]
+        self.role = "attaque"
+
+        #Penser à l'équipper
+
+        #Peut recevoir l'ordre : d'attaquer (chercher et combattre les ennemis),
+        #                        de tuer (éliminer un ennemi ciblé),
+        #                        d'attendre (rester sur place jusqu'à l'arrivée d'ennemis ou un nouvel ordre),
+        #                        de tenir une position (rester sur place à tout prix),
+        #                        d'aller (se diriger vers l'endroit ciblé, en éliminant les ennemis en cours de route, puis y attendre),
+        #                        de fuir (se mettre à l'abri en évitant les combats),
+        #                        d'explorer (chercher la sortie),
+        #                        de suivre (se déplacer avec le joueur, combattre les monstres en chemin, aller vers la sortie lorsque quelqu'un l'a trouvée)
+
+    def fuite(self):
+        #On fuit si on est en danger (pv trop bas) à condition d'avoir un chemin de fuite
+        #Pour l'instant on va juste vérifier les pv :
+        taux_limite = 0.4 + 0.01*self.appreciations[1] #Quand on se hait, on devient plus suicidaire
+        return self.pv // self.pv_max <= taux_limite
+
+    # /!\ Pour améliorer ça : ne pas fuir s'il n'y a nulle part où fuir
+
+    def get_skin(self):
+        return SKIN_ENCOMBRANT
+
+class Alchimiste(Humain): #Le septième humain du jeu, à l'étage 6 (un faiseur de potions aux magies diverses)
+    """La classe de l'alchimiste."""
+    def __init__(self,position,screen):
+
+        Agissant.__init__(self,position,'alchimiste',5) #Puissant, mais pas le plus utile en combat...
+
+        self.appreciations = [0,1,0,0,0,0,2,-2,2,-3]
+        self.role = "soutien"
+
+        #Penser à l'équipper, et à remplir son inventaire de potions
+
+        #Peut recevoir l'ordre : d'attaquer (chercher et combattre les ennemis),
+        #                        d'attendre (rester sur place jusqu'à l'arrivée d'ennemis ou un nouvel ordre),
+        #                        de tenir une position (rester sur place à tout prix),
+        #                        d'aller (se diriger vers l'endroit ciblé, en éliminant les ennemis en cours de route, puis y attendre),
+        #                        de fuir (se mettre à l'abri en évitant les combats),
+        #                        d'explorer (chercher la sortie),
+        #                        de suivre (se déplacer avec le joueur, combattre les monstres en chemin, aller vers la sortie lorsque quelqu'un l'a trouvée)
+
+    def fuite(self):
+        #On fuit si on est en danger (pv trop bas) à condition d'avoir un chemin de fuite
+        #Pour l'instant on va juste vérifier les pv :
+        taux_limite = 0.3 + 0.01*self.appreciations[1] #Quand on se hait, on devient plus suicidaire
+        return self.pv // self.pv_max <= taux_limite
+
+    # /!\ Pour améliorer ça : ne pas fuir s'il n'y a nulle part où fuir et ne pas fuir si on n'est pas à portée de monstres
+
+    def get_skin(self):
+        return SKIN_ALCHIMISTE
+
+class Peste(Humain): #La huitième humaine du jeu, à l'étage 7 (une sainte très à cheval sur beaucoup trop de trucs)
+    """La classe de la peste."""
+    def __init__(self,position,screen):
+
+        Agissant.__init__(self,position,'peste',3) #Très bonne soigneuse, accessoirement
+
+        self.appreciations = [1,-1,-2,-2,0,-3,-1,9,-4,-1]
+        self.role = "soin"
+
+        #Penser à l'équipper
+
+        #Peut recevoir l'ordre : d'attaquer (chercher et combattre les ennemis),
+        #                        d'attendre (rester sur place jusqu'à l'arrivée d'ennemis ou un nouvel ordre),
+        #                        d'aller (se diriger vers l'endroit ciblé, en éliminant les ennemis en cours de route, puis y attendre),
+        #                        d'explorer (chercher la sortie),
+        #                        de suivre (se déplacer avec le joueur, combattre les monstres en chemin, aller vers la sortie lorsque quelqu'un l'a trouvée)
+
+    def fuite(self):
+        #On fuit si on est en danger (pv trop bas)
+        #Pour l'instant on va juste vérifier les pv :
+        taux_limite = 0.1 + 0.01*self.appreciations[7] #Quand on se hait, on devient plus suicidaire
+        return self.pv // self.pv_max <= taux_limite
+
+    # /!\ Pour améliorer ça : ne pas fuir s'il n'y a nulle part où fuir et ne pas fuir si on n'est pas à portée de monstre
+
+    def get_skin(self):
+        return SKIN_PESTE
+
+class Bombe_atomique(Humain): #La neuvième humaine du jeu, à l'étage 8 (une magicienne légèrement aguicheuse)
+    """La classe de la bombe atomique."""
+    def __init__(self,position,screen):
+
+        Agissant.__init__(self,position,'bombe_atomique',4) #Ses magies sont littéralement explosives !
+
+        self.appreciations = [3,-1,1,-1,0,2,1,-1,3,0]
+        self.role = "attaque"
+
+        #Penser à l'équipper
+
+        #Peut recevoir l'ordre : d'attaquer (chercher et combattre les ennemis),
+        #                        de tuer (éliminer un ennemi ciblé),
+        #                        d'attendre (rester sur place jusqu'à l'arrivée d'ennemis ou un nouvel ordre),
+        #                        de tenir une position (rester sur place à tout prix),
+        #                        d'aller (se diriger vers l'endroit ciblé, en éliminant les ennemis en cours de route, puis y attendre),
+        #                        de fuir (se mettre à l'abri en évitant les combats),
+        #                        d'explorer (chercher la sortie),
+        #                        de suivre (se déplacer avec le joueur, combattre les monstres en chemin, aller vers la sortie lorsque quelqu'un l'a trouvée)
+
+    def fuite(self):
+        #On fuit si on est en danger (pv trop bas) ou en présence d'un monstre à condition d'avoir un chemin de fuite
+        #Pour l'instant on va juste vérifier les pv :
+        taux_limite = 0.3 + 0.01*self.appreciations[8] #Quand on se hait, on devient plus suicidaire
+        return self.pv // self.pv_max <= taux_limite
+
+    # /!\ Pour améliorer ça : ne pas fuir s'il n'y a nulle part où fuir
+
+    def get_skin(self):
+        return SKIN_BOMBE_ATOMIQUE
+
+class Marchand(Humain): #Le dixième humain du jeu, à l'étage 9 (le seul lien avec l'extérieur)
+    """La classe du marchand."""
+    def __init__(self,position,screen):
+
+        Agissant.__init__(self,position,'marchand',1) #Il a un skill d'échange d'objet avec son patron à l'extérieur
+
+        self.appreciations = [0,0,-1,0,0,-1,0,3,0,2]
+        self.role = "attaque"
+
+        #Est-ce qu'il a un minimum d'équippement ? Ou est-ce qu'il achète son équippement de base après avoir rencontré le joueur ?
+
+        #Peut recevoir l'ordre : d'attaquer (chercher et combattre les ennemis),
+        #                        de tuer (éliminer un ennemi ciblé),
+        #                        d'attendre (rester sur place jusqu'à l'arrivée d'ennemis ou un nouvel ordre),
+        #                        de tenir une position (rester sur place à tout prix),
+        #                        d'aller (se diriger vers l'endroit ciblé, en éliminant les ennemis en cours de route, puis y attendre),
+        #                        de fuir (se mettre à l'abri en évitant les combats),
+        #                        d'explorer (chercher la sortie),
+        #                        de suivre (se déplacer avec le joueur, combattre les monstres en chemin, aller vers la sortie lorsque quelqu'un l'a trouvée)
+
+    def fuite(self):
+        #On fuit si on est en danger (pv trop bas)
+        #Pour l'instant on va juste vérifier les pv :
+        taux_limite = 0.4 + 0.01*self.appreciations[9] #Quand on se hait, on devient plus suicidaire
+        return self.pv // self.pv_max <= taux_limite
+
+    # /!\ Pour améliorer ça : ne pas fuir s'il n'y a nulle part où fuir ou si le joueur a donné ordre de ne pas fuir et qu'on a suffisamment d'appréciation pour lui (rajouter un modificateur au taux_limite ?)
+
+    def get_skin(self):
+        return SKIN_MARCHAND
 
 class Item(Entitee):
     """La classe des entitées inanimées. Peuvent se situer dans un inventaire. Peuvent être lancés (déconseillé pour les non-projectiles)."""

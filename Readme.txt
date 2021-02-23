@@ -1,6 +1,9 @@
 Work in progress !
 
-
+Note du 23 février : travail effectué depuis la salle CMI
+L'affichage me semble d'un ennui, mais d'un ennui...
+Donc on le fera plus tard.
+La fonctionnalité des choix risque d'être un peu laborieuse, mais il faudra bien s'y mettre... commençons pas le choix "inhumain" et le système des espèces
 
 Nouvel objectif : l'organisation du main (terminé), la sauvegarde externe des parties (terminé)
 
@@ -16,6 +19,9 @@ Si j'ai le temps :
 - Faire utiliser les items par les pnjs
 - Recréer les dialogues, peut-être une copie du tutoriel de la vieille version d'Escape-Master
 
+
+
+À quoi servent les espèces ? À part être raciste ? Elles déterminent certaines statistiques ?
 
 
 
