@@ -188,176 +188,138 @@ class Classe:
 class Classe_principale(Classe):
     """La classe principale de l'agissant. Le niveau d'un agissant est égal au niveau de sa classe principale. Pour les agissants capables de s'améliorer, l'utilisation de la procédure gagne_xp de la classe principale provoque récursivement l'utilisation de cette procédure sur tous les sous-classe est skills de l'agissant. L'amélioration de la classe principale provoque une amélioration des statistiques de l'agissant.
        Pour le joueur, une amélioration de la classe principale permet de choisir une récompense dans l'arbre de compétence ou dans l'arbre élémental (ou deux dans l'arbre élémental avec la classe élémentaliste)."""
-    def __init__(self,skills_intrasecs=[],skills=[],evolutif=False,identite=None,niveau=0): #Si l'agissant n'est pas capable d'évoluer, il n'a pas besoin de conditions ou de cadeaux d'évolution. Comme les agissants capables d'évoluer sont rares (pour l'instant seulement le joueur) on peut faire la liste exhaustive.
-        self.evolutif = evolutif
-        if self.evolutif :
-            if identite == "joueur" : #Le joueur est aussi le protagoniste du jeu. C'est le personnage controlé par le joueur.
-                cond_evo = [0,10,20,30,40,50,60,70,80,90] #À adapter
+    def __init__(self,identite,niveau):
+        skills_intrasecs = []
+        skills = []
+        cond_evo = [0,10,20,30,40,50,60,70,80,90]
 
-                #On va ajouter divers skills aux skills passés en paramètre (pour le joueur il ne devrait pas y en avoir en paramètre)
-                
-                #Skills génériques
-                deplacement = Skill_deplacement() #On crée un skill de déplacement
-                #Est-ce que le joueur commence avec un déplacement au niveau 1 ? dans ce cas son skill de déplacement n'est pas le même que celui des Fattis par exemple
-                skills_intrasecs.append(deplacement)
-                vision = Skill_vision() #On crée un skill de vision
-                #Est-ce que le joueur commence avec une vision au niveau 1 ? dans ce cas son skill de vision n'est pas le même que celui des Slimes par exemple
-                skills_intrasecs.append(vision)
-                ramasse = Skill_ramasse() #On crée une skill de ramassage
-                #Est-ce que le joueur commence avec un ramassage de niveau 1 ?
-                skills_intrasecs.append(ramasse)
+        if identite == 'joueur' :
+            self.evolutif = True
 
-                #Autres (skills partagés par plusieurs agissants autres que le joueur mais pas tous)
-                stomp = Skill_stomp() #On crée un skill de stomp
-                stomp.evo() #On le passe au niveau 1
-                skills.append(stomp)
-                attaque = Skill_attaque() #On crée un skill d'attaque par le biais d'armes
-                attaque.evo() #On le passe au niveau 1
-                skills.append(attaque)
-                magies = {} #Il faudra ajouter dans ce dictionnaire les magies que le joueur possède naturellement
-                magie = Skill_magie(magies) #On crée un skill d'utilisation de magie
-                magie.evo() #On le passe au niveau 1
-                skills.append(magie)
-                blocage = Skill_blocage() #On crée un skill de blocage
-                blocage.evo() #On le passe au niveau 1
-                skills.append(blocage)
+            #Skills intrasecs (leur niveau est lié à celui de la classe principale) :
+            deplacement = Skill_deplacement() #On crée un skill de déplacement
+            skills_intrasecs.append(deplacement)
+            vision = Skill_vision() #On crée un skill de vision
+            skills_intrasecs.append(vision)
+            ramasse = Skill_ramasse() #On crée une skill de ramassage
+            skills_intrasecs.append(ramasse)
 
-                #!!! Attention : ce qui se passe ici est extérieur au système !
-#                if malchance_forcee : #Après la chance, la malchance...
- #                   malchanceux = Skill_malchanceux() #On crée un mystérieux skill de mauvais augure non-référencé...
-  #                  malchanceux.evo() #On augmente même son niveau...
-   #                 malchance_forcee = False #Mais on ne le fera pas la prochaine fois, promis !
-    #                skills.append(malchanceux)
-     #           elif random.random()<0.01 or chance_forcee : #On peut espérer, ou forcer le destin dans le fichier des constantes.
-      #              chanceux = Skill_chanceux() #On crée un mystérieux skill non-référencé, mais au moins son nom est encourageant !
-       #             chanceux.evo() #On le passe au niveau 1
-        #            malchance_forcee = True #Profitons bien de la partie, la prochaine risque d'être plus difficile...
-         #           skills.append(chanceux)
-                #Le système peut quand même voir les conséquences de ces actions mystérieuses.
+            #Autres skills :
+            stomp = Skill_stomp() #On crée un skill de stomp
+            stomp.evo() #On le passe au niveau 1
+            skills.append(stomp)
+            attaque = Skill_attaque() #On crée un skill d'attaque par le biais d'armes
+            attaque.evo() #On le passe au niveau 1
+            skills.append(attaque)
+            magie = Skill_magie() #On crée un skill d'utilisation de magie
+            magie.evo() #On le passe au niveau 1
+            skills.append(magie)
+            blocage = Skill_blocage() #On crée un skill de blocage
+            blocage.evo() #On le passe au niveau 1
+            skills.append(blocage)
 
-                #Pas de cadeaux d'évolution pour le joueur, il a déjà les arbres des compétences et des éléments !
+##            #!!! Attention : ce qui se passe ici est extérieur au système !
+##            if malchance_forcee : #Après la chance, la malchance...
+##                malchanceux = Skill_malchanceux() #On crée un mystérieux skill de mauvais augure non-référencé...
+##                malchanceux.evo() #On augmente même son niveau...
+##                malchance_forcee = False #Mais on ne le fera pas la prochaine fois, promis !
+##                skills.append(malchanceux)
+##            elif random.random()<0.01 or chance_forcee : #On peut espérer, ou forcer le destin dans le fichier des constantes.
+##                chanceux = Skill_chanceux() #On crée un mystérieux skill non-référencé, mais au moins son nom est encourageant !
+##                chanceux.evo() #On le passe au niveau 1
+##                malchance_forcee = True #Profitons bien de la partie, la prochaine risque d'être plus difficile...
+##                skills.append(chanceux)
+##            #Le système peut quand même voir les conséquences de ces actions mystérieuses.
 
-                Classe.__init__(self,cond_evo,skills_intrasecs,skills) #La classe principale est presque prête ! Il ne reste qu'à la donner au joueur et la faire évoluer !
+        elif identite == 'tank':
+            self.evolutif = False
+            deplacement = Skill_deplacement()
+            skills_intrasecs.append(deplacement)
+            vision = Skill_vision()
+            skills_intrasecs.append(vision)
+            stomp = Skill_stomp()
+            skills_intrasecs.append(stomp)
+            if niveau >= 5:
+                defense = Skill_defense()
+                skills_intrasecs.append(defense)
 
-            elif identite == "kumoko" : #aka Nightmare of the Labyrinth, kumoko est le personnage pricipal de kumo desu ga, nanika. C'est une arraignée et la mère des Nightmare Vestiges. Elle réside dans un niveau rempli de fils d'arraignés, et devient hostile au joueur si 10 de ses enfants sont tués. Elle dispose de skills uniques et surpuissants qui la rendent très difficile à vaincre.
-                cond_evo = [0,10,20,30,40,50,60,70,80,90] #Est-ce qu'elle commence au niveau 1 ? Ou déjà plus puissante ? Même question pour ses skills.
+        elif identite == 'dps':
+            self.evolutif = False
+            deplacement = Skill_deplacement()
+            skills_intrasecs.append(deplacement)
+            vision = Skill_vision()
+            skills_intrasecs.append(vision)
+            stomp = Skill_stomp()
+            skills_intrasecs.append(stomp)
+            attaque = Skill_attaque()
+            skills_intrasecs.append(attaque)
 
-                #On ne peux pas reporter exactement les skills du light novel dans ce jeu, donc on va créer un skill par comportement possible :
-                deplacement = Skanda() #D'après le nom du skill qui lui permet d'améliorer sa vitesse plus efficacement.
+        elif identite == 'soigneur':
+            self.evolutif = False
+            deplacement = Skill_deplacement()
+            skills_intrasecs.append(deplacement)
+            vision = Skill_vision()
+            skills_intrasecs.append(vision)
+            stomp = Skill_stomp()
+            skills_intrasecs.append(stomp)
+            magie = Skill_magie()
+            skills_intrasecs.append(magie)
 
-                vision = Wisdom() #D'après le nom du skill qu'elle a obtenu de D et qui lui permet de connaitre la position de tous ses ennemis.
+        elif identite == 'soutien':
+            self.evolutif = False
+            deplacement = Skill_deplacement()
+            skills_intrasecs.append(deplacement)
+            vision = Skill_vision()
+            skills_intrasecs.append(vision)
+            stomp = Skill_stomp()
+            skills_intrasecs.append(stomp)
+            magie = Skill_magie()
+            skills_intrasecs.append(magie)
 
-                magies = {} #Qaund j'aurai codé les magies, penser à ajouter : Heretic_Magic (attaque directement "l'âme", c'est-à-dire ignore toutes les défenses et affinités) ;
-                                                                             # Earth_magic (affinité à la terre) ;
-                                                                             # Dark_magic (affinité à l'ombre) ;
-                                                                             # Poison_magic ;
-                                                                             # Healing_magic ;
-                                                                             # Spacial_magic (principalement la téléportation) ;
-                                                                             # Abyss_magic (détruit et empêche toute résurrection/réanimation/immortalité, mais kumoko peut être prise dans l'attaque).
-                                                                             # en trouvant à chaque fois les sorts correspondants et ceux qui font sens dans ce jeu
-                magie = Height_of_Occultism(magies) #D'après le nom du skill qui lui sert à lancer des sorts
+        Classe.__init__(self,cond_evo,skills_intrasecs,skills)
+        self.evo(niveau)
 
-                toile = Divine_Thread_Weaving() #D'après le nom du skill qui lui permet de produire et d'utiliser sa toile (ici utilisée pour immobiliser, bloquer un chemin, attaquer)
-
-                mauvais_oeil1 = Jinx_Evil_Eye() #D'après le nom du skill qui lui permet d'absorber les MP, PV, SP de ses ennemis.
-
-                mauvais_oeil2 = Inert_Evil_Eye() #D'après le nom du skill qui lui permet de paralyser ses ennemis.
-
-                mauvais_oeil3 = Repellent_Evil_Eye() #D'après le nom du skill qui lui permet d'appliquer une force dans une direction voulue (ici, pour déplacer un ennemi ou l'immobiliser).
-
-                mauvais_oeil4 = Annihilating_Evil_Eye() #D'après le nom du skill qui lui permet d'infliger une attaque de type Rot sur un ennemi au pris de l'un de ses yeux (ici pour éliminer un ennemi trop puissant au prix d'un oeil).
-
-                mauvais_yeux = Evil_Eye() #À chaque tour, décide des cibles des Evil_Eyes.
-
-                tranche = Scythe() #Du nom de ses pates avant, qui infligent beaucoup de dégats.
-
-                orgueil = Pride() #D'après le nom du skill qui lui permet de monter en niveau plus rapidement. Ici, augmente les xp gagnés et la propagation.
-
-                paresse = Sloth() #D'après le nom du skill qui lui permet de ralentir le monde autour d'elle et d'accélerer toutes les diminutions de valeurs du système. Ici juste le ralentissement ?
-
-                piege = Taboo() #D'après le nom du skill qui révèle la vérité sur le monde. Ici, utilisé comme un piège contre les voleurs, qui perdront la partie s'ils l'acquièrent.
-
-                immortel = Immortality() #D'après le nom du skill qui l'empêche de mourir à moins qu'on attaque son âme.
-
-                ponte = Egg_Laying() #D'après le nom du skill qui lui permet de pondre des oeufs. Ici, elle pond chacun de ses dix premiers oeufs au moment où une toile d'araignée est détruite, s'il n'y a pas d'autre oeufs. Après, elle attaque le joueur mais s'arrète de temps en temps pour pondre des oeufs, qui lui servent nottament à se protéger de l'Abyss_magic.
-
-                for skill in [deplacement,vision,magie,toile,mauvais_oeil1,mauvais_oeil2,mauvais_oeil3,mauvais_oeil4,mauvais_yeux,tranche,orgueil,paresse,piege,immortel,ponte]:
-                    skill.evo()
-                    skills.append(skill)
-
-                Classe.__init__(self,cond_evo,skills_intrasecs,skills)
-
-            else :
-                print(identite+" ? Qu'est-ce que c'est que ça ?")
-        else :
-            if identite == "nightmare_vestige": #Créés par les oeufs de kumoko quand ils éclosent, se battent pour kumoko mais sont capables de la tuer. Tous leurs skills sont intrasecs, et augmentent avec la classe principale au niveau de kumoko quand elle les crée.
-                skills = [Hatching()]
-
-                skills_intrasecs = [Lesser_Skanda(),Lesser_Wisdom(),Lesser_Height_of_Occultism({}),Lesser_Divine_Thread_Weaving(),Lesser_Scythe()] #Lui donner des magies de kumoko au hasard ? Pareil pour les Evil_Eyes ? En tous cas l'Abyss_magic.
-
-                Classe.__init__(self,[0]*10,skills_intrasecs,skills) #Hatching() est le compte à rebours avant l'éclosion. Tant qu'il est de niveau < 10, l'apparence du vestige est un oeuf (item). Quand il éclot, il prend son apparence d'arraignée blanche. S'il éclot dans un inventaire, il sera du côté de son possesseur.
-
-            if identite == "Tank":
-
-                if niveau == 1:
-
-                    skills_intrasecs = [Skill_deplacement(),Skill_vision(),Skill_stomp()]
-
-                elif niveau == 2:
-
-                    skills_intrasecs = [Skill_deplacement(),Skill_vision(),Skill_stomp()]
-
-                elif niveau == 3:
-
-                    skills_intrasecs = [Skill_deplacement(),Skill_vision(),Skill_stomp(),Skill_attaque()]
-
-            if identite == "Dps":
-
-                if niveau == 1:
-
-                    skills_intrasecs = [Skill_deplacement(),Skill_vision(),Skill_stomp()]
-
-                elif niveau == 2:
-
-                    skills_intrasecs = [Skill_deplacement(),Skill_vision(),Skill_stomp()]
-
-                elif niveau == 3:
-
-                    skills_intrasecs = [Skill_deplacement(),Skill_vision(),Skill_stomp(),Skill_defense()]
-
-            if identite == "Soigneur":
-
-                if niveau == 1:
-
-                    skills_intrasecs = [Skill_deplacement(),Skill_vision(),Skill_stomp(),Skill_magie()]
-
-                elif niveau == 2:
-
-                    skills_intrasecs = [Skill_deplacement(),Skill_vision(),Skill_stomp(),Skill_magie()]
-
-                elif niveau == 3:
-
-                    skills_intrasecs = [Skill_deplacement(),Skill_vision(),Skill_stomp(),Skill_magie()]
-
-            if identite == "Soutien":
-
-                if niveau == 1:
-
-                    skills_intrasecs = [Skill_deplacement(),Skill_vision(),Skill_stomp(),Skill_magie()]
-
-                elif niveau == 2:
-
-                    skills_intrasecs = [Skill_deplacement(),Skill_vision(),Skill_stomp(),Skill_magie()]
-
-                elif niveau == 3:
-
-                    skills_intrasecs = [Skill_deplacement(),Skill_vision(),Skill_stomp(),Skill_magie()]
-
-            else:
-
-                Classe.__init__(self,[0]*10,skills_intrasecs,skills)
-
-            self.evo(niveau)
+##    def __init__(self,skills_intrasecs=[],skills=[],evolutif=False,identite=None,niveau=0): #Si l'agissant n'est pas capable d'évoluer, il n'a pas besoin de conditions ou de cadeaux d'évolution. Comme les agissants capables d'évoluer sont rares (pour l'instant seulement le joueur) on peut faire la liste exhaustive.
+##        self.evolutif = evolutif
+##        if self.evolutif :
+##            elif identite == "kumoko" : #aka Nightmare of the Labyrinth, kumoko est le personnage pricipal de kumo desu ga, nanika. C'est une arraignée et la mère des Nightmare Vestiges. Elle réside dans un niveau rempli de fils d'arraignés, et devient hostile au joueur si 10 de ses enfants sont tués. Elle dispose de skills uniques et surpuissants qui la rendent très difficile à vaincre.
+##                cond_evo = [0,10,20,30,40,50,60,70,80,90] #Est-ce qu'elle commence au niveau 1 ? Ou déjà plus puissante ? Même question pour ses skills.
+##                #On ne peux pas reporter exactement les skills du light novel dans ce jeu, donc on va créer un skill par comportement possible :
+##                deplacement = Skanda() #D'après le nom du skill qui lui permet d'améliorer sa vitesse plus efficacement.
+##                vision = Wisdom() #D'après le nom du skill qu'elle a obtenu de D et qui lui permet de connaitre la position de tous ses ennemis.
+##                magies = {} #Qaund j'aurai codé les magies, penser à ajouter : Heretic_Magic (attaque directement "l'âme", c'est-à-dire ignore toutes les défenses et affinités) ;
+##                                                                             # Earth_magic (affinité à la terre) ;
+##                                                                             # Dark_magic (affinité à l'ombre) ;
+##                                                                             # Poison_magic ;
+##                                                                             # Healing_magic ;
+##                                                                             # Spacial_magic (principalement la téléportation) ;
+##                                                                             # Abyss_magic (détruit et empêche toute résurrection/réanimation/immortalité, mais kumoko peut être prise dans l'attaque).
+##                                                                             # en trouvant à chaque fois les sorts correspondants et ceux qui font sens dans ce jeu
+##                magie = Height_of_Occultism(magies) #D'après le nom du skill qui lui sert à lancer des sorts
+##                toile = Divine_Thread_Weaving() #D'après le nom du skill qui lui permet de produire et d'utiliser sa toile (ici utilisée pour immobiliser, bloquer un chemin, attaquer)
+##                mauvais_oeil1 = Jinx_Evil_Eye() #D'après le nom du skill qui lui permet d'absorber les MP, PV, SP de ses ennemis.
+##                mauvais_oeil2 = Inert_Evil_Eye() #D'après le nom du skill qui lui permet de paralyser ses ennemis.
+##                mauvais_oeil3 = Repellent_Evil_Eye() #D'après le nom du skill qui lui permet d'appliquer une force dans une direction voulue (ici, pour déplacer un ennemi ou l'immobiliser).
+##                mauvais_oeil4 = Annihilating_Evil_Eye() #D'après le nom du skill qui lui permet d'infliger une attaque de type Rot sur un ennemi au prix de l'un de ses yeux (ici pour éliminer un ennemi trop puissant au prix d'un oeil).
+##                mauvais_yeux = Evil_Eye() #À chaque tour, décide des cibles des Evil_Eyes.
+##                tranche = Scythe() #Du nom de ses pates avant, qui infligent beaucoup de dégats.
+##                orgueil = Pride() #D'après le nom du skill qui lui permet de monter en niveau plus rapidement. Ici, augmente les xp gagnés et la propagation.
+##                paresse = Sloth() #D'après le nom du skill qui lui permet de ralentir le monde autour d'elle et d'accélerer toutes les diminutions de valeurs du système. Ici juste le ralentissement ?
+##                piege = Taboo() #D'après le nom du skill qui révèle la vérité sur le monde. Ici, utilisé comme un piège contre les voleurs, qui perdront la partie s'ils l'acquièrent.
+##                immortel = Immortality() #D'après le nom du skill qui l'empêche de mourir à moins qu'on attaque son âme.
+##                ponte = Egg_Laying() #D'après le nom du skill qui lui permet de pondre des oeufs. Ici, elle pond chacun de ses dix premiers oeufs au moment où une toile d'araignée est détruite, s'il n'y a pas d'autre oeufs. Après, elle attaque le joueur mais s'arrète de temps en temps pour pondre des oeufs, qui lui servent nottament à se protéger de l'Abyss_magic.
+##                for skill in [deplacement,vision,magie,toile,mauvais_oeil1,mauvais_oeil2,mauvais_oeil3,mauvais_oeil4,mauvais_yeux,tranche,orgueil,paresse,piege,immortel,ponte]:
+##                    skill.evo()
+##                    skills.append(skill)
+##                Classe.__init__(self,cond_evo,skills_intrasecs,skills)
+##            else :
+##                print(identite+" ? Qu'est-ce que c'est que ça ?")
+##        else :
+##            if identite == "nightmare_vestige": #Créés par les oeufs de kumoko quand ils éclosent, se battent pour kumoko mais sont capables de la tuer. Tous leurs skills sont intrasecs, et augmentent avec la classe principale au niveau de kumoko quand elle les crée.
+##                skills = [Hatching()]
+##                skills_intrasecs = [Lesser_Skanda(),Lesser_Wisdom(),Lesser_Height_of_Occultism({}),Lesser_Divine_Thread_Weaving(),Lesser_Scythe()] #Lui donner des magies de kumoko au hasard ? Pareil pour les Evil_Eyes ? En tous cas l'Abyss_magic.
+##                Classe.__init__(self,[0]*10,skills_intrasecs,skills) #Hatching() est le compte à rebours avant l'éclosion. Tant qu'il est de niveau < 10, l'apparence du vestige est un oeuf (item). Quand il éclot, il prend son apparence d'arraignée blanche. S'il éclot dans un inventaire, il sera du côté de son possesseur.
+##            self.evo(niveau)
 
     def gagne_xp(self):
         #On récupère l'xp propagé par les skills,
