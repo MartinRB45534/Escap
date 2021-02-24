@@ -276,6 +276,97 @@ class Classe_principale(Classe):
             magie = Skill_magie()
             skills_intrasecs.append(magie)
 
+        elif identite == 'receptionniste':
+            self.evolutif = True
+            deplacement = Skill_deplacement()
+            skills_intrasecs.append(deplacement)
+            vision = Skill_vision()
+            skills_intrasecs.append(vision)
+            stomp = Skill_stomp()
+            skills.append(stomp)
+            attaque = Skill_attaque()
+            skills.append(attaque)
+
+        elif identite == 'paume':
+            self.evolutif = True
+            deplacement = Skill_deplacement()
+            skills_intrasecs.append(deplacement)
+            vision = Skill_vision()
+            skills_intrasecs.append(vision)
+            stomp = Skill_stomp()
+            skills.append(stomp)
+
+        elif identite == 'peureuse':
+            self.evolutif = True
+            deplacement = Skill_deplacement()
+            skills_intrasecs.append(deplacement)
+            vision = Skill_vision()
+            skills_intrasecs.append(vision)
+            magie = Skill_magie()
+            skills.append(magie)
+
+        elif identite == 'codeur':
+            self.evolutif = False
+            omnipotence = Invite_de_commande()
+            skills.append(omnipotence)
+
+        elif identite == 'emcombrant':
+            self.evolutif = True
+            deplacement = Skill_deplacement()
+            skills_intrasecs.append(deplacement)
+            vision = Skill_vision()
+            skills_intrasecs.append(vision)
+            stomp = Skill_stomp()
+            skills.append(stomp)
+            attaque = Skill_attaque()
+            skills.append(attaque)
+
+        elif identite == 'alchimiste':
+            self.evolutif = True
+            deplacement = Skill_deplacement()
+            skills_intrasecs.append(deplacement)
+            vision = Skill_vision()
+            skills_intrasecs.append(vision)
+            stomp = Skill_stomp()
+            skills.append(stomp)
+            magie = Skill_magie()
+            skills.append(magie)
+            alchimie = Skill_alchimie()
+            skills.append(alchimie)
+
+        elif identite == 'peste':
+            self.evolutif = True
+            deplacement = Skill_deplacement()
+            skills_intrasecs.append(deplacement)
+            vision = Skill_vision()
+            skills_intrasecs.append(vision)
+            stomp = Skill_stomp()
+            skills.append(stomp)
+            magie = Skill_magie()
+            skills.append(magie)
+
+        elif identite == 'bombe_atomique':
+            self.evolutif = True
+            deplacement = Skill_deplacement()
+            skills_intrasecs.append(deplacement)
+            vision = Skill_vision()
+            skills_intrasecs.append(vision)
+            stomp = Skill_stomp()
+            skills.append(stomp)
+            magie = Skill_magie()
+            skills.append(magie)
+
+        elif identite == 'emcombrant':
+            self.evolutif = True
+            deplacement = Skill_deplacement()
+            skills_intrasecs.append(deplacement)
+            vision = Skill_vision()
+            skills_intrasecs.append(vision)
+            stomp = Skill_stomp()
+            skills.append(stomp)
+            echange = Skill_echange()
+            skills.append(echange)
+
         Classe.__init__(self,cond_evo,skills_intrasecs,skills)
         self.evo(niveau)
 

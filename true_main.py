@@ -165,18 +165,38 @@ class Main: #Modifier le nom plus tard pour plus de cohérence
     def ouvre(self):
         run = True
 
+        global ID_MAX
+
         while run:
-            global ID_MAX
-            boutons = [[f"Partie n°{i}",[50,30*i],["Un 'controleur'",f"Le joueur est au niveau {self.controleurs[i].entitees[2].niveau},",f"et a atteint l'étage {self.controleurs[i].entitees[2].position[0]}"],self.controleurs[i]] for i in range(len(self.controleurs))] + [["Nouveau",[50,30*len(self.controleurs)],["Lancer une nouvelle partie"],"new"],["Quitter",[50,30*len(self.controleurs)+30],["Quitter le 'joueur' et revenir à la liste des joueur"],True]]
+            boutons = [[f"Partie n°{i}",[50,30*i],["Un 'controleur'",f"Le joueur est au niveau {self.controleurs[i].entitees[2].niveau},",f"et a atteint l'étage {self.controleurs[i].entitees[2].position[0]}"],self.controleurs[i]] for i in range(len(self.controleurs))] + [
+             ["Nouveau",[50,30*len(self.controleurs)],["Lancer une nouvelle partie"],"new"],
+             ["Quitter",[50,30*len(self.controleurs)+30],["Quitter le 'joueur' et revenir à la liste des joueur"],True]]
             res = menu(boutons,screen)
             if res == False:
                 run = False
             elif res == "new":
-                ID_MAX = 1
-                self.controleur = Controleur()
-                self.controleurs.append(self.controleur)
-                self.controleur.jeu(screen)
-                self.boucle()
+                boutons = [["Nouvelle partie",[50,30],["Une nouvelle partie","Les autres parties ne seront pas effacées"],"new"],
+                           ["Tutoriel",[50,60],["Un nouveau tutoriel","Les autres tutoriels en cours ne seront pas effacés","","Découvrez le monde d'Escap et rencontrez les pnjs"],"tuto"],
+                           ["Quitter",[50,90],["Quitter le menu de création de partie et revenir à la liste des parties en cours"],True]]
+                res = menu(boutons,screen)
+                if res == False:
+                    run = False
+                elif res == "new":
+                    ID_MAX = 1
+                    self.controleur = Controleur()
+                    self.controleurs.append(self.controleur)
+                    self.controleur.jeu(screen)
+                    if ID_MAX != self.controleur.check_ID_MAX():
+                        print(ID_MAX,self.controleur.check_ID_MAX())
+                    self.boucle()
+                elif res == "tuto":
+                    ID_MAX = 1
+                    self.controleur = Controleur()
+                    self.controleurs.append(self.controleur)
+                    self.controleur.tuto(screen)
+                    if ID_MAX != self.controleur.check_ID_MAX():
+                        print(ID_MAX,self.controleur.check_ID_MAX())
+                    self.boucle()
             elif isinstance(res,Controleur):
                 self.controleur = res
                 ID_MAX = max(self.controleur.entitees.keys())
@@ -214,9 +234,9 @@ def menu(boutons,screen):
         screen.fill((0,0,0))
         for i in range(len(boutons)) :
             if i == curseur:
-                pygame.draw.rect(screen,(155,155,155),(boutons[i][1][0]-2,boutons[i][1][1]-2,54,22))
+                pygame.draw.rect(screen,(155,155,155),(boutons[i][1][0]-2,boutons[i][1][1]-2,104,22))
                 descr = boutons[i][2]
-            pygame.draw.rect(screen,(255,255,255),(boutons[i][1][0],boutons[i][1][1],50,18))
+            pygame.draw.rect(screen,(255,255,255),(boutons[i][1][0],boutons[i][1][1],100,18))
             text = police.render(boutons[i][0],True,(0,0,0))
             screen.blit(text,(boutons[i][1][0]+4,boutons[i][1][1]+2))
 
@@ -231,6 +251,6 @@ def menu(boutons,screen):
         res = False
     return res
 
-global main
-main = Main(screen)
-#main.start_game()
+##global main
+##main = Main(screen)
+##main.start_game()

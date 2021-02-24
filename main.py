@@ -117,8 +117,6 @@ def alll():
 observe()
 alll()
 
-pygame.quit()
-
 
 
 

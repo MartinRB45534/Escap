@@ -24,6 +24,8 @@ Si j'ai le temps :
 À quoi servent les espèces ? À part être raciste ? Elles déterminent certaines statistiques ?
 
 
+À l'occasion, faire le tri dans les constantes
+
 
 Messages d'entrée pour certains étages ?
 

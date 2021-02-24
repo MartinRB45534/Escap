@@ -497,7 +497,7 @@ class Skill_creation_de_fleches(Skill):
         return self.niveau
 
 class Skill_creation_d_explosifs(Skill):
-    """Permet de créer des projectiles de type explosif. Dans les faits, passe le nombre d'explosifs de telle catégorie dans l'inventaire à + l'infini (ou demande du temps/du mana pour créer les explosifs ?). La montée de niveau améliore les explosifs (diminue le coût de mana/le temps ?).
+    """Permet de créer des projectiles de type explosif. La montée de niveau améliore les explosifs (diminue le coût de mana/le temps ?).
        C'est un skill actif (souvent appelé par l'intermédiaire du skill de lancer ?)."""
     def __init__(self,explosifs=[]): #Rajouter le projectile explosif de base quand je l'aurai créé.
         Skill.__init__(self)
@@ -530,6 +530,72 @@ class Skill_creation_d_explosifs(Skill):
 
     def utilise(self,xp):
         self.gain_xp = xp
+        self.xp_new+=self.gain_xp #On gagne de l'xp, mais combien ? 0.1, est-ce assez ? trop ?
+        return self.niveau
+
+class Skill_alchimie(Skill):
+    """Permet de créer diverses potions. Coûte du mana ?""" #/!\ À retravailler en profondeur /!\
+    def __init__(self,potions=[]):
+        Skill.__init__(self)
+        self.potions=potions
+        self.gain_xp = 0 #L'xp dépend de la potion créée
+        self.nom = "Alchimie"
+
+    def evo(self,nb_evo=1):
+        for i in range(nb_evo):
+            """fonction qui procède à l'évolution"""
+            for cadeau in self.cad_evo[self.niveau]:
+                """if issubclass(cadeau,Classe):
+                    self.sous_classes.append(cadeau)
+                    cadeau.evo() #La classe devrait encore être au niveau 0
+                elif issubclass(cadeau,Skill):
+                    self.skills.append(cadeau)
+                    cadeau.evo() #Le skill devrait encore être au niveau 0
+                el"""
+                if isinstance(cadeau,int): #Comment faire pour les autres types de cadeaux ?
+                    self.xp.append(cadeau)
+                elif isinstance(cadeau,Explosif): #On peut gagner un type d'explosif avec la montée de niveau du skill ?
+                    self.ajoute(explosif)
+                else:
+                    print("Le père Noël s'est trompé...")
+            self.niveau+=1
+
+    def ajoute(self,potion):
+        self.potions.append(potion)
+
+    def utilise(self,xp):
+        self.gain_xp = xp
+        self.xp_new+=self.gain_xp #On gagne de l'xp, mais combien ? 0.1, est-ce assez ? trop ?
+        return self.niveau
+
+class Skill_echange(Skill):
+    """Un skill d'échange d'objet. Permet au marchand (dans le labyrinthe) d'échanger des objets avec son patron (à l'extérieur) pour les vendre."""
+    def __init__(self):
+        Skill.__init__(self)
+        self.items=None
+        self.gain_xp = 0.1
+        self.nom = "Échange"
+
+    def evo(self,nb_evo=1):
+        for i in range(nb_evo):
+            """fonction qui procède à l'évolution"""
+            for cadeau in self.cad_evo[self.niveau]:
+                """if issubclass(cadeau,Classe):
+                    self.sous_classes.append(cadeau)
+                    cadeau.evo() #La classe devrait encore être au niveau 0
+                elif issubclass(cadeau,Skill):
+                    self.skills.append(cadeau)
+                    cadeau.evo() #Le skill devrait encore être au niveau 0
+                el"""
+                if isinstance(cadeau,int): #Comment faire pour les autres types de cadeaux ?
+                    self.xp.append(cadeau)
+                elif isinstance(cadeau,Explosif): #On peut gagner un type d'explosif avec la montée de niveau du skill ?
+                    self.ajoute(explosif)
+                else:
+                    print("Le père Noël s'est trompé...")
+            self.niveau+=1
+
+    def utilise(self):
         self.xp_new+=self.gain_xp #On gagne de l'xp, mais combien ? 0.1, est-ce assez ? trop ?
         return self.niveau
 

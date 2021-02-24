@@ -6,6 +6,8 @@ from Jeu.Constantes import *
 from Jeu.Skins.Skins import *
 import random
 
+global ID_MAX
+
 # /!\ Mettre les lignes à jour !
 # Contenu du fichier :
 # La classe Controleur (lignes 0-500) ;
@@ -51,6 +53,9 @@ class Controleur():
         self.nb_tours = 0
         self.phase = TOUR
         self.phases = [TOUR]
+
+    def check_ID_MAX(self):
+        return ID_MAX
 
     def jeu(self,screen):
 
@@ -151,11 +156,16 @@ class Controleur():
 ##        self.esprits["1"].antagonise("2")
 ##        self.esprits["2"].antagonise("1")
 
+    def tuto(self,screen):
+        self.ajoute_entitee(Joueur(("Étage 1 : couloir",15,0),screen))
+        self.labs["Étage 1 : couloir"]=Labyrinthe("Étage 1 : couloir",19,3,("Étage 1 : couloir",0,0),[Patern(("Étage 1 : couloir",9,0),10,3,[("Étage 1 : couloir",0,1)],["clé couloir"])])
+        self.active_lab(self.entitees[2].position[0])
+
     def duel(self,esprit1,esprit2,niveau_1=1,niveau_2=1,tailles_lab=(20,20),vide=True,vue=False,screen=None):
         """Fonction qui crée les conditions d'un duel."""
 
         if vue : # On peut avoir des spectateurs, mais pas forcément
-            self.ajoute_entitee(Joueur(("arène",tailles_lab[0]//2,tailles_lab[1]//2),0,1,0,0,0,0,0,0,0,100,1,1,1,Classe_principale([],[],True,"joueur"),screen))
+            self.ajoute_entitee(Joueur(("arène",tailles_lab[0]//2,tailles_lab[1]//2),screen))
         # Première étape : créer l'arène
         self.labs["arène"]=Labyrinthe("arène",tailles_lab[0],tailles_lab[1],("arène",0,0),[Patern(("arène",0,0),tailles_lab[0],tailles_lab[1],[],[],vide)])
         # Deuxième étape : créer les opposants
@@ -2756,6 +2766,11 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         #Il doit afficher tout ce qu'il voit...
         print("Initialisation du joueur")
         self.affichage = Affichage(screen)
+        self.event = None
+        self.etage = 0
+        self.arbre = True
+        self.courant = 0
+        self.choix_elems = []
         print("Affichage : check")
         self.curseur = "carré" #... et sélectionner un certain nombre de trucs
 
@@ -4237,9 +4252,9 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
             self.choix_niveaux[ELEMENTAL][OMBRE][affinite] = False
             self.immunites.append(OMBRE)
 
-class Receptioniste(Humain): #Le deuxième humain du jeu, à l'étage 1 (engage la conversation après la chute, indique les commandes de base)
+class Receptionniste(Humain): #Le deuxième humain du jeu, à l'étage 1 (engage la conversation après la chute, indique les commandes de base)
     """La classe du récéptionniste."""
-    def __init__(self,position,screen):
+    def __init__(self,position):
 
         Agissant.__init__(self,position,'receptionniste',5) #À un haut niveau dès le départ
 
