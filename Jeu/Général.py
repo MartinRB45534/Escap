@@ -157,9 +157,30 @@ class Controleur():
 ##        self.esprits["2"].antagonise("1")
 
     def tuto(self,screen):
-        self.ajoute_entitee(Joueur(("Étage 1 : couloir",15,0),screen))
+        #On crée le joueur :
+        joueur = Joueur(("Étage 1 : couloir",14,1),screen)
+        self.ajoute_entitee(joueur) #Est-ce qu'il est à cet étage dès le début ? Même pendant la cinématique ?
+        self.esprits["joueur"] = Esprit_humain(joueur.ID,self)
+
+        #On crée le premier étage et son occupant :
+        receptionniste = Receptionniste(("Étage 1 : couloir",14,0))
+        self.ajoute_entitee(receptionniste)
+        self.esprits["receptionniste"] = Esprit_humain(receptionniste.ID,self)
         self.labs["Étage 1 : couloir"]=Labyrinthe("Étage 1 : couloir",19,3,("Étage 1 : couloir",0,0),[Patern(("Étage 1 : couloir",9,0),10,3,[("Étage 1 : couloir",0,1)],["clé couloir"])])
-        self.active_lab(self.entitees[2].position[0])
+
+        #On crée le deuxième étage et son occupant :
+        paume = Paume(("Étage 2 : labyrinthe",1,0))
+        self.ajoute_entitee(paume)
+        self.esprits["paume"] = Esprit_humain(paume.ID,self)
+        self.labs["Étage 2 : labyrinthe"]=Labyrinthe("Étage 2 : labyrinthe",15,15,("Étage 2 : labyrinthe",0,0),[Patern(("Étage 2 : labyrinthe",0,0),5,5,[("Étage 2 : labyrinthe",2,4)])])
+        self.construit_escalier(("Étage 1 : couloir",18,1),("Étage 2 : labyrinthe",0,0),DROITE,GAUCHE)
+
+
+
+        #On lance la cinématique :
+        #À rajouter
+        #Et on active le lab du joueur
+        self.active_lab("Étage 1 : couloir")
 
     def duel(self,esprit1,esprit2,niveau_1=1,niveau_2=1,tailles_lab=(20,20),vide=True,vue=False,screen=None):
         """Fonction qui crée les conditions d'un duel."""
@@ -277,6 +298,16 @@ class Controleur():
         mur_arr.detruit()
         mur_dep.set_cible(pos_arr,True)
         mur_arr.set_cible(pos_dep,True)
+
+    def construit_escalier(self,pos_dep,pos_arr,dir_dep,dir_arr):
+        case_dep = self.get_case(pos_dep)
+        case_arr = self.get_case(pos_arr)
+        mur_dep = case_dep.get_mur_dir(dir_dep)
+        mur_arr = case_arr.get_mur_dir(dir_arr)
+        mur_dep.detruit()
+        mur_arr.detruit()
+        mur_dep.set_escalier(pos_arr,HAUT) #Par convention, la première case est en bas
+        mur_arr.set_escalier(pos_dep,BAS)
 
     def get_case(self,position):
         return self.get_lab(position[0]).get_case(position)
@@ -588,138 +619,6 @@ class Controleur():
 
     def select_cout(self,magie,agissant):
         magie.cout_pm = agissant.cout_magie
-
-##    def select_cible_agissant(self,magie,joueur):
-##        cibles = self.get_cibles_potentielles_agissants(magie,joueur)
-##        curseur = 0 #L'indice de la cible sous le curseur.
-##        cible = []
-##        affichage = joueur.affichage
-##        affichage.draw_magie(joueur,cibles,cible,curseur)
-##        multi = isinstance(magie,Multi_cible)
-##        temps = magie.temps
-##        run = True
-##        start_time = pygame.time.get_ticks()
-##        current_time = start_time
-##        too_late = start_time + temps
-##        while current_time < too_late and run:
-##            events = pygame.event.get()
-##            for event in events:
-##                if event.type == pygame.KEYDOWN:
-##                    if event.key == pygame.K_UP :
-##                        if curseur == 0:
-##                            curseur = len(cibles)
-##                        curseur -= 1
-##                    elif event.key == pygame.K_DOWN :
-##                        curseur += 1
-##                        if curseur == len(cibles):
-##                            curseur = 0
-##                    elif event.key == pygame.K_SPACE :
-##                        new_cible = cibles[curseur]
-##                        if multi : #Si jamais une magie peut cibler plusieurs cibles.
-##                            if new_cible in cible :
-##                                cible.remove(new_cible)
-##                            else :
-##                                cible.append(new_cible)
-##                        else:
-##                            cible = [new_cible]
-##                    elif event.key == pygame.K_RETURN and cible != [] :
-##                        if multi :
-##                            magie.cible = cible
-##                        elif cible != []:
-##                            magie.cible = cible[0]
-##                        run = False
-##            current_time = pygame.time.get_ticks()
-##            proportion_ecoulee = (current_time - start_time)/temps
-##            affichage.redraw_magie(joueur,cibles,cible,curseur,proportion_ecoulee)
-##            pygame.display.flip()
-##
-##    def select_cible_item(self,magie,joueur):
-##        print("check")
-##        cibles = self.get_cibles_potentielles_items(magie,joueur)
-##        curseur = 0 #L'indice de la cible sous le curseur.
-##        cible = []
-##        affichage = joueur.affichage
-##        affichage.draw_magie(joueur,cibles,cible,curseur)
-##        multi = isinstance(magie,Multi_cible)
-##        temps = magie.temps
-##        run = True
-##        start_time = pygame.time.get_ticks()
-##        current_time = start_time
-##        too_late = start_time + temps
-##        while current_time < too_late and run:
-##            events = pygame.event.get()
-##            for event in events:
-##                if event.type == pygame.KEYDOWN:
-##                    if event.key == pygame.K_UP :
-##                        if curseur == 0:
-##                            curseur = len(cibles)
-##                        curseur -= 1
-##                    elif event.key == pygame.K_DOWN :
-##                        curseur += 1
-##                        if curseur == len(cibles):
-##                            curseur = 0
-##                    elif event.key == pygame.K_SPACE :
-##                        new_cible = cibles[curseur]
-##                        if multi : #Si jamais une magie peut cibler plusieurs cibles.
-##                            if new_cible in cible :
-##                                cible.remove(new_cible)
-##                            else :
-##                                cible.append(new_cible)
-##                        else:
-##                            cible = [new_cible]
-##                    elif event.key == pygame.K_RETURN and cible != [] :
-##                        if multi :
-##                            magie.cible = cible
-##                        else:
-##                            magie.cible = cible[0]
-##                        run = False
-##            current_time = pygame.time.get_ticks()
-##            proportion_ecoulee = (current_time - start_time)/temps
-##            affichage.redraw_magie(joueur,cibles,cible,curseur,proportion_ecoulee)
-##            pygame.display.flip()
-##
-##    def select_cible_case(self,magie,joueur):
-##        cibles = self.get_cibles_potentielles_cases(magie,joueur)
-##        curseur = (joueur.position[0],joueur.position[1],joueur.position[2]) #La position de la cible sous le curseur.
-##        cible = []
-##        affichage = joueur.affichage
-##        affichage.draw_magie_case(joueur,cibles,cible,curseur)
-##        multi = isinstance(magie,Multi_cible)
-##        temps = magie.temps
-##        run = True
-##        start_time = pygame.time.get_ticks()
-##        current_time = start_time
-##        too_late = start_time + temps
-##        while current_time < too_late and run:
-##            events = pygame.event.get()
-##            for event in events:
-##                if event.type == pygame.KEYDOWN:
-##                    if event.key == pygame.K_UP :
-##                        curseur = (curseur[0],curseur[1],curseur[2]-1)
-##                    elif event.key == pygame.K_DOWN :
-##                        curseur = (curseur[0],curseur[1],curseur[2]+1)
-##                    elif event.key == pygame.K_LEFT :
-##                        curseur = (curseur[0],curseur[1]-1,curseur[2])
-##                    elif event.key == pygame.K_RIGHT :
-##                        curseur = (curseur[0],curseur[1]+1,curseur[2])
-##                    elif event.key == pygame.K_SPACE and curseur in cibles:
-##                        if multi : #Si jamais une magie peut cibler plusieurs cibles.
-##                            if curseur in cible :
-##                                cible.remove(curseur)
-##                            else :
-##                                cible.append(curseur)
-##                        else:
-##                            cible = [curseur]
-##                    elif event.key == pygame.K_RETURN and cible != [] :
-##                        if multi :
-##                            magie.cible = cible
-##                        else:
-##                            magie.cible = cible[0]
-##                        run = False
-##            current_time = pygame.time.get_ticks()
-##            proportion_ecoulee = (current_time - start_time)/temps
-##            affichage.redraw_magie_case(joueur,cibles,cible,curseur,proportion_ecoulee)
-##            pygame.display.flip()
 
     def get_cibles_potentielles_agissants(self,magie,joueur):
         cibles_potentielles = []
@@ -1833,6 +1732,12 @@ class Mur:
                 self.effets.remove(effet)
         self.effets.append(Teleport(position,surnaturel))
 
+    def set_escalier(self,position,sens):
+        for effet in self.effets:
+            if isinstance(effet,Teleport):
+                self.effets.remove(effet)
+        self.effets.append(Escalier(position,sens))
+
     def get_mur_oppose(self):
         mur_oppose = None
         cible = self.get_cible()
@@ -2163,7 +2068,6 @@ class Agissant(Entitee): #Tout agissant est un cadavre, tout cadavre n'agit pas.
         self.immunites = [] #La liste des éléments auxquels l'entitée est immunisé (très rare)
         self.especes=stats['especes']
         self.classe_principale = Classe_principale(identite,niveau)
-        self.classe_principale.evo()
         self.niveau = self.classe_principale.niveau
         self.etat = "vivant"
 
@@ -2611,7 +2515,7 @@ class Agissant(Entitee): #Tout agissant est un cadavre, tout cadavre n'agit pas.
         self.inventaire.fin_tour()
         self.classe_principale.gagne_xp()
         if self.niveau != self.classe_principale.niveau : #On a gagné un niveau
-            if isinstance(self,Joueur):
+            if isinstance(self,Humain):
                 self.level_up()
             else:
                 print("Quelqu'un d'autre que le joueur a une incohérence entre son niveau et le niveau de sa classe principale !")
@@ -2741,6 +2645,37 @@ class Renforceur(Agissant):
 
 class Humain(Agissant,Entitee_superieure):
     """La classe des pnjs et du joueur. A un comportement un peu plus complexe, et une personnalité."""
+    def __init__(self,position,identite,niveau):
+        Agissant.__init__(self,position,identite,niveau)
+        self.dialogue = -1 #Le dialogue par défaut, celui des ordres
+        self.replique = None #La réplique en cours de l'agissant vaut None lorsqu'il n'y a pas de dialogue en cours
+        self.repliques = [] #Les réponses possibles de l'interlocuteur
+        self.replique_courante = 0 #La réponse sélectionnée
+
+        self.mouvement = 0 #0 pour un déplacement ciblé, 1 pour chercher
+        self.cible_deplacement = self.ID #Une ID pour suivre quelqu'un, ou une position pour s'y diriger
+        self.comportement_ennemis = 0 #0 pour combattre, 1 pour ignorer, 2 pour fuir, 3 pour tuer une cible
+        self.comportement_neutres = 1 #0 pour combattre, 1 pour ignorer, 2 pour fuir
+        self.cible_attaque = None #La cible à tuer
+
+    def parle(self,touche):
+        if touche == pygame.K_UP:
+            if self.replique_courante == 0:
+                self.replique_courante = len(self.repliques)
+            self.replique_courante -= 1
+        elif touche == pygame.K_DOWN:
+            self.replique_courante += 1
+            if self.replique_courante == len(self.repliques):
+                self.replique_courante = 0
+        elif touche == pygame.K_SPACE:
+            self.interprete(self.replique_courante)
+
+    def end_dialogue(self,dialogue=-1):
+        self.controleur.get_entitee(2).interlocuteur = None
+        self.controleur.get_entitee(2).event = None
+        self.controleur.unset_phase(EVENEMENT)
+        self.dialogue = dialogue
+
     def get_offenses(self):
         offenses = self.offenses
         self.offenses = []
@@ -2749,16 +2684,33 @@ class Humain(Agissant,Entitee_superieure):
         elif self.fuite():
             etat = "fuite"
         else:
-            etat = self.role
+            etat = "humain" #Les humains ont des comportements inutilement alambiqués...
         return offenses, etat
+
+    def level_up(self):
+        niveau = self.classe_principale.niveau # /!\ Peut donner des résultats non-voulus si la montée de niveau a lieu pendant qu'on est sous le coup d'un enchantement
+        stats=CONSTANTES_STATS[self.identite]
+        self.pv_max=stats['pv'][niveau]
+        self.regen_pv=stats['regen_pv'][niveau]
+        self.pm_max=stats['pm'][niveau]
+        self.regen_pm=stats['regen_pm'][niveau]
+        self.force=stats['force'][niveau]
+        self.priorite=stats['priorite'][niveau]
+        self.vitesse=stats['vitesse'][niveau]
+        self.aff_o=stats['aff_o'][niveau]
+        self.aff_f=stats['aff_f'][niveau]
+        self.aff_t=stats['aff_t'][niveau]
+        self.aff_g=stats['aff_g'][niveau]
+        self.niveau = self.classe_principale.niveau
 
 class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, c'est le personnage principal !)
     """La classe du joueur."""
     def __init__(self,position,screen):
 
+        self.identite = 'joueur'
+        self.place = 0
 
-        #Le joueur est un agissant (peut-être remplacer par un Humain.__init__ à un moment ?)
-        Agissant.__init__(self,position,'joueur',1)
+        Humain.__init__(self,position,self.identite,1)
 
         self.apreciations = [0,0,0,0,0,0,0,0,0,0]
         self.role = "independant"
@@ -2773,7 +2725,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         self.choix_elems = []
         print("Affichage : check")
         self.curseur = "carré" #... et sélectionner un certain nombre de trucs
-
+        self.highest = 0 #Le plus haut où l'on soit allé.
 
         #Il peut aussi monter de niveau, et a plusieurs choix lorsqu'il le fait :
         self.choix_niveaux = {CLASSIQUE:{1:None, #Le niveau 1 prendra la valeur physique ou magique
@@ -2851,10 +2803,6 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
 
         self.projectiles = {} #Le skill lancer peut s'utiliser de plusieurs façon : en le combinant à un skill de création de projectile, les touches sont associées comme pour les magies# sur l'item courant de l'inventaire, par le biais d'une touche du skill lancer ou, si l'item est un projectile, directement depuis l'inventaire
 
-        #self.classe_principale.evo(8)
-
-        self.niveau = 0
-
     def get_skin(self):
         return SKIN_JOUEUR
 
@@ -2864,6 +2812,15 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
     def debut_tour(self):
         self.affichage.dessine(self)
         Agissant.debut_tour(self)
+        if self.get_etage_courant() > self.highest:
+            self.highest = self.get_etage_courant()
+            if self.highest == 1:
+                self.interpele()
+            elif self.highest == 2:
+                self.interpele()
+
+    def get_etage_courant(self):
+        return int(self.position[0].split()[1])
 
     def recontrole(self):
         """La fonction qui réagit aux touches du clavier."""
@@ -2882,6 +2839,29 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
             self.inventaire.utilise_courant(self)
         elif self.curseur == "in_classe":
             self.skill_courant = self.classe_principale.utilise_courant()
+        else: #On vaut parler à quelqu'un
+            self.interpele() #On interpele les agissants à proximité
+
+    def interpele(self):
+        #On cherche la personne :
+        if self.dir_regard == HAUT:
+            positions = [(self.position[0],self.position[1]-1,self.position[2]),(self.position[0],self.position[1],self.position[2]-1),(self.position[0],self.position[1],self.position[2]+1),(self.position[0],self.position[1]+1,self.position[2])]
+        elif self.dir_regard == BAS:
+            positions = [(self.position[0],self.position[1]+1,self.position[2]),(self.position[0],self.position[1],self.position[2]-1),(self.position[0],self.position[1],self.position[2]+1),(self.position[0],self.position[1]-1,self.position[2])]
+        elif self.dir_regard == GAUCHE:
+            positions = [(self.position[0],self.position[1],self.position[2]-1),(self.position[0],self.position[1]-1,self.position[2]),(self.position[0],self.position[1]+1,self.position[2]),(self.position[0],self.position[1],self.position[2]+1)]
+        elif self.dir_regard == DROITE:
+            positions = [(self.position[0],self.position[1],self.position[2]+1),(self.position[0],self.position[1]-1,self.position[2]),(self.position[0],self.position[1]+1,self.position[2]),(self.position[0],self.position[1],self.position[2]-1)]
+        self.interlocuteur = None #Normalement c'est déjà le cas
+        for pos in positions:
+            agissants = self.controleur.trouve_agissants(pos)
+            for ID in agissants:
+                agissant = self.controleur.get_entitee(ID)
+                if isinstance(agissant,Humain) and self.interlocuteur == None and not self.controleur.est_item(ID):
+                    self.interlocuteur = agissant
+                    self.controleur.set_phase(EVENEMENT)
+                    self.event = DIALOGUE
+                    self.interlocuteur.start_dialogue()
 
     def controle(self,touche):
         if self.controleur.phase == TOUR:
@@ -2924,7 +2904,10 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
             #Option 4 : un choix d'évolution (possibilité de réorganisation des skills/classes)
             #Option 5 : une information d'évolution/accomplissement/etc. (est-ce vraiment un évènement ? est-ce une cinématique ?)
             #Pour l'instant, on se contente d'implémenter le choix d'évolution :
-            self.choisi_cadeau(touche)
+            if self.event == LEVELUP:
+                self.choisi_cadeau(touche)
+            elif self.event == DIALOGUE:
+                self.discute(touche)
 
     def complement(self):
         """Appelée une fois par tour pendant le choix des complements
@@ -3338,6 +3321,8 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         """La fonction qui est appelée à chaque tour au cours d'un événement"""
         if self.event == LEVELUP:
             self.affichage.choix_niveau(self)
+        elif self.event == DIALOGUE:
+            self.affichage.dialogue(self)
 
     def trouve_choix_possibles(self):
         """La fonction qui détermine les options disponibles au choix."""
@@ -4252,14 +4237,20 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
             self.choix_niveaux[ELEMENTAL][OMBRE][affinite] = False
             self.immunites.append(OMBRE)
 
+    def discute(self,touche):
+        self.interlocuteur.parle(touche)
+
 class Receptionniste(Humain): #Le deuxième humain du jeu, à l'étage 1 (engage la conversation après la chute, indique les commandes de base)
     """La classe du récéptionniste."""
     def __init__(self,position):
 
-        Agissant.__init__(self,position,'receptionniste',5) #À un haut niveau dès le départ
+        self.identite = 'receptionniste'
+        self.place = 1
+
+        Humain.__init__(self,position,self.identite,5) #À un haut niveau dès le départ
 
         self.appreciations = [0,3,0,0,0,0,1,3,6,0]
-        self.role = "attaque"
+        self.dialogue = 1
 
         #Penser à l'équipper, c'est quand-même un épéiste
 
@@ -4281,17 +4272,92 @@ class Receptionniste(Humain): #Le deuxième humain du jeu, à l'étage 1 (engage
     # /!\ Pour améliorer ça : modifier le taux limite en fonction des autres humains en danger au front et de l'appréciation qu'on a pour eux
     # et ne pas fuir s'il n'y a nulle part où fuir ou si le joueur a donné ordre de ne pas fuir et qu'on a suffisamment d'appréciation pour lui (rajouter un modificateur au taux_limite ?)
 
+    def start_dialogue(self): #On commence un nouveau dialogue !
+        #On initialise nos attributs
+        self.replique_courante = 0
+        #La plupart dépendent du dialogue
+        if self.dialogue == -1: #Le joueur est venu nous voir de son propre chef
+            self.replique = "Qu'est-ce que je peux faire pour toi ?"
+            self.repliques = ["Va quelque part.","Change ta méthode de combat.","C'est une question personnelle."] #La question personnelle est pour quand le joueur veut faire avancer les interractions.
+        elif self.dialogue == -2: #Le joueur est venu nous voir avant d'être sorti du premier couloir
+            self.replique = "Qu'est-ce qu'il y a ?"
+            self.repliques = ["Je ne trouve pas l'escalier.","Il n'y a pas d'autre chemin ?","Merci encore pour ton aide."]
+        elif self.dialogue == 1: #Le joueur vient de tomber
+            self.replique = "Quelle chute ! Tu vas bien ? Appuie sur Espace si tu peux m'entendre."
+            self.repliques = [""]
+        elif self.dialogue == 2: #Le joueur vient de se dégourdir les jambes
+            self.replique = "Alors, ça va mieux ?"
+            self.repliques = ["Oui, un peu. Où est-on ?","Je suis en pleine forme maintenant ! Où est-ce que je devrais aller ?"]
+
+    def interprete(self,nb_replique):
+        #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
+        if nb_replique in range(len(self.repliques)): #Une vérification stupide, au cas où
+            replique = self.repliques[nb_replique] #Donc la réplique est la phrase que le joueur à choisi
+        else:
+            print("Mais quel est l'idiot qui m'a codé ça comme un pied ?")
+            print(self.repliques)
+            print(nb_replique)
+            return
+        #Il suffit de savoir quelle phrase le joueur a choisi pour réagir en conséquence
+
+        #Premier dialogue
+        #Le receptionniste accueil le joueur
+        if replique == "":
+            self.replique="Tu peux te lever ? Utilise les flèches directionnelles pour te diriger, et W pour marcher. Appuie sur Espace à côté de moi pour revenir me parler."
+            self.repliques = ["Merci pour ton aide."]
+        elif replique == "Merci pour ton aide.":
+            self.appreciations[0]+= 0.5
+            self.end_dialogue(2)
+
+        #Deuxième dialogue
+        #Le receptionniste guide le joueur vers l'escalier
+        elif replique == "Oui, un peu. Où est-on ?":
+            self.replique = "Dans le labyrinthe de [insérer le nom de la montagne/mine/caverne ici]. La sortie est gardée par un [insérer le nom du boss ici] que je n'ai pas réussi à vaincre."
+            self.repliques = ["Un [insérer le nom du boss ici] ? J'en ai croisé un là-haut, il m'a fait tomber ici.","La sortie ? Où ça ?"]
+        elif replique == "Un [insérer le nom du boss ici] ? J'en ai croisé un là-haut, il m'a fait tomber ici.":
+            self.replique = "Heureusement que ton armure t'a protégé de la chute..."
+            self.repliques = ["Et du coup, où est la sortie ?"]
+        elif replique == "Et du coup, où est la sortie ?":
+            self.replique = "Il y a un escalier au bout du couloir, à droite."
+            self.repliques = [" "]
+        elif replique == "La sortie ? Où ça ?":
+            self.replique = "Il y a un escalier au bout du couloir, à droite."
+            self.repliques = [" "]
+        elif replique == "Je suis en pleine forme maintenant ! Où est-ce que je devrais aller ?":
+            self.replique = "Il y a un escalier au bout du couloir, à droite."
+            self.repliques = [" "]
+        elif replique == " ":
+            self.end_dialogue(-2)
+
+        elif replique == "Je ne trouve pas l'escalier.":
+            self.replique = "Au bout du couloir, à droite."
+            self.repliques = [" "]
+        elif replique == "Il n'y a pas d'autre chemin ?":
+            self.replique = "Il y a bien une porte tout à gauche, mais elle est fermée à clée."
+            self.repliques = ["Tant pis. Je vais essayer l'escalier alors."]
+        elif replique == "Tant pis. Je vais essayer l'escalier alors.":
+            self.replique = "Bon courage !"
+            self.repliques = [" "]
+        elif replique == "Merci encore pour ton aide.":
+            self.replique = "De rien."
+            self.repliques = [" "]
+
+        self.replique_courante = 0
+
     def get_skin(self):
         return SKIN_RECEPTIONNISTE
 
 class Paume(Humain): #Le troisième humain du jeu, à l'étage 2 (complêtement paumé, rejoint le joueur sauf rares exceptions)
     """La classe du mec paumé."""
-    def __init__(self,position,screen):
+    def __init__(self,position):
 
-        Agissant.__init__(self,position,'paume',1) #Plutôt faible, de base
+        self.identite = 'paume'
+        self.place = 2
+
+        Humain.__init__(self,position,self.identite,1) #Plutôt faible, de base
 
         self.appreciations = [1,1,3,2,0,0,0,7,4,-1]
-        self.role = "attaque"
+        self.dialogue = 1
 
         #Est-ce qu'il a un minimum d'équippement ?
 
@@ -4312,17 +4378,95 @@ class Paume(Humain): #Le troisième humain du jeu, à l'étage 2 (complêtement 
     # /!\ Pour améliorer ça : modifier le taux limite en fonction des autres humains en danger au front et de l'appréciation qu'on a pour eux (exceptionnel, pour le cas où le paumé serait amoureux, sinon il obéit et fuit normalement)
     # et ne pas fuir s'il n'y a nulle part où fuir ou si le joueur a donné ordre de ne pas fuir et qu'on a suffisamment d'appréciation pour lui (rajouter un modificateur au taux_limite ?)
 
+    def start_dialogue(self): #On commence un nouveau dialogue !
+        #On initialise nos attributs
+        self.replique_courante = 0
+        #La plupart dépendent du dialogue
+        if self.dialogue == -1: #Le joueur est venu nous voir de son propre chef
+            self.replique = "Je peux me rendre utile ?"
+            self.repliques = ["Va quelque part.","Change ta méthode de combat.","J'aimerais parler avec toi."] #La question personnelle est pour quand le joueur veut faire avancer les interractions.
+        elif self.dialogue == -2: #Le joueur nous a très mal traité
+            self.replique = "Quoi ?"
+            self.repliques = ["Rien !","Tu veux que je t'aide à sortir d'ici ?","Je voudrais m'excuser pour ce que j'ai dit."]
+        elif self.dialogue == 1: #Le joueur vient d'arriver depuis le premier étage
+            self.replique = "Quelle chance, il y a quelqu'un ici !"
+            self.repliques = ["Bonjour...","Je ne fais que passer, au-revoir."]
+
+    def interprete(self,nb_replique):
+        #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
+        replique = self.repliques[nb_replique] #Donc la réplique est la phrase que le joueur à choisi
+        #Il suffit de savoir quelle phrase le joueur a choisi pour réagir en conséquence
+
+        #Premier dialogue
+        #Le joueur arrive par l'escalier
+        if replique == "Bonjour...":
+            self.replique="Où est-ce que tu vas comme ça ?"
+            self.repliques = ["Je cherche la sortie."]
+        elif replique == "Je cherche la sortie.":
+            self.replique="Ces grottes sont un vrai labyrinthe, tu risquerais de te perdre !"
+            self.repliques = ["Je vais y aller quand même.","Il y a un autre chemin ?"]
+        elif replique == "Il y a un autre chemin ?":
+            self.replique="Non..."
+            self.repliques = ["Alors je n'ai pas d'autre choix que d'y aller"]
+        elif replique in ["Je vais y aller quand même.","Alors je n'ai pas d'autre choix que d'y aller"]:
+            self.replique="Ton courage est impressionnant ! Moi, je suis ici depuis plusieurs jours."
+            self.repliques = ["Tu peux venir avec moi, si ça te rassure.","Tu es vraiment pathétique."]
+        elif replique == "Tu peux venir avec moi, si ça te rassure.":
+            self.replique="Merci beaucoup ! N'hésite pas à me demander si tu as besoin de quelque-chose"
+            self.repliques = ["Je ferai appel à toi."]
+            self.appreciations[0]+= 0.5
+        elif replique == "Je ferai appel à toi.":
+            self.end_dialogue()
+            self.mouvement = 0 #Légèrement redondant ici
+            self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
+        elif replique == "Tu es vraiment pathétique.":
+            self.appreciations[0]-= 0.5
+            self.end_dialogue(-2)
+        elif replique == "Je ne fais que passer, au-revoir.":
+            self.appreciations[0]-= 0.5
+            self.end_dialogue(-2)
+
+        #Dialogue par défaut -2
+        elif replique == "Rien !":
+            self.end_dialogue(-2)
+        elif replique == "Tu veux que je t'aide à sortir d'ici ?":
+            self.replique="Non merci, je préfère rester bloquer que demander ton aide !"
+            self.repliques = ["Eh bien reste-ici !"]
+        elif replique == "Eh bien reste-ici !":
+            self.end_dialogue(-2)
+        elif replique == "Je voudrais m'excuser pour ce que j'ai dit.":
+            self.replique="... Bon, je te pardonne."
+            self.repliques = ["Du coup, on va à la sortie ?"]
+            self.appreciations[0]+= 0.5
+        elif replique == "Du coup, on va à la sortie ?":
+            self.replique="Ok, montre-moi le chemin."
+            self.repliques = ["Tache de ne pas te perdre.","Fais-moi confiance !"]
+        elif replique == "Tache de ne pas te perdre.":
+            self.appreciations[0]-= 0.5
+            self.end_dialogue()
+            self.mouvement = 0 #Légèrement redondant ici
+            self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
+        elif replique == "Fais-moi confiance !":
+            self.end_dialogue()
+            self.mouvement = 0 #Légèrement redondant ici
+            self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
+
+        self.replique_courante = 0
+
     def get_skin(self):
         return SKIN_PAUME
 
 class Peureuse(Humain): #La quatrième humaine du jeu, à l'étage 3 (terrorisée par les monstres)
     """La classe de la peureuse."""
-    def __init__(self,position,screen):
+    def __init__(self,position):
 
-        Agissant.__init__(self,position,'peureuse',1) #Plutôt faible, de base
+        self.identite = 'peureuse'
+        self.place = 3
+
+        Humain.__init__(self,position,self.identite,1) #Plutôt faible, de base
 
         self.appreciations = [1,1,0,-1,0,9,1,6,-1,-1]
-        self.role = "soutien"
+        self.dialogue = 1
 
         #Est-ce qu'elle a un minimum d'équippement ?
 
@@ -4341,32 +4485,183 @@ class Peureuse(Humain): #La quatrième humaine du jeu, à l'étage 3 (terrorisé
     # /!\ Pour améliorer ça : fuire dès qu'il y a un monstre en vue et accessible
     # et ne pas fuir s'il n'y a nulle part où fuir ou si le joueur a donné ordre de ne pas fuir et qu'on a suffisamment d'appréciation pour lui (rajouter un modificateur au taux_limite ?)
 
+    def start_dialogue(self): #On commence un nouveau dialogue !
+        #On initialise nos attributs
+        self.replique_courante = 0
+        #La plupart dépendent du dialogue
+        if self.dialogue == -1: #Le joueur est venu nous voir de son propre chef
+            self.replique = "Tu as besoin de quelque chose ?"
+            self.repliques = ["Tu pourrais aller quelque part ?","Discutons un peu."] #La question personnelle est pour quand le joueur veut faire avancer les interractions.
+        elif self.dialogue == -2: #Le joueur nous a mal traîté
+            self.replique = "Tu as du culot de revenir me parler après ce que tu m'as dit !"
+            self.repliques = [""]
+        elif self.dialogue == 1: #Le joueur vient d'arriver depuis le deuxième étage
+            self.replique = "Bonjour !"
+            self.repliques = ["Salut...","Bonjour ma jolie."]
+
+    def interprete(self,nb_replique):
+        #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
+        replique = self.repliques[nb_replique] #Donc la réplique est la phrase que le joueur à choisi
+        #Il suffit de savoir quelle phrase le joueur a choisi pour réagir en conséquence
+
+        #Premier dialogue
+        #Le joueur arrive par l'escalier
+        if replique in ["Salut...","Désolé..."]:
+            self.replique=""
+            self.repliques = ["...qu'est-ce que tu fais ici ?","...où est la sortie ?"]
+        elif replique == "...qu'est-ce que tu fais ici ?":
+            self.replique="Je voudrais continuer, mais il y a des monstres sur le chemin."
+            self.repliques = ["Tu veux que je les tue pour toi ?","Des monstres ? Ils sont dangereux ?"]
+        elif replique == "...où est la sortie ?":
+            self.replique="Tout en bas."
+            self.repliques = ["Pourquoi tu n'y vas pas ?"]
+        elif replique == "Pourquoi tu n'y vas pas ?":
+            self.replique="Il y a des monstres sur le chemin."
+            self.repliques = ["Tu veux que je les tue pour toi ?","Des monstres ? Ils sont dangereux ?"]
+        elif replique == "Tu veux que je les tue pour toi ?":
+            self.replique="S'il te plaît !"
+            self.repliques = ["Laisse-moi faire."]
+        elif replique == "Laisse-moi faire.":
+            self.appreciations[0] += 0.5
+            self.end_dialogue()
+        elif replique == "Des monstres ? Ils sont dangereux ?":
+            self.replique="Un peu. C'est surtout que je suis fragile..."
+            self.repliques = ["Je vais essayer de les combattre.","Pff... les faibles n'ont qu'à mourir."]
+        elif replique == "Je vais essayer de les combattre.":
+            self.replique="Je peux te suivre ?"
+            self.repliques = ["Oui, viens.","Non, tu ne ferais que me gêner."]
+        elif replique == "Oui viens.":
+            self.end_dialogue()
+            self.mouvement = 0 #Légèrement redondant ici
+            self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
+        elif replique == "Non, tu ne ferais que me gêner.":
+            self.appreciations[0]-= 0.5
+            self.end_dialogue(-2)
+        elif replique == "Pff... les faibles n'ont qu'à mourir.":
+            self.appreciations[0]-= 0.5
+            self.end_dialogue(-2)
+        elif replique == "Bonjour ma jolie.":
+            self.replique="Ne me parle pas si familièrement."
+            self.repliques = ["Désolé...","Allez, fais pas ta timide..."]
+        elif replique == "Allez, fais pas ta timide...":
+            self.replique="Sérieusement, t'es lourd ! J'ai déjà un copain, [insérer le nom du copain ici], alors arrête !"
+            self.repliques = ["Désolé..."]
+
+        #Dialogue par défaut -2
+        elif replique == "":
+            self.end_dialogue(-2)
+
+        self.replique_courante = 0
+
     def get_skin(self):
         return SKIN_PEUREUSE
 
 class Codeur(Humain): #Le cinquième humain du jeu, à l'étage 4 (répond au nom de Dev, quand Il n'est pas occupé à programmer un autre jeu)
     """Ma classe."""
-    def __init__(self,position,screen):
+    def __init__(self,position):
 
-        Agissant.__init__(self,position,'codeur',1) #La notion de niveau n'a pas d'emprise sur Dev... Il peut modifier son niveau simple 'self.niveau = '
-        self.role = "incapacite" #Dev ne participe pas aux combats
+        self.identite = 'codeur'
+        self.place = 4
+
+        Humain.__init__(self,position,self.identite,1) #La notion de niveau n'a pas d'emprise sur Dev... Il peut modifier son niveau simple 'self.niveau = '
 
         self.appreciations = [5,0,0,0,0,0,0,0,0,0]
 
     def fuite(self):
         return False
 
+    def start_dialogue(self): #On commence un nouveau dialogue !
+        #On initialise nos attributs
+        self.replique_courante = 0
+        #La plupart dépendent du dialogue
+        if self.dialogue == -1: #Le joueur est venu nous voir de son propre chef (c'est la seule option pour parler à Dev dans le tuto)
+            self.replique = "Salut, qu'est-ce que tu viens faire ici ?"
+            self.repliques = ["Je me suis perdu !","Je voulais explorer tous les recoins."]
+        elif self.dialogue == -2: #Le joueur nous a dit qu'il s'était perdu
+            self.replique = "Salut, qu'est-ce que tu viens faire ici ?"
+            self.repliques = ["Je me suis perdu !","Je voulais explorer tous les recoins. "]
+        elif self.dialogue == -3: #Le joueur ne s'intéresse qu'aux combats
+            self.replique = "Alors, comment vont tes combats ?"
+            self.repliques = ["Bien, merci."]
+        elif self.dialogue == -4: #Le joueur est revenu mentir
+            self.replique = "Tu n'obtiendras rien de plus de moi."
+            self.repliques = ["  "]
+        elif self.dialogue == -5: #Le joueur a écouté nos conseils
+            self.replique = "Salut, quoi de neuf ?"
+            self.repliques = ["Je passais juste dire bonjour.","Est-ce que je peux entendre tes conseils à nouveaux ?"]
+
+    def interprete(self,nb_replique):
+        #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
+        replique = self.repliques[nb_replique] #Donc la réplique est la phrase que le joueur à choisi
+        #Il suffit de savoir quelle phrase le joueur a choisi pour réagir en conséquence
+
+        #Premier dialogue
+        #Le joueur arrive vers Dev
+        if replique == "Je me suis perdu !":
+            self.replique="Ahah, c'est fait pour. Bonne chance pour la suite."
+            self.repliques = [""]
+        elif replique == "":
+            self.end_dialogue(-2)
+        elif replique == "Je voulais explorer tous les recoins.":
+            self.replique="Tu as bien raison. Observe, examine, scrute les moindres détails, cherche la vérité, et tu seras victorieux !"
+            self.repliques = ["Ça va vraiment m'aider à combattre les monstres ?","Quels genre de détails dois-je chercher ?"]
+        elif replique == "Ça va vraiment m'aider à combattre les monstres ?":
+            self.replique="Pas vraiment."
+            self.repliques = ["Je vais y aller alors."]
+        elif replique == "Je vais y aller alors.":
+            self.end_dialogue(-3)
+        elif replique == "Quels genre de détails dois-je chercher ?":
+            self.replique="Tu peux observer les inscriptions sur les murs, écouter ce que les PNJs ont à te dire... la suite viendra plus tard."
+            self.repliques = ["Merci pour ces conseils."]
+        elif replique == "Merci pour ces conseils.":
+            self.appreciations[0] += 0.5
+            self.end_dialogue(-5)
+
+        #Dialogue par défaut -2
+        elif replique == "Je voulais explorer tous les recoins. ":
+            self.replique="Vraiment ? Tu viens de me dire que tu t'étais perdu pourtant..."
+            self.repliques = [" "]
+        elif replique == " ":
+            self.replique="Tu pensais vraiment que je ne m'en souviendrais pas ?"
+            self.repliques = ["Désolé, je ne voulais pas te mentir..."]
+        elif replique == "Désolé, je ne voulais pas te mentir...":
+            self.replique="Allez, vas-y."
+            self.repliques = ["  "]
+        elif replique == "  ":
+            self.end_dialogue(-4)
+
+        #Dialogue par défaut -3
+        elif replique == "Bien, merci.":
+            self.end_dialogue(-3)
+
+        #Dialogue par défaut -5
+        elif replique == "Je passais juste dire bonjour.":
+            self.replique="Tu as des choses plus importantes à faire..."
+            self.repliques = ["Oui, j'y vais."]
+        elif replique == "Oui, j'y vais":
+            self.end_dialogue(-5)
+        elif replique == "Est-ce que je peux entendre tes conseils à nouveaux ?":
+            self.replique="Quelle partie ? 'Observe, examine, scrute les moindres détails, cherche la vérité, et tu seras victorieux !' ou 'Tu peux observer les inscriptions sur les murs, écouter ce que les PNJs ont à te dire... la suite viendra plus tard.' ?"
+            self.repliques = ["Les deux, merci !"]
+        elif replique == "Les deux, merci !":
+            self.end_dialogue(-5)
+
+        self.replique_courante = 0
+
     def get_skin(self):
         return SKIN_CODEUR
 
 class Encombrant(Humain): #Le sixième humain du jeu, à l'étage 5 (moyennement apprèciable, surtout si on essaye de draguer sa copine)
     """La classe de l'encombrant."""
-    def __init__(self,position,screen):
+    def __init__(self,position):
 
-        Agissant.__init__(self,position,'encombrant',2) #En plus il a fallu que ce soit un combattant relativement aguerri...
+        self.identite = 'encombrant'
+        self.place = 5
+
+        Humain.__init__(self,position,self.identite,2) #En plus il a fallu que ce soit un combattant relativement aguerri...
 
         self.appreciations = [0,1,-1,6,0,5,0,3,3,0]
-        self.role = "attaque"
+        self.dialogue = 1
 
         #Penser à l'équipper
 
@@ -4387,17 +4682,70 @@ class Encombrant(Humain): #Le sixième humain du jeu, à l'étage 5 (moyennement
 
     # /!\ Pour améliorer ça : ne pas fuir s'il n'y a nulle part où fuir
 
+    def start_dialogue(self): #On commence un nouveau dialogue !
+        #On initialise nos attributs
+        self.replique_courante = 0
+        #La plupart dépendent du dialogue
+        if self.dialogue == -1: #Le joueur est venu nous voir de son propre chef
+            self.replique = "Tu as besoin de quelque chose ?"
+            self.repliques = ["J'ai besoin que tu ailles quelque part.","Change de stratégie au combat.","On peut discuter ?"]
+        elif self.dialogue == -2: #Le joueur nous a offensé !
+            self.replique = "Meurs !"
+            self.repliques = [""]
+        elif self.dialogue == 1: #Le vient de passer la porte
+            self.replique = "Hey, salut ! Moi c'est [insérer le nom du copain ici]."
+            self.repliques = ["Moi c'est Arvel.","Alors c'est toi, son copain !"] #/!\ N'afficher la réplique du copain que si on a discuté de son copain avec la peureuse
+
+    def interprete(self,nb_replique):
+        #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
+        replique = self.repliques[nb_replique] #Donc la réplique est la phrase que le joueur à choisi
+        #Il suffit de savoir quelle phrase le joueur a choisi pour réagir en conséquence
+
+        #Premier dialogue
+        #Le joueur arrive par la porte
+        if replique == "Moi c'est Arvel.":
+            self.replique="Content de te voir !"
+            self.repliques = ["Moi aussi, mais comment je te fais sortir d'ici ? La porte se referme après mon passage."]
+        elif replique == "Moi aussi, mais comment je te fais sortir d'ici ? La porte se referme après mon passage.":
+            self.replique="Il y a une autre clé ici. Tu peux la ramasser avec la touche M. Elle ouvre la porte là-bas, qui ne se referme pas." #/!\ Faire dépendre de la touche effectivement utilisée par le joueur !
+            self.repliques = ["Cool ! On y va alors !","Je vais ressortir par l'autre porte en fait, au-revoir."]
+        elif replique == "Cool ! On y va alors !":
+            self.replique="Merci pour ça. Je te le revaudrai."
+            self.repliques = ["Alors je te demanderai si j'ai besoin d'aide."]
+        elif replique == "Alors je te demanderai si j'ai besoin d'aide.":
+            self.end_dialogue()
+        elif replique == "Je vais ressortir par l'autre porte en fait, au-revoir.":
+            self.end_dialogue(-2)
+            #self.controleur.get_esprit(self.esprit).antagonise(truc comme ça ou une offense ?
+            #+ modifier le role, ou quelque chose, pour qu'il combatte
+        elif replique == "Alors c'est toi, son copain !":
+            self.replique="Quoi ?"
+            self.repliques = ["Je vais te tuer, mais ce n'est rien de personnel."]
+        elif replique == "Je vais te tuer, mais ce n'est rien de personnel.":
+            #self.controleur.get_esprit(self.esprit).antagonise(truc comme ça ou une offense ?
+            #+ modifier le role, ou quelque chose, pour qu'il combatte
+            self.end_dialogue(-2)
+
+        #Dialogue par défaut -2
+        elif replique == "":
+            self.end_dialogue(-2)
+
+        self.replique_courante = 0
+
     def get_skin(self):
         return SKIN_ENCOMBRANT
 
 class Alchimiste(Humain): #Le septième humain du jeu, à l'étage 6 (un faiseur de potions aux magies diverses)
     """La classe de l'alchimiste."""
-    def __init__(self,position,screen):
+    def __init__(self,position):
 
-        Agissant.__init__(self,position,'alchimiste',5) #Puissant, mais pas le plus utile en combat...
+        self.identite = 'alchimiste'
+        self.place = 6
+
+        Humain.__init__(self,position,self.identite,5) #Puissant, mais pas le plus utile en combat...
 
         self.appreciations = [0,1,0,0,0,0,2,-2,2,-3]
-        self.role = "soutien"
+        self.dialogue = 1
 
         #Penser à l'équipper, et à remplir son inventaire de potions
 
@@ -4417,17 +4765,74 @@ class Alchimiste(Humain): #Le septième humain du jeu, à l'étage 6 (un faiseur
 
     # /!\ Pour améliorer ça : ne pas fuir s'il n'y a nulle part où fuir et ne pas fuir si on n'est pas à portée de monstres
 
+    def start_dialogue(self): #On commence un nouveau dialogue !
+        #On initialise nos attributs
+        self.replique_courante = 0
+        #La plupart dépendent du dialogue
+        if self.dialogue == -1: #Le joueur est venu nous voir de son propre chef
+            self.replique = "Mes talents sont-ils requis ?"
+            self.repliques = ["J'ai besoin que tu ailles quelque part.","Change de stratégie au combat.","Fais-moi une potion.","Examine une potion.","Lance un sort.","On peut discuter ?"]
+        elif self.dialogue == -2: #Le joueur nous a traité de vieillard
+            self.replique = "Qu'est-ce qu'il y a, gamin ?"
+            self.repliques = ["Tu ne voudrais pas rejoindre notre groupe ? Pour ta propre sécurité.","Désolé pour mon comportement."]
+        elif self.dialogue == 1:
+            self.replique = "Ho ho ho ! Y aurait-il d'autres humains coincés ici ?"
+            self.repliques = ["Oui, tu veux nous rejoindre ?","Ne fais pas attention, vieillard, on ne faisait que passer."]
+
+    def interprete(self,nb_replique):
+        #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
+        replique = self.repliques[nb_replique] #Donc la réplique est la phrase que le joueur à choisi
+        #Il suffit de savoir quelle phrase le joueur a choisi pour réagir en conséquence
+
+        #Premier dialogue
+        #Le joueur arrive par la porte
+        if replique == "Oui, tu veux nous rejoindre ?":
+            self.replique="Avec grand plaisir ! Mes talents d'alchimiste vous serons d'une grande aide."
+            self.repliques = ["Un alchimiste ! Qu'est-ce que tu peux faire ?","Je ferais appel à toi."]
+        elif replique == "Un alchimiste ! Qu'est-ce que tu peux faire ?":
+            self.replique="Créer des potions, examiner des potions... Je sais aussi utiliser plein de magies."
+            self.repliques = ["Je ferais appel à toi."]
+        elif replique == "Je ferais appel à toi.":
+            self.end_dialogue()
+        elif replique == "Ne fais pas attention, vieillard, on ne faisait que passer.":
+            self.appreciations[0] -= 0.5
+            self.end_dialogue(-2)
+
+        #Dialogue par défaut -2
+        elif replique == "Tu ne voudrais pas rejoindre notre groupe ? Pour ta propre sécurité.":
+            self.replique="Non merci, je me débrouille très bien tout seul."
+            self.repliques = ["Comme tu voudras.","Ne t'étonne pas de mourir !"]
+        elif replique == "Comme tu voudras.":
+            self.end_dialogue(-2)
+        elif replique == "Ne t'étonne pas de mourir !":
+            self.end_dialogue(-2)
+            #self.controleur.get_esprit(self.esprit).antagonise(truc comme ça ou une offense ?
+            #+ modifier le role, ou quelque chose, pour qu'il combatte
+        elif replique == "Désolé pour mon comportement.":
+            self.replique="Disons que ça passe pour cette fois."
+            self.repliques = ["Du coup, est-ce que tu voudrais rejoindre notre groupe ?"]
+        elif replique == "Du coup, est-ce que tu voudrais rejoindre notre groupe ?":
+            self.replique="Pourquoi pas. On n'est plus forts à plusieurs."
+            self.repliques = ["Bienvenu. Et désolé encore."]
+        elif replique == "Bienvenu. Et désolé encore.":
+            self.end_dialogue()
+
+        self.replique_courante = 0
+
     def get_skin(self):
         return SKIN_ALCHIMISTE
 
 class Peste(Humain): #La huitième humaine du jeu, à l'étage 7 (une sainte très à cheval sur beaucoup trop de trucs)
     """La classe de la peste."""
-    def __init__(self,position,screen):
+    def __init__(self,position):
 
-        Agissant.__init__(self,position,'peste',3) #Très bonne soigneuse, accessoirement
+        self.identite = 'peste'
+        self.place = 7
+
+        Humain.__init__(self,position,self.identite,3) #Très bonne soigneuse, accessoirement
 
         self.appreciations = [1,-1,-2,-2,0,-3,-1,9,-4,-1]
-        self.role = "soin"
+        self.dialogue = 1
 
         #Penser à l'équipper
 
@@ -4445,17 +4850,94 @@ class Peste(Humain): #La huitième humaine du jeu, à l'étage 7 (une sainte tr�
 
     # /!\ Pour améliorer ça : ne pas fuir s'il n'y a nulle part où fuir et ne pas fuir si on n'est pas à portée de monstre
 
+    def start_dialogue(self): #On commence un nouveau dialogue !
+        #On initialise nos attributs
+        self.replique_courante = 0
+        #La plupart dépendent du dialogue
+        if self.dialogue == -1: #Le joueur est venu nous voir de son propre chef
+            self.replique = "Qu'est-ce que je dois faire pour tuer plus de monstres ?"
+            self.repliques = ["Si tu vas à un certain, endroit, on pourrait tuer plus de monstres.","Je voulais te parler d'un truc."]
+        elif self.dialogue == -2: #Le joueur veut se débrouiller seul
+            self.replique = "(Je n'arriverai jamais à tuer tous les monstres...)"
+            self.repliques = ["Tu parles toute seule ? Tu ne serais pas un peu folle ?","On peut s'entraider pour tuer les monstres ?"]
+        elif self.dialogue == -3: #Le joueur ne veut pas tuer tous les monstres
+            self.replique = "Tu peux me laisser ? J'ai des monstres à tuer."
+            self.repliques = [" "]
+        elif self.dialogue == -4:
+            self.replique = "Meurs !"
+            self.repliques = ["  "]
+        elif self.dialogue == 1:
+            self.replique = "Hey, toi !"
+            self.repliques = ["Qu'est-ce qu'il y a ?","Ne me parle pas comme ça !"]
+
+    def interprete(self,nb_replique):
+        #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
+        replique = self.repliques[nb_replique] #Donc la réplique est la phrase que le joueur à choisi
+        #Il suffit de savoir quelle phrase le joueur a choisi pour réagir en conséquence
+
+        #Premier dialogue
+        #Le joueur arrive par la porte
+        if replique == "Qu'est-ce qu'il y a ?":
+            self.replique="J'ai besoin d'aide pour tuer tous ces immondes monstres."
+            self.repliques = ["Tu pourrais rejoindre notre groupe.","Est-on obligé de tous les tuer ?"]
+        elif replique == "Tu pourrais rejoindre notre groupe.":
+            self.replique="Ok. Je peux vous soigner si ces sales monstres vous blessent."
+            self.repliques = ["Tu as des capacité de guérison ?","D'accord."]
+        elif replique == "Tu as des capacité de guérison ?":
+            self.replique="Je suis la Sainte choisie par le grand Dieu [insérer le nom d'un Dieu ici] ! Tu ne trouveras pas de meilleure guérisseuse dans tout [insérer le nom d'une capitale ici]."
+            self.repliques = ["Waoh ! Je compterais sur toi alors."]
+        elif replique in ["Waoh ! Je compterais sur toi alors.","D'accord.","Je veux bien"]:
+            self.end_dialogue()
+        elif replique == "Est-on obligé de tous les tuer ?":
+            self.appreciations[0] -= 0.5
+            self.replique="Tu voudrais laisser ces vermines en vie !?"
+            self.repliques = ["Non, non, bien sûr que non...","Si ça peut nous permettre de rester en vie..."]
+        elif replique == "Non, non, bien sûr que non...":
+            self.replique="Alors, tu m'aides ?"
+            self.repliques = ["Non, je me débrouillerai tout seul.","Je veux bien."]
+        elif replique == "Non, je me débrouillerai tout seul.":
+            self.end_dialogue(-2)
+        elif replique == "Si ça peut nous permettre de rester en vie...":
+            self.end_dialogue(-3)
+
+        #Dialogue par défaut -2
+        elif replique == "Tu parles toute seule ? Tu ne serais pas un peu folle ?":
+            self.replique="De quel droit m'insulte-tu ? Meurs !"
+            self.repliques = [""]
+        elif replique == "":
+            self.end_dialogue(-4)
+            #self.controleur.get_esprit(self.esprit).antagonise(truc comme ça ou une offense ?
+            #+ modifier le role, ou quelque chose, pour qu'elle combatte
+        elif replique == "On peut s'entraider pour tuer les monstres ?":
+            self.replique="Humph. D'accord."
+            self.repliques = ["Merci."]
+        elif replique == "Merci":
+            self.end_dialogue()
+
+        #Dialogue par défaut -3
+        elif replique == " ":
+            self.end_dialogue(-3)
+
+        #Dialogue par défaut -4
+        elif replique == "  ":
+            self.end_dialogue(-4)
+
+        self.replique_courante = 0
+
     def get_skin(self):
         return SKIN_PESTE
 
 class Bombe_atomique(Humain): #La neuvième humaine du jeu, à l'étage 8 (une magicienne légèrement aguicheuse)
     """La classe de la bombe atomique."""
-    def __init__(self,position,screen):
+    def __init__(self,position):
 
-        Agissant.__init__(self,position,'bombe_atomique',4) #Ses magies sont littéralement explosives !
+        self.identite = 'bombe_atomique'
+        self.place = 8
+
+        Humain.__init__(self,position,self.identite,4) #Ses magies sont littéralement explosives !
 
         self.appreciations = [3,-1,1,-1,0,2,1,-1,3,0]
-        self.role = "attaque"
+        self.dialogue = 1
 
         #Penser à l'équipper
 
@@ -4476,17 +4958,107 @@ class Bombe_atomique(Humain): #La neuvième humaine du jeu, à l'étage 8 (une m
 
     # /!\ Pour améliorer ça : ne pas fuir s'il n'y a nulle part où fuir
 
+    def start_dialogue(self): #On commence un nouveau dialogue !
+        #On initialise nos attributs
+        self.replique_courante = 0
+        #La plupart dépendent du dialogue
+        if self.dialogue == -1: #Le joueur est venu nous voir de son propre chef
+            self.replique = "Tu as besoin d'aide, mon chou ?"
+            self.repliques = ["Est-ce que tu pourrais aller quelque-part ?","C'est à propos des combats.","On peut parler en privé ?"]
+        elif self.dialogue == -2:
+            self.replique = "Ah, c'est encore toi ?"
+            self.repliques = ["Tu ne voudrais pas m'accompagner ?","Désolé, je me suis trompé de personne."]
+        elif self.dialogue == -3:
+            self.replique = "Meurs !"
+            self.repliques = ["   "]
+        elif self.dialogue == 1:
+            self.replique = "Bonjour mon chou..."
+            self.repliques = ["Bonjour ma belle.","Bonjour..."]
+
+    def interprete(self,nb_replique):
+        #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
+        replique = self.repliques[nb_replique] #Donc la réplique est la phrase que le joueur à choisi
+        #Il suffit de savoir quelle phrase le joueur a choisi pour réagir en conséquence
+
+        #Premier dialogue
+        #Le joueur arrive par la porte
+        if replique == "Bonjour ma belle.":
+            self.appreciations[0] += 0.5
+            self.replique="Qu'est-ce qui t'amène ici ?"
+            self.repliques = ["Je cherche la sortie.","Je t'ai aperçue de loin, et j'ai voulu faire ta connaissance."]
+        elif replique == "Je cherche la sortie.":
+            self.replique="Moi aussi. On peut faire un bout de chemin ensemble ?"
+            self.repliques = ["Avec plaisir.","Non merci."]
+        elif replique in ["Avec plaisir.","Comment refuser une compagnie si agréable ?"]:
+            self.end_dialogue()
+        elif replique == "Non merci.":
+            self.end_dialogue(-2)
+        elif replique == "Je t'ai aperçue de loin, et j'ai voulu faire ta connaissance.":
+            self.appreciations[0] += 0.5
+            self.replique="Ahah... Tu veux que je tienne un peu compagnie ?"
+            self.repliques = ["Comment refuser une compagnie si agréable ?","Non merci."]
+        elif replique == "Bonjour...":
+            self.replique=""
+            self.repliques = ["...tu sais où est la sortie ?","...tu sais te battre ?"]
+        elif replique == "...tu sais où est la sortie ?":
+            self.replique="Au centième étage. Tu as encore du chemin à faire..."
+            self.repliques = ["Tu pourrais m'aider ?","Je n'ai pas de temps à perdre alors. À plus."]
+        elif replique == "Tu pourrais m'aider ?":
+            self.replique="Je suppose que je peux t'accompagner pour un bout du chemin."
+            self.repliques = ["Merci"]
+        elif replique == "Je n'ai pas de temps à perdre alors. À plus.":
+            self.end_dialogue(-2)
+        elif replique == "...tu sais te battre ?":
+            self.replique="Tu veux que je te montre ?"
+            self.repliques = ["Non, je te crois. Ça t'intéresserait de venir avec moi ?","Ouais, amène-toi."]
+        elif replique == "Non, je te crois. Ça t'intéresserait de venir avec moi ?":
+            self.replique="Oui. Demande-moi si tu as un monstre à carboniser."
+            self.repliques = ["J'y penserai."]
+        elif replique == "J'y penserai.":
+            self.end_dialogue()
+        elif replique == "Ouais, amène-toi.":
+            self.replique="Non, je voulais dire, te montrer sur les monstres."
+            self.repliques = ["Je te fais peur ?","Ok. Accompagne-moi alors."]
+        elif replique == "Je te fais peur ?":
+            self.replique="Tu l'auras voulu..."
+            self.repliques = [" "]
+        elif replique == " ":
+            self.end_dialogue(-3)
+            #self.controleur.get_esprit(self.esprit).antagonise(truc comme ça ou une offense ?
+            #+ modifier le role, ou quelque chose, pour qu'elle combatte
+        elif replique == "Ok. Accompagne-moi alors.":
+            self.end_dialogue()
+
+        #Dialogue par défaut -2
+        elif replique == "Tu ne voudrais pas m'accompagner ?":
+            self.replique="Ok."
+            self.repliques = ["  "]
+        elif replique == "  ":
+            self.appreciations[0] -= 0.5
+            self.end_dialogue()
+        elif replique == "Désolé, je me suis trompé de personne.":
+            self.end_dialogue(-2)
+
+        #Dialogue par défaut -3
+        elif replique == "   ":
+            self.end_dialogue(-3)
+
+        self.replique_courante = 0
+
     def get_skin(self):
         return SKIN_BOMBE_ATOMIQUE
 
 class Marchand(Humain): #Le dixième humain du jeu, à l'étage 9 (le seul lien avec l'extérieur)
     """La classe du marchand."""
-    def __init__(self,position,screen):
+    def __init__(self,position):
 
-        Agissant.__init__(self,position,'marchand',1) #Il a un skill d'échange d'objet avec son patron à l'extérieur
+        self.identite = 'marchand'
+        self.place = 9
+
+        Humain.__init__(self,position,self.identite,1) #Il a un skill d'échange d'objet avec son patron à l'extérieur
 
         self.appreciations = [0,0,-1,0,0,-1,0,3,0,2]
-        self.role = "attaque"
+        self.dialogue = 1
 
         #Est-ce qu'il a un minimum d'équippement ? Ou est-ce qu'il achète son équippement de base après avoir rencontré le joueur ?
 
@@ -4506,6 +5078,48 @@ class Marchand(Humain): #Le dixième humain du jeu, à l'étage 9 (le seul lien 
         return self.pv // self.pv_max <= taux_limite
 
     # /!\ Pour améliorer ça : ne pas fuir s'il n'y a nulle part où fuir ou si le joueur a donné ordre de ne pas fuir et qu'on a suffisamment d'appréciation pour lui (rajouter un modificateur au taux_limite ?)
+
+    def start_dialogue(self): #On commence un nouveau dialogue !
+        #On initialise nos attributs
+        self.replique_courante = 0
+        #La plupart dépendent du dialogue
+        if self.dialogue == -1: #Le joueur est venu nous voir de son propre chef
+            self.replique = "Un client !"
+            self.repliques = ["Non, je voulais te donner une consigne.","Je voudrais vendre.","Je voudrais acheter"]
+        elif self.dialogue == -2:
+            self.replique = "Un client !"
+            self.repliques = ["Je voudrais vendre.","Je voudrais acheter"]
+        elif self.dialogue == 1:
+            self.replique = "Vous avez besoin de quelque chose ?"
+            self.repliques = ["Vous pouvez faire quelque chose pour moi ?"]
+
+    def interprete(self,nb_replique):
+        #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
+        replique = self.repliques[nb_replique] #Donc la réplique est la phrase que le joueur à choisi
+        #Il suffit de savoir quelle phrase le joueur a choisi pour réagir en conséquence
+
+        #Premier dialogue
+        #Le joueur arrive par la porte
+        if replique == "Vous pouvez faire quelque chose pour moi ?":
+            self.replique="Bien sûr ! Je suis marchand, et je peux vous proposer toutes sortes d'objets. Certains articles coûtent un peu cher, mais vu les circonstances, vous ne trouverez pas mieux"
+            self.repliques = ["Je n'ai pas d'argent...","Intéressant... tu veux venir avec moi ?"]
+        elif replique == "Je n'ai d'argent...":
+            self.replique="Tu n'as qu'à me vendre ce dont tu ne te sers pas. Même les cadavres de monstre ont de la valeur." #/!\ Donner un peu de sous ?
+            self.repliques = ["Ce serait embêtant de revenir ici à chaque fois que j'ai tué un monstre..."]
+        elif replique == "Ce serait embêtant de revenir ici à chaque fois que j'ai tué un monstre...":
+            self.replique="Je peux t'accompagner."
+            self.repliques = ["Je veux bien.","Non merci."]
+        elif replique == "Je veux bien.":
+            self.end_dialogue()
+        elif replique == "Non merci.":
+            self.end_dialogue(-2)
+        elif replique == "Intéressant... tu veux venir avec moi ?":
+            self.replique="Volontiers. Il n'y a pas beaucoup d'autres clients ici."
+            self.repliques = [""]
+        elif replique == "":
+            self.end_dialogue()
+
+        self.replique_courante = 0
 
     def get_skin(self):
         return SKIN_MARCHAND
@@ -6815,7 +7429,7 @@ class Esprit_defensif(Esprit_type):
 
 class Esprit_solitaire(Esprit_type):
     """Un esprit avec un unique corp."""
-    def __init__(self,nom,corp,controleur):
+    def __init__(self,corp,controleur):
         self.nom = nom
         self.controleur = controleur
         self.oubli = 5
@@ -6823,6 +7437,312 @@ class Esprit_solitaire(Esprit_type):
         self.vue = {}
         self.corps = {}
         self.ajoute_corp(corp)
+
+class Esprit_humain(Esprit_type):
+    """Un esprit qui dirige un ou plusieurs humains. Peut interragir avec d'autres esprits humains."""
+    def __init__(self,corp,controleur): #Les humains commencent tous séparément, donc ils ont leur propre esprit au début
+        self.nom = controleur.get_entitee(corp).identite
+        self.controleur = controleur
+        self.oubli = 5 #Faire dépendre de l'humain
+        self.ennemis = {}
+        self.vue = {}
+        self.corps = {}
+        self.ajoute_corp(corp)
+        self.chef = corp #Les humains ne peuvent pas s'empêcher d'avoir des chefs
+
+    def merge(self,nom): #Regroupe deux esprits, lorsque des humains forment un groupe
+        esprit = self.controleur.get_esprit(nom)
+        for corp in esprit.corp.keys():
+            self.ajoute_corp(corp)
+        for ennemi in esprit.ennemis.keys():
+            if ennemi in self.ennemis.keys():
+                self.ennemis[ennemi] = max(self.ennemis[ennemi],esprit.ennemis[ennemi])
+            else:
+                self.ennemis[ennemi] = esprit.ennemis[ennemi]
+        for vue in esprit.vue.values():
+            niveau = vue[0][0][0][0] #La première coordonée de la position (première information) de la première case de la première colonne
+            if niveau in self.vue.keys(): 
+                self.maj_vue(vue,niveau)
+            else:
+                self.ajoute_vue(vue,niveau)
+        self.chef = self.elit()
+
+    def elit(self):
+        if 2 in self.corps.keys():
+            self.chef = 2 #Le joueur est le chef par défaut ! Ah mais non mais !
+        else:
+            self.chef = None
+            candidats = []
+            for corp in self.corps.keys():
+                if "humain" in self.controleur.get_entitee(corp).get_especes():
+                    candidats.append(self.controleur.get_entitee(corp)) #Les humains sont les seuls à pouvoir diriger un esprit d'humain. Et les seuls à voter, aussi.
+            votes_max = 0
+            for candidat in candidats:
+                votes = 0
+                place = candidat.get_place()
+                for votant in candidats:
+                    votes += votant.appreciation(place)
+                if votes > votes_max:
+                    self.chef = candidat.ID #/!\ Éviter les chefs morts, à l'occasion /!\
+                    votes_max = votes
+
+    def exclus(self,corp): #C'est super sympa, les relations humaines !
+        #Il va falloir créer un nouvel esprit pour l'humain exclus
+        #Et il va falloir donner un nom à ce nouvel esprit
+        #Les esprits humains sont nommés d'après leur porteur originel
+        if self.controleur.get_entitee(corp).identite != self.nom: #Tout va bien
+            self.controleur.esprits[self.controleur.get_entitee(corp).identite]=Esprit_humain(corp,self.controleur)
+        else:
+            self.controleur.esprits[self.controleur.get_entitee(corp).identite]=Esprit_humain(corp,self.controleur)
+            self.elit() #Autant changer tous les rapports de force d'un coup
+            self.nom = self.controleur.get_entitee(self.chef).identite
+
+    def decide(self):
+        bourrins = []
+        fuyards = []
+        soigneurs = []
+        soutiens = []
+        humains = []
+        autres = []
+        for corp in self.corps.keys():
+            if self.corps[corp] == "attaque":
+                bourrins.append(corp)
+            elif self.corps[corp] == "fuite": 
+                fuyards.append(corp)
+            elif self.corps[corp] == "soin":
+                soigneurs.append(corp)
+            elif self.corps[corp] == "soutien":
+                soutiens.append(corp)
+            elif self.corps[corp] == "humain":
+                humains.append(corp)
+            else:
+                autres.append(corp)
+        bourrins_sups = []
+        #On va traiter les humains en premier (on note que les humains fuyards ne se compliquent pas tant la vie) :
+        for humain in humains :
+            res = self.deplace_humain(humain)
+            if res == "attaque": #L'humain est en position d'attaquer bientôt ou a attaqué, conformément aux ordres
+                bourrins_sups.append(humain)
+            elif res == "soin": #L'humain (plutôt l'humaine en fait) est en capacité de soigner, à ce tour ou à un prochain
+                soigneurs.append(humain)
+            elif res == "soutien": #L'humain (plutôt l'humaine ici aussi) est en capacité d'aider, à ce tour ou à un prochain
+                soutiens.append(humain)
+            #Sinon, c'est que l'humain s'est déjà déplacé
+        if bourrins == fuyards == soigneurs == [] and soutiens != []:
+            bourrins.append(soutiens[0])
+            soutiens.pop(0)
+        elif bourrins == fuyards == []:
+            bourrins = soigneurs
+            soigneurs = []
+        elif soigneurs == []:
+            bourrins += fuyards
+            fuyards = []
+        for corp in bourrins:
+            agissant = self.controleur.get_entitee(corp)
+            if agissant.latence <= 0 :
+                if isinstance(agissant,Joueur): #Comment faire pour que le joueur puisse être en autopilote ?
+                    agissant.recontrole()
+                else:
+                    self.ordonne_bourrin(agissant)
+        for corp in fuyards:
+            agissant = self.controleur.get_entitee(corp)
+            if agissant.latence <= 0 :
+                if isinstance(agissant,Joueur):
+                    agissant.recontrole()
+                else:
+                    self.ordonne_fuite(agissant)
+        bourrins += bourrins_sup
+        for corp in soigneurs:
+            agissant = self.controleur.get_entitee(corp)
+            if agissant.latence <= 0 :
+                if isinstance(agissant,Joueur):
+                    agissant.recontrole()
+                else:
+                    self.ordonne_soin(agissant,fuyards,bourrins)
+        for corp in soutiens:
+            agissant = self.controleur.get_entitee(corp)
+            if agissant.latence <= 0 :
+                if isinstance(agissant,Joueur):
+                    agissant.recontrole()
+                else:
+                    self.ordonne_soutien(agissant,bourrins)
+        for corp in autres:
+            agissant = self.controleur.get_entitee(corp)
+            if agissant.latence <= 0 :
+                if isinstance(agissant,Joueur):
+                    agissant.recontrole()
+
+        def deplace_humain(self,ID_humain):
+            res = None
+            #Les mouvements des humains sont très alambiqués...
+            #D'abord, les consignes positionnelles :
+            humain = self.controleur.get_entitee(Id_humain)
+            if humain.mouvement == 0: #0 pour aller vers, et 1 pour chercher
+                if isinstance(humain.cible_deplacement,int):
+                    cible = self.controleur.get_entitee(humain.cible_deplacement).get_position()
+                    portee = 5
+                else:
+                    cible = humain.cible_deplacement
+                    portee = 3
+                pos_cibles = self.controleur.get_pos_touches(cible,portee,propagation = "C__S___",direction = None,traverse="tout",responsable=0)
+                if humain.position in pos_cibles: #Tout va bien, on y est ! On peut combattre, par exemple.
+                    position = humain.get_position()
+                    labyrinthe = self.vue[position[0]] #On récupère le labyrinthe
+                    case = labyrinthe[position[1]][position[2]]
+                    directions = []
+                    for i in range(4):
+                        if case[6][i]:
+                            directions.append(i) #On détermine les directions accessibles
+                    cases = []
+                    dirs = []
+                    importance = 0
+                    for direction in directions:
+                        if direction == 0 and position[2] > 0:
+                            if [position[0],position[1],position[2]-1] in pos_cibles:
+                                case_pot = labyrinthe[position[1]][position[2]-1]
+                                entitees = case_pot[7]
+                                libre = True
+                                for ID_entitee in entitees:
+                                    entitee = humain.controleur.get_entitee(ID_entitee)
+                                    if not issubclass(entitee.get_classe(),Item): #Un agissant !
+                                        if ID_entitee in self.ennemis.keys() and humain.comportement_ennemis == 0: #Un ennemi ! Et le feu vert pour l'attaquer
+                                            if self.ennemis[ID_entitee] > importance:
+                                                importance = self.ennemis[ID_entitee]
+                                                humain.dir_regard = direction
+                                                humain.skill_courant = humain.get_skill_attaque()
+                                        elif not ID_entitee in self.corps.keys() and humain.comportement_neutres == 0: #Un neutre ! Et le feu vert pour l'attaquer
+                                            if importance == 0:
+                                                humain.dir_regard = direction
+                                                humain.skill_courant = humain.get_skill_attaque()
+                                        else: #Probablement un allié, ou un neutre
+                                            libre = False
+                                if libre:
+                                    cases.append(case_pot)
+                                    dirs.append(direction)
+                        elif direction == 1 and position[1] < len(labyrinthe)-1:
+                            if [position[0],position[1]+1,position[2]] in pos_cibles:
+                                case_pot = labyrinthe[position[1]+1][position[2]]
+                                entitees = case_pot[7]
+                                libre = True
+                                for ID_entitee in entitees:
+                                    entitee = humain.controleur.get_entitee(ID_entitee)
+                                    if not issubclass(entitee.get_classe(),Item): #Un agissant !
+                                        if ID_entitee in self.ennemis.keys() and humain.comportement_ennemis == 0: #Un ennemi !
+                                            if self.ennemis[ID_entitee] > importance:
+                                                importance = self.ennemis[ID_entitee]
+                                                humain.dir_regard = direction
+                                                humain.skill_courant = humain.get_skill_attaque()
+                                        elif not ID_entitee in self.corps.keys() and humain.comportement_neutres == 0: #Un neutre ! Et le feu vert pour l'attaquer
+                                            if importance == 0:
+                                                humain.dir_regard = direction
+                                                humain.skill_courant = humain.get_skill_attaque()
+                                        else: #Probablement un allié, ou un neutre
+                                            libre = False
+                                if libre:
+                                    cases.append(case_pot)
+                                    dirs.append(direction)
+                        elif direction == 2 and position[2] < len(labyrinthe[0])-1:
+                            if [position[0],position[1],position[2]+1] in pos_cibles:
+                                case_pot = labyrinthe[position[1]][position[2]+1]
+                                entitees = case_pot[7]
+                                libre = True
+                                for ID_entitee in entitees:
+                                    entitee = humain.controleur.get_entitee(ID_entitee)
+                                    if not issubclass(entitee.get_classe(),Item): #Un agissant !
+                                        if ID_entitee in self.ennemis.keys() and humain.comportement_ennemis == 0: #Un ennemi !
+                                            if self.ennemis[ID_entitee] > importance:
+                                                importance = self.ennemis[ID_entitee]
+                                                humain.dir_regard = direction
+                                                humain.skill_courant = humain.get_skill_attaque()
+                                        elif not ID_entitee in self.corps.keys() and humain.comportement_neutres == 0: #Un neutre ! Et le feu vert pour l'attaquer
+                                            if importance == 0:
+                                                humain.dir_regard = direction
+                                                humain.skill_courant = humain.get_skill_attaque()
+                                        else: #Probablement un allié, ou un neutre
+                                            libre = False
+                                if libre:
+                                    cases.append(case_pot)
+                                    dirs.append(direction)
+                        elif direction == 3 and position[1] > 0:
+                            if [position[0],position[1]-1,position[2]] in pos_cibles:
+                                case_pot = labyrinthe[position[1]-1][position[2]]
+                                entitees = case_pot[7]
+                                libre = True
+                                for ID_entitee in entitees:
+                                    entitee = humain.controleur.get_entitee(ID_entitee)
+                                    if not issubclass(entitee.get_classe(),Item): #Un agissant !
+                                        if ID_entitee in self.ennemis.keys() and humain.comportement_ennemis == 0: #Un ennemi !
+                                            if self.ennemis[ID_entitee] > importance:
+                                                importance = self.ennemis[ID_entitee]
+                                                humain.dir_regard = direction
+                                                humain.skill_courant = humain.get_skill_attaque()
+                                        elif not ID_entitee in self.corps.keys() and humain.comportement_neutres == 0: #Un neutre ! Et le feu vert pour l'attaquer
+                                            if importance == 0:
+                                                humain.dir_regard = direction
+                                                humain.skill_courant = humain.get_skill_attaque()
+                                        else: #Probablement un allié, ou un neutre
+                                            libre = False
+                                if libre:
+                                    cases.append(case_pot)
+                                    dirs.append(direction)
+                    if importance == 0: #On n'a pas d'ennemi à portée directe (ou on ne souhaite pas attaquer)
+                        if len(cases) == 0: #Pas de cases libres à proximité
+                            humain.skill_courant = None
+                        else :
+                            dir_choix = 2
+                            num_choix = 0
+                            distance = case[3]
+                            for i in range(len(cases)):
+                                if ((cases[i][3] > distance or (cases[i][3] == distance and cases[i][4] >= cases[num_choix][4])) and humain.comportement_ennemis == 0) or ((cases[i][3] < distance or (cases[i][3] == distance and cases[i][4] <= cases[num_choix][4])) and humain.comportement_ennemis == 2):
+                                    distance = cases[i][3]
+                                    dir_choix = dirs[i]
+                                    num_choix = i
+                            if distance == 0 : #Pas d'accès direct à une cible
+                                distance = case[4]
+                                meilleur_choix = False
+                                humain.skill_courant = None #Dans l'éventualité où on est déjà sur la meilleure case
+                                for i in range(len(cases)):
+                                    if (cases[i][4] > distance and humain.comportement == 0) or (cases[i][4] > distance and humain.comportement == 2):
+                                        meilleur_choix = True
+                                        distance = cases[i][4] #On prend le chemin avec des obstacles
+                                        dir_choix = dirs[i]
+                                if meilleur_choix:
+                                    humain.skill_courant = Skill_deplacement
+                                    humain.dir_regard = dir_choix
+                                if distance == 0: #Pas d'accès du tout !
+                                    if len(dirs)>1: #On peut se permettre de choisir
+                                        if humain.dir_regard != None: #L'agissant regarde quelque part
+                                            dir_back = [HAUT,DROITE,BAS,GAUCHE][humain.dir_regard-2]
+                                            if dir_back in dirs: #On ne veut pas y retourner
+                                                dirs.remove(dir_back)
+                                    humain.skill_courant = Skill_deplacement #On cherche (au hasard en l'occurence)
+                                    humain.dir_regard = dirs[random.randint(0,len(dirs)-1)] #On prend une direction random
+                                    # ! Modifier pour avoir différents comportements !
+                            else : #Accès direct à une cible !
+                                humain.dir_regard = dir_choix #On y va, sans se poser plus de questions !
+                                humain.skill_courant = Skill_deplacement
+                                entitees = cases[num_choix][7]
+                else:
+                    #On dirige l'humain vers la cible
+                    #res est généré ici, à nouveau
+            else: #On doit chercher au hasard
+                if ennemi_in_vue: #ennemi_in_vue généré par nous ou par l'esprit, à voir
+                    if humain.comportement_ennemis == 0: #On veut combattre nos ennemis
+                        #Tout ça dépend de la spécialité de l'humain en question
+                        #Res généré ici à nouveau
+                    elif humain.comportement_ennemis == 2: #On veut fuir nos ennemis
+                        #On génére un res de fuyard ? Ou on réfléchit un peu plus ?
+                if monstre_in_vue and res == None: #Les monstres neutres passent en second dans l'ordre des priorités
+                    if humain.comportement_neutres == 0: #On veut combattre tout le monde
+                        #Tout ça dépend de la spécialité de l'humain en question
+                        #Res généré ici à nouveau
+                    elif humain.comportement_neutres == 2: #On fuit les neutres
+                        #On génére un res de fuyard ? Ou on réfléchit un peu plus ?
+                if res == None: #On n'a pris aucune décision ? Donc pas de contrainte, on peut explorer au hasard
+                    #Explorer au hasard (hasard réfléchit et intelligent) ici
+            return res
+
+
 
 class Effet :
     """Les effets regroupent des choses qui arrivent à des éléments du système. Ils peuvent cibler une case, un mur, un agissant, un étage, etc. et sont souvent limités dans le temps ou par d'autres conditions. Ils sont évalués par le controleur dans différentes circonstances."""
@@ -7656,6 +8576,19 @@ class Teleport(On_through):
 
     def get_skin(self):
         return SKIN_PORTAIL
+
+class Escalier(Teleport):
+
+    def __init__(self,position,sens):
+        self.affiche = True
+        self.sens = sens
+        self.position = position
+
+    def get_skin(self):
+        if self.sens == HAUT:
+            return SKIN_ESCALIER_HAUT
+        elif self.sens == BAS:
+            return SKIN_ESCALIER_BAS #/!\ Modifier pour avoir deux images différentes
 
 class On_try_through(Effet):
     """La classe des effets déclenchés quand on essaye de traverser un mur."""
@@ -9294,6 +10227,14 @@ class Affichage:
         self.dessine_droite(joueur)
         self.dessine_gauche(joueur)
 
+    def dialogue(self,joueur):
+        """phase de dialogue avec un pnj"""
+        self.dessine_zones(joueur.curseur)
+
+        self.dessine_lab(joueur)
+        self.dessine_droite_dialogue(joueur)
+        self.dessine_gauche(joueur)
+
     def draw_magie_cible(self,joueur):
         """phase de choix d'une cible"""
         self.frame += 1
@@ -9884,6 +10825,28 @@ class Affichage:
                 marge_haut += 20
             if message[1] == 0:
                 self.messages.remove(message)
+
+    def dessine_droite_dialogue(self,joueur): #La fonction qui écrit les dialogues à droite
+        #Dans un jeu parfait, on aurait une image de l'interlocuteur au dessus des répliques
+
+        marge_haut = self.position_debut_y_rectangles_et_carre + 5
+        marge_gauche = self.position_debut_x_rectangle_2 + 5
+
+        #D'abord, la réplique de l'interlocuteur, si il y en a une
+        textes = self.scinde_texte(joueur.interlocuteur.replique,self.largeur_rectangles-10)
+        for texte in textes :
+            self.screen.blit(texte,(marge_gauche,marge_haut))
+            marge_haut += 20
+
+        replique_courante = joueur.interlocuteur.replique_courante
+        for i in range(len(joueur.interlocuteur.repliques)):
+            replique = joueur.interlocuteur.repliques[i]
+            textes = self.scinde_texte(replique,self.largeur_rectangles-25)
+            if replique_courante == i:
+                self.screen.blit(pygame.font.SysFont(None, 20).render("->",True,(255,125,0)),(marge_gauche,marge_haut))
+            for texte in textes :
+                self.screen.blit(texte,(marge_gauche+15,marge_haut))
+                marge_haut += 20
 
     def dessine_droite_magie_cible(self,joueur,proportion_ecoulee = 0): #La fonction qui dessine le rectangle de droite, pendant les choix de cible
 
@@ -11472,6 +12435,20 @@ class Affichage:
     def message(self,texte="Ceci est le message par défaut. Avez-vous oublié de préciser ce que vous vouliez dire ?",temps = 20,secret=0):
         self.messages.append([texte,temps,secret])
 
+    def scinde_texte(self,texte,largeur,hauteur=20,couleur=(0,0,0),police=None):
+        """Fonction qui prend en entrée une chaine de caractère et renvoie les surfaces des lignes successives du texte."""
+        police = pygame.font.SysFont(police,hauteur) #/!\ Se souvenir de jouer avec les polices un jour /!\
+        mots = texte.split() #On explose sur les espaces
+        i = 0
+        res = []
+        while i < len(mots):
+            ligne = mots[i]
+            i+=1
+            while i < len(mots) and police.size(ligne+" "+mots[i])[0] <= largeur:
+                ligne = ligne + " " + mots[i]
+                i+=1
+            res.append(police.render(ligne,True,couleur))
+        return res
 
     def affiche(self,joueur,vue,position,taille):
         self.affichables=[]

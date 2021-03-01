@@ -53,6 +53,24 @@ global SKIN_BLESSURE
 SKIN_BLESSURE = Skin("blessure.png")
 global SKIN_JOUEUR
 SKIN_JOUEUR = Skin("joueur.png")
+global SKIN_RECEPTIONNISTE
+SKIN_RECEPTIONNISTE = Skin("agissant.png")
+global SKIN_PAUME
+SKIN_PAUME = Skin("agissant.png")
+global SKIN_PEUREUSE
+SKIN_PEUREUSE = Skin("agissant.png")
+global SKIN_CODEUR
+SKIN_CODEUR = Skin("agissant.png")
+global SKIN_ENCOMBRANT
+SKIN_ENCOMBRANT = Skin("agissant.png")
+global SKIN_ALCHIMISTE
+SKIN_ALCHIMISTE = Skin("agissant.png")
+global SKIN_PESTE
+SKIN_PESTE = Skin("agissant.png")
+global SKIN_BOMBE_ATOMIQUE
+SKIN_BOMBE_ATOMIQUE = Skin("agissant.png")
+global SKIN_MARCHAND
+SKIN_MARCHAND = Skin("agissant.png")
 global SKIN_HUMAIN
 SKIN_HUMAIN = Skin("humain.png")
 global SKIN_MYSTERE
@@ -105,6 +123,12 @@ global SKIN_MUR
 SKIN_MUR = Skin("mur.png")
 global SKIN_MUR_CASSE
 SKIN_MUR_CASSE = Skin("mur_casse.png")
+global SKIN_ESALIER
+SKIN_ESCALIER = Skin("escalier.png")
+global SKIN_ESALIER_BAS
+SKIN_ESCALIER_BAS = Skin("escalier_bas.png")
+global SKIN_ESALIER_HAUT
+SKIN_ESCALIER_HAUT = Skin("escalier_haut.png")
 global SKIN_PORTE
 SKIN_PORTE = Skin("porte.png")
 global SKIN_PORTE_OUVERTE

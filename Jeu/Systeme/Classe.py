@@ -194,7 +194,7 @@ class Classe_principale(Classe):
         cond_evo = [0,10,20,30,40,50,60,70,80,90]
 
         if identite == 'joueur' :
-            self.evolutif = True
+            self.evolutif = False
 
             #Skills intrasecs (leur niveau est lié à celui de la classe principale) :
             deplacement = Skill_deplacement() #On crée un skill de déplacement

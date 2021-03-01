@@ -1,9 +1,10 @@
 Work in progress !
 
-Note du 23 février : travail effectué depuis la salle CMI
-L'affichage me semble d'un ennui, mais d'un ennui...
-Donc on le fera plus tard.
-La fonctionnalité des choix risque d'être un peu laborieuse, mais il faudra bien s'y mettre... commençons pas le choix "inhumain" et le système des espèces
+
+La variable globale ID_MAX ne remplit pas du tout son rôle ! Qu'est-ce que je fais ?
+L'autruche, en codant les pnjs
+
+
 
 Nouvel objectif : l'organisation du main (terminé), la sauvegarde externe des parties (terminé)
 
@@ -70,3 +71,9 @@ Notes de trucs à améliorer :
 
 
 Garder une trace du code couleur, pour faciliter les modifications futures.
+
+
+
+
+Fonctionnement des dialogues/interractions :
+Du point de vue d'un joueur, les pnjs ont un dialogue par défaut (si le joueur les accoste sans raison) et des dialogues conditionnés (indiqués par un ! ou ? au dessus de leur tête).
