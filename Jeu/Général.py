@@ -91,7 +91,6 @@ class Controleur():
         self.set_teleport((1,0,10),("test_barriere",19,17),GAUCHE,DROITE)
 
         #On place un poison dans le labyrinthe 0, et son antidote
-##        self.ajoute_entitee(Potion((0,8,9),Poison(1,30,3))) # C'est très efficace ! En tout cas contre un joueur niveau 1. Presque trop...
         self.ajoute_entitee(Potion_empoisonnee((0,2,2)))
         self.ajoute_entitee(Potion_antidote((0,8,9)))
         #On place aussi un parchemin qui peut servir d'antidote dans le labyrinthe 1
@@ -121,27 +120,6 @@ class Controleur():
         self.ajoute_entitee(Anneau_de_vitalite(("armurerie",0,8),1.2))
         self.ajoute_entitee(Anneau_de_vitalite(("armurerie",0,9),1.2))
 
-##        agissant1 = Agissant(("test_esprit",0,1),10,10,0.05,0,0,0,10,1,1,1,1,1,1,Classe([None]*10,[Skill_deplacement(),Skill_vision()],[Skill_stomp()]))
-##        self.ajoute_entitee(agissant1)
-##        agissant2 = Agissant(("test_esprit",1,4),10,10,0.05,0,0,0,10,1,1,1,1,1,1,Classe([None]*10,[Skill_deplacement(),Skill_vision()],[Skill_stomp()]))
-##        self.ajoute_entitee(agissant2)
-##        agissant3 = Agissant(("test_esprit",9,7),10,10,0.05,0,0,0,10,1,1,1,1,1,1,Classe([None]*10,[Skill_deplacement(),Skill_vision()],[Skill_stomp()]))
-##        agissant3.latence+=1
-##        self.ajoute_entitee(agissant3)
-##        agissant4 = Agissant(("test_esprit",9,8),10,10,0.05,0,0,0,10,1,1,1,1,1,1,Classe([None]*10,[Skill_deplacement(),Skill_vision()],[Skill_stomp()]))
-##        agissant4.latence+=2
-##        self.ajoute_entitee(agissant4)
-##        esprit_test = Esprit("Premier_esprit")
-##        esprit_jaloux = Esprit("Deuxieme_esprit")
-##        self.esprits["Premier_esprit"]=esprit_test
-##        self.esprits["Deuxieme_esprit"]=esprit_jaloux
-##        esprit_test.controleur = self
-##        esprit_test.ajoute_corps([agissant1.ID,agissant2.ID])
-##        esprit_jaloux.controleur = self
-##        esprit_jaloux.ajoute_corps([agissant3.ID,agissant4.ID])
-##        esprit_jaloux.ennemis[agissant1.ID]=1
-
-
         self.esprits["1"] = Esprit_defensif("1",2,self,("test_esprit",0,0))
         self.esprits["2"] = Esprit_bourrin("2",2,self,("test_esprit",9,4))
         self.esprits["1"].antagonise("2")
@@ -149,12 +127,6 @@ class Controleur():
 
         self.esprits["Joueur"] = Esprit_solitaire("Joueur",2,self) #L'esprit du joueur
         self.active_lab(self.entitees[2].position[0])
-##        self.esprits["1"] = Esprit_solitaire("1",2,self)
-##        ennemi = Dps(("test_esprit",9,9),2)
-##        self.ajoute_entitee(ennemi)
-##        self.esprits["2"] = Esprit_solitaire("2",ennemi.ID,self)
-##        self.esprits["1"].antagonise("2")
-##        self.esprits["2"].antagonise("1")
 
     def tuto(self,screen):
         #On crée le joueur :
@@ -2096,64 +2068,8 @@ class Agissant(Entitee): #Tout agissant est un cadavre, tout cadavre n'agit pas.
 
         if stats['special']:
             #Quelques entitées un peu particulières :
+            #Comme celles qui commencent avec des magies
             pass
-
-##    def __init__(self,position,pv,pv_max,regen_pv,pm,pm_max,regen_pm,force,priorite,vitesse,affinite_ombre,affinite_feu,affinite_terre,affinite_glace,classe_principale,especes = ["humain"]):
-##
-##        Entitee.__init__(self,position)
-##
-##        self.pv=pv
-##        self.pv_max=pv_max
-##        self.regen_pv=regen_pv
-##        self.taux_regen_pv = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à la régénération des pv. Correspond aux effets passager sur la régénération des pv.
-##        self.pm=pm
-##        self.pm_max=pm_max
-##        self.regen_pm=regen_pm
-##        self.taux_regen_pm = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à la régénération des pm. Correspond aux effets passager sur la régénération des pm.
-##        self.force=force
-##        self.taux_force = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à la force. Correspond aux effets passager sur la force.
-##        self.priorite=priorite
-##        self.taux_priorite = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à la priorité. Correspond aux effets passager sur la priorité.
-##        self.vitesse = vitesse
-##        self.taux_vitesse = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à la vitesse. Correspond aux effets passager sur la vitesse.
-##        self.aff_o=affinite_ombre
-##        self.taux_aff_o = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à l'affinité à l'ombre. Correspond aux effets passager sur l'affinité à l'ombre.
-##        self.aff_f=affinite_feu
-##        self.taux_aff_f = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à l'affinité au feu. Correspond aux effets passager sur l'affinité au feu.
-##        self.aff_t=affinite_terre
-##        self.taux_aff_t = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à l'affinité à la terre. Correspond aux effets passager sur l'affinité à la terre.
-##        self.aff_g=affinite_glace
-##        self.taux_aff_g = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à l'affinité à la glace. Correspond aux effets passager sur l'affinité à la glace.
-##        self.taux_stats = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer aux statistiques. Correspond aux effets passager sur les statistiques. (Inclure les regen dans les stats ?)
-##        self.immunites = [] #La liste des éléments auxquels l'entitée est immunisé (très rare)
-##        self.especes = especes
-##        self.classe_principale = classe_principale
-##        self.classe_principale.evo()
-##        self.niveau = self.classe_principale.niveau
-##        self.etat = "vivant"
-##
-##        #vue de l'agissant
-##        self.vue = None
-##        self.position_vue = None
-##        self.vue_nouvelle = False
-##
-##        self.offenses=[]
-##        self.esprit=None
-##
-##        #possessions de l'agissant
-##        self.inventaire = Inventaire(self.ID,10)
-##
-##        #la direction du regard
-##        self.skill_courant = None
-##        self.dir_regard = 0
-##        self.talent = 1
-##        self.magie_courante = None
-##        self.cible_magie = None
-##        self.dir_magie = None
-##        self.cout_magie = 0
-##        self.multi = False
-##        self.latence = 0
-##        self.hauteur = 0 #Des fois qu'on devienne un item
 
     def active(self,controleur):
         self.controleur = controleur
@@ -2172,6 +2088,17 @@ class Agissant(Entitee): #Tout agissant est un cadavre, tout cadavre n'agit pas.
             force *= taux
             affinite *= taux
         return force,affinite,self.dir_regard,self.ID
+
+    def attaque(self,direction):
+        self.dir_regard = direction
+        if self.get_arme() != None:
+            self.skill_courant = Skill_attaque
+        else:
+            self.skill_courant = Skill_stomp
+
+    def va(self,direction):
+        self.dir_regard = direction
+        self.skill_courant = Skill_deplacement #La plupart des monstres n'ont pas ce skill !
 
     def get_direction(self):
         if self.dir_regard != None:
@@ -4765,6 +4692,16 @@ class Alchimiste(Humain): #Le septième humain du jeu, à l'étage 6 (un faiseur
 
     # /!\ Pour améliorer ça : ne pas fuir s'il n'y a nulle part où fuir et ne pas fuir si on n'est pas à portée de monstres
 
+    def attaque(self,direction=self.dir_regard):
+        #Quelle est sa magie de prédilection ? Pour l'instant on va prendre l'avalanche
+        skill = trouve_skill(self.classe_principale,Skill_magie) #Est-ce qu'il a le même Skill_magie que le joueur ?
+        if self.peut_payer(cout_pm_avalanche[skill.niveau-1]):
+            self.skill_courant = Skill_magie
+            self.magie_courante = "avalanche" #/!\
+            self.dir_magie = direction
+        else:
+            self.skill_courant = Skill_stomp
+
     def start_dialogue(self): #On commence un nouveau dialogue !
         #On initialise nos attributs
         self.replique_courante = 0
@@ -4849,6 +4786,16 @@ class Peste(Humain): #La huitième humaine du jeu, à l'étage 7 (une sainte tr�
         return self.pv // self.pv_max <= taux_limite
 
     # /!\ Pour améliorer ça : ne pas fuir s'il n'y a nulle part où fuir et ne pas fuir si on n'est pas à portée de monstre
+
+    def attaque(self,direction=self.dir_regard):
+        #Quelle est sa magie de prédilection ? Pour l'instant on va prendre l'avalanche
+        skill = trouve_skill(self.classe_principale,Skill_magie) #Est-ce qu'il a le même Skill_magie que le joueur ?
+        if self.peut_payer(cout_pm_avalanche[skill.niveau-1]):
+            self.skill_courant = Skill_magie
+            self.magie_courante = "purification" #/!\
+            self.dir_magie = direction
+        else:
+            self.skill_courant = Skill_stomp
 
     def start_dialogue(self): #On commence un nouveau dialogue !
         #On initialise nos attributs
@@ -4957,6 +4904,15 @@ class Bombe_atomique(Humain): #La neuvième humaine du jeu, à l'étage 8 (une m
         return self.pv // self.pv_max <= taux_limite
 
     # /!\ Pour améliorer ça : ne pas fuir s'il n'y a nulle part où fuir
+
+    def attaque(self,direction=self.dir_regard):
+        #Quelle est sa magie de prédilection ? Pour l'instant on va prendre l'avalanche
+        skill = trouve_skill(self.classe_principale,Skill_magie) #Est-ce qu'il a le même Skill_magie que le joueur ?
+        if self.peut_payer(cout_pm_avalanche[skill.niveau-1]):
+            self.skill_courant = Skill_magie
+            self.magie_courante = "brasier" #/!\
+        else:
+            self.skill_courant = Skill_stomp
 
     def start_dialogue(self): #On commence un nouveau dialogue !
         #On initialise nos attributs
@@ -6747,8 +6703,7 @@ class Esprit :
                         if ID_entitee in self.ennemis.keys(): #Un ennemi !
                             if self.ennemis[ID_entitee] > importance:
                                 importance = self.ennemis[ID_entitee]
-                                agissant.dir_regard = direction
-                                agissant.skill_courant = Skill_stomp
+                                agissant.attaque(direction)
                         else: #Probablement un allié, ou un neutre
                             libre = False
                 if libre:
@@ -6764,8 +6719,7 @@ class Esprit :
                         if ID_entitee in self.ennemis.keys(): #Un ennemi !
                             if self.ennemis[ID_entitee] > importance:
                                 importance = self.ennemis[ID_entitee]
-                                agissant.dir_regard = direction
-                                agissant.skill_courant = Skill_stomp
+                                agissant.attaque(direction)
                         else: #Probablement un allié, ou un neutre
                             libre = False
                 if libre:
@@ -6781,8 +6735,7 @@ class Esprit :
                         if ID_entitee in self.ennemis.keys(): #Un ennemi !
                             if self.ennemis[ID_entitee] > importance:
                                 importance = self.ennemis[ID_entitee]
-                                agissant.dir_regard = direction
-                                agissant.skill_courant = Skill_stomp
+                                agissant.attaque(direction)
                         else: #Probablement un allié, ou un neutre
                             libre = False
                 if libre:
@@ -6798,8 +6751,7 @@ class Esprit :
                         if ID_entitee in self.ennemis.keys(): #Un ennemi !
                             if self.ennemis[ID_entitee] > importance:
                                 importance = self.ennemis[ID_entitee]
-                                agissant.dir_regard = direction
-                                agissant.skill_courant = Skill_stomp
+                                agissant.attaque(direction)
                         else: #Probablement un allié, ou un neutre
                             libre = False
                 if libre:
@@ -6836,8 +6788,7 @@ class Esprit :
                             dir_choix = dirs[i]
 
                     if meilleur_choix:
-                        agissant.skill_courant = Skill_deplacement
-                        agissant.dir_regard = dir_choix
+                        agissant.va(dir_choix)
 
                     if distance == 0: #Pas d'accès du tout !
                         if len(dirs)>1: #On peut se permettre de choisir
@@ -6845,14 +6796,11 @@ class Esprit :
                                 dir_back = [HAUT,DROITE,BAS,GAUCHE][agissant.dir_regard-2]
                                 if dir_back in dirs: #On ne veut pas y retourner
                                     dirs.remove(dir_back)
-                        agissant.skill_courant = Skill_deplacement #On cherche (au hasard en l'occurence)
-                        agissant.dir_regard = dirs[random.randint(0,len(dirs)-1)] #On prend une direction random
+                        agissant.va(dirs[random.randint(0,len(dirs)-1)]) #On prend une direction random
                         # ! Modifier pour avoir différents comportements !
 
                 else : #Accès direct à une cible !
-                    agissant.dir_regard = dir_choix #On y va, sans se poser plus de questions !
-                    agissant.skill_courant = Skill_deplacement
-                    entitees = cases[num_choix][7]
+                    agissant.va(dir_choix)
 
     def ordonne_fuite(self,agissant):
         #Il faudra identifier les comportements possibles des agissants : attaque bourrine, attaque à distance, support (renforcement), soin, fuite, recherche et autres (réanimation pour les nécromantiens par exemple)
@@ -6927,8 +6875,7 @@ class Esprit :
                             dir_back = [HAUT,DROITE,BAS,GAUCHE][agissant.dir_regard-2]
                             if dir_back in directions: #On ne veut pas y retourner
                                 directions.remove(dir_back)
-                    agissant.skill_courant = Skill_deplacement #On cherche (au hasard en l'occurence)
-                    agissant.dir_regard = directions[random.randint(0,len(directions)-1)] #On prend une direction random
+                    agissant.va(directions[random.randint(0,len(directions)-1)]) #On prend une direction random
                     # ! Modifier pour avoir différents comportements !
 
                 else : #On est accessible indirectement ! Aaah !
@@ -6942,8 +6889,7 @@ class Esprit :
                             dir_choix = directions[i]
 
                     if meilleur_choix:
-                        agissant.skill_courant = Skill_deplacement
-                        agissant.dir_regard = dir_choix 
+                        agissant.va(dir_choix)
 
             else : #On est accessible directement ! Aaaaaaaah !
                 for i in range(len(cases)):
@@ -6952,8 +6898,7 @@ class Esprit :
                         dir_choix = directions[i]
                         num_choix = i
                     
-                agissant.dir_regard = dir_choix #On s'en va, sans se poser plus de questions !
-                agissant.skill_courant = Skill_deplacement
+                agissant.va(dir_choix)
 
     def ordonne_soin(self,agissant,fuyards,bourrins):
         #On va considérer qu'on peut soigner à n'importe quelle distance pour l'instant
@@ -6972,9 +6917,7 @@ class Esprit :
                     cible = ID_bourrin
                     PV_mins = bourrin.pv
         if cible != None:
-            agissant.skill_courant = Skill_magie
-            agissant.magie_courante = "magie soin"
-            agissant.cible_magie = cible
+            agissant.soigne(cible)
         else:
             self.ordonne_cherche(agissant)
 
@@ -6990,12 +6933,10 @@ class Esprit :
             if bourrin.get_position()[0] == agissant.get_position()[0] and distance > importance :
                 cible = ID_bourrin
                 importance = distance
-##        if cible != None:
-##            agissant.skill_courant = Skill_magie
-##            agissant.magie_courante = Magie_support
-##            agissant.cible_magie = cible
-##        else:
-##            self.ordonne_cherche(agissant)
+        if cible != None:
+            agissant.boost(cible)
+        else:
+            self.ordonne_cherche(agissant)
 
     def ordonne_cherche(self,agissant):
         position = agissant.get_position()
@@ -7056,8 +6997,7 @@ class Esprit :
                     dir_back = [HAUT,DROITE,BAS,GAUCHE][agissant.dir_regard-2]
                     if dir_back in directions: #On ne veut pas y retourner
                         directions.remove(dir_back)
-            agissant.skill_courant = Skill_deplacement #On cherche (au hasard en l'occurence)
-            agissant.dir_regard = directions[random.randint(0,len(directions)-1)] #On prend une direction random
+            agissant.va(directions[random.randint(0,len(directions)-1)])
             # ! Modifier pour avoir différents comportements !
 
     def refait_vue(self):
@@ -7523,10 +7463,6 @@ class Esprit_humain(Esprit_type):
             res = self.deplace_humain(humain)
             if res == "attaque": #L'humain est en position d'attaquer bientôt ou a attaqué, conformément aux ordres
                 bourrins_sups.append(humain)
-            elif res == "soin": #L'humain (plutôt l'humaine en fait) est en capacité de soigner, à ce tour ou à un prochain
-                soigneurs.append(humain)
-            elif res == "soutien": #L'humain (plutôt l'humaine ici aussi) est en capacité d'aider, à ce tour ou à un prochain
-                soutiens.append(humain)
             #Sinon, c'est que l'humain s'est déjà déplacé
         if bourrins == fuyards == soigneurs == [] and soutiens != []:
             bourrins.append(soutiens[0])
@@ -7584,108 +7520,132 @@ class Esprit_humain(Esprit_type):
                 else:
                     cible = humain.cible_deplacement
                     portee = 3
-                pos_cibles = self.controleur.get_pos_touches(cible,portee,propagation = "C__S___",direction = None,traverse="tout",responsable=0)
-                if humain.position in pos_cibles: #Tout va bien, on y est ! On peut combattre, par exemple.
-                    position = humain.get_position()
-                    labyrinthe = self.vue[position[0]] #On récupère le labyrinthe
-                    case = labyrinthe[position[1]][position[2]]
-                    directions = []
-                    for i in range(4):
-                        if case[6][i]:
-                            directions.append(i) #On détermine les directions accessibles
-                    cases = []
-                    dirs = []
-                    importance = 0
-                    for direction in directions:
-                        if direction == 0 and position[2] > 0:
-                            if [position[0],position[1],position[2]-1] in pos_cibles:
-                                case_pot = labyrinthe[position[1]][position[2]-1]
-                                entitees = case_pot[7]
-                                libre = True
-                                for ID_entitee in entitees:
-                                    entitee = humain.controleur.get_entitee(ID_entitee)
-                                    if not issubclass(entitee.get_classe(),Item): #Un agissant !
-                                        if ID_entitee in self.ennemis.keys() and humain.comportement_ennemis == 0: #Un ennemi ! Et le feu vert pour l'attaquer
-                                            if self.ennemis[ID_entitee] > importance:
-                                                importance = self.ennemis[ID_entitee]
-                                                humain.dir_regard = direction
-                                                humain.skill_courant = humain.get_skill_attaque()
-                                        elif not ID_entitee in self.corps.keys() and humain.comportement_neutres == 0: #Un neutre ! Et le feu vert pour l'attaquer
-                                            if importance == 0:
-                                                humain.dir_regard = direction
-                                                humain.skill_courant = humain.get_skill_attaque()
-                                        else: #Probablement un allié, ou un neutre
-                                            libre = False
-                                if libre:
-                                    cases.append(case_pot)
-                                    dirs.append(direction)
-                        elif direction == 1 and position[1] < len(labyrinthe)-1:
-                            if [position[0],position[1]+1,position[2]] in pos_cibles:
-                                case_pot = labyrinthe[position[1]+1][position[2]]
-                                entitees = case_pot[7]
-                                libre = True
-                                for ID_entitee in entitees:
-                                    entitee = humain.controleur.get_entitee(ID_entitee)
-                                    if not issubclass(entitee.get_classe(),Item): #Un agissant !
-                                        if ID_entitee in self.ennemis.keys() and humain.comportement_ennemis == 0: #Un ennemi !
-                                            if self.ennemis[ID_entitee] > importance:
-                                                importance = self.ennemis[ID_entitee]
-                                                humain.dir_regard = direction
-                                                humain.skill_courant = humain.get_skill_attaque()
-                                        elif not ID_entitee in self.corps.keys() and humain.comportement_neutres == 0: #Un neutre ! Et le feu vert pour l'attaquer
-                                            if importance == 0:
-                                                humain.dir_regard = direction
-                                                humain.skill_courant = humain.get_skill_attaque()
-                                        else: #Probablement un allié, ou un neutre
-                                            libre = False
-                                if libre:
-                                    cases.append(case_pot)
-                                    dirs.append(direction)
-                        elif direction == 2 and position[2] < len(labyrinthe[0])-1:
-                            if [position[0],position[1],position[2]+1] in pos_cibles:
-                                case_pot = labyrinthe[position[1]][position[2]+1]
-                                entitees = case_pot[7]
-                                libre = True
-                                for ID_entitee in entitees:
-                                    entitee = humain.controleur.get_entitee(ID_entitee)
-                                    if not issubclass(entitee.get_classe(),Item): #Un agissant !
-                                        if ID_entitee in self.ennemis.keys() and humain.comportement_ennemis == 0: #Un ennemi !
-                                            if self.ennemis[ID_entitee] > importance:
-                                                importance = self.ennemis[ID_entitee]
-                                                humain.dir_regard = direction
-                                                humain.skill_courant = humain.get_skill_attaque()
-                                        elif not ID_entitee in self.corps.keys() and humain.comportement_neutres == 0: #Un neutre ! Et le feu vert pour l'attaquer
-                                            if importance == 0:
-                                                humain.dir_regard = direction
-                                                humain.skill_courant = humain.get_skill_attaque()
-                                        else: #Probablement un allié, ou un neutre
-                                            libre = False
-                                if libre:
-                                    cases.append(case_pot)
-                                    dirs.append(direction)
-                        elif direction == 3 and position[1] > 0:
-                            if [position[0],position[1]-1,position[2]] in pos_cibles:
-                                case_pot = labyrinthe[position[1]-1][position[2]]
-                                entitees = case_pot[7]
-                                libre = True
-                                for ID_entitee in entitees:
-                                    entitee = humain.controleur.get_entitee(ID_entitee)
-                                    if not issubclass(entitee.get_classe(),Item): #Un agissant !
-                                        if ID_entitee in self.ennemis.keys() and humain.comportement_ennemis == 0: #Un ennemi !
-                                            if self.ennemis[ID_entitee] > importance:
-                                                importance = self.ennemis[ID_entitee]
-                                                humain.dir_regard = direction
-                                                humain.skill_courant = humain.get_skill_attaque()
-                                        elif not ID_entitee in self.corps.keys() and humain.comportement_neutres == 0: #Un neutre ! Et le feu vert pour l'attaquer
-                                            if importance == 0:
-                                                humain.dir_regard = direction
-                                                humain.skill_courant = humain.get_skill_attaque()
-                                        else: #Probablement un allié, ou un neutre
-                                            libre = False
-                                if libre:
-                                    cases.append(case_pot)
-                                    dirs.append(direction)
-                    if importance == 0: #On n'a pas d'ennemi à portée directe (ou on ne souhaite pas attaquer)
+            else:
+                cible = humain.get_position()
+                portee = 10 #C'est juste pour qu'il puisse aller où il veut
+            pos_cibles = self.controleur.get_pos_touches(cible,portee,propagation = "C__S___",direction = None,traverse="tout",responsable=0)
+            if humain.position in pos_cibles: #Tout va bien, on y est ! On peut combattre, par exemple.
+                #Tout le monde attaque au corps à corps quand ils en ont l'occasion (sauf la peureuse, qui fuit)
+                position = humain.get_position()
+                labyrinthe = self.vue[position[0]] #On récupère le labyrinthe
+                case = labyrinthe[position[1]][position[2]]
+                directions = []
+                for i in range(4):
+                    if case[6][i]:
+                        directions.append(i) #On détermine les directions accessibles
+                cases = []
+                dirs = []
+                importance = 0
+                for direction in directions:
+                    if direction == 0 and position[2] > 0:
+                        if [position[0],position[1],position[2]-1] in pos_cibles:
+                            case_pot = labyrinthe[position[1]][position[2]-1]
+                            entitees = case_pot[7]
+                            libre = True
+                            for ID_entitee in entitees:
+                                entitee = humain.controleur.get_entitee(ID_entitee)
+                                if not issubclass(entitee.get_classe(),Item): #Un agissant !
+                                    if ID_entitee in self.ennemis.keys() and humain.comportement_ennemis == 0: #Un ennemi ! Et le feu vert pour l'attaquer
+                                        if self.ennemis[ID_entitee] > importance:
+                                            importance = self.ennemis[ID_entitee]
+                                            humain.attaque(direction)
+                                            res = "attaque"
+                                    elif not ID_entitee in self.corps.keys() and humain.comportement_neutres == 0: #Un neutre ! Et le feu vert pour l'attaquer
+                                        if importance == 0:
+                                            humain.attaque(direction)
+                                            res = "attaque"
+                                    else: #Probablement un allié, ou un neutre
+                                        libre = False
+                            if libre:
+                                cases.append(case_pot)
+                                dirs.append(direction)
+                    elif direction == 1 and position[1] < len(labyrinthe)-1:
+                        if [position[0],position[1]+1,position[2]] in pos_cibles:
+                            case_pot = labyrinthe[position[1]+1][position[2]]
+                            entitees = case_pot[7]
+                            libre = True
+                            for ID_entitee in entitees:
+                                entitee = humain.controleur.get_entitee(ID_entitee)
+                                if not issubclass(entitee.get_classe(),Item): #Un agissant !
+                                    if ID_entitee in self.ennemis.keys() and humain.comportement_ennemis == 0: #Un ennemi !
+                                        if self.ennemis[ID_entitee] > importance:
+                                            importance = self.ennemis[ID_entitee]
+                                            humain.attaque(direction)
+                                            res = "attaque"
+                                    elif not ID_entitee in self.corps.keys() and humain.comportement_neutres == 0: #Un neutre ! Et le feu vert pour l'attaquer
+                                        if importance == 0:
+                                            humain.attaque(direction)
+                                            res = "attaque"
+                                    else: #Probablement un allié, ou un neutre
+                                        libre = False
+                            if libre:
+                                cases.append(case_pot)
+                                dirs.append(direction)
+                    elif direction == 2 and position[2] < len(labyrinthe[0])-1:
+                        if [position[0],position[1],position[2]+1] in pos_cibles:
+                            case_pot = labyrinthe[position[1]][position[2]+1]
+                            entitees = case_pot[7]
+                            libre = True
+                            for ID_entitee in entitees:
+                                entitee = humain.controleur.get_entitee(ID_entitee)
+                                if not issubclass(entitee.get_classe(),Item): #Un agissant !
+                                    if ID_entitee in self.ennemis.keys() and humain.comportement_ennemis == 0: #Un ennemi !
+                                        if self.ennemis[ID_entitee] > importance:
+                                            importance = self.ennemis[ID_entitee]
+                                            humain.attaque(direction)
+                                            res = "attaque"
+                                    elif not ID_entitee in self.corps.keys() and humain.comportement_neutres == 0: #Un neutre ! Et le feu vert pour l'attaquer
+                                        if importance == 0:
+                                            humain.attaque(direction)
+                                            res = "attaque"
+                                    else: #Probablement un allié, ou un neutre
+                                        libre = False
+                            if libre:
+                                cases.append(case_pot)
+                                dirs.append(direction)
+                    elif direction == 3 and position[1] > 0:
+                        if [position[0],position[1]-1,position[2]] in pos_cibles:
+                            case_pot = labyrinthe[position[1]-1][position[2]]
+                            entitees = case_pot[7]
+                            libre = True
+                            for ID_entitee in entitees:
+                                entitee = humain.controleur.get_entitee(ID_entitee)
+                                if not issubclass(entitee.get_classe(),Item): #Un agissant !
+                                    if ID_entitee in self.ennemis.keys() and humain.comportement_ennemis == 0: #Un ennemi !
+                                        if self.ennemis[ID_entitee] > importance:
+                                            importance = self.ennemis[ID_entitee]
+                                            humain.attaque(direction)
+                                            res = "attaque"
+                                    elif not ID_entitee in self.corps.keys() and humain.comportement_neutres == 0: #Un neutre ! Et le feu vert pour l'attaquer
+                                        if importance == 0:
+                                            humain.attaque(direction)
+                                            res = "attaque"
+                                    else: #Probablement un allié, ou un neutre
+                                        libre = False
+                            if libre:
+                                cases.append(case_pot)
+                                dirs.append(direction)
+                if importance == 0: #On n'a pas d'ennemi à portée directe (ou on ne souhaite pas attaquer)
+                    if humain.comportement_ennemis == 2:
+                        res = "fuite"
+                    elif humain.identite in ["alchimiste","bombe_atomique"]: #Les deux capables d'attaquer à distance (attaques de zone)
+                        if humain.attaque_en_vue(): #Renvoie True et choisi la cible, la magie, et le skill s'il y a une cible en vue
+                            res = "attaque"
+                        else:
+                            res = "deplacement"
+                    elif humain.identite == "peste": #La soigneuse
+                        if humain.soigne(): #Renvoie True et choisi la cible, la magie, et le skill s'il y a une cible en vue
+                            res = "soin"
+                        else:
+                            res = "deplacement"
+                    elif humain.identite == "peureuse": #La spécialiste du soutien
+                        if humain.boost(): #Renvoie True et choisi la cible, la magie, et le skill s'il y a une cible en vue
+                            res = "soutien"
+                        else:
+                            res = "deplacement"
+                    else: #Il ne reste plus que les bourrins
+                        res = "deplacement"
+                    if res in ["deplacement","fuite"] and humain.latence <= 0:
                         if len(cases) == 0: #Pas de cases libres à proximité
                             humain.skill_courant = None
                         else :
@@ -7702,44 +7662,22 @@ class Esprit_humain(Esprit_type):
                                 meilleur_choix = False
                                 humain.skill_courant = None #Dans l'éventualité où on est déjà sur la meilleure case
                                 for i in range(len(cases)):
-                                    if (cases[i][4] > distance and humain.comportement == 0) or (cases[i][4] > distance and humain.comportement == 2):
+                                    if (cases[i][4] > distance and humain.comportement_ennemis == 0) or (cases[i][4] > distance and humain.comportement_ennemis == 2):
                                         meilleur_choix = True
                                         distance = cases[i][4] #On prend le chemin avec des obstacles
                                         dir_choix = dirs[i]
                                 if meilleur_choix:
-                                    humain.skill_courant = Skill_deplacement
-                                    humain.dir_regard = dir_choix
+                                    humain.va(dir_choix)
                                 if distance == 0: #Pas d'accès du tout !
                                     if len(dirs)>1: #On peut se permettre de choisir
                                         if humain.dir_regard != None: #L'agissant regarde quelque part
                                             dir_back = [HAUT,DROITE,BAS,GAUCHE][humain.dir_regard-2]
                                             if dir_back in dirs: #On ne veut pas y retourner
                                                 dirs.remove(dir_back)
-                                    humain.skill_courant = Skill_deplacement #On cherche (au hasard en l'occurence)
-                                    humain.dir_regard = dirs[random.randint(0,len(dirs)-1)] #On prend une direction random
+                                    humain.va(dirs[random.randint(0,len(dirs)-1)]) #/!\ Ne pas retourner sur ses pas, c'est bien ! Aller vers les endroits inconnus, ce serait mieux. /!\
                                     # ! Modifier pour avoir différents comportements !
                             else : #Accès direct à une cible !
-                                humain.dir_regard = dir_choix #On y va, sans se poser plus de questions !
-                                humain.skill_courant = Skill_deplacement
-                                entitees = cases[num_choix][7]
-                else:
-                    #On dirige l'humain vers la cible
-                    #res est généré ici, à nouveau
-            else: #On doit chercher au hasard
-                if ennemi_in_vue: #ennemi_in_vue généré par nous ou par l'esprit, à voir
-                    if humain.comportement_ennemis == 0: #On veut combattre nos ennemis
-                        #Tout ça dépend de la spécialité de l'humain en question
-                        #Res généré ici à nouveau
-                    elif humain.comportement_ennemis == 2: #On veut fuir nos ennemis
-                        #On génére un res de fuyard ? Ou on réfléchit un peu plus ?
-                if monstre_in_vue and res == None: #Les monstres neutres passent en second dans l'ordre des priorités
-                    if humain.comportement_neutres == 0: #On veut combattre tout le monde
-                        #Tout ça dépend de la spécialité de l'humain en question
-                        #Res généré ici à nouveau
-                    elif humain.comportement_neutres == 2: #On fuit les neutres
-                        #On génére un res de fuyard ? Ou on réfléchit un peu plus ?
-                if res == None: #On n'a pris aucune décision ? Donc pas de contrainte, on peut explorer au hasard
-                    #Explorer au hasard (hasard réfléchit et intelligent) ici
+                                humain.va(dir_choix)
             return res
 
 
