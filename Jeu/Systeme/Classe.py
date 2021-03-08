@@ -277,7 +277,7 @@ class Classe_principale(Classe):
             skills_intrasecs.append(magie)
 
         elif identite == 'receptionniste':
-            self.evolutif = True
+            self.evolutif = False
             deplacement = Skill_deplacement()
             skills_intrasecs.append(deplacement)
             vision = Skill_vision()
@@ -288,7 +288,7 @@ class Classe_principale(Classe):
             skills.append(attaque)
 
         elif identite == 'paume':
-            self.evolutif = True
+            self.evolutif = False
             deplacement = Skill_deplacement()
             skills_intrasecs.append(deplacement)
             vision = Skill_vision()
@@ -297,7 +297,7 @@ class Classe_principale(Classe):
             skills.append(stomp)
 
         elif identite == 'peureuse':
-            self.evolutif = True
+            self.evolutif = False
             deplacement = Skill_deplacement()
             skills_intrasecs.append(deplacement)
             vision = Skill_vision()
@@ -309,9 +309,11 @@ class Classe_principale(Classe):
             self.evolutif = False
             omnipotence = Invite_de_commande()
             skills.append(omnipotence)
+            omniscience = Skill_vision() #Lui faire un vrai skill d'omniscience à l'occasion
+            skills_intrasecs.append(omniscience)
 
-        elif identite == 'emcombrant':
-            self.evolutif = True
+        elif identite == 'encombrant':
+            self.evolutif = False
             deplacement = Skill_deplacement()
             skills_intrasecs.append(deplacement)
             vision = Skill_vision()
@@ -322,7 +324,7 @@ class Classe_principale(Classe):
             skills.append(attaque)
 
         elif identite == 'alchimiste':
-            self.evolutif = True
+            self.evolutif = False
             deplacement = Skill_deplacement()
             skills_intrasecs.append(deplacement)
             vision = Skill_vision()
@@ -335,7 +337,7 @@ class Classe_principale(Classe):
             skills.append(alchimie)
 
         elif identite == 'peste':
-            self.evolutif = True
+            self.evolutif = False
             deplacement = Skill_deplacement()
             skills_intrasecs.append(deplacement)
             vision = Skill_vision()
@@ -346,7 +348,7 @@ class Classe_principale(Classe):
             skills.append(magie)
 
         elif identite == 'bombe_atomique':
-            self.evolutif = True
+            self.evolutif = False
             deplacement = Skill_deplacement()
             skills_intrasecs.append(deplacement)
             vision = Skill_vision()
@@ -356,7 +358,7 @@ class Classe_principale(Classe):
             magie = Skill_magie()
             skills.append(magie)
 
-        elif identite == 'emcombrant':
+        elif identite == 'marchand':
             self.evolutif = True
             deplacement = Skill_deplacement()
             skills_intrasecs.append(deplacement)

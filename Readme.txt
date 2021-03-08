@@ -6,19 +6,17 @@ L'autruche, en codant les pnjs
 
 
 
-Nouvel objectif : l'organisation du main (terminé), la sauvegarde externe des parties (terminé)
-
-Travail en cours : la structure du main
-- Numérotation des frames pour les illustrations
+Objectif courant : recréer le tutoriel
+- PNJs
+- Interractions PNJs-joueur
+- Monstres
+- Layout
 Au passage :
 - Fin du travail sur l'affichage (arbre élémental)
 - Rendre fonctionnels tous les choix, puis les conditionner
 
 Si j'ai le temps :
-- Créer les premiers humains
 - Créer les premiers monstres
-- Faire utiliser les items par les pnjs
-- Recréer les dialogues, peut-être une copie du tutoriel de la vieille version d'Escape-Master
 
 
 

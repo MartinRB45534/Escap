@@ -54,25 +54,27 @@ SKIN_BLESSURE = Skin("blessure.png")
 global SKIN_JOUEUR
 SKIN_JOUEUR = Skin("joueur.png")
 global SKIN_RECEPTIONNISTE
-SKIN_RECEPTIONNISTE = Skin("agissant.png")
+SKIN_RECEPTIONNISTE = Skin("receptionniste.png")
 global SKIN_PAUME
-SKIN_PAUME = Skin("agissant.png")
+SKIN_PAUME = Skin("paume.png")
 global SKIN_PEUREUSE
-SKIN_PEUREUSE = Skin("agissant.png")
+SKIN_PEUREUSE = Skin("peureuse.png")
 global SKIN_CODEUR
-SKIN_CODEUR = Skin("agissant.png")
+SKIN_CODEUR = Skin("codeur.png")
 global SKIN_ENCOMBRANT
-SKIN_ENCOMBRANT = Skin("agissant.png")
+SKIN_ENCOMBRANT = Skin("encombrant.png")
 global SKIN_ALCHIMISTE
-SKIN_ALCHIMISTE = Skin("agissant.png")
+SKIN_ALCHIMISTE = Skin("alchimiste.png")
 global SKIN_PESTE
-SKIN_PESTE = Skin("agissant.png")
+SKIN_PESTE = Skin("peste.png")
 global SKIN_BOMBE_ATOMIQUE
-SKIN_BOMBE_ATOMIQUE = Skin("agissant.png")
+SKIN_BOMBE_ATOMIQUE = Skin("bombe_atomique.png")
 global SKIN_MARCHAND
-SKIN_MARCHAND = Skin("agissant.png")
+SKIN_MARCHAND = Skin("marchand.png")
 global SKIN_HUMAIN
 SKIN_HUMAIN = Skin("humain.png")
+global SKIN_DIALOGUE
+SKIN_DIALOGUE = Skin("dialogue.png")
 global SKIN_MYSTERE
 SKIN_MYSTERE = Skin("mystere.png")
 global SKIN_BOUCLIER

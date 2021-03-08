@@ -15,12 +15,23 @@ def trouve_skill(classe,type_skill): #Vraiment une méthode propre au controleur
                 trouve = trouve_bis
     return trouve
 
+class Id_max:
+    def __init__(self):
+        self.valeur = 0
+
+    def incremente(self):
+        self.valeur+=1
+        return self.valeur
+
+    def set_id_max(self,n):
+        self.valeur = n
+
+global ID_MAX
+ID_MAX = Id_max()
+
 #Constantes d'équilibrage :
 global constantes_lab
 constantes_lab = {0:0.1}
-
-global ID_MAX
-ID_MAX = 1 #L'ID de la dernière entitée crée.
 
 #constantes
 global HAUT

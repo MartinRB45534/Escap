@@ -133,8 +133,7 @@ class Main: #Modifier le nom plus tard pour plus de cohérence
 
         self.run = True
         while self.run : #Devient faux quand on quitte
-            if self.controleur.phase == TOUR : #On fait un tour normal
-                self.debut_tour()
+            self.debut_tour()
 
             self.input()
             if self.controleur.phase == TOUR : #On continue un tour normal
@@ -175,31 +174,27 @@ class Main: #Modifier le nom plus tard pour plus de cohérence
             if res == False:
                 run = False
             elif res == "new":
-                boutons = [["Nouvelle partie",[50,30],["Une nouvelle partie","Les autres parties ne seront pas effacées"],"new"],
-                           ["Tutoriel",[50,60],["Un nouveau tutoriel","Les autres tutoriels en cours ne seront pas effacés","","Découvrez le monde d'Escap et rencontrez les pnjs"],"tuto"],
+                boutons = [["Tutoriel",[50,30],["Un nouveau tutoriel","Les autres tutoriels en cours ne seront pas effacés","","Découvrez le monde d'Escap et rencontrez les pnjs"],"tuto"],
+                           ["Nouvelle partie",[50,60],["Une nouvelle partie","Les autres parties ne seront pas effacées"],"new"],
                            ["Quitter",[50,90],["Quitter le menu de création de partie et revenir à la liste des parties en cours"],True]]
                 res = menu(boutons,screen)
                 if res == False:
                     run = False
                 elif res == "new":
-                    ID_MAX = 1
+                    ID_MAX.set_id_max(1)
                     self.controleur = Controleur()
                     self.controleurs.append(self.controleur)
                     self.controleur.jeu(screen)
-                    if ID_MAX != self.controleur.check_ID_MAX():
-                        print(ID_MAX,self.controleur.check_ID_MAX())
                     self.boucle()
                 elif res == "tuto":
-                    ID_MAX = 1
+                    ID_MAX.set_id_max(10)
                     self.controleur = Controleur()
                     self.controleurs.append(self.controleur)
                     self.controleur.tuto(screen)
-                    if ID_MAX != self.controleur.check_ID_MAX():
-                        print(ID_MAX,self.controleur.check_ID_MAX())
                     self.boucle()
             elif isinstance(res,Controleur):
                 self.controleur = res
-                ID_MAX = max(self.controleur.entitees.keys())
+                ID_MAX.set_id_max(max(self.controleur.entitees.keys()))
                 self.controleur.jeu(screen)
                 self.boucle()
             else:

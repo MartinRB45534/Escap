@@ -671,3 +671,25 @@ class Skill_affinite_elementale(Skill):
     def utilise(self):
         self.xp_new += self.gain_xp
         return self.affinite_bonus
+
+class Invite_de_commande(Skill):
+    """Un skill pour exécuter des commandes arbitraires."""
+    def __init__(self):
+        Skill.__init__(self)
+        self.chaine = ""
+        self.nom = "Invite de commande"
+
+    def evo(self,nb_evo=1):
+        """fonction qui procède à l'évolution"""
+        for i in range(nb_evo):
+            self.niveau+=1
+
+    def utilise(self,touche):
+        if touche == pygame.K_DELETE:
+            if len(self.chaine >= 1):
+                self.chaine = self.chaine[:-1]
+        elif touche == pygame.K_ENTER:
+            eval(self.chaine) #/!\ Rajouter les variables globales pour que ça serve à quelque-chose !
+            self.chaine = ""
+        elif self.chaine.append(pygame.key.name(touche)): #On se limite aux trucs simples pour l'instant !
+            self.chaine.append(pygame.key.name(touche))
