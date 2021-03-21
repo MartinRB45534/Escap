@@ -15,6 +15,7 @@ CONSTANTES_STATS = {
         'aff_o':[0,1,1,1,1,1,1,1,1,1,1],
         'especes':['humain'],
         'doigts':10,
+        'magies':False,
         'special':True},
     #Le tank par défaut (voué à disparaître bientôt)
     "tank":{
@@ -31,6 +32,7 @@ CONSTANTES_STATS = {
         'aff_o':[0,1,1,1,1,1,1,1,1,1,1],
         'especes':['humain'],
         'doigts':10,
+        'magies':False,
         'special':False},
     #Le dps par défaut (voué à disparaître bientôt)
     "dps":{
@@ -47,6 +49,7 @@ CONSTANTES_STATS = {
         'aff_o':[0,1,1,1,1,1,1,1,1,1,1],
         'especes':['humain'],
         'doigts':10,
+        'magies':False,
         'special':False},
     #Le soigneur par défaut (voué à disparaître bientôt)
     "dps":{
@@ -63,6 +66,7 @@ CONSTANTES_STATS = {
         'aff_o':[0,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5],
         'especes':['humain'],
         'doigts':10,
+        'magies':['Magie_soin','Magie_auto_soin'],
         'special':False},
     #Le soutien par défaut (voué à disparaître bientôt)
     "soutien":{
@@ -79,6 +83,7 @@ CONSTANTES_STATS = {
         'aff_o':[0,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5],
         'especes':['humain'],
         'doigts':10,
+        'magies':['Magie_enchantement_force'],
         'special':False},
     #L'épéiste à l'accueil (stats non définitives, à retravailler)
     "receptionniste":{
@@ -95,6 +100,7 @@ CONSTANTES_STATS = {
         'aff_o':[0,1,1,1,1,1,1,1,1,1,1],
         'especes':['humain'],
         'doigts':10,
+        'magies':False,
         'special':False},
     #Le mec paumé du premier labyrinthe (stats non définitives, à retravailler)
     "paume":{
@@ -111,6 +117,7 @@ CONSTANTES_STATS = {
         'aff_o':[0,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5],
         'especes':['humain'],
         'doigts':10,
+        'magies':False,
         'special':False},
     #La meuf peureuse des premiers monstres (stats non définitives, à retravailler)
     "peureuse":{
@@ -127,6 +134,7 @@ CONSTANTES_STATS = {
         'aff_o':[0,2,2,2,2,2,2,2,2,2,2],
         'especes':['humain'],
         'doigts':10,
+        'magies':False, #/!\ Ajouter les magies de soutien ici !
         'special':False},
     #Le mec chelou qui se prend pour Dieu
     "codeur":{
@@ -143,6 +151,7 @@ CONSTANTES_STATS = {
         'aff_o':[0,1,1,1,1,1,1,1,1,1,1],
         'especes':['humain'],
         'doigts':10,
+        'magies':False,
         'special':False},
     #Le mec chiant enfermé à clé (stats non définitives, à retravailler)
     "encombrant":{
@@ -159,6 +168,7 @@ CONSTANTES_STATS = {
         'aff_o':[0,1,1,1,1,1,1,1,1,1,1],
         'especes':['humain'],
         'doigts':10,
+        'magies':False,
         'special':False},
     #L'alchimiste de l'étage des potions (stats non défintitves, à retravailler):
     "alchimiste":{
@@ -175,6 +185,7 @@ CONSTANTES_STATS = {
         'aff_o':[0,1,1,1,1,1,1,1,1,1,1],
         'especes':['humain'],
         'doigts':10,
+        'magies':['Magie_poing_magique'],
         'special':False},
     #La sainte monstrophobe (stats non défintitves, à retravailler):
     "peste":{
@@ -191,6 +202,7 @@ CONSTANTES_STATS = {
         'aff_o':[0,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5],
         'especes':['humain'],
         'doigts':10,
+        'magies':['Magie_soin','Magie_auto_soin'], # /!\ Rajouter la purification
         'special':False},
     #La magicienne (stats non défintitves, à retravailler):
     "bombe_atomique":{
@@ -207,6 +219,7 @@ CONSTANTES_STATS = {
         'aff_o':[0,1,1,1,1,1,1,1,1,1,1],
         'especes':['humain'],
         'doigts':10,
+        'magies':['Magie_brasier','Magie_poing_ardent'],
         'special':False},
     #Le gros qui extorque des sous (stats non définitives, à retravailler)
     "marchand":{
@@ -223,5 +236,125 @@ CONSTANTES_STATS = {
         'aff_o':[0,1,1,1,1,1,1,1,1,1,1],
         'especes':['humain'],
         'doigts':10,
+        'magies':False,
+        'special':False},
+    #Le gobelin de base (faible, très faible, presque autant que les slimes en terme de stats brutes)
+    "gobelin":{
+        'pv':[0,20,25,30,35,40,50,60,70,80,100],
+        'regen_pv':[0,0,0,0,0,0,0,0,0,0,1],
+        'pm':[0,0,0,0,0,0,0,0,0,0,0],
+        'regen_pm':[0,0,0,0,0,0,0,0,0,0,0],
+        'force':[0,1,1.1,1.2,1.4,1.6,1.8,2.1,2.4,2.7,3],
+        'priorite':[0,1,1,1,1,1,1,1,1,1,1],
+        'vitesse':[0,0.5,0.6,0.7,0.9,1.1,1.4,1.7,2,2.5,3],
+        'aff_t':[0,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2],
+        'aff_f':[0,1,1,1,1,1,1,1,1,1,1],
+        'aff_g':[0,1,1,1,1,1,1,1,1,1,1],
+        'aff_o':[0,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9],
+        'especes':['gobelin'],
+        'doigts':8,
+        'magies':False,
+        'special':False},
+    #Le gobelin sentinelle
+    "sentinelle_gobelin":{
+        'pv':[0,30,35,40,50,60,80,100,130,160,200],
+        'regen_pv':[0,0,0,0,0.5,0.5,1,1,1.5,1.5,2],
+        'pm':[0,0,0,0,0,0,0,0,0,0,0],
+        'regen_pm':[0,0,0,0,0,0,0,0,0,0,0],
+        'force':[0,1,1.1,1.2,1.4,1.6,1.8,2.1,2.4,2.7,3],
+        'priorite':[0,1,1,1,1,1,1,1,1,1,1],
+        'vitesse':[0,0.5,0.6,0.7,0.9,1.1,1.4,1.7,2,2.5,3],
+        'aff_t':[0,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2],
+        'aff_f':[0,1,1,1,1,1,1,1,1,1,1],
+        'aff_g':[0,1,1,1,1,1,1,1,1,1,1],
+        'aff_o':[0,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9],
+        'especes':['gobelin'],
+        'doigts':8,
+        'magies':False,
+        'special':False},
+    #Le guerrier gobelin
+    "guerrier_gobelin":{
+        'pv':[0,20,25,30,35,40,50,60,70,80,100],
+        'regen_pv':[0,0,0,0,0,0,0,0,0,0,1],
+        'pm':[0,0,0,0,0,0,0,0,0,0,0],
+        'regen_pm':[0,0,0,0,0,0,0,0,0,0,0],
+        'force':[0,1.5,1.6,1.7,1.9,2.2,2.5,2.9,3.3,3.7,4.2],
+        'priorite':[0,1,1,1,1,1,1,1,1,1,1],
+        'vitesse':[0,0.5,0.6,0.7,0.9,1.1,1.4,1.7,2,2.5,3],
+        'aff_t':[0,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2],
+        'aff_f':[0,1,1,1,1,1,1,1,1,1,1],
+        'aff_g':[0,1,1,1,1,1,1,1,1,1,1],
+        'aff_o':[0,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9],
+        'especes':['gobelin'],
+        'doigts':8,
+        'magies':False,
+        'special':False},
+    #L'explorateur gobelin
+    "explorateur_gobelin":{
+        'pv':[0,20,25,30,35,40,50,60,70,80,100],
+        'regen_pv':[0,0,0,0,0,0,0,0,0,0,1],
+        'pm':[0,0,0,0,0,0,0,0,0,0,0],
+        'regen_pm':[0,0,0,0,0,0,0,0,0,0,0],
+        'force':[0,1,1.1,1.2,1.4,1.6,1.8,2.1,2.4,2.7,3],
+        'priorite':[0,1,1,1,1,1,1,1,1,1,1],
+        'vitesse':[0,1,1.2,1.4,1.7,2,2.3,2.7,3.1,3.5,4],
+        'aff_t':[0,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2],
+        'aff_f':[0,1,1,1,1,1,1,1,1,1,1],
+        'aff_g':[0,1,1,1,1,1,1,1,1,1,1],
+        'aff_o':[0,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9],
+        'especes':['gobelin'],
+        'doigts':8,
+        'magies':False,
+        'special':False},
+    #Le mage gobelin
+    "mage_gobelin":{
+        'pv':[0,20,25,30,35,40,50,60,70,80,100],
+        'regen_pv':[0,0,0,0,0,0,0,0,0,0,1],
+        'pm':[0,20,25,30,35,40,50,60,70,80,100],
+        'regen_pm':[0.5,0.7,1,1.4,1.9,2.5,3.1,3.8,4.6,5.5,6.5],
+        'force':[0,1,1.1,1.2,1.4,1.6,1.8,2.1,2.4,2.7,3],
+        'priorite':[0,1,1,1,1,1,1,1,1,1,1],
+        'vitesse':[0,0.5,0.6,0.7,0.9,1.1,1.4,1.7,2,2.5,3],
+        'aff_t':[0,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2],
+        'aff_f':[0,1,1,1,1,1,1,1,1,1,1],
+        'aff_g':[0,1,1,1,1,1,1,1,1,1,1],
+        'aff_o':[0,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9],
+        'especes':['gobelin'],
+        'doigts':8,
+        'magies':['Magie_poing_magique'],
+        'special':False},
+    #Le shaman gobelin
+    "shaman_gobelin":{
+        'pv':[0,20,25,30,35,40,50,60,70,80,100],
+        'regen_pv':[0,0,0,0,0,0,0,0,0,0,1],
+        'pm':[0,20,25,30,35,40,50,60,70,80,100],
+        'regen_pm':[0.5,0.7,1,1.4,1.9,2.5,3.1,3.8,4.6,5.5,6.5],
+        'force':[0,1,1.1,1.2,1.4,1.6,1.8,2.1,2.4,2.7,3],
+        'priorite':[0,1,1,1,1,1,1,1,1,1,1],
+        'vitesse':[0,0.5,0.6,0.7,0.9,1.1,1.4,1.7,2,2.5,3],
+        'aff_t':[0,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2],
+        'aff_f':[0,1,1,1,1,1,1,1,1,1,1],
+        'aff_g':[0,1,1,1,1,1,1,1,1,1,1],
+        'aff_o':[0,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9],
+        'especes':['gobelin'],
+        'doigts':8,
+        'magies':False, # /!\ À modifier
+        'special':False},
+    #Le chef gobelin
+    "chef_gobelin":{
+        'pv':[0,30,35,40,50,60,80,100,130,160,200],
+        'regen_pv':[0,1,2,3,4,5,6,7,8,9,10],
+        'pm':[0,0,0,0,0,0,0,0,0,0,0],
+        'regen_pm':[0,0,0,0,0,0,0,0,0,0,0],
+        'force':[0,1.5,1.6,1.7,1.9,2.2,2.5,2.9,3.3,3.7,4.2],
+        'priorite':[0,1,1,1,1,1,1,1,1,1,1],
+        'vitesse':[0,0.5,0.6,0.7,0.9,1.1,1.4,1.7,2,2.5,3],
+        'aff_t':[0,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2],
+        'aff_f':[0,1,1,1,1,1,1,1,1,1,1],
+        'aff_g':[0,1,1,1,1,1,1,1,1,1,1],
+        'aff_o':[0,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9],
+        'especes':['gobelin'],
+        'doigts':8,
+        'magies':False,
         'special':False},
         }

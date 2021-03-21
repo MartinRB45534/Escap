@@ -1,6 +1,7 @@
 Work in progress !
 
 
+Est-ce que les gens sont blessés par leur propre stomp !? Le mystère du mage gobelin...
 La variable globale ID_MAX ne remplit pas du tout son rôle ! Qu'est-ce que je fais ?
 L'autruche, en codant les pnjs
 
@@ -16,11 +17,33 @@ Au passage :
 - Rendre fonctionnels tous les choix, puis les conditionner
 
 Si j'ai le temps :
-- Créer les premiers monstres
+- Créer les premiers monstres (le tutoriel est un camp de gobelins)
+- Faire de meilleurs skins pour les gobelins.
 
 
 
-À quoi servent les espèces ? À part être raciste ? Elles déterminent certaines statistiques ?
+Quelques nouvelles magies à créer :
+- Magies tribales (genre, qui varient selon l'espèce, comme un coup de poing magique qui n'est pas le même pour les gobelins et les orcs)
+- Coup de poing magique (magie d'attaque des mages de combat)
+- Boost complet (un boost qui affecte toutes les stats)
+- Purification (la magie anti-monstres de la peste)
+
+
+Étage combat : trois sentinelles aux trois points de passage
+Étage monstres : une sentinelle, un gobelin de base, un mage, deux guerriers, dans un dédale
+Étage portes (prison) : sentinelles, guerrier de plus haut niveau dans une salle (c'est un piège !), quelques monstres capturés ?
+Étage potions : guerriers, mages, un shaman, deux guerriers de plus haut niveau.
+Étage meutes : guerriers, mages, deux shamans, plein de gobelins de base dans les couloirs.
+Étage magie : tout !
+Étage items : tout, mais un peu moins, plus quelques gobelins équippés.
+Étage boss : tout, mais un peu plus, plus un chef gobelin.
+
+
+Quels genres de monstres peut-on trouver tout au fond d'un donjon ? Sachant que les plus bas sont les plus faibles for some reason.
+Slimes : faibles mais capables de progresser, en particulier en groupe. Leur niveau de dangerosité augmente exponentiellement quand ils sont nombreux, et leur nombre augmente au fil du temps.
+Gobelins : humanoides, donc organisés, avec plein de sous-espèces (mages, dps, tank, boss... avec d'autres noms)
+Orcs : gobelins en mieux. Sauf peut-être pour la vitesse, et souvent moins nombreux.
+
 
 
 À l'occasion, faire le tri dans les constantes

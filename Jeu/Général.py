@@ -133,35 +133,94 @@ class Controleur():
         receptionniste = Receptionniste(("Étage 1 : couloir",14,0))
         self.ajoute_entitee(receptionniste)
         self.esprits["receptionniste"] = Esprit_humain(receptionniste.ID,self)
-        self.labs["Étage 1 : couloir"]=Labyrinthe("Étage 1 : couloir",19,3,("Étage 1 : couloir",0,0),[Patern(("Étage 1 : couloir",9,0),10,3,[("Étage 1 : couloir",0,1)],["clé couloir"])])
+        paterns1 = [Patern(("Étage 1 : couloir",9,0),10,3,[("Étage 1 : couloir",0,1)],["clé couloir"])]
+        self.labs["Étage 1 : couloir"]=Labyrinthe("Étage 1 : couloir",19,3,("Étage 1 : couloir",0,0),paterns1,1,1,TERRE,1)
 
         #On crée le deuxième étage et son occupant :
         paume = Paume(("Étage 2 : labyrinthe",1,0))
         self.ajoute_entitee(paume)
         self.esprits["paume"] = Esprit_humain(paume.ID,self)
-        self.labs["Étage 2 : labyrinthe"]=Labyrinthe("Étage 2 : labyrinthe",15,15,("Étage 2 : labyrinthe",0,0),[Patern(("Étage 2 : labyrinthe",0,0),5,5,[("Étage 2 : labyrinthe",4,1),("Étage 2 : labyrinthe",4,2),("Étage 2 : labyrinthe",4,3)]),Patern(("Étage 2 : labyrinthe",5,5),5,5,[("Étage 2 : labyrinthe",0,1)],["Porte_centre_2"])],1,1,TERRE,0.5)
+        paterns2 = [Patern(("Étage 2 : labyrinthe",0,0),5,5,[("Étage 2 : labyrinthe",4,1),("Étage 2 : labyrinthe",4,2),("Étage 2 : labyrinthe",4,3)]),
+                    Patern(("Étage 2 : labyrinthe",5,5),5,5,[("Étage 2 : labyrinthe",0,1)],["Porte_centre_2"])]
+        self.labs["Étage 2 : labyrinthe"]=Labyrinthe("Étage 2 : labyrinthe",15,15,("Étage 2 : labyrinthe",0,0),paterns2,1,1,TERRE,0.5)
         self.construit_escalier(("Étage 1 : couloir",18,1),("Étage 2 : labyrinthe",0,0),DROITE,GAUCHE)
 
         #On crée le troisième étage et son occupante :
-        peureuse = Peureuse(("Étage 3 : combat",17,18))
+        peureuse = Peureuse(("Étage 3 : combat",12,13))
         self.ajoute_entitee(peureuse)
         self.esprits["peureuse"] = Esprit_humain(peureuse.ID,self)
-        self.labs["Étage 3 : combat"]=Labyrinthe("Étage 3 : combat",20,20,("Étage 3 : combat",0,0),[Patern(("Étage 3 : combat",8,8),12,12,[("Étage 3 : combat",0,8),("Étage 3 : combat",8,0),("Étage 3 : combat",0,0)]),Patern(("Étage 3 : combat",6,6),5,5,[("Étage 3 : combat",0,0),("Étage 3 : combat",4,4)]),Patern(("Étage 3 : combat",13,4),5,5,[("Étage 3 : combat",2,0),("Étage 3 : combat",2,4)]),Patern(("Étage 3 : combat",4,13),5,5,[("Étage 3 : combat",4,2),("Étage 3 : combat",0,2)])]) #,Patern(("Étage 3 : combat",4,52),5,8,[("Étage 3 : combat",4,0)])])
-        self.construit_escalier(("Étage 2 : labyrinthe",1,5),("Étage 3 : combat",19,19),HAUT,BAS)
+        cle1 = Cle(("Étage 3 : combat",12,13),"Porte_entree_encombrant_5")
+        self.ajoute_entitee(cle1)
+        peureuse.inventaire.ajoute(cle1)
+        cle2 = Cle(("Étage 3 : combat",12,13),"Porte_contournement_encombrant_5")
+        self.ajoute_entitee(cle2)
+        peureuse.inventaire.ajoute(cle2)
+        gobel1 = Sentinelle_gobelin(("Étage 3 : combat",11,5),1)
+        self.ajoute_entitee(gobel1)
+        gobel2 = Sentinelle_gobelin(("Étage 3 : combat",5,11),1)
+        self.ajoute_entitee(gobel2)
+        gobel3 = Sentinelle_gobelin(("Étage 3 : combat",6,6),1)
+        self.ajoute_entitee(gobel3)
+        self.esprits["gobelins_combat"]=Esprit_simple("gobelins_combat",[gobel1.ID,gobel2.ID,gobel3.ID],self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
+        paterns3 = [Patern(("Étage 3 : combat",6,6),9,9,[("Étage 3 : combat",0,4),("Étage 3 : combat",4,0),("Étage 3 : combat",0,0)]),
+                    Patern(("Étage 3 : combat",5,5),3,3,[("Étage 3 : combat",0,0),("Étage 3 : combat",2,2)]),
+                    Patern(("Étage 3 : combat",10,4),3,3,[("Étage 3 : combat",1,0),("Étage 3 : combat",1,2)]),
+                    Patern(("Étage 3 : combat",4,10),3,3,[("Étage 3 : combat",2,1),("Étage 3 : combat",0,1)])]
+        self.labs["Étage 3 : combat"]=Labyrinthe("Étage 3 : combat",15,15,("Étage 3 : combat",0,0),paterns3,1,1,TERRE,0.4)
+        self.construit_escalier(("Étage 2 : labyrinthe",1,5),("Étage 3 : combat",14,14),HAUT,BAS)
 
         #On crée le quatrième étage et son occupant :
-        codeur = Codeur(("Étage 4 : monstres",2,0))
+        codeur = Codeur(("Étage 4 : monstres",15,1))
         self.ajoute_entitee(codeur)
         self.esprits["codeur"] = Esprit_humain(codeur.ID,self)
-        self.labs["Étage 4 : monstres"]=Labyrinthe("Étage 4 : monstres",10,60,("Étage 4 : monstres",0,0),[Patern(("Étage 4 : monstres",4,0),2,10,[("Étage 4 : monstres",0,9),("Étage 4 : monstres",1,9)]),Patern(("Étage 4 : monstres",1,13),8,8,[("Étage 4 : monstres",4,0),("Étage 4 : monstres",5,7)]),Patern(("Étage 4 : monstres",1,25),6,8,[("Étage 4 : monstres",4,0),("Étage 4 : monstres",5,7)]),Patern(("Étage 4 : monstres",2,40),8,8,[("Étage 4 : monstres",4,0),("Étage 4 : monstres",5,7)]),Patern(("Étage 4 : monstres",4,52),5,8,[("Étage 4 : monstres",4,0)])])
-        self.construit_escalier(("Étage 3 : combat",5,0),("Étage 4 : monstres",5,0),HAUT,HAUT)
+        gobel1 = Sentinelle_gobelin(("Étage 4 : monstres",23,13),1)
+        self.ajoute_entitee(gobel1)
+        gobel2 = Gobelin(("Étage 4 : monstres",21,7),1)
+        self.ajoute_entitee(gobel2)
+        gobel3 = Mage_gobelin(("Étage 4 : monstres",15,5),1)
+        self.ajoute_entitee(gobel3)
+        gobel4 = Guerrier_gobelin(("Étage 4 : monstres",4,5),1)
+        self.ajoute_entitee(gobel4)
+        gobel5 = Guerrier_gobelin(("Étage 4 : monstres",5,5),1)
+        self.ajoute_entitee(gobel5)
+        self.esprits["gobelins_monstres"]=Esprit_simple("gobelins_monstres",[gobel1.ID,gobel2.ID,gobel3.ID,gobel4.ID,gobel5.ID],self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
+        paterns4 = [Patern(("Étage 4 : monstres",4,0),10,2,[("Étage 4 : monstres",0,1)],[],False),
+                    Patern(("Étage 4 : monstres",14,0),3,3,[("Étage 4 : monstres",0,1)]),
+                    Patern(("Étage 4 : monstres",0,10),8,5,[("Étage 4 : monstres",7,2)],["Porte_coin_4"]),
+                    Patern(("Étage 4 : monstres",20,5),10,4,[("Étage 4 : monstres",2,0),("Étage 4 : monstres",5,0),("Étage 4 : monstres",6,0),("Étage 4 : monstres",8,0)],[],False)]
+        self.labs["Étage 4 : monstres"]=Labyrinthe("Étage 4 : monstres",30,15,("Étage 4 : monstres",0,0),paterns4,1,1,TERRE,0.35)
+        self.construit_escalier(("Étage 3 : combat",0,3),("Étage 4 : monstres",29,7),GAUCHE,DROITE)
 
         #On crée le cinquième étage et son occupant :
-        encombrant = Encombrant(("Étage 5 : portes",2,0))
+        encombrant = Encombrant(("Étage 5 : portes",2,3))
         self.ajoute_entitee(encombrant)
         self.esprits["encombrant"] = Esprit_humain(encombrant.ID,self)
-        self.labs["Étage 5 : portes"]=Labyrinthe("Étage 5 : portes",10,60,("Étage 5 : portes",0,0),[Patern(("Étage 5 : portes",4,0),2,10,[("Étage 5 : portes",0,9),("Étage 5 : portes",1,9)]),Patern(("Étage 5 : portes",1,13),8,8,[("Étage 5 : portes",4,0),("Étage 5 : portes",5,7)]),Patern(("Étage 5 : portes",1,25),6,8,[("Étage 5 : portes",4,0),("Étage 5 : portes",5,7)]),Patern(("Étage 5 : portes",2,40),8,8,[("Étage 5 : portes",4,0),("Étage 5 : portes",5,7)]),Patern(("Étage 5 : portes",4,52),5,8,[("Étage 5 : portes",4,0)])])
-        self.construit_escalier(("Étage 4 : monstres",4,0),("Étage 5 : portes",5,0),HAUT,HAUT) #/!\ Modifier le layout de ce niveau !
+        passepartout1 = Cle(("Étage 5 : portes",8,22),["Porte_cellule_slime_5","Porte_cellule_piège_5","Porte_cellule_pré-piège_5","Porte_petite_cellule_droite_5"])
+        self.ajoute_entitee(passepartout1)
+        passepartout2 = Cle(("Étage 5 : portes",9,18),["Porte_double_cellule_deuxième_5","Porte_petite_cellule_gauche_5","Porte_grande_cellule_droite_5"])
+        self.ajoute_entitee(passepartout2)
+        cle1 = Cle(("Étage 5 : portes",4,15),["Porte_grande_cellule_5"])
+        self.ajoute_entitee(cle1)
+        cle2 = Cle(("Étage 5 : portes",0,9),["Porte_cellule_ombriul_5"])
+        self.ajoute_entitee(cle2)
+        cle3 = Cle(("Étage 5 : portes",9,10),["Porte_double_cellule_première_5"])
+        self.ajoute_entitee(cle3)
+        cle4 = Cle(("Étage 5 : portes",1,4),["Porte_sortie_encombrant_5"])
+        self.ajoute_entitee(cle4)
+        paterns5 = [Patern(("Étage 5 : portes",0,0),10,24,[]),
+                    Patern(("Étage 5 : portes",0,1),5,5,[("Étage 5 : portes",1,0),("Étage 5 : portes",4,2)],["Porte_sortie_encombrant_5","Porte_entree_encombrant_5"]),
+                    Patern(("Étage 5 : portes",0,6),3,3,[("Étage 5 : portes",2,1)],["Porte_double_cellule_deuxième_5"]),
+                    Patern(("Étage 5 : portes",3,6),3,3,[("Étage 5 : portes",2,1)],["Porte_double_cellule_première_5"]),
+                    Patern(("Étage 5 : portes",0,9),4,7,[("Étage 5 : portes",3,4)],["Porte_grande_cellule_5"]),
+                    Patern(("Étage 5 : portes",0,16),3,3,[("Étage 5 : portes",2,1)],["Porte_petite_cellule_gauche_5"]),
+                    Patern(("Étage 5 : portes",0,19),4,4,[("Étage 5 : portes",3,2)],["Porte_cellule_slime_5"]),
+                    Patern(("Étage 5 : portes",6,0),4,4,[("Étage 5 : portes",2,3)],["Porte_cellule_piège_5"]),
+                    Patern(("Étage 5 : portes",7,4),3,6,[("Étage 5 : portes",0,3)],["Porte_cellule_pré-piège_5"]),
+                    Patern(("Étage 5 : portes",5,10),5,3,[("Étage 5 : portes",1,0)],["Porte_cellule_ombriul_5"]),
+                    Patern(("Étage 5 : portes",6,13),4,5,[("Étage 5 : portes",0,2)],["Porte_grande_cellule_droite_5"]),
+                    Patern(("Étage 5 : portes",7,18),3,3,[("Étage 5 : portes",0,1)],["Porte_petite_cellule_droite_5"])]
+        self.labs["Étage 5 : portes"]=Labyrinthe("Étage 5 : portes",10,24,("Étage 5 : portes",0,0),paterns5)
+        self.construit_escalier(("Étage 4 : monstres",29,14),("Étage 5 : portes",0,23),DROITE,GAUCHE) #/!\ Modifier le layout de ce niveau !
 
         #On crée le sixième étage et son occupant :
         alchimiste = Alchimiste(("Étage 6 : potions",2,0))
@@ -422,7 +481,7 @@ class Controleur():
                 #Une attaque qui se fait sans arme.
                 force,affinite,direction,ID = agissant.get_stats_attaque(TERRE)
                 latence,taux,portee = skill.utilise()
-            
+
                 degats = force*taux*affinite
                 attaque = Attaque(ID,degats,TERRE,portee)
 
@@ -1797,6 +1856,7 @@ class Patern:
         for nb in range(len(self.entrees)):
             x = self.entrees[nb][1]+self.position[1]
             y = self.entrees[nb][2]+self.position[2]
+            print(x,y)
             case = matrice_lab[x][y]
             for bord in self.contraintes_cases(self.entrees[nb]):
                 mur = case.murs[bord]
@@ -2113,6 +2173,16 @@ class Agissant(Entitee): #Tout agissant est un cadavre, tout cadavre n'agit pas.
         self.latence = 0
         self.hauteur = 0 #Des fois qu'on devienne un item
 
+        if stats['magies']:
+            skill = trouve_skill(self.classe_principale,Skill_magie)
+            if skill == None:
+                print(self)
+                print(self.classe_principale)
+                for skil in self.classe_principale.skills:
+                    print(skil.niveau)
+                    print(skil)
+            for magie in stats['magies']:
+                skill.ajoute(eval(magie))
         if stats['special']:
             #Quelques entitées un peu particulières :
             #Comme celles qui commencent avec des magies
@@ -2611,12 +2681,144 @@ class Renforceur(Agissant):
                 return SKIN_AGISSANT
         else:
             return SKIN_CADAVRE
-##
-##class Gobelin(Agissant):
-##    """Le monstre de base. Faible, souvent en groupe."""
-##    def __init__(self,position,niveau):
-##        Agissant.__init__(self,position,pv_gobelin[niveau],pv_gobelin[niveau],regen_pv_gobelin[niveau],0,0,0,force_gobelin[niveau],priorite_gobelin[niveau],vitess_gobelin[niveau],aff_o_gobelin[niveau],aff_f_gobelin[niveau],aff_t_gobelin[niveau],aff_g_gobelin[niveau],classe_principale([],[],False,"gobelin",niveau),"gobelin")
-##
+
+class Sentinelle(Agissant):
+    """Une classe factice. Pour les agissants qui ne se déplace qu'en présence d'ennemis. Ne fonctionne pas lorsqu'un humain est aux commandes."""
+    pass
+
+class Gobelin(Agissant):
+    """Le monstre de base. Faible, souvent en groupe."""
+    def __init__(self,position,niveau):
+        Agissant.__init__(self,position,"gobelin",niveau)
+
+    def get_offenses(self):
+        offenses = self.offenses
+        self.offenses = []
+        if self.etat != "vivant" or self.controleur == None:
+            etat = "incapacite"
+        elif self.pv <= self.pv_max//2:
+            etat = "fuite"
+        else:
+            etat = "attaque"
+        return offenses, etat
+
+    def get_skin(self):
+        if self.etat == "vivant":
+            return SKIN_GOBELIN
+        else:
+            return SKIN_CADAVRE
+
+    #Est-ce qu'il a besoin d'une méthode spécifique ? Pour les offenses peut-être ?
+
+class Sentinelle_gobelin(Gobelin,Sentinelle):
+    """Un gobelin qui reste sur place tant qu'il ne voit pas d'ennemi. Créé spécifiquement pour les premiers étages et le tutoriel.
+       Il a une meilleure défense que les gobelins de base."""
+    def __init__(self,position,niveau):
+        Agissant.__init__(self,position,"sentinelle_gobelin",niveau)
+
+    def get_offenses(self):
+        offenses = self.offenses
+        self.offenses = []
+        if self.etat != "vivant" or self.controleur == None:
+            etat = "incapacite"
+        elif self.pv <= self.pv_max//9:
+            etat = "fuite"
+        else:
+            etat = "attaque"
+        return offenses, etat
+
+class Guerrier_gobelin(Gobelin):
+    """Un gobelin agressif est avide de sang.
+       Il a une meilleure attaque que les gobelins de base."""
+    def __init__(self,position,niveau):
+        Agissant.__init__(self,position,"guerrier_gobelin",niveau)
+
+    def get_offenses(self):
+        offenses = self.offenses
+        self.offenses = []
+        if self.etat != "vivant" or self.controleur == None:
+            etat = "incapacite"
+        elif self.pv <= self.pv_max//2:
+            etat = "fuite"
+        else:
+            etat = "attaque"
+        return offenses, etat
+
+class Explorateur_gobelin(Gobelin):
+    """Un gobelin rapide et trop curieux.
+       Il a une bonne vitesse que les gobelins de base, qui l'avantage aussi en combat."""
+    def __init__(self,position,niveau):
+        Agissant.__init__(self,position,"explorateur_gobelin",niveau)
+
+    def get_offenses(self):
+        offenses = self.offenses
+        self.offenses = []
+        if self.etat != "vivant" or self.controleur == None:
+            etat = "incapacite"
+        elif self.pv <= self.pv_max//2:
+            etat = "fuite"
+        else:
+            etat = "attaque"
+        return offenses, etat
+
+class Mage_gobelin(Gobelin):
+    """Un gobelin avec un potentiel magique.
+       Il peut utiliser une attaque magique."""
+    def __init__(self,position,niveau):
+        Agissant.__init__(self,position,"mage_gobelin",niveau)
+
+    def attaque(self,direction):
+        skill = trouve_skill(self.classe_principale,Skill_magie) #Est-ce qu'il a le même Skill_magie que le joueur ?
+        if self.peut_payer(cout_pm_poing_magique[skill.niveau-1]): #Quelle est l'attaque magique des gobelins ?
+            self.skill_courant = Skill_magie
+            self.magie_courante = "magie poing magique"
+        else:
+            self.skill_courant = Skill_stomp
+
+    def get_offenses(self):
+        offenses = self.offenses
+        self.offenses = []
+        if self.etat != "vivant" or self.controleur == None:
+            etat = "incapacite"
+        elif self.pv <= self.pv_max//2:
+            etat = "fuite"
+        else:
+            etat = "attaque"
+        return offenses, etat
+
+class Shaman_gobelin(Gobelin):
+    """Un gobelin avec un potentiel magique.
+       Il peut utiliser un sort de boost."""
+    def __init__(self,position,niveau):
+        Agissant.__init__(self,position,"shaman_gobelin",niveau)
+
+    def get_offenses(self):
+        offenses = self.offenses
+        self.offenses = []
+        if self.etat != "vivant" or self.controleur == None:
+            etat = "incapacite"
+        elif self.pv <= 3*self.pv_max//4 or self.pm < 50:
+            etat = "fuite"
+        else:
+            etat = "soutien"
+        return offenses, etat
+
+class Chef_gobelin(Gobelin):
+    """Un gobelin qui dirige un groupe.
+       Bonnes stats, augmente l'efficacité de l'esprit."""
+    def __init__(self,position,niveau):
+        Agissant.__init__(self,position,"chef_gobelin",niveau)
+
+    def get_offenses(self):
+        offenses = self.offenses
+        self.offenses = []
+        if self.etat != "vivant" or self.controleur == None:
+            etat = "incapacite"
+        elif self.pv <= self.pv_max//2:
+            etat = "fuite"
+        else:
+            etat = "attaque"
+        return offenses, etat
 
 class Humain(Agissant,Entitee_superieure):
     """La classe des pnjs et du joueur. A un comportement un peu plus complexe, et une personnalité."""
@@ -2797,6 +2999,13 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
                 self.interpele()
             elif self.highest == 2:
                 self.interpele()
+            elif self.highest == 4:
+                #La peureuse passe à l'explication des différents monstres
+                pass
+            elif self.highest == 5:
+                peureuse = self.controleur.entitess[5]
+                if peureuse.dialogue == -1:
+                    peureuse.dialogue = 3
 
     def get_etage_courant(self):
         return int(self.position[0].split()[1])
@@ -4494,6 +4703,12 @@ class Peureuse(Humain): #La quatrième humaine du jeu, à l'étage 3 (terrorisé
         elif self.dialogue == 1: #Le joueur vient d'arriver depuis le deuxième étage
             self.replique = "Bonjour !"
             self.repliques = ["Salut...","Bonjour ma jolie."]
+        elif self.dialogue == 2: #On a atteint les premiers monstres
+            self.replique = "Nous nous rapprochons du camp gobelin, il serait bien que je t'explique quelques trucs sur les monstres."
+            self.repliques = ["Oui, volontiers.","C'est gentil de proposer, mais je n'ai pas besoin d'aide.","Tu me prends pour un débutant ? Tu crois que je ne connais pas les monstres ?"]
+        elif self.dialogue == 3: #On a atteint la prison
+            self.replique = "Est-ce que tu vois ces portes dans les murs autour de toi ?
+            self.repliques = ["Oui.","Ces [insérer une description ici] ?","Évidemment, je ne suis pas aveugle !"]
 
     def interprete(self,nb_replique):
         #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
@@ -4552,6 +4767,89 @@ class Peureuse(Humain): #La quatrième humaine du jeu, à l'étage 3 (terrorisé
         #Dialogue par défaut -2
         elif replique == "":
             self.end_dialogue(-2)
+
+        #Dialogue de description des monstres
+        elif replique == "Oui, volontiers.":
+            self.replique="Les monstres sont très différents les uns des autres, aussi bien par leurs comportements que par leurs capacitées."
+            self.repliques = ["Donc, ils ne vont pas tous attendre sans bouger comme ceux de l'étage précédent ?","Leurs capacitées ? Tu veux dire leur puissance de combat ?"]
+        elif replique == "Donc, ils ne vont pas tous attendre sans bouger comme ceux de l'étage précédent ?":
+            self.replique="Exactement. Ceux-là sont des sentinnelles, ils ne bougent que quand ils aperçoivent un ennemi."
+            self.repliques = ["Attendre qu'on vienne à eux est donc plutôt une exception ?","Est-ce qu'il y a d'autres monstres que des gobelins ici ?"]
+        elif replique == "Attendre qu'on vienne à eux est donc plutôt une exception ?":
+            self.replique="Oui. C'est encore plus rare chez les monstres non-humanoïdes comme les slimes."
+            self.repliques = ["Il existe différentes espèces de monstres ?","Et qu'est-ce que tu disais sur leurs capacitées ?"]
+        elif replique in ["Il existe différentes espèces de monstres ?","Est-ce qu'il y a d'autres monstres que des gobelins ici ?"]:
+            self.replique="IL y a les gobelins, les orcs, les slimes, les ombriuls... certains ne sont pas hostiles aux humains, et ne combattront que si on les provoque."
+            self.repliques = ["Et qu'est-ce que tu disais sur leurs capacitées ?"]
+        elif replique == "Et qu'est-ce que tu disais sur leurs capacitées ?":
+            self.replique="Certains ont une meilleure défense, ou une bonne vitesse, d'autres peuvent même utiliser de la magie pour attaquer ou soigner."
+            self.repliques = ["Et il faut qu'on combatte tout ça ? Ah, la galère...","Et bien, nous aussi, donc on s'en sortira !"]
+        elif replique == "Et il faut qu'on combatte tout ça ? Ah, la galère...":
+            self.replique="Hélas..."
+            self.repliques = ["Bon, allons-y."]
+        elif replique == "Et bien, nous aussi, donc on s'en sortira !":
+            self.appreciations[0]+= 0.5
+            self.replique="Oui ! Je te fais confiance !"
+            self.repliques = ["Bon, allons-y."]
+        elif replique == "Leurs capacitées ? Tu veux dire leur puissance de combat ?":
+            self.replique="Entre autre, mais je pensais plutôt aux capacités comme le soin, ou les attaques magiques."
+            self.repliques = ["Ces créatures peuvent utiliser de la magie ?"]
+        elif replique == "Ces crétures peuvent utiliser de la magie ?":
+            self.replique="Les humanoïdes comme les gobelins comptent parfois des mages dans leurs rangs."
+            self.repliques = ["Donc ils ont des rôles spécifiques...","Et les monstres non-humanoïdes ?"]
+        elif replique == "Donc ils ont des rôles spécifiques...":
+            self.replique="Exactement. Les sentinelles qu'on a croisés à l'étage précédent sont spécialisés en défense et ne se déplacent que quand ils aperçoivent un ennemi, alors que d'autres nous cherchent activement."
+            self.repliques = ["Pourquoi faut-il qu'ils veuillent tous notre peau...","Ces gobelins sont bien organisés."]
+        elif replique == "Pourquoi faut-il qu'ils veuillent tous notre peau...":
+            self.replique="La plupart des monstres ont une dent contre les humains, mais pas tous. Il arrive même qu'ils se battent entre espèces."
+            self.repliques = ["Il y a beaucoup d'espèces de monstres ici ?"]
+        elif replique == "Il y a beaucoup d'espèces de monstres ici ?":
+            self.replique="Je ne sais pas, et j'espère en croiser le moins possible..."
+            self.repliques = ["Ne t'inquiète pas, je te protégerai.","On verra bien."]
+        elif replique == "Ne t'inquiète pas, je te protégerai.":
+            self.replique="Merci !"
+            self.appreciations[0]+=0.5
+            self.repliques = ["Bon, allons-y."]
+        elif replique == "On verra bien.":
+            
+        elif replique == "C'est gentil de proposer, mais je n'ai pas besoin d'aide.":
+            self.replique="D'accord, bonne chance."
+            self.repliques = ["  "]
+        elif replique == "  ":
+            self.end_dialogue()
+        elif replique == "Tu me prends pour un débutant ? Tu crois que je ne connais pas les monstres ?":
+            self.replique="Ne viens pas te plaindre si tu meurs !"
+            self.repliques = [" "]
+
+        #Dialogue de la prison
+        elif replique == "Oui.":
+            self.replique="Il te faut des clés pour les ouvrir."
+            self.repliques = ["Des clés ? Où est-ce que je peux les trouver ?"]
+        elif replique == "Des clés ? Où est-ce que je peux les trouver ?":
+            self.replique="Par terre, après avoir tué un monstre par exemple. Ramasse-les avec la touche m."
+            self.repliques = ["Ok, je regarderai autour de moi."]
+        elif replique == "Ok, je regarderai autour de moi.":
+            self.controleur.entitees[0].inventaire.ramasse(self.inventaire.get_clee("Porte_entree_encombrant_5")) #On refile au joueur la clé dont il a besoin
+            self.replique="Attends ! J'en ai une, elle te sera peut-être utile."
+            self.repliques = ["Merci. J'y vais alors.","Comment tu l'as trouvée ?"]
+        elif replique == "Merci. J'y vais alors.":
+            self.end_dialogue()
+        elif replique == "Comment tu l'as trouvée ?":
+            self.replique="Un des gobelins l'a laissée tomber quand ils ont capturés mon petit-ami."
+            self.repliques = ["Tu crois qu'il est enfermé ici ? Je vais le libérer."]
+        elif replique == "Tu crois qu'il est enfermé ici ? Je vais le libérer.":
+            self.appreciations[0]+= 0.5
+            self.end_dialogue()
+        elif replique == "Ces [insérer une description ici] ?":
+            self.replique="C'est ça. Il te faut des clés pour les ouvrir."
+            self.repliques = ["Des clés ? Où est-ce que je peux les trouver ?"]
+        elif replique == "Évidemment, je ne suis pas aveugle !":
+            self.replique="Alors je suppose que tu sauras trouver les clés tout seul !"
+            self.controleur.entitees[0].inventaire.ramasse(self.inventaire.get_clee("Porte_entree_encombrant_5")) #On refile quand même au joueur la clé dont il a besoin
+            self.repliques = [" "]
+        elif replique == " ":
+            self.appreciations[0]-= 0.5
+            self.end_dialogue()
 
         self.replique_courante = 0
 
@@ -5017,9 +5315,9 @@ class Bombe_atomique(Humain): #La neuvième humaine du jeu, à l'étage 8 (une m
     def attaque(self,direction):
         #Quelle est sa magie de prédilection ? Pour l'instant on va prendre l'avalanche
         skill = trouve_skill(self.classe_principale,Skill_magie) #Est-ce qu'il a le même Skill_magie que le joueur ?
-        if self.peut_payer(cout_pm_brasier[skill.niveau-1]):
+        if self.peut_payer(cout_pm_poing_ardent[skill.niveau-1]):
             self.skill_courant = Skill_magie
-            self.magie_courante = "brasier" #/!\
+            self.magie_courante = "magie poing ardent"
         else:
             self.skill_courant = Skill_stomp
 
@@ -6510,11 +6808,16 @@ class Inventaire:
         """
         Fonction qui gère le ramassage d'un item
         Entrée:
-            -l'item à ramasser
+            -l'ID de l'item à ramasser
         """
         item = self.controleur.get_entitee(ID_item)
         item.position = None
         self.items[item.get_classe()].append(ID_item)
+
+    def ajoute(self,item):
+        #Comme la précédente, mais c'est l'item et non son ID qui est passé en paramètre
+        item.position = None
+        self.items[item.get_classe()].append(item.ID)
 
     def utilise_item(self,agissant):
         """
@@ -6654,6 +6957,13 @@ class Inventaire:
             for code in cle.codes:
                 clees.append(code)
         return clees
+
+    def get_clee(self,code):
+        cle = None
+        for ID_cle in self.items[Cle]:
+            if code in self.controleur.get_entitee(ID_cle).codes:
+            clee = ID_cle
+        return cle
 
     def get_items(self):
         items = []
@@ -6856,7 +7166,7 @@ class Esprit :
                             if case[7][i][0] == position[0] and ID_entitee in self.ennemis.keys(): #Un ennemi ! Et au bon étage
                                 if self.ennemis[ID_entitee] > importance:
                                     importance = self.ennemis[ID_entitee]
-                                    agissant.attaque(direction)
+                                    agissant.attaque(i)
                             else: #Probablement un allié, ou un neutre, ou à un autre étage (cette configuration autorise les tentatives d'attaques au travers des portails de même niveau)
                                 libre = False
                     if libre:
@@ -6896,13 +7206,14 @@ class Esprit :
                         agissant.va(dir_choix)
 
                     if distance == 0: #Pas d'accès du tout !
-                        if len(dirs)>1: #On peut se permettre de choisir
-                            if agissant.dir_regard != None: #L'agissant regarde quelque part
-                                dir_back = [HAUT,DROITE,BAS,GAUCHE][agissant.dir_regard-2]
-                                if dir_back in dirs: #On ne veut pas y retourner
-                                    dirs.remove(dir_back)
-                        agissant.va(dirs[random.randint(0,len(dirs)-1)]) #On prend une direction random
-                        # ! Modifier pour avoir différents comportements !
+                        if not isinstance(agissant,Sentinelle): #Les sentinelles ne cherchent pas
+                            if len(dirs)>1: #On peut se permettre de choisir
+                                if agissant.dir_regard != None: #L'agissant regarde quelque part
+                                    dir_back = [HAUT,DROITE,BAS,GAUCHE][agissant.dir_regard-2]
+                                    if dir_back in dirs: #On ne veut pas y retourner
+                                        dirs.remove(dir_back)
+                            agissant.va(dirs[random.randint(0,len(dirs)-1)]) #On prend une direction random
+                            # ! Modifier pour avoir différents comportements !
 
                 else : #Accès direct à une cible !
                     agissant.va(dir_choix)
@@ -6940,16 +7251,15 @@ class Esprit :
                 distance = case[4]
 
                 if distance == 0: #On n'est pas accessible du tout ! On va pouvoir souffler un peu.
-                    #if isinstance(agissant,Soigneur): #On peut se soigner soi-même !
-                    #    agissant.skill_courant = Skill_magie
-                    #    agissant.magie_courante = "Soin"
-                    #else:
-                    if len(directions)>1: #On peut se permettre de choisir
-                        if agissant.dir_regard != None: #L'agissant regarde quelque part
-                            dir_back = [HAUT,DROITE,BAS,GAUCHE][agissant.dir_regard-2]
-                            if dir_back in directions: #On ne veut pas y retourner
-                                directions.remove(dir_back)
-                    agissant.va(directions[random.randint(0,len(directions)-1)]) #On prend une direction random
+                    if isinstance(agissant,Soigneur): #On peut se soigner soi-même !
+                        agissant.soigne(agissant.ID)
+                    elif not isinstance(agissant,Sentinelle): #Les sentinelles ne cherchent pas
+                        if len(directions)>1: #On peut se permettre de choisir
+                            if agissant.dir_regard != None: #L'agissant regarde quelque part
+                                dir_back = [HAUT,DROITE,BAS,GAUCHE][agissant.dir_regard-2]
+                                if dir_back in directions: #On ne veut pas y retourner
+                                    directions.remove(dir_back)
+                        agissant.va(directions[random.randint(0,len(directions)-1)]) #On prend une direction random
                     # ! Modifier pour avoir différents comportements !
 
                 else : #On est accessible indirectement ! Aaah !
@@ -6992,7 +7302,7 @@ class Esprit :
                     PV_mins = bourrin.pv
         if cible != None:
             agissant.soigne(cible)
-        else:
+        elif not isinstance(agissant,Sentinelle): #Les sentinelles ne cherchent pas
             self.ordonne_cherche(agissant)
 
     def ordonne_soutien(self,agissant,bourrins):
@@ -7009,7 +7319,7 @@ class Esprit :
                 importance = distance
         if cible != None:
             agissant.boost(cible)
-        else:
+        elif not isinstance(agissant,Sentinelle): #Les sentinelles ne cherchent pas
             self.ordonne_cherche(agissant)
 
     def ordonne_cherche(self,agissant):
@@ -7396,6 +7706,17 @@ class Esprit_solitaire(Esprit_type):
         self.vue = {}
         self.corps = {}
         self.ajoute_corp(corp)
+
+class Esprit_simple(Esprit_type):
+    """Un esprit avec les corps qu'on lui donne."""
+    def __init__(self,nom,corps,controleur):
+        self.nom = nom
+        self.controleur = controleur
+        self.oubli = 5
+        self.ennemis = {}
+        self.vue = {}
+        self.corps = {}
+        self.ajoute_corps(corps)
 
 class Esprit_humain(Esprit_type):
     """Un esprit qui dirige un ou plusieurs humains. Peut interragir avec d'autres esprits humains."""
@@ -9961,6 +10282,44 @@ class Magie_laser(Attaque_magique_dirigee):
 
     def get_skin():
         return SKIN_MAGIE_LASER
+
+class Magie_poing_magique(Attaque_magique_dirigee): #À modifier selon l'espèce qui l'utilise
+    """La magie qui crée une attaque de poing magique."""
+    nom = "magie poing magique"
+    def __init__(self,niveau):
+        self.phase = "démarrage"
+        self.gain_xp = gain_xp_poing_magique[niveau-1]
+        self.cout_pm = cout_pm_poing_magique[niveau-1]
+        self.latence = latence_poing_magique[niveau-1]
+        self.niveau = niveau
+        self.direction = None
+        self.temps = 10000
+        self.affiche = False
+
+    def action(self,porteur):
+        porteur.effets.append(Attaque(porteur.ID,degats_poing_magique[self.niveau-1],TERRE,portee_poing_magique[self.niveau-1],"Sd_T___",self.direction))
+
+    def get_skin():
+        return SKIN_MAGIE_POING_MAGIQUE
+
+class Magie_poing_ardent(Attaque_magique_dirigee): #L'attaque de mélée de la bombe atomique
+    """La magie qui crée une attaque de poing ardent."""
+    nom = "magie poing ardent"
+    def __init__(self,niveau):
+        self.phase = "démarrage"
+        self.gain_xp = gain_xp_poing_ardent[niveau-1]
+        self.cout_pm = cout_pm_poing_ardent[niveau-1]
+        self.latence = latence_poing_ardent[niveau-1]
+        self.niveau = niveau
+        self.direction = None
+        self.temps = 10000
+        self.affiche = False
+
+    def action(self,porteur):
+        porteur.effets.append(Attaque(porteur.ID,degats_poing_ardent[self.niveau-1],TERRE,portee_poing_ardent[self.niveau-1],"Sd_T___",self.direction))
+
+    def get_skin():
+        return SKIN_MAGIE_POING_MAGIQUE
 
 class Magie_brasier(Attaque_magique):
     """La magie qui crée une attaque de brasier."""

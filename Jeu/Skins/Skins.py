@@ -73,6 +73,8 @@ global SKIN_MARCHAND
 SKIN_MARCHAND = Skin("marchand.png")
 global SKIN_HUMAIN
 SKIN_HUMAIN = Skin("humain.png")
+global SKIN_GOBELIN
+SKIN_GOBELIN = Skin("gobelin.png")
 global SKIN_DIALOGUE
 SKIN_DIALOGUE = Skin("dialogue.png")
 global SKIN_MYSTERE

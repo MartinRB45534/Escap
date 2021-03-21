@@ -283,8 +283,10 @@ class Classe_principale(Classe):
             vision = Skill_vision()
             skills_intrasecs.append(vision)
             stomp = Skill_stomp()
+            stomp.evo()
             skills.append(stomp)
             attaque = Skill_attaque()
+            attaque.evo()
             skills.append(attaque)
 
         elif identite == 'paume':
@@ -294,6 +296,7 @@ class Classe_principale(Classe):
             vision = Skill_vision()
             skills_intrasecs.append(vision)
             stomp = Skill_stomp()
+            stomp.evo()
             skills.append(stomp)
 
         elif identite == 'peureuse':
@@ -303,11 +306,13 @@ class Classe_principale(Classe):
             vision = Skill_vision()
             skills_intrasecs.append(vision)
             magie = Skill_magie()
+            magie.evo()
             skills.append(magie)
 
         elif identite == 'codeur':
             self.evolutif = False
             omnipotence = Invite_de_commande()
+            omnipotence.evo()
             skills.append(omnipotence)
             omniscience = Skill_vision() #Lui faire un vrai skill d'omniscience à l'occasion
             skills_intrasecs.append(omniscience)
@@ -319,8 +324,10 @@ class Classe_principale(Classe):
             vision = Skill_vision()
             skills_intrasecs.append(vision)
             stomp = Skill_stomp()
+            stomp.evo()
             skills.append(stomp)
             attaque = Skill_attaque()
+            attaque.evo()
             skills.append(attaque)
 
         elif identite == 'alchimiste':
@@ -330,10 +337,13 @@ class Classe_principale(Classe):
             vision = Skill_vision()
             skills_intrasecs.append(vision)
             stomp = Skill_stomp()
+            stomp.evo()
             skills.append(stomp)
             magie = Skill_magie()
+            magie.evo()
             skills.append(magie)
             alchimie = Skill_alchimie()
+            alchimie.evo()
             skills.append(alchimie)
 
         elif identite == 'peste':
@@ -343,8 +353,10 @@ class Classe_principale(Classe):
             vision = Skill_vision()
             skills_intrasecs.append(vision)
             stomp = Skill_stomp()
+            stomp.evo()
             skills.append(stomp)
             magie = Skill_magie()
+            magie.evo()
             skills.append(magie)
 
         elif identite == 'bombe_atomique':
@@ -354,20 +366,102 @@ class Classe_principale(Classe):
             vision = Skill_vision()
             skills_intrasecs.append(vision)
             stomp = Skill_stomp()
+            stomp.evo()
             skills.append(stomp)
             magie = Skill_magie()
+            magie.evo()
             skills.append(magie)
 
         elif identite == 'marchand':
-            self.evolutif = True
+            self.evolutif = False
             deplacement = Skill_deplacement()
             skills_intrasecs.append(deplacement)
             vision = Skill_vision()
             skills_intrasecs.append(vision)
             stomp = Skill_stomp()
+            stomp.evo()
             skills.append(stomp)
             echange = Skill_echange()
+            echange.evo()
             skills.append(echange)
+
+        elif identite == 'gobelin':
+            self.evolutif = False
+            deplacement = Skill_deplacement()
+            skills_intrasecs.append(deplacement)
+            vision = Skill_vision()
+            skills_intrasecs.append(vision)
+            stomp = Skill_stomp()
+            skills_intrasecs.append(stomp)
+            attaque = Skill_attaque()
+            skills_intrasecs.append(attaque)
+
+        elif identite == 'sentinelle_gobelin':
+            self.evolutif = False
+            deplacement = Skill_deplacement()
+            skills_intrasecs.append(deplacement)
+            vision = Skill_vision()
+            skills_intrasecs.append(vision)
+            stomp = Skill_stomp()
+            skills_intrasecs.append(stomp)
+            attaque = Skill_attaque()
+            skills_intrasecs.append(attaque)
+
+        elif identite == 'guerrier_gobelin':
+            self.evolutif = False
+            deplacement = Skill_deplacement()
+            skills_intrasecs.append(deplacement)
+            vision = Skill_vision()
+            skills_intrasecs.append(vision)
+            stomp = Skill_stomp()
+            skills_intrasecs.append(stomp)
+            attaque = Skill_attaque()
+            skills_intrasecs.append(attaque)
+
+        elif identite == 'explorateur_gobelin':
+            self.evolutif = False
+            deplacement = Skill_deplacement()
+            skills_intrasecs.append(deplacement)
+            vision = Skill_vision()
+            skills_intrasecs.append(vision)
+            stomp = Skill_stomp()
+            skills_intrasecs.append(stomp)
+            attaque = Skill_attaque()
+            skills_intrasecs.append(attaque)
+
+        elif identite == 'mage_gobelin':
+            self.evolutif = False
+            deplacement = Skill_deplacement()
+            skills_intrasecs.append(deplacement)
+            vision = Skill_vision()
+            skills_intrasecs.append(vision)
+            stomp = Skill_stomp()
+            skills_intrasecs.append(stomp)
+            magie = Skill_magie()
+            skills_intrasecs.append(magie)
+
+        elif identite == 'shaman_gobelin':
+            self.evolutif = False
+            deplacement = Skill_deplacement()
+            skills_intrasecs.append(deplacement)
+            vision = Skill_vision()
+            skills_intrasecs.append(vision)
+            stomp = Skill_stomp()
+            skills_intrasecs.append(stomp)
+            magie = Skill_magie()
+            skills_intrasecs.append(magie)
+
+        elif identite == 'chef_gobelin':
+            self.evolutif = False
+            deplacement = Skill_deplacement()
+            skills_intrasecs.append(deplacement)
+            vision = Skill_vision()
+            skills_intrasecs.append(vision)
+            stomp = Skill_stomp()
+            skills_intrasecs.append(stomp)
+            attaque = Skill_attaque()
+            skills_intrasecs.append(attaque)
+            #Lui rajouter un skill de dirigeant ?
 
         Classe.__init__(self,cond_evo,skills_intrasecs,skills)
         self.evo(niveau)
