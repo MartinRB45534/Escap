@@ -464,7 +464,7 @@ class Classe_principale(Classe):
             #Lui rajouter un skill de dirigeant ?
 
         elif identite == 'slime':
-            self.evolutif = True #C'est de là que vient le danger des slimes
+            self.evolutif = False #Changer ça à l'occasion
             deplacement = Skill_deplacement()
             skills_intrasecs.append(deplacement)
             vision = Skill_vision()

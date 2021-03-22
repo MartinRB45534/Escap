@@ -149,10 +149,10 @@ class Controleur():
         peureuse = Peureuse(("Étage 3 : combat",12,13))
         self.ajoute_entitee(peureuse)
         self.esprits["peureuse"] = Esprit_humain(peureuse.ID,self)
-        cle1 = Cle(("Étage 3 : combat",12,13),"Porte_entree_encombrant_5")
+        cle1 = Cle(("Étage 3 : combat",12,13),["Porte_entree_encombrant_5"])
         self.ajoute_entitee(cle1)
         peureuse.inventaire.ajoute(cle1)
-        cle2 = Cle(("Étage 3 : combat",12,13),"Porte_contournement_encombrant_5")
+        cle2 = Cle(("Étage 3 : combat",12,13),["Porte_contournement_encombrant_5"])
         self.ajoute_entitee(cle2)
         peureuse.inventaire.ajoute(cle2)
         gobel1 = Sentinelle_gobelin(("Étage 3 : combat",11,5),1) #Trois sentinelles gardent l'entrée du camp gobelin
@@ -207,39 +207,43 @@ class Controleur():
         self.ajoute_entitee(cle3)
         cle4 = Cle(("Étage 5 : portes",1,4),["Porte_sortie_encombrant_5"])
         self.ajoute_entitee(cle4)
-        gobel1 = Sentinelle_gobelin(("Étage 5 : portes",23,13),1) #Une sentinelle veille sur la prison
+        gobel1 = Sentinelle_gobelin(("Étage 5 : portes",8,22),1) #Une sentinelle veille sur la prison
         self.ajoute_entitee(gobel1)
-        gobel2 = Guerrier_gobelin(("Étage 5 : portes",4,5),2) #Un renégat mis à l'isolement pour le mater, ou un piège diabolique dirigé contre le joueur ?
+        gobel1.inventaire.ajoute(passepartout1)
+        gobel2 = Guerrier_gobelin(("Étage 5 : portes",8,1),2) #Un renégat mis à l'isolement pour le mater, ou un piège diabolique dirigé contre le joueur ?
         self.ajoute_entitee(gobel2)
-        slime = Slime(("Étage 5 : portes",4,5),1) #Un slime ! Est-ce que les gobelins ont pris soin de l'affaiblir ?
+        slime = Slime(("Étage 5 : portes",1,20),1) #Un slime ! Est-ce que les gobelins ont pris soin de l'affaiblir ?
         self.ajoute_entitee(slime)
-        ombriul = Ombriul(("Étage 5 : portes",4,5),1) #Un prisonnier de guerre
-        self.ajoute_entitee(ombriul)
+        #ombriul = Ombriul(("Étage 5 : portes",8,11),1) #Un prisonnier de guerre
+        #self.ajoute_entitee(ombriul)
         self.esprits["gobelins_portes"]=Esprit_simple("gobelins_portes",[gobel1.ID,gobel2.ID],self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
-        self.esprits["ombriul_captif"]=Esprit_simple("ombriul_captif",[ombriul.ID],self)
-        esprit_slime = Esprit_slime([slime],self)
+        #self.esprits["ombriul_captif"]=Esprit_simple("ombriul_captif",[ombriul.ID],self)
+        esprit_slime = Esprit_slime(slime.ID,self)
         self.esprits[esprit_slime.nom]=esprit_slime #Les esprits des slimes sont presque aussi compliqués que ceux des humains, les ruptures en moins.
         paterns5 = [Patern(("Étage 5 : portes",0,0),10,24,[]),
                     Patern(("Étage 5 : portes",0,1),5,5,[("Étage 5 : portes",1,0),("Étage 5 : portes",4,2)],["Porte_sortie_encombrant_5","Porte_entree_encombrant_5"]),
-                    Patern(("Étage 5 : portes",0,6),3,3,[("Étage 5 : portes",2,1)],["Porte_double_cellule_deuxième_5"]),
-                    Patern(("Étage 5 : portes",3,6),3,3,[("Étage 5 : portes",2,1)],["Porte_double_cellule_première_5"]),
+                    Patern(("Étage 5 : portes",0,6),3,3,[]),
+                    Patern(("Étage 5 : portes",3,6),3,3,[("Étage 5 : portes",2,1),("Étage 5 : portes",0,1)],["Porte_double_cellule_première_5","Porte_double_cellule_deuxième_5"]),
                     Patern(("Étage 5 : portes",0,9),4,7,[("Étage 5 : portes",3,4)],["Porte_grande_cellule_5"]),
                     Patern(("Étage 5 : portes",0,16),3,3,[("Étage 5 : portes",2,1)],["Porte_petite_cellule_gauche_5"]),
                     Patern(("Étage 5 : portes",0,19),4,4,[("Étage 5 : portes",3,2)],["Porte_cellule_slime_5"]),
-                    Patern(("Étage 5 : portes",6,0),4,4,[("Étage 5 : portes",2,3)],["Porte_cellule_piège_5"]),
-                    Patern(("Étage 5 : portes",7,4),3,6,[("Étage 5 : portes",0,3)],["Porte_cellule_pré-piège_5"]),
+                    Patern(("Étage 5 : portes",6,0),4,4,[]),
+                    Patern(("Étage 5 : portes",7,4),3,6,[("Étage 5 : portes",0,3),("Étage 5 : portes",1,0)],["Porte_cellule_pré-piège_5","Porte_cellule_piège_5"]),
                     Patern(("Étage 5 : portes",5,10),5,3,[("Étage 5 : portes",1,0)],["Porte_cellule_ombriul_5"]),
                     Patern(("Étage 5 : portes",6,13),4,5,[("Étage 5 : portes",0,2)],["Porte_grande_cellule_droite_5"]),
                     Patern(("Étage 5 : portes",7,18),3,3,[("Étage 5 : portes",0,1)],["Porte_petite_cellule_droite_5"])]
         self.labs["Étage 5 : portes"]=Labyrinthe("Étage 5 : portes",10,24,("Étage 5 : portes",0,0),paterns5)
-        self.construit_escalier(("Étage 4 : monstres",29,14),("Étage 5 : portes",0,23),DROITE,GAUCHE) #/!\ Modifier le layout de ce niveau !
+        self.construit_escalier(("Étage 4 : monstres",29,14),("Étage 5 : portes",0,23),DROITE,GAUCHE)
 
         #On crée le sixième étage et son occupant :
         alchimiste = Alchimiste(("Étage 6 : potions",2,0))
         self.ajoute_entitee(alchimiste)
         self.esprits["alchimiste"] = Esprit_humain(alchimiste.ID,self)
-        self.labs["Étage 6 : potions"]=Labyrinthe("Étage 6 : potions",10,60,("Étage 6 : potions",0,0),[Patern(("Étage 6 : potions",4,0),2,10,[("Étage 6 : potions",0,9),("Étage 6 : potions",1,9)]),Patern(("Étage 6 : potions",1,13),8,8,[("Étage 6 : potions",4,0),("Étage 6 : potions",5,7)]),Patern(("Étage 6 : potions",1,25),6,8,[("Étage 6 : potions",4,0),("Étage 6 : potions",5,7)]),Patern(("Étage 6 : potions",2,40),8,8,[("Étage 6 : potions",4,0),("Étage 6 : potions",5,7)]),Patern(("Étage 6 : potions",4,52),5,8,[("Étage 6 : potions",4,0)])])
-        self.construit_escalier(("Étage 5 : portes",4,0),("Étage 6 : potions",5,0),HAUT,HAUT) #/!\ Modifier le layout de ce niveau !
+        paterns6 = [Patern(("Étage 6 : potions",0,4),7,9,[("Étage 6 : potions",6,4)]),
+                    Patern(("Étage 6 : potions",0,19),5,5,[("Étage 6 : potions",4,2)],["Porte_armurerie_6"]), #Une armurerie, vraiment ? Plutôt une potionnerie, non ?
+                    Patern(("Étage 6 : potions",10,3),15,12,[("Étage 6 : potions",0,6),("Étage 6 : potions",8,0),("Étage 6 : potions",8,11)])]
+        self.labs["Étage 6 : potions"]=Labyrinthe("Étage 6 : potions",25,24,("Étage 6 : potions",0,0),paterns6,1,1,TERRE,0.2)
+        self.construit_escalier(("Étage 5 : portes",0,0),("Étage 6 : potions",24,0),GAUCHE,DROITE) #/!\ Modifier le layout de ce niveau !
 
         #On crée le septième étage et son occupante :
         peste = Peste(("Étage 7 : meutes",2,0))
@@ -719,7 +723,7 @@ class Controleur():
 
             elif type_skill == Skill_divide:
                 latence = skill.utilise()
-                if agissant.peut_payer(20) #Insérer le cout ici d'une façon ou d'une autre /!\
+                if agissant.peut_payer(20): #Insérer le cout ici d'une façon ou d'une autre /!\
                     new_slime = type(agissant)(agissant.position,agissant.niveau,True)
                     agissant.paye(20)
                     agissant.subit(20) #Il perd la moitié de ses pv max et de ses pm max
@@ -2872,6 +2876,17 @@ class Slime(Agissant):
     def __init__(self,position,niveau):
         Agissant.__init__(self,position,"slime",niveau)
 
+    def get_offenses(self):
+        offenses = self.offenses
+        self.offenses = []
+        if self.etat != "vivant" or self.controleur == None:
+            etat = "incapacite"
+        elif self.pv <= self.pv_max//9:
+            etat = "fuite"
+        else:
+            etat = "attaque"
+        return offenses, etat
+
     def get_skin(self):
         if self.etat == "vivant":
             return SKIN_SLIME
@@ -3061,7 +3076,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
                 #La peureuse passe à l'explication des différents monstres
                 pass
             elif self.highest == 5:
-                peureuse = self.controleur.entitess[5]
+                peureuse = self.controleur.entitees[5]
                 if peureuse.dialogue == -1:
                     peureuse.dialogue = 3
 
@@ -4891,7 +4906,7 @@ class Peureuse(Humain): #La quatrième humaine du jeu, à l'étage 3 (terrorisé
             self.replique="Par terre, après avoir tué un monstre par exemple. Ramasse-les avec la touche m."
             self.repliques = ["Ok, je regarderai autour de moi."]
         elif replique == "Ok, je regarderai autour de moi.":
-            self.controleur.entitees[0].inventaire.ramasse(self.inventaire.get_clee("Porte_entree_encombrant_5")) #On refile au joueur la clé dont il a besoin
+            self.controleur.entitees[2].inventaire.ramasse_item(self.inventaire.get_clee("Porte_entree_encombrant_5")) #On refile au joueur la clé dont il a besoin
             self.replique="Attends ! J'en ai une, elle te sera peut-être utile."
             self.repliques = ["Merci. J'y vais alors.","Comment tu l'as trouvée ?"]
         elif replique == "Merci. J'y vais alors.":
@@ -4907,7 +4922,7 @@ class Peureuse(Humain): #La quatrième humaine du jeu, à l'étage 3 (terrorisé
             self.repliques = ["Des clés ? Où est-ce que je peux les trouver ?"]
         elif replique == "Évidemment, je ne suis pas aveugle !":
             self.replique="Alors je suppose que tu sauras trouver les clés tout seul !"
-            self.controleur.entitees[0].inventaire.ramasse(self.inventaire.get_clee("Porte_entree_encombrant_5")) #On refile quand même au joueur la clé dont il a besoin
+            self.controleur.entitees[2].inventaire.ramasse_item(self.inventaire.get_clee("Porte_entree_encombrant_5")) #On refile quand même au joueur la clé dont il a besoin
             self.repliques = [" "]
         elif replique == " ":
             self.appreciations[0]-= 0.5
@@ -7024,7 +7039,7 @@ class Inventaire:
         cle = None
         for ID_cle in self.items[Cle]:
             if code in self.controleur.get_entitee(ID_cle).codes:
-                clee = ID_cle
+                cle = ID_cle
         return cle
 
     def get_items(self):
@@ -8094,14 +8109,14 @@ class Esprit_humain(Esprit_type):
 class Esprit_slime(Esprit_type):
     """Un esprit qui dirige un ou plusieurs slimes. Peut interragir avec d'autres esprits slimes."""
     def __init__(self,corp,controleur): #Les slimes commencent tous séparément, donc ils ont leur propre esprit au début
-        self.nom = "esprit_slime"+str(controleur.get_entitee(corp).ID)
+        self.nom = "esprit_slime"+str(corp)
         self.controleur = controleur
         self.oubli = 5 #Faire dépendre des skills
         self.ennemis = {}
         self.vue = {}
         self.corps = {}
-        self.ajoute_corp(corp)
         self.classe = controleur.get_entitee(corp).classe_principale
+        self.ajoute_corp(corp)
 
     def merge(self,nom): #Regroupe deux esprits, lorsque des slimes se regroupent
         esprit = self.controleur.get_esprit(nom)

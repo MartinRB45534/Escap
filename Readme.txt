@@ -7,6 +7,8 @@ L'autruche, en codant les pnjs
 
 
 
+Idée pour accélèrer : ne pas recharger la police à chaque frame !
+
 Pour la magie, la régénération est ce qui détermine la véritable puissance. Les pm max correspondent juste à une limitation sur les sorts qu'on peut utiliser, et sur le nombre de sorts qu'on peut balancer d'affilée au début de la confrontation. Modifier les stats en conséquence.
 
 
@@ -35,8 +37,8 @@ Quelques nouvelles magies à créer :
 
 Étage combat : trois sentinelles aux trois points de passage
 Étage monstres : une sentinelle, un gobelin de base, un mage, deux guerriers, dans un dédale
-Étage portes (prison) : sentinelles, guerrier de plus haut niveau dans une salle (c'est un piège !), quelques monstres capturés ?
-Étage potions : guerriers, mages, un shaman, deux guerriers de plus haut niveau.
+Étage portes (prison) : sentinelles, guerrier de plus haut niveau dans une salle (c'est un piège !), quelques monstres capturés ? (il manque encore des portes)
+Étage potions : guerriers, mages, un shaman, deux guerriers de plus haut niveau. (penser à modifier la générations)
 Étage meutes : guerriers, mages, deux shamans, plein de gobelins de base dans les couloirs.
 Étage magie : tout !
 Étage items : tout, mais un peu moins, plus quelques gobelins équippés.

@@ -52,7 +52,7 @@ CONSTANTES_STATS = {
         'magies':False,
         'special':False},
     #Le soigneur par défaut (voué à disparaître bientôt)
-    "dps":{
+    "soigneur":{
         'pv':[0,50,75,100,125,150,175,200,225,250,275],
         'regen_pv':[0,0,0,0,0,0,0,0,0,0,0],
         'pm':[0,100,120,140,160,180,200,220,240,260,280],
