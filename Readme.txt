@@ -7,6 +7,10 @@ L'autruche, en codant les pnjs
 
 
 
+Pour la magie, la régénération est ce qui détermine la véritable puissance. Les pm max correspondent juste à une limitation sur les sorts qu'on peut utiliser, et sur le nombre de sorts qu'on peut balancer d'affilée au début de la confrontation. Modifier les stats en conséquence.
+
+
+
 Objectif courant : recréer le tutoriel
 - PNJs
 - Interractions PNJs-joueur
