@@ -7,7 +7,7 @@ class Classe:
     def __init__(self,conditions_evo=[0,10,20,30,40,50,60,70,80,90],skills_intrasecs=[],skills=[],cadeaux_evo=[[],[],[],[],[],[],[],[],[],[]]):
         """conditions_evo : les conditions d'évolution de la classe au niveau supérieur ; si c'est un nombre, indique l'xp nécessaire à l'évolution, si c'est une chaine de caractère, indique la fonction capable d'évaluer la condition
            skills_intrasecs : les skills obtenus automatiquement avec la classe
-           cadeux_evo : les récompenses d'évolution ; peuvent être des skills, des classes ou de l'xp"""
+           cadeux_evo : les récompenses d'évolution ; peuvent être des skills, des classes ou de l'xp""" #Plus vraiment, en fait... À rafraichir
         self.skills=skills
         self.skills_intrasecs=skills_intrasecs
         self.sous_classes=[] #Une classe peut posséder des sous-classes, qui contribueront à son évolution moins qu'à celle de la classe principale
