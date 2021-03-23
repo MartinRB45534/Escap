@@ -55,3 +55,28 @@ dpt_gob_chef = 0.18
 dpt_slime = 0.06 (c'est un peu trop faible...)
 
 
+
+
+Étages :
+1 (tuto) pas de monstres
+2 (tuto) pas de monstres
+3 (tuto) gobelins lvl 1 (sentinelles)
+4 (tuto) gobelins lvl 1 (sentinelle, mage, guerrier, base)
+5 (tuto) gobelins lvl 1-2 (sentinelle, guerrier) slime lvl 1 ombriul lvl 1 (base)
+6 (tuto) gobelins lvl 1-2 (guerriers, mages, shaman)
+7 (tuto) gobelins lvl 1 (guerriers, mages, shamans, bases)
+8 (tuto) gobelins lvl 1 (guerriers, sentinelles, mages, shamans, bases)
+9 (tuto) gobelins lvl 1 (guerriers, sentinelles, mages, shamans, bases) (à partir d'ici les monstres sont pourvus de leur équippement)
+10 (tuto) gobelins lvl 1-2 (guerriers, sentinelles, mages, shamans, bases, chef) ombriuls lvl 5-6 (variés, affaiblis)
+1 pas de monstres
+
+53 kumoko lvl 1 +araignée lvl 1-10 (vestige)
+
+65 slime lvl 6 (noir)
+
+70 slimes lvl 4-7 rimuru lvl 1
+
+85-90 orcs lvl 9-10 gobelins lvl 10 etc lvl 9-10 ombriuls lvl 8-9
+
+90-100 ombriuls lvl 9-10
+
