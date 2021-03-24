@@ -191,7 +191,7 @@ class Controleur():
         self.labs["Étage 4 : monstres"]=Labyrinthe("Étage 4 : monstres",30,15,("Étage 4 : monstres",0,0),paterns4,1,1,TERRE,0.35)
         self.construit_escalier(("Étage 3 : combat",0,3),("Étage 4 : monstres",29,7),GAUCHE,DROITE)
 
-        #On crée le cinquième étage et ses occupant :
+        #On crée le cinquième étage et ses occupants :
         encombrant = Encombrant(("Étage 5 : portes",2,3))
         self.ajoute_entitee(encombrant)
         self.esprits["encombrant"] = Esprit_humain(encombrant.ID,self)
@@ -207,6 +207,8 @@ class Controleur():
         self.ajoute_entitee(cle3)
         cle4 = Cle(("Étage 5 : portes",1,4),["Porte_sortie_encombrant_5"])
         self.ajoute_entitee(cle4)
+        cle5 = Cle(("Étage 5 : portes",0,6),["Porte_armurerie_6"])
+        self.ajoute_entitee(cle5)
         gobel1 = Sentinelle_gobelin(("Étage 5 : portes",8,22),1) #Une sentinelle veille sur la prison
         self.ajoute_entitee(gobel1)
         gobel1.inventaire.ajoute(passepartout1)
@@ -233,41 +235,75 @@ class Controleur():
                     Patern(("Étage 5 : portes",6,13),4,5,[("Étage 5 : portes",0,2)],["Porte_grande_cellule_droite_5"]),
                     Patern(("Étage 5 : portes",7,18),3,3,[("Étage 5 : portes",0,1)],["Porte_petite_cellule_droite_5"])]
         self.labs["Étage 5 : portes"]=Labyrinthe("Étage 5 : portes",10,24,("Étage 5 : portes",0,0),paterns5)
+        self.labs["Étage 5 : portes"].matrice_cases[4][3].murs[DROITE].effets[1].auto = True
+        self.labs["Étage 5 : portes"].matrice_cases[5][3].murs[GAUCHE].effets[1].auto = True
+        self.labs["Étage 5 : portes"].matrice_cases[3][0].murs[DROITE].effets.append(Porte(1,"Porte_contournement_encombrant_5"))
+        self.labs["Étage 5 : portes"].matrice_cases[4][0].murs[GAUCHE].effets.append(Porte(1,"Porte_contournement_encombrant_5"))
         self.construit_escalier(("Étage 4 : monstres",29,14),("Étage 5 : portes",0,23),DROITE,GAUCHE)
 
         #On crée le sixième étage et son occupant :
-        alchimiste = Alchimiste(("Étage 6 : potions",2,0))
+        alchimiste = Alchimiste(("Étage 6 : potions",23,2))
         self.ajoute_entitee(alchimiste)
         self.esprits["alchimiste"] = Esprit_humain(alchimiste.ID,self)
+        gobelins = self.cree_agissants(Mage_gobelin,1,("Étage 6 : potions",10,3),6,12,2) + self.cree_agissants(Mage_gobelin,1,("Étage 6 : potions",7,15),16,8,5) + self.cree_agissants(Guerrier_gobelin,1,("Étage 6 : potions",7,15),16,8,9) + self.cree_agissants(Guerrier_gobelin,2,("Étage 6 : potions",7,15),16,8,2)
+        self.esprits["gobelins_potions"]=Esprit_simple("gobelins_potions",gobelins,self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
         paterns6 = [Patern(("Étage 6 : potions",0,4),7,9,[("Étage 6 : potions",6,4)]),
                     Patern(("Étage 6 : potions",0,19),5,5,[("Étage 6 : potions",4,2)],["Porte_armurerie_6"]), #Une armurerie, vraiment ? Plutôt une potionnerie, non ?
-                    Patern(("Étage 6 : potions",10,3),15,12,[("Étage 6 : potions",0,6),("Étage 6 : potions",8,0),("Étage 6 : potions",8,11)])]
+                    Patern(("Étage 6 : potions",10,3),15,12,[])]#,[("Étage 6 : potions",0,6),("Étage 6 : potions",8,0),("Étage 6 : potions",8,11)])]
         self.labs["Étage 6 : potions"]=Labyrinthe("Étage 6 : potions",25,24,("Étage 6 : potions",0,0),paterns6,1,1,TERRE,0.2)
-        self.construit_escalier(("Étage 5 : portes",0,0),("Étage 6 : potions",24,0),GAUCHE,DROITE) #/!\ Modifier le layout de ce niveau !
+        self.labs["Étage 6 : potions"].matrice_cases[10][9].murs[GAUCHE].brise()
+        self.labs["Étage 6 : potions"].matrice_cases[9][9].murs[DROITE].brise()
+        self.labs["Étage 6 : potions"].matrice_cases[18][2].murs[BAS].brise()
+        self.labs["Étage 6 : potions"].matrice_cases[18][3].murs[HAUT].brise()
+        self.labs["Étage 6 : potions"].matrice_cases[18][14].murs[BAS].brise()
+        self.labs["Étage 6 : potions"].matrice_cases[18][15].murs[HAUT].brise()
+        self.construit_escalier(("Étage 5 : portes",0,0),("Étage 6 : potions",24,0),GAUCHE,DROITE)
 
         #On crée le septième étage et son occupante :
         peste = Peste(("Étage 7 : meutes",2,0))
         self.ajoute_entitee(peste)
         self.esprits["peste"] = Esprit_humain(peste.ID,self)
-        self.labs["Étage 7 : meutes"]=Labyrinthe("Étage 7 : meutes",10,60,("Étage 7 : meutes",0,0),[Patern(("Étage 7 : meutes",4,0),2,10,[("Étage 7 : meutes",0,9),("Étage 7 : meutes",1,9)]),Patern(("Étage 7 : meutes",1,13),8,8,[("Étage 7 : meutes",4,0),("Étage 7 : meutes",5,7)]),Patern(("Étage 7 : meutes",1,25),6,8,[("Étage 7 : meutes",4,0),("Étage 7 : meutes",5,7)]),Patern(("Étage 7 : meutes",2,40),8,8,[("Étage 7 : meutes",4,0),("Étage 7 : meutes",5,7)]),Patern(("Étage 7 : meutes",4,52),5,8,[("Étage 7 : meutes",4,0)])])
-        self.construit_escalier(("Étage 6 : potions",4,0),("Étage 7 : meutes",5,0),HAUT,HAUT) #/!\ Modifier le layout de ce niveau !
+        gobelins = self.cree_agissants(Mage_gobelin,1,("Étage 7 : meutes",0,2),5,4,3) + self.cree_agissants(Mage_gobelin,1,("Étage 7 : meutes",15,2),5,4,3) + self.cree_agissants(Guerrier_gobelin,1,("Étage 7 : meutes",0,2),5,4,5) + self.cree_agissants(Guerrier_gobelin,1,("Étage 7 : meutes",15,2),5,4,5) + self.cree_agissants(Gobelin,1,("Étage 7 : meutes",5,2),10,5,20) + self.cree_agissants(Gobelin,1,("Étage 7 : meutes",0,7),20,3,20)
+        self.esprits["gobelins_meutes"]=Esprit_simple("gobelins_meutes",gobelins,self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
+        paterns7 = [Patern(("Étage 7 : meutes",0,0),20,2,[]),
+                    Patern(("Étage 7 : meutes",0,2),5,4,[("Étage 7 : meutes",1,0),("Étage 7 : meutes",2,3)],["Porte_annexe_gauche_7"]),
+                    Patern(("Étage 7 : meutes",5,2),10,5,[("Étage 7 : meutes",4,0)],["Porte_salle_commune_7"]),
+                    Patern(("Étage 7 : meutes",15,2),5,4,[("Étage 7 : meutes",3,0),("Étage 7 : meutes",2,3)],["Porte_annexe_droite_7"])]
+        self.labs["Étage 7 : meutes"]=Labyrinthe("Étage 7 : meutes",20,10,("Étage 7 : meutes",0,0),paterns7,1,1,TERRE,0.3)
+        self.construit_escalier(("Étage 6 : potions",21,23),("Étage 7 : meutes",10,0),BAS,HAUT) #/!\ Rajouter les shamans !
 
         #On crée le huitième étage et son occupante :
         bombe_atomique = Bombe_atomique(("Étage 8 : magie",2,0))
         self.ajoute_entitee(bombe_atomique)
         self.esprits["bombe_atomique"] = Esprit_humain(bombe_atomique.ID,self)
-        self.labs["Étage 8 : magie"]=Labyrinthe("Étage 8 : magie",10,60,("Étage 8 : magie",0,0),[Patern(("Étage 8 : magie",4,0),2,10,[("Étage 8 : magie",0,9),("Étage 8 : magie",1,9)]),Patern(("Étage 8 : magie",1,13),8,8,[("Étage 8 : magie",4,0),("Étage 8 : magie",5,7)]),Patern(("Étage 8 : magie",1,25),6,8,[("Étage 8 : magie",4,0),("Étage 8 : magie",5,7)]),Patern(("Étage 8 : magie",2,40),8,8,[("Étage 8 : magie",4,0),("Étage 8 : magie",5,7)]),Patern(("Étage 8 : magie",4,52),5,8,[("Étage 8 : magie",4,0)])])
-        self.construit_escalier(("Étage 7 : meutes",4,0),("Étage 8 : magie",5,0),HAUT,HAUT) #/!\ Modifier le layout de ce niveau !
+        paterns8 = [Patern(("Étage 8 : magie",33,0),7,4,[("Étage 8 : magie",0,1)]),
+                    Patern(("Étage 8 : magie",26,6),4,4,[("Étage 8 : magie",0,2)],["Porte_anti_chambre_8"]),
+                    Patern(("Étage 8 : magie",30,4),10,6,[("Étage 8 : magie",5,0)],["Porte_sas_8"])]
+        self.labs["Étage 8 : magie"]=Labyrinthe("Étage 8 : magie",40,10,("Étage 8 : magie",0,0),paterns8,1,1,TERRE,0.4)
+        self.construit_escalier(("Étage 7 : meutes",4,0),("Étage 8 : magie",5,0),HAUT,HAUT) #/!\ Rajouter les ennemis !
 
         #On crée le neuvième étage et son occupant :
         marchand = Marchand(("Étage 9 : équippement",2,0))
         self.ajoute_entitee(marchand)
         self.esprits["marchand"] = Esprit_humain(marchand.ID,self)
-        self.labs["Étage 9 : équippement"]=Labyrinthe("Étage 9 : équippement",10,60,("Étage 9 : équippement",0,0),[Patern(("Étage 9 : équippement",4,0),2,10,[("Étage 9 : équippement",0,9),("Étage 9 : équippement",1,9)]),Patern(("Étage 9 : équippement",1,13),8,8,[("Étage 9 : équippement",4,0),("Étage 9 : équippement",5,7)]),Patern(("Étage 9 : équippement",1,25),6,8,[("Étage 9 : équippement",4,0),("Étage 9 : équippement",5,7)]),Patern(("Étage 9 : équippement",2,40),8,8,[("Étage 9 : équippement",4,0),("Étage 9 : équippement",5,7)]),Patern(("Étage 9 : équippement",4,52),5,8,[("Étage 9 : équippement",4,0)])])
-        self.construit_escalier(("Étage 8 : magie",6,0),("Étage 9 : équippement",5,0),HAUT,HAUT) #/!\ Modifier le layout de ce niveau !
+        paterns9 = [Patern(("Étage 9 : équippement",0,0),7,4,[("Étage 9 : équippement",5,3)],["Porte_première_armurerie_9"]),
+                    Patern(("Étage 9 : équippement",5,5),4,5,[("Étage 9 : équippement",2,0)],["Porte_deuxième_armurerie_9"]),
+                    Patern(("Étage 9 : équippement",15,3),6,5,[("Étage 9 : équippement",0,3)],["Porte_troisième_armurerie_9"]),
+                    Patern(("Étage 9 : équippement",28,7),10,3,[("Étage 9 : équippement",8,0)],["Porte_quatrième_armurerie_9"]),
+                    Patern(("Étage 9 : équippement",43,0),17,10,[],[],False),
+                    Patern(("Étage 9 : équippement",40,1),8,4,[("Étage 9 : équippement",3,0)],["Porte_cinquième_armurerie_9"]),
+                    Patern(("Étage 9 : équippement",53,0),7,4,[("Étage 9 : équippement",1,6)],["Porte_sixième_armurerie_9"]),
+                    ]
+        self.labs["Étage 9 : équippement"]=Labyrinthe("Étage 9 : équippement",60,10,("Étage 9 : équippement",0,0),paterns9,1,1,TERRE,0.1)
+        self.labs["Étage 9 : équippement"].matrice_cases[43][0].murs[GAUCHE].brise()
+        self.labs["Étage 9 : équippement"].matrice_cases[42][0].murs[DROITE].brise()
+        self.construit_escalier(("Étage 8 : magie",38,0),("Étage 9 : équippement",1,9),HAUT,BAS) #/!\ Rajouter les ennemis !
 
         #On crée le dixième étage
-        self.labs["Étage 10 : Boss"]=Labyrinthe("Étage 10 : Boss",10,60,("Étage 10 : Boss",0,0),[Patern(("Étage 10 : Boss",4,0),2,10,[("Étage 10 : Boss",0,9),("Étage 10 : Boss",1,9)]),Patern(("Étage 10 : Boss",1,13),8,8,[("Étage 10 : Boss",4,0),("Étage 10 : Boss",5,7)]),Patern(("Étage 10 : Boss",1,25),6,8,[("Étage 10 : Boss",4,0),("Étage 10 : Boss",5,7)]),Patern(("Étage 10 : Boss",2,40),8,8,[("Étage 10 : Boss",4,0),("Étage 10 : Boss",5,7)]),Patern(("Étage 10 : Boss",4,52),5,8,[("Étage 10 : Boss",4,0)])])
+        paterns10 = [Patern(("Étage 10 : Boss",0,0),25,19,[],[]),
+                     Patern(("Étage 10 : Boss",10,0),10,19,[("Étage 10 : Boss",0,9)],["Porte_boss_10"]),
+                     Patern(("Étage 10 : Boss",20,7),3,5,[("Étage 10 : Boss",0,2)],["Porte_dérobée_10"])]
+        self.labs["Étage 10 : Boss"]=Labyrinthe("Étage 10 : Boss",25,19,("Étage 10 : Boss",0,0),paterns10,1,1,TERRE,0.1)
         self.construit_escalier(("Étage 9 : équippement",4,0),("Étage 10 : Boss",5,0),BAS,HAUT) #/!\ Modifier le layout de ce niveau !
 
         #On lance la cinématique :
@@ -290,6 +326,19 @@ class Controleur():
         self.esprits["2"].antagonise("1")
         # Quatrième étape : admirer
         self.active_lab("arène")
+
+    def cree_agissants(self,classe,niveau,position,largeur,hauteur,nombre):
+        poss = [(position[0],position[1]+i,position[2]+j) for i in range(largeur) for j in range(hauteur)] #Les positions possibles
+        #Rajouter une  vérification pour ne prendre que les cases vides ?
+        agissants = []
+        for i in range(nombre):
+            if poss != []:
+                j = random.randrange(len(poss))
+                pos = poss.pop(j) #On choisit aléatoirement la position de l'agissant et on ne veut pas la réutiliser
+                agissant = classe(pos,niveau)
+                self.ajoute_entitee(agissant)
+                agissants.append(agissant.ID)
+        return agissants
 
     def set_phase(self,phase):
         if phase not in self.phases : #On ne veut pas avoir deux fois la même phase !
@@ -1054,7 +1103,7 @@ class Labyrinthe:
         self.matrice_cases[coord[0]][coord[1]].step(entitee)
 
     def get_vue(self,agissant):
-        return self.resoud(agissant.get_position(),agissant.get_portee_vue())
+        return self.resoud(agissant.get_position(),agissant.get_portee_vue(),"vue","C__S_Pb",None,[],True,agissant.get_clees())
             
     def getMatrice_cases(self):
         #on obtient une copie indépendante du labyrinthe
@@ -1102,7 +1151,7 @@ class Labyrinthe:
     def attaque(self,position,portee,propagation,direction,obstacles):
         return self.resoud(position,portee,"attaque",propagation,direction,obstacles)
 
-    def resoud(self,position,portee,action="vue",propagation="C__S_Pb",direction=None,dead_ends=[],reset=True):
+    def resoud(self,position,portee,action="vue",propagation="C__S_Pb",direction=None,dead_ends=[],reset=True,clees=[]):
         #Les possibilités de propagation sont :
         #                           Circulaire, le mode de propagation de la vision
         #                           Rectiligne, dans une unique direction
@@ -1153,7 +1202,7 @@ class Labyrinthe:
                 #trouver les positions explorables
                 positions_voisins=self.voisins_case(data)
 
-                datas_explorables = self.positions_utilisables(positions_voisins,data)
+                datas_explorables = self.positions_utilisables(positions_voisins,data,clees)
 
                 for data_explorable in datas_explorables:
                     pos = data_explorable[0]
@@ -1170,7 +1219,7 @@ class Labyrinthe:
                         queue.append(data_explorable)
 
         if action == "vue":
-            matrice_cases = [[self.matrice_cases[i][j].get_infos((self.id,i,j)) for j in range(len(self.matrice_cases[0]))] for i in range(len(self.matrice_cases))]
+            matrice_cases = [[self.matrice_cases[i][j].get_infos((self.id,i,j),clees) for j in range(len(self.matrice_cases[0]))] for i in range(len(self.matrice_cases))]
         else :
             matrice_cases = self.matrice_cases
 
@@ -1220,7 +1269,7 @@ class Labyrinthe:
 
         return positions_voisins
 
-    def positions_utilisables(self,positions_voisins,data):
+    def positions_utilisables(self,positions_voisins,data,clees):
         """
         Fonction qui prend en entrées:
             les voisins de la case
@@ -1244,7 +1293,7 @@ class Labyrinthe:
                 voisin = positions_voisins[direction]
 
                 #on vérifie si on peut passer
-                blocage = self.matrice_cases[position[1]][position[2]].get_mur_dir(direction).get_blocage()
+                blocage = self.matrice_cases[position[1]][position[2]].get_mur_dir(direction).get_blocage(clees)
                 if blocage != "Imp" and (passage=="m" or (blocage!="Ple" and ((passage=="p" and (blocage == "Por" or blocage == "P_b")) or (passage=="b" and (blocage == "Bar" or blocage == "P_b")) or (blocage == "Esc" and deplacement == "T") or blocage == None))):
                     #On détermine éventuellement la nouvelle forme de propagation
                     if degenerescence == "d":
@@ -1701,8 +1750,8 @@ class Case:
         """
         return self.murs[direction].is_ferme()
 
-    def acces(self,direction):
-        return not(self.murs[direction].is_ferme()) and self.murs[direction].get_cible()
+    def acces(self,direction,clees=[]):
+        return not(self.murs[direction].is_ferme(clees)) and self.murs[direction].get_cible()
 
     def murs_pleins(self):
         directions = []
@@ -1735,8 +1784,8 @@ class Case:
     def get_opacite(self):
         return self.opacite + self.opacite_bonus
 
-    def get_infos(self,position):
-        return [position,self.clarte,0,0,0,0,self.calcule_code(),[self.acces(i) for i in range(4)],[]]
+    def get_infos(self,position,clees):
+        return [position,self.clarte,0,0,0,0,self.calcule_code(),[self.acces(i,clees) for i in range(4)],[]]
 
     def calcule_code(self):#La fonction qui calcule le code correpondant à l'état de la case. De base, 0. Modifié d'après les effets subits par la case.
         return self.code
@@ -1777,23 +1826,23 @@ class Mur:
         self.peut_passer = False
         self.controleur = None
 
-    def is_ferme(self):
+    def is_ferme(self,clees=[]):
         ferme = False
         for effet in self.effets :
-            if isinstance(effet,Mur_impassable) or (isinstance(effet,Mur_plein) and not(effet.casse)) or (isinstance(effet,Porte) and effet.ferme):
+            if isinstance(effet,Mur_impassable) or (isinstance(effet,Mur_plein) and not(effet.casse)) or (isinstance(effet,Porte) and (effet.ferme and not(effet.code in clees))):
                 ferme = True
         return ferme
 
-    def get_blocage(self):
+    def get_blocage(self,clees):
         blocage = None
         for effet in self.effets :
             if isinstance(effet,Mur_impassable):
                 blocage = "Imp"
             elif blocage != "Imp" and (isinstance(effet,Mur_plein) and not(effet.casse)):
                 blocage = "Ple"
-            elif blocage != "Imp" and blocage != "Ple" and (isinstance(effet,Porte_barriere) and effet.ferme):
+            elif blocage != "Imp" and blocage != "Ple" and (isinstance(effet,Porte_barriere) and (effet.ferme and not(effet.code in clees))):
                 blocage = "P_b"
-            elif blocage != "Imp" and blocage != "Ple" and blocage != "P_b" and (isinstance(effet,Porte) and effet.ferme):
+            elif blocage != "Imp" and blocage != "Ple" and blocage != "P_b" and (isinstance(effet,Porte) and (effet.ferme and not(effet.code in clees))):
                 blocage = "Por"
             elif blocage != "Imp" and blocage != "Ple" and blocage != "P_b" and isinstance(effet,Barriere):
                 blocage = "Bar"
@@ -2968,6 +3017,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
 
         self.apreciations = [0,0,0,0,0,0,0,0,0,0]
         self.role = "independant"
+        self.inventaire = Sac_a_dos()
 
         #Il doit afficher tout ce qu'il voit...
         print("Initialisation du joueur")
@@ -2984,7 +3034,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         #Il peut aussi monter de niveau, et a plusieurs choix lorsqu'il le fait :
         self.choix_niveaux = {CLASSIQUE:{1:None, #Le niveau 1 prendra la valeur physique ou magique
                                          2:None, #Le niveau 2 prendra la valeur corps à corps, distance, magie_infinie ou essence magique
-                                         3:None, #Les propositions pour les niveaux suivants dépendent grandement du choix aus niveaux 1 et 2
+                                         3:None, #Les propositions pour les niveaux suivants dépendent grandement du choix aux niveaux 1 et 2
                                          4:None,
                                          5:None,
                                          6:None,
@@ -4906,13 +4956,15 @@ class Peureuse(Humain): #La quatrième humaine du jeu, à l'étage 3 (terrorisé
             self.replique="Par terre, après avoir tué un monstre par exemple. Ramasse-les avec la touche m."
             self.repliques = ["Ok, je regarderai autour de moi."]
         elif replique == "Ok, je regarderai autour de moi.":
-            self.controleur.entitees[2].inventaire.ramasse_item(self.inventaire.get_clee("Porte_entree_encombrant_5")) #On refile au joueur la clé dont il a besoin
+            ID_clee = self.inventaire.get_clee("Porte_entree_encombrant_5")
+            self.inventaire.drop(None,ID_clee)
+            self.controleur.entitees[2].inventaire.ramasse_item(ID_clee) #On refile au joueur la clé dont il a besoin
             self.replique="Attends ! J'en ai une, elle te sera peut-être utile."
             self.repliques = ["Merci. J'y vais alors.","Comment tu l'as trouvée ?"]
         elif replique == "Merci. J'y vais alors.":
             self.end_dialogue()
         elif replique == "Comment tu l'as trouvée ?":
-            self.replique="Un des gobelins l'a laissée tomber quand ils ont capturés mon petit-ami."
+            self.replique="Un des gobelins l'a laissée tomber quand ils ont capturé mon petit-ami."
             self.repliques = ["Tu crois qu'il est enfermé ici ? Je vais le libérer."]
         elif replique == "Tu crois qu'il est enfermé ici ? Je vais le libérer.":
             self.appreciations[0]+= 0.5
@@ -4921,8 +4973,9 @@ class Peureuse(Humain): #La quatrième humaine du jeu, à l'étage 3 (terrorisé
             self.replique="C'est ça. Il te faut des clés pour les ouvrir."
             self.repliques = ["Des clés ? Où est-ce que je peux les trouver ?"]
         elif replique == "Évidemment, je ne suis pas aveugle !":
-            self.replique="Alors je suppose que tu sauras trouver les clés tout seul !"
-            self.controleur.entitees[2].inventaire.ramasse_item(self.inventaire.get_clee("Porte_entree_encombrant_5")) #On refile quand même au joueur la clé dont il a besoin
+            ID_clee = self.inventaire.get_clee("Porte_entree_encombrant_5")
+            self.inventaire.drop(None,ID_clee)
+            self.controleur.entitees[2].inventaire.ramasse_item(ID_clee) #On refile quand même au joueur la clé dont il a besoin
             self.repliques = [" "]
         elif replique == " ":
             self.appreciations[0]-= 0.5
@@ -6864,9 +6917,6 @@ class Inventaire:
         self.armure = None #L'armure équipée
         self.haume = None #Le haume équipé
         self.anneau = [None]*nb_doigts #Les anneaux équipés
-        self.cat_courante = 0
-        self.item_courant = 0
-        self.profondeur = 0
         self.controleur = None
 
     def active(self,controleur):
@@ -6896,25 +6946,13 @@ class Inventaire:
         item.position = None
         self.items[item.get_classe()].append(item.ID)
 
-    def utilise_item(self,agissant):
-        """
-        Fonction qui utilise l'item actuellement sélectionné dans l'inventaire
-        En sortie : Rien
-        """
-        ID_item = self.get_item_courant()
-        item = self.controleur.get_entitee(ID_item)
-        if isinstance(item,consommable):
-            item.utilise(agissant)
-
-    def utilise_courant(self,proprietaire):
+    def utilise_item(self,ID_item):
         """Appelé en appuyant sur la touche espace, utilise l'item actuellement sélectionné."""
         ###L'utilisation varie beaucoup selon le type d'item :
-        
-        ID_item = self.get_item_courant()
         if ID_item != None:
             item = self.controleur.get_entitee(ID_item)
             if isinstance(item,Consommable): #Un consommable se consomme (si c'est un parchemin, l'activation peut échouer)
-                item.utilise(proprietaire)
+                item.utilise(self.controleur.get_entitee(self.possesseur))
             elif isinstance(item,Arme): #Un équipable s'équipe. Il y a certaines conditions.
                 self.set_arme()
             elif isinstance(item,Bouclier):
@@ -7049,6 +7087,77 @@ class Inventaire:
                 items.append(self.controleur.get_entitee(ID))
         return items
 
+    def nettoie_item(self): #Méthode appelée à chaque fin de tour pour supprimer les items retirés ou utilisés.
+        for cat in range(10): #On parcourt les catégories
+            items = self.items[self.kiiz[cat]]
+            for nb_item in range(len(items)-1,-1,-1): #On parcourt les items
+                ID_item = items[nb_item]
+                item = self.controleur.get_entitee(ID_item)
+                if item.position != None or item.etat == "brisé": #S'il a été lancé ou n'est plus en état
+                    items.remove(ID_item)
+
+                    if self.arme == ID_item :
+                        self.arme = None
+                    elif self.bouclier == ID_item :
+                        self.bouclier = None
+                    elif self.armure == ID_item :
+                        self.armure = None
+                    elif self.haume == ID_item :
+                        self.haume = None
+                    else :
+                        for doigt in range(len(self.anneau)):
+                            if self.anneau[doigt] == ID_item :
+                                self.anneau[doigt] = None #Quel genre d'imbécile briserait ou lancerait son équippement ? Enfin...
+
+    def drop_all(self,position):
+        items = []
+        for cat_item in self.kiiz : #On drop aussi les cadavres et les oeufs
+            items += self.items[cat_item]
+            self.items[cat_item] = []
+        for ID_item in items :
+            item = self.controleur.get_entitee(ID_item)
+            item.position = position
+
+    def drop(self,position,ID_item):
+        for cat_item in self.kiiz :
+            if ID_item in self.items[cat_item]:
+                item = self.controleur.get_entitee(ID_item)
+                item.position = position
+                self.items[cat_item].remove(ID_item)
+
+    def debut_tour(self):
+        items = []
+        for cat_item in [Potion,Parchemin,Cle,Arme,Bouclier,Armure,Haume,Anneau,Projectile] : #On sépare les 'vrais' items des faux.
+            items += self.items[cat_item]
+        for ID_item in items :
+            item = self.controleur.get_entitee(ID_item)
+            item.debut_tour()
+        #On ne manipule pas les cadavres
+        for ID_oeuf in self.items[Oeuf]: #Mais les oeufs incubent !
+            oeuf = self.controleur.get_entitee(ID_oeuf)
+            hatch = trouve_skill(oeuf.classe_principale,Hatching)
+            if hatch != None:
+                if hatch.utilise(): #Et peuvent même éclore !
+                    self.controleur.fait_eclore(oeuf,self.possesseur)
+
+    def fin_tour(self):
+        items = []
+        for item in [Potion,Parchemin,Cle,Arme,Bouclier,Armure,Haume,Anneau,Projectile] : #On sépare les 'vrais' items des faux.
+            items += self.items[item]
+        for ID_item in items :
+            item = self.controleur.get_entitee(ID_item)
+            item.fin_tour() #Moins de choses à faire à la fin du tour.
+        self.nettoie_item()
+
+class Sac_a_dos(Inventaire): #L'inventaire du joueur
+
+    def __init__(self):
+        Inventaire.__init__(self,2,10)
+        self.cat_courante = 0
+        self.item_courant = 0
+        self.profondeur = 0
+
+    #La principale différence est la notion d'item courant, et tout ce qui tourne autour
     def get_item_courant(self):
         cat = self.items[self.kiiz[self.cat_courante]]
         if self.item_courant < len(cat):
@@ -7056,6 +7165,42 @@ class Inventaire:
         else:
             item_courant = None
         return item_courant
+
+    def deplace(self,direction):
+        res = False
+        if direction == IN and self.profondeur <= 1:
+            self.profondeur += 1
+        elif direction == OUT:
+            if self.profondeur == 0:
+                res = True
+            else:
+                self.profondeur -=1
+        elif direction == BAS:
+            if self.profondeur == 0:
+                self.cat_courante += 1
+                if self.cat_courante >= 10:
+                    self.cat_courante = 0
+                self.item_courant = 0
+            elif self.profondeur == 1:
+                self.item_courant += 1
+                if self.item_courant >= len(self.items[self.kiiz[self.cat_courante]]):
+                    self.item_courant = 0
+        elif direction == HAUT:
+            if self.profondeur == 0:
+                self.cat_courante -= 1
+                if self.cat_courante < 0:
+                    self.cat_courante = 9
+                self.item_courant = 0
+            elif self.profondeur == 1:
+                self.item_courant -= 1
+                if self.item_courant < 0:
+                    self.item_courant = len(self.items[self.kiiz[self.cat_courante]])-1
+        return res
+
+    def utilise_courant(self):
+        """Appelé en appuyant sur la touche espace, utilise l'item actuellement sélectionné."""
+        ID_item = self.get_item_courant()
+        self.utilise_item(ID_item)
 
     def nettoie_item(self): #Méthode appelée à chaque fin de tour pour supprimer les items retirés ou utilisés.
         for cat in range(10): #On parcourt les catégories
@@ -7093,75 +7238,11 @@ class Inventaire:
                 self.item_courant = 0
                 self.profondeur = 0
 
-    def deplace(self,direction):
-        res = False
-        if direction == IN and self.profondeur <= 1:
-            self.profondeur += 1
-        elif direction == OUT:
-            if self.profondeur == 0:
-                res = True
-            else:
-                self.profondeur -=1
-        elif direction == BAS:
-            if self.profondeur == 0:
-                self.cat_courante += 1
-                if self.cat_courante >= 10:
-                    self.cat_courante = 0
-                self.item_courant = 0
-            elif self.profondeur == 1:
-                self.item_courant += 1
-                if self.item_courant >= len(self.items[self.kiiz[self.cat_courante]]):
-                    self.item_courant = 0
-        elif direction == HAUT:
-            if self.profondeur == 0:
-                self.cat_courante -= 1
-                if self.cat_courante < 0:
-                    self.cat_courante = 9
-                self.item_courant = 0
-            elif self.profondeur == 1:
-                self.item_courant -= 1
-                if self.item_courant < 0:
-                    self.item_courant = len(self.items[self.kiiz[self.cat_courante]])-1
-        return res
-
-    def drop_all(self,position):
-        items = []
-        for cat_item in self.kiiz : #On drop aussi les cadavres et les oeufs
-            items += self.items[cat_item]
-        for ID_item in items :
-            item = self.controleur.get_entitee(ID_item)
-            item.position = position
-
-    def drop(self,position):
+    def drop_courant(self,position):
         cat = self.items[self.kiiz[self.cat_courante]]
         if cat != []:
             ID_item = cat[self.item_courant]
-            item = self.controleur.get_entitee(ID_item)
-            item.position = position
-
-    def debut_tour(self):
-        items = []
-        for cat_item in [Potion,Parchemin,Cle,Arme,Bouclier,Armure,Haume,Anneau,Projectile] : #On sépare les 'vrais' items des faux.
-            items += self.items[cat_item]
-        for ID_item in items :
-            item = self.controleur.get_entitee(ID_item)
-            item.debut_tour()
-        #On ne manipule pas les cadavres
-        for ID_oeuf in self.items[Oeuf]: #Mais les oeufs incubent !
-            oeuf = self.controleur.get_entitee(ID_oeuf)
-            hatch = trouve_skill(oeuf.classe_principale,Hatching)
-            if hatch != None:
-                if hatch.utilise(): #Et peuvent même éclore !
-                    self.controleur.fait_eclore(oeuf,self.possesseur)
-
-    def fin_tour(self):
-        items = []
-        for item in [Potion,Parchemin,Cle,Arme,Bouclier,Armure,Haume,Anneau,Projectile] : #On sépare les 'vrais' items des faux.
-            items += self.items[item]
-        for ID_item in items :
-            item = self.controleur.get_entitee(ID_item)
-            item.fin_tour() #Moins de choses à faire à la fin du tour.
-        self.nettoie_item()
+            self.drop(position,ID_item)
 
 class Esprit :
     """La classe des esprits, qui manipulent les agisants."""
@@ -7952,7 +8033,7 @@ class Esprit_humain(Esprit_type):
             if humain.position in pos_cibles: #Tout va bien, on y est ! On peut combattre, par exemple.
                 #Tout le monde attaque au corps à corps quand ils en ont l'occasion (sauf la peureuse, qui fuit)
                 position = humain.get_position()
-                case = self.vue[position[0]][position[1]][position[2]] #On récupère le labyrinthe
+                case = humain.vue[position[1]][position[2]]
                 cases = []
                 dirs = []
                 importance = 0
@@ -8175,186 +8256,6 @@ class Esprit_slime(Esprit_type):
             self.controleur.get_entitee(corp).classe_principale = self.classe #C'est la plus grande force des slimes : progresser ensemble !
 
     #/!\ Faire un processus de décision propre aux slimes, qui prend en compte les capacités (communes heureusement) et la situation de chacun
-
-    def deplace_humain(self,ID_humain):
-        res = None
-        #Les mouvements des humains sont très alambiqués...
-        #D'abord, les consignes positionnelles :
-        humain = self.controleur.get_entitee(ID_humain)
-        if humain.identite == "joueur":
-            humain.recontrole()
-            if humain.skill_courant in [Skill_stomp,Skill_attaque]:
-                res = "attaque"
-            else:
-                res = "deplacement"
-        else:
-            if humain.mouvement == 0: #0 pour aller vers, et 1 pour chercher
-                if isinstance(humain.cible_deplacement,int):
-                    cible = self.controleur.get_entitee(humain.cible_deplacement).get_position()
-                    portee = 5
-                else:
-                    cible = humain.cible_deplacement
-                    portee = 3
-            else:
-                cible = humain.get_position()
-                portee = 10 #C'est juste pour qu'il puisse aller où il veut
-            pos_cibles = self.controleur.get_pos_touches(cible,portee,propagation = "C__S___",direction = None,traverse="tout",responsable=0)
-            if humain.position in pos_cibles: #Tout va bien, on y est ! On peut combattre, par exemple.
-                #Tout le monde attaque au corps à corps quand ils en ont l'occasion (sauf la peureuse, qui fuit)
-                position = humain.get_position()
-                case = self.vue[position[0]][position[1]][position[2]] #On récupère le labyrinthe
-                cases = []
-                dirs = []
-                importance = 0
-                for i in range(4):
-                    if case[7][i]:
-                        if case[7][i][0] in self.vue.keys():
-                            case_pot = self.vue[case[7][i][0]][case[7][i][1]][case[7][i][2]]
-                            entitees = case_pot[8]
-                            libre = True
-                            for ID_entitee in entitees:
-                                entitee = humain.controleur.get_entitee(ID_entitee)
-                                if not issubclass(entitee.get_classe(),Item): #Un agissant !
-                                    if case[7][i][0] == position[0] and ID_entitee in self.ennemis.keys() and humain.comportement_ennemis == 0: #Un ennemi ! Et le feu vert pour l'attaquer
-                                        if self.ennemis[ID_entitee] > importance:
-                                            importance = self.ennemis[ID_entitee]
-                                            humain.attaque(i)
-                                            res = "attaque"
-                                    elif case[7][i][0] == position[0] and not ID_entitee in self.corps.keys() and humain.comportement_neutres == 0: #Un neutre ! Et le feu vert pour l'attaquer
-                                        if importance == 0:
-                                            humain.attaque(i)
-                                            res = "attaque"
-                                    else: #Probablement un allié, ou un neutre
-                                        libre = False
-                            if libre:
-                                cases.append(case_pot)
-                                dirs.append(i)
-                if importance == 0: #On n'a pas d'ennemi à portée directe (ou on ne souhaite pas attaquer)
-                    if humain.comportement_ennemis == 2:
-                        res = "fuite"
-                    elif humain.identite in ["alchimiste","bombe_atomique"]: #Les deux capables d'attaquer à distance (attaques de zone)
-                        if humain.attaque_en_vue(): #Renvoie True et choisi la cible, la magie, et le skill s'il y a une cible en vue
-                            res = "attaque"
-                        else:
-                            res = "deplacement"
-                    elif humain.identite == "peste": #La soigneuse
-                        if humain.heal(): #Renvoie True et choisi la cible, la magie, et le skill s'il y a une cible en vue
-                            res = "soin"
-                        else:
-                            res = "deplacement"
-                    elif humain.identite == "peureuse": #La spécialiste du soutien
-                        if humain.boost(): #Renvoie True et choisi la cible, la magie, et le skill s'il y a une cible en vue
-                            res = "soutien"
-                        else:
-                            res = "deplacement"
-                    else: #Il ne reste plus que les bourrins
-                        res = "deplacement"
-                    if res in ["deplacement","fuite"] and humain.latence <= 0:
-                        if len(cases) == 0: #Pas de cases libres à proximité
-                            humain.skill_courant = None
-                        else :
-                            dir_choix = 2
-                            num_choix = 0
-                            distance = case[3]
-                            for i in range(len(cases)):
-                                if ((cases[i][3] > distance or (cases[i][3] == distance and cases[i][4] >= cases[num_choix][4])) and humain.comportement_ennemis == 0) or ((cases[i][3] < distance or (cases[i][3] == distance and cases[i][4] <= cases[num_choix][4])) and humain.comportement_ennemis == 2):
-                                    distance = cases[i][3]
-                                    dir_choix = dirs[i]
-                                    num_choix = i
-                            if distance == 0 : #Pas d'accès direct à une cible
-                                distance = case[4]
-                                meilleur_choix = False
-                                humain.skill_courant = None #Dans l'éventualité où on est déjà sur la meilleure case
-                                for i in range(len(cases)):
-                                    if (cases[i][4] > distance and humain.comportement_ennemis == 0) or (cases[i][4] > distance and humain.comportement_ennemis == 2):
-                                        meilleur_choix = True
-                                        distance = cases[i][4] #On prend le chemin avec des obstacles
-                                        dir_choix = dirs[i]
-                                if meilleur_choix:
-                                    humain.va(dir_choix)
-                                if distance == 0: #Pas d'accès du tout !
-                                    if len(dirs)>1: #On peut se permettre de choisir
-                                        if humain.dir_regard != None: #L'agissant regarde quelque part
-                                            dir_back = [HAUT,DROITE,BAS,GAUCHE][humain.dir_regard-2]
-                                            if dir_back in dirs: #On ne veut pas y retourner
-                                                dirs.remove(dir_back)
-                                    humain.va(dirs[random.randint(0,len(dirs)-1)]) #/!\ Ne pas retourner sur ses pas, c'est bien ! Aller vers les endroits inconnus, ce serait mieux. /!\
-                                    # ! Modifier pour avoir différents comportements !
-                            else : #Accès direct à une cible !
-                                humain.va(dir_choix)
-            else:
-                self.resoud(cible,10,5)
-                position = humain.get_position()
-                case = self.vue[position[0]][position[1]][position[2]]
-                cases = []
-                dirs = []
-                importance = 0
-                for i in range(4):
-                    if case[7][i]:
-                        if case[7][i][0] in self.vue.keys():
-                            case_pot = self.vue[case[7][i][0]][case[7][i][1]][case[7][i][2]]
-                            entitees = case_pot[8]
-                            libre = True
-                            for ID_entitee in entitees:
-                                entitee = humain.controleur.get_entitee(ID_entitee)
-                                if not issubclass(entitee.get_classe(),Item): #Un agissant !
-                                    if case[7][i][0] == position[0] and ID_entitee in self.ennemis.keys() and humain.comportement_ennemis == 0: #Un ennemi ! Et le feu vert pour l'attaquer
-                                        if self.ennemis[ID_entitee] > importance:
-                                            importance = self.ennemis[ID_entitee]
-                                            humain.attaque(i)
-                                            res = "attaque"
-                                    elif case[7][i][0] == position[0] and not ID_entitee in self.corps.keys() and humain.comportement_neutres == 0: #Un neutre ! Et le feu vert pour l'attaquer
-                                        if importance == 0:
-                                            humain.attaque(i)
-                                            res = "attaque"
-                                    else: #Probablement un allié, ou un neutre
-                                        libre = False
-                            if libre:
-                                cases.append(case_pot)
-                                dirs.append(i)
-                if importance == 0: #On n'a pas d'ennemi à portée directe (ou on ne souhaite pas attaquer)
-                    if humain.comportement_ennemis == 2:
-                        res = "fuite"
-                    elif humain.identite in ["alchimiste","bombe_atomique"]: #Les deux capables d'attaquer à distance (attaques de zone)
-                        if humain.attaque_en_vue(): #Renvoie True et choisi la cible, la magie, et le skill s'il y a une cible en vue
-                            res = "attaque"
-                        else:
-                            res = "deplacement"
-                    elif humain.identite == "peste": #La soigneuse
-                        if humain.heal(): #Renvoie True et choisi la cible, la magie, et le skill s'il y a une cible en vue
-                            res = "soin"
-                        else:
-                            res = "deplacement"
-                    elif humain.identite == "peureuse": #La spécialiste du soutien
-                        if humain.boost(): #Renvoie True et choisi la cible, la magie, et le skill s'il y a une cible en vue
-                            res = "soutien"
-                        else:
-                            res = "deplacement"
-                    else: #Il ne reste plus que les bourrins
-                        res = "deplacement"
-                    if res in ["deplacement","fuite"] and humain.latence <= 0:
-                        if len(cases) == 0: #Pas de cases libres à proximité
-                            humain.skill_courant = None
-                        else :
-                            dir_choix = 2
-                            num_choix = 0
-                            distance = case[5]
-                            for i in range(len(cases)):
-                                if cases[i][5] > distance:
-                                    distance = cases[i][5]
-                                    dir_choix = dirs[i]
-                                    num_choix = i
-                            if distance > 0 : #On connait le chemin pour aller à la cible
-                                humain.va(dir_choix)
-                            else:
-                                if len(dirs)>1: #On cherche la cible
-                                    if humain.dir_regard != None: #L'agissant regarde quelque part
-                                        dir_back = [HAUT,DROITE,BAS,GAUCHE][humain.dir_regard-2]
-                                        if dir_back in dirs: #On ne veut pas y retourner
-                                            dirs.remove(dir_back)
-                                humain.va(dirs[random.randint(0,len(dirs)-1)]) #/!\ Ne pas retourner sur ses pas, c'est bien ! Aller vers les endroits inconnus, ce serait mieux. /!\
-
-        return res
 
 
 

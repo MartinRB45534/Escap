@@ -37,8 +37,8 @@ Quelques nouvelles magies à créer :
 
 Étage combat : trois sentinelles aux trois points de passage
 Étage monstres : une sentinelle, un gobelin de base, un mage, deux guerriers, dans un dédale
-Étage portes (prison) : sentinelles, guerrier de plus haut niveau dans une salle (c'est un piège !), quelques monstres capturés ? (il manque encore des portes)
-Étage potions : guerriers, mages, un shaman, deux guerriers de plus haut niveau. (penser à modifier la générations)
+Étage portes (prison) : sentinelles, guerrier de plus haut niveau dans une salle (c'est un piège !), quelques monstres capturés ?
+Étage potions : guerriers, mages, un shaman, deux guerriers de plus haut niveau.
 Étage meutes : guerriers, mages, deux shamans, plein de gobelins de base dans les couloirs.
 Étage magie : tout !
 Étage items : tout, mais un peu moins, plus quelques gobelins équippés.
@@ -104,3 +104,9 @@ Garder une trace du code couleur, pour faciliter les modifications futures.
 
 Fonctionnement des dialogues/interractions :
 Du point de vue d'un joueur, les pnjs ont un dialogue par défaut (si le joueur les accoste sans raison) et des dialogues conditionnés (indiqués par un ! ou ? au dessus de leur tête).
+
+Quelques objets/skills obtenus dans des quètes :
+- La carte. Permet de consulter la vue de l'esprit (donc de tous les alliés) en mettant le jeu en pause.
+- La thélépathie. Permet de déclencher un dialogue avec un pnj qui n'est pas sur une case voisine.
+- La concentration de bataille. Quand elle est activée, le jeu se déroule en tour par tour (au sens où le joueur doit "terminer le tour" pour passer au suivant.
+En combinant les trois, le joueur peut donner des ordres plus précis aux pnjs ("déplace-toi d'une case à gauche" ou "utilise tel sort sur tel ennemi", au lieu de "suis-moi", "fuit", "combat" etc. où les détails sont gérés par l'esprit)
