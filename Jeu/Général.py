@@ -286,6 +286,19 @@ class Controleur():
         marchand = Marchand(("Étage 9 : équippement",2,0))
         self.ajoute_entitee(marchand)
         self.esprits["marchand"] = Esprit_humain(marchand.ID,self)
+        #On crée aussi quelques items :
+        #Pas d'item dans l'armurerie où est le marchand, il l'a déjà dévalisée !
+        #Dans la deuxième armurerie, une armure :
+        armure = Armure_tuto(("Étage 9 : équippement",5,9),1)
+        #Dans la troisième, une lance :
+        lance = Lance_tuto(("Étage 9 : équippement",20,3),1)
+        #Dans la quatrième, huit anneaux :
+        anneau_1 = Anneau_pv_tuto(("Étage 9 : équippement",20,3),1)
+        anneau_2 = Anneau_pm_tuto(("Étage 9 : équippement",20,3),1)
+        anneau_3 = Anneau_pv_tuto(("Étage 9 : équippement",20,3),1)
+        anneau_4 = Anneau_pv_tuto(("Étage 9 : équippement",20,3),1)
+        anneau_5 = Anneau_pv_tuto(("Étage 9 : équippement",20,3),1)
+        anneau_6 = Anneau_pv_tuto(("Étage 9 : équippement",20,3),1)
         paterns9 = [Patern(("Étage 9 : équippement",0,0),7,4,[("Étage 9 : équippement",5,3)],["Porte_première_armurerie_9"]),
                     Patern(("Étage 9 : équippement",5,5),4,5,[("Étage 9 : équippement",2,0)],["Porte_deuxième_armurerie_9"]),
                     Patern(("Étage 9 : équippement",15,3),6,5,[("Étage 9 : équippement",0,3)],["Porte_troisième_armurerie_9"]),
@@ -301,10 +314,10 @@ class Controleur():
 
         #On crée le dixième étage
         paterns10 = [Patern(("Étage 10 : Boss",0,0),25,19,[],[]),
-                     Patern(("Étage 10 : Boss",10,0),10,19,[("Étage 10 : Boss",0,9)],["Porte_boss_10"]),
+                     Patern(("Étage 10 : Boss",10,0),10,19,[("Étage 10 : Boss",0,9)],["Porte_boss_10"],1,1,FEU),
                      Patern(("Étage 10 : Boss",20,7),3,5,[("Étage 10 : Boss",0,2)],["Porte_dérobée_10"])]
         self.labs["Étage 10 : Boss"]=Labyrinthe("Étage 10 : Boss",25,19,("Étage 10 : Boss",0,0),paterns10,1,1,TERRE,0.1)
-        self.construit_escalier(("Étage 9 : équippement",4,0),("Étage 10 : Boss",5,0),BAS,HAUT) #/!\ Modifier le layout de ce niveau !
+        self.construit_escalier(("Étage 9 : équippement",4,0),("Étage 10 : Boss",5,0),BAS,HAUT) #/!\ Rajouter les ennemis !
 
         #On lance la cinématique :
         #À rajouter
@@ -522,7 +535,7 @@ class Controleur():
                     agissant.inventaire.ramasse_item(item)
                     if isinstance(agissant,Joueur):
                         affichage = agissant.affichage
-                        affichage.message("Tu as volé avec succès un "+item+" à "+victime+" !")
+                        affichage.message(f"Tu as volé avec succès un {item} à {victime} !")
                 else :
                     possesseur.persecuteurs.append(agissant.ID)
                 #refaire les autres vols sur le même modèle /!\
@@ -2357,18 +2370,34 @@ class Agissant(Entitee): #Tout agissant est un cadavre, tout cadavre n'agit pas.
             affinite = self.aff_o
             for taux in self.taux_aff_o.values():
                 affinite *= taux
+            for equippement in self.inventaire.get_equippement():
+                item = self.controleur.get_entitee(equippement)
+                if isinstance(item,Tenebreux):
+                    affinite *= item.taux_aff_ombre
         elif element == FEU :
             affinite = self.aff_f
             for taux in self.taux_aff_f.values():
                 affinite *= taux
+            for equippement in self.inventaire.get_equippement():
+                item = self.controleur.get_entitee(equippement)
+                if isinstance(item,Incandescant):
+                    affinite *= item.taux_aff_feu
         elif element == TERRE :
             affinite = self.aff_t
             for taux in self.taux_aff_t.values():
                 affinite *= taux
+            for equippement in self.inventaire.get_equippement():
+                item = self.controleur.get_entitee(equippement)
+                if isinstance(item,Rocheux):
+                    affinite *= item.taux_aff_terre
         elif element == GLACE :
             affinite = self.aff_g
             for taux in self.taux_aff_g.values():
                 affinite *= taux
+            for equippement in self.inventaire.get_equippement():
+                item = self.controleur.get_entitee(equippement)
+                if isinstance(item,Neigeux):
+                    affinite *= item.taux_aff_glace
         else :
             print(element + "... quel est donc cet élément mystérieux ?")
         return affinite
@@ -2418,11 +2447,10 @@ class Agissant(Entitee): #Tout agissant est un cadavre, tout cadavre n'agit pas.
         for taux in self.taux_stats.values() :
             regen_pv *= taux
         # /!\ Rajouter les effets négatifs du skill de magie infinie /!\
-        items = []
         for equippement in self.inventaire.get_equippement():
             item = self.controleur.get_entitee(equippement)
-            if isinstance(item,Regeneration_pv):
-                regen_pv *= item.get_taux()
+            if isinstance(item,Reparateur):
+                regen_pv = item.regen_pv(regen_pv)
         return regen_pv
 
     def get_total_regen_pm(self):
@@ -2431,11 +2459,10 @@ class Agissant(Entitee): #Tout agissant est un cadavre, tout cadavre n'agit pas.
             regen_pm *= taux
         for taux in self.taux_stats.values() :
             regen_pm *= taux
-        items = []
         for equippement in self.inventaire.get_equippement():
             item = self.controleur.get_entitee(equippement)
-            if isinstance(item,Regeneration_pm):
-                regen_pm *= item.get_taux()
+            if isinstance(item,Reparateur_magique):
+                regen_pm = item.regen_pm(regen_pm)
         return regen_pm
 
     def get_vitesse(self):
@@ -2444,6 +2471,10 @@ class Agissant(Entitee): #Tout agissant est un cadavre, tout cadavre n'agit pas.
             vitesse *= taux
         for taux in self.taux_stats.values() :
             vitesse *= taux
+        for equippement in self.inventaire.get_equippement():
+            item = self.controleur.get_entitee(equippement)
+            if isinstance(item,Accelerateur):
+                vitesse = item.augmente_vitesse(vitesse)
         return vitesse
 
     def get_priorite(self):
@@ -2452,6 +2483,10 @@ class Agissant(Entitee): #Tout agissant est un cadavre, tout cadavre n'agit pas.
             priorite *= taux
         for taux in self.taux_stats.values() :
             priorite *= taux
+        for equippement in self.inventaire.get_equippement():
+            item = self.controleur.get_entitee(equippement)
+            if isinstance(item,Anoblisseur):
+                priorite *= item.augmente_priorite(priorite)
         return priorite
 
     def subit(self,degats,element=TERRE,ID=0): #L'ID 0 ne correspond à personne
@@ -5827,7 +5862,7 @@ class Parchemin(Consommable):
             agissant.ajoute_effet(self.effet)
             self.etat = "brisé"
         elif isinstance(agissant,Joueur):
-            agissant.affichage.message(Message(["Tu n'as pas assez de mana pour utiliser ce parchemin"]))
+            agissant.affichage.message("Tu n'as pas assez de mana pour utiliser ce parchemin.")
 
     def get_classe(self):
         return Parchemin
@@ -6173,40 +6208,191 @@ class Poly_instakill(Poly_de_cours):
 
 class Equipement(Item):
     """La classe des items qui peuvent être portés. Sont toujours actifs tant qu'ils sont portés."""
-    pass
+    def __init__(self,position):
+        Item.__init__(self,position)
+        self.taux_stats = {}
+
+    def equippe(self,agissant):
+        pass
+
+    def desequippe(self):
+        for cause in self.taux_stats.keys():
+            if cause == "incompatibilité porteur":
+                self.taux_stats.remove(cause)
+
+class Equipement_tribal(Equipement):
+    def __init__(self,position,espece,taux):
+        self.espece = espece
+        self.taux = taux
+
+    def equippe(self,agissant):
+        if not self.espece in agissant.especes :
+            self.taux_stats["incompatibilité porteur"] = self.taux
+            if isinstance(agissant,Joueur):
+                agissant.affichage.message("Cet équipement est destiné aux {self.espece}s, donc ses stats ont été réduites.")
 
 class Defensif(Equipement):
     """La classe des équipements défensifs. Réduit les dégats."""
-    def __init__(self,position,taux_degats):
-        Item.__init__(self,position)
-        self.taux_degats = taux_degats
-        self.taux_stats = {}
 
     def intercepte(self,attaque):
+        pass
+
+class Defensif_proportion(Defensif):
+    def __init__(self,position,taux_degats):
+        Equipement.__init__(self,position)
+        self.taux_degats = taux_degats
+
+    def intercepte(self,attaque)
+        degats_bloques = self.taux_degats
         for taux in self.taux_stats.values():
-            attaque.degats *= taux
-        attaque.degats *= self.taux_degats
+            degats_bloques *= taux
+        attaque.degats *= (1-degats_bloques)
 
-class Regeneration_pm(Equipement):
-    """La classe des équipements régénérateurs de mana. Augmentent les pm récupérés à chaque tour."""
-    def __init__(self,position,taux_regen_pm):
+class Defensif_seuil(Defensif):
+    def __init__(self,position,degats):
+        Equipement.__init__(self,position)
+        self.degats = degats
+
+    def intercepte(self,attaque)
+        degats = self.degats
+        for taux in self.taux_stats.values():
+            degats *= taux
+        if attaque.degats <= degats: #On bloque les attaques trop faibles
+            attaque.degats = 0
+
+class Defensif_plafond(Defensif):
+    def __init__(self,position,degats):
+        Equipement.__init__(self,position)
+        self.degats = degats
+
+    def intercepte(self,attaque)
+        degats = self.degats
+        for taux in self.taux_stats.values():
+            degats *= 1/taux
+        if attaque.degats > degats: #On limite la force des attaques
+            attaque.degats = degats
+
+class Defensif_valeur(Defensif):
+    def __init__(self,position,degats):
+        Equipement.__init__(self,position)
+        self.degats = degats
+
+    def intercepte(self,attaque)
+        degats = self.degats
+        for taux in self.taux_stats.values():
+            degats *= taux
+        if attaque.degats > degats: #On limite la force des attaques
+            attaque.degats -= degats
+        else:
+            attaque.degats = 0
+#On suppose pour l'instant qu'un item défensif n'appartient qu'à une seule de ces catégories
+
+class Reparateur_magique(Equipement):
+    """La classe des équipements qui régénèrent les pm."""
+    def regen_pm(self,regen_pm):
+        pass
+
+class Pompe_a_pm(Reparateur): #Régénère une quantité fixe de pm
+    def __init__(self,position,pm):
         Item.__init__(self,position)
-        self.taux_regen_pm = taux_regen_pm
+        self.pm = pm
 
-    def get_taux(self):
-        return self.taux_regen_pm
+    def regen_pm(self,regen_pm):
+        pm = self.pm
+        for taux in self.taux_stats.values():
+            pm *= taux
+        return regen_pm + pm
 
-class Regeneration_pv(Equipement):
-    """La classe des équipements régénérateurs de vie. Augmentent les pv récupérés à chaque tour."""
-    def __init__(self,position,taux_regen_pv):
+class Renforce_regen_pm(Reparateur): #Démultiplie l'efficacité de la régénération
+    def __init__(self,position,taux_pm):
         Item.__init__(self,position)
-        self.taux_regen_pv = taux_regen_pv
+        self.taux_pm = taux_pm
 
-    def get_taux(self):
-        return self.taux_regen_pv
+    def regen_pm(self,regen_pm):
+        taux_pm = self.pm
+        for taux in self.taux_stats.values():
+            taux_pm *= taux
+        return regen_pm * taux_pm
+
+class Reparateur(Equipement):
+    """La classe des équipements qui régénèrent les pv."""
+    def regen_pv(self,regen_pv):
+        pass
+
+class Pompe_a_pv(Reparateur): #Régénère une quantité fixe de pm
+    def __init__(self,position,pv):
+        Item.__init__(self,position)
+        self.pv = pv
+
+    def regen_pv(self,regen_pv):
+        pv = self.pv
+        for taux in self.taux_stats.values():
+            pv *= taux
+        return regen_pv + pv
+
+class Renforce_regen_pv(Reparateur): #Démultiplie l'efficacité de la régénération
+    def __init__(self,position,taux_pv):
+        Item.__init__(self,position)
+        self.taux_pv = taux_pv
+
+    def regen_pv(self,regen_pv):
+        taux_pv = self.pv
+        for taux in self.taux_stats.values():
+            taux_pv *= taux
+        return regen_pv * taux_pv
+
+class Accelerateur(Equipement):
+    """La classe des équipements qui augmentent la vitesse."""
+    def __init__(self,position,taux_vitesse):
+        Item.__init__(self,position)
+        self.taux_vitesse = taux_vitesse
+
+    def augmente_vitesse(self,vitesse):
+        taux_vitesse = self.taux_vitesse
+        for taux in self.taux_stats.values():
+            taux_vitesse *= taux
+        return vitesse * taux_vitesse
+
+class Anoblisseur(Equipement):
+    """La classe des équipements qui augmentent la priorité."""
+    def __init__(self,position,taux_priorite):
+        Item.__init__(self,position)
+        self.taux_priorite = taux_priorite
+
+    def augmente_priorite(self,priorite):
+        taux_priorite = self.taux_priorite
+        for taux in self.taux_stats.values():
+            taux_priorite *= taux
+        return priorite * taux_priorite
+
+#/!\ Rajouter des items pour augmenter la force ? Une pièce d'équippement ne modifierait pas la force physique de quelqu'un (comment ça, le reste du jeu n'est pas cohérent de toute façon ?) et les armes sont déjà là pour ça.
+
+class Rocheux(Equipement):
+    """La classe des équipements qui augmentent l'affinité à la terre."""
+    def __init__(self,position,taux_aff_terre):
+        Item.__init__(self,position)
+        self.taux_aff_terre = taux_aff_terre
+
+class Incandescant(Equipement):
+    """La classe des équipements qui augmentent l'affinité au feu."""
+    def __init__(self,position,taux_aff_feu):
+        Item.__init__(self,position)
+        self.taux_aff_feu = taux_aff_feu
+
+class Neigeux(Equipement): #"Neigeux" ? "Glaçant" ? "Glacial" ?
+    """La classe des équipements qui augmentent l'affinité à la glace."""
+    def __init__(self,position,taux_aff_glace):
+        Item.__init__(self,position)
+        self.taux_aff_glace = taux_aff_glace
+
+class Tenebreux(Equipement):
+    """La classe des équipements qui augmentent l'affinité à l'ombre."""
+    def __init__(self,position,taux_aff_ombre):
+        Item.__init__(self,position)
+        self.taux_aff_ombre = taux_aff_ombre
 
 class Armure(Equipement):
-    """La classe des équipements défensifs de type armure. On ne peut en porter qu'une à la fois. Réduit les dégats."""
+    """La classe des équipements défensifs de type armure. On ne peut en porter qu'une à la fois."""
     def __init__(self,position):
         Item.__init__(self,position)
         self.poids = 10 #C'est lourd !
@@ -6221,14 +6407,14 @@ class Armure(Equipement):
     def get_skin(self):
         return SKIN_ARMURE
 
-class Armure_type(Armure,Defensif):
+class Armure_type(Armure,Defensif_proportion):
     """Une armure type : défend contre les attaques."""
     def __init__(self,position,taux_degats):
         Armure.__init__(self,position)
-        Defensif.__init__(self,position,taux_degats)
+        Defensif_proportion.__init__(self,position,taux_degats)
 
 class Haume(Equipement):
-    """La classe des équipements défensifs de type haume. On ne peut en porter qu'un à la fois. Réduit les dégats."""
+    """La classe des équipements défensifs de type haume. On ne peut en porter qu'un à la fois."""
     def __init__(self,position):
         Item.__init__(self,position)
         self.poids = 3 #C'est plutôt léger.
@@ -6243,11 +6429,11 @@ class Haume(Equipement):
     def get_skin(self):
         return SKIN_CASQUE
 
-class Haume_type(Haume,Defensif):
+class Haume_type(Haume,Defensif_proportion):
     """Un haume type : défend contre les attaques."""
     def __init__(self,position,taux_degats):
         Haume.__init__(self,position)
-        Defensif.__init__(self,position,taux_degats)
+        Defensif_proportion.__init__(self,position,taux_degats)
 
 class Anneau(Equipement):
     """La classe des équipements de type anneau. Le nombre d'anneaux qu'on peut porter dépend de l'espèce. Les anneaux peuvent avoir des effets très différends (magiques pour la plupart)."""
@@ -6265,19 +6451,19 @@ class Anneau(Equipement):
     def get_skin(self):
         return SKIN_ANNEAU
 
-class Anneau_magique(Anneau,Regeneration_pm):
+class Anneau_magique(Anneau,Renforce_regen_pm):
     """Un anneau magique : augmente la régénération des pm."""
     def __init__(self,position,taux_regen):
         Anneau.__init__(self,position)
-        Regeneration_pm.__init__(self,position,taux_regen)
+        Renforce_regen_pm.__init__(self,position,taux_regen)
 
-class Anneau_de_vitalite(Anneau,Regeneration_pv):
+class Anneau_de_vitalite(Anneau,Renforce_regen_pv):
     """Un anneau un peu moins magique : augmente la régénération des pv."""
     def __init__(self,position,taux_regen):
         Anneau.__init__(self,position)
-        Regeneration_pv.__init__(self,position,taux_regen)
+        Renforce_regen_pv.__init__(self,position,taux_regen)
 
-class Degainable(Item):
+class Degainable(Equipement):
     """La classe des items qui doivent être dégainés. Sont utilisés en complément d'un skill, n'ont pas d'effet le reste du temps."""
     pass
 
@@ -6712,7 +6898,7 @@ class Cree_fleche_de_base_skill(Cree_item):
             print("Euh... Quoi ? Qu'est-ce qui m'est arrivé ?")
             item = None
         else:
-            niveau = skill.utilise(0.01) #L'xp gagné. En faire un variable /!\
+            niveau = skill.utilise(0.01) #L'xp gagné. En faire une variable /!\
             item = self.item(niveau,None)
             agissant.controleur.ajoute_entitee(item)
         return item
@@ -6732,7 +6918,7 @@ class Cree_fleche_percante_skill(Cree_item):
             print("Euh... Quoi ? Qu'est-ce qui m'est arrivé ?")
             item = None
         else:
-            niveau = skill.utilise(0.01) #L'xp gagné. En faire un variable /!\
+            niveau = skill.utilise(0.01) #L'xp gagné. En faire une variable /!\
             item = self.item(niveau,None)
             agissant.controleur.ajoute_entitee(item)
         return item
@@ -6752,7 +6938,7 @@ class Cree_fleche_fantome_skill(Cree_item):
             print("Euh... Quoi ? Qu'est-ce qui m'est arrivé ?")
             item = None
         else:
-            niveau = skill.utilise(0.01) #L'xp gagné. En faire un variable /!\
+            niveau = skill.utilise(0.01) #L'xp gagné. En faire une variable /!\
             item = self.item(niveau,None)
             agissant.controleur.ajoute_entitee(item)
         return item
@@ -6772,7 +6958,7 @@ class Cree_fleche_lourde_skill(Cree_item):
             print("Euh... Quoi ? Qu'est-ce qui m'est arrivé ?")
             item = None
         else:
-            niveau = skill.utilise(0.01) #L'xp gagné. En faire un variable /!\
+            niveau = skill.utilise(0.01) #L'xp gagné. En faire une variable /!\
             item = self.item(niveau,None)
             agissant.controleur.ajoute_entitee(item)
         return item
@@ -6792,7 +6978,7 @@ class Cree_fleche_legere_skill(Cree_item):
             print("Euh... Quoi ? Qu'est-ce qui m'est arrivé ?")
             item = None
         else:
-            niveau = skill.utilise(0.01) #L'xp gagné. En faire un variable /!\
+            niveau = skill.utilise(0.01) #L'xp gagné. En faire une variable /!\
             item = self.item(niveau,None)
             agissant.controleur.ajoute_entitee(item)
         return item
@@ -6815,19 +7001,19 @@ class Cree_fleche_explosive_skill(Cree_item):
         elif skill_fleche != None:
             if skill_explosif != None:
                 if skill_fleche.niveau > skill_explosif.niveau :
-                    niveau = skill_fleche.utilise(0.01) #L'xp gagné. En faire un variable /!\
+                    niveau = skill_fleche.utilise(0.01) #L'xp gagné. En faire une variable /!\
                     item = self.item(niveau,None)
                     agissant.controleur.ajoute_entitee(item)
                 else:
-                    niveau = skill_explosif.utilise(0.01) #L'xp gagné. En faire un variable /!\
+                    niveau = skill_explosif.utilise(0.01) #L'xp gagné. En faire une variable /!\
                     item = self.item(niveau,None)
                     agissant.controleur.ajoute_entitee(item)
             else:
-                niveau = skill_fleche.utilise(0.01) #L'xp gagné. En faire un variable /!\
+                niveau = skill_fleche.utilise(0.01) #L'xp gagné. En faire une variable /!\
                 item = self.item(niveau,None)
                 agissant.controleur.ajoute_entitee(item)
         else:
-            niveau = skill_explosif.utilise(0.01) #L'xp gagné. En faire un variable /!\
+            niveau = skill_explosif.utilise(0.01) #L'xp gagné. En faire une variable /!\
             item = self.item(niveau,None)
             agissant.controleur.ajoute_entitee(item)
         return item
@@ -6847,7 +7033,7 @@ class Cree_charge_de_base_skill(Cree_item):
             print("Euh... Quoi ? Qu'est-ce qui m'est arrivé ?")
             item = None
         else:
-            niveau = skill.utilise(0.01) #L'xp gagné. En faire un variable /!\
+            niveau = skill.utilise(0.01) #L'xp gagné. En faire une variable /!\
             item = self.item(niveau,None)
             agissant.controleur.ajoute_entitee(item)
         return item
@@ -6867,7 +7053,7 @@ class Cree_charge_lourde_skill(Cree_item):
             print("Euh... Quoi ? Qu'est-ce qui m'est arrivé ?")
             item = None
         else:
-            niveau = skill.utilise(0.01) #L'xp gagné. En faire un variable /!\
+            niveau = skill.utilise(0.01) #L'xp gagné. En faire une variable /!\
             item = self.item(niveau,None)
             agissant.controleur.ajoute_entitee(item)
         return item
@@ -6887,13 +7073,108 @@ class Cree_charge_etendue_skill(Cree_item):
             print("Euh... Quoi ? Qu'est-ce qui m'est arrivé ?")
             item = None
         else:
-            niveau = skill.utilise(0.01) #L'xp gagné. En faire un variable /!\
+            niveau = skill.utilise(0.01) #L'xp gagné. En faire une variable /!\
             item = self.item(niveau,None)
             agissant.controleur.ajoute_entitee(item)
         return item
 
     def get_skin(self):
         return SKIN_CREE_CHARGE_ETENDUE
+
+#Quelques items pour le tutoriel :
+
+class Epee_de_gobelin(Epee,Equipement_tribal):
+    """L'épée des gobelins de base. Ils en sont équippés à partir du niveau 5 (peut-être plus ?) mais on peut en trouver à l'abandon dans le labyrinthe."""
+    def __init__(self,position,niveau):
+        Arme.__init__(self,position,TERRE,tranchant_de_gobelin[niveau-1],portee_epee_gobelin[niveau-1])
+        Equipement_tribal.__init__(self,position,"gobelin",taux_refus_epee_gobelin[niveau-1])
+        self.poids = poids_epee_gobelin[niveau-1]
+        self.frottements = frottements_epee_gobelin[niveau-1]
+        self.niveau = niveau
+
+    def get_description(self,observation):
+        return ["Une épée","Elle est petite et mal entretenue"]
+
+    def get_skin(self):
+        return SKIN_EPEE
+
+class Lance_de_gobelin(Lance,Equipement_tribal):
+    """La lance des sentinelles gobelins. Ils en sont équippés à partir du niveau 3 (peut-être moins ?) mais on peut en trouver à l'abandon dans le labyrinthe."""
+    def __init__(self,position,niveau):
+        Arme.__init__(self,position,TERRE,tranchant_lance_gobelin[niveau-1],portee_lance_gobelin[niveau-1])
+        Equipement_tribal.__init__(self,position,"gobelin",taux_refus_lance_gobelin[niveau-1])
+        self.poids = poids_lance_gobelin[niveau-1]
+        self.frottements = frottements_lance_gobelin[niveau-1]
+        self.niveau = niveau
+
+    def get_description(self,observation):
+        return ["Une lance","Elle est petite et un peu rouillée"]
+
+    def get_skin(self):
+        return SKIN_LANCE
+
+class Cimetere_de_gobelin(Epee,Equipement_tribal):
+    """L'épée des guerriers gobelins. Ils en sont équippés à partir du niveau 3 (peut-être moins ?) mais on peut en trouver à l'abandon dans le labyrinthe."""
+    def __init__(self,position,niveau):
+        Arme.__init__(self,position,TERRE,tranchant_cimetere_gobelin[niveau-1],portee_cimetere_gobelin[niveau-1])
+        Equipement_tribal.__init__(self,position,"gobelin",taux_refus_cimetere_gobelin[niveau-1])
+        self.poids = poids_cimetere_gobelin[niveau-1]
+        self.frottements = frottements_cimetere_gobelin[niveau-1]
+        self.niveau = niveau
+
+    def get_description(self,observation):
+        return ["Une épée","Il y a du sang sur la lame"]
+
+    def get_skin(self):
+        return SKIN_EPEE
+
+class Armure_de_gobelin(Armure,Defensif_proportion,Equipement_tribal):
+    """L'armure des sentinelles gobelins. Ils en sont équippés à partir du niveau 3 (peut-être moins ?) mais on peut en trouver à l'abandon dans le labyrinthe."""
+    def __init__(self,position):
+        Defensif_proportion.__init__(self,position,taux_degats_armure_gobelin[niveau-1])
+        Equipement_tribal.__init__(self,position,"gobelin",taux_refus_armure_gobelin[niveau-1])
+        self.poids = poids_armure_gobelin[niveau-1]
+        self.frottements = frottements_armure_gobelin[niveau-1]
+        self.niveau = niveau
+
+    def get_description(self,observation):
+        return ["Une armure","Elle a rétréci au lavage ?"]
+
+    def get_skin(self):
+        return SKIN_ARMURE
+
+class Haume_de_gobelin(Haume,Defensif_proportion,Equipement_tribal):
+    """Le casque des sentinelles gobelins. Ils en sont équippés à partir du niveau 5 (peut-être plus ?) mais on peut en trouver à l'abandon dans le labyrinthe."""
+    def __init__(self,position):
+        Defensif_proportion.__init__(self,position,taux_degats_haume_gobelin[niveau-1])
+        Equipement_tribal.__init__(self,position,"gobelin",taux_refus_haume_gobelin[niveau-1])
+        self.poids = poids_haume_gobelin[niveau-1]
+        self.frottements = frottements_haume_gobelin[niveau-1]
+        self.niveau = niveau
+
+    def get_description(self,observation):
+        return ["Un casque","Un peu cabossé"]
+
+    def get_skin(self):
+        return SKIN_CASQUE
+
+class Bandeau_de_gobelin(Haume,Pompe_a_pm,Equipement_tribal):
+    """Le bandeau des mages gobelins. Ils en sont équippés à partir du niveau 5 (peut-être plus ?) mais on peut en trouver à l'abandon dans le labyrinthe."""
+    def __init__(self,position):
+        Pompe_a_pm.__init__(self,position,pm_bandeau_gobelin[niveau-1])
+        Equipement_tribal.__init__(self,position,"gobelin",taux_refus_bandeau_gobelin[niveau-1])
+        self.poids = poids_bandeau_gobelin[niveau-1]
+        self.frottements = frottements_bandeau_gobelin[niveau-1]
+        self.niveau = niveau
+
+    def get_description(self,observation):
+        return ["Un casque","Un peu cabossé"]
+
+    def get_skin(self):
+        return SKIN_CASQUE
+
+class Anneau_terrestre_gobelin(Anneau,Rocheux,Equipement_tribal):
+    """L'anneau d'affinité à la terre des chefs gobelins.
 
 class Inventaire:
 

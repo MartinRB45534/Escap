@@ -45,11 +45,12 @@ Quelques nouvelles magies à créer :
 Étage boss : tout, mais un peu plus, plus un chef gobelin.
 
 
-Quels genres de monstres peut-on trouver tout au fond d'un donjon ? Sachant que les plus bas sont les plus faibles for some reason.
-Slimes : faibles mais capables de progresser, en particulier en groupe. Leur niveau de dangerosité augmente exponentiellement quand ils sont nombreux, et leur nombre augmente au fil du temps.
-Gobelins : humanoides, donc organisés, avec plein de sous-espèces (mages, dps, tank, boss... avec d'autres noms)
-Orcs : gobelins en mieux. Sauf peut-être pour la vitesse, et souvent moins nombreux.
-
+Équippements du tutoriel :
+Armures (bloque 20%, réduit les dégats de 20, réduit les dégats à 20, annule les attaques de moins de 20 mais laisse passer les autres... pas toutes mais deux ou trois)
+Armes (épée, lance, autre (une arme peut-être plus forte mais avec moins de skills de boosts évidemment))
+Casques (comme les armures, + bandeau ou quelque chose, qui boost le mana)
+Anneaux (plein d'effets possibles !)
+Bouclier (sauf qu'il faut un skill pour s'en servir... peut-être un bouclier avec un effet passif semblable aux armures ?)
 
 
 À l'occasion, faire le tri dans les constantes
