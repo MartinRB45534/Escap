@@ -1,5 +1,8 @@
 Work in progress !
 
+Attention /!\ les pnjs peuvent bloquer le joueur en essayant d'aller vers lui lorsqu'ils sont trop nombreux et que le joueur doit faire demi-tour !
+
+Ralentir les menus, on n'a pas besoin d'une grande précision d'affichage et ça rame
 
 Est-ce que les gens sont blessés par leur propre stomp !? Le mystère du mage gobelin...
 La variable globale ID_MAX ne remplit pas du tout son rôle ! Qu'est-ce que je fais ?

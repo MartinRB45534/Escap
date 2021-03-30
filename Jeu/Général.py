@@ -1,6 +1,7 @@
 from Jeu.Systeme.Classe import *
 from Jeu.Systeme.Constantes_magies.Magies import *
 from Jeu.Systeme.Constantes_projectiles.Projectiles import *
+from Jeu.Systeme.Constantes_items.Items import *
 from Jeu.Systeme.Constantes_stats import *
 from Jeu.Constantes import *
 from Jeu.Skins.Skins import *
@@ -197,7 +198,7 @@ class Controleur():
         self.esprits["encombrant"] = Esprit_humain(encombrant.ID,self)
         passepartout1 = Cle(("Étage 5 : portes",8,22),["Porte_cellule_slime_5","Porte_cellule_piège_5","Porte_cellule_pré-piège_5","Porte_petite_cellule_droite_5"])
         self.ajoute_entitee(passepartout1)
-        passepartout2 = Cle(("Étage 5 : portes",9,18),["Porte_double_cellule_deuxième_5","Porte_petite_cellule_gauche_5","Porte_grande_cellule_droite_5"])
+        passepartout2 = Cle(("Étage 5 : portes",9,18),["Porte_double_cellule_deuxième_5""Porte_petite_cellule_gauche_5","Porte_grande_cellule_droite_5"])
         self.ajoute_entitee(passepartout2)
         cle1 = Cle(("Étage 5 : portes",4,15),["Porte_grande_cellule_5"])
         self.ajoute_entitee(cle1)
@@ -207,8 +208,16 @@ class Controleur():
         self.ajoute_entitee(cle3)
         cle4 = Cle(("Étage 5 : portes",1,4),["Porte_sortie_encombrant_5"])
         self.ajoute_entitee(cle4)
-        cle5 = Cle(("Étage 5 : portes",0,6),["Porte_armurerie_6"])
+        cle5 = Cle(("Étage 5 : portes",3,6),["Porte_armurerie_6"])
         self.ajoute_entitee(cle5)
+        cle6 = Cle(("Étage 5 : portes",0,6),["Porte_quatrième_armurerie_9"])
+        self.ajoute_entitee(cle6)
+        cle7 = Cle(("Étage 5 : portes",0,22),["Porte_annexe_droite_7"])
+        self.ajoute_entitee(cle7)
+        cle8 = Cle(("Étage 5 : portes",0,16),["Porte_troisième_armurerie_9"])
+        self.ajoute_entitee(cle8)
+        cle9 = Cle(("Étage 5 : portes",9,13),["Porte_anti_chambre_8"])
+        self.ajoute_entitee(cle9)
         gobel1 = Sentinelle_gobelin(("Étage 5 : portes",8,22),1) #Une sentinelle veille sur la prison
         self.ajoute_entitee(gobel1)
         gobel1.inventaire.ajoute(passepartout1)
@@ -245,6 +254,10 @@ class Controleur():
         alchimiste = Alchimiste(("Étage 6 : potions",23,2))
         self.ajoute_entitee(alchimiste)
         self.esprits["alchimiste"] = Esprit_humain(alchimiste.ID,self)
+        cle1 = Cle(("Étage 6 : potions",0,19),["Porte_double_cellule_deuxième_5"])
+        self.ajoute_entitee(cle1)
+        cle2 = Cle(("Étage 6 : potions",21,20),["Porte_annexe_gauche_7"])
+        self.ajoute_entitee(cle2)
         gobelins = self.cree_agissants(Mage_gobelin,1,("Étage 6 : potions",10,3),6,12,2) + self.cree_agissants(Mage_gobelin,1,("Étage 6 : potions",7,15),16,8,5) + self.cree_agissants(Guerrier_gobelin,1,("Étage 6 : potions",7,15),16,8,9) + self.cree_agissants(Guerrier_gobelin,2,("Étage 6 : potions",7,15),16,8,2)
         self.esprits["gobelins_potions"]=Esprit_simple("gobelins_potions",gobelins,self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
         paterns6 = [Patern(("Étage 6 : potions",0,4),7,9,[("Étage 6 : potions",6,4)]),
@@ -263,53 +276,86 @@ class Controleur():
         peste = Peste(("Étage 7 : meutes",2,0))
         self.ajoute_entitee(peste)
         self.esprits["peste"] = Esprit_humain(peste.ID,self)
+        cle1 = Cle(("Étage 7 : meutes",12,1),["Porte_salle_commune_7"])
+        self.ajoute_entitee(cle1)
+        cle1 = Cle(("Étage 7 : meutes",14,6),["Porte_sixième_armurerie_9"])
+        self.ajoute_entitee(cle1)
         gobelins = self.cree_agissants(Mage_gobelin,1,("Étage 7 : meutes",0,2),5,4,3) + self.cree_agissants(Mage_gobelin,1,("Étage 7 : meutes",15,2),5,4,3) + self.cree_agissants(Guerrier_gobelin,1,("Étage 7 : meutes",0,2),5,4,5) + self.cree_agissants(Guerrier_gobelin,1,("Étage 7 : meutes",15,2),5,4,5) + self.cree_agissants(Gobelin,1,("Étage 7 : meutes",5,2),10,5,20) + self.cree_agissants(Gobelin,1,("Étage 7 : meutes",0,7),20,3,20)
         self.esprits["gobelins_meutes"]=Esprit_simple("gobelins_meutes",gobelins,self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
         paterns7 = [Patern(("Étage 7 : meutes",0,0),20,2,[]),
                     Patern(("Étage 7 : meutes",0,2),5,4,[("Étage 7 : meutes",1,0),("Étage 7 : meutes",2,3)],["Porte_annexe_gauche_7"]),
                     Patern(("Étage 7 : meutes",5,2),10,5,[("Étage 7 : meutes",4,0)],["Porte_salle_commune_7"]),
                     Patern(("Étage 7 : meutes",15,2),5,4,[("Étage 7 : meutes",3,0),("Étage 7 : meutes",2,3)],["Porte_annexe_droite_7"])]
-        self.labs["Étage 7 : meutes"]=Labyrinthe("Étage 7 : meutes",20,10,("Étage 7 : meutes",0,0),paterns7,1,1,TERRE,0.3)
+        self.labs["Étage 7 : meutes"]=Labyrinthe("Étage 7 : meutes",20,10,("Étage 7 : meutes",0,9),paterns7,1,1,TERRE,0.3)
         self.construit_escalier(("Étage 6 : potions",21,23),("Étage 7 : meutes",10,0),BAS,HAUT) #/!\ Rajouter les shamans !
 
         #On crée le huitième étage et son occupante :
-        bombe_atomique = Bombe_atomique(("Étage 8 : magie",2,0))
+        bombe_atomique = Bombe_atomique(("Étage 8 : magie",28,8))
         self.ajoute_entitee(bombe_atomique)
         self.esprits["bombe_atomique"] = Esprit_humain(bombe_atomique.ID,self)
+        cle1 = Cle(("Étage 8 : magie",27,6),["Porte_sas_8"])
+        self.ajoute_entitee(cle1)
+        cle2 = Cle(("Étage 8 : magie",3,8),["Porte_deuxième_armurerie_9"])
+        self.ajoute_entitee(cle2)
+        cle3 = Cle(("Étage 8 : magie",35,8),["Porte_anti_anti_chambre_8"])
+        self.ajoute_entitee(cle3)
         paterns8 = [Patern(("Étage 8 : magie",33,0),7,4,[("Étage 8 : magie",0,1)]),
                     Patern(("Étage 8 : magie",26,6),4,4,[("Étage 8 : magie",0,2)],["Porte_anti_chambre_8"]),
-                    Patern(("Étage 8 : magie",30,4),10,6,[("Étage 8 : magie",5,0)],["Porte_sas_8"])]
+                    Patern(("Étage 8 : magie",30,4),10,6,[("Étage 8 : magie",5,0),("Étage 8 : magie",0,4)],["Porte_sas_8","Porte_anti_anti_chambre_8"])]
         self.labs["Étage 8 : magie"]=Labyrinthe("Étage 8 : magie",40,10,("Étage 8 : magie",0,0),paterns8,1,1,TERRE,0.4)
-        self.construit_escalier(("Étage 7 : meutes",4,0),("Étage 8 : magie",5,0),HAUT,HAUT) #/!\ Rajouter les ennemis !
+        self.construit_escalier(("Étage 7 : meutes",0,9),("Étage 8 : magie",39,7),GAUCHE,DROITE) #/!\ Rajouter les ennemis !
 
         #On crée le neuvième étage et son occupant :
         marchand = Marchand(("Étage 9 : équippement",2,0))
         self.ajoute_entitee(marchand)
+        cle1 = Cle(("Étage 9 : équippement",2,0),["Porte_première_armurerie_9"])
+        self.ajoute_entitee(cle1)
+        marchand.inventaire.ajoute(cle1)
         self.esprits["marchand"] = Esprit_humain(marchand.ID,self)
+        cle2 = Cle(("Étage 9 : équippement",58,8),["Porte_cinquième_armurerie_9"])
+        self.ajoute_entitee(cle2)
         #On crée aussi quelques items :
         #Pas d'item dans l'armurerie où est le marchand, il l'a déjà dévalisée !
         #Dans la deuxième armurerie, une armure :
-        armure = Armure_tuto(("Étage 9 : équippement",5,9),1)
+        armure = Armure_de_gobelin(("Étage 9 : équippement",5,9),1)
+        self.ajoute_entitee(armure)
         #Dans la troisième, une lance :
-        lance = Lance_tuto(("Étage 9 : équippement",20,3),1)
+        lance = Lance_de_gobelin(("Étage 9 : équippement",20,3),1)
+        self.ajoute_entitee(lance)
         #Dans la quatrième, huit anneaux :
-        anneau_1 = Anneau_pv_tuto(("Étage 9 : équippement",20,3),1)
-        anneau_2 = Anneau_pm_tuto(("Étage 9 : équippement",20,3),1)
-        anneau_3 = Anneau_pv_tuto(("Étage 9 : équippement",20,3),1)
-        anneau_4 = Anneau_pv_tuto(("Étage 9 : équippement",20,3),1)
-        anneau_5 = Anneau_pv_tuto(("Étage 9 : équippement",20,3),1)
-        anneau_6 = Anneau_pv_tuto(("Étage 9 : équippement",20,3),1)
+        anneau_1 = Anneau_magique_gobelin(("Étage 9 : équippement",35,7),1)
+        self.ajoute_entitee(anneau_1)
+        anneau_2 = Anneau_magique_gobelin(("Étage 9 : équippement",35,9),1)
+        self.ajoute_entitee(anneau_2)
+        anneau_3 = Anneau_soin_gobelin(("Étage 9 : équippement",33,7),1)
+        self.ajoute_entitee(anneau_3)
+        anneau_4 = Anneau_soin_gobelin(("Étage 9 : équippement",33,9),1)
+        self.ajoute_entitee(anneau_4)
+        anneau_5 = Anneau_vitesse_gobelin(("Étage 9 : équippement",31,7),1)
+        self.ajoute_entitee(anneau_5)
+        anneau_6 = Anneau_vitesse_gobelin(("Étage 9 : équippement",31,9),1)
+        self.ajoute_entitee(anneau_6)
+        anneau_7 = Anneau_terrestre_gobelin(("Étage 9 : équippement",29,7),1)
+        self.ajoute_entitee(anneau_7)
+        anneau_8 = Sceau_roi_gobelin(("Étage 9 : équippement",28,9),1)
+        self.ajoute_entitee(anneau_8)
+        #Dans la cinquième, un haume :
+        haume = Haume_de_gobelin(("Étage 9 : équippement",47,1),1)
+        self.ajoute_entitee(haume)
+        #Dans la sixième, une épée :
+        epee = Epee_de_gobelin(("Étage 9 : équippement",59,0),1)
+        self.ajoute_entitee(epee)
         paterns9 = [Patern(("Étage 9 : équippement",0,0),7,4,[("Étage 9 : équippement",5,3)],["Porte_première_armurerie_9"]),
                     Patern(("Étage 9 : équippement",5,5),4,5,[("Étage 9 : équippement",2,0)],["Porte_deuxième_armurerie_9"]),
                     Patern(("Étage 9 : équippement",15,3),6,5,[("Étage 9 : équippement",0,3)],["Porte_troisième_armurerie_9"]),
                     Patern(("Étage 9 : équippement",28,7),10,3,[("Étage 9 : équippement",8,0)],["Porte_quatrième_armurerie_9"]),
-                    Patern(("Étage 9 : équippement",43,0),17,10,[],[],False),
+                    Patern(("Étage 9 : équippement",43,0),17,10,[("Étage 9 : équippement",0,0)],[],False),
                     Patern(("Étage 9 : équippement",40,1),8,4,[("Étage 9 : équippement",3,0)],["Porte_cinquième_armurerie_9"]),
                     Patern(("Étage 9 : équippement",53,0),7,4,[("Étage 9 : équippement",1,6)],["Porte_sixième_armurerie_9"]),
                     ]
-        self.labs["Étage 9 : équippement"]=Labyrinthe("Étage 9 : équippement",60,10,("Étage 9 : équippement",0,0),paterns9,1,1,TERRE,0.1)
-        self.labs["Étage 9 : équippement"].matrice_cases[43][0].murs[GAUCHE].brise()
-        self.labs["Étage 9 : équippement"].matrice_cases[42][0].murs[DROITE].brise()
+        self.labs["Étage 9 : équippement"]=Labyrinthe("Étage 9 : équippement",60,10,("Étage 9 : équippement",0,0),paterns9,1,1,TERRE,0.3)
+        self.labs["Étage 9 : équippement"].matrice_cases[5][3].murs[BAS].effets[1].ferme = False
+        self.labs["Étage 9 : équippement"].matrice_cases[5][4].murs[HAUT].effets[1].ferme = False
         self.construit_escalier(("Étage 8 : magie",38,0),("Étage 9 : équippement",1,9),HAUT,BAS) #/!\ Rajouter les ennemis !
 
         #On crée le dixième étage
@@ -317,7 +363,7 @@ class Controleur():
                      Patern(("Étage 10 : Boss",10,0),10,19,[("Étage 10 : Boss",0,9)],["Porte_boss_10"],1,1,FEU),
                      Patern(("Étage 10 : Boss",20,7),3,5,[("Étage 10 : Boss",0,2)],["Porte_dérobée_10"])]
         self.labs["Étage 10 : Boss"]=Labyrinthe("Étage 10 : Boss",25,19,("Étage 10 : Boss",0,0),paterns10,1,1,TERRE,0.1)
-        self.construit_escalier(("Étage 9 : équippement",4,0),("Étage 10 : Boss",5,0),BAS,HAUT) #/!\ Rajouter les ennemis !
+        self.construit_escalier(("Étage 9 : équippement",49,4),("Étage 10 : Boss",0,10),DROITE,GAUCHE) #/!\ Rajouter les ennemis !
 
         #On lance la cinématique :
         #À rajouter
@@ -1097,10 +1143,41 @@ class Labyrinthe:
                 rien
         """
         #ini du tableau de case (4 murs pleins)
-        for colone in self.matrice_cases:
-            for case in colone:
+        self.matrice_cases[0][0].murs[0].effets = [Mur_impassable()]
+        self.matrice_cases[0][0].murs[3].effets = [Mur_impassable()]
+        for mur in self.matrice_cases[0][0].murs[1:3]:
+            mur.effets.append(Mur_plein(self.durete))
+        for case in self.matrice_cases[0][1:-1]:
+            case.murs[3].effets = [Mur_impassable()]
+            for mur in case.murs[:3]:
+                mur.effets.append(Mur_plein(self.durete))
+        self.matrice_cases[0][-1].murs[2].effets = [Mur_impassable()]
+        self.matrice_cases[0][-1].murs[3].effets = [Mur_impassable()]
+        for mur in self.matrice_cases[0][-1].murs[:2]:
+            mur.effets.append(Mur_plein(self.durete))
+        for colone in self.matrice_cases[1:-1]:
+            colone[0].murs[0].effets = [Mur_impassable()]
+            for mur in colone[0].murs[1:]:
+                mur.effets.append(Mur_plein(self.durete))
+            for case in colone[1:-1]:
                 for mur in case.murs:
                     mur.effets.append(Mur_plein(self.durete))
+            colone[-1].murs[2].effets = [Mur_impassable()]
+            for mur in colone[-1].murs[0:2]+colone[-1].murs[3:]:
+                mur.effets.append(Mur_plein(self.durete))
+        self.matrice_cases[-1][0].murs[0].effets = [Mur_impassable()]
+        self.matrice_cases[-1][0].murs[1].effets = [Mur_impassable()]
+        for mur in self.matrice_cases[-1][0].murs[2:]:
+            mur.effets.append(Mur_plein(self.durete))
+        for case in self.matrice_cases[-1][1:-1]:
+            case.murs[1].effets = [Mur_impassable()]
+            for mur in case.murs[:1]+case.murs[2:]:
+                mur.effets.append(Mur_plein(self.durete))
+        self.matrice_cases[-1][-1].murs[2].effets = [Mur_impassable()]
+        self.matrice_cases[-1][-1].murs[1].effets = [Mur_impassable()]
+        for mur in [self.matrice_cases[-1][-1].murs[0],self.matrice_cases[-1][-1].murs[3]]:
+            mur.effets.append(Mur_plein(self.durete))
+        
         #génération en profondeur via l'objet generateur
         print("Génération du labyrinthe")
         gene=Generateur(self.matrice_cases,self.depart,self.largeur,self.hauteur,self.patterns)
@@ -1974,16 +2051,18 @@ class Patern:
             for bord in self.contraintes_cases(self.entrees[nb]):
                 mur = case.murs[bord]
                 if nb < len(self.codes) :
-                    mur.brise()
-                    mur.effets.append(Porte(self.durete,self.codes[nb]))
+                    if mur.get_blocage([]) != "Imp":
+                        mur.brise()
+                        mur.effets.append(Porte(self.durete,self.codes[nb]))
                     mur_oppose = self.get_mur_oppose(mur,matrice_lab)
-                    if mur_oppose != None :
+                    if mur_oppose != None and mur_oppose.get_blocage([]) != "Imp":
                         mur_oppose.brise()
                         mur_oppose.effets.append(Porte(self.durete,self.codes[nb]))
                 else :
-                    mur.brise()
+                    if mur.get_blocage([]) != "Imp":
+                        mur.brise()
                     mur_oppose = self.get_mur_oppose(mur,matrice_lab)
-                    if mur_oppose != None :
+                    if mur_oppose != None and mur_oppose.get_blocage([]) != "Imp":
                         mur_oppose.brise()
 
     def pre_generation(self,matrice_lab):
@@ -6242,7 +6321,7 @@ class Defensif_proportion(Defensif):
         Equipement.__init__(self,position)
         self.taux_degats = taux_degats
 
-    def intercepte(self,attaque)
+    def intercepte(self,attaque):
         degats_bloques = self.taux_degats
         for taux in self.taux_stats.values():
             degats_bloques *= taux
@@ -6253,7 +6332,7 @@ class Defensif_seuil(Defensif):
         Equipement.__init__(self,position)
         self.degats = degats
 
-    def intercepte(self,attaque)
+    def intercepte(self,attaque):
         degats = self.degats
         for taux in self.taux_stats.values():
             degats *= taux
@@ -6265,7 +6344,7 @@ class Defensif_plafond(Defensif):
         Equipement.__init__(self,position)
         self.degats = degats
 
-    def intercepte(self,attaque)
+    def intercepte(self,attaque):
         degats = self.degats
         for taux in self.taux_stats.values():
             degats *= 1/taux
@@ -6277,7 +6356,7 @@ class Defensif_valeur(Defensif):
         Equipement.__init__(self,position)
         self.degats = degats
 
-    def intercepte(self,attaque)
+    def intercepte(self,attaque):
         degats = self.degats
         for taux in self.taux_stats.values():
             degats *= taux
@@ -6292,7 +6371,7 @@ class Reparateur_magique(Equipement):
     def regen_pm(self,regen_pm):
         pass
 
-class Pompe_a_pm(Reparateur): #Régénère une quantité fixe de pm
+class Pompe_a_pm(Reparateur_magique): #Régénère une quantité fixe de pm
     def __init__(self,position,pm):
         Item.__init__(self,position)
         self.pm = pm
@@ -6303,7 +6382,7 @@ class Pompe_a_pm(Reparateur): #Régénère une quantité fixe de pm
             pm *= taux
         return regen_pm + pm
 
-class Renforce_regen_pm(Reparateur): #Démultiplie l'efficacité de la régénération
+class Renforce_regen_pm(Reparateur_magique): #Démultiplie l'efficacité de la régénération
     def __init__(self,position,taux_pm):
         Item.__init__(self,position)
         self.taux_pm = taux_pm
@@ -7086,7 +7165,7 @@ class Cree_charge_etendue_skill(Cree_item):
 class Epee_de_gobelin(Epee,Equipement_tribal):
     """L'épée des gobelins de base. Ils en sont équippés à partir du niveau 5 (peut-être plus ?) mais on peut en trouver à l'abandon dans le labyrinthe."""
     def __init__(self,position,niveau):
-        Arme.__init__(self,position,TERRE,tranchant_de_gobelin[niveau-1],portee_epee_gobelin[niveau-1])
+        Arme.__init__(self,position,TERRE,tranchant_epee_gobelin[niveau-1],portee_epee_gobelin[niveau-1])
         Equipement_tribal.__init__(self,position,"gobelin",taux_refus_epee_gobelin[niveau-1])
         self.poids = poids_epee_gobelin[niveau-1]
         self.frottements = frottements_epee_gobelin[niveau-1]
@@ -7130,7 +7209,7 @@ class Cimetere_de_gobelin(Epee,Equipement_tribal):
 
 class Armure_de_gobelin(Armure,Defensif_proportion,Equipement_tribal):
     """L'armure des sentinelles gobelins. Ils en sont équippés à partir du niveau 3 (peut-être moins ?) mais on peut en trouver à l'abandon dans le labyrinthe."""
-    def __init__(self,position):
+    def __init__(self,position,niveau):
         Defensif_proportion.__init__(self,position,taux_degats_armure_gobelin[niveau-1])
         Equipement_tribal.__init__(self,position,"gobelin",taux_refus_armure_gobelin[niveau-1])
         self.poids = poids_armure_gobelin[niveau-1]
@@ -7145,7 +7224,7 @@ class Armure_de_gobelin(Armure,Defensif_proportion,Equipement_tribal):
 
 class Haume_de_gobelin(Haume,Defensif_proportion,Equipement_tribal):
     """Le casque des sentinelles gobelins. Ils en sont équippés à partir du niveau 5 (peut-être plus ?) mais on peut en trouver à l'abandon dans le labyrinthe."""
-    def __init__(self,position):
+    def __init__(self,position,niveau):
         Defensif_proportion.__init__(self,position,taux_degats_haume_gobelin[niveau-1])
         Equipement_tribal.__init__(self,position,"gobelin",taux_refus_haume_gobelin[niveau-1])
         self.poids = poids_haume_gobelin[niveau-1]
@@ -7160,7 +7239,7 @@ class Haume_de_gobelin(Haume,Defensif_proportion,Equipement_tribal):
 
 class Bandeau_de_gobelin(Haume,Pompe_a_pm,Equipement_tribal):
     """Le bandeau des mages gobelins. Ils en sont équippés à partir du niveau 5 (peut-être plus ?) mais on peut en trouver à l'abandon dans le labyrinthe."""
-    def __init__(self,position):
+    def __init__(self,position,niveau):
         Pompe_a_pm.__init__(self,position,pm_bandeau_gobelin[niveau-1])
         Equipement_tribal.__init__(self,position,"gobelin",taux_refus_bandeau_gobelin[niveau-1])
         self.poids = poids_bandeau_gobelin[niveau-1]
@@ -7168,13 +7247,85 @@ class Bandeau_de_gobelin(Haume,Pompe_a_pm,Equipement_tribal):
         self.niveau = niveau
 
     def get_description(self,observation):
-        return ["Un casque","Un peu cabossé"]
+        return ["Un bout de tissu","Peut-être un peu magique ?"]
 
     def get_skin(self):
-        return SKIN_CASQUE
+        return SKIN_CASQUE #/!\ Lui faire un autre skin !
 
 class Anneau_terrestre_gobelin(Anneau,Rocheux,Equipement_tribal):
-    """L'anneau d'affinité à la terre des chefs gobelins.
+    """L'anneau d'affinité à la terre des chefs gobelins. Ils en sont équippés à partir du niveau 1 (peut-être plus ?) mais on peut en trouver à l'abandon dans le labyrinthe."""
+    def __init__(self,position,niveau):
+        Rocheux.__init__(self,position,aff_anneau_terrestre_gobelin[niveau-1])
+        Equipement_tribal.__init__(self,position,"gobelin",taux_refus_anneau_terrestre_gobelin[niveau-1])
+        self.poids = poids_anneau_terrestre_gobelin[niveau-1]
+        self.frottements = frottements_anneau_terrestre_gobelin[niveau-1]
+        self.niveau = niveau
+
+    def get_description(self,observation):
+        return ["Un anneau","Il a l'air taillé dans la pierre"]
+
+    def get_skin(self):
+        return SKIN_ANNEAU
+
+class Anneau_magique_gobelin(Anneau,Pompe_a_pm,Equipement_tribal):
+    """L'anneau de régénération de mana des chefs gobelins. Ils en sont équippés à partir du niveau 1 (peut-être plus ?) mais on peut en trouver à l'abandon dans le labyrinthe."""
+    def __init__(self,position,niveau):
+        Pompe_a_pm.__init__(self,position,pm_anneau_magique_gobelin[niveau-1])
+        Equipement_tribal.__init__(self,position,"gobelin",taux_refus_anneau_magique_gobelin[niveau-1])
+        self.poids = poids_anneau_magique_gobelin[niveau-1]
+        self.frottements = frottements_anneau_magique_gobelin[niveau-1]
+        self.niveau = niveau
+
+    def get_description(self,observation):
+        return ["Un anneau","Il y a d'étranges inscriptions autour"]
+
+    def get_skin(self):
+        return SKIN_ANNEAU
+
+class Anneau_soin_gobelin(Anneau,Pompe_a_pv,Equipement_tribal):
+    """L'anneau de soin des chefs gobelins. Ils en sont équippés à partir du niveau 1 (peut-être plus ?) mais on peut en trouver à l'abandon dans le labyrinthe."""
+    def __init__(self,position,niveau):
+        Pompe_a_pv.__init__(self,position,pv_anneau_soin_gobelin[niveau-1])
+        Equipement_tribal.__init__(self,position,"gobelin",taux_refus_anneau_soin_gobelin[niveau-1])
+        self.poids = poids_anneau_soin_gobelin[niveau-1]
+        self.frottements = frottements_anneau_soin_gobelin[niveau-1]
+        self.niveau = niveau
+
+    def get_description(self,observation):
+        return ["Un anneau","Enfile-le"]
+
+    def get_skin(self):
+        return SKIN_ANNEAU
+
+class Anneau_vitesse_gobelin(Anneau,Accelerateur,Equipement_tribal):
+    """L'anneau de vitesse des chefs gobelins. Ils en sont équippés à partir du niveau 1 (peut-être plus ?) mais on peut en trouver à l'abandon dans le labyrinthe."""
+    def __init__(self,position,niveau):
+        Accelerateur.__init__(self,position,vitesse_anneau_vitesse_gobelin[niveau-1])
+        Equipement_tribal.__init__(self,position,"gobelin",taux_refus_anneau_vitesse_gobelin[niveau-1])
+        self.poids = poids_anneau_vitesse_gobelin[niveau-1]
+        self.frottements = frottements_anneau_vitesse_gobelin[niveau-1]
+        self.niveau = niveau
+
+    def get_description(self,observation):
+        return ["Un anneau","Vite, enfile-le !"]
+
+    def get_skin(self):
+        return SKIN_ANNEAU
+
+class Sceau_roi_gobelin(Anneau,Anoblisseur,Equipement_tribal):
+    """L'anneau donné par le roi aux chefs gobelins. Ils en sont équippés à partir du niveau 1 (peut-être plus ?) mais on peut en trouver à l'abandon dans le labyrinthe."""
+    def __init__(self,position,niveau):
+        Anoblisseur.__init__(self,position,priorite_sceau_roi_gobelin[niveau-1])
+        Equipement_tribal.__init__(self,position,"gobelin",taux_refus_sceau_roi_gobelin[niveau-1])
+        self.poids = poids_sceau_roi_gobelin[niveau-1]
+        self.frottements = frottements_sceau_roi_gobelin[niveau-1]
+        self.niveau = niveau
+
+    def get_description(self,observation):
+        return ["Un anneau","Vite, enfile-le !"]
+
+    def get_skin(self):
+        return SKIN_ANNEAU
 
 class Inventaire:
 
