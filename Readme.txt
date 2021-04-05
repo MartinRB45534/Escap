@@ -2,15 +2,12 @@ Work in progress !
 
 Attention /!\ les pnjs peuvent bloquer le joueur en essayant d'aller vers lui lorsqu'ils sont trop nombreux et que le joueur doit faire demi-tour !
 
-Ralentir les menus, on n'a pas besoin d'une grande précision d'affichage et ça rame
-
 Est-ce que les gens sont blessés par leur propre stomp !? Le mystère du mage gobelin...
 La variable globale ID_MAX ne remplit pas du tout son rôle ! Qu'est-ce que je fais ?
 L'autruche, en codant les pnjs
 
 
 
-Idée pour accélèrer : ne pas recharger la police à chaque frame !
 
 Pour la magie, la régénération est ce qui détermine la véritable puissance. Les pm max correspondent juste à une limitation sur les sorts qu'on peut utiliser, et sur le nombre de sorts qu'on peut balancer d'affilée au début de la confrontation. Modifier les stats en conséquence.
 

@@ -26,6 +26,9 @@ class Id_max:
     def set_id_max(self,n):
         self.valeur = n
 
+global POLICE20
+POLICE20 = pygame.font.SysFont(None, 20)
+
 global ID_MAX
 ID_MAX = Id_max()
 

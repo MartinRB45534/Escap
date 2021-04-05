@@ -2046,7 +2046,6 @@ class Patern:
         for nb in range(len(self.entrees)):
             x = self.entrees[nb][1]+self.position[1]
             y = self.entrees[nb][2]+self.position[2]
-            print(x,y)
             case = matrice_lab[x][y]
             for bord in self.contraintes_cases(self.entrees[nb]):
                 mur = case.murs[bord]
@@ -3270,17 +3269,17 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
     def interpele(self):
         #On cherche la personne :
         if self.dir_regard == HAUT:
-            positions = [(self.position[0],self.position[1]-1,self.position[2]),(self.position[0],self.position[1],self.position[2]-1),(self.position[0],self.position[1],self.position[2]+1),(self.position[0],self.position[1]+1,self.position[2])]
-            directions = [GAUCHE,HAUT,BAS,DROITE]
-        elif self.dir_regard == BAS:
-            positions = [(self.position[0],self.position[1]+1,self.position[2]),(self.position[0],self.position[1],self.position[2]-1),(self.position[0],self.position[1],self.position[2]+1),(self.position[0],self.position[1]-1,self.position[2])]
-            directions = [DROITE,HAUT,BAS,GAUCHE]
-        elif self.dir_regard == GAUCHE:
             positions = [(self.position[0],self.position[1],self.position[2]-1),(self.position[0],self.position[1]-1,self.position[2]),(self.position[0],self.position[1]+1,self.position[2]),(self.position[0],self.position[1],self.position[2]+1)]
             directions = [HAUT,GAUCHE,DROITE,BAS]
-        elif self.dir_regard == DROITE:
+        elif self.dir_regard == BAS:
             positions = [(self.position[0],self.position[1],self.position[2]+1),(self.position[0],self.position[1]-1,self.position[2]),(self.position[0],self.position[1]+1,self.position[2]),(self.position[0],self.position[1],self.position[2]-1)]
             directions = [BAS,GAUCHE,DROITE,HAUT]
+        elif self.dir_regard == GAUCHE:
+            positions = [(self.position[0],self.position[1]-1,self.position[2]),(self.position[0],self.position[1],self.position[2]-1),(self.position[0],self.position[1],self.position[2]+1),(self.position[0],self.position[1]+1,self.position[2])]
+            directions = [GAUCHE,HAUT,BAS,DROITE]
+        elif self.dir_regard == DROITE:
+            positions = [(self.position[0],self.position[1]+1,self.position[2]),(self.position[0],self.position[1],self.position[2]-1),(self.position[0],self.position[1],self.position[2]+1),(self.position[0],self.position[1]-1,self.position[2])]
+            directions = [DROITE,HAUT,BAS,GAUCHE]
         self.interlocuteur = None #Normalement c'est déjà le cas
         for i in range(4):
             pos = positions[i]
@@ -4773,6 +4772,10 @@ class Receptionniste(Humain): #Le deuxième humain du jeu, à l'étage 1 (engage
             self.replique = "De rien."
             self.repliques = [" "]
 
+        else:
+            self.end_dialogue(self.dialogue)
+            print("Je ne connais pas cette réplique !")
+
         self.replique_courante = 0
 
     def get_skin(self):
@@ -4887,6 +4890,10 @@ class Paume(Humain): #Le troisième humain du jeu, à l'étage 2 (complêtement 
             self.mouvement = 0 #Légèrement redondant ici
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
             self.attente = False
+
+        else:
+            self.end_dialogue(self.dialogue)
+            print("Je ne connais pas cette réplique !")
 
         self.replique_courante = 0
 
@@ -5095,6 +5102,10 @@ class Peureuse(Humain): #La quatrième humaine du jeu, à l'étage 3 (terrorisé
             self.appreciations[0]-= 0.5
             self.end_dialogue()
 
+        else:
+            self.end_dialogue(self.dialogue)
+            print("Je ne connais pas cette réplique !")
+
         self.replique_courante = 0
 
     def get_skin(self):
@@ -5190,6 +5201,10 @@ class Codeur(Humain): #Le cinquième humain du jeu, à l'étage 4 (répond au no
         elif replique == "Les deux, merci !":
             self.end_dialogue(-5)
 
+        else:
+            self.end_dialogue(self.dialogue)
+            print("Je ne connais pas cette réplique !")
+
         self.replique_courante = 0
 
     def get_skin(self):
@@ -5279,6 +5294,10 @@ class Encombrant(Humain): #Le sixième humain du jeu, à l'étage 5 (moyennement
         #Dialogue par défaut -2
         elif replique == "":
             self.end_dialogue(-2)
+
+        else:
+            self.end_dialogue(self.dialogue)
+            print("Je ne connais pas cette réplique !")
 
         self.replique_courante = 0
 
@@ -5390,6 +5409,10 @@ class Alchimiste(Humain): #Le septième humain du jeu, à l'étage 6 (un faiseur
             self.mouvement = 0 #Légèrement redondant ici
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
             self.attente = False
+
+        else:
+            self.end_dialogue(self.dialogue)
+            print("Je ne connais pas cette réplique !")
 
         self.replique_courante = 0
 
@@ -5519,6 +5542,10 @@ class Peste(Humain): #La huitième humaine du jeu, à l'étage 7 (une sainte tr�
         #Dialogue par défaut -4
         elif replique == "  ":
             self.end_dialogue(-4)
+
+        else:
+            self.end_dialogue(self.dialogue)
+            print("Je ne connais pas cette réplique !")
 
         self.replique_courante = 0
 
@@ -5668,6 +5695,10 @@ class Bombe_atomique(Humain): #La neuvième humaine du jeu, à l'étage 8 (une m
         elif replique == "   ":
             self.end_dialogue(-3)
 
+        else:
+            self.end_dialogue(self.dialogue)
+            print("Je ne connais pas cette réplique !")
+
         self.replique_courante = 0
 
     def get_skin(self):
@@ -5751,6 +5782,10 @@ class Marchand(Humain): #Le dixième humain du jeu, à l'étage 9 (le seul lien 
             self.mouvement = 0 #Légèrement redondant ici
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
             self.attente = False
+
+        else:
+            self.end_dialogue(self.dialogue)
+            print("Je ne connais pas cette réplique !")
 
         self.replique_courante = 0
 
@@ -11283,8 +11318,7 @@ class Affichage:
 
     def dessine_zones(self,curseur):
         self.screen.fill((0,0,0))
-        police=pygame.font.SysFont(None, 20)
-        titre=police.render("Ceci est un test !",True,(255,255,255))
+        titre=POLICE20.render("Ceci est un test !",True,(255,255,255))
         self.screen.blit(titre,(self.position_debut_x_rectangle_1,self.position_debut_y_titre))
         if curseur == "rectangle_g":
             pygame.draw.rect(self.screen,(255,64,0),(self.position_debut_x_rectangle_1-2,self.position_debut_y_rectangles_et_carre-2,self.largeur_rectangles+4,self.hauteur_exploitable+4))
@@ -11337,8 +11371,8 @@ class Affichage:
 
             longueur_barre_totale = self.largeur_rectangles//2 - 15
 
-            PV = police.render("PV",True,(0,0,0))
-            PM = police.render("PM",True,(0,0,0))
+            PV = POLICE20.render("PV",True,(0,0,0))
+            PM = POLICE20.render("PM",True,(0,0,0))
             self.screen.blit(PV,(pos_PV,marge_haut))
             self.screen.blit(PM,(pos_PM,marge_haut))
 
@@ -11389,7 +11423,7 @@ class Affichage:
                 pygame.draw.rect(self.screen,(255,160,160),(marge_gauche,hauteur_barre_pv,longueur_barre_totale,10))
                 pygame.draw.rect(self.screen,(96,0,160),(marge_gauche,hauteur_barre_pv,longueur_barre_pv,10))
 
-                quantite=police.render("0",True,(0,0,0))
+                quantite=POLICE20.render("0",True,(0,0,0))
                 self.screen.blit(quantite,(marge_gauche+longueur_barre_pv,hauteur_texte_pv))
 
             else:
@@ -11398,7 +11432,7 @@ class Affichage:
                 pygame.draw.rect(self.screen,(255,160,160),(marge_gauche,hauteur_barre_pv,longueur_barre_totale,10))
                 pygame.draw.rect(self.screen,(255,0,0),(marge_gauche,hauteur_barre_pv,longueur_barre_pv,10))
 
-                quantite=police.render("0",True,(0,0,0))
+                quantite=POLICE20.render("0",True,(0,0,0))
                 self.screen.blit(quantite,(marge_gauche,hauteur_texte_pv))
 
             if skill != None:
@@ -11414,7 +11448,7 @@ class Affichage:
                 pygame.draw.rect(self.screen,(160,255,255),(marge_gauche,hauteur_barre_pm,self.largeur_rectangles-10,10))
                 pygame.draw.rect(self.screen,(160,0,224),(marge_gauche,hauteur_barre_pm,longueur_barre_pm,10))
 
-                quantite=police.render("0",True,(0,0,0))
+                quantite=POLICE20.render("0",True,(0,0,0))
                 self.screen.blit(quantite,(marge_gauche+longueur_barre_pm,hauteur_texte_pm))
 
             elif joueur.pm != joueur.get_total_pm() and observation >= 5: #Le joueur a des effets de réserve et peut les voir (trouver une valeur du niveau du skill observation un peu moins arbitraire !
@@ -11426,7 +11460,7 @@ class Affichage:
                 pygame.draw.rect(self.screen,(32,255,255),(marge_gauche,hauteur_barre_pm,longueur_barre_pm,10))
                 pygame.draw.rect(self.screen,(32,255,255),(marge_gauche+longueur_barre_pm_sans_reserve,hauteur_barre_pm,longueur_barre_reserve,10))
 
-                quantite=police.render("0",True,(0,0,0))
+                quantite=POLICE20.render("0",True,(0,0,0))
                 self.screen.blit(quantite,(marge_gauche,hauteur_texte_pm))
 
             else:
@@ -11435,7 +11469,7 @@ class Affichage:
                 pygame.draw.rect(self.screen,(160,255,255),(marge_gauche,hauteur_barre_pm,longueur_barre_totale,10))
                 pygame.draw.rect(self.screen,(32,255,255),(marge_gauche,hauteur_barre_pm,longueur_barre_pm,10))
 
-                quantite=police.render("0",True,(0,0,0))
+                quantite=POLICE20.render("0",True,(0,0,0))
                 self.screen.blit(quantite,(marge_gauche,hauteur_texte_pm))
 
             marge_haut = self.position_debut_y_rectangles_et_carre+55
@@ -11452,8 +11486,8 @@ class Affichage:
 
             longueur_barre_totale = self.largeur_rectangles//2 - 15
 
-            PV = police.render("PV",True,(0,0,0))
-            PM = police.render("PM",True,(0,0,0))
+            PV = POLICE20.render("PV",True,(0,0,0))
+            PM = POLICE20.render("PM",True,(0,0,0))
             self.screen.blit(PV,(pos_PV,marge_haut))
             self.screen.blit(PM,(pos_PM,marge_haut))
 
@@ -11497,7 +11531,7 @@ class Affichage:
             pygame.draw.rect(self.screen,couleur_curseur_actif,(marge_gauche,marge_haut,self.largeur_rectangles-10,25))
             pygame.draw.rect(self.screen,(225,225,225),(marge_gauche+2,marge_haut+2,self.largeur_rectangles-14,21))
 
-            inventaire = police.render("Inventaire",True,(0,0,0))
+            inventaire = POLICE20.render("Inventaire",True,(0,0,0))
             self.screen.blit(inventaire,(marge_gauche+5,marge_haut+5))
 
             marge_haut += 25
@@ -11513,7 +11547,7 @@ class Affichage:
             cats = [SKIN_POTION,SKIN_PARCHEMIN,SKIN_CLE,SKIN_ARME,SKIN_BOUCLIER_BIS,SKIN_ARMURE_BIS,SKIN_CASQUE,SKIN_ANNEAU,SKIN_PROJECTILE,SKIN_CRANE,SKIN_OEUF]
             cat_courante = inventaire.cat_courante
 
-            titre = police.render("Inventaire :",True,(0,0,0))
+            titre = POLICE20.render("Inventaire :",True,(0,0,0))
             self.screen.blit(titre,(marge_gauche,limite_haut))
 
             limite_haut += 25
@@ -11539,7 +11573,7 @@ class Affichage:
 
             noms = ["Potions :","Parchemins :","Clés :","Armes :","Boucliers :","Armures :","Haumes :","Anneaux :","Cadavres :","Oeufs :"]
 
-            titre_cat = police.render(noms[icat],True,(0,0,0))
+            titre_cat = POLICE20.render(noms[icat],True,(0,0,0))
             self.screen.blit(titre_cat,(marge_gauche,limite_haut))
             
 
@@ -11587,7 +11621,7 @@ class Affichage:
 
                 marge_gauche += 44
 
-                titre_description = police.render("Description :",True,(0,0,0))
+                titre_description = POLICE20.render("Description :",True,(0,0,0))
                 self.screen.blit(titre_description,(marge_gauche,limite_haut))
 
                 limite_haut += 25
@@ -11595,7 +11629,7 @@ class Affichage:
 
                 infos = joueur.controleur.get_entitee(items[inventaire.item_courant]).get_description(observation)
                 for info in infos :
-                    texte_info = police.render(info,True,(0,0,0))
+                    texte_info = POLICE20.render(info,True,(0,0,0))
                     self.screen.blit(texte_info,(marge_gauche,marge_haut))
                     marge_haut += 25
 
@@ -11607,7 +11641,7 @@ class Affichage:
 
             pygame.draw.rect(self.screen,(225,225,225),(marge_gauche,marge_haut,self.largeur_rectangles-10,25))
 
-            inventaire = police.render("Inventaire",True,(0,0,0))
+            inventaire = POLICE20.render("Inventaire",True,(0,0,0))
             self.screen.blit(inventaire,(marge_gauche+5,marge_haut+5))
 
             marge_haut += 25
@@ -11626,7 +11660,7 @@ class Affichage:
             pygame.draw.rect(self.screen,couleur_curseur_actif,(marge_gauche,marge_haut,self.largeur_rectangles-10,25))
             pygame.draw.rect(self.screen,(225,225,225),(marge_gauche+2,marge_haut+2,self.largeur_rectangles-14,21))
 
-            inventaire = police.render("Classe principale",True,(0,0,0))
+            inventaire = POLICE20.render("Classe principale",True,(0,0,0))
             self.screen.blit(inventaire,(marge_gauche+5,marge_haut+5))
 
             marge_haut += 25
@@ -11654,7 +11688,7 @@ class Affichage:
                     pygame.draw.rect(self.screen,couleur_curseur_actif,(marge_gauche,marge_haut,self.largeur_rectangles-(10*compt),25))
                     pygame.draw.rect(self.screen,(225,225,225),(marge_gauche+2,marge_haut+2,self.largeur_rectangles-(10*compt)-4,21))
 
-                    skill = police.render("Sous-classes",True,(0,0,0))
+                    skill = POLICE20.render("Sous-classes",True,(0,0,0))
                     self.screen.blit(skill,(marge_gauche+5,marge_haut+5))
 
                     marge_haut += 25
@@ -11663,7 +11697,7 @@ class Affichage:
 
                     pygame.draw.rect(self.screen,(225,225,225),(marge_gauche,marge_haut,self.largeur_rectangles-(10*compt),25))
 
-                    skill = police.render("Sous-classes :",True,(0,0,0))
+                    skill = POLICE20.render("Sous-classes :",True,(0,0,0))
                     self.screen.blit(skill,(marge_gauche+5,marge_haut+5))
 
                     marge_haut += 25
@@ -11675,7 +11709,7 @@ class Affichage:
                             pygame.draw.rect(self.screen,(200,200,200),(marge_gauche+7,marge_haut+2,self.largeur_rectangles-(10*compt)-9,21))
                         else:
                             pygame.draw.rect(self.screen,(200,200,200),(marge_gauche+5,marge_haut,self.largeur_rectangles-(10*compt)-5,25))
-                        nom_classe = police.render(classes[i].nom,True,(0,0,0))
+                        nom_classe = POLICE20.render(classes[i].nom,True,(0,0,0))
                         self.screen.blit(nom_classe,(marge_gauche+10,marge_haut+5))
                         marge_haut += 25
 
@@ -11686,7 +11720,7 @@ class Affichage:
 
                     pygame.draw.rect(self.screen,(225,225,225),(marge_gauche,marge_haut,self.largeur_rectangles-(10*compt),25))
 
-                    skill = police.render(classe.nom,True,(0,0,0))
+                    skill = POLICE20.render(classe.nom,True,(0,0,0))
                     self.screen.blit(skill,(marge_gauche+5,marge_haut+5))
 
                     marge_haut += 25
@@ -11695,7 +11729,7 @@ class Affichage:
 
                     pygame.draw.rect(self.screen,(225,225,225),(marge_gauche,marge_haut,self.largeur_rectangles-(10*compt),25))
 
-                    skill = police.render("Sous-classes",True,(0,0,0))
+                    skill = POLICE20.render("Sous-classes",True,(0,0,0))
                     self.screen.blit(skill,(marge_gauche+5,marge_haut+5))
 
                     marge_haut += 25
@@ -11706,7 +11740,7 @@ class Affichage:
                     pygame.draw.rect(self.screen,couleur_curseur_actif,(marge_gauche,marge_haut,self.largeur_rectangles-(10*compt),25))
                     pygame.draw.rect(self.screen,(225,225,225),(marge_gauche+2,marge_haut+2,self.largeur_rectangles-(10*compt)-4,21))
 
-                    skill = police.render("Skills intrasecs",True,(0,0,0))
+                    skill = POLICE20.render("Skills intrasecs",True,(0,0,0))
                     self.screen.blit(skill,(marge_gauche+5,marge_haut+5))
 
                     marge_haut += 25
@@ -11715,7 +11749,7 @@ class Affichage:
 
                     pygame.draw.rect(self.screen,(225,225,225),(marge_gauche,marge_haut,self.largeur_rectangles-(10*compt),25))
 
-                    skill = police.render("Skills intrasecs :",True,(0,0,0))
+                    skill = POLICE20.render("Skills intrasecs :",True,(0,0,0))
                     self.screen.blit(skill,(marge_gauche+5,marge_haut+5))
 
                     marge_haut += 25
@@ -11727,7 +11761,7 @@ class Affichage:
                             pygame.draw.rect(self.screen,(200,200,200),(marge_gauche+7,marge_haut+2,self.largeur_rectangles-(10*compt)-9,21))
                         else:
                             pygame.draw.rect(self.screen,(200,200,200),(marge_gauche+5,marge_haut,self.largeur_rectangles-(10*compt)-5,25))
-                        nom_skill = police.render(skills[i].nom,True,(0,0,0))
+                        nom_skill = POLICE20.render(skills[i].nom,True,(0,0,0))
                         self.screen.blit(nom_skill,(marge_gauche+10,marge_haut+5))
                         marge_haut += 25
 
@@ -11735,7 +11769,7 @@ class Affichage:
 
                     pygame.draw.rect(self.screen,(225,225,225),(marge_gauche,marge_haut,self.largeur_rectangles-(10*compt),25))
 
-                    skill = police.render("Skills intrasecs",True,(0,0,0))
+                    skill = POLICE20.render("Skills intrasecs",True,(0,0,0))
                     self.screen.blit(skill,(marge_gauche+5,marge_haut+5))
 
                     marge_haut += 25
@@ -11745,7 +11779,7 @@ class Affichage:
                     pygame.draw.rect(self.screen,couleur_curseur_actif,(marge_gauche,marge_haut,self.largeur_rectangles-(10*compt),25))
                     pygame.draw.rect(self.screen,(225,225,225),(marge_gauche+2,marge_haut+2,self.largeur_rectangles-(10*compt)-4,21))
 
-                    skill = police.render("Skills",True,(0,0,0))
+                    skill = POLICE20.render("Skills",True,(0,0,0))
                     self.screen.blit(skill,(marge_gauche+5,marge_haut+5))
 
                     marge_haut += 25
@@ -11754,7 +11788,7 @@ class Affichage:
 
                     pygame.draw.rect(self.screen,(225,225,225),(marge_gauche,marge_haut,self.largeur_rectangles-(10*compt),25))
 
-                    skill = police.render("Skills :",True,(0,0,0))
+                    skill = POLICE20.render("Skills :",True,(0,0,0))
                     self.screen.blit(skill,(marge_gauche+5,marge_haut+5))
 
                     marge_haut += 25
@@ -11766,7 +11800,7 @@ class Affichage:
                             pygame.draw.rect(self.screen,(200,200,200),(marge_gauche+7,marge_haut+2,self.largeur_rectangles-(10*compt)-9,21))
                         else:
                             pygame.draw.rect(self.screen,(200,200,200),(marge_gauche+5,marge_haut,self.largeur_rectangles-(10*compt)-5,25))
-                        nom_skill = police.render(skills[i].nom,True,(0,0,0))
+                        nom_skill = POLICE20.render(skills[i].nom,True,(0,0,0))
                         self.screen.blit(nom_skill,(marge_gauche+10,marge_haut+5))
                         marge_haut += 25
 
@@ -11774,7 +11808,7 @@ class Affichage:
 
                     pygame.draw.rect(self.screen,(225,225,225),(marge_gauche,marge_haut,self.largeur_rectangles-(10*compt),25))
 
-                    skill = police.render("Skills",True,(0,0,0))
+                    skill = POLICE20.render("Skills",True,(0,0,0))
                     self.screen.blit(skill,(marge_gauche+5,marge_haut+5))
 
                     marge_haut += 25
@@ -11785,7 +11819,7 @@ class Affichage:
 
             pygame.draw.rect(self.screen,(225,225,225),(marge_gauche,marge_haut,self.largeur_rectangles-10,25))
 
-            inventaire = police.render("Classe principale",True,(0,0,0))
+            inventaire = POLICE20.render("Classe principale",True,(0,0,0))
             self.screen.blit(inventaire,(marge_gauche+5,marge_haut+5))
 
             marge_haut += 25
@@ -11805,7 +11839,7 @@ class Affichage:
             message[1]-=1
             if message[2]<=observation:
                 police=pygame.font.SysFont(None, 20)
-                texte = police.render(message[0],True,(0,0,0))
+                texte = POLICE20.render(message[0],True,(0,0,0))
                 self.screen.blit(texte,(self.position_debut_x_rectangle_2+2,marge_haut))
                 marge_haut += 20
             if message[1] == 0:
@@ -11913,15 +11947,15 @@ class Affichage:
 
         marge_haut += 15
 
-        police = pygame.font.SysFont(None, 20)
+        pygame.font.SysFont(None, 20)
 
         texte = []
 
-        texte.append(police.render("Mana à disposition : " + str(joueur.get_total_pm()),True,(0,0,0)))
-        texte.append(police.render("Cout_actuel : " + str(joueur.choix_cout_magie),True,(0,0,0)))
-        texte.append(police.render("(Utilisez les touches haut et bas pour modifier le coût.)",True,(0,0,0)))
-        texte.append(police.render("Précision du coût : " + str(joueur.precision_cout_magie),True,(0,0,0)))
-        texte.append(police.render("(Utilisez les touches gauche et droite pour modifier la précision.)",True,(0,0,0)))
+        texte.append(POLICE20.render("Mana à disposition : " + str(joueur.get_total_pm()),True,(0,0,0)))
+        texte.append(POLICE20.render("Cout_actuel : " + str(joueur.choix_cout_magie),True,(0,0,0)))
+        texte.append(POLICE20.render("(Utilisez les touches haut et bas pour modifier le coût.)",True,(0,0,0)))
+        texte.append(POLICE20.render("Précision du coût : " + str(joueur.precision_cout_magie),True,(0,0,0)))
+        texte.append(POLICE20.render("(Utilisez les touches gauche et droite pour modifier la précision.)",True,(0,0,0)))
 
         for tex in texte:
             self.screen.blit(tex,(marge_gauche,marge_haut))
@@ -12012,7 +12046,7 @@ class Affichage:
     def dessine_choix_touche(self,joueur,zones,skills,magies,lancer):
         marge_haut = 10 + self.position_debut_y_rectangles_et_carre
         marge_gauche = 10 + self.position_debut_x_carre
-        police = pygame.font.SysFont(None, 20)
+        (None, 20)
         etage = joueur.etage
         element_courant = joueur.element_courant
         if etage == -1 :
@@ -12044,7 +12078,7 @@ class Affichage:
             marge_haut += 50
             marge_gauche = 10 + self.position_debut_x_carre
             descr = ["Touches de déplacement du curseur (zones)","Raccourcis des skills","Raccourcis des magies","Raccourcis des projectiles","Quitter"][element_courant]
-            texte = police.render(descr,True,(255,255,255))
+            texte = POLICE20.render(descr,True,(255,255,255))
             self.screen.blit(texte,(marge_gauche,marge_haut))
         elif etage == 0 :
             touches = []
@@ -12060,13 +12094,13 @@ class Affichage:
                 for touche in touches :
                     if joueur.dir_touches[touche] == i:
                         letter = pygame.key.name(touche)
-                        lettre = police.render(letter.upper(),True,(255,255,255))
+                        lettre = POLICE20.render(letter.upper(),True,(255,255,255))
                         self.screen.blit(lettre,(marge_gauche+28,marge_haut+28))
                 marge_gauche += 50
             marge_haut += 50
             marge_gauche = 10 + self.position_debut_x_carre
             descr = noms_dirs[element_courant]
-            texte = police.render(descr,True,(255,255,255))
+            texte = POLICE20.render(descr,True,(255,255,255))
             self.screen.blit(texte,(marge_gauche,marge_haut))
         elif etage == 1:
             touches = []
@@ -12080,7 +12114,7 @@ class Affichage:
                 for touche in touches :
                     if i < len(skills) and joueur.skill_touches[touche] == type(skills[i]) and not isinstance(skills[i],(Skill_magie,Skill_lancer)):
                         letter = pygame.key.name(touche)
-                        lettre = police.render(letter.upper(),True,(255,255,255))
+                        lettre = POLICE20.render(letter.upper(),True,(255,255,255))
                         self.screen.blit(lettre,(marge_gauche+28,marge_haut+28))
                 marge_gauche += 50
                 if marge_gauche + 60 > self.position_debut_x_rectangle_2 :
@@ -12095,7 +12129,7 @@ class Affichage:
                 descr = "Quitter"
             else :
                 descr = skills[element_courant].nom
-            texte = police.render(descr,True,(255,255,255))
+            texte = POLICE20.render(descr,True,(255,255,255))
             self.screen.blit(texte,(marge_gauche,marge_haut))
         elif etage == 2:
             touches = []
@@ -12109,7 +12143,7 @@ class Affichage:
                 for touche in touches :
                     if i < len(magies) and joueur.magies[touche] == magies[i].nom:
                         letter = pygame.key.name(touche)
-                        lettre = police.render(letter.upper(),True,(255,255,255))
+                        lettre = POLICE20.render(letter.upper(),True,(255,255,255))
                         self.screen.blit(lettre,(marge_gauche+28,marge_haut+28))
                 marge_gauche += 50
                 if marge_gauche + 60 > self.position_debut_x_rectangle_2 :
@@ -12124,7 +12158,7 @@ class Affichage:
                 descr = "Quitter"
             else :
                 descr = magies[element_courant].nom
-            texte = police.render(descr,True,(255,255,255))
+            texte = POLICE20.render(descr,True,(255,255,255))
             self.screen.blit(texte,(marge_gauche,marge_haut))
         elif etage == 3:
             touches = []
@@ -12141,7 +12175,7 @@ class Affichage:
                 for touche in touches :
                     if i < len(lancer) and joueur.projectiles[touche] == lancer[i]:
                         letter = pygame.key.name(touche)
-                        lettre = police.render(letter.upper(),True,(255,255,255))
+                        lettre = POLICE20.render(letter.upper(),True,(255,255,255))
                         self.screen.blit(lettre,(marge_gauche+28,marge_haut+28))
                 marge_gauche += 50
                 if marge_gauche + 60 > self.position_debut_x_rectangle_2 :
@@ -12158,7 +12192,7 @@ class Affichage:
                 descr = "Item courant"
             else :
                 descr = lancer[element_courant].nom
-            texte = police.render(descr,True,(255,255,255))
+            texte = POLICE20.render(descr,True,(255,255,255))
             self.screen.blit(texte,(marge_gauche,marge_haut))
 
     def choix_touche(self,joueur,zones,skills,magies,lancer):
@@ -12197,9 +12231,7 @@ class Affichage:
             pos_gauche = self.position_debut_x_carre + 5
             pos_haut = self.position_debut_y_rectangles_et_carre + 5
 
-            police = pygame.font.SysFont(None, 20)
-
-            titre = police.render("Choix du niveau " + str(joueur.classe_principale.niveau),True,(0,0,0))
+            titre = POLICE20.render("Choix du niveau " + str(joueur.classe_principale.niveau),True,(0,0,0))
             self.screen.blit(titre,(pos_gauche,pos_haut))
 
             pos_gauche += marge_gauche - 5
@@ -12688,9 +12720,7 @@ class Affichage:
             marge_gauche = self.position_debut_x_carre + (self.hauteur_exploitable - 660)/2
             marge_haut = self.position_debut_y_rectangles_et_carre
 
-            police = pygame.font.SysFont(None, 20)
-
-            titre = police.render("Choix élémentaire",True,(0,0,0))
+            titre = POLICE20.render("Choix élémentaire",True,(0,0,0))
             self.screen.blit(titre,(pos_gauche,pos_haut))
 
             #Les dessins des arbres :
@@ -13391,10 +13421,8 @@ class Affichage:
         pos_gauche = self.position_debut_x_rectangle_2 + 5
         pos_haut = self.position_debut_y_rectangles_et_carre + 5
 
-        police = pygame.font.SysFont(None, 20)
-
         for phrase in descr:
-            texte = police.render(phrase,True,(0,0,0))
+            texte = POLICE20.render(phrase,True,(0,0,0))
             self.screen.blit(texte,(pos_gauche,pos_haut))
             pos_haut += 20
 

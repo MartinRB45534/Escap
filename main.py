@@ -6,8 +6,6 @@ pygame.init()
 
 screen = pygame.display.set_mode((1350, 690))
 
-police=pygame.font.SysFont(None, 20)
-
 from true_main import *
 
 #Les objets qu'on va manipuler :
@@ -107,7 +105,7 @@ def alll():
 ##        screen.fill((0,0,0))
 ##        for i in range(len(mains)):
 ##            pygame.draw.rect(screen,(255,255,255),(pos_boutons[i][0],pos_boutons[i][1],50,18))
-##            titre=police.render(mains[i][1],True,(0,0,0))
+##            titre=POLICE20.render(mains[i][1],True,(0,0,0))
 ##            screen.blit(titre,(pos_boutons[i][0]+4,pos_boutons[i][1]+2))
 ##
 ##        pygame.display.flip()

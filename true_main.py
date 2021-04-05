@@ -202,9 +202,9 @@ class Main: #Modifier le nom plus tard pour plus de cohérence
                 print(res)
 
 def menu(boutons,screen):
-    police=pygame.font.SysFont(None, 20)
     res = False
     curseur = 0
+    clock = pygame.time.Clock()
     while not(res):
         #Récupération / traitement des inputs :
         events = pygame.event.get()
@@ -232,16 +232,17 @@ def menu(boutons,screen):
                 pygame.draw.rect(screen,(155,155,155),(boutons[i][1][0]-2,boutons[i][1][1]-2,104,22))
                 descr = boutons[i][2]
             pygame.draw.rect(screen,(255,255,255),(boutons[i][1][0],boutons[i][1][1],100,18))
-            text = police.render(boutons[i][0],True,(0,0,0))
+            text = POLICE20.render(boutons[i][0],True,(0,0,0))
             screen.blit(text,(boutons[i][1][0]+4,boutons[i][1][1]+2))
 
         y = 20
         for tex in descr :
-            line = police.render(tex,True,(255,255,255))
+            line = POLICE20.render(tex,True,(255,255,255))
             screen.blit(line,(150,y))
             y += 30
 
         pygame.display.flip()
+        clock.tick(20)
     if res == True:
         res = False
     return res
