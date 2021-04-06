@@ -82,11 +82,14 @@ class Skill_magie(Skill):
         self.magies[magie.nom]=magie #Les magies sont répérées par leur nom
 
     def utilise(self,nom):
-        magie = self.magies[nom](self.niveau) #Les caractéristiques des magies s'améliorent avec le niveau du skill
-        self.gain_xp = magie.gain_xp + magie.cout_pm*0.1
-        self.xp_new+=self.gain_xp #On gagne de l'xp, mais combien ? 0.1, est-ce assez ? trop ?
-        self.latence = magie.latence
-        return self.latence, magie #On renvoie le temps que prendra l'action, pour savoir combien de temps l'agissant attendra et la magie (il y a plein de types de magies différentes, avec ou sans cible, etc. alors on laisse le controleur et la magie se débrouiller (attention quand même, il y a un risque de misfire ou même de backfire si ces détails de visée et autres ne sont pas réglés à temps)).
+        if nom in self.magies.keys():
+            magie = self.magies[nom](self.niveau) #Les caractéristiques des magies s'améliorent avec le niveau du skill
+            self.gain_xp = magie.gain_xp + magie.cout_pm*0.1
+            self.xp_new+=self.gain_xp #On gagne de l'xp, mais combien ? 0.1, est-ce assez ? trop ?
+            self.latence = magie.latence
+            return self.latence, magie #On renvoie le temps que prendra l'action, pour savoir combien de temps l'agissant attendra et la magie (il y a plein de types de magies différentes, avec ou sans cible, etc. alors on laisse le controleur et la magie se débrouiller (attention quand même, il y a un risque de misfire ou même de backfire si ces détails de visée et autres ne sont pas réglés à temps)).
+        else:
+            return 0, None
 
 class Skill_essence_magique(Skill):
     """Ce skill permet d'utiliser les PM comme deuxième barre de PV si les PV sont à 0. Inspiré du skill persévérance dans komu desu ga, nanika ? et point de départ de l'une des quatre branches d'évolution du joueur.

@@ -202,7 +202,7 @@ CONSTANTES_STATS = {
         'aff_o':[0,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5],
         'especes':['humain'],
         'doigts':10,
-        'magies':['Magie_soin','Magie_auto_soin'], # /!\ Rajouter la purification
+        'magies':['Magie_soin','Magie_auto_soin','Magie_purification'], # /!\ Rajouter la purification
         'special':False},
     #La magicienne (stats non défintitves, à retravailler):
     "bombe_atomique":{

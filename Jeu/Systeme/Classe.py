@@ -43,6 +43,15 @@ class Classe:
         if self.next_evo=="xp" and self.niveau < 10:
             self.check_evo()
         return res
+        
+    def vire_xp(self):
+        for skill in self.skills:
+            skill.xp_new = 0
+        for skill in self.skills_intrasecs:
+            skill.xp_new = 0
+        for classe in self.sous_classes:
+            classe.vire_xp()
+        self.xp_new=0 #Pas nécessaire, je suppose ?
 
     def prep_next_evo(self):
         """fonction qui permet de savoir comment vérifier la prochaine évolution"""
@@ -524,24 +533,10 @@ class Classe_principale(Classe):
 ##            self.evo(niveau)
 
     def gagne_xp(self):
-        #On récupère l'xp propagé par les skills,
-        for skill in self.skills:
-            self.xp_new+=skill.gagne_xp()
-        #les skills intrasecs
-        for skill in self.skills_intrasecs:
-            self.xp_new+=skill.gagne_xp()
-        #et par les sous-classes
-        for classe in self.sous_classes:
-            self.xp_new+=classe.gagne_xp()
-        #Qu'on propage vers la classe supérieure
-        res = self.xp_new*self.propagation
         if self.evolutif :
-            #On l'ajoute aussi à son propre xp
-            self.xp+=self.xp_new
-            #On en profite pour vérifier si on peut évoluer
-            if self.next_evo=="xp":
-                self.check_evo()
-        self.xp_new=0
+            Classe.gagne_xp(self)
+        else:
+            Classe.vire_xp(self)
 
 class Artificier(Classe):
     """La classe des utilisateurs d'explosifs de haut niveau. Le skill de création d'explosif peut lui être transféré. La classe apporte des bonus lors de l'utilisation d'explosifs."""

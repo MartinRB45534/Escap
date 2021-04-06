@@ -162,7 +162,7 @@ class Controleur():
         self.ajoute_entitee(gobel2)
         gobel3 = Sentinelle_gobelin(("Étage 3 : combat",6,6),1)
         self.ajoute_entitee(gobel3)
-        self.esprits["gobelins_combat"]=Esprit_simple("gobelins_combat",[gobel1.ID,gobel2.ID,gobel3.ID],self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
+        self.esprits["gobelins_combat"]=Esprit_simple("gobelins_combat",[gobel1.ID,gobel2.ID,gobel3.ID],["humain"],self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
         paterns3 = [Patern(("Étage 3 : combat",6,6),9,9,[("Étage 3 : combat",0,4),("Étage 3 : combat",4,0),("Étage 3 : combat",0,0)]),
                     Patern(("Étage 3 : combat",5,5),3,3,[("Étage 3 : combat",0,0),("Étage 3 : combat",2,2)]),
                     Patern(("Étage 3 : combat",10,4),3,3,[("Étage 3 : combat",1,0),("Étage 3 : combat",1,2)]),
@@ -184,7 +184,7 @@ class Controleur():
         self.ajoute_entitee(gobel4)
         gobel5 = Guerrier_gobelin(("Étage 4 : monstres",5,5),1)
         self.ajoute_entitee(gobel5)
-        self.esprits["gobelins_monstres"]=Esprit_simple("gobelins_monstres",[gobel1.ID,gobel2.ID,gobel3.ID,gobel4.ID,gobel5.ID],self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
+        self.esprits["gobelins_monstres"]=Esprit_simple("gobelins_monstres",[gobel1.ID,gobel2.ID,gobel3.ID,gobel4.ID,gobel5.ID],["humain"],self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
         paterns4 = [Patern(("Étage 4 : monstres",4,0),10,2,[("Étage 4 : monstres",0,1)],[],False),
                     Patern(("Étage 4 : monstres",14,0),3,3,[("Étage 4 : monstres",0,1)]),
                     Patern(("Étage 4 : monstres",0,10),8,5,[("Étage 4 : monstres",7,2)],["Porte_coin_4"]),
@@ -227,8 +227,8 @@ class Controleur():
         self.ajoute_entitee(slime)
         #ombriul = Ombriul(("Étage 5 : portes",8,11),1) #Un prisonnier de guerre
         #self.ajoute_entitee(ombriul)
-        self.esprits["gobelins_portes"]=Esprit_simple("gobelins_portes",[gobel1.ID,gobel2.ID],self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
-        #self.esprits["ombriul_captif"]=Esprit_simple("ombriul_captif",[ombriul.ID],self)
+        self.esprits["gobelins_portes"]=Esprit_simple("gobelins_portes",[gobel1.ID,gobel2.ID],["humain"],self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
+        #self.esprits["ombriul_captif"]=Esprit_simple("ombriul_captif",[ombriul.ID],["humain"],self)
         esprit_slime = Esprit_slime(slime.ID,self)
         self.esprits[esprit_slime.nom]=esprit_slime #Les esprits des slimes sont presque aussi compliqués que ceux des humains, les ruptures en moins.
         paterns5 = [Patern(("Étage 5 : portes",0,0),10,24,[]),
@@ -259,7 +259,7 @@ class Controleur():
         cle2 = Cle(("Étage 6 : potions",21,20),["Porte_annexe_gauche_7"])
         self.ajoute_entitee(cle2)
         gobelins = self.cree_agissants(Mage_gobelin,1,("Étage 6 : potions",10,3),6,12,2) + self.cree_agissants(Mage_gobelin,1,("Étage 6 : potions",7,15),16,8,5) + self.cree_agissants(Guerrier_gobelin,1,("Étage 6 : potions",7,15),16,8,9) + self.cree_agissants(Guerrier_gobelin,2,("Étage 6 : potions",7,15),16,8,2)
-        self.esprits["gobelins_potions"]=Esprit_simple("gobelins_potions",gobelins,self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
+        self.esprits["gobelins_potions"]=Esprit_simple("gobelins_potions",gobelins,["humain"],self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
         paterns6 = [Patern(("Étage 6 : potions",0,4),7,9,[("Étage 6 : potions",6,4)]),
                     Patern(("Étage 6 : potions",0,19),5,5,[("Étage 6 : potions",4,2)],["Porte_armurerie_6"]), #Une armurerie, vraiment ? Plutôt une potionnerie, non ?
                     Patern(("Étage 6 : potions",10,3),15,12,[])]#,[("Étage 6 : potions",0,6),("Étage 6 : potions",8,0),("Étage 6 : potions",8,11)])]
@@ -281,7 +281,7 @@ class Controleur():
         cle1 = Cle(("Étage 7 : meutes",14,6),["Porte_sixième_armurerie_9"])
         self.ajoute_entitee(cle1)
         gobelins = self.cree_agissants(Mage_gobelin,1,("Étage 7 : meutes",0,2),5,4,3) + self.cree_agissants(Mage_gobelin,1,("Étage 7 : meutes",15,2),5,4,3) + self.cree_agissants(Guerrier_gobelin,1,("Étage 7 : meutes",0,2),5,4,5) + self.cree_agissants(Guerrier_gobelin,1,("Étage 7 : meutes",15,2),5,4,5) + self.cree_agissants(Gobelin,1,("Étage 7 : meutes",5,2),10,5,20) + self.cree_agissants(Gobelin,1,("Étage 7 : meutes",0,7),20,3,20)
-        self.esprits["gobelins_meutes"]=Esprit_simple("gobelins_meutes",gobelins,self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
+        self.esprits["gobelins_meutes"]=Esprit_simple("gobelins_meutes",gobelins,["humain"],self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
         paterns7 = [Patern(("Étage 7 : meutes",0,0),20,2,[]),
                     Patern(("Étage 7 : meutes",0,2),5,4,[("Étage 7 : meutes",1,0),("Étage 7 : meutes",2,3)],["Porte_annexe_gauche_7"]),
                     Patern(("Étage 7 : meutes",5,2),10,5,[("Étage 7 : meutes",4,0)],["Porte_salle_commune_7"]),
@@ -758,26 +758,30 @@ class Controleur():
             elif type_skill in [Skill_magie,Height_of_Occultism,Lesser_Height_of_Occultism] :
                 nom_magie = agissant.magie_courante
                 latence,magie = skill.utilise(nom_magie)
-                cout = magie.cout_pm
-                if agissant.peut_payer(cout) :
-                    agissant.effets.append(magie)
-                    reussite = True
-                    #if isinstance(agissant,Joueur):
-                    #    malchance = trouve_skill(agissant.classe_principale,Skill_malchanceux)
-                    #else:
-                    #    malchance = None
-                    #if malchance != None:
-                    #    reussite = malchance.utilise("cast_magic")
-                    if isinstance(magie,Magie_cible) :
-                        self.select_cible(magie,agissant)
-                    if isinstance(magie,Magie_dirigee) :
-                        self.select_direction(magie,agissant)
-                    if isinstance(magie,Magie_cout) :
-                        self.select_cout(magie,agissant)
-                    agissant.paye(magie.cout_pm)
-                    agissant.add_latence(latence)
-                    if not reussite :
-                        magie.miss_fire(agissant)
+                if magie != None:
+                    cout = magie.cout_pm
+                    if agissant.peut_payer(cout) :
+                        agissant.effets.append(magie)
+                        reussite = True
+                        #if isinstance(agissant,Joueur):
+                        #    malchance = trouve_skill(agissant.classe_principale,Skill_malchanceux)
+                        #else:
+                        #    malchance = None
+                        #if malchance != None:
+                        #    reussite = malchance.utilise("cast_magic")
+                        if isinstance(magie,Magie_cible) :
+                            self.select_cible(magie,agissant)
+                        if isinstance(magie,Magie_dirigee) :
+                            self.select_direction(magie,agissant)
+                        if isinstance(magie,Magie_cout) :
+                            self.select_cout(magie,agissant)
+                        agissant.paye(magie.cout_pm)
+                        agissant.add_latence(latence)
+                        if not reussite :
+                            magie.miss_fire(agissant)
+                else:
+                    print("On ne peut pas utiliser une magie que l'on a pas !")
+                    print(nom_magie,agissant)
 
 
 
@@ -924,6 +928,13 @@ class Controleur():
 
     def get_entitee(self,ID):
         return self.entitees[ID]
+
+    def get_especes(self,ID):
+        entitee = self.get_entitee(ID)
+        if not issubclass(entitee.get_classe(),Item):
+            return entitee.especes
+        else:
+            return []
 
     def ajoute_entitees(self,entitees):
         for entitee in entitees:
@@ -3260,7 +3271,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
 
     def utilise_courant(self):
         if self.curseur == "in_inventaire":
-            self.inventaire.utilise_courant(self)
+            self.inventaire.utilise_courant()
         elif self.curseur == "in_classe":
             self.skill_courant = self.classe_principale.utilise_courant()
         else: #On vaut parler à quelqu'un
@@ -4772,6 +4783,68 @@ class Receptionniste(Humain): #Le deuxième humain du jeu, à l'étage 1 (engage
             self.replique = "De rien."
             self.repliques = [" "]
 
+        #Dialogue par défaut:
+        elif replique == "Va quelque part.":
+            self.replique = "Où ?"
+            self.repliques = ["Tu peux suivre quelqu'un ?","Tu vois là-bas ?","Cherche la sortie."]
+        elif replique == "Tu peux suivre quelqu'un ?":
+            self.mouvement = 0
+            self.replique = "Oui, qui ?"
+            self.repliques = ["Moi.","Je vais te montrer."]
+        elif replique == "Moi.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
+        elif replique == "Je vais te montrer.":
+            #/!\ Comment faire le choix ?
+            self.replique = "Désolé, le choix n'a pas été implémenté. Je vais me suivre moi-même à la place."
+            self.repliques = ["Merci."]
+            self.cible_deplacement = self.ID
+        elif replique == "Cherche la sortie.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.mouvement = 1
+        elif replique == "Change ta méthode de combat.":
+            self.replique = "Envers les ennemis, ou les monstres neutres ?"
+            self.repliques = ["Les ennemis, ceux qui nous ont déjà attaqués.","Les neutres."]
+        elif replique == "Les ennemis, ceux qui nous ont déjà attaqués.":
+            self.replique = "Qu'est-ce que je leur fait ?"
+            self.repliques = ["Attaque-les, ils nous ont attaqué en premier.","Ignore-les, on a plus important à faire.","Fuis-les, ça sera plus sûr."]
+        elif replique == "Attaque-les, ils nous ont attaqué en premier.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_ennemis = 0
+        elif replique == "Ignore-les, on a plus important à faire.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_ennemis = 1
+        elif replique == "Fuis-les, ça sera plus sûr.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_ennemis = 2
+        elif replique == "Les neutres.":
+            self.replique = "Qu'est-ce que je leur fait ?"
+            self.repliques = ["Attaque-les, l'attaque est la meilleure défense.","Ignore-les, tant qu'ils ne nous agressent pas.","Fuis-les, tous les monstres sont dangereux."]
+        elif replique == "Attaque-les, l'attaque est la meilleure défense.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_neutres = 0
+        elif replique == "Ignore-les, tant qu'ils ne nous agressent pas.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_neutres = 1
+        elif replique == "Fuis-les, tous les monstres sont dangereux.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_neutres = 2
+        elif replique == "Merci.":
+            self.end_dialogue(-1)
+        elif replique == "C'est une question personnelle.":
+            self.replique = "On a pas vraiment le temps, là..."
+            self.repliques = ["Ah, c'est vrai..."]
+        elif replique == "Ah, c'est vrai...":
+            self.end_dialogue(-1)
+
         else:
             self.end_dialogue(self.dialogue)
             print("Je ne connais pas cette réplique !")
@@ -4891,6 +4964,68 @@ class Paume(Humain): #Le troisième humain du jeu, à l'étage 2 (complêtement 
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
             self.attente = False
 
+        #Dialogue par défaut:
+        elif replique == "Va quelque part.":
+            self.replique = "Où ?"
+            self.repliques = ["Tu peux suivre quelqu'un ?","Tu vois là-bas ?","Cherche la sortie."]
+        elif replique == "Tu peux suivre quelqu'un ?":
+            self.mouvement = 0
+            self.replique = "Oui, qui ?"
+            self.repliques = ["Moi.","Je vais te montrer."]
+        elif replique == "Moi.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
+        elif replique == "Je vais te montrer.":
+            #/!\ Comment faire le choix ?
+            self.replique = "Désolé, le choix n'a pas été implémenté. Je vais me suivre moi-même à la place."
+            self.repliques = ["Merci."]
+            self.cible_deplacement = self.ID
+        elif replique == "Cherche la sortie.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.mouvement = 1
+        elif replique == "Change ta méthode de combat.":
+            self.replique = "Envers les ennemis, ou les monstres neutres ?"
+            self.repliques = ["Les ennemis, ceux qui nous ont déjà attaqués.","Les neutres."]
+        elif replique == "Les ennemis, ceux qui nous ont déjà attaqués.":
+            self.replique = "Qu'est-ce que je leur fait ?"
+            self.repliques = ["Attaque-les, ils nous ont attaqué en premier.","Ignore-les, on a plus important à faire.","Fuis-les, ça sera plus sûr."]
+        elif replique == "Attaque-les, ils nous ont attaqué en premier.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_ennemis = 0
+        elif replique == "Ignore-les, on a plus important à faire.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_ennemis = 1
+        elif replique == "Fuis-les, ça sera plus sûr.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_ennemis = 2
+        elif replique == "Les neutres.":
+            self.replique = "Qu'est-ce que je leur fait ?"
+            self.repliques = ["Attaque-les, l'attaque est la meilleure défense.","Ignore-les, tant qu'ils ne nous agressent pas.","Fuis-les, tous les monstres sont dangereux."]
+        elif replique == "Attaque-les, l'attaque est la meilleure défense.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_neutres = 0
+        elif replique == "Ignore-les, tant qu'ils ne nous agressent pas.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_neutres = 1
+        elif replique == "Fuis-les, tous les monstres sont dangereux.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_neutres = 2
+        elif replique == "Merci.":
+            self.end_dialogue(-1)
+        elif replique == "C'est une question personnelle.":
+            self.replique = "On a pas vraiment le temps, là..."
+            self.repliques = ["Ah, c'est vrai..."]
+        elif replique == "Ah, c'est vrai...":
+            self.end_dialogue(-1)
+
         else:
             self.end_dialogue(self.dialogue)
             print("Je ne connais pas cette réplique !")
@@ -4908,6 +5043,9 @@ class Peureuse(Humain): #La quatrième humaine du jeu, à l'étage 3 (terrorisé
         self.place = 3
 
         Humain.__init__(self,position,self.identite,1,5) #Plutôt faible, de base
+
+        self.comportement_ennemis = 2
+        self.comportement_neutres = 2
 
         self.appreciations = [1,1,0,-1,0,9,1,6,-1,-1]
         self.dialogue = 1
@@ -4932,6 +5070,7 @@ class Peureuse(Humain): #La quatrième humaine du jeu, à l'étage 3 (terrorisé
     def boost(self):
         #On cherche un allié à booster
         #À compléter quand on aura des magies de boost à utiliser
+        print("check")
         return False
 
     def start_dialogue(self): #On commence un nouveau dialogue !
@@ -5101,6 +5240,65 @@ class Peureuse(Humain): #La quatrième humaine du jeu, à l'étage 3 (terrorisé
         elif replique == " ":
             self.appreciations[0]-= 0.5
             self.end_dialogue()
+
+        #Dialogue par défaut:
+        elif replique == "Va quelque part.":
+            self.replique = "Où ?"
+            self.repliques = ["Tu peux suivre quelqu'un ?","Tu vois là-bas ?","Cherche la sortie."]
+        elif replique == "Tu peux suivre quelqu'un ?":
+            self.mouvement = 0
+            self.replique = "Oui, qui ?"
+            self.repliques = ["Moi.","Je vais te montrer."]
+        elif replique == "Moi.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
+        elif replique == "Je vais te montrer.":
+            #/!\ Comment faire le choix ?
+            self.replique = "Désolé, le choix n'a pas été implémenté. Je vais me suivre moi-même à la place."
+            self.repliques = ["Merci."]
+            self.cible_deplacement = self.ID
+        elif replique == "Cherche la sortie.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.mouvement = 1
+        elif replique == "Change ta méthode de combat.":
+            self.replique = "Envers les ennemis, ou les monstres neutres ?"
+            self.repliques = ["Les ennemis, ceux qui nous ont déjà attaqués.","Les neutres."]
+        elif replique == "Les ennemis, ceux qui nous ont déjà attaqués.":
+            self.replique = "Qu'est-ce que je leur fait ?"
+            self.repliques = ["Attaque-les, ils nous ont attaqué en premier.","Ignore-les, on a plus important à faire.","Fuis-les, ça sera plus sûr."]
+        elif replique == "Attaque-les, ils nous ont attaqué en premier.":
+            self.replique = "Désolé, j'ai trop peur pour les attaquer."
+            self.repliques = ["Ah, c'est vrai..."]
+        elif replique == "Ignore-les, on a plus important à faire.":
+            self.replique = "Désolé, je ne peux pas faire comme s'ils n'étaient pas là !."
+            self.repliques = ["Ah, c'est vrai..."]
+        elif replique == "Fuis-les, ça sera plus sûr.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_ennemis = 2
+        elif replique == "Les neutres.":
+            self.replique = "Qu'est-ce que je leur fait ?"
+            self.repliques = ["Attaque-les, l'attaque est la meilleure défense.","Ignore-les, tant qu'ils ne nous agressent pas.","Fuis-les, tous les monstres sont dangereux."]
+        elif replique == "Attaque-les, l'attaque est la meilleure défense.":
+            self.replique = "Désolé, j'ai trop peur pour les attaquer."
+            self.repliques = ["Ah, c'est vrai..."]
+        elif replique == "Ignore-les, tant qu'ils ne nous agressent pas.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_neutres = 1
+        elif replique == "Fuis-les, tous les monstres sont dangereux.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_neutres = 2
+        elif replique == "Merci.":
+            self.end_dialogue(-1)
+        elif replique == "C'est une question personnelle.":
+            self.replique = "On a pas vraiment le temps, là..."
+            self.repliques = ["Ah, c'est vrai..."]
+        elif replique == "Ah, c'est vrai...":
+            self.end_dialogue(-1)
 
         else:
             self.end_dialogue(self.dialogue)
@@ -5295,6 +5493,68 @@ class Encombrant(Humain): #Le sixième humain du jeu, à l'étage 5 (moyennement
         elif replique == "":
             self.end_dialogue(-2)
 
+        #Dialogue par défaut:
+        elif replique == "Va quelque part.":
+            self.replique = "Où ?"
+            self.repliques = ["Tu peux suivre quelqu'un ?","Tu vois là-bas ?","Cherche la sortie."]
+        elif replique == "Tu peux suivre quelqu'un ?":
+            self.mouvement = 0
+            self.replique = "Oui, qui ?"
+            self.repliques = ["Moi.","Je vais te montrer."]
+        elif replique == "Moi.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
+        elif replique == "Je vais te montrer.":
+            #/!\ Comment faire le choix ?
+            self.replique = "Désolé, le choix n'a pas été implémenté. Je vais me suivre moi-même à la place."
+            self.repliques = ["Merci."]
+            self.cible_deplacement = self.ID
+        elif replique == "Cherche la sortie.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.mouvement = 1
+        elif replique == "Change ta méthode de combat.":
+            self.replique = "Envers les ennemis, ou les monstres neutres ?"
+            self.repliques = ["Les ennemis, ceux qui nous ont déjà attaqués.","Les neutres."]
+        elif replique == "Les ennemis, ceux qui nous ont déjà attaqués.":
+            self.replique = "Qu'est-ce que je leur fait ?"
+            self.repliques = ["Attaque-les, ils nous ont attaqué en premier.","Ignore-les, on a plus important à faire.","Fuis-les, ça sera plus sûr."]
+        elif replique == "Attaque-les, ils nous ont attaqué en premier.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_ennemis = 0
+        elif replique == "Ignore-les, on a plus important à faire.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_ennemis = 1
+        elif replique == "Fuis-les, ça sera plus sûr.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_ennemis = 2
+        elif replique == "Les neutres.":
+            self.replique = "Qu'est-ce que je leur fait ?"
+            self.repliques = ["Attaque-les, l'attaque est la meilleure défense.","Ignore-les, tant qu'ils ne nous agressent pas.","Fuis-les, tous les monstres sont dangereux."]
+        elif replique == "Attaque-les, l'attaque est la meilleure défense.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_neutres = 0
+        elif replique == "Ignore-les, tant qu'ils ne nous agressent pas.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_neutres = 1
+        elif replique == "Fuis-les, tous les monstres sont dangereux.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_neutres = 2
+        elif replique == "Merci.":
+            self.end_dialogue(-1)
+        elif replique == "C'est une question personnelle.":
+            self.replique = "On a pas vraiment le temps, là..."
+            self.repliques = ["Ah, c'est vrai..."]
+        elif replique == "Ah, c'est vrai...":
+            self.end_dialogue(-1)
+
         else:
             self.end_dialogue(self.dialogue)
             print("Je ne connais pas cette réplique !")
@@ -5344,7 +5604,7 @@ class Alchimiste(Humain): #Le septième humain du jeu, à l'étage 6 (un faiseur
         skill = trouve_skill(self.classe_principale,Skill_magie) #Est-ce qu'il a le même Skill_magie que le joueur ?
         if self.peut_payer(cout_pm_avalanche[skill.niveau-1]):
             self.skill_courant = Skill_magie
-            self.magie_courante = "avalanche" #/!\
+            self.magie_courante = "magie poing magique" #/!\
             self.dir_magie = direction
         else:
             self.skill_courant = Skill_stomp
@@ -5410,6 +5670,68 @@ class Alchimiste(Humain): #Le septième humain du jeu, à l'étage 6 (un faiseur
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
             self.attente = False
 
+        #Dialogue par défaut:
+        elif replique == "Va quelque part.":
+            self.replique = "Où ?"
+            self.repliques = ["Tu peux suivre quelqu'un ?","Tu vois là-bas ?","Cherche la sortie."]
+        elif replique == "Tu peux suivre quelqu'un ?":
+            self.mouvement = 0
+            self.replique = "Oui, qui ?"
+            self.repliques = ["Moi.","Je vais te montrer."]
+        elif replique == "Moi.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
+        elif replique == "Je vais te montrer.":
+            #/!\ Comment faire le choix ?
+            self.replique = "Désolé, le choix n'a pas été implémenté. Je vais me suivre moi-même à la place."
+            self.repliques = ["Merci."]
+            self.cible_deplacement = self.ID
+        elif replique == "Cherche la sortie.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.mouvement = 1
+        elif replique == "Change ta méthode de combat.":
+            self.replique = "Envers les ennemis, ou les monstres neutres ?"
+            self.repliques = ["Les ennemis, ceux qui nous ont déjà attaqués.","Les neutres."]
+        elif replique == "Les ennemis, ceux qui nous ont déjà attaqués.":
+            self.replique = "Qu'est-ce que je leur fait ?"
+            self.repliques = ["Attaque-les, ils nous ont attaqué en premier.","Ignore-les, on a plus important à faire.","Fuis-les, ça sera plus sûr."]
+        elif replique == "Attaque-les, ils nous ont attaqué en premier.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_ennemis = 0
+        elif replique == "Ignore-les, on a plus important à faire.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_ennemis = 1
+        elif replique == "Fuis-les, ça sera plus sûr.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_ennemis = 2
+        elif replique == "Les neutres.":
+            self.replique = "Qu'est-ce que je leur fait ?"
+            self.repliques = ["Attaque-les, l'attaque est la meilleure défense.","Ignore-les, tant qu'ils ne nous agressent pas.","Fuis-les, tous les monstres sont dangereux."]
+        elif replique == "Attaque-les, l'attaque est la meilleure défense.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_neutres = 0
+        elif replique == "Ignore-les, tant qu'ils ne nous agressent pas.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_neutres = 1
+        elif replique == "Fuis-les, tous les monstres sont dangereux.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_neutres = 2
+        elif replique == "Merci.":
+            self.end_dialogue(-1)
+        elif replique == "C'est une question personnelle.":
+            self.replique = "On a pas vraiment le temps, là..."
+            self.repliques = ["Ah, c'est vrai..."]
+        elif replique == "Ah, c'est vrai...":
+            self.end_dialogue(-1)
+
         else:
             self.end_dialogue(self.dialogue)
             print("Je ne connais pas cette réplique !")
@@ -5457,7 +5779,7 @@ class Peste(Humain): #La huitième humaine du jeu, à l'étage 7 (une sainte tr�
         skill = trouve_skill(self.classe_principale,Skill_magie) #Est-ce qu'il a le même Skill_magie que le joueur ?
         if self.peut_payer(cout_pm_avalanche[skill.niveau-1]):
             self.skill_courant = Skill_magie
-            self.magie_courante = "purification" #/!\
+            self.magie_courante = "magie purification" #/!\
             self.dir_magie = direction
         else:
             self.skill_courant = Skill_stomp
@@ -5542,6 +5864,65 @@ class Peste(Humain): #La huitième humaine du jeu, à l'étage 7 (une sainte tr�
         #Dialogue par défaut -4
         elif replique == "  ":
             self.end_dialogue(-4)
+
+        #Dialogue par défaut:
+        elif replique == "Va quelque part.":
+            self.replique = "Où ?"
+            self.repliques = ["Tu peux suivre quelqu'un ?","Tu vois là-bas ?","Cherche la sortie."]
+        elif replique == "Tu peux suivre quelqu'un ?":
+            self.mouvement = 0
+            self.replique = "Oui, qui ?"
+            self.repliques = ["Moi.","Je vais te montrer."]
+        elif replique == "Moi.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
+        elif replique == "Je vais te montrer.":
+            #/!\ Comment faire le choix ?
+            self.replique = "Désolé, le choix n'a pas été implémenté. Je vais me suivre moi-même à la place."
+            self.repliques = ["Merci."]
+            self.cible_deplacement = self.ID
+        elif replique == "Cherche la sortie.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.mouvement = 1
+        elif replique == "Change ta méthode de combat.":
+            self.replique = "Envers les ennemis, ou les monstres neutres ?"
+            self.repliques = ["Les ennemis, ceux qui nous ont déjà attaqués.","Les neutres."]
+        elif replique == "Les ennemis, ceux qui nous ont déjà attaqués.":
+            self.replique = "Qu'est-ce que je leur fait ?"
+            self.repliques = ["Attaque-les, ils nous ont attaqué en premier.","Ignore-les, on a plus important à faire.","Fuis-les, ça sera plus sûr."]
+        elif replique == "Attaque-les, ils nous ont attaqué en premier.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_ennemis = 0
+        elif replique == "Ignore-les, on a plus important à faire.":
+            self.replique = "Ignorer des monstres ? Tu es fou ? Il faut tous les exterminer !"
+            self.repliques = ["Ah, c'est vrai..."]
+        elif replique == "Fuis-les, ça sera plus sûr.":
+            self.replique = "Je ne fuirais jamais devant les monstres !"
+            self.repliques = ["Ah, c'est vrai..."]
+        elif replique == "Les neutres.":
+            self.replique = "Qu'est-ce que je leur fait ?"
+            self.repliques = ["Attaque-les, l'attaque est la meilleure défense.","Ignore-les, tant qu'ils ne nous agressent pas.","Fuis-les, tous les monstres sont dangereux."]
+        elif replique == "Attaque-les, l'attaque est la meilleure défense.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_neutres = 0
+        elif replique == "Ignore-les, tant qu'ils ne nous agressent pas.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_neutres = 1
+        elif replique == "Fuis-les, tous les monstres sont dangereux.":
+            self.replique = "Je ne fuirais jamais devant les monstres !"
+            self.repliques = ["Ah, c'est vrai..."]
+        elif replique == "Merci.":
+            self.end_dialogue(-1)
+        elif replique == "C'est une question personnelle.":
+            self.replique = "On a pas vraiment le temps, là..."
+            self.repliques = ["Ah, c'est vrai..."]
+        elif replique == "Ah, c'est vrai...":
+            self.end_dialogue(-1)
 
         else:
             self.end_dialogue(self.dialogue)
@@ -5695,6 +6076,68 @@ class Bombe_atomique(Humain): #La neuvième humaine du jeu, à l'étage 8 (une m
         elif replique == "   ":
             self.end_dialogue(-3)
 
+        #Dialogue par défaut:
+        elif replique == "Va quelque part.":
+            self.replique = "Où ?"
+            self.repliques = ["Tu peux suivre quelqu'un ?","Tu vois là-bas ?","Cherche la sortie."]
+        elif replique == "Tu peux suivre quelqu'un ?":
+            self.mouvement = 0
+            self.replique = "Oui, qui ?"
+            self.repliques = ["Moi.","Je vais te montrer."]
+        elif replique == "Moi.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
+        elif replique == "Je vais te montrer.":
+            #/!\ Comment faire le choix ?
+            self.replique = "Désolé, le choix n'a pas été implémenté. Je vais me suivre moi-même à la place."
+            self.repliques = ["Merci."]
+            self.cible_deplacement = self.ID
+        elif replique == "Cherche la sortie.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.mouvement = 1
+        elif replique == "Change ta méthode de combat.":
+            self.replique = "Envers les ennemis, ou les monstres neutres ?"
+            self.repliques = ["Les ennemis, ceux qui nous ont déjà attaqués.","Les neutres."]
+        elif replique == "Les ennemis, ceux qui nous ont déjà attaqués.":
+            self.replique = "Qu'est-ce que je leur fait ?"
+            self.repliques = ["Attaque-les, ils nous ont attaqué en premier.","Ignore-les, on a plus important à faire.","Fuis-les, ça sera plus sûr."]
+        elif replique == "Attaque-les, ils nous ont attaqué en premier.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_ennemis = 0
+        elif replique == "Ignore-les, on a plus important à faire.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_ennemis = 1
+        elif replique == "Fuis-les, ça sera plus sûr.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_ennemis = 2
+        elif replique == "Les neutres.":
+            self.replique = "Qu'est-ce que je leur fait ?"
+            self.repliques = ["Attaque-les, l'attaque est la meilleure défense.","Ignore-les, tant qu'ils ne nous agressent pas.","Fuis-les, tous les monstres sont dangereux."]
+        elif replique == "Attaque-les, l'attaque est la meilleure défense.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_neutres = 0
+        elif replique == "Ignore-les, tant qu'ils ne nous agressent pas.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_neutres = 1
+        elif replique == "Fuis-les, tous les monstres sont dangereux.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_neutres = 2
+        elif replique == "Merci.":
+            self.end_dialogue(-1)
+        elif replique == "C'est une question personnelle.":
+            self.replique = "On a pas vraiment le temps, là..."
+            self.repliques = ["Ah, c'est vrai..."]
+        elif replique == "Ah, c'est vrai...":
+            self.end_dialogue(-1)
+
         else:
             self.end_dialogue(self.dialogue)
             print("Je ne connais pas cette réplique !")
@@ -5782,6 +6225,68 @@ class Marchand(Humain): #Le dixième humain du jeu, à l'étage 9 (le seul lien 
             self.mouvement = 0 #Légèrement redondant ici
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
             self.attente = False
+
+        #Dialogue par défaut:
+        elif replique == "Va quelque part.":
+            self.replique = "Où ?"
+            self.repliques = ["Tu peux suivre quelqu'un ?","Tu vois là-bas ?","Cherche la sortie."]
+        elif replique == "Tu peux suivre quelqu'un ?":
+            self.mouvement = 0
+            self.replique = "Oui, qui ?"
+            self.repliques = ["Moi.","Je vais te montrer."]
+        elif replique == "Moi.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
+        elif replique == "Je vais te montrer.":
+            #/!\ Comment faire le choix ?
+            self.replique = "Désolé, le choix n'a pas été implémenté. Je vais me suivre moi-même à la place."
+            self.repliques = ["Merci."]
+            self.cible_deplacement = self.ID
+        elif replique == "Cherche la sortie.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.mouvement = 1
+        elif replique == "Change ta méthode de combat.":
+            self.replique = "Envers les ennemis, ou les monstres neutres ?"
+            self.repliques = ["Les ennemis, ceux qui nous ont déjà attaqués.","Les neutres."]
+        elif replique == "Les ennemis, ceux qui nous ont déjà attaqués.":
+            self.replique = "Qu'est-ce que je leur fait ?"
+            self.repliques = ["Attaque-les, ils nous ont attaqué en premier.","Ignore-les, on a plus important à faire.","Fuis-les, ça sera plus sûr."]
+        elif replique == "Attaque-les, ils nous ont attaqué en premier.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_ennemis = 0
+        elif replique == "Ignore-les, on a plus important à faire.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_ennemis = 1
+        elif replique == "Fuis-les, ça sera plus sûr.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_ennemis = 2
+        elif replique == "Les neutres.":
+            self.replique = "Qu'est-ce que je leur fait ?"
+            self.repliques = ["Attaque-les, l'attaque est la meilleure défense.","Ignore-les, tant qu'ils ne nous agressent pas.","Fuis-les, tous les monstres sont dangereux."]
+        elif replique == "Attaque-les, l'attaque est la meilleure défense.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_neutres = 0
+        elif replique == "Ignore-les, tant qu'ils ne nous agressent pas.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_neutres = 1
+        elif replique == "Fuis-les, tous les monstres sont dangereux.":
+            self.replique = "Ok."
+            self.repliques = ["Merci."]
+            self.comportement_neutres = 2
+        elif replique == "Merci.":
+            self.end_dialogue(-1)
+        elif replique == "C'est une question personnelle.":
+            self.replique = "On a pas vraiment le temps, là..."
+            self.repliques = ["Ah, c'est vrai..."]
+        elif replique == "Ah, c'est vrai...":
+            self.end_dialogue(-1)
 
         else:
             self.end_dialogue(self.dialogue)
@@ -7717,6 +8222,7 @@ class Esprit :
         self.corps = {}
         self.vue = {}
         self.ennemis = {}
+        self.prejuges = []
         self.oubli = 1
         self.nom = nom
         self.controleur = None
@@ -7988,6 +8494,11 @@ class Esprit :
         for vue in vues: #On identifie les agissants perçus
             agissants_vus += self.trouve_agissants(vue)
         self.oublie_agissants(agissants_vus) #Puisqu'on les a vus, on n'a plus besoin de garder en mémoire leur position précédente
+        for ID_agissant in agissants_vus:
+            if not(ID_agissant in self.ennemis.keys() or ID_agissant in self.corps.keys()):
+                for espece in self.controleur.get_especes(ID_agissant):
+                    if espece in self.prejuges:
+                        self.ennemis[ID_agissant] = 0.01
         for vue in vues :
             niveau = vue[0][0][0][0] #La première coordonée de la position (première information) de la première case de la première colonne
             if niveau in self.vue.keys(): 
@@ -8230,6 +8741,7 @@ class Esprit_type(Esprit):
         self.controleur = controleur
         self.oubli = niveau
         self.ennemis = {}
+        self.prejuges = []
         self.vue = {}
         self.corps = {}
         if niveau == 1:
@@ -8283,6 +8795,7 @@ class Esprit_bourrin(Esprit_type):
         self.controleur = controleur
         self.oubli = niveau
         self.ennemis = {}
+        self.prejuges = []
         self.vue = {}
         self.corps = {}
         if niveau == 1:
@@ -8306,6 +8819,7 @@ class Esprit_defensif(Esprit_type):
         self.controleur = controleur
         self.oubli = niveau
         self.ennemis = {}
+        self.prejuges = []
         self.vue = {}
         self.corps = {}
         if niveau == 1:
@@ -8323,22 +8837,24 @@ class Esprit_defensif(Esprit_type):
 
 class Esprit_solitaire(Esprit_type):
     """Un esprit avec un unique corp."""
-    def __init__(self,corp,controleur):
+    def __init__(self,nom,corp,controleur):
         self.nom = nom
         self.controleur = controleur
         self.oubli = 5
         self.ennemis = {}
+        self.prejuges = []
         self.vue = {}
         self.corps = {}
         self.ajoute_corp(corp)
 
 class Esprit_simple(Esprit_type):
     """Un esprit avec les corps qu'on lui donne."""
-    def __init__(self,nom,corps,controleur):
+    def __init__(self,nom,corps,prejuges,controleur):
         self.nom = nom
         self.controleur = controleur
         self.oubli = 5
         self.ennemis = {}
+        self.prejuges = prejuges
         self.vue = {}
         self.corps = {}
         self.ajoute_corps(corps)
@@ -8350,6 +8866,7 @@ class Esprit_humain(Esprit_type):
         self.controleur = controleur
         self.oubli = 5 #Faire dépendre de l'humain
         self.ennemis = {}
+        self.prejuges = [] #Peut-être quelques boss ?
         self.vue = {}
         self.corps = {}
         self.ajoute_corp(corp)
@@ -8661,6 +9178,7 @@ class Esprit_slime(Esprit_type):
         self.controleur = controleur
         self.oubli = 5 #Faire dépendre des skills
         self.ennemis = {}
+        self.prejuges = ["humain"] #Vraiment ?
         self.vue = {}
         self.corps = {}
         self.classe = controleur.get_entitee(corp).classe_principale
@@ -9491,6 +10009,24 @@ class Attaque_percante(Attaque_particulier): #Attention ! Perçant pour une atta
 
     def get_skin(self):
         return SKIN_BLESSURE
+
+class Purification(Attaque):
+    """L'effet de purification. Une attaque de 'lumière'."""
+    def __init__(self,responsable,degats,portee):
+        self.affiche = False
+        self.phase = "démarrage"
+        self.responsable = responsable
+        self.degats = degats
+        self.portee = portee
+
+    def action(self,controleur):
+        position = controleur.get_entitee(self.responsable).get_position()
+        positions_touches = controleur.get_pos_touches(position,self.portee,"C__S___",None,"tout")
+        for position_touche in positions_touches:
+            for victime_potentielle in controleur.trouve_agissants(position_touche):
+                if not "humain" in controleur.get_especes(victime_potentielle):
+                    victime = controleur.get_entitee(victime_potentielle)
+                    victime.pv -= self.degats * victime.get_aff(OMBRE)
     
 class On_hit(Effet):
     """La classe des effets qui se déclenchent quand un projectile heurte un agissant ou un mur."""
@@ -11125,6 +11661,23 @@ class Magie_instakill(Magie_cible):
 
     def get_skin():
         return SKIN_MAGIE_INSTAKILL
+
+class Magie_purification(Magie):
+    """La magie qui crée un effet de purification sur un agissant."""
+    nom = "magie purification"
+    def __init__(self,niveau):
+        self.phase = "démarrage"
+        self.gain_xp = gain_xp_purification[niveau-1]
+        self.cout_pm = cout_pm_purification[niveau-1]
+        self.latence = latence_purification[niveau-1]
+        self.niveau = niveau
+        self.affiche = False
+
+    def action(self,porteur):
+        porteur.effets.append(Purification(porteur.ID,degats_purification[self.niveau-1],portee_purification[self.niveau-1])) #Ajouter une direction ?
+
+    def get_skin():
+        return SKIN_MAGIE_PURIFICATION
 
 # Les sorts de projectiles qui sont lancés depuis l'emplacement de l'agissant n'ont pas besoin de classe propre (la classe Invocation suffit).
 # On les liste quand même pour rappel :
