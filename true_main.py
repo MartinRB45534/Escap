@@ -38,6 +38,22 @@ class Main: #Modifier le nom plus tard pour plus de cohérence
         for esprit in self.esprits_courants:
             esprit.debut_tour() #Des décisions sont prises ici
 
+    def pseudo_debut_tour(self):
+        """La fonction qui fait la première moitiée de chaque tour"""
+
+        #On récupère les intervenants du tour
+        self.agissants_courants,self.items_courants,self.labs_courants,self.esprits_courants = self.controleur.get_agissants_items_labs_esprits()
+
+        for agissant in self.agissants_courants :
+            self.controleur.make_vue(agissant)
+            agissant.pseudo_debut_tour()
+        for item in self.items_courants :
+            item.pseudo_debut_tour()
+        for lab in self.labs_courants:
+            lab.pseudo_debut_tour()
+        for esprit in self.esprits_courants:
+            esprit.pseudo_debut_tour()
+
     def fin_tour(self):
         """La fonction qui fait la deuxième moitiée de chaque tour"""
 
@@ -133,7 +149,10 @@ class Main: #Modifier le nom plus tard pour plus de cohérence
 
         self.run = True
         while self.run : #Devient faux quand on quitte
-            self.debut_tour()
+            if self.controleur.phase == TOUR :
+                self.debut_tour()
+            else :
+                self.pseudo_debut_tour() #Quelques trucs d'affichage
 
             self.input()
             if self.controleur.phase == TOUR : #On continue un tour normal
@@ -181,7 +200,7 @@ class Main: #Modifier le nom plus tard pour plus de cohérence
                 if res == False:
                     run = False
                 elif res == "new":
-                    ID_MAX.set_id_max(1)
+                    ID_MAX.set_id_max(10)
                     self.controleur = Controleur()
                     self.controleurs.append(self.controleur)
                     self.controleur.jeu(screen)

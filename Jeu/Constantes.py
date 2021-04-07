@@ -32,10 +32,6 @@ POLICE20 = pygame.font.SysFont(None, 20)
 global ID_MAX
 ID_MAX = Id_max()
 
-#Constantes d'équilibrage :
-global constantes_lab
-constantes_lab = {0:0.1}
-
 #constantes
 global HAUT
 HAUT=0
@@ -49,132 +45,6 @@ global IN
 IN=4
 global OUT
 OUT=5
-
-
-global MUR_VIDE
-MUR_VIDE=0
-global MUR_PLEIN
-MUR_PLEIN=1
-global INTOUCHABLE
-INTOUCHABLE=2
-
-global PORTE_FERMEE
-PORTE_FERMEE=0
-global PORTE_OUVERTE
-PORTE_OUVERTE=1
-
-#global Potion
-
-global FENETRE_X
-FENETRE_X = 600
-global FENETRE_Y
-FENETRE_Y = 600
-
-global malchance_forcee
-malchance_forcee = False
-
-global voir_tout
-voir_tout = 0
-global parcours_en_profondeur
-parcours_en_profondeur = 1
-global aveugle
-aveugle = 2
-global distance_max
-distance_max = 3
-
-global passage
-passage = 1
-
-
-global BEGINNER
-BEGINNER = 0
-global EASY
-EASY = 1
-global AVERAGE
-AVERAGE = 2
-global HARD
-HARD = 3
-global INSANE
-INSANE = 4
-global IMPOSSIBLE
-IMPOSSIBLE = 5
-
-
-global BOUGER
-BOUGER = 0
-global ATTAQUER
-ATTAQUER = 1
-global PARLER
-PARLER = 2
-global INTERAGIR
-INTERAGIR = 3
-global CONSULTER_MINIMAP
-CONSULTER_MINIMAP = 4
-global CONSULTER_INVENTAIRE
-CONSULTER_INVENTAIRE = 5
-global PRECISION
-PRECISION = 6
-global POSTCISION
-POSTCISION = 7
-global RETOUR
-RETOUR = 8
-global BOUGER_MINIMAP
-BOUGER_MINIMAP = 9
-global BOUGER_INVENTAIRE
-BOUGER_INVENTAIRE = 10
-global UTILISER
-UTILISER = 11
-global AIDER
-AIDER = 12
-
-
-global ARRIVEE
-ARRIVEE=(30, 144, 255)
-
-global LABYRINTHE
-LABYRINTHE=0
-global MINIMAP
-MINIMAP=1
-global INVENTAIRE_
-INVENTAIRE_=2
-global DIALOGUE
-DIALOGUE=3
-global ITEM
-ITEM=4
-
-global LIGHT
-LIGHT = 0
-global HEAVY
-HEAVY = 1
-
-
-global sauvegarde
-sauvegarde = "save.p"
-
-global TAILLE_FIXE
-TAILLE_FIXE = False
-global taille_fixe
-taille_fixe = 10
-
-global SCREEN
-
-#À supprimer ?
-global LAB
-global JOUEUR
-global AGISSANTS
-global ITEMS
-
-global BIENFAIT
-BIENFAIT = 0
-global DELIT
-DELIT = 1
-global CRIME
-CRIME = 2
-
-global MORT
-MORT = 0
-global VIVANT
-VIVANT = 1
 
 global TERRE
 TERRE = 0
@@ -496,3 +366,7 @@ EVENEMENT = 5
 
 global LEVELUP
 LEVELUP = 0
+global DIALOGUE
+DIALOGUE = 1
+global COMPLEMENT_DIALOGUE
+COMPLEMENT_DIALOGUE = 2
