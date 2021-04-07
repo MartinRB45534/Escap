@@ -299,6 +299,8 @@ class Controleur():
         self.ajoute_entitee(cle2)
         cle3 = Cle(("Étage 8 : magie",35,8),["Porte_anti_anti_chambre_8"])
         self.ajoute_entitee(cle3)
+        gobelins = self.cree_agissants(Mage_gobelin,1,("Étage 8 : magie",0,0),25,10,7) + self.cree_agissants(Guerrier_gobelin,1,("Étage 8 : magie",0,0),25,10,9)
+        self.esprits["gobelins_magie"]=Esprit_simple("gobelins_magie",gobelins,["humain"],self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
         paterns8 = [Patern(("Étage 8 : magie",33,0),7,4,[("Étage 8 : magie",0,1)]),
                     Patern(("Étage 8 : magie",26,6),4,4,[("Étage 8 : magie",0,2)],["Porte_anti_chambre_8"]),
                     Patern(("Étage 8 : magie",30,4),10,6,[("Étage 8 : magie",5,0),("Étage 8 : magie",0,4)],["Porte_sas_8","Porte_anti_anti_chambre_8"])]
@@ -345,6 +347,8 @@ class Controleur():
         #Dans la sixième, une épée :
         epee = Epee_de_gobelin(("Étage 9 : équippement",59,0),1)
         self.ajoute_entitee(epee)
+        #gobelins = self.cree_agissants(Mage_gobelin,1,("Étage 9 : équippement",0,0),25,10,7) + self.cree_agissants(Guerrier_gobelin,1,("Étage 9 : équippement",0,0),25,10,9)
+        #self.esprits["gobelins_equippement"]=Esprit_simple("gobelins_equippement",gobelins,["humain"],self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
         paterns9 = [Patern(("Étage 9 : équippement",0,0),7,4,[("Étage 9 : équippement",5,3)],["Porte_première_armurerie_9"]),
                     Patern(("Étage 9 : équippement",5,5),4,5,[("Étage 9 : équippement",2,0)],["Porte_deuxième_armurerie_9"]),
                     Patern(("Étage 9 : équippement",15,3),6,5,[("Étage 9 : équippement",0,3)],["Porte_troisième_armurerie_9"]),
@@ -1140,7 +1144,7 @@ class Labyrinthe:
         self.controleur = None #Tant qu'il n'est pas actif, il n'a pas de controleur à qui se référer
 
         self.generation(proba,None,None)
-        print("Génération : check")
+        #print("Génération : check")
 
     def generation(self,proba=None,nbMurs=None,pourcentage=None):
         """
@@ -1190,9 +1194,9 @@ class Labyrinthe:
             mur.effets.append(Mur_plein(self.durete))
         
         #génération en profondeur via l'objet generateur
-        print("Génération du labyrinthe")
+        #print("Génération du labyrinthe")
         gene=Generateur(self.matrice_cases,self.depart,self.largeur,self.hauteur,self.patterns)
-        print("Générateur : check")
+        #print("Générateur : check")
         self.matrice_cases=gene.generation(proba,nbMurs,pourcentage)
 
     def veut_passer(self,intrus,direction):
@@ -2993,9 +2997,11 @@ class Mage_gobelin(Gobelin):
 
     def attaque(self,direction):
         skill = trouve_skill(self.classe_principale,Skill_magie) #Est-ce qu'il a le même Skill_magie que le joueur ?
+        self.dir_regard = direction
         if self.peut_payer(cout_pm_poing_magique[skill.niveau-1]): #Quelle est l'attaque magique des gobelins ?
             self.skill_courant = Skill_magie
             self.magie_courante = "magie poing magique"
+            self.dir_magie = direction
         else:
             self.skill_courant = Skill_stomp
 
@@ -3144,14 +3150,14 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         self.inventaire = Sac_a_dos()
 
         #Il doit afficher tout ce qu'il voit...
-        print("Initialisation du joueur")
+        #print("Initialisation du joueur")
         self.affichage = Affichage(screen)
         self.event = None
         self.etage = 0
         self.arbre = True
         self.courant = 0
         self.choix_elems = []
-        print("Affichage : check")
+        #print("Affichage : check")
         self.curseur = "carré" #... et sélectionner un certain nombre de trucs
         self.highest = 0 #Le plus haut où l'on soit allé.
 
@@ -11730,7 +11736,7 @@ class Magie_purification(Magie):
 
 class Affichage:
     def __init__(self,screen):
-        print("Initialisation de l'affichage")
+        #print("Initialisation de l'affichage")
         self.screen = screen
         self.hauteur_ecran = 0
         self.largeur_ecran = 0
