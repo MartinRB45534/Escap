@@ -55,21 +55,21 @@ class Controleur():
 
     def jeu(self,screen):
 
-        joueur = Joueur(("Étage 1 : test",0,0),screen)
+        joueur = Joueur(self,("Étage 1 : test",0,0),screen)
         self.ajoute_entitee(joueur) #Est-ce qu'il est à cet étage dès le début ? Même pendant la cinématique ?
         self.esprits["joueur"] = Esprit_humain(joueur.ID,self)
 
-        autre = Alchimiste(("Étage 1 : test",1,0))
-        self.ajoute_entitee(autre)
-        self.esprits["alchimiste"] = Esprit_humain(autre.ID,self)
+##        autre = Alchimiste(self,("Étage 1 : test",1,0))
+##        self.ajoute_entitee(autre)
+##        self.esprits["alchimiste"] = Esprit_humain(autre.ID,self)
 
-        gobel1 = Sentinelle_gobelin(("Étage 1 : test",11,15),1)
+        gobel1 = Chef_gobelin(self,("Étage 1 : test",11,15),1)
         self.ajoute_entitee(gobel1)
-        self.esprits["gobel1"]=Esprit_simple("gobel1",[gobel1.ID],["humain"],self)
+        #self.esprits["gobel1"]=Esprit_simple("gobel1",[gobel1.ID],["humain"],self)
 
-        gobel2 = Sentinelle_gobelin(("Étage 1 : test",2,6),1)
+        gobel2 = Sentinelle_gobelin(self,("Étage 1 : test",2,6),1)
         self.ajoute_entitee(gobel2)
-        self.esprits["gobel2"]=Esprit_simple("gobel2",[gobel2.ID],[],self)
+        self.esprits["gobel2"]=Esprit_simple("gobel2",[gobel1.ID,gobel2.ID],[],self)
 
         paterns1 = [Patern(("Étage 1 : test",0,0),20,20,[])]
         self.labs["Étage 1 : test"]=Labyrinthe("Étage 1 : test",20,20,("Étage 1 : test",0,0),paterns1,1,1,TERRE,1)
@@ -78,19 +78,19 @@ class Controleur():
 
     def tuto(self,screen):
         #On crée le joueur :
-        joueur = Joueur(("Étage 1 : couloir",13,0),screen)
+        joueur = Joueur(self,("Étage 1 : couloir",13,0),screen)
         self.ajoute_entitee(joueur) #Est-ce qu'il est à cet étage dès le début ? Même pendant la cinématique ?
         self.esprits["joueur"] = Esprit_humain(joueur.ID,self)
 
         #On crée le premier étage et son occupant :
-        receptionniste = Receptionniste(("Étage 1 : couloir",14,0))
+        receptionniste = Receptionniste(self,("Étage 1 : couloir",14,0))
         self.ajoute_entitee(receptionniste)
         self.esprits["receptionniste"] = Esprit_humain(receptionniste.ID,self)
         paterns1 = [Patern(("Étage 1 : couloir",9,0),10,3,[("Étage 1 : couloir",0,1)],["clé couloir"])]
         self.labs["Étage 1 : couloir"]=Labyrinthe("Étage 1 : couloir",19,3,("Étage 1 : couloir",0,0),paterns1,1,1,TERRE,1)
 
         #On crée le deuxième étage et son occupant :
-        paume = Paume(("Étage 2 : labyrinthe",1,0))
+        paume = Paume(self,("Étage 2 : labyrinthe",1,0))
         self.ajoute_entitee(paume)
         self.esprits["paume"] = Esprit_humain(paume.ID,self)
         paterns2 = [Patern(("Étage 2 : labyrinthe",0,0),5,5,[("Étage 2 : labyrinthe",4,1),("Étage 2 : labyrinthe",4,2),("Étage 2 : labyrinthe",4,3)]),
@@ -99,7 +99,7 @@ class Controleur():
         self.construit_escalier(("Étage 1 : couloir",18,1),("Étage 2 : labyrinthe",0,0),DROITE,GAUCHE)
 
         #On crée le troisième étage et son occupante :
-        peureuse = Peureuse(("Étage 3 : combat",12,13))
+        peureuse = Peureuse(self,("Étage 3 : combat",12,13))
         self.ajoute_entitee(peureuse)
         self.esprits["peureuse"] = Esprit_humain(peureuse.ID,self)
         cle1 = Cle(("Étage 3 : combat",12,13),["Porte_entree_encombrant_5"])
@@ -108,11 +108,11 @@ class Controleur():
         cle2 = Cle(("Étage 3 : combat",12,13),["Porte_contournement_encombrant_5"])
         self.ajoute_entitee(cle2)
         peureuse.inventaire.ajoute(cle2)
-        gobel1 = Sentinelle_gobelin(("Étage 3 : combat",11,5),1) #Trois sentinelles gardent l'entrée du camp gobelin
+        gobel1 = Sentinelle_gobelin(self,("Étage 3 : combat",11,5),1) #Trois sentinelles gardent l'entrée du camp gobelin
         self.ajoute_entitee(gobel1)
-        gobel2 = Sentinelle_gobelin(("Étage 3 : combat",5,11),1)
+        gobel2 = Sentinelle_gobelin(self,("Étage 3 : combat",5,11),1)
         self.ajoute_entitee(gobel2)
-        gobel3 = Sentinelle_gobelin(("Étage 3 : combat",6,6),1)
+        gobel3 = Sentinelle_gobelin(self,("Étage 3 : combat",6,6),1)
         self.ajoute_entitee(gobel3)
         self.esprits["gobelins_combat"]=Esprit_simple("gobelins_combat",[gobel1.ID,gobel2.ID,gobel3.ID],["humain"],self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
         paterns3 = [Patern(("Étage 3 : combat",6,6),9,9,[("Étage 3 : combat",0,4),("Étage 3 : combat",4,0),("Étage 3 : combat",0,0)]),
@@ -123,18 +123,18 @@ class Controleur():
         self.construit_escalier(("Étage 2 : labyrinthe",1,5),("Étage 3 : combat",14,14),HAUT,BAS)
 
         #On crée le quatrième étage et son occupant :
-        codeur = Codeur(("Étage 4 : monstres",15,1))
+        codeur = Codeur(self,("Étage 4 : monstres",15,1))
         self.ajoute_entitee(codeur)
         self.esprits["codeur"] = Esprit_humain(codeur.ID,self)
-        gobel1 = Sentinelle_gobelin(("Étage 4 : monstres",23,13),1) #Une sentinelle garde les abords
+        gobel1 = Sentinelle_gobelin(self,("Étage 4 : monstres",23,13),1) #Une sentinelle garde les abords
         self.ajoute_entitee(gobel1)
-        gobel2 = Gobelin(("Étage 4 : monstres",21,7),1) #Un gobelin standard s'y balade
+        gobel2 = Gobelin(self,("Étage 4 : monstres",21,7),1) #Un gobelin standard s'y balade
         self.ajoute_entitee(gobel2)
-        gobel3 = Mage_gobelin(("Étage 4 : monstres",15,5),1) #Ainsi qu'un mage,
+        gobel3 = Mage_gobelin(self,("Étage 4 : monstres",15,5),1) #Ainsi qu'un mage,
         self.ajoute_entitee(gobel3)
-        gobel4 = Guerrier_gobelin(("Étage 4 : monstres",4,5),1) #et deux guerriers
+        gobel4 = Guerrier_gobelin(self,("Étage 4 : monstres",4,5),1) #et deux guerriers
         self.ajoute_entitee(gobel4)
-        gobel5 = Guerrier_gobelin(("Étage 4 : monstres",5,5),1)
+        gobel5 = Guerrier_gobelin(self,("Étage 4 : monstres",5,5),1)
         self.ajoute_entitee(gobel5)
         self.esprits["gobelins_monstres"]=Esprit_simple("gobelins_monstres",[gobel1.ID,gobel2.ID,gobel3.ID,gobel4.ID,gobel5.ID],["humain"],self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
         paterns4 = [Patern(("Étage 4 : monstres",4,0),10,2,[("Étage 4 : monstres",0,1)],[],False),
@@ -145,7 +145,7 @@ class Controleur():
         self.construit_escalier(("Étage 3 : combat",0,3),("Étage 4 : monstres",29,7),GAUCHE,DROITE)
 
         #On crée le cinquième étage et ses occupants :
-        encombrant = Encombrant(("Étage 5 : portes",2,3))
+        encombrant = Encombrant(self,("Étage 5 : portes",2,3))
         self.ajoute_entitee(encombrant)
         self.esprits["encombrant"] = Esprit_humain(encombrant.ID,self)
         passepartout1 = Cle(("Étage 5 : portes",8,22),["Porte_cellule_slime_5","Porte_cellule_piège_5","Porte_cellule_pré-piège_5","Porte_petite_cellule_droite_5"])
@@ -170,14 +170,14 @@ class Controleur():
         self.ajoute_entitee(cle8)
         cle9 = Cle(("Étage 5 : portes",9,13),["Porte_anti_chambre_8"])
         self.ajoute_entitee(cle9)
-        gobel1 = Sentinelle_gobelin(("Étage 5 : portes",8,22),1) #Une sentinelle veille sur la prison
+        gobel1 = Sentinelle_gobelin(self,("Étage 5 : portes",8,22),1) #Une sentinelle veille sur la prison
         self.ajoute_entitee(gobel1)
         gobel1.inventaire.ajoute(passepartout1)
-        gobel2 = Guerrier_gobelin(("Étage 5 : portes",8,1),2) #Un renégat mis à l'isolement pour le mater, ou un piège diabolique dirigé contre le joueur ?
+        gobel2 = Guerrier_gobelin(self,("Étage 5 : portes",8,1),2) #Un renégat mis à l'isolement pour le mater, ou un piège diabolique dirigé contre le joueur ?
         self.ajoute_entitee(gobel2)
-        slime = Slime(("Étage 5 : portes",1,20),1) #Un slime ! Est-ce que les gobelins ont pris soin de l'affaiblir ?
+        slime = Slime(self,("Étage 5 : portes",1,20),1) #Un slime ! Est-ce que les gobelins ont pris soin de l'affaiblir ?
         self.ajoute_entitee(slime)
-        #ombriul = Ombriul(("Étage 5 : portes",8,11),1) #Un prisonnier de guerre
+        #ombriul = Ombriul(self,("Étage 5 : portes",8,11),1) #Un prisonnier de guerre
         #self.ajoute_entitee(ombriul)
         self.esprits["gobelins_portes"]=Esprit_simple("gobelins_portes",[gobel1.ID,gobel2.ID],["humain"],self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
         #self.esprits["ombriul_captif"]=Esprit_simple("ombriul_captif",[ombriul.ID],["humain"],self)
@@ -203,7 +203,7 @@ class Controleur():
         self.construit_escalier(("Étage 4 : monstres",29,14),("Étage 5 : portes",0,23),DROITE,GAUCHE)
 
         #On crée le sixième étage et son occupant :
-        alchimiste = Alchimiste(("Étage 6 : potions",23,2))
+        alchimiste = Alchimiste(self,("Étage 6 : potions",23,2))
         self.ajoute_entitee(alchimiste)
         self.esprits["alchimiste"] = Esprit_humain(alchimiste.ID,self)
         cle1 = Cle(("Étage 6 : potions",0,19),["Porte_double_cellule_deuxième_5"])
@@ -225,7 +225,7 @@ class Controleur():
         self.construit_escalier(("Étage 5 : portes",0,0),("Étage 6 : potions",24,0),GAUCHE,DROITE)
 
         #On crée le septième étage et son occupante :
-        peste = Peste(("Étage 7 : meutes",2,0))
+        peste = Peste(self,("Étage 7 : meutes",2,0))
         self.ajoute_entitee(peste)
         self.esprits["peste"] = Esprit_humain(peste.ID,self)
         cle1 = Cle(("Étage 7 : meutes",12,1),["Porte_salle_commune_7"])
@@ -242,7 +242,7 @@ class Controleur():
         self.construit_escalier(("Étage 6 : potions",21,23),("Étage 7 : meutes",10,0),BAS,HAUT) #/!\ Rajouter les shamans !
 
         #On crée le huitième étage et son occupante :
-        bombe_atomique = Bombe_atomique(("Étage 8 : magie",28,8))
+        bombe_atomique = Bombe_atomique(self,("Étage 8 : magie",28,8))
         self.ajoute_entitee(bombe_atomique)
         self.esprits["bombe_atomique"] = Esprit_humain(bombe_atomique.ID,self)
         cle1 = Cle(("Étage 8 : magie",27,6),["Porte_sas_8"])
@@ -260,7 +260,7 @@ class Controleur():
         self.construit_escalier(("Étage 7 : meutes",0,9),("Étage 8 : magie",39,7),GAUCHE,DROITE) #/!\ Rajouter les ennemis !
 
         #On crée le neuvième étage et son occupant :
-        marchand = Marchand(("Étage 9 : équippement",2,0))
+        marchand = Marchand(self,("Étage 9 : équippement",2,0))
         self.ajoute_entitee(marchand)
         cle1 = Cle(("Étage 9 : équippement",2,0),["Porte_première_armurerie_9"])
         self.ajoute_entitee(cle1)
@@ -350,7 +350,7 @@ class Controleur():
             if poss != []:
                 j = random.randrange(len(poss))
                 pos = poss.pop(j) #On choisit aléatoirement la position de l'agissant et on ne veut pas la réutiliser
-                agissant = classe(pos,niveau)
+                agissant = classe(self,pos,niveau)
                 self.ajoute_entitee(agissant)
                 agissants.append(agissant.ID)
         return agissants
@@ -2284,7 +2284,7 @@ class Fantome(Entitee):
 
 class Agissant(Entitee): #Tout agissant est un cadavre, tout cadavre n'agit pas.
     """La classe des entitées animées. Capable de décision, de différentes actions, etc. Les principales caractéristiques sont l'ID, les stats, et la classe principale."""
-    def __init__(self,position,identite,niveau,ID=None):
+    def __init__(self,controleur,position,identite,niveau,ID=None):
         Entitee.__init__(self,position,ID)
         stats=CONSTANTES_STATS[identite]
         self.pv=stats['pv'][niveau]
@@ -2349,9 +2349,13 @@ class Agissant(Entitee): #Tout agissant est un cadavre, tout cadavre n'agit pas.
                     print(skil)
             for magie in stats['magies']:
                 skill.ajoute(eval(magie))
+        if stats['items']:
+            new_items = []
+            for item in stats['items']:
+                new_items.append(eval(item)(None,niveau))
+            controleur.ajoute_entitees(new_items)
+            self.inventaire.equippe(new_items)
         if stats['special']:
-            #Quelques entitées un peu particulières :
-            #Comme celles qui commencent avec des magies
             pass
 
     def active(self,controleur):
@@ -2760,128 +2764,14 @@ class Agissant(Entitee): #Tout agissant est un cadavre, tout cadavre n'agit pas.
                 print(self.niveau)
                 print(self.classe_principale.niveau)
 
-class Tank(Agissant):
-    """La classe des agissants forts en défense."""
-    def __init__(self,position,niveau):
-        Agissant.__init__(self,position,"tank",niveau)
-
-    def get_offenses(self):
-        offenses = self.offenses
-        self.offenses = []
-        if self.etat != "vivant" or self.controleur == None:
-            etat = "incapacite"
-        elif self.pv <= self.pv_max//9:
-            etat = "fuite"
-        else:
-            etat = "attaque"
-        return offenses, etat
-
-    def get_skin(self):
-        if self.etat == "vivant":
-            if self.esprit == "1":
-                return SKIN_VERT
-            elif self.esprit == "2":
-                return SKIN_ROUGE
-            else:
-                return SKIN_AGISSANT
-        else:
-            return SKIN_CADAVRE
-
-class Dps(Agissant):
-    """La classe des agissants forts en attaque."""
-    def __init__(self,position,niveau):
-        Agissant.__init__(self,position,"dps",niveau)
-
-    def get_offenses(self):
-        offenses = self.offenses
-        self.offenses = []
-        if self.etat != "vivant" or self.controleur == None:
-            etat = "incapacite"
-        elif self.pv <= self.pv_max//2:
-            etat = "fuite"
-        else:
-            etat = "attaque"
-        return offenses, etat
-
-    def get_skin(self):
-        if self.etat == "vivant":
-            if self.esprit == "1":
-                return SKIN_VERT
-            elif self.esprit == "2":
-                return SKIN_ROUGE
-            else:
-                return SKIN_AGISSANT
-        else:
-            return SKIN_CADAVRE
-
-class Soigneur(Agissant):
-    """La classe des agissants qui soignent les autres."""
-    def __init__(self,position,niveau):
-        Agissant.__nit__(self,position,'soigneur',niveau)
-        magie = trouve_skill(self.classe_principale,Skill_magie)
-        magie.ajoute(Magie_soin)
-        magie.ajoute(Magie_auto_soin)
-
-    def get_offenses(self):
-        offenses = self.offenses
-        self.offenses = []
-        if self.etat != "vivant" or self.controleur == None:
-            etat = "incapacite"
-        elif self.pv <= 3*self.pv_max//4 or self.pm < 50:
-            etat = "fuite"
-        else:
-            etat = "soin"
-        return offenses, etat
-
-    def get_skin(self):
-        if self.etat == "vivant":
-            if self.esprit == "1":
-                return SKIN_VERT
-            elif self.esprit == "2":
-                return SKIN_ROUGE
-            else:
-                return SKIN_AGISSANT
-        else:
-            return SKIN_CADAVRE
-
-class Renforceur(Agissant):
-    """La classe des agissants qui renforcent les autres."""
-    def __init__(self,position,niveau):
-        Agissant.__init__(self,position,"soutien",niveau)
-        magie = trouve_skill(self.classe_principale,Skill_magie)
-        magie.ajoute(Magie_enchantement_force())
-
-
-    def get_offenses(self):
-        offenses = self.offenses
-        self.offenses = []
-        if self.etat != "vivant" or self.controleur == None:
-            etat = "incapacite"
-        elif self.pv <= 3*self.pv_max//4 or self.pm < 50:
-            etat = "fuite"
-        else:
-            etat = "soutien"
-        return offenses, etat
-
-    def get_skin(self):
-        if self.etat == "vivant":
-            if self.esprit == "1":
-                return SKIN_VERT
-            elif self.esprit == "2":
-                return SKIN_ROUGE
-            else:
-                return SKIN_AGISSANT
-        else:
-            return SKIN_CADAVRE
-
 class Sentinelle(Agissant):
     """Une classe factice. Pour les agissants qui ne se déplace qu'en présence d'ennemis. Ne fonctionne pas lorsqu'un humain est aux commandes."""
     pass
 
 class Gobelin(Agissant):
     """Le monstre de base. Faible, souvent en groupe."""
-    def __init__(self,position,niveau):
-        Agissant.__init__(self,position,"gobelin",niveau)
+    def __init__(self,controleur,position,niveau):
+        Agissant.__init__(self,controleur,position,"gobelin",niveau)
 
     def get_offenses(self):
         offenses = self.offenses
@@ -2905,8 +2795,8 @@ class Gobelin(Agissant):
 class Sentinelle_gobelin(Gobelin,Sentinelle):
     """Un gobelin qui reste sur place tant qu'il ne voit pas d'ennemi. Créé spécifiquement pour les premiers étages et le tutoriel.
        Il a une meilleure défense que les gobelins de base."""
-    def __init__(self,position,niveau):
-        Agissant.__init__(self,position,"sentinelle_gobelin",niveau)
+    def __init__(self,controleur,position,niveau):
+        Agissant.__init__(self,controleur,position,"sentinelle_gobelin",niveau)
 
     def get_offenses(self):
         offenses = self.offenses
@@ -2922,8 +2812,8 @@ class Sentinelle_gobelin(Gobelin,Sentinelle):
 class Guerrier_gobelin(Gobelin):
     """Un gobelin agressif est avide de sang.
        Il a une meilleure attaque que les gobelins de base."""
-    def __init__(self,position,niveau):
-        Agissant.__init__(self,position,"guerrier_gobelin",niveau)
+    def __init__(self,controleur,position,niveau):
+        Agissant.__init__(self,controleur,position,"guerrier_gobelin",niveau)
 
     def get_offenses(self):
         offenses = self.offenses
@@ -2939,8 +2829,8 @@ class Guerrier_gobelin(Gobelin):
 class Explorateur_gobelin(Gobelin):
     """Un gobelin rapide et trop curieux.
        Il a une bonne vitesse que les gobelins de base, qui l'avantage aussi en combat."""
-    def __init__(self,position,niveau):
-        Agissant.__init__(self,position,"explorateur_gobelin",niveau)
+    def __init__(self,controleur,position,niveau):
+        Agissant.__init__(self,controleur,position,"explorateur_gobelin",niveau)
 
     def get_offenses(self):
         offenses = self.offenses
@@ -2956,8 +2846,8 @@ class Explorateur_gobelin(Gobelin):
 class Mage_gobelin(Gobelin):
     """Un gobelin avec un potentiel magique.
        Il peut utiliser une attaque magique."""
-    def __init__(self,position,niveau):
-        Agissant.__init__(self,position,"mage_gobelin",niveau)
+    def __init__(self,controleur,position,niveau):
+        Agissant.__init__(self,controleur,position,"mage_gobelin",niveau)
 
     def attaque(self,direction):
         skill = trouve_skill(self.classe_principale,Skill_magie) #Est-ce qu'il a le même Skill_magie que le joueur ?
@@ -2983,8 +2873,14 @@ class Mage_gobelin(Gobelin):
 class Shaman_gobelin(Gobelin):
     """Un gobelin avec un potentiel magique.
        Il peut utiliser un sort de boost."""
-    def __init__(self,position,niveau):
-        Agissant.__init__(self,position,"shaman_gobelin",niveau)
+    def __init__(self,controleur,position,niveau):
+        Agissant.__init__(self,controleur,position,"shaman_gobelin",niveau)
+
+    def boost(self,cible):
+        skill = trouve_skill(self.classe_principale,Skill_magie) #Est-ce qu'il a le même Skill_magie que le joueur ?
+        self.skill_courant = Skill_magie
+        self.magie_courante = "magie boost"
+        self.cible_magie = cible
 
     def get_offenses(self):
         offenses = self.offenses
@@ -3000,8 +2896,8 @@ class Shaman_gobelin(Gobelin):
 class Chef_gobelin(Gobelin):
     """Un gobelin qui dirige un groupe.
        Bonnes stats, augmente l'efficacité de l'esprit."""
-    def __init__(self,position,niveau):
-        Agissant.__init__(self,position,"chef_gobelin",niveau)
+    def __init__(self,controleur,position,niveau):
+        Agissant.__init__(self,controleur,position,"chef_gobelin",niveau)
 
     def get_offenses(self):
         offenses = self.offenses
@@ -3016,8 +2912,8 @@ class Chef_gobelin(Gobelin):
 
 class Slime(Agissant):
     """Un tas de gelée. Faible, tant qu'il est tout seul et de bas niveau..."""
-    def __init__(self,position,niveau):
-        Agissant.__init__(self,position,"slime",niveau)
+    def __init__(self,controleur,position,niveau):
+        Agissant.__init__(self,controleur,position,"slime",niveau)
 
     def get_offenses(self):
         offenses = self.offenses
@@ -3038,8 +2934,8 @@ class Slime(Agissant):
 
 class Humain(Agissant,Entitee_superieure):
     """La classe des pnjs et du joueur. A un comportement un peu plus complexe, et une personnalité."""
-    def __init__(self,position,identite,niveau,ID):
-        Agissant.__init__(self,position,identite,niveau,ID)
+    def __init__(self,controleur,position,identite,niveau,ID):
+        Agissant.__init__(self,controleur,position,identite,niveau,ID)
         self.dialogue = -1 #Le dialogue par défaut, celui des ordres
         self.replique = None #La réplique en cours de l'agissant vaut None lorsqu'il n'y a pas de dialogue en cours
         self.repliques = [] #Les réponses possibles de l'interlocuteur
@@ -3108,12 +3004,12 @@ class Humain(Agissant,Entitee_superieure):
 
 class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, c'est le personnage principal !)
     """La classe du joueur."""
-    def __init__(self,position,screen):
+    def __init__(self,controleur,position,screen):
 
         self.identite = 'joueur'
         self.place = 0
 
-        Humain.__init__(self,position,self.identite,1,2)
+        Humain.__init__(self,controleur,position,self.identite,1,2)
 
         self.apreciations = [0,0,0,0,0,0,0,0,0,0]
         self.role = "independant"
@@ -4713,12 +4609,12 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
 
 class Receptionniste(Humain): #Le deuxième humain du jeu, à l'étage 1 (engage la conversation après la chute, indique les commandes de base)
     """La classe du récéptionniste."""
-    def __init__(self,position):
+    def __init__(self,controleur,position):
 
         self.identite = 'receptionniste'
         self.place = 1
 
-        Humain.__init__(self,position,self.identite,5,3) #À un haut niveau dès le départ
+        Humain.__init__(self,controleur,position,self.identite,5,3) #À un haut niveau dès le départ
 
         self.appreciations = [0,3,0,0,0,0,1,3,6,0]
         self.dialogue = 1
@@ -4885,12 +4781,12 @@ class Receptionniste(Humain): #Le deuxième humain du jeu, à l'étage 1 (engage
 
 class Paume(Humain): #Le troisième humain du jeu, à l'étage 2 (complêtement paumé, rejoint le joueur sauf rares exceptions)
     """La classe du mec paumé."""
-    def __init__(self,position):
+    def __init__(self,controleur,position):
 
         self.identite = 'paume'
         self.place = 2
 
-        Humain.__init__(self,position,self.identite,1,4) #Plutôt faible, de base
+        Humain.__init__(self,controleur,position,self.identite,1,4) #Plutôt faible, de base
 
         self.appreciations = [1,1,3,2,0,0,0,7,4,-1]
         self.dialogue = 1
@@ -5067,12 +4963,12 @@ class Paume(Humain): #Le troisième humain du jeu, à l'étage 2 (complêtement 
 
 class Peureuse(Humain): #La quatrième humaine du jeu, à l'étage 3 (terrorisée par les monstres)
     """La classe de la peureuse."""
-    def __init__(self,position):
+    def __init__(self,controleur,position):
 
         self.identite = 'peureuse'
         self.place = 3
 
-        Humain.__init__(self,position,self.identite,1,5) #Plutôt faible, de base
+        Humain.__init__(self,controleur,position,self.identite,1,5) #Plutôt faible, de base
 
         self.comportement_ennemis = 2
         self.comportement_neutres = 2
@@ -5351,12 +5247,12 @@ class Peureuse(Humain): #La quatrième humaine du jeu, à l'étage 3 (terrorisé
 
 class Codeur(Humain): #Le cinquième humain du jeu, à l'étage 4 (répond au nom de Dev, quand Il n'est pas occupé à programmer un autre jeu)
     """Ma classe."""
-    def __init__(self,position):
+    def __init__(self,controleur,position):
 
         self.identite = 'codeur'
         self.place = 4
 
-        Humain.__init__(self,position,self.identite,1,1) #La notion de niveau n'a pas d'emprise sur Dev... Il peut modifier son niveau simple 'self.niveau = '
+        Humain.__init__(self,controleur,position,self.identite,1,1) #La notion de niveau n'a pas d'emprise sur Dev... Il peut modifier son niveau simple 'self.niveau = '
 
         self.appreciations = [5,0,0,0,0,0,0,0,0,0]
 
@@ -5450,12 +5346,12 @@ class Codeur(Humain): #Le cinquième humain du jeu, à l'étage 4 (répond au no
 
 class Encombrant(Humain): #Le sixième humain du jeu, à l'étage 5 (moyennement apprèciable, surtout si on essaye de draguer sa copine)
     """La classe de l'encombrant."""
-    def __init__(self,position):
+    def __init__(self,controleur,position):
 
         self.identite = 'encombrant'
         self.place = 5
 
-        Humain.__init__(self,position,self.identite,2,6) #En plus il a fallu que ce soit un combattant relativement aguerri...
+        Humain.__init__(self,controleur,position,self.identite,2,6) #En plus il a fallu que ce soit un combattant relativement aguerri...
 
         self.appreciations = [0,1,-1,6,0,5,0,3,3,0]
         self.dialogue = 1
@@ -5607,12 +5503,12 @@ class Encombrant(Humain): #Le sixième humain du jeu, à l'étage 5 (moyennement
 
 class Alchimiste(Humain): #Le septième humain du jeu, à l'étage 6 (un faiseur de potions aux magies diverses)
     """La classe de l'alchimiste."""
-    def __init__(self,position):
+    def __init__(self,controleur,position):
 
         self.identite = 'alchimiste'
         self.place = 6
 
-        Humain.__init__(self,position,self.identite,5,7) #Puissant, mais pas le plus utile en combat...
+        Humain.__init__(self,controleur,position,self.identite,5,7) #Puissant, mais pas le plus utile en combat...
 
         self.appreciations = [0,1,0,0,0,0,2,-2,2,-3]
         self.dialogue = 1
@@ -5798,12 +5694,12 @@ class Alchimiste(Humain): #Le septième humain du jeu, à l'étage 6 (un faiseur
 
 class Peste(Humain): #La huitième humaine du jeu, à l'étage 7 (une sainte très à cheval sur beaucoup trop de trucs)
     """La classe de la peste."""
-    def __init__(self,position):
+    def __init__(self,controleur,position):
 
         self.identite = 'peste'
         self.place = 7
 
-        Humain.__init__(self,position,self.identite,3,8) #Très bonne soigneuse, accessoirement
+        Humain.__init__(self,controleur,position,self.identite,3,8) #Très bonne soigneuse, accessoirement
 
         self.appreciations = [1,-1,-2,-2,0,-3,-1,9,-4,-1]
         self.dialogue = 1
@@ -6001,12 +5897,12 @@ class Peste(Humain): #La huitième humaine du jeu, à l'étage 7 (une sainte tr�
 
 class Bombe_atomique(Humain): #La neuvième humaine du jeu, à l'étage 8 (une magicienne légèrement aguicheuse)
     """La classe de la bombe atomique."""
-    def __init__(self,position):
+    def __init__(self,controleur,position):
 
         self.identite = 'bombe_atomique'
         self.place = 8
 
-        Humain.__init__(self,position,self.identite,4,9) #Ses magies sont littéralement explosives !
+        Humain.__init__(self,controleur,position,self.identite,4,9) #Ses magies sont littéralement explosives !
 
         self.appreciations = [3,-1,1,-1,0,2,1,-1,3,0]
         self.dialogue = 1
@@ -6229,12 +6125,12 @@ class Bombe_atomique(Humain): #La neuvième humaine du jeu, à l'étage 8 (une m
 
 class Marchand(Humain): #Le dixième humain du jeu, à l'étage 9 (le seul lien avec l'extérieur)
     """La classe du marchand."""
-    def __init__(self,position):
+    def __init__(self,controleur,position):
 
         self.identite = 'marchand'
         self.place = 9
 
-        Humain.__init__(self,position,self.identite,1,10) #Il a un skill d'échange d'objet avec son patron à l'extérieur
+        Humain.__init__(self,controleur,position,self.identite,1,10) #Il a un skill d'échange d'objet avec son patron à l'extérieur
 
         self.appreciations = [0,0,-1,0,0,-1,0,3,0,2]
         self.dialogue = 1
@@ -8111,11 +8007,15 @@ class Inventaire:
             elif isinstance(item,Bouclier):
                 if not ID in self.items[Bouclier]:
                     self.items[Bouclier].append(ID)
-                self.arme = ID
+                self.bouclier = ID
             elif isinstance(item,Armure):
                 if not ID in self.items[Armure]:
                     self.items[Armure].append(ID)
-                self.arme = ID
+                self.armure = ID
+            elif isinstance(item,Haume):
+                if not ID in self.items[Haume]:
+                    self.items[Haume].append(ID)
+                self.haume = ID
             elif isinstance(item,Anneau):
                 if not ID in self.items[Anneau]:
                     self.items[Anneau].append(ID)
@@ -8572,12 +8472,12 @@ class Esprit :
 
         else:
 
-            if len(directions)>1: #On peut se permettre de choisir
+            if len(dirs)>1: #On peut se permettre de choisir
                 if agissant.dir_regard != None: #L'agissant regarde quelque part
                     dir_back = [HAUT,DROITE,BAS,GAUCHE][agissant.dir_regard-2]
-                    if dir_back in directions: #On ne veut pas y retourner
-                        directions.remove(dir_back)
-            agissant.va(directions[random.randint(0,len(directions)-1)])
+                    if dir_back in dirs: #On ne veut pas y retourner
+                        dirs.remove(dir_back)
+            agissant.va(dirs[random.randint(0,len(dirs)-1)])
             # ! Modifier pour avoir différents comportements !
 
     def refait_vue(self):
