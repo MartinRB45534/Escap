@@ -2,6 +2,7 @@ from Jeu.Systeme.Constantes_magies.Constantes_absorption import *
 from Jeu.Systeme.Constantes_magies.Constantes_avalanche import *
 from Jeu.Systeme.Constantes_magies.Constantes_blizzard import *
 from Jeu.Systeme.Constantes_magies.Constantes_bombes import *
+from Jeu.Systeme.Constantes_magies.Constantes_boost import *
 from Jeu.Systeme.Constantes_magies.Constantes_boule_de_feu import *
 from Jeu.Systeme.Constantes_magies.Constantes_brasier import *
 from Jeu.Systeme.Constantes_magies.Constantes_cecite import *
@@ -18,6 +19,9 @@ from Jeu.Systeme.Constantes_magies.Constantes_instakill import *
 from Jeu.Systeme.Constantes_magies.Constantes_investissement import *
 from Jeu.Systeme.Constantes_magies.Constantes_jet_de_mana import *
 from Jeu.Systeme.Constantes_magies.Constantes_laser import *
+from Jeu.Systeme.Constantes_magies.Constantes_meteorite import *
+from Jeu.Systeme.Constantes_magies.Constantes_multi_boost import *
+from Jeu.Systeme.Constantes_magies.Constantes_multi_soin import *
 from Jeu.Systeme.Constantes_magies.Constantes_neige import *
 from Jeu.Systeme.Constantes_magies.Constantes_obscurite import *
 from Jeu.Systeme.Constantes_magies.Constantes_ombre_furtive import *
@@ -42,6 +46,7 @@ from Jeu.Systeme.Constantes_magies.Constantes_tenebre import *
 from Jeu.Systeme.Constantes_magies.Constantes_vision import *
 from Jeu.Systeme.Constantes_magies.Constantes_vitalite import *
 from Jeu.Systeme.Constantes_magies.Constantes_vitesse import *
+from Jeu.Systeme.Constantes_magies.Constantes_volcan import *
 from Jeu.Systeme.Constantes_magies.Constantes_aura_terre import *
 from Jeu.Systeme.Constantes_magies.Constantes_aura_feu import *
 from Jeu.Systeme.Constantes_magies.Constantes_aura_glace import *

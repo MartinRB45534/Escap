@@ -2,28 +2,22 @@ Work in progress !
 
 Attention /!\ les pnjs peuvent bloquer le joueur en essayant d'aller vers lui lorsqu'ils sont trop nombreux et que le joueur doit faire demi-tour !
 
-Est-ce que les gens sont blessés par leur propre stomp !? Le mystère du mage gobelin...
 La variable globale ID_MAX ne remplit pas du tout son rôle ! Qu'est-ce que je fais ?
 L'autruche, en codant les pnjs
 
 
 
 
-Pour la magie, la régénération est ce qui détermine la véritable puissance. Les pm max correspondent juste à une limitation sur les sorts qu'on peut utiliser, et sur le nombre de sorts qu'on peut balancer d'affilée au début de la confrontation. Modifier les stats en conséquence.
 
 
 
 Objectif courant : recréer le tutoriel
-- PNJs
-- Interractions PNJs-joueur
-- Monstres
-- Layout
+- Fin du layout et équilibrage
 Au passage :
 - Fin du travail sur l'affichage (arbre élémental)
 - Rendre fonctionnels tous les choix, puis les conditionner
 
 Si j'ai le temps :
-- Créer les premiers monstres (le tutoriel est un camp de gobelins)
 - Faire de meilleurs skins pour les gobelins.
 
 
@@ -75,9 +69,7 @@ En réalité, l'affinité élémentale des maladies dépend de la maladie en question,
 pour informer les joueurs sur les maladies, et indiquer que l'observation permet de connaitre l'affinité de quelquechose.
 
 
-Notes de trucs à améliorer :
-- Réglage du nombre de tours par seconde. Please.
-- Allonger les temps pour les magies à choix de coût.
+
 
 
 À réflechir sérieusement :

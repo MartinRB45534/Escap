@@ -59,9 +59,9 @@ class Controleur():
         self.ajoute_entitee(joueur) #Est-ce qu'il est à cet étage dès le début ? Même pendant la cinématique ?
         self.esprits["joueur"] = Esprit_humain(joueur.ID,self)
 
-        autre = Paume(("Étage 1 : test",1,0))
+        autre = Alchimiste(("Étage 1 : test",1,0))
         self.ajoute_entitee(autre)
-        self.esprits["paume"] = Esprit_humain(autre.ID,self)
+        self.esprits["alchimiste"] = Esprit_humain(autre.ID,self)
 
         gobel1 = Sentinelle_gobelin(("Étage 1 : test",11,15),1)
         self.ajoute_entitee(gobel1)
@@ -2679,7 +2679,7 @@ class Agissant(Entitee): #Tout agissant est un cadavre, tout cadavre n'agit pas.
         for effet in self.effets:
             if isinstance(effet,On_post_action): #Les protections (générales) par exemple
                 effet.execute(self)
-            elif isinstance(effet,On_attack):
+            elif isinstance(effet,Dopage):
                 dopages.append(effet)
             elif isinstance(effet,Attaque):
                 attaques.append(effet)
@@ -5097,11 +5097,20 @@ class Peureuse(Humain): #La quatrième humaine du jeu, à l'étage 3 (terrorisé
     # /!\ Pour améliorer ça : fuire dès qu'il y a un monstre en vue et accessible
     # et ne pas fuir s'il n'y a nulle part où fuir ou si le joueur a donné ordre de ne pas fuir et qu'on a suffisamment d'appréciation pour lui (rajouter un modificateur au taux_limite ?)
 
-    def boost(self):
-        #On cherche un allié à booster
-        #À compléter quand on aura des magies de boost à utiliser
-        print("check")
-        return False
+    def multi_boost(self,corps):
+        res = False
+        cibles = []
+        #On cherche des alliés à booster
+        for ID in corps.keys():
+            if ID in [2,3,4,6]:
+                cibles.append(ID) #Il y a sûrement plus efficace pour interescter les deux (et il faudrait vérifier qu'ils sont près à attaquer)
+        skill = trouve_skill(self.classe_principale,Skill_magie) #Est-ce qu'elle a le même Skill_magie que le joueur ?
+        if cibles != [] and self.peut_payer(cout_pm_multi_boost[skill.niveau-1]):
+            self.skill_courant = Skill_magie
+            self.magie_courante = "magie multi boost" #/!\avoir plusieurs magies successives ?
+            self.cible_magie = cibles
+            res = True
+        return res
 
     def start_dialogue(self): #On commence un nouveau dialogue !
         #On initialise nos attributs
@@ -5626,10 +5635,23 @@ class Alchimiste(Humain): #Le septième humain du jeu, à l'étage 6 (un faiseur
 
     # /!\ Pour améliorer ça : ne pas fuir s'il n'y a nulle part où fuir et ne pas fuir si on n'est pas à portée de monstres
 
-    def attaque_en_vue(self):
-        #On cherche le meilleur endroit pour placer une attaque de zone
-        #À compléter quand on aura des magies d'attaque à utiliser
-        return False
+    def attaque_en_vue(self,ennemis):
+        res = False
+        cibles = []
+        #On cherche l'ennemi le plus puissant en vue
+        for colonne in self.vue:
+            for case in colonne:
+                for ID in case[8]:
+                    if ID in ennemis.keys() and not self.controleur.est_item(ID):
+                        cibles.append([ennemis[ID],ID,case[0]])
+        skill = trouve_skill(self.classe_principale,Skill_magie) #Est-ce qu'elle a le même Skill_magie que le joueur ?
+        if cibles != [] and self.peut_payer(cout_pm_meteorite[skill.niveau-1]):
+            new_cibles = sorted(cibles, key=lambda ennemi: ennemi[0])
+            self.skill_courant = Skill_magie
+            self.magie_courante = "magie meteorite"
+            self.cible_magie = new_cibles[-1][-1]
+            res = True
+        return res
 
     def attaque(self,direction):
         #Quelle est sa magie de prédilection ? Pour l'instant on va prendre l'avalanche
@@ -5802,10 +5824,20 @@ class Peste(Humain): #La huitième humaine du jeu, à l'étage 7 (une sainte tr�
 
     # /!\ Pour améliorer ça : ne pas fuir s'il n'y a nulle part où fuir et ne pas fuir si on n'est pas à portée de monstre
 
-    def heal(self):
-        #On cherche Un allié à soigner
-        #À compléter quand on aura une magie de soin à utiliser
-        return False
+    def heal(self,corps):
+        res = False
+        cibles = []
+        #On cherche des alliés à soigner
+        for ID in corps.keys():
+            if ID in [1,2,3,4,5,6,7,8,9,10]:
+                cibles.append(ID) #Il y a sûrement plus efficace pour interescter les deux (et il faudrait vérifier qu'ils ne sont pas full-life)
+        skill = trouve_skill(self.classe_principale,Skill_magie) #Est-ce qu'elle a le même Skill_magie que le joueur ?
+        if cibles != [] and self.peut_payer(cout_pm_multi_soin[skill.niveau-1]):
+            self.skill_courant = Skill_magie
+            self.magie_courante = "magie multi soin" #/!\remplacer par un soin de zone ou un soin unique ou un auto soin selon les cas
+            self.cible_magie = cibles
+            res = True
+        return res
 
     def attaque(self,direction):
         #Quelle est sa magie de prédilection ? Pour l'instant on va prendre l'avalanche
@@ -6007,10 +6039,23 @@ class Bombe_atomique(Humain): #La neuvième humaine du jeu, à l'étage 8 (une m
         else:
             self.skill_courant = Skill_stomp
 
-    def attaque_en_vue(self):
-        #On cherche le meilleur endroit pour placer une attaque de zone
-        #À compléter quand on aura des magies d'attaque à utiliser
-        return False
+    def attaque_en_vue(self,ennemis):
+        res = False
+        cibles = []
+        #On cherche l'ennemi le plus puissant en vue
+        for colonne in self.vue:
+            for case in colonne:
+                for ID in case[8]:
+                    if ID in ennemis.keys() and not self.controleur.est_item(ID):
+                        cibles.append([ennemis[ID],ID,case[0]])
+        skill = trouve_skill(self.classe_principale,Skill_magie) #Est-ce qu'elle a le même Skill_magie que le joueur ?
+        if cibles != [] and self.peut_payer(cout_pm_volcan[skill.niveau-1]):
+            new_cibles = sorted(cibles, key=lambda ennemi: ennemi[0])
+            self.skill_courant = Skill_magie
+            self.magie_courante = "magie volcan"
+            self.cible_magie = new_cibles[-1][-1]
+            res = True
+        return res
 
     def start_dialogue(self): #On commence un nouveau dialogue !
         #On initialise nos attributs
@@ -9020,7 +9065,6 @@ class Esprit_humain(Esprit_type):
             res = self.deplace_humain(humain)
             if res == "attaque": #L'humain est en position d'attaquer bientôt ou a attaqué, conformément aux ordres
                 bourrins_sups.append(humain)
-            #Sinon, c'est que l'humain s'est déjà déplacé
         if bourrins == fuyards == soigneurs == [] and soutiens != []:
             bourrins.append(soutiens[0])
             soutiens.pop(0)
@@ -9081,13 +9125,13 @@ class Esprit_humain(Esprit_type):
                 if isinstance(humain.cible_deplacement,int):
                     if not(self.controleur.est_item(humain.cible_deplacement)):
                         cible = self.controleur.get_entitee(humain.cible_deplacement).get_position()
-                        portee = 5
+                        portee = 8
                     else:
                         cible = humain.get_position()
                         portee = 10 #C'est juste pour qu'il puisse aller où il veut
                 else:
                     cible = humain.cible_deplacement
-                    portee = 3
+                    portee = 5
             else:
                 cible = humain.get_position()
                 portee = 10 #C'est juste pour qu'il puisse aller où il veut
@@ -9124,20 +9168,20 @@ class Esprit_humain(Esprit_type):
                                 cases.append(case_pot)
                                 dirs.append(i)
                 if importance == 0: #On n'a pas d'ennemi à portée directe (ou on ne souhaite pas attaquer)
-                    if humain.comportement_ennemis == 2:
+                    if humain.fuite():
                         res = "fuite"
                     elif humain.identite in ["alchimiste","bombe_atomique"]: #Les deux capables d'attaquer à distance (attaques de zone)
-                        if humain.attaque_en_vue(): #Renvoie True et choisi la cible, la magie, et le skill s'il y a une cible en vue
+                        if humain.attaque_en_vue(self.ennemis): #Renvoie True et choisi la cible, la magie, et le skill s'il y a une cible en vue
                             res = "attaque"
                         else:
                             res = "deplacement"
                     elif humain.identite == "peste": #La soigneuse
-                        if humain.heal(): #Renvoie True et choisi la cible, la magie, et le skill s'il y a une cible en vue
+                        if humain.heal(self.corps): #Renvoie True et choisi la cible, la magie, et le skill s'il y a une cible en vue
                             res = "soin"
                         else:
                             res = "deplacement"
                     elif humain.identite == "peureuse": #La spécialiste du soutien
-                        if humain.boost(): #Renvoie True et choisi la cible, la magie, et le skill s'il y a une cible en vue
+                        if humain.multi_boost(self.corps): #Renvoie True et choisi la cible, la magie, et le skill s'il y a une cible en vue
                             res = "soutien"
                         else:
                             res = "deplacement"
@@ -9207,20 +9251,20 @@ class Esprit_humain(Esprit_type):
                                 cases.append(case_pot)
                                 dirs.append(i)
                 if importance == 0: #On n'a pas d'ennemi à portée directe (ou on ne souhaite pas attaquer)
-                    if humain.comportement_ennemis == 2:
+                    if humain.fuite():
                         res = "fuite"
                     elif humain.identite in ["alchimiste","bombe_atomique"]: #Les deux capables d'attaquer à distance (attaques de zone)
-                        if humain.attaque_en_vue(): #Renvoie True et choisi la cible, la magie, et le skill s'il y a une cible en vue
+                        if humain.attaque_en_vue(self.ennemis): #Renvoie True et choisi la cible, la magie, et le skill s'il y a une cible en vue
                             res = "attaque"
                         else:
                             res = "deplacement"
                     elif humain.identite == "peste": #La soigneuse
-                        if humain.heal(): #Renvoie True et choisi la cible, la magie, et le skill s'il y a une cible en vue
+                        if humain.heal(self.corps): #Renvoie True et choisi la cible, la magie, et le skill s'il y a une cible en vue
                             res = "soin"
                         else:
                             res = "deplacement"
                     elif humain.identite == "peureuse": #La spécialiste du soutien
-                        if humain.boost(): #Renvoie True et choisi la cible, la magie, et le skill s'il y a une cible en vue
+                        if humain.multi_boost(self.corps): #Renvoie True et choisi la cible, la magie, et le skill s'il y a une cible en vue
                             res = "soutien"
                         else:
                             res = "deplacement"
@@ -9956,7 +10000,7 @@ class Enseignement(One_shot,On_fin_tour):
         if skill != None:
             skill.ajoute(self.magie)
 
-class Dopage(One_shot,On_attack):
+class Dopage(One_shot):
     """Effet qui "dope" la prochaine attaque du joueur."""
     def __init__(self,taux_degats):
         self.affiche = False
@@ -10018,6 +10062,35 @@ class Attaque(One_shot):
         positions_touches = controleur.get_pos_touches(position,self.portee,self.propagation,self.direction,"alliés",self.responsable)
         for position_touche in positions_touches:
             controleur.labs[position[0]].matrice_cases[position_touche[1]][position_touche[2]].effets.append(Attaque_case(self.responsable,self.degats,self.element,self.direction,self.autre,self.taux_autre))
+        
+class Attaque_magique(Attaque):
+    """L'effet d'attaque magique dans sa version générale. Pour chaque case dans la zone, crée une attaque (version intermèdiaire). Attachée au responsable."""
+
+    def action(self,controleur):
+        position = controleur.get_entitee(self.responsable).get_position()
+        positions_touches = controleur.get_pos_touches(position,self.portee,self.propagation,self.direction,"tout",self.responsable)
+        for position_touche in positions_touches:
+            controleur.labs[position[0]].matrice_cases[position_touche[1]][position_touche[2]].effets.append(Attaque_case(self.responsable,self.degats,self.element,self.direction,self.autre,self.taux_autre))
+        
+class Attaque_decentree(Attaque_magique):
+    """L'effet d'attaque dans sa version générale. Pour chaque case dans la zone, crée une attaque (version intermèdiaire). Attachée au responsable."""
+    def __init__(self,position,responsable=0,degats=0,element=TERRE,portee=1,propagation="C__S___",direction=None,autre=None,taux_autre=None):
+        self.affiche = False
+        self.phase = "démarrage"
+        self.position = position
+        self.responsable = responsable
+        self.degats = degats
+        self.element = element
+        self.portee = portee
+        self.propagation = propagation
+        self.direction = direction
+        self.autre = autre
+        self.taux_autre = taux_autre
+
+    def action(self,controleur):
+        positions_touches = controleur.get_pos_touches(self.position,self.portee,self.propagation,self.direction,"tout",self.responsable)
+        for position_touche in positions_touches:
+            controleur.labs[self.position[0]].matrice_cases[position_touche[1]][position_touche[2]].effets.append(Attaque_case(self.responsable,self.degats,self.element,self.direction,self.autre,self.taux_autre))
 
 class Attaque_case(One_shot):
     """L'effet d'attaque dans sa version intermédiaire. Créée par une attaque (version générale), chargé d'attacher une attaque particulière aux agissants de la case, en passant d'abord les défenses de la case. Attachée à la case."""
@@ -10819,20 +10892,6 @@ class Enchante_agissant(Enchante,Cible_agissant):
         Enchante.__init__(self,gain_xp,cout_mp,latence,enchantement)
         Magie_cible.__init__(self,temps)
 
-class Attaque_magique(Magie):
-    """La classe des magies d'attaque (pas les projectiles, ni les effets qui infligent des dégats, ni les instakills, juste les dégats directs, représentés par un objet Attaque)."""
-    def __init__(self,gain_xp,cout_mp,latence,attaque):
-        Magie.__init__(self,gain_xp,cout_mp,latence)
-        self.attaque = attaque
-
-    def get_attaque(self):
-        return self.attaque
-
-class Attaque_magique_dirigee(Magie_dirigee):
-    def __init__(self,gain_xp,cout_mp,latence,temps,attaque):
-        Attaque_magique.__init__(self,gain_xp,cout_mp,latence,attaque)
-        Magie_dirigee.__init__(self,temps)
-
 # Maintenant on va créer les véritables sorts. On commence par les soins :
 class Magie_soin(Cible_agissant):
     """La magie qui invoque un effet de soin sur un agissant ciblé."""
@@ -10850,6 +10909,27 @@ class Magie_soin(Cible_agissant):
     def action(self,lanceur):
         agissant_cible = lanceur.controleur.get_entitee(self.cible)
         agissant_cible.effets.append(Soin(self.gain_pv))
+
+    def get_skin():
+        return SKIN_MAGIE_SOIN
+
+class Magie_multi_soin(Cible_agissant,Multi_cible):
+    """La magie qui invoque un effet de soin sur des agissants ciblés."""
+    nom = "magie multi soin"
+    def __init__(self,niveau):
+        self.phase = "démarrage"
+        self.gain_xp = gain_xp_multi_soin[niveau-1]
+        self.cout_pm = cout_pm_multi_soin[niveau-1]
+        self.latence = latence_multi_soin[niveau-1]
+        self.gain_pv = gain_pv_multi_soin[niveau-1]
+        self.temps = 10000
+        self.cible = None #Fixée par le controleur
+        self.affiche = False
+
+    def action(self,lanceur):
+        for cible in self.cible:
+            agissant_cible = lanceur.controleur.get_entitee(cible)
+            agissant_cible.effets.append(Soin(self.gain_pv))
 
     def get_skin():
         return SKIN_MAGIE_SOIN
@@ -11569,12 +11649,12 @@ class Magie_explosion_de_mana(Magie_cout):
         self.affiche = False
 
     def action(self,porteur):
-        porteur.effets.append(Attaque(porteur.ID,self.cout_pm*taux_degats_explosion_de_mana[self.niveau-1],TERRE,portee_explosion_de_mana[self.niveau-1]))
+        porteur.effets.append(Attaque_magique(porteur.ID,self.cout_pm*taux_degats_explosion_de_mana[self.niveau-1],TERRE,portee_explosion_de_mana[self.niveau-1]))
 
     def get_skin():
         return SKIN_MAGIE_EXPLOSION_DE_MANA
 
-class Magie_laser(Attaque_magique_dirigee):
+class Magie_laser(Magie_dirigee):
     """La magie qui crée une attaque de laser."""
     nom = "magie laser"
     def __init__(self,niveau):
@@ -11588,12 +11668,12 @@ class Magie_laser(Attaque_magique_dirigee):
         self.affiche = False
 
     def action(self,porteur):
-        porteur.effets.append(Attaque(porteur.ID,degats_laser[self.niveau-1],TERRE,portee_laser[self.niveau-1],"R__T___",self.direction))
+        porteur.effets.append(Attaque_magique(porteur.ID,degats_laser[self.niveau-1],TERRE,portee_laser[self.niveau-1],"R__T___",self.direction))
 
     def get_skin():
         return SKIN_MAGIE_LASER
 
-class Magie_poing_magique(Attaque_magique_dirigee): #À modifier selon l'espèce qui l'utilise
+class Magie_poing_magique(Magie_dirigee): #À modifier selon l'espèce qui l'utilise
     """La magie qui crée une attaque de poing magique."""
     nom = "magie poing magique"
     def __init__(self,niveau):
@@ -11607,12 +11687,12 @@ class Magie_poing_magique(Attaque_magique_dirigee): #À modifier selon l'espèce
         self.affiche = False
 
     def action(self,porteur):
-        porteur.effets.append(Attaque(porteur.ID,degats_poing_magique[self.niveau-1],TERRE,portee_poing_magique[self.niveau-1],"Sd_T___",self.direction))
+        porteur.effets.append(Attaque_magique(porteur.ID,degats_poing_magique[self.niveau-1],TERRE,portee_poing_magique[self.niveau-1],"Sd_T___",self.direction))
 
     def get_skin():
         return SKIN_MAGIE_POING_MAGIQUE
 
-class Magie_poing_ardent(Attaque_magique_dirigee): #L'attaque de mélée de la bombe atomique
+class Magie_poing_ardent(Magie_dirigee): #L'attaque de mélée de la bombe atomique
     """La magie qui crée une attaque de poing ardent."""
     nom = "magie poing ardent"
     def __init__(self,niveau):
@@ -11626,12 +11706,12 @@ class Magie_poing_ardent(Attaque_magique_dirigee): #L'attaque de mélée de la b
         self.affiche = False
 
     def action(self,porteur):
-        porteur.effets.append(Attaque(porteur.ID,degats_poing_ardent[self.niveau-1],TERRE,portee_poing_ardent[self.niveau-1],"Sd_T___",self.direction))
+        porteur.effets.append(Attaque_magique(porteur.ID,degats_poing_ardent[self.niveau-1],TERRE,portee_poing_ardent[self.niveau-1],"Sd_T___",self.direction))
 
     def get_skin():
         return SKIN_MAGIE_POING_MAGIQUE
 
-class Magie_brasier(Attaque_magique):
+class Magie_brasier(Magie):
     """La magie qui crée une attaque de brasier."""
     nom = "magie brasier"
     def __init__(self,niveau):
@@ -11643,12 +11723,12 @@ class Magie_brasier(Attaque_magique):
         self.affiche = False
 
     def action(self,porteur):
-        porteur.effets.append(Attaque(porteur.ID,degats_brasier[self.niveau-1],FEU,portee_brasier[self.niveau-1]))
+        porteur.effets.append(Attaque_magique(porteur.ID,degats_brasier[self.niveau-1],FEU,portee_brasier[self.niveau-1]))
 
     def get_skin():
         return SKIN_MAGIE_BRASIER
 
-class Magie_avalanche(Attaque_magique_dirigee):
+class Magie_avalanche(Magie_dirigee):
     """La magie qui crée une attaque d'avalanche."""
     nom = "magie avalanche"
     def __init__(self,niveau):
@@ -11662,7 +11742,7 @@ class Magie_avalanche(Attaque_magique_dirigee):
         self.affiche = False
 
     def action(self,porteur):
-        porteur.effets.append(Attaque(porteur.ID,degats_avalanche[self.niveau-1],TERRE,portee_avalanche[self.niveau-1],"S__S_Pb",self.direction))
+        porteur.effets.append(Attaque_magique(porteur.ID,degats_avalanche[self.niveau-1],TERRE,portee_avalanche[self.niveau-1],"S__S_Pb",self.direction))
 
     def get_skin():
         return SKIN_MAGIE_AVALANCHE
@@ -11722,6 +11802,45 @@ class Magie_dopage(Magie):
     def get_skin():
         return SKIN_MAGIE_DOPAGE
 
+class Magie_boost(Cible_agissant):
+    """La magie qui crée un effet de dopage sur un autre agissant."""
+    nom = "magie boost"
+    def __init__(self,niveau):
+        self.phase = "démarrage"
+        self.gain_xp = gain_xp_boost[niveau-1]
+        self.cout_pm = cout_pm_boost[niveau-1]
+        self.latence = latence_boost[niveau-1]
+        self.niveau = niveau
+        self.cible = None
+        self.temps = 10000
+        self.affiche = False
+
+    def action(self,porteur):
+        porteur.controleur.get_entitee(self.cible).effets.append(Dopage(taux_boost[self.niveau-1]))
+
+    def get_skin():
+        return SKIN_MAGIE_DOPAGE
+
+class Magie_multi_boost(Cible_agissant,Multi_cible):
+    """La magie qui crée un effet de dopage sur plusieurs autres agissants."""
+    nom = "magie multi boost"
+    def __init__(self,niveau):
+        self.phase = "démarrage"
+        self.gain_xp = gain_xp_multi_boost[niveau-1]
+        self.cout_pm = cout_pm_multi_boost[niveau-1]
+        self.latence = latence_multi_boost[niveau-1]
+        self.niveau = niveau
+        self.cible = None
+        self.temps = 10000
+        self.affiche = False
+
+    def action(self,porteur):
+        for cible in self.cible:
+            porteur.controleur.get_entitee(cible).effets.append(Dopage(taux_multi_boost[self.niveau-1]))
+
+    def get_skin():
+        return SKIN_MAGIE_DOPAGE
+
 class Magie_instakill(Magie_cible):
     """La magie qui crée un effet d'instakill sur un agissant."""
     nom = "magie instakill"
@@ -11757,6 +11876,44 @@ class Magie_purification(Magie):
 
     def get_skin():
         return SKIN_MAGIE_PURIFICATION
+
+class Magie_volcan(Cible_case):
+    """La magie qui crée une attaque de feu à un autre endroit."""
+    nom = "magie volcan"
+    def __init__(self,niveau):
+        self.phase = "démarrage"
+        self.gain_xp = gain_xp_volcan[niveau-1]
+        self.cout_pm = cout_pm_volcan[niveau-1]
+        self.latence = latence_volcan[niveau-1]
+        self.niveau = niveau
+        self.cible = None
+        self.temps = 10000
+        self.affiche = False
+
+    def action(self,porteur):
+        porteur.effets.append(Attaque_decentree(self.cible,porteur.ID,degats_volcan[self.niveau-1],FEU,portee_volcan[self.niveau-1]))
+
+    def get_skin():
+        return SKIN_MAGIE_BRASIER
+
+class Magie_meteorite(Cible_case):
+    """La magie qui crée une attaque de terre à un autre endroit."""
+    nom = "magie meteorite"
+    def __init__(self,niveau):
+        self.phase = "démarrage"
+        self.gain_xp = gain_xp_meteorite[niveau-1]
+        self.cout_pm = cout_pm_meteorite[niveau-1]
+        self.latence = latence_meteorite[niveau-1]
+        self.niveau = niveau
+        self.cible = None
+        self.temps = 10000
+        self.affiche = False
+
+    def action(self,porteur):
+        porteur.effets.append(Attaque_decentree(self.cible,porteur.ID,degats_meteorite[self.niveau-1],TERRE,portee_meteorite[self.niveau-1]))
+
+    def get_skin():
+        return SKIN_MAGIE_AVALANCHE
 
 # Les sorts de projectiles qui sont lancés depuis l'emplacement de l'agissant n'ont pas besoin de classe propre (la classe Invocation suffit).
 # On les liste quand même pour rappel :
@@ -14177,6 +14334,8 @@ class Affichage:
                         effet.get_skin().dessine_toi(self.screen,position,taille,direction)
                         if effet.phase == "affichage":
                             effet.phase = "terminé"
+                self.screen.blit(pygame.transform.scale(pygame.image.load("Jeu/Skins/barre_de_vie.png").convert_alpha(),(int(taille*((16*agissant.pv)/(19*agissant.pv_max))),int(taille*(16/19)))),(position[0]+int(taille*(3/19)),position[1]+int(taille*(3/19))))
+                
             #Rajouter des conditions d'observation
 
     def clear(self):

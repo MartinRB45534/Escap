@@ -17,74 +17,6 @@ CONSTANTES_STATS = {
         'doigts':10,
         'magies':False,
         'special':True},
-    #Le tank par défaut (voué à disparaître bientôt)
-    "tank":{
-        'pv':[0,150,200,250,300,350,400,450,500,550,600],
-        'regen_pv':[0,0,0,0,0,0,0,0,0,0,0],
-        'pm':[0,0,0,0,0,0,0,0,0,0,0],
-        'regen_pm':[0,0,0,0,0,0,0,0,0,0,0],
-        'force':[0,3,3,3,3,3,3,3,3,3,3],
-        'priorite':[0,1,1,1,1,1,1,1,1,1,1],
-        'vitesse':[0,1,1,1,1,1,1,1,1,1,1],
-        'aff_t':[0,2,2,2,2,2,2,2,2,2,2],
-        'aff_f':[0,1,1,1,1,1,1,1,1,1,1],
-        'aff_g':[0,1,1,1,1,1,1,1,1,1,1],
-        'aff_o':[0,1,1,1,1,1,1,1,1,1,1],
-        'especes':['humain'],
-        'doigts':10,
-        'magies':False,
-        'special':False},
-    #Le dps par défaut (voué à disparaître bientôt)
-    "dps":{
-        'pv':[0,50,75,100,125,150,175,200,225,250,275],
-        'regen_pv':[0,0,0,0,0,0,0,0,0,0,0],
-        'pm':[0,0,0,0,0,0,0,0,0,0,0],
-        'regen_pm':[0,0,0,0,0,0,0,0,0,0,0],
-        'force':[0,5,10,15,20,25,30,35,40,45,50],
-        'priorite':[0,1,1,1,1,1,1,1,1,1,1],
-        'vitesse':[0,2.1,2.1,2.1,2.1,2.1,2.1,2.1,2.1,2.1,2.1],
-        'aff_t':[0,1,1,1,1,1,1,1,1,1,1],
-        'aff_f':[0,1,1,1,1,1,1,1,1,1,1],
-        'aff_g':[0,1,1,1,1,1,1,1,1,1,1],
-        'aff_o':[0,1,1,1,1,1,1,1,1,1,1],
-        'especes':['humain'],
-        'doigts':10,
-        'magies':False,
-        'special':False},
-    #Le soigneur par défaut (voué à disparaître bientôt)
-    "soigneur":{
-        'pv':[0,50,75,100,125,150,175,200,225,250,275],
-        'regen_pv':[0,0,0,0,0,0,0,0,0,0,0],
-        'pm':[0,100,120,140,160,180,200,220,240,260,280],
-        'regen_pm':[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1],
-        'force':[0,1,1,1,1,1,1,1,1,1,1],
-        'priorite':[0,1,1,1,1,1,1,1,1,1,1],
-        'vitesse':[0,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9],
-        'aff_t':[0,1,1,1,1,1,1,1,1,1,1],
-        'aff_f':[0,1,1,1,1,1,1,1,1,1,1],
-        'aff_g':[0,1,1,1,1,1,1,1,1,1,1],
-        'aff_o':[0,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5],
-        'especes':['humain'],
-        'doigts':10,
-        'magies':['Magie_soin','Magie_auto_soin'],
-        'special':False},
-    #Le soutien par défaut (voué à disparaître bientôt)
-    "soutien":{
-        'pv':[0,50,75,100,125,150,175,200,225,250,275],
-        'regen_pv':[0,0.05,0.05,0.05,0.05,0.05,0.05,0.05,0.05,0.05,0.05],
-        'pm':[0,100,120,140,160,180,200,220,240,260,280],
-        'regen_pm':[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1],
-        'force':[0,1,1,1,1,1,1,1,1,1,1],
-        'priorite':[0,1,1,1,1,1,1,1,1,1,1],
-        'vitesse':[0,0.6,0.7,0.8,0.9,1,1.1,1.2,1.3,1.4,1.5],
-        'aff_t':[0,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1],
-        'aff_f':[0,1.3,1.3,1.3,1.3,1.3,1.3,1.3,1.3,1.3,1.3],
-        'aff_g':[0,1,1,1,1,1,1,1,1,1,1],
-        'aff_o':[0,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5],
-        'especes':['humain'],
-        'doigts':10,
-        'magies':['Magie_enchantement_force'],
-        'special':False},
     #L'épéiste à l'accueil (stats non définitives, à retravailler)
     "receptionniste":{
         'pv':[0,150,200,250,300,350,400,450,500,550,600],
@@ -134,7 +66,7 @@ CONSTANTES_STATS = {
         'aff_o':[0,2,2,2,2,2,2,2,2,2,2],
         'especes':['humain'],
         'doigts':10,
-        'magies':False, #/!\ Ajouter les magies de soutien ici !
+        'magies':['Magie_multi_boost'], #/!\ Ajouter les magies de soutien ici !
         'special':False},
     #Le mec chelou qui se prend pour Dieu
     "codeur":{
@@ -185,7 +117,7 @@ CONSTANTES_STATS = {
         'aff_o':[0,1,1,1,1,1,1,1,1,1,1],
         'especes':['humain'],
         'doigts':10,
-        'magies':['Magie_poing_magique'],
+        'magies':['Magie_poing_magique','Magie_meteorite'],
         'special':False},
     #La sainte monstrophobe (stats non défintitves, à retravailler):
     "peste":{
@@ -202,7 +134,7 @@ CONSTANTES_STATS = {
         'aff_o':[0,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5],
         'especes':['humain'],
         'doigts':10,
-        'magies':['Magie_soin','Magie_auto_soin','Magie_purification'], # /!\ Rajouter la purification
+        'magies':['Magie_soin','Magie_auto_soin','Magie_multi_soin','Magie_purification'], # /!\ Rajouter la purification
         'special':False},
     #La magicienne (stats non défintitves, à retravailler):
     "bombe_atomique":{
@@ -219,7 +151,7 @@ CONSTANTES_STATS = {
         'aff_o':[0,1,1,1,1,1,1,1,1,1,1],
         'especes':['humain'],
         'doigts':10,
-        'magies':['Magie_brasier','Magie_poing_ardent'],
+        'magies':['Magie_brasier','Magie_poing_ardent','Magie_volcan'],
         'special':False},
     #Le gros qui extorque des sous (stats non définitives, à retravailler)
     "marchand":{

@@ -48,9 +48,9 @@ class Skill_magie(Skill):
     """Le skill utilisé pour faire de la magie. Le seul autorisé à consommer du mana (?).
        On le sélectionne en passant en argument la magie souhaitée, puis on précise éventuellement les cibles.
        C'est un skill actif, qui s'actionne quand on le réclame."""
-    def __init__(self,magies={}): #On précise les magies directement disponibles. D'autres peuvent être acquisent en cours de jeu dans le cas du joueur. magies est un dictionnaire, les clées sont les noms des magies.
+    def __init__(self): #On précise les magies directement disponibles. D'autres peuvent être acquisent en cours de jeu dans le cas du joueur. magies est un dictionnaire, les clées sont les noms des magies.
         Skill.__init__(self) #Il faudra penser à ajouter des cadeaux magiques
-        self.magies=magies
+        self.magies={}
         self.latence = 0 #La latence dépend du sort utilisé
         self.gain_xp = 0 #L'xp dépend du sort utilisé et du mana dépensé
         self.nom = "Magie"
