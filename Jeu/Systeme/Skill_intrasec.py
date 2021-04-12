@@ -1,6 +1,7 @@
 from Jeu.Skins import *
 from Jeu.Skins.Skins import *
 from Jeu.Constantes import *
+from Jeu.Systeme.Constantes_skills.Skills import *
 
 #Les skills sont la base des actions qui ont lieu dans le jeu (action voulues ou automatiques). Les skills intrasecs sont liés à une classe, et montent de niveau quand la classe monte de niveau.
 
@@ -49,8 +50,6 @@ class Skill_deplacement(Skill_intrasec):
        C'est un skill actif, qui s'actionne quand on le réclame."""
     def __init__(self): #Pour l'instant le skill est générique, identique pour tous
         Skill_intrasec.__init__(self)
-        self.latence = 11 #Le temps qui s'écoule après une utilisation de ce skill, il passera à 10 quand le skill sera mis au niveau 1
-        self.gain_xp = 0.1 #L'xp gagnée à chaque utilisation du skill, actuellement il faut se déplacer 100 fois pour monter d'un niveau de la classe principale (c'est peu !)
         self.nom="Deplacement"
 
     def get_skin(self):
@@ -58,33 +57,29 @@ class Skill_deplacement(Skill_intrasec):
 
     def evo(self,nb_evo=1):
         for i in range(nb_evo):
-            self.latence-=1 #La latence diminue à chaque niveau
             self.niveau+=1 #Le niveau augmente
             #Pas d'autre cadeau
         
     def utilise(self):
         """fonction qui utilise le skill"""
-        self.xp_new+=self.gain_xp #On gagne de l'xp !
-        return self.latence, self.niveau #On renvoie le temps que prendra l'action, pour savoir combien de temps l'agissant attendra, et le niveau, pour les calculs du controleur, des collisions, du labyrinthe, etc.
+        self.xp_new+=gain_xp_deplacement[self.niveau-1] #On gagne de l'xp !
+        return latence_deplacement[self.niveau-1], self.niveau #On renvoie le temps que prendra l'action, pour savoir combien de temps l'agissant attendra, et le niveau, pour les calculs du controleur, des collisions, du labyrinthe, etc.
 
 class Skill_vision(Skill_intrasec):
     """Le skill utilisé pour observer son environnement. Lorsqu'il augmente de niveau, on peut voir plus loin. C'est un skill intrasec à la classe principale. !!!Ne pas confondre avec observation, qui permet d'obtenir des informations sur ce que l'on voit.!!!
        C'est un skill semi-passif, qui s'actionne à chaque tour."""
     def __init__(self): #Pour l'instant le skill est générique, identique pour tous
         Skill_intrasec.__init__(self)
-        self.portee = 5 #Avec combien veut-on commencer ? Peut-être un peu plus ?
-        self.gain_xp = 0.01 #L'xp gagnée à chaque utilisation du skill, actuellement il faut juste attendre 1000 tours pour monter d'un niveau de la classe principale (c'est peu !)
         self.nom="Vision"
 
     def evo(self,nb_evo=1):
         for i in range(nb_evo):
-            self.portee+=1 #1, est-ce trop ? pas assez ? En tous cas la portée de la vision augmente à chaque niveau
             self.niveau+=1 #Le niveau augmente
             #Pas d'autre cadeau
 
     def utilise(self): #Le skill ne fait que donner des infos, il ne peut pas manipuler d'objet labyrinthe ou autres
-        self.xp_new+=self.gain_xp #On gagne de l'xp !
-        return self.portee #Pour l'instant la portée est la seule chose qu'on veut savoir
+        self.xp_new+=gain_xp_vision[self.niveau-1] #On gagne de l'xp !
+        return portee_vision[self.niveau-1] #Pour l'instant la portée est la seule chose qu'on veut savoir
 
 class Skill_ramasse(Skill_intrasec):
     """Le skill utilisé pour ramasser un item. Lorsqu'il augmente de niveau, on peut ramasser des objets plus puissants. C'est un skill intrasec à la classe principale (mais certains ne l'ont pas).
@@ -107,7 +102,8 @@ class Skill_ramasse(Skill_intrasec):
             #Pas d'autre cadeau
 
     def utilise(self,priorite):
-        return self.latence, self.priorite>priorite
+        self.xp_new+=gain_xp_ramasse[self.niveau-1] #On gagne de l'xp ! Ou pas ?
+        return latence_ramasse[self.niveau-1], priorite_ramasse[self.niveau-1]>priorite
 
 class Skill_boost_explosifs(Skill_intrasec):
     """Le skill d'amélioration des effets des explosifs (le spliter pour les trois effets ?). C'est un skill intrasec à la classe artificier.

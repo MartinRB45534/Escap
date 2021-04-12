@@ -7,7 +7,9 @@ L'autruche, en codant les pnjs
 
 
 
-
+J'ai reworké les comportements des humains, mais pas encore vraiment testé tout ça.
+Il faut aussi attribuer aux pnjs les items qu'ils méritent et, évidemment, replancher sur l'équilibrage pour prendre ça en compte.
+Objectif : que même moi je sois capable de finir le tuto en tuant tout le monde sur mon chemin (surtout les pnjs) ou en sauvant tous les pnjs. C'est juste un tuto, donc s'il est à mon niveau c'est bien.
 
 
 
@@ -26,13 +28,12 @@ Quelques nouvelles magies à créer :
 - Magies tribales (genre, qui varient selon l'espèce, comme un coup de poing magique qui n'est pas le même pour les gobelins et les orcs)
 - Coup de poing magique (magie d'attaque des mages de combat)
 - Boost complet (un boost qui affecte toutes les stats)
-- Purification (la magie anti-monstres de la peste)
 
 
-Étage combat : trois sentinelles aux trois points de passage
-Étage monstres : une sentinelle, un gobelin de base, un mage, deux guerriers, dans un dédale
-Étage portes (prison) : sentinelles, guerrier de plus haut niveau dans une salle (c'est un piège !), quelques monstres capturés ?
-Étage potions : guerriers, mages, un shaman, deux guerriers de plus haut niveau.
+Étage combat : une sentinelle au point de passage
+Étage monstres : une sentinelle, un mage, dans un dédale
+Étage portes (prison) : deux sentinelles, guerrier dans une salle (c'est un piège !), un slime et un ombriul
+Étage potions : guerriers, mages, un shaman.
 Étage meutes : guerriers, mages, deux shamans, plein de gobelins de base dans les couloirs.
 Étage magie : tout !
 Étage items : tout, mais un peu moins, plus quelques gobelins équippés.

@@ -2,7 +2,8 @@ from Jeu.Systeme.Constantes_items.Constantes_anneau_magique_gobelin import *
 from Jeu.Systeme.Constantes_items.Constantes_anneau_soin_gobelin import *
 from Jeu.Systeme.Constantes_items.Constantes_anneau_terrestre_gobelin import *
 from Jeu.Systeme.Constantes_items.Constantes_anneau_vitesse_gobelin import *
-from Jeu.Systeme.Constantes_items.Constantes_armure_gobelin import *
+from Jeu.Systeme.Constantes_items.Constantes_armure_guerrier_gobelin import *
+from Jeu.Systeme.Constantes_items.Constantes_armure_sentinelle_gobelin import *
 from Jeu.Systeme.Constantes_items.Constantes_bandeau_gobelin import *
 from Jeu.Systeme.Constantes_items.Constantes_cimetere_gobelin import *
 from Jeu.Systeme.Constantes_items.Constantes_epee_gobelin import *

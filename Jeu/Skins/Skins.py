@@ -167,6 +167,12 @@ global SKIN_ATTAQUE_GLACE
 SKIN_ATTAQUE_GLACE = Skin("attaque_4.png")
 global SKIN_ATTAQUE_OMBRE
 SKIN_ATTAQUE_OMBRE = Skin("attaque_8.png")
+global SKIN_DOPAGE
+SKIN_DOPAGE = Skin("dopage.png")
+global SKIN_SOIN
+SKIN_SOIN = Skin("soin.png")
+global SKIN_MAGIE
+SKIN_MAGIE = Skin("magie.png")
 
 # Skills :
 

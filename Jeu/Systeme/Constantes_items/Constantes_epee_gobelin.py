@@ -4,7 +4,7 @@ global tranchant_epee_gobelin
 tranchant_epee_gobelin = [1.5,2,2.5,3,3.5,4,4.5,5,5.5,6]
 
 global portee_epee_gobelin
-portee_epee_gobelin = [1,1,1,1,2,2,2,3,3,4]
+portee_epee_gobelin = [2,2,2,2,3,3,3,4,4,5]
 
 global taux_refus_epee_gobelin
 taux_refus_epee_gobelin = [0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8]

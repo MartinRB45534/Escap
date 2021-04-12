@@ -370,3 +370,6 @@ global DIALOGUE
 DIALOGUE = 1
 global COMPLEMENT_DIALOGUE
 COMPLEMENT_DIALOGUE = 2
+
+global LISTE_EXHAUSTIVE_DES_MAGIES_OFFENSIVES #Les magies qui créent un objet Attaque
+LISTE_EXHAUSTIVE_DES_MAGIES_OFFENSIVES = ["magie poing magique","magie poing ardent","magie secousse","magie volcan","magie explosion de mana","magie laser","magie brasier","magie avalanche"] #Je suis sur qu'il y en a d'autres

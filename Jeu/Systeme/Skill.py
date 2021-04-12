@@ -361,41 +361,11 @@ class Skill_defense(Skill):
         self.xp_new += self.gain_xp #Faire dépendre des dégats bloqués ?
         return self.taux
 
-class Skill_stomp(Skill):
-    """Permet d'attaquer la zone avoisinnante sans arme.
-       C'est un skill actif."""
-    def __init__(self):
-        Skill.__init__(self)
-        self.taux_utilisation = 0 #La proportion des stats du joueur qui sera vraiment appliquée
-        self.latence = 6
-        self.portee = 2
-        self.gain_xp=0.1
-        self.nom = "Stomp"
-
-    def get_skin(self):
-        return SKIN_SKILL_STOMP
-
-    def evo(self,nb_evo=1):
-        for i in range(nb_evo):
-            self.taux_utilisation += 0.1
-            if self.niveau%2 == 0:
-                self.latence -= 1
-            else :
-                self.portee += 1
-            self.niveau += 1
-
-    def utilise(self):
-        self.xp_new += self.gain_xp
-        return self.latence,self.taux_utilisation,self.portee
-
 class Skill_attaque(Skill):
     """Permet d'attaquer avec une arme.
        C'est un skill actif."""
     def __init__(self):
         Skill.__init__(self)
-        self.taux_utilisation = 0 #La proportion des stats de l'arme qui sera vraiment appliquée
-        self.latence = 11
-        self.gain_xp=0.1
         self.nom = "Attaque"
 
     def get_skin(self):
@@ -403,13 +373,29 @@ class Skill_attaque(Skill):
 
     def evo(self,nb_evo=1):
         for i in range(nb_evo):
-            self.taux_utilisation += 0.1
-            self.latence -= 1
             self.niveau += 1
 
     def utilise(self):
-        self.xp_new += self.gain_xp
-        return self.latence,self.taux_utilisation
+        self.xp_new += gain_xp_attaque[self.niveau-1]
+        return latence_attaque[self.niveau-1],taux_utilisation_attaque[self.niveau-1]
+
+class Skill_stomp(Skill_attaque):
+    """Permet d'attaquer la zone avoisinnante sans arme.
+       C'est un skill actif."""
+    def __init__(self):
+        Skill.__init__(self)
+        self.nom = "Stomp"
+
+    def get_skin(self):
+        return SKIN_SKILL_STOMP
+
+    def evo(self,nb_evo=1):
+        for i in range(nb_evo):
+            self.niveau += 1
+
+    def utilise(self):
+        self.xp_new += gain_xp_stomp[self.niveau-1]
+        return latence_stomp[self.niveau-1],taux_utilisation_stomp[self.niveau-1],portee_stomp[self.niveau-1]
 
 class Skill_blocage(Skill):
     """Permet de se cacher derrière son bouclier.

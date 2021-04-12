@@ -34,26 +34,65 @@ On prend un peu au pif dpp_base = 1 et on verra ce que ça donne.
 
 
 
-Stats actuelles (probablement très déséquilibrées) :
-dpt_joueur = 2 (niveau 1, en utilisant le stomp) (il est trop fort)
-dpt_tank = 0.6
-dpt_dps = 2.1
-dpt_recep = 2.1
-dpt_paume = 0.2 (un peu trop faible, même si c'est plutôt un tank)
-dpt_peureuse = 0.01 (elle n'est pas censé attaquer de toute façon)
-dpt_encomb = 1.26
-dpt_alchi = 0.4
-dpt_peste = 0.4
-dpt_bombe = 0.2
-dpt_march = 0.6 (son équippement est la source de sa puissance)
-dpt_gob = 0.12
-dpt_gob_sent = 0.12
-dpt_gob_guer = 0.18
-dpt_gob_expl = 0.24 (il est un peu (beaucoup !) trop puissant, là)
-dpt_gob_mage = 0.12 (et ça c'est sans magie)
-dpt_gob_chef = 0.18
-dpt_slime = 0.06 (c'est un peu trop faible...)
 
+
+
+On veut que :
+joueur > tous individuellement, moyennant un équippement adéquat (volé sur des cadavres... humains)
+sentinelle > guerrier
+guerrier > 2~3 base
+2~3 base > sentinelle
+paume > sentinelle (parce que regen)
+paume ~< guerrier
+encomb > sentinelle
+encomb > guerrier
+march > sentinelle
+march > guerrier
+march > encomb (parce que stuff)
+encomb > paume
+paume = slime parce que regen pour les deux
+encomb > slime
+march > slime
+guerrier >~ slime
+sentinelle < slime
+
+
+Stats stomp au niveau 1:
+dpt_joueur = 5
+dpt_recep = 5
+dpt_paume = 3
+dpt_encomb = 5
+dpt_alchi = 1.5
+dpt_peste = 1
+dpt_bombe = 1.5
+dpt_march = 3
+dpt_gob = 2
+dpt_gob_sent = 2
+dpt_gob_guer = 5
+dpt_gob_expl = 1
+dpt_gob_mage = 2
+dpt_gob_chef = 5
+dpt_slime = 2
+
+Stats attaque au niveau 1: (équippement standard de fin de tuto pour le joueur)
+dpt_joueur = 8
+dpt_recep = 10
+dpt_encomb = 10
+dpt_march = 8
+dpt_gob = 3
+dpt_gob_sent = 4
+dpt_gob_guer = 10
+dpt_gob_chef = 10
+
+Stats attaque magique au niveau 1:
+dpt_alchi1 = 3
+dpt_alchi2 = 1
+dpt_peste1 = 1.5
+dpt_peste2 = 0.75
+dpt_bombe1 = 10
+dpt_bombe2 = 1
+dpt_gob_mage1 = 3
+dpt_gob_mage2 = 1
 
 
 

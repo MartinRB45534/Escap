@@ -19,7 +19,6 @@ from Jeu.Systeme.Constantes_magies.Constantes_instakill import *
 from Jeu.Systeme.Constantes_magies.Constantes_investissement import *
 from Jeu.Systeme.Constantes_magies.Constantes_jet_de_mana import *
 from Jeu.Systeme.Constantes_magies.Constantes_laser import *
-from Jeu.Systeme.Constantes_magies.Constantes_meteorite import *
 from Jeu.Systeme.Constantes_magies.Constantes_multi_boost import *
 from Jeu.Systeme.Constantes_magies.Constantes_multi_soin import *
 from Jeu.Systeme.Constantes_magies.Constantes_neige import *
@@ -38,6 +37,7 @@ from Jeu.Systeme.Constantes_magies.Constantes_resurection import *
 from Jeu.Systeme.Constantes_magies.Constantes_rocher import *
 from Jeu.Systeme.Constantes_magies.Constantes_rouille import *
 from Jeu.Systeme.Constantes_magies.Constantes_sable import *
+from Jeu.Systeme.Constantes_magies.Constantes_secousse import *
 from Jeu.Systeme.Constantes_magies.Constantes_soin import *
 from Jeu.Systeme.Constantes_magies.Constantes_soin_auto import *
 from Jeu.Systeme.Constantes_magies.Constantes_soin_superieur import *

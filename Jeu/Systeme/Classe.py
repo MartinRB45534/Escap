@@ -240,51 +240,6 @@ class Classe_principale(Classe):
 ##                skills.append(chanceux)
 ##            #Le système peut quand même voir les conséquences de ces actions mystérieuses.
 
-        elif identite == 'tank':
-            self.evolutif = False
-            deplacement = Skill_deplacement()
-            skills_intrasecs.append(deplacement)
-            vision = Skill_vision()
-            skills_intrasecs.append(vision)
-            stomp = Skill_stomp()
-            skills_intrasecs.append(stomp)
-            if niveau >= 5:
-                defense = Skill_defense()
-                skills_intrasecs.append(defense)
-
-        elif identite == 'dps':
-            self.evolutif = False
-            deplacement = Skill_deplacement()
-            skills_intrasecs.append(deplacement)
-            vision = Skill_vision()
-            skills_intrasecs.append(vision)
-            stomp = Skill_stomp()
-            skills_intrasecs.append(stomp)
-            attaque = Skill_attaque()
-            skills_intrasecs.append(attaque)
-
-        elif identite == 'soigneur':
-            self.evolutif = False
-            deplacement = Skill_deplacement()
-            skills_intrasecs.append(deplacement)
-            vision = Skill_vision()
-            skills_intrasecs.append(vision)
-            stomp = Skill_stomp()
-            skills_intrasecs.append(stomp)
-            magie = Skill_magie()
-            skills_intrasecs.append(magie)
-
-        elif identite == 'soutien':
-            self.evolutif = False
-            deplacement = Skill_deplacement()
-            skills_intrasecs.append(deplacement)
-            vision = Skill_vision()
-            skills_intrasecs.append(vision)
-            stomp = Skill_stomp()
-            skills_intrasecs.append(stomp)
-            magie = Skill_magie()
-            skills_intrasecs.append(magie)
-
         elif identite == 'receptionniste':
             self.evolutif = False
             deplacement = Skill_deplacement()
@@ -314,6 +269,9 @@ class Classe_principale(Classe):
             skills_intrasecs.append(deplacement)
             vision = Skill_vision()
             skills_intrasecs.append(vision)
+            stomp = Skill_stomp()
+            stomp.evo()
+            skills.append(stomp)
             magie = Skill_magie()
             magie.evo()
             skills.append(magie)

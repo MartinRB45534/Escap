@@ -7,10 +7,10 @@ global cout_pm_volcan
 cout_pm_volcan = [20,18,16,15,14,13,11,10,10,10]
 
 global latence_volcan
-latence_volcan = [10,9,9,8,8,8,7,7,7,7]
+latence_volcan = [7,9,9,8,8,8,7,7,7,7]
 
 global degats_volcan
-degats_volcan = [20,40,60,80,100,120,140,160,180,200]
+degats_volcan = [10,40,60,80,100,120,140,160,180,200]
 
 global portee_volcan
-portee_volcan = [5,6,6,7,7,8,8,9,9,10]
+portee_volcan = [2,3,6,7,7,8,8,9,9,10]

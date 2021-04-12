@@ -27,16 +27,32 @@ class Main: #Modifier le nom plus tard pour plus de cohérence
 
         #On récupère les intervenants du tour
         self.agissants_courants,self.items_courants,self.labs_courants,self.esprits_courants = self.controleur.get_agissants_items_labs_esprits()
+        new_courant = pygame.time.get_ticks()
+        duree = new_courant - constantes_temps['courant']
+        constantes_temps['reste'] += duree
+        constantes_temps['courant'] = new_courant
 
         for agissant in self.agissants_courants :
             self.controleur.make_vue(agissant)
             agissant.debut_tour()
+        new_courant = pygame.time.get_ticks()
+        duree = new_courant - constantes_temps['courant']
+        constantes_temps['agissants.debut_tour'] += duree
+        constantes_temps['courant'] = new_courant
         for item in self.items_courants :
             item.debut_tour()
         for lab in self.labs_courants:
             lab.debut_tour()
+        new_courant = pygame.time.get_ticks()
+        duree = new_courant - constantes_temps['courant']
+        constantes_temps['reste'] += duree
+        constantes_temps['courant'] = new_courant
         for esprit in self.esprits_courants:
             esprit.debut_tour() #Des décisions sont prises ici
+        new_courant = pygame.time.get_ticks()
+        duree = new_courant - constantes_temps['courant']
+        constantes_temps['esprits'] += duree
+        constantes_temps['courant'] = new_courant
 
     def pseudo_debut_tour(self):
         """La fonction qui fait la première moitiée de chaque tour"""
@@ -148,7 +164,9 @@ class Main: #Modifier le nom plus tard pour plus de cohérence
         """Fonction qui gère tout, agrège les autres"""
 
         self.run = True
+        constantes_temps['courant'] = pygame.time.get_ticks()
         while self.run : #Devient faux quand on quitte
+            constantes_temps['tours']+=1
             if self.controleur.phase == TOUR :
                 self.debut_tour()
             else :
@@ -164,7 +182,11 @@ class Main: #Modifier le nom plus tard pour plus de cohérence
             elif self.controleur.phase == EVENEMENT : #Un événement (montée de niveau, dialogue...) interrompt le jeu et le joueur doit réagir
                 self.evenement()
             self.affichage()
-            self.patiente(20)
+            self.patiente(6)
+            new_courant = pygame.time.get_ticks()
+            duree = new_courant - constantes_temps['courant']
+            constantes_temps['reste'] += duree
+            constantes_temps['courant'] = new_courant
 
     def clear(self):
         """Fonction qui enlève tous les éléments superflus avant une sauvegarde."""
