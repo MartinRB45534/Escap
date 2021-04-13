@@ -2973,7 +2973,7 @@ class Soigneur(Agissant):
                 cible = ID
                 pire = rapport
         skill = trouve_skill(self.classe_principale,Skill_magie)
-        if self.peut_payer(cout_pm_soin[skill.niveau-1]):#/!\ J'utilise le fait que le soin et l'auto soin aient le même coût !
+        if cible != None and self.peut_payer(cout_pm_soin[skill.niveau-1]):#/!\ J'utilise le fait que le soin et l'auto soin aient le même coût !
             self.skill_courant = Skill_magie
             self.cible_magie = cible
             defaut = "soin"
@@ -3071,7 +3071,7 @@ class Renforceur(Agissant):
                 if cible == None: #Rajouter un tri plus efficace que ça. Comparer les dégats par exemple.
                     cible = ID
         skill = trouve_skill(self.classe_principale,Skill_magie)
-        if self.peut_payer(cout_pm_boost[skill.niveau-1]):
+        if cible != None and self.peut_payer(cout_pm_boost[skill.niveau-1]):
             self.skill_courant = Skill_magie
             self.magie_courante = "magie boost"
             self.cible_magie = cible
@@ -3217,7 +3217,7 @@ class Shaman_gobelin(Renforceur,Support_lointain,Gobelin):
         Agissant.__init__(self,controleur,position,"shaman_gobelin",niveau)
 
     def boost(self,cible):
-        skill = trouve_skill(self.classe_principale,Skill_magie) #Est-ce qu'il a le même Skill_magie que le joueur ?
+        skill = trouve_skill(self.classe_principale,Skill_magie)
         self.skill_courant = Skill_magie
         self.magie_courante = "magie boost"
         self.cible_magie = cible
@@ -6340,7 +6340,7 @@ class Bombe_atomique(Attaquant_magique_case,Support_lointain,Humain): #La neuvi�
         taux_limite = 0.5 + 0.01*self.appreciations[8] #Quand on se hait, on devient plus suicidaire
         return self.pv / self.pv_max <= taux_limite
 
-    def peut_caster(sel,niveau):
+    def peut_caster(self,niveau):
         return self.peut_payer(cout_pm_volcan[niveau-1])
 
     def caste(self):
@@ -8087,6 +8087,62 @@ class Cree_charge_etendue_skill(Cree_item):
 
 #Quelques items pour le tutoriel :
 
+class Epee_epeiste(Epee):
+    """Les épées des deux humains épéistes."""
+    def __init__(self,position,niveau):
+        Arme.__init__(self,position,TERRE,tranchant_epee_epeiste[niveau-1],portee_epee_epeiste[niveau-1])
+        self.poids = poids_epee_epeiste[niveau-1]
+        self.frottements = frottements_epee_epeiste[niveau-1]
+        self.niveau = niveau
+
+    def get_description(self,observation):
+        return ["Une épée","Très bien entretenue"]
+
+    def get_skin(self):
+        return SKIN_EPEE
+
+class Armure_epeiste(Armure,Defensif_proportion):
+    """Les armures des deux humains épéistes."""
+    def __init__(self,position,niveau):
+        Defensif_proportion.__init__(self,position,taux_degats_armure_epeiste[niveau-1])
+        self.poids = poids_armure_epeiste[niveau-1]
+        self.frottements = frottements_armure_epeiste[niveau-1]
+        self.niveau = niveau
+
+    def get_description(self,observation):
+        return ["Une armure","Un peu légère"]
+
+    def get_skin(self):
+        return SKIN_ARMURE
+
+class Tunique_enchantee(Armure,Defensif_proportion):
+    """La tunique du mec paumé du deuxième étage. Étonnament résistante."""
+    def __init__(self,position,niveau):
+        Defensif_proportion.__init__(self,position,taux_degats_tunique_enchantee[niveau-1])
+        self.poids = poids_tunique_enchantee[niveau-1]
+        self.frottements = frottements_tunique_enchantee[niveau-1]
+        self.niveau = niveau
+
+    def get_description(self,observation):
+        return ["Une tunique","Un peu légère"]
+
+    def get_skin(self):
+        return SKIN_ARMURE #Lui créer un SKIN_TUNIQUE_ENCHANTEE /!\
+
+class Chapeau_de_sorciere(Haume,Pompe_a_pm):
+    """Le chapeau de la sorcière."""
+    def __init__(self,position,niveau):
+        Pompe_a_pm.__init__(self,position,pm_chapeau_sorciere[niveau-1])
+        self.poids = poids_chapeau_sorciere[niveau-1]
+        self.frottements = frottements_chapeau_sorciere[niveau-1]
+        self.niveau = niveau
+
+    def get_description(self,observation):
+        return ["Un bout de tissu","Peut-être un peu magique ?"]
+
+    def get_skin(self):
+        return SKIN_CASQUE #/!\ Lui faire un autre skin !
+
 class Epee_de_gobelin(Epee,Equipement_tribal):
     """L'épée des gobelins de base. Ils en sont équippés à partir du niveau 5 (peut-être plus ?) mais on peut en trouver à l'abandon dans le labyrinthe."""
     def __init__(self,position,niveau):
@@ -9131,15 +9187,19 @@ class Esprit :
                                 dirs.remove(dir_back)
                     corp.va(dirs[random.randint(0,len(dirs)-1)]) #/!\ Ne pas retourner sur ses pas, c'est bien ! Aller vers les endroits inconnus, ce serait mieux. /!\
             elif res == "deplacement":
-                dir_choix = dirs[0]
-                num_choix = 0
+                dir_choix = None
+                meilleur_choix = False
                 distance = case[3]
+                distance_indirecte = case[4]
                 for i in range(len(cases)):
-                    if cases[i][3] > distance or (cases[i][3] == distance and cases[i][4] > cases[num_choix][4]):
+                    if cases[i][3] > distance or (cases[i][3] == distance and cases[i][4] > distance_indirecte):
                         distance = cases[i][3]
+                        distance_indirecte = cases[i][4]
+                        meilleur_choix = True
                         dir_choix = dirs[i]
-                        num_choix = i
-                if distance == 0: #Pas d'accès direct à un ennemi
+                if meilleur_choix:
+                    corp.va(dir_choix)
+                elif distance == 0: #Pas d'accès direct à un ennemi
                     distance = case[4]
                     meilleur_choix = False
                     corp.skill_courant = None #Dans l'éventualité où on est déjà sur la meilleure case
@@ -9152,12 +9212,12 @@ class Esprit :
                         corp.va(dir_choix)
                     else:
                         res = corp.agit_en_vue(self) #Pas de résultat par défaut
-                else : #Accès direct à une cible !
-                    corp.va(dir_choix)
+                else : #Accès direct à une cible ! Mais on est déjà sur la meilleure case ! (Euh, quoi ? Comment c'est possible ?)
+                    res = corp.agit_en_vue(self) #Pas de résultat par défaut
+                    print("Agissants superposés ?")
 
             elif res == "fuite":
-                dir_choix = 2
-                num_choix = 0
+                dir_choix = None
                 meilleur_choix = False
                 distance = case[3]
                 distance_indirecte = case[4]
@@ -9167,7 +9227,9 @@ class Esprit :
                         distance_indirecte = cases[i][4]
                         meilleur_choix = True
                         dir_choix = dirs[i]
-                if distance == 0 and not meilleur_choix: #Pas d'accès direct à un ennemi (ou alors on est déjà sur la case la plus éloignée
+                if meilleur_choix:
+                    corp.va(dir_choix)
+                elif distance == 0: #Pas d'accès direct à un ennemi (ou alors on est déjà sur la case la plus éloignée
                     distance = case[4]
                     meilleur_choix = False
                     corp.skill_courant = None #Dans l'éventualité où on est déjà sur la meilleure case
@@ -9180,8 +9242,8 @@ class Esprit :
                         corp.va(dir_choix)
                     else: #On est accessible, mais on ne peut pas s'enfuir mieux
                         res = corp.agit_en_vue(self) #Pas de résultat par défaut
-                else : #Accès direct à un ennemi ! Et on a un bon endroit pour fuir !
-                    corp.va(dir_choix)
+                else : #Accès direct à un ennemi ! Et on est sur la meilleure case !
+                    res = corp.agit_en_vue(self) #Pas de résultat par défaut
 
     def oublie(self):
         for lab in self.vue.values():

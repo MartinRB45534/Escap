@@ -34,7 +34,7 @@ CONSTANTES_STATS = {
         'especes':['humain'],
         'doigts':10,
         'magies':False,
-        'items':False, #Rajouter l'épée et l'armure, au moins
+        'items':['Epee_epeiste','Armure_epeiste'], #Rajouter l'épée et l'armure, au moins
         'special':False},
     #Le mec paumé du premier labyrinthe (stats non définitives, à retravailler)
     "paume":{
@@ -52,7 +52,7 @@ CONSTANTES_STATS = {
         'especes':['humain'],
         'doigts':10,
         'magies':False,
-        'items':False,
+        'items':['Tunique_enchantee'], #Un item défensif très puissant, même si on le confondrait aisément avec un T-shirt. Mais qui est ce mec ?
         'special':False},
     #La meuf peureuse des premiers monstres (stats non définitives, à retravailler)
     "peureuse":{
@@ -106,7 +106,7 @@ CONSTANTES_STATS = {
         'especes':['humain'],
         'doigts':10,
         'magies':False,
-        'items':False, #Lui aussi, une épée et une armure ?
+        'items':['Epee_epeiste','Armure_epeiste'], #Lui aussi, une épée et une armure ?
         'special':False},
     #L'alchimiste de l'étage des potions (stats non défintitves, à retravailler):
     "alchimiste":{

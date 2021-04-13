@@ -7,9 +7,8 @@ L'autruche, en codant les pnjs
 
 
 
-J'ai reworké les comportements des humains, mais pas encore vraiment testé tout ça.
-Il faut aussi attribuer aux pnjs les items qu'ils méritent et, évidemment, replancher sur l'équilibrage pour prendre ça en compte.
-Objectif : que même moi je sois capable de finir le tuto en tuant tout le monde sur mon chemin (surtout les pnjs) ou en sauvant tous les pnjs. C'est juste un tuto, donc s'il est à mon niveau c'est bien.
+Finir de rajouter les items des pnjs et rééquilibrer le jeu
+Améliorer le système de la fuite, c'est vraiment soulant actuellement...
 
 
 
