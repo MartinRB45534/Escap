@@ -332,3 +332,6 @@ constantes_temps = {'tours':0,
                     'esprits':0,
                     'reste':0,
                     'courant':0}
+
+global constantes_deplacements
+constantes_deplacements = []

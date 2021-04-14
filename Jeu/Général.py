@@ -6,6 +6,7 @@ from Jeu.Systeme.Constantes_stats import *
 from Jeu.Constantes import *
 from Jeu.Skins.Skins import *
 import random
+import operator
 
 # /!\ Mettre les lignes à jour !
 # Contenu du fichier :
@@ -9097,11 +9098,10 @@ class Esprit :
 
     def positions_utilisables(self,position,dead_ends):
         pos_utilisables=[]
-        cardinaux = [HAUT,DROITE,BAS,GAUCHE]
 
         case = self.vue[position[0]][position[1]][position[2]]
 
-        for direction in cardinaux:
+        for direction in range(4):
             if case[7][direction] and not(dead_ends and case[8]!=[]) and case[7][direction][0] in self.vue.keys():
                 pos_utilisables.append(case[7][direction])
 
@@ -9126,19 +9126,21 @@ class Esprit :
         corp = self.controleur.get_entitee(ID)
         position = corp.get_position()
         case = corp.vue[position[1]][position[2]]
-        cases = [[-1,case[0],case[3],case[4],case[5]]]
+        tcase = self.vue[position[0]][position[1]][position[2]]
+        cases = [[-1,tcase[0],tcase[3],tcase[4],tcase[5]]]
+        dirs = []
         importance = 0
         res = None
         for i in range(4): #On commence par se renseigner sur les possibilités :
             if case[7][i]:
-                if case[7][i][0] in self.vue.keys():
+                if case[7][i][0] == position[0]:
                     case_pot = self.vue[case[7][i][0]][case[7][i][1]][case[7][i][2]]
                     entitees = case_pot[8]
                     libre = True
                     for ID_entitee in entitees:
                         entitee = self.controleur.get_entitee(ID_entitee)
                         if not issubclass(entitee.get_classe(),Item): #Un agissant !
-                            if case[7][i][0] == position[0] and ID_entitee in self.ennemis.keys(): #Un ennemi !
+                            if ID_entitee in self.ennemis.keys(): #Un ennemi !
                                 if corp.veut_attaquer(): #On veut atatquer lorsqu'on croise un ennemi au corps à corps (et on a assez de mana pour, si on utilise la magie)
                                     if self.ennemis[ID_entitee] > importance:
                                         importance = self.ennemis[ID_entitee]
@@ -9149,6 +9151,7 @@ class Esprit :
                             libre = False
                     if libre:
                         cases.append([i,case_pot[0],case_pot[3],case_pot[4],case_pot[5]])
+                        dirs.append(i)
         if res == None: #Quelques comportements possibles :
             comportement = corp.comporte_distance()
             if comportement == 0 : #Foncer tête baissée ! Pour les combattants au corps à corps
@@ -9176,7 +9179,7 @@ class Esprit :
                                             importance = self.ennemis[ID_entitee]
                                             corp.attaque(i)
                                             res = "attaque"
-            elif case[4] == 0: #Et case[3] forcément aussi par la même occasion, donc on est totalement libre de chercher
+            elif tcase[4] == 0: #Et case[3] forcément aussi par la même occasion, donc on est totalement libre de chercher
                 if not isinstance(corp,Sentinelle):
                     if len(dirs)>1: #On peut se permettre de choisir
                         if corp.dir_regard != None: #L'agissant regarde quelque part
@@ -9184,16 +9187,22 @@ class Esprit :
                             if dir_back in dirs: #On ne veut pas y retourner
                                 dirs.remove(dir_back)
                     corp.va(dirs[random.randint(0,len(dirs)-1)]) #/!\ Ne pas retourner sur ses pas, c'est bien ! Aller vers les endroits inconnus, ce serait mieux. /!\
+                    if ID == 4:
+                        constantes_deplacements.append([self.controleur.nb_tours,"cherche",corp.dir_regard,cases])
             else:
-                new_cases = sorted(cases,key=itemgetter(2,3))
+                new_cases = sorted(cases,key=operator.itemgetter(2,3))
                 if res == "deplacement":
                     if new_cases[-1][0] != -1: #La dernière case (i.e. les valeurs les plus élevées) n'est pas celle où l'on est
                         corp.va(new_cases[-1][0])
+                        if ID == 4:
+                            constantes_deplacements.append([self.controleur.nb_tours,"deplacement",corp.dir_regard,new_cases])
                     else:
                         res = corp.agit_en_vue(self)
                 elif res == "fuite":
                     if new_cases[0][0] != -1: #La première case (i.e. les valeurs les moins élevées) n'est pas celle où l'on est
                         corp.va(new_cases[0][0])
+                        if ID == 4:
+                            constantes_deplacements.append([self.controleur.nb_tours,"fuite",corp.dir_regard,new_cases])
                     else:
                         res = corp.agit_en_vue(self)
 ##            elif res == "deplacement":
@@ -9535,7 +9544,7 @@ class Esprit_humain(Esprit_type):
                     case[5] = 0
 
     def peureuse(self):
-        return 5 in self.corps.values() and self.corps[5] in ["humain","attente","fuite","attaque","vivant"] #J'ai un doute sur la possibilité des deux derniers mais bon...
+        return 5 in self.corps.keys() and self.corps[5] in ["humain","attente","fuite","deplacement","attaque","vivant"] #J'ai un doute sur la possibilité des deux derniers mais bon...
 
     def decide(self):
         bourrins = []
@@ -9608,7 +9617,7 @@ class Esprit_humain(Esprit_type):
                                             res = "fuite"
                                     libre = False
                             if libre:
-                                cases.append(i,case_pot[0],case_pot[3],case_pot[4],case_pot[5]])
+                                cases.append([i,case_pot[0],case_pot[3],case_pot[4],case_pot[5]])
                 if res == None: #On n'a pas d'ennemi à portée directe (ou on ne souhaite pas attaquer ni fuir)
                     comportement = humain.comporte_distance()
                     if comportement == 0 : #Foncer tête baissée ! Pour les combattants au corps à corps
@@ -9637,17 +9646,21 @@ class Esprit_humain(Esprit_type):
                                                     humain.attaque(i)
                                                     res = "attaque"
                     else:
-                        new_cases = sorted(cases,key=itemgetter(4,2,3))
+                        new_cases = sorted(cases,key=operator.itemgetter(4,2,3))
                         if res == "deplacement":
                             if new_cases[-1][0] != -1: #La dernière case (i.e. les valeurs les plus élevées) n'est pas celle où l'on est
-                                corp.va(new_cases[-1][0])
+                                humain.va(new_cases[-1][0])
+                                if ID_humain == 4:
+                                    constantes_deplacements.append([self.controleur.nb_tours,"deplacement loin",humain.dir_regard,new_cases])
                             else:
-                                res = corp.agit_en_vue(self)
+                                res = humain.agit_en_vue(self)
                         elif res == "fuite":
                             if new_cases[0][0] != -1: #La première case (i.e. les valeurs les moins élevées) n'est pas celle où l'on est
-                                corp.va(new_cases[0][0])
+                                humain.va(new_cases[0][0])
+                                if ID_humain == 4:
+                                    constantes_deplacements.append([self.controleur.nb_tours,"fuite loin",humain.dir_regard,new_cases])
                             else:
-                                res = corp.agit_en_vue(self)
+                                res = humain.agit_en_vue(self)
 ##                    elif res == "deplacement" or case[4] == 0:
 ##                        dir_choix = 2
 ##                        num_choix = 0
