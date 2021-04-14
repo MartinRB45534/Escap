@@ -9586,7 +9586,7 @@ class Esprit_humain(Esprit_type):
                 self.resoud(cible,10,5)
                 position = humain.get_position()
                 case = self.vue[position[0]][position[1]][position[2]]
-                cases = []
+                cases = [[-1,case[0],case[3],case[4],case[5]]]
                 dirs = []
                 importance = 0
                 for i in range(4):
@@ -9608,8 +9608,7 @@ class Esprit_humain(Esprit_type):
                                             res = "fuite"
                                     libre = False
                             if libre:
-                                cases.append(case_pot)
-                                dirs.append(i)
+                                cases.append(i,case_pot[0],case_pot[3],case_pot[4],case_pot[5]])
                 if res == None: #On n'a pas d'ennemi à portée directe (ou on ne souhaite pas attaquer ni fuir)
                     comportement = humain.comporte_distance()
                     if comportement == 0 : #Foncer tête baissée ! Pour les combattants au corps à corps
@@ -9620,7 +9619,7 @@ class Esprit_humain(Esprit_type):
                         res = humain.agit_en_vue(self,"fuite")
                     elif comportement == 3 : #La fuite ! Quand les pvs sont bas
                         res = "fuite"
-                    if len(cases) == 0: #Pas de cases libres à proximité, on va essayer d'attaquer pour s'en sortir
+                    if len(cases) == 1: #Pas de cases libres à proximité, on va essayer d'attaquer pour s'en sortir
                         humain.skill_courant = None
                         importance = 0
                         for i in range(4):
@@ -9637,52 +9636,64 @@ class Esprit_humain(Esprit_type):
                                                     importance = self.ennemis[ID_entitee]
                                                     humain.attaque(i)
                                                     res = "attaque"
-                    elif res == "deplacement" or case[4] == 0:
-                        dir_choix = 2
-                        num_choix = 0
-                        distance = case[5]
-                        for i in range(len(cases)):
-                            if cases[i][5] > distance:
-                                distance = cases[i][5]
-                                dir_choix = dirs[i]
-                                num_choix = i
-                        if distance > 0 : #On connait le chemin pour aller à la cible
-                            humain.va(dir_choix)
-                        else:
-                            if len(dirs)>1: #On cherche la cible
-                                if humain.dir_regard != None: #L'agissant regarde quelque part
-                                    dir_back = [HAUT,DROITE,BAS,GAUCHE][humain.dir_regard-2]
-                                    if dir_back in dirs: #On ne veut pas y retourner
-                                        dirs.remove(dir_back)
-                            humain.va(dirs[random.randint(0,len(dirs)-1)])
-
-                    elif res == "fuite" :
-                        dir_choix = 2
-                        num_choix = 0
-                        meilleur_choix = False
-                        distance = case[3]
-                        distance_indirecte = case[4]
-                        for i in range(len(cases)):
-                            if (cases[i][3] < distance or (cases[i][3] == distance and cases[i][4] <= distance_indirecte)) and cases[i][0][0] == case[0][0]:
-                                distance = cases[i][3]
-                                distance_indirecte = cases[i][4]
-                                meilleur_choix = True
-                                dir_choix = dirs[i]
-                        if distance == 0 and not meilleur_choix: #Pas d'accès direct à un ennemi (ou alors on est déjà sur la case la plus éloignée
-                            distance = case[4]
-                            meilleur_choix = False
-                            humain.skill_courant = None #Dans l'éventualité où on est déjà sur la meilleure case
-                            for i in range(len(cases)):
-                                if (cases[i][4] < distance) and cases[i][0][0] == case[0][0]:
-                                    meilleur_choix = True
-                                    distance = cases[i][4] #On s'éloigne aussi du chemin avec des obstacles
-                                    dir_choix = dirs[i]
-                            if meilleur_choix:
-                                humain.va(dir_choix)
-                            else: #On est accessible, mais on ne peut pas s'enfuir mieux
-                                res = humain.agit_en_vue(self) #Pas de résultat par défaut
-                        else : #Accès direct à un ennemi ! Et on a un bon endroit pour fuir !
-                            humain.va(dir_choix)
+                    else:
+                        new_cases = sorted(cases,key=itemgetter(4,2,3))
+                        if res == "deplacement":
+                            if new_cases[-1][0] != -1: #La dernière case (i.e. les valeurs les plus élevées) n'est pas celle où l'on est
+                                corp.va(new_cases[-1][0])
+                            else:
+                                res = corp.agit_en_vue(self)
+                        elif res == "fuite":
+                            if new_cases[0][0] != -1: #La première case (i.e. les valeurs les moins élevées) n'est pas celle où l'on est
+                                corp.va(new_cases[0][0])
+                            else:
+                                res = corp.agit_en_vue(self)
+##                    elif res == "deplacement" or case[4] == 0:
+##                        dir_choix = 2
+##                        num_choix = 0
+##                        distance = case[5]
+##                        for i in range(len(cases)):
+##                            if cases[i][5] > distance:
+##                                distance = cases[i][5]
+##                                dir_choix = dirs[i]
+##                                num_choix = i
+##                        if distance > 0 : #On connait le chemin pour aller à la cible
+##                            humain.va(dir_choix)
+##                        else:
+##                            if len(dirs)>1: #On cherche la cible
+##                                if humain.dir_regard != None: #L'agissant regarde quelque part
+##                                    dir_back = [HAUT,DROITE,BAS,GAUCHE][humain.dir_regard-2]
+##                                    if dir_back in dirs: #On ne veut pas y retourner
+##                                        dirs.remove(dir_back)
+##                            humain.va(dirs[random.randint(0,len(dirs)-1)])
+##
+##                    elif res == "fuite" :
+##                        dir_choix = 2
+##                        num_choix = 0
+##                        meilleur_choix = False
+##                        distance = case[3]
+##                        distance_indirecte = case[4]
+##                        for i in range(len(cases)):
+##                            if (cases[i][3] < distance or (cases[i][3] == distance and cases[i][4] <= distance_indirecte)) and cases[i][0][0] == case[0][0]:
+##                                distance = cases[i][3]
+##                                distance_indirecte = cases[i][4]
+##                                meilleur_choix = True
+##                                dir_choix = dirs[i]
+##                        if distance == 0 and not meilleur_choix: #Pas d'accès direct à un ennemi (ou alors on est déjà sur la case la plus éloignée
+##                            distance = case[4]
+##                            meilleur_choix = False
+##                            humain.skill_courant = None #Dans l'éventualité où on est déjà sur la meilleure case
+##                            for i in range(len(cases)):
+##                                if (cases[i][4] < distance) and cases[i][0][0] == case[0][0]:
+##                                    meilleur_choix = True
+##                                    distance = cases[i][4] #On s'éloigne aussi du chemin avec des obstacles
+##                                    dir_choix = dirs[i]
+##                            if meilleur_choix:
+##                                humain.va(dir_choix)
+##                            else: #On est accessible, mais on ne peut pas s'enfuir mieux
+##                                res = humain.agit_en_vue(self) #Pas de résultat par défaut
+##                        else : #Accès direct à un ennemi ! Et on a un bon endroit pour fuir !
+##                            humain.va(dir_choix)
 
         return res
 
