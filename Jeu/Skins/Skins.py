@@ -51,32 +51,42 @@ global SKIN_OEUF
 SKIN_OEUF = Skin("oeuf.png")
 global SKIN_BLESSURE
 SKIN_BLESSURE = Skin("blessure.png")
-global SKIN_JOUEUR
-SKIN_JOUEUR = Skin("joueur.png")
-global SKIN_RECEPTIONNISTE
-SKIN_RECEPTIONNISTE = Skin("receptionniste.png")
-global SKIN_PAUME
-SKIN_PAUME = Skin("paume.png")
-global SKIN_PEUREUSE
-SKIN_PEUREUSE = Skin("peureuse.png")
+global SKIN_TETE_JOUEUR
+SKIN_TETE_JOUEUR = Skin("joueur_tete.png")
+global SKIN_TETE_RECEPTIONNISTE
+SKIN_TETE_RECEPTIONNISTE = Skin("receptionniste_tete.png")
+global SKIN_TETE_PAUME
+SKIN_TETE_PAUME = Skin("paume_tete.png")
+global SKIN_TETE_PEUREUSE
+SKIN_TETE_PEUREUSE = Skin("peureuse_tete.png")
 global SKIN_CODEUR
 SKIN_CODEUR = Skin("codeur.png")
-global SKIN_ENCOMBRANT
-SKIN_ENCOMBRANT = Skin("encombrant.png")
-global SKIN_ALCHIMISTE
-SKIN_ALCHIMISTE = Skin("alchimiste.png")
-global SKIN_PESTE
-SKIN_PESTE = Skin("peste.png")
-global SKIN_BOMBE_ATOMIQUE
-SKIN_BOMBE_ATOMIQUE = Skin("bombe_atomique.png")
-global SKIN_MARCHAND
-SKIN_MARCHAND = Skin("marchand.png")
-global SKIN_HUMAIN
-SKIN_HUMAIN = Skin("humain.png")
+global SKIN_TETE_ENCOMBRANT
+SKIN_TETE_ENCOMBRANT = Skin("encombrant_tete.png")
+global SKIN_TETE_ALCHIMISTE
+SKIN_TETE_ALCHIMISTE = Skin("alchimiste_tete.png")
+global SKIN_TETE_PESTE
+SKIN_TETE_PESTE = Skin("peste_tete.png")
+global SKIN_TETE_BOMBE_ATOMIQUE
+SKIN_TETE_BOMBE_ATOMIQUE = Skin("bombe_atomique_tete.png")
+global SKIN_TETE_MARCHAND
+SKIN_TETE_MARCHAND = Skin("marchand_tete.png")
+global SKIN_CORPS_HUMAIN
+SKIN_CORPS_HUMAIN = Skin("humain_corps.png")
+global SKIN_CORPS_PAUME
+SKIN_CORPS_PAUME = Skin("paume_corps.png")
 global SKIN_GOBELIN
 SKIN_GOBELIN = Skin("gobelin.png")
+global SKIN_CORPS_GOBELIN
+SKIN_CORPS_GOBELIN = Skin("gobelin_corps.png")
+global SKIN_TETE_GOBELIN
+SKIN_TETE_GOBELIN = Skin("gobelin_tete.png")
 global SKIN_SLIME
 SKIN_SLIME = Skin("slime.png")
+global SKIN_CORPS_OMBRIUL
+SKIN_CORPS_OMBRIUL = Skin("ombriul_corps.png")
+global SKIN_TETE_OMBRIUL
+SKIN_TETE_OMBRIUL = Skin("ombriul_tete.png")
 global SKIN_DIALOGUE
 SKIN_DIALOGUE = Skin("dialogue.png")
 global SKIN_MYSTERE
@@ -95,16 +105,46 @@ global SKIN_PARCHEMIN
 SKIN_PARCHEMIN = Skin("parchemin.png")
 global SKIN_EPEE
 SKIN_EPEE = Skin("epee.png")
+global SKIN_EPEE_GOBELIN
+SKIN_EPEE_GOBELIN = Skin("epee_gobelin.png")
+global SKIN_EPEE_MARCHAND
+SKIN_EPEE_MARCHAND = Skin("epee_marchand.png")
+global SKIN_CIMETERE_GOBELIN
+SKIN_CIMETERE_GOBELIN = Skin("cimetere_gobelin.png")
 global SKIN_LANCE
 SKIN_LANCE = Skin("lance.png")
+global SKIN_LANCE_GOBELIN
+SKIN_LANCE_GOBELIN = Skin("lance_gobelin.png")
+global SKIN_LANCE_DOR
+SKIN_LANCE_DOR = Skin("lance_dor.png")
 global SKIN_ARME
 SKIN_ARME = Skin("arme.png")
 global SKIN_ARMURE
 SKIN_ARMURE = Skin("armure.png")
+global SKIN_ARMURE_DOR
+SKIN_ARMURE_DOR = Skin("armure_dor.png")
+global SKIN_ARMURE_GOBELIN
+SKIN_ARMURE_GOBELIN = Skin("armure_gobelin.png")
 global SKIN_ARMURE_BIS
 SKIN_ARMURE_BIS = Skin("armure_bis.png")
+global SKIN_TUNIQUE_ENCHANTEE
+SKIN_TUNIQUE_ENCHANTEE = Skin("tunique_enchantee.png")
+global SKIN_SOUTANE
+SKIN_SOUTANE = Skin("soutane.png")
+global SKIN_TUNIQUE_ALCHIMISTE
+SKIN_TUNIQUE_ALCHIMISTE = Skin("tunique_alchimiste.png")
+global SKIN_ROBE_MAGIQUE
+SKIN_ROBE_MAGIQUE = Skin("robe_magique.png")
+global SKIN_ROBE_SORCIERE
+SKIN_ROBE_SORCIERE = Skin("robe_sorciere.png")
 global SKIN_CASQUE
 SKIN_CASQUE = Skin("casque.png")
+global SKIN_CHAPEAU_DE_SORCIERE
+SKIN_CHAPEAU_DE_SORCIERE = Skin("chapeau_de_sorciere.png")
+global SKIN_CASQUE_GOBELIN
+SKIN_CASQUE_GOBELIN = Skin("casque_gobelin.png")
+global SKIN_BANDEAU_GOBELIN
+SKIN_BANDEAU_GOBELIN = Skin("bandeau_gobelin.png")
 global SKIN_ANNEAU
 SKIN_ANNEAU = Skin("anneau.png")
 global SKIN_PROJECTILE
@@ -139,6 +179,8 @@ global SKIN_PORTE
 SKIN_PORTE = Skin("porte.png")
 global SKIN_PORTE_OUVERTE
 SKIN_PORTE_OUVERTE = Skin("porte_ouverte.png")
+global SKIN_PORTE_OUVRABLE
+SKIN_PORTE_OUVRABLE = Skin("porte_ouvrable.png")
 global SKIN_BARRIERE
 SKIN_BARRIERE = Skin("barriere.png")
 global SKIN_PORTAIL

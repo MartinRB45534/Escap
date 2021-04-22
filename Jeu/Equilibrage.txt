@@ -38,6 +38,25 @@ On prend un peu au pif dpp_base = 1 et on verra ce que ça donne.
 
 
 On veut que :
+joueur > paume (sans équippement pour le joueur) donc :
+temps de survie du joueur sous les coups du paumé > temps de survie du paumé sous les coups du joueur
+pv du joueur//degats subits par le joueur > pv du paumé//degats subits par le paumé
+pv_joueur//(degats du paumé - regen_joueur) > pv_paumé//(degats du joueur*defense_de_paumé - regen_paumé)
+pv_joueur//(dpt_stomp_paumé - regen_joueur) > pv_paumé//(dpt_stomp_joueur*taux_degats_tunique - regen_paumé)
+100//(2-1) > 150//(5*X-2)
+100 > 150//(5*X-2)
+5*X-2 > 1.5
+X>0.7 avec X dans [0,1]
+joueur > encomb (avec la tunique volée au paumé) donc :
+temps de survie du joueur sous les coups de l'encomb > temps de survie de l'encomb sous les coups du joueur
+pv du joueur//degats subits par le joueur > pv de l'encomb//degats subits par l'encomb
+pv_joueur//(degats de l'encomb*defense_du_joueur - regen_joueur) > pv_encomb//(degats du joueur*defense_de_paumé - regen_paumé)
+pv_joueur//(dpt_attaque_encomb*taux_degats_tunique - regen_joueur) > pv_encomb//(dpt_stomp_joueur*taux_degats_armure - regen_paumé)
+100//(10*0.7-1) > 75//(5*x-1.5)
+100//6 > 75//(5*x-2)
+100*(5*x-2) > 75*6
+500*x > 550
+x>1.1 avec x dans [0,1]
 joueur > tous individuellement, moyennant un équippement adéquat (volé sur des cadavres... humains)
 sentinelle > guerrier
 guerrier > 2~3 base
@@ -60,7 +79,7 @@ sentinelle < slime
 Stats stomp au niveau 1:
 dpt_joueur = 5
 dpt_recep = 5
-dpt_paume = 3
+dpt_paume = 2
 dpt_encomb = 5
 dpt_alchi = 1.5
 dpt_peste = 1

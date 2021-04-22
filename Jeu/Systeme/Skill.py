@@ -421,6 +421,27 @@ class Skill_blocage(Skill):
         self.xp_new += self.gain_xp
         return self.latence,self.taux_utilisation
 
+class Skill_course(Skill):
+    """Le skill utilisé pour se déplacer. Lorsqu'il augmente de niveau, la vitesse de déplacement augmente aussi. C'est un skill intrasec à la classe principale.
+       Les pnjs le sélectionnent lorsqu'il choisissent de se déplacer, alors que le joueur le sélectionne lorsqu'il appuie sur les touches. Le joueur peut aussi s'en servir lorsqu'il explore la minimap ou l'inventaire.
+       C'est un skill actif, qui s'actionne quand on le réclame."""
+    def __init__(self): #Pour l'instant le skill est générique, identique pour tous
+        Skill.__init__(self)
+        self.nom="Course"
+
+    def get_skin(self):
+        return SKIN_SKILL_DEPLACEMENT
+
+    def evo(self,nb_evo=1):
+        for i in range(nb_evo):
+            self.niveau+=1 #Le niveau augmente
+            #Pas d'autre cadeau
+        
+    def utilise(self):
+        """fonction qui utilise le skill"""
+        self.xp_new+=gain_xp_course[self.niveau-1] #On gagne de l'xp !
+        return latence_course[self.niveau-1], self.niveau #On renvoie le temps que prendra l'action, pour savoir combien de temps l'agissant attendra, et le niveau, pour les calculs du controleur, des collisions, du labyrinthe, etc.
+
 class Skill_lancer(Skill):
     """Permet de lancer un item. Le temps du lancer dépend du poid de l'item et du niveau du skill. La portée du lancer dépend de la portée de l'item, du niveau du skill et des capacités de l'agissant. L'item peut être dans l'inventaire ou créé au moment du lancer.
        C'est un skill actif."""

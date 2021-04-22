@@ -6,7 +6,7 @@ CONSTANTES_STATS = {
         'regen_pv':[0,1,1,1,1,1,1,1,1,1,1],
         'pm':[0,1000,100,100,100,100,100,100,100,100,100],
         'regen_pm':[0,1,1,1,1,1,1,1,1,1,1],
-        'force':[0,10,10,10,10,10,10,10,10,10,10],
+        'force':[0,20,10,10,10,10,10,10,10,10,10],
         'priorite':[0,10,10,10,10,10,10,10,10,10,10],
         'vitesse':[0,1,1,1,1,1,1,1,1,1,1],
         'aff_t':[0,1,1,1,1,1,1,1,1,1,1],
@@ -16,7 +16,7 @@ CONSTANTES_STATS = {
         'especes':['humain'],
         'doigts':10,
         'magies':False,
-        'items':False, #Rajouter les items de base
+        'items':['Armure_dor','Lance_dor'],
         'special':True},
     #L'épéiste à l'accueil (stats non définitives, à retravailler)
     "receptionniste":{
@@ -34,7 +34,7 @@ CONSTANTES_STATS = {
         'especes':['humain'],
         'doigts':10,
         'magies':False,
-        'items':['Epee_epeiste','Armure_epeiste'], #Rajouter l'épée et l'armure, au moins
+        'items':['Epee_epeiste','Armure_epeiste'],
         'special':False},
     #Le mec paumé du premier labyrinthe (stats non définitives, à retravailler)
     "paume":{
@@ -42,7 +42,7 @@ CONSTANTES_STATS = {
         'regen_pv':[0,2,2,2,2,2,2,2,2,2,2],
         'pm':[0,0,0,0,0,0,0,0,0,0,0],
         'regen_pm':[0,0,0,0,0,0,0,0,0,0,0],
-        'force':[0,6,6,6,6,6,6,7,8,9,10],
+        'force':[0,8,4,4,4,5,6,7,8,9,10],
         'priorite':[0,1,1,1,1,1,1,1,1,1,1],
         'vitesse':[0,1,1,1,1,1,1,1,1,1,1],
         'aff_t':[0,1,1,1,1,1,1,1,1,1,1],
@@ -70,7 +70,7 @@ CONSTANTES_STATS = {
         'especes':['humain'],
         'doigts':10,
         'magies':['Magie_multi_boost','Magie_boost'], #/!\ Ajouter les magies de soutien ici !
-        'items':False, #Peut-être un ou deux anneaux ?
+        'items':['Robe_magique'], #Peut-être un ou deux anneaux ?
         'special':False},
     #Le mec chelou qui se prend pour Dieu
     "codeur":{
@@ -93,10 +93,10 @@ CONSTANTES_STATS = {
     #Le mec chiant enfermé à clé (stats non définitives, à retravailler)
     "encombrant":{
         'pv':[0,150,200,250,300,350,400,450,500,550,600],
-        'regen_pv':[0,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5],
+        'regen_pv':[0,0.75,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5],
         'pm':[0,0,0,0,0,0,0,0,0,0,0],
         'regen_pm':[0,0,0,0,0,0,0,0,0,0,0],
-        'force':[0,10,10,10,12,15,18,21,24,27,30],
+        'force':[0,15,10,10,12,15,18,21,24,27,30],
         'priorite':[0,1,1,1,1,1,1,1,1,1,1],
         'vitesse':[0,1,1,1,1,1,1,1,1,1,1],
         'aff_t':[0,1,1,1,1,1,1,1,1,1,1],
@@ -106,7 +106,7 @@ CONSTANTES_STATS = {
         'especes':['humain'],
         'doigts':10,
         'magies':False,
-        'items':['Epee_epeiste','Armure_epeiste'], #Lui aussi, une épée et une armure ?
+        'items':['Epee_epeiste','Armure_epeiste'],
         'special':False},
     #L'alchimiste de l'étage des potions (stats non défintitves, à retravailler):
     "alchimiste":{
@@ -124,7 +124,7 @@ CONSTANTES_STATS = {
         'especes':['humain'],
         'doigts':10,
         'magies':['Magie_poing_magique','Magie_secousse'],
-        'items':False, #Un baton, peut-être ? Ça ne ferait pas beaucoup de sens mais il lui faut des objets
+        'items':['Tunique_alchimiste'], #Un baton, peut-être ? Ça ne ferait pas beaucoup de sens mais il lui faut des objets
         'special':False},
     #La sainte monstrophobe (stats non défintitves, à retravailler):
     "peste":{
@@ -142,7 +142,7 @@ CONSTANTES_STATS = {
         'especes':['humain'],
         'doigts':10,
         'magies':['Magie_soin','Magie_auto_soin','Magie_multi_soin','Magie_purification'], # /!\ Rajouter la purification
-        'items':False, #Quelques reliques
+        'items':['Soutane'], #Quelques reliques
         'special':False},
     #La magicienne (stats non défintitves, à retravailler):
     "bombe_atomique":{
@@ -160,7 +160,7 @@ CONSTANTES_STATS = {
         'especes':['humain'],
         'doigts':10,
         'magies':['Magie_brasier','Magie_poing_ardent','Magie_volcan'],
-        'items':False, #Un chapeau, des anneaux... tout ça tout ça
+        'items':['Chapeau_de_sorciere','Robe_de_sorciere'],
         'special':False},
     #Le gros qui extorque des sous (stats non définitives, à retravailler)
     "marchand":{
@@ -178,7 +178,7 @@ CONSTANTES_STATS = {
         'especes':['humain'],
         'doigts':10,
         'magies':False,
-        'items':False, #Est-ce qu'il les a dès le départ ?
+        'items':['Epee_marchand','Armure_marchand'],
         'special':False},
     #Le gobelin de base (faible, très faible, presque autant que les slimes en terme de stats brutes)
     "gobelin":{
@@ -323,6 +323,24 @@ CONSTANTES_STATS = {
         'doigts':0,
         'magies':False, #Pas de magies à la création
         'items':False, #Les slimes ne peuvent pas porter d'équippement
+        'special':False},
+    #L'ombriul de base (plus puissant que les autres monstres de base)
+    "ombriul":{
+        'pv':[0,100,35,40,50,60,80,100,130,160,200],
+        'regen_pv':[0,1,2,3,4,5,6,7,8,9,10],
+        'pm':[0,100,0,0,0,0,0,0,0,0,0],
+        'regen_pm':[0,3,0,0,0,0,0,0,0,0,0],
+        'force':[0,10,1.6,1.7,1.9,2.2,2.5,2.9,3.3,3.7,4.2],
+        'priorite':[0,1,1,1,1,1,1,1,1,1,1],
+        'vitesse':[0,0.5,0.6,0.7,0.9,1.1,1.4,1.7,2,2.5,3],
+        'aff_t':[0,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8],
+        'aff_f':[0,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8],
+        'aff_g':[0,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8],
+        'aff_o':[0,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5],
+        'especes':['ombriul'],
+        'doigts':10,
+        'magies':['Magie_poing_sombre'],
+        'items':False,
         'special':False},
         }
 

@@ -29,6 +29,7 @@ from Jeu.Systeme.Constantes_magies.Constantes_perte_de_pv import *
 from Jeu.Systeme.Constantes_magies.Constantes_poches_trouees import *
 from Jeu.Systeme.Constantes_magies.Constantes_poing_ardent import *
 from Jeu.Systeme.Constantes_magies.Constantes_poing_magique import *
+from Jeu.Systeme.Constantes_magies.Constantes_poing_sombre import *
 from Jeu.Systeme.Constantes_magies.Constantes_purification import *
 from Jeu.Systeme.Constantes_magies.Constantes_reanimation import *
 from Jeu.Systeme.Constantes_magies.Constantes_renforcement import *

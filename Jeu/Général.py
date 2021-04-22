@@ -1,12 +1,12 @@
+from Jeu.Constantes import *
 from Jeu.Systeme.Classe import *
 from Jeu.Systeme.Constantes_magies.Magies import *
 from Jeu.Systeme.Constantes_projectiles.Projectiles import *
 from Jeu.Systeme.Constantes_items.Items import *
 from Jeu.Systeme.Constantes_stats import *
-from Jeu.Constantes import *
 from Jeu.Skins.Skins import *
-import random
 import operator
+import random
 
 # /!\ Mettre les lignes à jour !
 # Contenu du fichier :
@@ -106,9 +106,6 @@ class Controleur():
         cle1 = Cle(("Étage 3 : combat",12,13),["Porte_entree_encombrant_5"])
         self.ajoute_entitee(cle1)
         peureuse.inventaire.ajoute(cle1)
-        cle2 = Cle(("Étage 3 : combat",12,13),["Porte_contournement_encombrant_5"])
-        self.ajoute_entitee(cle2)
-        peureuse.inventaire.ajoute(cle2)
         gobel1 = Sentinelle_gobelin(self,("Étage 3 : combat",3,8),1)
         self.ajoute_entitee(gobel1)
         self.esprits["gobelins_combat"]=Esprit_simple("gobelins_combat",[gobel1.ID],["humain"],self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
@@ -173,11 +170,11 @@ class Controleur():
         self.ajoute_entitee(gobel3)
         slime = Slime(self,("Étage 5 : portes",1,20),1) #Un slime ! Est-ce que les gobelins ont pris soin de l'affaiblir ?
         self.ajoute_entitee(slime)
-        #ombriul = Ombriul(self,("Étage 5 : portes",8,11),1) #Un prisonnier de guerre
-        #self.ajoute_entitee(ombriul)
+        ombriul = Ombriul(self,("Étage 5 : portes",8,11),1) #Un prisonnier de guerre
+        self.ajoute_entitee(ombriul)
         #Rajouter quelques cadavres pour le nécromancien
         self.esprits["gobelins_portes"]=Esprit_simple("gobelins_portes",[gobel1.ID,gobel2.ID,gobel3.ID],["humain"],self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
-        #self.esprits["ombriul_captif"]=Esprit_simple("ombriul_captif",[ombriul.ID],["humain"],self)
+        self.esprits["ombriul_captif"]=Esprit_simple("ombriul_captif",[ombriul.ID],["humain"],self)
         esprit_slime = Esprit_slime(slime.ID,self)
         self.esprits[esprit_slime.nom]=esprit_slime #Les esprits des slimes sont presque aussi compliqués que ceux des humains, les ruptures en moins.
         paterns5 = [Patern(("Étage 5 : portes",0,0),10,24,[]),
@@ -195,8 +192,6 @@ class Controleur():
         self.labs["Étage 5 : portes"]=Labyrinthe("Étage 5 : portes",10,24,("Étage 5 : portes",0,0),paterns5)
         self.labs["Étage 5 : portes"].matrice_cases[4][3].murs[DROITE].effets[1].auto = True
         self.labs["Étage 5 : portes"].matrice_cases[5][3].murs[GAUCHE].effets[1].auto = True
-        self.labs["Étage 5 : portes"].matrice_cases[3][0].murs[DROITE].effets.append(Porte(1,"Porte_contournement_encombrant_5"))
-        self.labs["Étage 5 : portes"].matrice_cases[4][0].murs[GAUCHE].effets.append(Porte(1,"Porte_contournement_encombrant_5"))
         self.construit_escalier(("Étage 4 : monstres",16,7),("Étage 5 : portes",0,23),DROITE,GAUCHE)
 
         #On crée le sixième étage et son occupant :
@@ -771,7 +766,7 @@ class Controleur():
 
 
 
-            elif type_skill in [Skill_deplacement,Skanda,Lesser_Skanda]:
+            elif type_skill in [Skill_deplacement,Skill_course,Skanda,Lesser_Skanda]:
                 latence,niveau = skill.utilise()
                 direction = agissant.get_direction()
                 position = agissant.get_position()
@@ -1232,7 +1227,7 @@ class Labyrinthe:
         self.matrice_cases[coord[0]][coord[1]].step(entitee)
 
     def get_vue(self,agissant):
-        return self.resoud(agissant.get_position(),agissant.get_portee_vue(),"vue","C__S_Pb",None,[],True,agissant.get_clees())
+        return self.resoud(agissant.get_position(),agissant.get_portee_vue())
             
     def getMatrice_cases(self):
         #on obtient une copie indépendante du labyrinthe
@@ -2747,6 +2742,9 @@ class Agissant(Entitee): #Tout agissant est un cadavre, tout cadavre n'agit pas.
         else:
             return SKIN_CADAVRE
 
+    def get_skin_tete(self):
+        return SKIN_VIDE
+
     # Découvrons le déroulé d'un tour, avec agissant-san :
     def debut_tour(self):
         if self.etat == "vivant":
@@ -3127,9 +3125,12 @@ class Gobelin(Dps):
 
     def get_skin(self):
         if self.etat == "vivant":
-            return SKIN_GOBELIN
+            return SKIN_CORPS_GOBELIN
         else:
             return SKIN_CADAVRE
+
+    def get_skin_tete(self):
+        return SKIN_TETE_GOBELIN
 
     #Est-ce qu'il a besoin d'une méthode spécifique ? Pour les offenses peut-être ?
 
@@ -3269,9 +3270,47 @@ class Slime(Dps):
 
     def get_skin(self):
         if self.etat == "vivant":
-            return SKIN_SLIME
+            return SKIN_VIDE
         else:
             return SKIN_CADAVRE
+
+    def get_skin_tete(self):
+        return SKIN_SLIME
+
+class Ombriul(Dps):
+    """Une créature des ténèbres, non-endémique du labyrinthe."""
+    def __init__(self,controleur,position,niveau):
+        Agissant.__init__(self,controleur,position,"ombriul",niveau)
+
+    def get_offenses(self):
+        offenses = self.offenses
+        self.offenses = []
+        if self.etat != "vivant" or self.controleur == None:
+            etat = "incapacite"
+        elif self.pv <= self.pv_max//6:
+            etat = "fuite"
+        else:
+            etat = "attaque"
+        return offenses, etat
+
+    def attaque(self,direction):
+        skill = trouve_skill(self.classe_principale,Skill_magie) #Est-ce qu'il a le même Skill_magie que le joueur ?
+        self.dir_regard = direction
+        if self.peut_payer(cout_pm_poing_magique[skill.niveau-1]): #Quelle est l'attaque magique des gobelins ?
+            self.skill_courant = Skill_magie
+            self.magie_courante = "magie poing sombre"
+            self.dir_magie = direction
+        else:
+            self.skill_courant = Skill_stomp
+
+    def get_skin(self):
+        if self.etat == "vivant":
+            return SKIN_CORPS_OMBRIUL
+        else:
+            return SKIN_CADAVRE
+
+    def get_skin_tete(self):
+        return SKIN_TETE_OMBRIUL
 
 class Humain(Agissant,Entitee_superieure):
     """La classe des pnjs et du joueur. A un comportement un peu plus complexe, et une personnalité."""
@@ -3373,6 +3412,12 @@ class Humain(Agissant,Entitee_superieure):
                             if self.ID in self.controleur.get_esprit(self.controleur.get_entitee(entitee).esprit).ennemis.keys():
                                 self.insurge(entitee,0.01)
 
+    def get_skin(self):
+        if self.etat == "vivant":
+            return SKIN_CORPS_HUMAIN
+        else:
+            return SKIN_CADAVRE
+
 class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, c'est le personnage principal !)
     """La classe du joueur."""
     def __init__(self,controleur,position,screen):
@@ -3384,7 +3429,8 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
 
         self.apreciations = [0,0,0,0,0,0,0,0,0,0]
         self.role = "independant"
-        self.inventaire = Sac_a_dos()
+        self.inventaire.__class__ = Sac_a_dos
+        self.inventaire.complete()
 
         #Il doit afficher tout ce qu'il voit...
         #print("Initialisation du joueur")
@@ -3447,6 +3493,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
                             pygame.K_w:"skill",
                             pygame.K_x:"skill",
                             pygame.K_m:"skill",
+                            pygame.K_r:"skill",
                             pygame.K_SPACE:"courant", #La barre espace sélectionne, valide, etc. l'objet courant. Elle ne peut pas être modifiée
                             pygame.K_RETURN:"touches"} #La touche Entrée confirme certains choix, ou peut modifier les touches. Elle ne peut pas être modifiée
 
@@ -3464,7 +3511,8 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         self.skill_touches = {pygame.K_p:Skill_stomp, #Les touches associées à un skill.
                               pygame.K_m:Skill_ramasse,
                               pygame.K_w:Skill_deplacement,
-                              pygame.K_x:Skill_attaque}
+                              pygame.K_x:Skill_attaque,
+                              pygame.K_r:Skill_course}
 
         self.magies = {} #Le skill magie contient beaucoup de magie. La touche est associée à la fois au skill magie et à la magie correspondante.
         self.methode_courante = None
@@ -3474,8 +3522,8 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
 
         self.projectiles = {} #Le skill lancer peut s'utiliser de plusieurs façon : en le combinant à un skill de création de projectile, les touches sont associées comme pour les magies# sur l'item courant de l'inventaire, par le biais d'une touche du skill lancer ou, si l'item est un projectile, directement depuis l'inventaire
 
-    def get_skin(self):
-        return SKIN_JOUEUR
+    def get_skin_tete(self):
+        return SKIN_TETE_JOUEUR
 
     def fuite(self):
         return False #À modifier pour quand on prend le controle de Dev
@@ -3509,7 +3557,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         else :
             portee = skill.utilise()
             portee *= self.get_aff(OMBRE) #Puisque c'est le manque de lumière qui réduit le champ de vision !
-        return portee + 1 #Petit cadeau, rien que pour le joueur !
+        return portee + 2 #Petit cadeau, rien que pour le joueur !
 
     def recontrole(self):
         """La fonction qui réagit aux touches du clavier."""
@@ -5160,10 +5208,10 @@ class Receptionniste(Dps,Humain): #Le deuxième humain du jeu, à l'étage 1 (en
 
         self.replique_courante = 0
 
-    def get_skin(self):
-        return SKIN_RECEPTIONNISTE
+    def get_skin_tete(self):
+        return SKIN_TETE_RECEPTIONNISTE
 
-class Paume(Tank,Humain): #Le troisième humain du jeu, à l'étage 2 (complêtement paumé, rejoint le joueur sauf rares exceptions)
+class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2 (complêtement paumé, rejoint le joueur sauf rares exceptions)
     """La classe du mec paumé."""
     def __init__(self,controleur,position):
 
@@ -5228,10 +5276,13 @@ class Paume(Tank,Humain): #Le troisième humain du jeu, à l'étage 2 (complête
             self.replique="Ton courage est impressionnant ! Moi, je suis ici depuis plusieurs jours."
             self.repliques = ["Tu peux venir avec moi, si ça te rassure.","Tu es vraiment pathétique."]
         elif replique == "Tu peux venir avec moi, si ça te rassure.":
-            self.replique="Merci beaucoup ! N'hésite pas à me demander si tu as besoin de quelque-chose"
+            self.replique="Merci beaucoup ! N'hésite pas à me demander si tu as besoin de quelque-chose."
             self.repliques = ["Je ferai appel à toi."]
             self.appreciations[0]+= 0.5
         elif replique == "Je ferai appel à toi.":
+            self.replique="Au fait, tu peux courir avec R, mais évite de me perdre de vue s'il te plaît !"
+            self.repliques=["Merci du conseil."]
+        elif replique == "Merci du conseil.":
             self.end_dialogue()
             self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
             self.mouvement = 0 #Légèrement redondant ici
@@ -5343,7 +5394,13 @@ class Paume(Tank,Humain): #Le troisième humain du jeu, à l'étage 2 (complête
         self.replique_courante = 0
 
     def get_skin(self):
-        return SKIN_PAUME
+        if self.etat == "vivant":
+            return SKIN_CORPS_PAUME
+        else:
+            return SKIN_CADAVRE
+
+    def get_skin_tete(self):
+        return SKIN_TETE_PAUME
 
 class Peureuse(Multi_renforceur,Support_lointain,Humain): #La quatrième humaine du jeu, à l'étage 3 (terrorisée par les monstres)
     """La classe de la peureuse."""
@@ -5448,7 +5505,7 @@ class Peureuse(Multi_renforceur,Support_lointain,Humain): #La quatrième humaine
             self.repliques = ["Tu veux que je les tue pour toi ?","Des monstres ? Ils sont dangereux ?"]
         elif replique == "Tu veux que je les tue pour toi ?":
             self.replique="S'il te plaît !"
-            self.repliques = ["Laisse-moi faire."]
+            self.repliques = ["Laisse-moi faire.","Euh... comment on fait pour combattre ?"]
         elif replique == "Laisse-moi faire.":
             self.appreciations[0] += 0.5
             self.end_dialogue()
@@ -5460,9 +5517,18 @@ class Peureuse(Multi_renforceur,Support_lointain,Humain): #La quatrième humaine
             self.replique="Un peu. C'est surtout que je suis fragile..."
             self.repliques = ["Je vais essayer de les combattre.","Pff... les faibles n'ont qu'à mourir."]
         elif replique == "Je vais essayer de les combattre.":
-            self.replique="Je peux te suivre ?"
+            self.replique="Tu sais faire ?"
+            self.repliques = "Oui.","Euh, non..."
+        elif replique in ["Euh... comment on fait pour combattre ?","Euh, non..."]:
+            self.replique="Tu peux donner un coup de pied au sol avec la touche P, je suppose."
+            self.repliques = ["Un coup de pied au sol ? Ça n'a pas l'air très efficace.","D'accord, je vais y aller."]
+        elif replique == "Un coup de pied au sol ? Ça n'a pas l'air très efficace.":
+            self.replique="Je suppose que tu pourrais utiliser ta lance avec X, mais vu son état ça sera encore moins efficace."
+            self.repliques = ["D'accord, je vais y aller."]
+        elif replique == "D'accord, je vais y aller.":
+            self.replique="Je peux venir avec toi ?"
             self.repliques = ["Oui, viens.","Non, tu ne ferais que me gêner."]
-        elif replique == "Oui viens.":
+        elif replique == "Oui, viens.":
             self.end_dialogue()
             self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
             self.mouvement = 0 #Légèrement redondant ici
@@ -5641,8 +5707,8 @@ class Peureuse(Multi_renforceur,Support_lointain,Humain): #La quatrième humaine
 
         self.replique_courante = 0
 
-    def get_skin(self):
-        return SKIN_PEUREUSE
+    def get_skin_tete(self):
+        return SKIN_TETE_PEUREUSE
 
 class Codeur(Humain): #Le cinquième humain du jeu, à l'étage 4 (répond au nom de Dev, quand Il n'est pas occupé à programmer un autre jeu)
     """Ma classe."""
@@ -5899,8 +5965,8 @@ class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyenne
 
         self.replique_courante = 0
 
-    def get_skin(self):
-        return SKIN_ENCOMBRANT
+    def get_skin_tete(self):
+        return SKIN_TETE_ENCOMBRANT
 
 class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du jeu, à l'étage 6 (un faiseur de potions aux magies diverses)
     """La classe de l'alchimiste."""
@@ -6080,8 +6146,8 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
 
         self.replique_courante = 0
 
-    def get_skin(self):
-        return SKIN_ALCHIMISTE
+    def get_skin_tete(self):
+        return SKIN_TETE_ALCHIMISTE
 
 class Peste(Soigneur,Support_lointain,Humain): #La huitième humaine du jeu, à l'étage 7 (une sainte très à cheval sur beaucoup trop de trucs)
     """La classe de la peste."""
@@ -6305,8 +6371,8 @@ class Peste(Soigneur,Support_lointain,Humain): #La huitième humaine du jeu, à 
 
         self.replique_courante = 0
 
-    def get_skin(self):
-        return SKIN_PESTE
+    def get_skin_tete(self):
+        return SKIN_TETE_PESTE
 
 class Bombe_atomique(Attaquant_magique_case,Support_lointain,Humain): #La neuvième humaine du jeu, à l'étage 8 (une magicienne légèrement aguicheuse)
     """La classe de la bombe atomique."""
@@ -6523,8 +6589,8 @@ class Bombe_atomique(Attaquant_magique_case,Support_lointain,Humain): #La neuvi�
 
         self.replique_courante = 0
 
-    def get_skin(self):
-        return SKIN_BOMBE_ATOMIQUE
+    def get_skin_tete(self):
+        return SKIN_TETE_BOMBE_ATOMIQUE
 
 class Marchand(Dps,Humain): #Le dixième humain du jeu, à l'étage 9 (le seul lien avec l'extérieur)
     """La classe du marchand."""
@@ -6677,8 +6743,8 @@ class Marchand(Dps,Humain): #Le dixième humain du jeu, à l'étage 9 (le seul l
 
         self.replique_courante = 0
 
-    def get_skin(self):
-        return SKIN_MARCHAND
+    def get_skin_tete(self):
+        return SKIN_TETE_MARCHAND
 
 class Item(Entitee):
     """La classe des entitées inanimées. Peuvent se situer dans un inventaire. Peuvent être lancés (déconseillé pour les non-projectiles)."""
@@ -8088,6 +8154,34 @@ class Cree_charge_etendue_skill(Cree_item):
 
 #Quelques items pour le tutoriel :
 
+class Armure_dor(Armure,Defensif_valeur):
+    """L'armure du joueur, brisée dans la chute.""" #Vérifier si le joueur est chanceux !
+    def __init__(self,position,niveau):
+        Defensif_valeur.__init__(self,position,1) #Chaque attaque est réduite de 1 dégat ! Est-ce trop pour une armure brisée ?
+        self.poids = 10
+        self.frottements = 10
+        self.niveau = niveau
+
+    def get_description(self,observation):
+        return ["Une armure","Totalement_brisée"]
+
+    def get_skin(self):
+        return SKIN_ARMURE_DOR
+
+class Lance_dor(Lance):
+    """La lance du joueur, brisée dans la chute.""" #Vérifier si le joueur est chanceux !
+    def __init__(self,position,niveau):
+        Arme.__init__(self,position,TERRE,0.45,2) #Juste un peu moins de dégats que le stomp
+        self.poids = 3
+        self.frottements = 4
+        self.niveau = niveau
+
+    def get_description(self,observation):
+        return ["Une lance","Totalement brisée"]
+
+    def get_skin(self):
+        return SKIN_LANCE_DOR
+
 class Epee_epeiste(Epee):
     """Les épées des deux humains épéistes."""
     def __init__(self,position,niveau):
@@ -8128,7 +8222,63 @@ class Tunique_enchantee(Armure,Defensif_proportion):
         return ["Une tunique","Un peu légère"]
 
     def get_skin(self):
-        return SKIN_ARMURE #Lui créer un SKIN_TUNIQUE_ENCHANTEE /!\
+        return SKIN_TUNIQUE_ENCHANTEE
+
+class Robe_magique(Armure,Pompe_a_pm): #Lui donner un item plus utile, plus en lien avec ses capacités ?
+    """La robe de la peureuse."""
+    def __init__(self,position,niveau):
+        Pompe_a_pm.__init__(self,position,pm_robe_magique[niveau-1])
+        self.poids = poids_robe_magique[niveau-1]
+        self.frottements = frottements_robe_magique[niveau-1]
+        self.niveau = niveau
+
+    def get_description(self,observation):
+        return ["Une robe","Probablement sans effet ?"]
+
+    def get_skin(self):
+        return SKIN_ROBE_MAGIQUE
+
+class Tunique_alchimiste(Armure,Pompe_a_pm):
+    """La tunique de l'alchimiste."""
+    def __init__(self,position,niveau):
+        Pompe_a_pm.__init__(self,position,pm_tunique_alchimiste[niveau-1])
+        self.poids = poids_tunique_alchimiste[niveau-1]
+        self.frottements = frottements_tunique_alchimiste[niveau-1]
+        self.niveau = niveau
+
+    def get_description(self,observation):
+        return ["Une tunique","A appartenu à un alchimiste"]
+
+    def get_skin(self):
+        return SKIN_TUNIQUE_ALCHIMISTE
+
+class Soutane(Armure,Defensif_plafond):
+    """La soutane de la sainte."""
+    def __init__(self,position,niveau):
+        Defensif_plafond.__init__(self,position,degats_soutane[niveau-1])
+        self.poids = poids_soutane[niveau-1]
+        self.frottements = frottements_soutane[niveau-1]
+        self.niveau = niveau
+
+    def get_description(self,observation):
+        return ["Une soutane","A appartenu à un pape,","il y a très longtemps."]
+
+    def get_skin(self):
+        return SKIN_SOUTANE
+
+class Robe_de_sorciere(Armure,Pompe_a_pm): #Un peu redondant avec le chapeau...
+    """La robe de la sorcière."""
+    def __init__(self,position,niveau):
+        Pompe_a_pm.__init__(self,position,pm_robe_sorciere[niveau-1])
+        self.poids = poids_robe_sorciere[niveau-1]
+        self.frottements = frottements_robe_sorciere[niveau-1]
+        self.niveau = niveau
+
+    def get_description(self,observation):
+        return ["Une robe","A appartenu à une magicienne"]
+
+    def get_skin(self):
+        return SKIN_ROBE_SORCIERE
 
 class Chapeau_de_sorciere(Haume,Pompe_a_pm):
     """Le chapeau de la sorcière."""
@@ -8139,10 +8289,38 @@ class Chapeau_de_sorciere(Haume,Pompe_a_pm):
         self.niveau = niveau
 
     def get_description(self,observation):
-        return ["Un bout de tissu","Peut-être un peu magique ?"]
+        return ["Un chapeau","A appartenu à une magicienne"]
 
     def get_skin(self):
-        return SKIN_CASQUE #/!\ Lui faire un autre skin !
+        return SKIN_CHAPEAU_DE_SORCIERE
+
+class Armure_marchand(Armure,Defensif_valeur):
+    """L'armure du marchand.""" #/!\ Faire spawner le marchand avec une armure qu'on retrouve plus tard dans le jeu, pas avec un équippement propre !
+    def __init__(self,position,niveau):
+        Defensif_valeur.__init__(self,position,degats_armure_marchand[niveau-1])
+        self.poids = poids_armure_marchand[niveau-1]
+        self.frottements = frottements_armure_marchand[niveau-1]
+        self.niveau = niveau
+
+    def get_description(self,observation):
+        return ["Une armure","Plutôt solide !"]
+
+    def get_skin(self):
+        return SKIN_ARMURE
+
+class Epee_marchand(Epee):
+    """L'épée du marchand.""" #/!\ Faire spawner le marchand avec une arme qu'on retrouve plus tard dans le jeu, pas avec un équippement propre ! (Une arme d'un autre élément que la terre par exemple ?)
+    def __init__(self,position,niveau):
+        Arme.__init__(self,position,GLACE,tranchant_epee_marchand[niveau-1],portee_epee_marchand[niveau-1])
+        self.poids = poids_epee_marchand[niveau-1]
+        self.frottements = frottements_epee_marchand[niveau-1]
+        self.niveau = niveau
+
+    def get_description(self,observation):
+        return ["Une épée","Avec une jolie teinte bleutée"]
+
+    def get_skin(self):
+        return SKIN_EPEE
 
 class Epee_de_gobelin(Epee,Equipement_tribal):
     """L'épée des gobelins de base. Ils en sont équippés à partir du niveau 5 (peut-être plus ?) mais on peut en trouver à l'abandon dans le labyrinthe."""
@@ -8157,7 +8335,7 @@ class Epee_de_gobelin(Epee,Equipement_tribal):
         return ["Une épée","Elle est petite et mal entretenue"]
 
     def get_skin(self):
-        return SKIN_EPEE
+        return SKIN_EPEE_GOBELIN
 
 class Lance_de_gobelin(Lance,Equipement_tribal):
     """La lance des sentinelles gobelins. Ils en sont équippés à partir du niveau 3 (peut-être moins ?) mais on peut en trouver à l'abandon dans le labyrinthe."""
@@ -8172,7 +8350,7 @@ class Lance_de_gobelin(Lance,Equipement_tribal):
         return ["Une lance","Elle est petite et un peu rouillée"]
 
     def get_skin(self):
-        return SKIN_LANCE
+        return SKIN_LANCE_GOBELIN
 
 class Cimetere_de_gobelin(Epee,Equipement_tribal):
     """L'épée des guerriers gobelins. Ils en sont équippés à partir du niveau 3 (peut-être moins ?) mais on peut en trouver à l'abandon dans le labyrinthe."""
@@ -8187,7 +8365,7 @@ class Cimetere_de_gobelin(Epee,Equipement_tribal):
         return ["Une épée","Il y a du sang sur la lame"]
 
     def get_skin(self):
-        return SKIN_EPEE
+        return SKIN_CIMETERE_GOBELIN
 
 class Armure_sentinelle_gobelin(Armure,Defensif_proportion,Equipement_tribal):
     """L'armure des sentinelles gobelins. Ils en sont équippés à partir du niveau 3 (peut-être moins ?) mais on peut en trouver à l'abandon dans le labyrinthe."""
@@ -8202,7 +8380,7 @@ class Armure_sentinelle_gobelin(Armure,Defensif_proportion,Equipement_tribal):
         return ["Une armure","Elle a rétréci au lavage ?"]
 
     def get_skin(self):
-        return SKIN_ARMURE
+        return SKIN_ARMURE_GOBELIN
 
 class Armure_guerrier_gobelin(Armure,Defensif_proportion,Equipement_tribal):
     """L'armure des sentinelles gobelins. Ils en sont équippés à partir du niveau 3 (peut-être moins ?) mais on peut en trouver à l'abandon dans le labyrinthe."""
@@ -8217,7 +8395,7 @@ class Armure_guerrier_gobelin(Armure,Defensif_proportion,Equipement_tribal):
         return ["Une cote de maille","Avec plein de trous..."]
 
     def get_skin(self):
-        return SKIN_ARMURE
+        return SKIN_ARMURE_GOBELIN
 
 class Haume_de_gobelin(Haume,Defensif_proportion,Equipement_tribal):
     """Le casque des sentinelles gobelins. Ils en sont équippés à partir du niveau 5 (peut-être plus ?) mais on peut en trouver à l'abandon dans le labyrinthe."""
@@ -8232,7 +8410,7 @@ class Haume_de_gobelin(Haume,Defensif_proportion,Equipement_tribal):
         return ["Un casque","Un peu cabossé"]
 
     def get_skin(self):
-        return SKIN_CASQUE
+        return SKIN_CASQUE_GOBELIN
 
 class Bandeau_de_gobelin(Haume,Pompe_a_pm,Equipement_tribal):
     """Le bandeau des mages gobelins. Ils en sont équippés à partir du niveau 5 (peut-être plus ?) mais on peut en trouver à l'abandon dans le labyrinthe."""
@@ -8247,7 +8425,7 @@ class Bandeau_de_gobelin(Haume,Pompe_a_pm,Equipement_tribal):
         return ["Un bout de tissu","Peut-être un peu magique ?"]
 
     def get_skin(self):
-        return SKIN_CASQUE #/!\ Lui faire un autre skin !
+        return SKIN_BANDEAU_GOBELIN
 
 class Anneau_terrestre_gobelin(Anneau,Rocheux,Equipement_tribal):
     """L'anneau d'affinité à la terre des chefs gobelins. Ils en sont équippés à partir du niveau 1 (peut-être plus ?) mais on peut en trouver à l'abandon dans le labyrinthe."""
@@ -8600,6 +8778,11 @@ class Sac_a_dos(Inventaire): #L'inventaire du joueur
         self.item_courant = 0
         self.profondeur = 0
 
+    def complete(self):
+        self.cat_courante = 0
+        self.item_courant = 0
+        self.profondeur = 0
+
     #La principale différence est la notion d'item courant, et tout ce qui tourne autour
     def get_item_courant(self):
         cat = self.items[self.kiiz[self.cat_courante]]
@@ -8749,212 +8932,212 @@ class Esprit :
                         if ID in case[8]:
                             case[8].remove(ID)
 
-    def ordonne_bourrin(self,agissant):
-        #Il faudra identifier les comportements possibles des agissants : attaque bourrine, attaque à distance, support (renforcement), soin, fuite, recherche et autres (réanimation pour les nécromantiens par exemple)
-        #Pour l'instant juste des bourrins.
-        position = agissant.get_position()
-        case = self.vue[position[0]][position[1]][position[2]] #On récupère le labyrinthe
-        cases = []
-        dirs = []
-        importance = 0
-        for i in range(4):
-            if case[7][i]:
-                if case[7][i][0] in self.vue.keys():
-                    case_pot = self.vue[case[7][i][0]][case[7][i][1]][case[7][i][2]]
-                    entitees = case_pot[8]
-                    libre = True
-                    for ID_entitee in entitees:
-                        entitee = agissant.controleur.get_entitee(ID_entitee)
-                        if not issubclass(entitee.get_classe(),Item): #Un agissant !
-                            if case[7][i][0] == position[0] and ID_entitee in self.ennemis.keys(): #Un ennemi ! Et au bon étage
-                                if self.ennemis[ID_entitee] > importance:
-                                    importance = self.ennemis[ID_entitee]
-                                    agissant.attaque(i)
-                            else: #Probablement un allié, ou un neutre, ou à un autre étage (cette configuration autorise les tentatives d'attaques au travers des portails de même niveau)
-                                libre = False
-                    if libre:
-                        cases.append(case_pot)
-                        dirs.append(i)
-
-        if importance == 0: #On n'a pas d'ennemi à portée
-
-            if len(cases) == 0: #Pas de cases libres à proximité
-                agissant.skill_courant = None
-
-            else :
-            
-                dir_choix = 2
-                num_choix = 0
-                distance = case[3]
-
-                for i in range(len(cases)):
-                    if cases[i][3] > distance or (cases[i][3] == distance and cases[i][4] >= cases[num_choix][4]):
-                        distance = cases[i][3]
-                        dir_choix = dirs[i]
-                        num_choix = i
-
-                if distance == 0 : #Pas d'accès direct à une cible
-
-                    distance = case[4]
-                    meilleur_choix = False
-                    agissant.skill_courant = None #Dans l'éventualité où on est déjà sur la meilleure case
-
-                    for i in range(len(cases)):
-                        if cases[i][4] > distance:
-                            meilleur_choix = True
-                            distance = cases[i][4] #On prend le chemin avec des obstacles
-                            dir_choix = dirs[i]
-
-                    if meilleur_choix:
-                        agissant.va(dir_choix)
-
-                    if distance == 0: #Pas d'accès du tout !
-                        if not isinstance(agissant,Sentinelle): #Les sentinelles ne cherchent pas
-                            if len(dirs)>1: #On peut se permettre de choisir
-                                if agissant.dir_regard != None: #L'agissant regarde quelque part
-                                    dir_back = [HAUT,DROITE,BAS,GAUCHE][agissant.dir_regard-2]
-                                    if dir_back in dirs: #On ne veut pas y retourner
-                                        dirs.remove(dir_back)
-                            agissant.va(dirs[random.randint(0,len(dirs)-1)]) #On prend une direction random
-                            # ! Modifier pour avoir différents comportements !
-
-                else : #Accès direct à une cible !
-                    agissant.va(dir_choix)
-
-    def ordonne_fuite(self,agissant):
-        #Il faudra identifier les comportements possibles des agissants : attaque bourrine, attaque à distance, support (renforcement), soin, fuite, recherche et autres (réanimation pour les nécromantiens par exemple)
-        position = agissant.get_position()
-        case = self.vue[position[0]][position[1]][position[2]] #On récupère le labyrinthe
-        cases = []
-        dirs = []
-        for i in range(4):
-            if case[7][i]:
-                if case[7][i][0] in self.vue.keys():
-                    case_pot = self.vue[case[7][i][0]][case[7][i][1]][case[7][i][2]]
-                    entitees = case_pot[8]
-                    libre = True
-                    for ID_entitee in entitees:
-                        if not issubclass(agissant.controleur.get_entitee(ID_entitee).get_classe(),Item): #On veut s'enfuir, pas foncer dans quelqu'un !
-                            libre = False
-                    if libre:
-                        cases.append(case_pot)
-                        dirs.append(i)
-
-        if len(cases) == 0: #On n'a nulle part où aller ! Aaaaaaaaaaaaaaaaaaaaaaaaaaaaah !
-            agissant.skill_courant = None
-
-        else:
-
-            dir_choix = 2
-            num_choix = 0
-            distance = case[3]
-
-            if distance == 0 : #On n'est pas accessible directement, ouf !
-
-                distance = case[4]
-
-                if distance == 0: #On n'est pas accessible du tout ! On va pouvoir souffler un peu.
-                    if isinstance(agissant,Soigneur): #On peut se soigner soi-même !
-                        agissant.soigne(agissant.ID)
-                    elif not isinstance(agissant,Sentinelle): #Les sentinelles ne cherchent pas
-                        if len(directions)>1: #On peut se permettre de choisir
-                            if agissant.dir_regard != None: #L'agissant regarde quelque part
-                                dir_back = [HAUT,DROITE,BAS,GAUCHE][agissant.dir_regard-2]
-                                if dir_back in directions: #On ne veut pas y retourner
-                                    directions.remove(dir_back)
-                        agissant.va(directions[random.randint(0,len(directions)-1)]) #On prend une direction random
-                    # ! Modifier pour avoir différents comportements !
-
-                else : #On est accessible indirectement ! Aaah !
-                    meilleur_choix = False
-                    agissant.skill_courant = None #Dans l'éventualité où on est déjà sur la meilleure case
-
-                    for i in range(len(cases)):
-                        if cases[i][4] < distance:
-                            meilleur_choix = True
-                            distance = cases[i][4] #On s'éloigne quand même
-                            dir_choix = directions[i]
-
-                    if meilleur_choix:
-                        agissant.va(dir_choix)
-
-            else : #On est accessible directement ! Aaaaaaaah !
-                for i in range(len(cases)):
-                    if cases[i][3] < distance or (cases[i][3] == distance and cases[i][4] < cases[num_choix][4]): #On cherche à s'éloigner
-                        distance = cases[i][3]
-                        dir_choix = directions[i]
-                        num_choix = i
-                    
-                agissant.va(dir_choix)
-
-    def ordonne_soin(self,agissant,fuyards,bourrins):
-        #On va considérer qu'on peut soigner à n'importe quelle distance pour l'instant
-        #Mais pas d'un étage à l'autre quand même !
-        PV_mins = 0
-        cible = None
-        for ID_fuyard in fuyards :
-            fuyard = self.controleur.get_entitee(ID_fuyard)
-            if fuyard.get_position()[0] == agissant.get_position()[0] and (cible == None or fuyard.pv <= PV_mins) :
-                cible = ID_fuyard
-                PV_mins = fuyard.pv
-        if cible == None : #On soigne les bourrins alors
-            for ID_bourrin in bourrins :
-                bourrin = self.controleur.get_entitee(ID_bourrin)
-                if bourrin.get_position()[0] == agissant.get_position()[0] and (cible == None or bourrin.pv <= PV_mins) and bourrin.pv < bourrin.pv_max :
-                    cible = ID_bourrin
-                    PV_mins = bourrin.pv
-        if cible != None:
-            agissant.soigne(cible)
-        elif not isinstance(agissant,Sentinelle): #Les sentinelles ne cherchent pas
-            self.ordonne_cherche(agissant)
-
-    def ordonne_soutien(self,agissant,bourrins):
-        #On va considérer qu'on peut soutenir à n'importe quelle distance pour l'instant
-        #Mais pas d'un étage à l'autre quand même !
-        importance = 0
-        cible = None
-        for ID_bourrin in bourrins :
-            bourrin = self.controleur.get_entitee(ID_bourrin)
-            pos = bourrin.get_position()
-            distance = self.vue[pos[0]][pos[1]][pos[2]][3]
-            if bourrin.get_position()[0] == agissant.get_position()[0] and distance > importance :
-                cible = ID_bourrin
-                importance = distance
-        if cible != None:
-            agissant.boost(cible)
-        elif not isinstance(agissant,Sentinelle): #Les sentinelles ne cherchent pas
-            self.ordonne_cherche(agissant)
-
-    def ordonne_cherche(self,agissant):
-        position = agissant.get_position()
-        case = self.vue[position[0]][position[1]][position[2]] #On récupère le labyrinthe
-        cases = []
-        dirs = []
-        for i in range(4):
-            if case[7][i]:
-                if case[7][i][0] in self.vue.keys():
-                    case_pot = self.vue[case[7][i][0]][case[7][i][1]][case[7][i][2]]
-                    entitees = case_pot[8]
-                    libre = True
-                    for ID_entitee in entitees:
-                        if not issubclass(agissant.controleur.get_entitee(ID_entitee).get_classe(),Item):
-                            libre = False
-                    if libre:
-                        cases.append(case_pot)
-                        dirs.append(i)
-
-        if len(cases) == 0: #On n'a nulle part où aller
-            agissant.skill_courant = None
-
-        else:
-
-            if len(dirs)>1: #On peut se permettre de choisir
-                if agissant.dir_regard != None: #L'agissant regarde quelque part
-                    dir_back = [HAUT,DROITE,BAS,GAUCHE][agissant.dir_regard-2]
-                    if dir_back in dirs: #On ne veut pas y retourner
-                        dirs.remove(dir_back)
-            agissant.va(dirs[random.randint(0,len(dirs)-1)])
-            # ! Modifier pour avoir différents comportements !
+##    def ordonne_bourrin(self,agissant):
+##        #Il faudra identifier les comportements possibles des agissants : attaque bourrine, attaque à distance, support (renforcement), soin, fuite, recherche et autres (réanimation pour les nécromantiens par exemple)
+##        #Pour l'instant juste des bourrins.
+##        position = agissant.get_position()
+##        case = self.vue[position[0]][position[1]][position[2]] #On récupère le labyrinthe
+##        cases = []
+##        dirs = []
+##        importance = 0
+##        for i in range(4):
+##            if case[7][i]:
+##                if case[7][i][0] in self.vue.keys():
+##                    case_pot = self.vue[case[7][i][0]][case[7][i][1]][case[7][i][2]]
+##                    entitees = case_pot[8]
+##                    libre = True
+##                    for ID_entitee in entitees:
+##                        entitee = agissant.controleur.get_entitee(ID_entitee)
+##                        if not issubclass(entitee.get_classe(),Item): #Un agissant !
+##                            if case[7][i][0] == position[0] and ID_entitee in self.ennemis.keys(): #Un ennemi ! Et au bon étage
+##                                if self.ennemis[ID_entitee] > importance:
+##                                    importance = self.ennemis[ID_entitee]
+##                                    agissant.attaque(i)
+##                            else: #Probablement un allié, ou un neutre, ou à un autre étage (cette configuration autorise les tentatives d'attaques au travers des portails de même niveau)
+##                                libre = False
+##                    if libre:
+##                        cases.append(case_pot)
+##                        dirs.append(i)
+##
+##        if importance == 0: #On n'a pas d'ennemi à portée
+##
+##            if len(cases) == 0: #Pas de cases libres à proximité
+##                agissant.skill_courant = None
+##
+##            else :
+##            
+##                dir_choix = 2
+##                num_choix = 0
+##                distance = case[3]
+##
+##                for i in range(len(cases)):
+##                    if cases[i][3] > distance or (cases[i][3] == distance and cases[i][4] >= cases[num_choix][4]):
+##                        distance = cases[i][3]
+##                        dir_choix = dirs[i]
+##                        num_choix = i
+##
+##                if distance == 0 : #Pas d'accès direct à une cible
+##
+##                    distance = case[4]
+##                    meilleur_choix = False
+##                    agissant.skill_courant = None #Dans l'éventualité où on est déjà sur la meilleure case
+##
+##                    for i in range(len(cases)):
+##                        if cases[i][4] > distance:
+##                            meilleur_choix = True
+##                            distance = cases[i][4] #On prend le chemin avec des obstacles
+##                            dir_choix = dirs[i]
+##
+##                    if meilleur_choix:
+##                        agissant.va(dir_choix)
+##
+##                    if distance == 0: #Pas d'accès du tout !
+##                        if not isinstance(agissant,Sentinelle): #Les sentinelles ne cherchent pas
+##                            if len(dirs)>1: #On peut se permettre de choisir
+##                                if agissant.dir_regard != None: #L'agissant regarde quelque part
+##                                    dir_back = [HAUT,DROITE,BAS,GAUCHE][agissant.dir_regard-2]
+##                                    if dir_back in dirs: #On ne veut pas y retourner
+##                                        dirs.remove(dir_back)
+##                            agissant.va(dirs[random.randint(0,len(dirs)-1)]) #On prend une direction random
+##                            # ! Modifier pour avoir différents comportements !
+##
+##                else : #Accès direct à une cible !
+##                    agissant.va(dir_choix)
+##
+##    def ordonne_fuite(self,agissant):
+##        #Il faudra identifier les comportements possibles des agissants : attaque bourrine, attaque à distance, support (renforcement), soin, fuite, recherche et autres (réanimation pour les nécromantiens par exemple)
+##        position = agissant.get_position()
+##        case = self.vue[position[0]][position[1]][position[2]] #On récupère le labyrinthe
+##        cases = []
+##        dirs = []
+##        for i in range(4):
+##            if case[7][i]:
+##                if case[7][i][0] in self.vue.keys():
+##                    case_pot = self.vue[case[7][i][0]][case[7][i][1]][case[7][i][2]]
+##                    entitees = case_pot[8]
+##                    libre = True
+##                    for ID_entitee in entitees:
+##                        if not issubclass(agissant.controleur.get_entitee(ID_entitee).get_classe(),Item): #On veut s'enfuir, pas foncer dans quelqu'un !
+##                            libre = False
+##                    if libre:
+##                        cases.append(case_pot)
+##                        dirs.append(i)
+##
+##        if len(cases) == 0: #On n'a nulle part où aller ! Aaaaaaaaaaaaaaaaaaaaaaaaaaaaah !
+##            agissant.skill_courant = None
+##
+##        else:
+##
+##            dir_choix = 2
+##            num_choix = 0
+##            distance = case[3]
+##
+##            if distance == 0 : #On n'est pas accessible directement, ouf !
+##
+##                distance = case[4]
+##
+##                if distance == 0: #On n'est pas accessible du tout ! On va pouvoir souffler un peu.
+##                    if isinstance(agissant,Soigneur): #On peut se soigner soi-même !
+##                        agissant.soigne(agissant.ID)
+##                    elif not isinstance(agissant,Sentinelle): #Les sentinelles ne cherchent pas
+##                        if len(directions)>1: #On peut se permettre de choisir
+##                            if agissant.dir_regard != None: #L'agissant regarde quelque part
+##                                dir_back = [HAUT,DROITE,BAS,GAUCHE][agissant.dir_regard-2]
+##                                if dir_back in directions: #On ne veut pas y retourner
+##                                    directions.remove(dir_back)
+##                        agissant.va(directions[random.randint(0,len(directions)-1)]) #On prend une direction random
+##                    # ! Modifier pour avoir différents comportements !
+##
+##                else : #On est accessible indirectement ! Aaah !
+##                    meilleur_choix = False
+##                    agissant.skill_courant = None #Dans l'éventualité où on est déjà sur la meilleure case
+##
+##                    for i in range(len(cases)):
+##                        if cases[i][4] < distance:
+##                            meilleur_choix = True
+##                            distance = cases[i][4] #On s'éloigne quand même
+##                            dir_choix = directions[i]
+##
+##                    if meilleur_choix:
+##                        agissant.va(dir_choix)
+##
+##            else : #On est accessible directement ! Aaaaaaaah !
+##                for i in range(len(cases)):
+##                    if cases[i][3] < distance or (cases[i][3] == distance and cases[i][4] < cases[num_choix][4]): #On cherche à s'éloigner
+##                        distance = cases[i][3]
+##                        dir_choix = directions[i]
+##                        num_choix = i
+##                    
+##                agissant.va(dir_choix)
+##
+##    def ordonne_soin(self,agissant,fuyards,bourrins):
+##        #On va considérer qu'on peut soigner à n'importe quelle distance pour l'instant
+##        #Mais pas d'un étage à l'autre quand même !
+##        PV_mins = 0
+##        cible = None
+##        for ID_fuyard in fuyards :
+##            fuyard = self.controleur.get_entitee(ID_fuyard)
+##            if fuyard.get_position()[0] == agissant.get_position()[0] and (cible == None or fuyard.pv <= PV_mins) :
+##                cible = ID_fuyard
+##                PV_mins = fuyard.pv
+##        if cible == None : #On soigne les bourrins alors
+##            for ID_bourrin in bourrins :
+##                bourrin = self.controleur.get_entitee(ID_bourrin)
+##                if bourrin.get_position()[0] == agissant.get_position()[0] and (cible == None or bourrin.pv <= PV_mins) and bourrin.pv < bourrin.pv_max :
+##                    cible = ID_bourrin
+##                    PV_mins = bourrin.pv
+##        if cible != None:
+##            agissant.soigne(cible)
+##        elif not isinstance(agissant,Sentinelle): #Les sentinelles ne cherchent pas
+##            self.ordonne_cherche(agissant)
+##
+##    def ordonne_soutien(self,agissant,bourrins):
+##        #On va considérer qu'on peut soutenir à n'importe quelle distance pour l'instant
+##        #Mais pas d'un étage à l'autre quand même !
+##        importance = 0
+##        cible = None
+##        for ID_bourrin in bourrins :
+##            bourrin = self.controleur.get_entitee(ID_bourrin)
+##            pos = bourrin.get_position()
+##            distance = self.vue[pos[0]][pos[1]][pos[2]][3]
+##            if bourrin.get_position()[0] == agissant.get_position()[0] and distance > importance :
+##                cible = ID_bourrin
+##                importance = distance
+##        if cible != None:
+##            agissant.boost(cible)
+##        elif not isinstance(agissant,Sentinelle): #Les sentinelles ne cherchent pas
+##            self.ordonne_cherche(agissant)
+##
+##    def ordonne_cherche(self,agissant):
+##        position = agissant.get_position()
+##        case = self.vue[position[0]][position[1]][position[2]] #On récupère le labyrinthe
+##        cases = []
+##        dirs = []
+##        for i in range(4):
+##            if case[7][i]:
+##                if case[7][i][0] in self.vue.keys():
+##                    case_pot = self.vue[case[7][i][0]][case[7][i][1]][case[7][i][2]]
+##                    entitees = case_pot[8]
+##                    libre = True
+##                    for ID_entitee in entitees:
+##                        if not issubclass(agissant.controleur.get_entitee(ID_entitee).get_classe(),Item):
+##                            libre = False
+##                    if libre:
+##                        cases.append(case_pot)
+##                        dirs.append(i)
+##
+##        if len(cases) == 0: #On n'a nulle part où aller
+##            agissant.skill_courant = None
+##
+##        else:
+##
+##            if len(dirs)>1: #On peut se permettre de choisir
+##                if agissant.dir_regard != None: #L'agissant regarde quelque part
+##                    dir_back = [HAUT,DROITE,BAS,GAUCHE][agissant.dir_regard-2]
+##                    if dir_back in dirs: #On ne veut pas y retourner
+##                        dirs.remove(dir_back)
+##            agissant.va(dirs[random.randint(0,len(dirs)-1)])
+##            # ! Modifier pour avoir différents comportements !
 
     def refait_vue(self):
         vues = []
@@ -9122,6 +9305,12 @@ class Esprit :
             if corp != 2 and self.corps[corp] in ["attaque","fuite","soin","soutien"]:
                 self.deplace(corp)
 
+    def fuite_utile(self,ID):
+        for corp in self.corps.keys():
+            if corp != ID and self.corps[corp] not in ["fuite","incapacite","mort"]:
+                return True
+        return False
+
     def deplace(self,ID):
         corp = self.controleur.get_entitee(ID)
         position = corp.get_position()
@@ -9141,12 +9330,12 @@ class Esprit :
                         entitee = self.controleur.get_entitee(ID_entitee)
                         if not issubclass(entitee.get_classe(),Item): #Un agissant !
                             if ID_entitee in self.ennemis.keys(): #Un ennemi !
-                                if corp.veut_attaquer(): #On veut atatquer lorsqu'on croise un ennemi au corps à corps (et on a assez de mana pour, si on utilise la magie)
+                                if corp.veut_attaquer() or (corp.veut_fuir() and not self.fuite_utile(ID)) : #On veut atatquer lorsqu'on croise un ennemi au corps à corps (et on a assez de mana pour, si on utilise la magie)
                                     if self.ennemis[ID_entitee] > importance:
                                         importance = self.ennemis[ID_entitee]
                                         corp.attaque(i)
                                         res = "attaque"
-                                elif corp.veut_fuir(): #On veut fuire lorsqu'on croise un ennemi au corps à corps
+                                elif corp.veut_fuir() and self.fuite_utile(ID): #On veut fuire lorsqu'on croise un ennemi au corps à corps
                                     res = "fuite"
                             libre = False
                     if libre:
@@ -9156,7 +9345,7 @@ class Esprit :
             comportement = corp.comporte_distance()
             if comportement == 0 : #Foncer tête baissée ! Pour les combattants au corps à corps
                 res = "deplacement"
-            elif comportement == 1: #Tenter une action, puis approcher. Pour les effets à distance qui ont besoin de ne pas être trop loin.
+            elif comportement == 1 or (comportement > 1 and not self.fuite_utile(ID)): #Tenter une action, puis approcher. Pour les effets à distance qui ont besoin de ne pas être trop loin.
                 res = corp.agit_en_vue(self,"deplacement")
             elif comportement == 2: #Tenter une action, puis fuir. Pour les effets à distance qui peuvent se permettre d'être loin.
                 res = corp.agit_en_vue(self,"fuite")
@@ -9180,7 +9369,7 @@ class Esprit :
                                             corp.attaque(i)
                                             res = "attaque"
             elif tcase[4] == 0: #Et case[3] forcément aussi par la même occasion, donc on est totalement libre de chercher
-                if not isinstance(corp,Sentinelle):
+                if not isinstance(corp,Sentinelle) or isinstance(corp,Humain):
                     if len(dirs)>1: #On peut se permettre de choisir
                         if corp.dir_regard != None: #L'agissant regarde quelque part
                             dir_back = [HAUT,DROITE,BAS,GAUCHE][corp.dir_regard-2]
@@ -9523,7 +9712,7 @@ class Esprit_humain(Esprit_type):
                         corps_ennemis = esprit_offenseur.corps
                         for ID in corps_ennemis.keys():
                             if not ID in self.ennemis:
-                                self.ennemis[ID] += 0.01
+                                self.ennemis[ID] = 0.01
 
     def oublie(self):
         for lab in self.vue.values():
@@ -9579,7 +9768,7 @@ class Esprit_humain(Esprit_type):
                 if isinstance(humain.cible_deplacement,int):
                     if not(self.controleur.est_item(humain.cible_deplacement)):
                         cible = self.controleur.get_entitee(humain.cible_deplacement).get_position()
-                        portee = 8
+                        portee = 7
                     else:
                         cible = humain.get_position()
                         portee = 10 #C'est juste pour qu'il puisse aller où il veut
@@ -9618,6 +9807,7 @@ class Esprit_humain(Esprit_type):
                                     libre = False
                             if libre:
                                 cases.append([i,case_pot[0],case_pot[3],case_pot[4],case_pot[5]])
+                                dirs.append(i)
                 if res == None: #On n'a pas d'ennemi à portée directe (ou on ne souhaite pas attaquer ni fuir)
                     comportement = humain.comporte_distance()
                     if comportement == 0 : #Foncer tête baissée ! Pour les combattants au corps à corps
@@ -9645,9 +9835,17 @@ class Esprit_humain(Esprit_type):
                                                     importance = self.ennemis[ID_entitee]
                                                     humain.attaque(i)
                                                     res = "attaque"
+                    elif case[5] == 0 and  case[4] == 0:
+                        if not isinstance(humain,Sentinelle):
+                            if len(dirs)>1: #On peut se permettre de choisir
+                                if humain.dir_regard != None: #L'agissant regarde quelque part
+                                    dir_back = [HAUT,DROITE,BAS,GAUCHE][humain.dir_regard-2]
+                                    if dir_back in dirs: #On ne veut pas y retourner
+                                        dirs.remove(dir_back)
+                            humain.va(dirs[random.randint(0,len(dirs)-1)]) #/!\ Ne pas retourner sur ses pas, c'est bien ! Aller vers les endroits inconnus, ce serait mieux. /!\
                     else:
-                        new_cases = sorted(cases,key=operator.itemgetter(4,2,3))
                         if res == "deplacement":
+                            new_cases = sorted(cases,key=operator.itemgetter(4,2,3))
                             if new_cases[-1][0] != -1: #La dernière case (i.e. les valeurs les plus élevées) n'est pas celle où l'on est
                                 humain.va(new_cases[-1][0])
                                 if ID_humain == 4:
@@ -9655,6 +9853,9 @@ class Esprit_humain(Esprit_type):
                             else:
                                 res = humain.agit_en_vue(self)
                         elif res == "fuite":
+                            for case in cases:
+                                case[4] *= -1
+                            new_cases = sorted(cases,key=operator.itemgetter(4,2,3))
                             if new_cases[0][0] != -1: #La première case (i.e. les valeurs les moins élevées) n'est pas celle où l'on est
                                 humain.va(new_cases[0][0])
                                 if ID_humain == 4:
@@ -10777,8 +10978,10 @@ class Porte(On_try_through):
         if not(self.casse) and self.ferme :
             self.action(mur,entitee)
 
-    def get_skin(self):
-        if self.ferme:
+    def get_skin(self,clees = []):
+        if self.ferme and self.code in clees:
+            return SKIN_PORTE_OUVRABLE
+        elif self.ferme:
             return SKIN_PORTE
         else:
             return SKIN_PORTE_OUVERTE
@@ -12132,7 +12335,26 @@ class Magie_poing_ardent(Magie_dirigee): #L'attaque de mélée de la bombe atomi
         self.affiche = True
 
     def action(self,porteur):
-        porteur.effets.append(Attaque_magique(porteur.ID,degats_poing_ardent[self.niveau-1],TERRE,portee_poing_ardent[self.niveau-1],"Sd_T___",self.direction))
+        porteur.effets.append(Attaque_magique(porteur.ID,degats_poing_ardent[self.niveau-1],FEU,portee_poing_ardent[self.niveau-1],"Sd_T___",self.direction))
+
+    def get_image():
+        return SKIN_MAGIE_POING_MAGIQUE
+
+class Magie_poing_sombre(Magie_dirigee): #L'attaque de mélée de la bombe atomique
+    """La magie qui crée une attaque de poing sombre."""
+    nom = "magie poing sombre"
+    def __init__(self,niveau):
+        self.phase = "démarrage"
+        self.gain_xp = gain_xp_poing_sombre[niveau-1]
+        self.cout_pm = cout_pm_poing_sombre[niveau-1]
+        self.latence = latence_poing_sombre[niveau-1]
+        self.niveau = niveau
+        self.direction = None
+        self.temps = 10000
+        self.affiche = True
+
+    def action(self,porteur):
+        porteur.effets.append(Attaque_magique(porteur.ID,degats_poing_sombre[self.niveau-1],OMBRE,portee_poing_sombre[self.niveau-1],"Sd_T___",self.direction))
 
     def get_image():
         return SKIN_MAGIE_POING_MAGIQUE
@@ -14724,7 +14946,10 @@ class Affichage:
                 mur = case.get_mur_dir(i)
                 for effet in mur.effets:
                     if effet.affiche:
-                        effet.get_skin().dessine_toi(self.screen,position,taille,i)
+                        if isinstance(effet,Porte):
+                            effet.get_skin(joueur.get_clees()).dessine_toi(self.screen,position,taille,i)
+                        else:
+                            effet.get_skin().dessine_toi(self.screen,position,taille,i)
             for effet in case.effets:
                 if effet.affiche:
                     effet.get_skin().dessine_toi(self.screen,position,taille)
@@ -14749,6 +14974,7 @@ class Affichage:
                 if bouclier != None:
                     joueur.controleur.get_entitee(bouclier).get_skin().dessine_toi(self.screen,position,taille,direction)
                 haume = agissant.inventaire.haume
+                agissant.get_skin_tete().dessine_toi(self.screen,position,taille,direction) #Avoir éventuellement la tête dans une autre direction ?
                 if haume != None:
                     joueur.controleur.get_entitee(haume).get_skin().dessine_toi(self.screen,position,taille,direction)
                 if isinstance(agissant,Humain) and agissant.dialogue > 0: #Est-ce qu'on veut vraiment avoir cet indicatif en-dessous des effets ?

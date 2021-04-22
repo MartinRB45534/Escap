@@ -1,53 +1,60 @@
-Work in progress !
+À l'attention du joueur :
 
-Attention /!\ les pnjs peuvent bloquer le joueur en essayant d'aller vers lui lorsqu'ils sont trop nombreux et que le joueur doit faire demi-tour !
+Escap version 0 : le tutoriel
 
-La variable globale ID_MAX ne remplit pas du tout son rôle ! Qu'est-ce que je fais ?
-L'autruche, en codant les pnjs
+Quelques petites remarques :
+1 - Le jeu s'arrête avant la fin du tutoriel, au moment de vaincre le boss gobelin à  l'étage 10. Il n'y a pas encore de moyen d'ouvrir la porte de l'étage 10, mais le boss dropera la clé quand j'aurai codé les monstres derrière la porte.
+2 - Le jeu est TRÈS déséquilibré ! J'apprécie beaucoup les retours, et l'équilibrage peut être modifié (voir plus bas).
+3 - Désolé pour les graphismes, je vais sûrement les améliorer mais j'ai la flemme pour l'instant.
+4 - Il reste quelques bugs dans le jeu. Je ne crois pas qu'il y ait de situation qui fasse planter le programme à l'heure actuelle, mais on peut se retrouver bloqué. Par exemple :
+	- Si deux agissants s'affrontent et que chacun subit moins de dégats qu'il ne récupère de PV (les humains sont les seuls, avec le boss de fin, à récupérer des PVs donc ça devrait aller).
+	- Si un agissant avec peu de PVs s'enfuit (ça devrait moins arriver avec les limitations que j'ai placées sur la fuite, mais c'est toujours plus pratique d'attaquer à 2 pour encercler).
+	- Si le joueur est dans une impasse avec tous les PNJs derrière lui (les PNJs sont codés pour rester à une certaine distance du joueur, donc le plus loin refuserait de s'éloigner et tout le monde serait immobilisé) (on peut facilement éviter ça en demandant aux PNJs de suivre un autre PNJ qui lui suit le joueur, mais c'est plus difficile de vérifier qui s'est perdu et en cas de mort du PNJ suivi on risque de perdre les autres PNJs).
+	- Si un agissant de type Sentinelle s'arrète sur l'escalier. Typiquement, un des gardes du boss. Sans humain dans la salle du boss, impossible de le faire bouger, et l'escalier restera condamné à jamais.
+    La meilleure solution dans ce cas est de considérer ça comme une défaite et de recommencer, mais on peut aussi modifier le jeu (voir plus bas).
+5 - Certaines commandes ne sont pas expliqués. A et E pour entrer et sortir d'un item d'un menu (pendant le jeu), ZQSD pour haut droite bas gauche dans ces même menus, et espace pour utiliser l'item de menu courant. Typiquement, Q pour passer de la zone centrale à la zone de gauche (un pourtour rouge indique la zone courante), puis A pour entrer dans la zone de gauche et Z/S pour séléctionner l'inventaire/la classe principale, puis A pour entrer dans l'inventaire/la classe principale, de nouveau Z, S, A et E pour naviguer dans l'inventaire/la classe principale et enfin espace pour équipper l'item séléctionné/boire la potion séléctionnée/lancer le projectile séléctionné (pas encore de projectiles à ce niveau)/utiliser le skill séléctionné (utile quand un skill s'utilise deux fois d'affilée par les moyens normaux). Attention, les zones ne sont pas toutes codées et se déplacer ou sortir d'une zone non codée fait planter le jeu, donc se limiter aux skills et items est une bonne pratique.
+6 - Le ramassage des objets n'est pas automatique. C'est une action dont la commande est expliquée en temps voulu. Cette action prend un certain temps pour chaque objet à ramasser, et ramasse tous les objets sur la case. De plus les cadavres de monstres, comme chaque pièce de leur équippements, sont des objets, donc tuer plusieurs monstres sur la même case puis récupérer la clée lachée par le dernier peut prendre pas mal de temps et donner l'impression que le jeu ne répond plus. Il suffit d'être patient et de ne pas se faire attaquer par d'autres monstres au même moment.
+7 - Les commandes sont expliquées au fur et à mesure qu'elles deviennent utiles, par les PNJs. Pour modifier ces commandes et/ou se les remettre en mémoire, appuyer sur la touche retour/entrée.
 
+Pour aller plus loin :
 
+Modifier l'équilibrage
+Tout est dans Jeu/Systeme. Le fichier Constantes_stats.py contient un dictionnaire avec les stats de base de chaque agissant, ainsi que son équippement et ses magies. Les skills sont créés dans le fichier Classe.py, dans la fonction __init__ de la Classe_principale, mais je vais probablement les déplacer dans le fichier Constantes_stats à l'occasion.
+Les dossiers Constantes_items, Constantes_magies, Constantes_skills contiennent les stats pour les items, les magies, et les skills respectivement. La vitesse des frames se modifie dans la fonction attend (ou peut-être affiche ?) du fichier True_main, un pygame.wait() quelque part. Ces deux fichiers et trois dossiers devraient contenir toutes les valeur numériques actuellement utilisées par le jeu.
 
-Finir de rajouter les items des pnjs et rééquilibrer le jeu
-Améliorer le système de la fuite, c'est vraiment soulant actuellement...
-
-
-
-Objectif courant : recréer le tutoriel
-- Fin du layout et équilibrage
-Au passage :
-- Fin du travail sur l'affichage (arbre élémental)
-- Rendre fonctionnels tous les choix, puis les conditionner
-
-Si j'ai le temps :
-- Faire de meilleurs skins pour les gobelins.
-
-
-
-Quelques nouvelles magies à créer :
-- Magies tribales (genre, qui varient selon l'espèce, comme un coup de poing magique qui n'est pas le même pour les gobelins et les orcs)
-- Coup de poing magique (magie d'attaque des mages de combat)
-- Boost complet (un boost qui affecte toutes les stats)
-
-
-Étage combat : une sentinelle au point de passage
-Étage monstres : une sentinelle, un mage, dans un dédale
-Étage portes (prison) : deux sentinelles, guerrier dans une salle (c'est un piège !), un slime et un ombriul
-Étage potions : guerriers, mages, un shaman.
-Étage meutes : guerriers, mages, deux shamans, plein de gobelins de base dans les couloirs.
-Étage magie : tout !
-Étage items : tout, mais un peu moins, plus quelques gobelins équippés.
-Étage boss : tout, mais un peu plus, plus un chef gobelin.
-
-
-Équippements du tutoriel :
-Armures (bloque 20%, réduit les dégats de 20, réduit les dégats à 20, annule les attaques de moins de 20 mais laisse passer les autres... pas toutes mais deux ou trois)
-Armes (épée, lance, autre (une arme peut-être plus forte mais avec moins de skills de boosts évidemment))
-Casques (comme les armures, + bandeau ou quelque chose, qui boost le mana)
-Anneaux (plein d'effets possibles !)
-Bouclier (sauf qu'il faut un skill pour s'en servir... peut-être un bouclier avec un effet passif semblable aux armures ?)
+Débloquer une situation
+Première étape : Controle + C dans le shell pour interrompre l'exécution.
+Deuxième étape : depuis le shell, mains est une variable globale qui liste tous les objets Main en cours d'utilisation (les fichiers .p dans le répertoire à la dernière vérification). s'il y a un seul Main, mains[0][2] y accédera. Le controleur de la partie interrompue sauvagement devrait être mains[0][2].controleur, et le controleur donne accès à tous les éléments du jeu. Quelques exemple :
+	- mains[0][2].controleur.entitees[2] est le joueur, donc :
+	- mains[0][2].controleur.entitees[2].pv = 100 pour remettre les pvs du joueur à 100 , ou
+	- mains[0][2].controleur.entitees[2].position = ('Étage 10 : Boss',0,0) pour déplacer le joueur à l'étage du boss, dans le coin en haut à droite
+	les ID de 1 à 10 sont réservées aux humains, donc elles sont fixes, pour les autre :
+	- mains[0][2].controleur.entitees donne le dictionnaire de toutes les entitees, (agissants et items) classées par ID, ensuite, c'est de l'essai erreur pour trouver la bonne
+	- mains[0][2].controleur.labs donne le dictionnaire de tous les labyrinthes (~= étages pour l'instant) classés par nom, ce qui aide pour la première coordonnée des positions
+	- mains[0][2].controleur.esprits donne le dictionnaire des esprits, et :
+	- mains[0][2].controleur.entitees[ID].esprit donne le nom de l'esprit de l'entitée correspondant à ID, donc :
+	- mains[0][2].controleur.esprits[mains[0][2].controleur.entitees[ID].esprit].ennemis pour le dictionnaire des ennemis de l'esprit de l'entitée correspondant à ID
+	- mains[0][2].controleur.labs[mains[0][2].controleur.entitees[ID].position[0]].matrice_cases[mains[0][2].controleur.entitees[ID].position[1]][mains[0][2].controleur.entitees[ID].position[2]].murs[mains[0][2].controleur.entitees[ID].dir_regard].effets donnerai la liste des effets du mur juste en face de l'entitée correspondant à ID (probablement un Teleport qui conduit à la case voisine et éventuellement un Mur ou une Porte qui bloque le passage)
+	- mains[0][2].controleur.entitees_courantes pour la liste des IDs des entitées en activité, et
+	- mains[0][2].controleur.labs_courants pour la liste des noms des labyrinthe actifs
+Honnêtement la modification de position est la seule chose utile de ce que je viens de citer, dès qu'on commence à ramener des entitees à la vie ça s'appelle tricher... Attention quand même quand on se rend dans un étage inactif, penser à l'activer ou toute interraction avec l'environnement (les monstres ou les humains, par exemple) fera planter le jeu (prendre l'escalier pour sortir de l'étage et y revenir réactive l'étage, sinon mains[0][2].controleur.active_lab(nom_du_lab_à_activer) en remplaçant nom_du_lab_à_activer par le nom du labyrinthe à activer.
+Si le controleur (la "partie") n'est pas sur le premier Main de la liste, il faut remplacer le 0 dans mains[0][2] par l'indice du Main (bonne indication : quand mains[0][2].controleur renvoie None, c'est qu'on est pas sur le bon Main).
+Troisième étape : mains[0][2].boucle() et le jeu reprend immédiatement, attention aux surprises quand l'affichage se met à jour pour prendre en compte les nouvelles modifications !
 
 
-À l'occasion, faire le tri dans les constantes
+
+À mon attention :
+
+Travail à faire :
+- Modifier un peu le layout du niveau prison
+- Finir les ombriuls (renforcer l'ombriul existant, lui donner un équivalent du stomp pour l'ombre, créer les ombriuls d'après le boss gobelin)
+- Améliorer l'affichage (affichage de la vue du joueur/des agissants en vue de l'esprit selon la zone sélectionnée)
+- Réorganiser les dialogues (début -> formulations (modification de l'appréciation) -> info importante -> formulations -> infos ... -> fin mais donner les informations sur les touches dans tous les cas)
+(- Modifier la fuite pour ne fuir que si un allié est accessible)
+- Il n'y a plus de problème de lenteur de l'affichage et le joueur s'arrète souvent une case trop loin, réaugmenter le nombre de tours par seconde ?
+- Équilibrer !
+
+
 
 
 Messages d'entrée pour certains étages ?

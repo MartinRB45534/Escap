@@ -172,7 +172,7 @@ class Classe:
     def get_skills_actifs(self):
         skills = []
         for skill in self.skills:
-            if isinstance(skill,(Skill_magie,Skill_analyse,Skill_vol,Skill_stomp,Skill_attaque,Skill_blocage,Skill_lancer)):
+            if isinstance(skill,(Skill_magie,Skill_analyse,Skill_vol,Skill_stomp,Skill_attaque,Skill_blocage,Skill_lancer,Skill_course)):
                 skills.append(skill) #Ne prend pas en compte la création d'items pour l'instant !
         for skill in self.skills_intrasecs:
             if isinstance(skill,(Skill_deplacement,Skill_ramasse,Skill_soin,Skill_regeneration_MP,Skill_reanimation,Skill_reanimation_renforcee)):
@@ -223,9 +223,9 @@ class Classe_principale(Classe):
             magie = Skill_magie() #On crée un skill d'utilisation de magie
             magie.evo() #On le passe au niveau 1
             skills.append(magie)
-            blocage = Skill_blocage() #On crée un skill de blocage
-            blocage.evo() #On le passe au niveau 1
-            skills.append(blocage)
+            course = Skill_course() #On crée un skill de course
+            course.evo() #On le passe au niveau 1
+            skills.append(course)
 
 ##            #!!! Attention : ce qui se passe ici est extérieur au système !
 ##            if malchance_forcee : #Après la chance, la malchance...
@@ -444,6 +444,17 @@ class Classe_principale(Classe):
             skills_intrasecs.append(absorption)
             fusion = Skill_merge()
             skills_intrasecs.append(fusion)
+
+        elif identite == 'ombriul':
+            self.evolutif = False
+            deplacement = Skill_deplacement()
+            skills_intrasecs.append(deplacement)
+            vision = Skill_vision()
+            skills_intrasecs.append(vision)
+            stomp = Skill_stomp()
+            skills_intrasecs.append(stomp)
+            magie = Skill_magie()
+            skills_intrasecs.append(magie)
 
         Classe.__init__(self,cond_evo,skills_intrasecs,skills)
         self.evo(niveau)
