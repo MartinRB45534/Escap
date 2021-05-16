@@ -236,7 +236,6 @@ class Main: #Modifier le nom plus tard pour plus de cohérence
             elif isinstance(res,Controleur):
                 self.controleur = res
                 ID_MAX.set_id_max(max(self.controleur.entitees.keys()))
-                self.controleur.jeu(screen)
                 self.boucle()
             else:
                 print("Erreur menu true_main, res non reconnu")

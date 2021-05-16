@@ -46,16 +46,19 @@ Troisième étape : mains[0][2].boucle() et le jeu reprend immédiatement, attentio
 À mon attention :
 
 Travail à faire :
-- Modifier un peu le layout du niveau prison
-- Finir les ombriuls (renforcer l'ombriul existant, lui donner un équivalent du stomp pour l'ombre, créer les ombriuls d'après le boss gobelin)
-- Améliorer l'affichage (affichage de la vue du joueur/des agissants en vue de l'esprit selon la zone sélectionnée)
-- Réorganiser les dialogues (début -> formulations (modification de l'appréciation) -> info importante -> formulations -> infos ... -> fin mais donner les informations sur les touches dans tous les cas)
+- Layout (prison, dialogues)
+- Création (ombriuls)
+- Affichage (rectangle de droite, esprit)
 (- Modifier la fuite pour ne fuir que si un allié est accessible)
-- Il n'y a plus de problème de lenteur de l'affichage et le joueur s'arrète souvent une case trop loin, réaugmenter le nombre de tours par seconde ?
-- Équilibrer !
+- Équilibrer ! (tours par secondes, combats, jeter un oeil à l'XP obtenu)
+
+Les infos qu'on veut savoir dans le rectangle de droite :
+Pour les humains, leur statut de déplacement (cherche la sortie, à proximité de sa cible, connait le chemin vers sa cible, cherche un chemin vers sa cible, totalement perdu) (éventuellement indiquer s'il est au-dessus/en-dessous du joueur/de sa cible)
+Pour tous, leur statut de combat (pas d'ennemi en vue, fuite, soutien, attaque, se rapproche)
 
 
 
+Rejetter un oeil à la sauvegarde
 
 Messages d'entrée pour certains étages ?
 

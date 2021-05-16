@@ -89,6 +89,30 @@ global SKIN_TETE_OMBRIUL
 SKIN_TETE_OMBRIUL = Skin("ombriul_tete.png")
 global SKIN_DIALOGUE
 SKIN_DIALOGUE = Skin("dialogue.png")
+global SKIN_STATUT_PAIX
+SKIN_STATUT_PAIX = Skin("statut_paix.png")
+global SKIN_STATUT_EXPLORATION
+SKIN_STATUT_EXPLORATION = Skin("statut_exploration.png")
+global SKIN_STATUT_FUITE
+SKIN_STATUT_FUITE = Skin("statut_fuite.png")
+global SKIN_STATUT_SOUTIEN
+SKIN_STATUT_SOUTIEN = Skin("statut_soutien.png")
+global SKIN_STATUT_SOIN
+SKIN_STATUT_SOIN = Skin("statut_soin.png")
+global SKIN_STATUT_ATTAQUE
+SKIN_STATUT_ATTAQUE = Skin("statut_attaque.png")
+global SKIN_STATUT_RAPPROCHE
+SKIN_STATUT_RAPPROCHE = Skin("statut_approche.png")
+global SKIN_STATUT_CHERCHE
+SKIN_STATUT_CHERCHE = Skin("statut_cherche.png")
+global SKIN_STATUT_PROXIMITE
+SKIN_STATUT_PROXIMITE = Skin("statut_proximite.png")
+global SKIN_STATUT_CHEMIN
+SKIN_STATUT_CHEMIN = Skin("statut_en_chemin.png")
+global SKIN_STATUT_PERDU
+SKIN_STATUT_PERDU = Skin("statut_perdu.png")
+global SKIN_STATUT_PAUME
+SKIN_STATUT_PAUME = Skin("statut_paume.png")
 global SKIN_MYSTERE
 SKIN_MYSTERE = Skin("mystere.png")
 global SKIN_BOUCLIER
@@ -167,6 +191,24 @@ global SKIN_EFFET
 SKIN_EFFET = Skin("effet.png")
 global SKIN_MUR
 SKIN_MUR = Skin("mur.png")
+global SKIN_MUR_1
+SKIN_MUR_1 = Skin("mur_1.png")
+global SKIN_MUR_2
+SKIN_MUR_2 = Skin("mur_2.png")
+global SKIN_MUR_3
+SKIN_MUR_3 = Skin("mur_3.png")
+global SKIN_MUR_4
+SKIN_MUR_4 = Skin("mur_4.png")
+global SKIN_MUR_5
+SKIN_MUR_5 = Skin("mur_5.png")
+global SKIN_MUR_6
+SKIN_MUR_6 = Skin("mur_6.png")
+global SKIN_MUR_7
+SKIN_MUR_7 = Skin("mur_7.png")
+global SKIN_MUR_8
+SKIN_MUR_8 = Skin("mur_8.png")
+global SKINS_MURS
+SKINS_MURS = [SKIN_MUR,SKIN_MUR_1,SKIN_MUR_2,SKIN_MUR_3,SKIN_MUR_4,SKIN_MUR_5,SKIN_MUR_6,SKIN_MUR_7,SKIN_MUR_8]
 global SKIN_MUR_CASSE
 SKIN_MUR_CASSE = Skin("mur_casse.png")
 global SKIN_ESALIER

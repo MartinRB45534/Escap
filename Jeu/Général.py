@@ -1782,7 +1782,32 @@ class Case:
                 
 
     def pseudo_debut_tour(self):
-        pass
+        self.code = 0
+        priorite_max = 0
+        IDmax = 0
+        auras = {}
+
+        for effet in self.effets:
+            if isinstance(effet,Aura_elementale):
+                ID = effet.responsable
+                if ID in auras.keys() : # On a déjà une aura de ce type
+                    auras[ID].append(effet)
+                else:
+                    auras[ID]=[effet]
+                prio = effet.priorite
+                if prio > priorite_max : # On a un nouveau gagnant !
+                    IDmax = ID
+                    priorite_max = prio
+
+        for aura in auras[IDmax]:
+            if isinstance(aura,(Terre,Terre_permanente)):
+                self.code += 1
+            elif isinstance(aura,(Feu,Feu_permanent)):
+                self.code += 2
+            elif isinstance(aura,(Glace,Glace_permanente)):
+                self.code += 4
+            elif isinstance(aura,(Ombre,Ombre_permanente)):
+                self.code += 8
 
     #Certains agissants particulièrement tapageurs font un concours de celui qui aura la plus grosse aura (comment ça, cette phrase particulièrement compliquée aura juste servi à faire un jeu de mot sur aura
     def ajoute_aura(self,aura):
@@ -2413,6 +2438,7 @@ class Agissant(Entitee): #Tout agissant est un cadavre, tout cadavre n'agit pas.
         self.especes=stats['especes']
         self.classe_principale = Classe_principale(identite,niveau)
         self.niveau = self.classe_principale.niveau
+        self.statut = "attente"
         self.etat = "vivant"
 
         #vue de l'agissant
@@ -2481,6 +2507,7 @@ class Agissant(Entitee): #Tout agissant est un cadavre, tout cadavre n'agit pas.
             self.skill_courant = Skill_attaque
         else:
             self.skill_courant = Skill_stomp
+        self.statut = "attaque"
 
     def va(self,direction):
         self.dir_regard = direction
@@ -2742,6 +2769,24 @@ class Agissant(Entitee): #Tout agissant est un cadavre, tout cadavre n'agit pas.
         else:
             return SKIN_CADAVRE
 
+    def get_skins_statuts(self):
+        if self.statut == "paix":
+            return [SKIN_STATUT_PAIX]
+        elif self.statut == "exploration":
+            return [SKIN_STATUT_EXPLORATION]
+        elif self.statut == "fuite":
+            return [SKIN_STATUT_FUITE]
+        elif self.statut == "soutien":
+            return [SKIN_STATUT_SOUTIEN]
+        elif self.statut == "soin":
+            return [SKIN_STATUT_SOIN]
+        elif self.statut == "attaque":
+            return [SKIN_STATUT_ATTAQUE]
+        elif self.statut == "rapproche":
+            return [SKIN_STATUT_RAPPROCHE]
+        else:
+            return [SKIN_VIDE]
+
     def get_skin_tete(self):
         return SKIN_VIDE
 
@@ -2976,6 +3021,7 @@ class Soigneur(Agissant):
             self.skill_courant = Skill_magie
             self.cible_magie = cible
             defaut = "soin"
+            self.statut = "soin"
             if cible == self.ID:
                 self.magie_courante = "magie auto soin"
             else:
@@ -2996,6 +3042,7 @@ class Multi_soigneur(Agissant):
                 self.skill_courant = Skill_magie
                 self.cible_magie = cibles[0]
                 defaut = "soin"
+                self.statut = "soin"
                 if cibles[0] == self.ID:
                     self.magie_courante = "magie auto soin"
                 else:
@@ -3006,10 +3053,12 @@ class Multi_soigneur(Agissant):
                 self.magie_courante = "magie multi soin"
                 self.cible_magie = cibles
                 defaut = "soin"
+                self.statut = "soin"
             elif self.peut_payer(cout_pm_soin[skill.niveau-1]):#/!\ J'utilise le fait que le soin et l'auto soin aient le même coût !
                 self.skill_courant = Skill_magie
                 self.cible_magie = cibles[0]
                 defaut = "soin"
+                self.statut = "soin"
                 if cibles[0] == self.ID:
                     self.magie_courante = "magie auto soin"
                 else:
@@ -3034,6 +3083,7 @@ class Attaquant_magique_case(Agissant):
             self.magie_courante = self.caste()
             self.cible_magie = new_cibles[-1][-1]
             defaut = "attaque"
+            self.statut = "attaque"
         return defaut
 
 class Attaquant_magique_agissant(Agissant):
@@ -3054,6 +3104,7 @@ class Attaquant_magique_agissant(Agissant):
             self.magie_courante = self.caste()
             self.cible_magie = new_cibles[-1][-1]
             defaut = "attaque"
+            self.statut = "attaque"
         return defaut
 
 class Renforceur(Agissant):
@@ -3075,6 +3126,7 @@ class Renforceur(Agissant):
             self.magie_courante = "magie boost"
             self.cible_magie = cible
             defaut = "soutien"
+            self.statut = "soutien"
         return defaut
 
 class Multi_renforceur(Renforceur):
@@ -3094,17 +3146,20 @@ class Multi_renforceur(Renforceur):
                 self.magie_courante = "magie boost"
                 self.cible_magie = cibles[0]
                 defaut = "soutien"
+                self.statut = "soutien"
         elif cibles != []:
             if self.peut_payer(cout_pm_multi_boost[skill.niveau-1]):
                 self.skill_courant = Skill_magie
                 self.magie_courante = "magie multi boost"
                 self.cible_magie = cibles
                 defaut = "soutien"
+                self.statut = "soutien"
             elif self.peut_payer(cout_pm_boost[skill.niveau-1]):
                 self.skill_courant = Skill_magie
                 self.magie_courante = "magie boost"
                 self.cible_magie = cibles[0]
                 defaut = "soutien"
+                self.statut = "soutien"
         return defaut
 
 class Gobelin(Dps):
@@ -3200,6 +3255,7 @@ class Mage_gobelin(Gobelin):
             self.dir_magie = direction
         else:
             self.skill_courant = Skill_stomp
+        self.statut = "attaque"
 
     def get_offenses(self):
         offenses = self.offenses
@@ -3302,6 +3358,7 @@ class Ombriul(Dps):
             self.dir_magie = direction
         else:
             self.skill_courant = Skill_stomp
+        self.statut = "attaque"
 
     def get_skin(self):
         if self.etat == "vivant":
@@ -3316,6 +3373,7 @@ class Humain(Agissant,Entitee_superieure):
     """La classe des pnjs et du joueur. A un comportement un peu plus complexe, et une personnalité."""
     def __init__(self,controleur,position,identite,niveau,ID):
         Agissant.__init__(self,controleur,position,identite,niveau,ID)
+        self.statut_humain = "attente"
         self.dialogue = -1 #Le dialogue par défaut, celui des ordres
         self.replique = None #La réplique en cours de l'agissant vaut None lorsqu'il n'y a pas de dialogue en cours
         self.repliques = [] #Les réponses possibles de l'interlocuteur
@@ -3417,6 +3475,20 @@ class Humain(Agissant,Entitee_superieure):
             return SKIN_CORPS_HUMAIN
         else:
             return SKIN_CADAVRE
+
+    def get_skins_statuts(self):
+        skins = Agissant.get_skins_statuts(self)
+        if self.statut_humain == "exploration":
+            skins.append(SKIN_STATUT_CHERCHE)
+        elif self.statut_humain == "proximite":
+            skins.append(SKIN_STATUT_PROXIMITE)
+        elif self.statut_humain == "en chemin":
+            skins.append(SKIN_STATUT_CHEMIN)
+        elif self.statut_humain == "perdu":
+            skins.append(SKIN_STATUT_PERDU)
+        elif self.statut_humain == "paume":
+            skins.append(SKIN_STATUT_PAUME)
+        return skins
 
 class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, c'est le personnage principal !)
     """La classe du joueur."""
@@ -4020,7 +4092,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
             elif direction == GAUCHE:
                 self.curseur = "carré"
             elif direction == IN:
-                self.curseur = "messages"
+                self.curseur = "in_esprit"
         elif self.curseur == "rectangle_g":
             if direction == DROITE:
                 self.curseur = "carré"
@@ -4087,15 +4159,18 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         elif self.curseur == "in_classe":
             if self.classe_principale.deplace(direction):
                 self.curseur = "classe"
-        elif self.curseur == "in_liste":
-            if self.affichage.deplace_liste(direction):
-                self.curseur = "liste_d"
-        elif self.curseur == "in_cases":
-            if self.affichage.deplace_cases(direction):
-                self.curseur = "cases"
-        elif self.curseur == "in_messages":
-            if self.affichage.deplace_messages(direction):
-                self.curseur = "messages"
+        elif self.curseur == "in_esprit":
+            if self.controleur.get_esprit(self.esprit).deplace(direction):
+                self.curseur = "rectangle_d"
+##        elif self.curseur == "in_liste":
+##            if self.affichage.deplace_liste(direction):
+##                self.curseur = "liste_d"
+##        elif self.curseur == "in_cases":
+##            if self.affichage.deplace_cases(direction):
+##                self.curseur = "cases"
+##        elif self.curseur == "in_messages":
+##            if self.affichage.deplace_messages(direction):
+##                self.curseur = "messages"
 
     def level_up(self):
         """La fonction qui augmente le niveau du joueur. Augmente les stats, et offre un cadeau d'évolution au choix."""
@@ -5435,35 +5510,6 @@ class Peureuse(Multi_renforceur,Support_lointain,Humain): #La quatrième humaine
     # /!\ Pour améliorer ça : fuire dès qu'il y a un monstre en vue et accessible
     # et ne pas fuir s'il n'y a nulle part où fuir ou si le joueur a donné ordre de ne pas fuir et qu'on a suffisamment d'appréciation pour lui (rajouter un modificateur au taux_limite ?)
 
-    def multi_boost(self,corps):
-        res = False
-        cibles = []
-        #On cherche des alliés à booster
-        for ID in corps.keys():
-            if ID in [2,3,4,6]:
-                skill = self.controleur.get_entitee(ID).skill_courant
-                if skill != None and issubclass(skill,(Skill_attaque,Skill_stomp)):
-                    cibles.append(ID)
-        skill = trouve_skill(self.classe_principale,Skill_magie) #Est-ce qu'elle a le même Skill_magie que le joueur ?
-        if len(cibles) == 1:
-            if self.peut_payer(cout_pm_boost[skill.niveau-1]):
-                self.skill_courant = Skill_magie
-                self.magie_courante = "magie boost"
-                self.cible_magie = cibles[0]
-                res = True
-        elif cibles != []:
-            if self.peut_payer(cout_pm_multi_boost[skill.niveau-1]):
-                self.skill_courant = Skill_magie
-                self.magie_courante = "magie multi boost"
-                self.cible_magie = cibles
-                res = True
-            elif self.peut_payer(cout_pm_boost[skill.niveau-1]):
-                self.skill_courant = Skill_magie
-                self.magie_courante = "magie boost"
-                self.cible_magie = cibles[0]
-                res = True
-        return res
-
     def start_dialogue(self): #On commence un nouveau dialogue !
         #On initialise nos attributs
         self.replique_courante = 0
@@ -6181,39 +6227,6 @@ class Peste(Soigneur,Support_lointain,Humain): #La huitième humaine du jeu, à 
 
     # /!\ Pour améliorer ça : ne pas fuir s'il n'y a nulle part où fuir et ne pas fuir si on n'est pas à portée de monstre
 
-    def heal(self,corps):
-        res = False
-        cibles = []
-        #On cherche des alliés à soigner
-        for ID in corps.keys():
-            if self.controleur.get_entitee(ID).pv < self.controleur.get_entitee(ID).pv_max:
-                cibles.append(ID)
-        skill = trouve_skill(self.classe_principale,Skill_magie) #Est-ce qu'elle a le même Skill_magie que le joueur ?
-        if len(cibles) == 1:
-            if self.peut_payer(cout_pm_soin[skill.niveau-1]):#/!\ J'utilise le fait que le soin et l'auto soin aient le même coût !
-                self.skill_courant = Skill_magie
-                self.cible_magie = cibles[0]
-                res = True
-                if cibles[0] == self.ID:
-                    self.magie_courante = "magie auto soin" #/!\remplacer par un soin de zone ou un soin unique ou un auto soin selon les cas
-                else:
-                    self.magie_courante = "magie soin"
-        elif cibles != []:
-            if self.peut_payer(cout_pm_multi_soin[skill.niveau-1]):
-                self.skill_courant = Skill_magie
-                self.magie_courante = "magie multi soin" #/!\remplacer par un soin de zone ou un soin unique ou un auto soin selon les cas
-                self.cible_magie = cibles
-                res = True
-            elif self.peut_payer(cout_pm_soin[skill.niveau-1]):#/!\ J'utilise le fait que le soin et l'auto soin aient le même coût !
-                self.skill_courant = Skill_magie
-                self.cible_magie = cibles[0]
-                res = True
-                if cibles[0] == self.ID:
-                    self.magie_courante = "magie auto soin" #/!\remplacer par un soin de zone ou un soin unique ou un auto soin selon les cas
-                else:
-                    self.magie_courante = "magie soin"
-        return res
-
     def attaque(self,direction):
         #Quelle est sa magie de prédilection ? Pour l'instant on va prendre l'avalanche
         skill = trouve_skill(self.classe_principale,Skill_magie) #Est-ce qu'il a le même Skill_magie que le joueur ?
@@ -6421,6 +6434,7 @@ class Bombe_atomique(Attaquant_magique_case,Support_lointain,Humain): #La neuvi�
             self.magie_courante = "magie poing ardent"
         else:
             self.skill_courant = Skill_stomp
+        self.statut_humain = "attaque"
 
     def start_dialogue(self): #On commence un nouveau dialogue !
         #On initialise nos attributs
@@ -9226,11 +9240,11 @@ class Esprit :
             matrice = self.vue[etage]
             print("Vue de l'esprit :")
             print(self.nom)
-            for j in range(len(matrice)):
+            for i in range(len(matrice)):
                 haut = ""
                 centre = ""
                 bas = ""
-                for i in range(len(matrice[0])):
+                for j in range(len(matrice[0])):
                     case = matrice[i][j]
                     if case[6] == 0:
                         haut += " ~~~ "
@@ -9296,11 +9310,6 @@ class Esprit :
                 self.ennemis[corp] = 0.1
 
     def decide(self):
-        bourrins = []
-        fuyards = []
-        soigneurs = []
-        soutiens = []
-        autres = []
         for corp in self.corps.keys():
             if corp != 2 and self.corps[corp] in ["attaque","fuite","soin","soutien"]:
                 self.deplace(corp)
@@ -9319,7 +9328,7 @@ class Esprit :
         cases = [[-1,tcase[0],tcase[3],tcase[4],tcase[5]]]
         dirs = []
         importance = 0
-        res = None
+        res = "attente"
         for i in range(4): #On commence par se renseigner sur les possibilités :
             if case[7][i]:
                 if case[7][i][0] == position[0]:
@@ -9341,7 +9350,7 @@ class Esprit :
                     if libre:
                         cases.append([i,case_pot[0],case_pot[3],case_pot[4],case_pot[5]])
                         dirs.append(i)
-        if res == None: #Quelques comportements possibles :
+        if res == "attente": #Quelques comportements possibles :
             comportement = corp.comporte_distance()
             if comportement == 0 : #Foncer tête baissée ! Pour les combattants au corps à corps
                 res = "deplacement"
@@ -9353,6 +9362,7 @@ class Esprit :
                 res = "fuite"
         if res in ["deplacement","fuite"] and corp.latence <= 0:
             if len(cases) == 1: #Pas de cases libres à proximité, on va essayer d'attaquer pour s'en sortir
+                corp.statut = "bloqué"
                 corp.skill_courant = None
                 importance = 0
                 for i in range(4):
@@ -9369,18 +9379,21 @@ class Esprit :
                                             corp.attaque(i)
                                             res = "attaque"
             elif tcase[4] == 0: #Et case[3] forcément aussi par la même occasion, donc on est totalement libre de chercher
+                corp.statut = "paix"
                 if not isinstance(corp,Sentinelle) or isinstance(corp,Humain):
+                    corp.statut = "exploration"
                     if len(dirs)>1: #On peut se permettre de choisir
                         if corp.dir_regard != None: #L'agissant regarde quelque part
                             dir_back = [HAUT,DROITE,BAS,GAUCHE][corp.dir_regard-2]
                             if dir_back in dirs: #On ne veut pas y retourner
                                 dirs.remove(dir_back)
                     corp.va(dirs[random.randint(0,len(dirs)-1)]) #/!\ Ne pas retourner sur ses pas, c'est bien ! Aller vers les endroits inconnus, ce serait mieux. /!\
-                    if ID == 4:
+                    if ID == 4: # /!\ Nettoyer quand plus nécessaire
                         constantes_deplacements.append([self.controleur.nb_tours,"cherche",corp.dir_regard,cases])
             else:
                 new_cases = sorted(cases,key=operator.itemgetter(2,3))
                 if res == "deplacement":
+                    corp.statut = "approche"
                     if new_cases[-1][0] != -1: #La dernière case (i.e. les valeurs les plus élevées) n'est pas celle où l'on est
                         corp.va(new_cases[-1][0])
                         if ID == 4:
@@ -9388,6 +9401,7 @@ class Esprit :
                     else:
                         res = corp.agit_en_vue(self)
                 elif res == "fuite":
+                    corp.statut = "fuite"
                     if new_cases[0][0] != -1: #La première case (i.e. les valeurs les moins élevées) n'est pas celle où l'on est
                         corp.va(new_cases[0][0])
                         if ID == 4:
@@ -9623,8 +9637,69 @@ class Esprit_humain(Esprit_type):
         self.prejuges = [] #Peut-être quelques boss ?
         self.vue = {}
         self.corps = {}
-        self.ajoute_corp(corp)
+        Esprit_type.ajoute_corp(self,corp)
         self.chef = corp #Les humains ne peuvent pas s'empêcher d'avoir des chefs
+        self.curseur = "corps"
+        self.item_courant = 0
+
+    def deplace(self,direction):
+        if self.curseur == "corps":
+            if direction == BAS:
+                self.curseur = "ennemis"
+                self.item_courant = 0
+            elif direction == HAUT:
+                self.curseur = "ennemis"
+                self.item_courant = 0
+            elif direction == IN:
+                self.curseur = "in_corps"
+            elif direction == OUT:
+                return True
+        elif self.curseur == "in_corps":
+            if direction == BAS:
+                self.item_courant += 1
+                if self.item_courant == len(self.corps):
+                    self.item_courant = 0
+            elif direction == HAUT:
+                if self.item_courant == 0:
+                    self.item_courant = len(self.corps)
+                self.item_courant -= 1
+            elif direction == OUT:
+                self.curseur = "corps"
+        elif self.curseur == "ennemis":
+            if direction == BAS:
+                self.curseur = "corps"
+                self.item_courant = 0
+            elif direction == HAUT:
+                self.curseur = "corps"
+                self.item_courant = 0
+            elif direction == IN:
+                self.curseur = "in_ennemis"
+            elif direction == OUT:
+                return True
+        elif self.curseur == "in_ennemis":
+            if direction == BAS:
+                self.item_courant += 1
+                if self.item_courant == len(self.ennemis):
+                    self.item_courant = 0
+            elif direction == HAUT:
+                if self.item_courant == 0:
+                    self.item_courant = len(self.ennemis)
+                self.item_courant -= 1
+            elif direction == OUT:
+                self.curseur = "ennemis"
+
+    def ajoute_corp(self,corp):
+        if not corp in self.corps:
+            if corp < sorted(self.corps)[self.item_courant]: #Notre nouveau corp à un ID inférieur à celui actuellement selectionné, il est avant dans la liste
+                self.item_courant += 1 #On décale pour rester sur le même
+            self.corps[corp] = "incapacite"
+            self.controleur.get_entitee(corp).rejoint(self.nom)
+
+    def retire_corp(self,corp):
+        if corp in self.corps:
+            if corp <= sorted(self.corps)[self.item_courant] and self.item_courant != 0: #Notre corp perdu est avant le courant, ou est le courant.
+                self.item_courant -= 1 #On décale pour rester sur le même/passer au précédent
+            self.corps.pop(corp)
 
     def merge(self,nom): #Regroupe deux esprits, lorsque des humains forment un groupe
         esprit = self.controleur.get_esprit(nom)
@@ -9686,6 +9761,28 @@ class Esprit_humain(Esprit_type):
         agissants.sort()
         return agissants
 
+    def get_corps_vus(self,lab):
+        corps = []
+        if lab in self.vue.keys():
+            for ID in self.corps.keys():
+                corp = self.controleur.get_entitee(ID)
+                if not issubclass(corp.get_classe(),Item):
+                    pos = corp.position
+                    if self.vue[pos[0]][pos[1]][pos[2]][2]>0:
+                        corps.append(corp)
+        return corps
+
+    def get_ennemis_vus(self,lab):
+        ennemis = []
+        if lab in self.vue.keys():
+            for ID in self.ennemis.keys():
+                ennemi = self.controleur.get_entitee(ID)
+                if not issubclass(ennemi.get_classe(),Item):
+                    pos = ennemi.position
+                    if self.vue[pos[0]][pos[1]][pos[2]][2]>0:
+                        ennemis.append(ennemi)
+        return ennemis
+
     def get_cases_vues(self,humain):
         cases = []
         for colonne in self.vue[humain.position[0]]:
@@ -9719,10 +9816,11 @@ class Esprit_humain(Esprit_type):
             for i in range(len(lab)):
                 for j in range(len(lab[0])):
                     case = lab[i][j]
-                    if self.peureuse():
-                        case[2] = self.oubli
-                    elif case[2] > 0:
-                        case[2] -= 1
+                    if case[2] > 0:
+                        if self.peureuse():
+                            case[2] = self.oubli
+                        else:
+                            case[2] -= 1
                     if case[2] <= 0:
                         case[1] = 0
                         case[6] = 0
@@ -9736,12 +9834,6 @@ class Esprit_humain(Esprit_type):
         return 5 in self.corps.keys() and self.corps[5] in ["humain","attente","fuite","deplacement","attaque","vivant"] #J'ai un doute sur la possibilité des deux derniers mais bon...
 
     def decide(self):
-        bourrins = []
-        fuyards = []
-        soigneurs = []
-        soutiens = []
-        humains = []
-        autres = []
         for corp in self.corps.keys():
             if corp == 2:
                 self.controleur.get_entitee(corp).recontrole()
@@ -9754,16 +9846,19 @@ class Esprit_humain(Esprit_type):
                     self.deplace(corp)
 
     def deplace_humain(self,ID_humain):
-        res = None
+        res = "attente"
         humain = self.controleur.get_entitee(ID_humain)
         humain.skill_courant = None
         if humain.identite == "joueur":
             humain.recontrole()
+            humain.statut = "joueur"
+            humain.statut_humain = "joueur"
             if humain.skill_courant in [Skill_stomp,Skill_attaque]:
                 res = "attaque"
             else:
                 res = "deplacement"
         else:
+            humain.statut_humain = "proximite"
             if humain.mouvement == 0: #0 pour aller vers, et 1 pour chercher
                 if isinstance(humain.cible_deplacement,int):
                     if not(self.controleur.est_item(humain.cible_deplacement)):
@@ -9778,15 +9873,22 @@ class Esprit_humain(Esprit_type):
                 pos_cibles = self.controleur.get_pos_touches(cible,portee,propagation = "C__S___",direction = None,traverse="tout",responsable=0)
             else:
                 pos_cibles = [humain.get_position()]
+                humain.statut_humain = "exploration"
             if humain.position in pos_cibles: #Tout va bien, on y est ! On peut combattre, par exemple.
                 Esprit.deplace(self,ID_humain)
             else:
+                res = "recherche"
                 self.resoud(cible,10,5)
                 position = humain.get_position()
                 case = self.vue[position[0]][position[1]][position[2]]
                 cases = [[-1,case[0],case[3],case[4],case[5]]]
                 dirs = []
                 importance = 0
+                humain.statut_humain = "en chemin"
+                if case[5] == 0:
+                    humain.statut_humain = "perdu"
+                    if humain.ID == 4:
+                        humain.statut_humain = "paume"
                 for i in range(4):
                     if case[7][i]:
                         if case[7][i][0] in self.vue.keys():
@@ -9808,7 +9910,7 @@ class Esprit_humain(Esprit_type):
                             if libre:
                                 cases.append([i,case_pot[0],case_pot[3],case_pot[4],case_pot[5]])
                                 dirs.append(i)
-                if res == None: #On n'a pas d'ennemi à portée directe (ou on ne souhaite pas attaquer ni fuir)
+                if res == "recherche": #On n'a pas d'ennemi à portée directe (ou on ne souhaite pas attaquer ni fuir)
                     comportement = humain.comporte_distance()
                     if comportement == 0 : #Foncer tête baissée ! Pour les combattants au corps à corps
                         res = "deplacement"
@@ -9836,7 +9938,9 @@ class Esprit_humain(Esprit_type):
                                                     humain.attaque(i)
                                                     res = "attaque"
                     elif case[5] == 0 and  case[4] == 0:
+                        humain.statut = "paix"
                         if not isinstance(humain,Sentinelle):
+                            humain.statut = "exploration"
                             if len(dirs)>1: #On peut se permettre de choisir
                                 if humain.dir_regard != None: #L'agissant regarde quelque part
                                     dir_back = [HAUT,DROITE,BAS,GAUCHE][humain.dir_regard-2]
@@ -9845,6 +9949,7 @@ class Esprit_humain(Esprit_type):
                             humain.va(dirs[random.randint(0,len(dirs)-1)]) #/!\ Ne pas retourner sur ses pas, c'est bien ! Aller vers les endroits inconnus, ce serait mieux. /!\
                     else:
                         if res == "deplacement":
+                            humain.statut = "approche"
                             new_cases = sorted(cases,key=operator.itemgetter(4,2,3))
                             if new_cases[-1][0] != -1: #La dernière case (i.e. les valeurs les plus élevées) n'est pas celle où l'on est
                                 humain.va(new_cases[-1][0])
@@ -9853,6 +9958,7 @@ class Esprit_humain(Esprit_type):
                             else:
                                 res = humain.agit_en_vue(self)
                         elif res == "fuite":
+                            humain.statut = "fuite"
                             for case in cases:
                                 case[4] *= -1
                             new_cases = sorted(cases,key=operator.itemgetter(4,2,3))
@@ -9908,8 +10014,6 @@ class Esprit_humain(Esprit_type):
 ##                                res = humain.agit_en_vue(self) #Pas de résultat par défaut
 ##                        else : #Accès direct à un ennemi ! Et on a un bon endroit pour fuir !
 ##                            humain.va(dir_choix)
-
-        return res
 
 class Esprit_slime(Esprit_type):
     """Un esprit qui dirige un ou plusieurs slimes. Peut interragir avec d'autres esprits slimes."""
@@ -10913,9 +11017,9 @@ class Mur_plein(On_try_through):
         if not(self.casse) :
             self.action(mur,entitee)
 
-    def get_skin(self):
+    def get_skin(self,code):
         if not(self.casse) :
-            return SKIN_MUR
+            return SKINS_MURS[code]
         else:
             return SKIN_MUR_CASSE
 
@@ -10930,8 +11034,8 @@ class Mur_impassable(On_try_through):
     def execute(self,mur,entitee):
         self.action(mur,entitee)
 
-    def get_skin(self):
-        return SKIN_MUR
+    def get_skin(self,code):
+        return SKINS_MURS[code]
 
 class Porte(On_try_through):
     """L'effet qui correspond à la présence d'une porte sur le passage de l'entitée (une porte et un mur plein peuvent se cumuler, mais ce n'est pas conseillé)."""
@@ -13263,24 +13367,152 @@ class Affichage:
 
     def dessine_droite(self,joueur): #La fonction qui dessine le rectangle de droite. Elle affiche le joueur, son interlocuteur ou son ennemi, sur fond de labyrinthe. Elle fait appel a des graphiques presque déjà complets (une couche pour le labyrinthe, une autre pour l'agissant, une troisième pour les équippements de l'agissant, une quatrième pour une expression du visage.
 
-        marge_haut = self.position_debut_y_rectangles_et_carre + 2
+        marge_gauche = self.position_debut_x_rectangle_2+9
+        marge_haut = self.position_debut_y_rectangles_et_carre+5
+
+        police=pygame.font.SysFont(None, 20)
 
         skill = trouve_skill(joueur.classe_principale,Skill_observation)
 
         observation = 0
 
-        for i in range(len(self.messages)-1,-1,-1):
-            message = self.messages[i]
-            if skill != None:
-                observation = skill.utilise() #On le réactive à chaque fois qu'on observe quelque chose !
-            message[1]-=1
-            if message[2]<=observation:
-                police=pygame.font.SysFont(None, 20)
-                texte = POLICE20.render(message[0],True,(0,0,0))
-                self.screen.blit(texte,(self.position_debut_x_rectangle_2+2,marge_haut))
-                marge_haut += 20
-            if message[1] == 0:
-                self.messages.remove(message)
+        curseur = joueur.curseur
+
+        couleur_curseur_actif = (255,64,0)
+
+        esprit = joueur.controleur.get_esprit(joueur.esprit)
+
+        curseur_in = esprit.curseur
+
+        corps = esprit.get_corps_vus(joueur.position[0])
+        ennemis = esprit.get_ennemis_vus(joueur.position[0])
+        ID_courant = 0
+
+        if curseur == "rectangle_d" or curseur == "in_esprit": #Le curseur est sur le rectangle de droite, on l'a déjà dessiné en dessinant les zones
+
+            #Les copains d'abord :
+
+            if (curseur == "rectangle_d" and curseur_in == "corps") or curseur_in == "in_corps":
+                pygame.draw.rect(self.screen,(130,130,130),(marge_gauche-4,marge_haut,48,44*len(corps)+4))
+                pygame.draw.rect(self.screen,(2,83,9),(marge_gauche-2,marge_haut+2,44,44*len(corps)))
+                ID_courant = sorted(esprit.corps)[esprit.item_courant]
+
+            elif curseur == "in_esprit" and curseur_in == "corps":
+                pygame.draw.rect(self.screen,couleur_curseur_actif,(marge_gauche-4,marge_haut,48,44*len(corps)+4))
+                pygame.draw.rect(self.screen,(2,83,9),(marge_gauche-2,marge_haut+2,44,44*len(corps)))
+                ID_courant = sorted(esprit.corps)[esprit.item_courant]
+
+            else:
+                pygame.draw.rect(self.screen,(2,83,9),(marge_gauche-4,marge_haut,48,44*len(corps)+4))
+
+            marge_haut += 4
+
+            for i in range(len(corps)):
+                if corps[i].ID == ID_courant :
+                    if curseur_in == "in_corps":
+                        pygame.draw.rect(self.screen,couleur_curseur_actif,(marge_gauche-1,marge_haut-1,42,42))
+                        pygame.draw.rect(self.screen,(200,200,200),(marge_gauche+1,marge_haut+1,38,38))
+                    else:
+                        pygame.draw.rect(self.screen,(130,130,130),(marge_gauche-1,marge_haut-1,42,42))
+                        pygame.draw.rect(self.screen,(200,200,200),(marge_gauche+1,marge_haut+1,38,38))
+                else:
+                    pygame.draw.rect(self.screen,(200,200,200),(marge_gauche-1,marge_haut-1,42,42))
+                agissant = corps[i]
+                taille = 40
+                position = (marge_gauche,marge_haut)
+                direction = agissant.get_direction()
+                arme = agissant.inventaire.arme
+                if arme != None:
+                    joueur.controleur.get_entitee(arme).get_skin().dessine_toi(self.screen,position,taille,direction)
+                agissant.get_skin().dessine_toi(self.screen,position,taille,direction)
+                armure = agissant.inventaire.armure
+                if armure != None:
+                    joueur.controleur.get_entitee(armure).get_skin().dessine_toi(self.screen,position,taille,direction)
+                bouclier = agissant.inventaire.bouclier
+                if bouclier != None:
+                    joueur.controleur.get_entitee(bouclier).get_skin().dessine_toi(self.screen,position,taille,direction)
+                haume = agissant.inventaire.haume
+                agissant.get_skin_tete().dessine_toi(self.screen,position,taille,direction) #Avoir éventuellement la tête dans une autre direction ?
+                if haume != None:
+                    joueur.controleur.get_entitee(haume).get_skin().dessine_toi(self.screen,position,taille,direction)
+                for statut in agissant.get_skins_statuts():
+                    statut.dessine_toi(self.screen,position,taille)
+                for effet in agissant.effets:
+                    if effet.affiche:
+                        effet.get_skin().dessine_toi(self.screen,position,taille,direction)
+                self.screen.blit(pygame.transform.scale(pygame.image.load("Jeu/Skins/barre_de_vie.png").convert_alpha(),(int(taille*((16*agissant.pv)/(19*agissant.pv_max))),int(taille*(16/19)))),(position[0]+int(taille*(3/19)),position[1]+int(taille*(3/19))))
+                marge_haut += 44
+
+            #Puis les ennemis :
+            if ennemis != []:
+
+                marge_haut += 5
+
+                if (curseur == "rectangle_d" and curseur_in == "ennemis") or curseur_in == "in_ennemis":
+                    pygame.draw.rect(self.screen,(130,130,130),(marge_gauche-4,marge_haut,48,44*len(ennemis)+4))
+                    pygame.draw.rect(self.screen,(61,6,1),(marge_gauche-2,marge_haut+2,44,44*len(ennemis)))
+                    ID_courant = sorted(esprit.ennemis)[esprit.item_courant]
+
+                elif curseur == "in_esprit" and curseur_in == "ennemis":
+                    pygame.draw.rect(self.screen,couleur_curseur_actif,(marge_gauche-4,marge_haut,48,44*len(ennemis)+4))
+                    pygame.draw.rect(self.screen,(61,6,1),(marge_gauche-2,marge_haut+2,44,44*len(ennemis)))
+                    ID_courant = sorted(esprit.ennemis)[esprit.item_courant]
+
+                else:
+                    pygame.draw.rect(self.screen,(2,83,9),(marge_gauche-4,marge_haut,48,44*len(ennemis)+4))
+
+                marge_haut += 4
+
+                for i in range(len(ennemis)):
+                    if ennemis[i].ID == ID_courant :
+                        if curseur_in == "in_ennemis":
+                            pygame.draw.rect(self.screen,couleur_curseur_actif,(marge_gauche-1,marge_haut-1,42,42))
+                            pygame.draw.rect(self.screen,(200,200,200),(marge_gauche+1,marge_haut+1,38,38))
+                        else:
+                            pygame.draw.rect(self.screen,(130,130,130),(marge_gauche-1,marge_haut-1,42,42))
+                            pygame.draw.rect(self.screen,(200,200,200),(marge_gauche+1,marge_haut+1,38,38))
+                    else:
+                        pygame.draw.rect(self.screen,(200,200,200),(marge_gauche-1,marge_haut-1,42,42))
+                    agissant = ennemis[i]
+                    taille = 40
+                    position = (marge_gauche,marge_haut)
+                    direction = agissant.get_direction()
+                    arme = agissant.inventaire.arme
+                    if arme != None:
+                        joueur.controleur.get_entitee(arme).get_skin().dessine_toi(self.screen,position,taille,direction)
+                    agissant.get_skin().dessine_toi(self.screen,position,taille,direction)
+                    armure = agissant.inventaire.armure
+                    if armure != None:
+                        joueur.controleur.get_entitee(armure).get_skin().dessine_toi(self.screen,position,taille,direction)
+                    bouclier = agissant.inventaire.bouclier
+                    if bouclier != None:
+                        joueur.controleur.get_entitee(bouclier).get_skin().dessine_toi(self.screen,position,taille,direction)
+                    haume = agissant.inventaire.haume
+                    agissant.get_skin_tete().dessine_toi(self.screen,position,taille,direction) #Avoir éventuellement la tête dans une autre direction ?
+                    if haume != None:
+                        joueur.controleur.get_entitee(haume).get_skin().dessine_toi(self.screen,position,taille,direction)
+                    if isinstance(agissant,Humain) and agissant.dialogue > 0:
+                        SKIN_DIALOGUE.dessine_toi(self.screen,position,taille)
+                    for effet in agissant.effets:
+                        if effet.affiche:
+                            effet.get_skin().dessine_toi(self.screen,position,taille,direction)
+                    self.screen.blit(pygame.transform.scale(pygame.image.load("Jeu/Skins/barre_de_vie.png").convert_alpha(),(int(taille*((16*agissant.pv)/(19*agissant.pv_max))),int(taille*(16/19)))),(position[0]+int(taille*(3/19)),position[1]+int(taille*(3/19))))
+                    marge_haut += 44
+
+# Repenser les messages
+
+##        for i in range(len(self.messages)-1,-1,-1):
+##            message = self.messages[i]
+##            if skill != None:
+##                observation = skill.utilise() #On le réactive à chaque fois qu'on observe quelque chose !
+##            message[1]-=1
+##            if message[2]<=observation:
+##                police=pygame.font.SysFont(None, 20)
+##                texte = POLICE20.render(message[0],True,(0,0,0))
+##                self.screen.blit(texte,(self.position_debut_x_rectangle_2+2,marge_haut))
+##                marge_haut += 20
+##            if message[1] == 0:
+##                self.messages.remove(message)
 
     def dessine_droite_dialogue(self,joueur): #La fonction qui écrit les dialogues à droite
         #Dans un jeu parfait, on aurait une image de l'interlocuteur au dessus des répliques
@@ -13428,7 +13660,7 @@ class Affichage:
         vue_x = position[1] - distance
         vue_y = position[2] - distance
         nb_cases = distance*2 + 1
-        taille_case = self.hauteur_exploitable // nb_cases
+        taille_case = int(self.hauteur_exploitable // nb_cases)
         hauteur_exploitee = taille_case * nb_cases
         marge = (self.hauteur_exploitable - hauteur_exploitee) // 2
         marge_haut = marge + self.position_debut_y_rectangles_et_carre
@@ -14946,9 +15178,11 @@ class Affichage:
                 mur = case.get_mur_dir(i)
                 for effet in mur.effets:
                     if effet.affiche:
-                        if isinstance(effet,Porte):
+                        if isinstance(effet,Porte) :
                             effet.get_skin(joueur.get_clees()).dessine_toi(self.screen,position,taille,i)
-                        else:
+                        elif isinstance(effet,(Mur_plein,Mur_impassable)) :
+                            effet.get_skin(vue[6]).dessine_toi(self.screen,position,taille,i)
+                        else :
                             effet.get_skin().dessine_toi(self.screen,position,taille,i)
             for effet in case.effets:
                 if effet.affiche:
