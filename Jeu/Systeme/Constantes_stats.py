@@ -17,6 +17,8 @@ CONSTANTES_STATS = {
         'doigts':10,
         'magies':False,
         'items':['Armure_dor','Lance_dor'],
+        'forme':"homme",
+        'forme_tete':"joueur",
         'special':True},
     #L'épéiste à l'accueil (stats non définitives, à retravailler)
     "receptionniste":{
@@ -35,6 +37,8 @@ CONSTANTES_STATS = {
         'doigts':10,
         'magies':False,
         'items':['Epee_epeiste','Armure_epeiste'],
+        'forme':"homme",
+        'forme_tete':"receptionniste",
         'special':False},
     #Le mec paumé du premier labyrinthe (stats non définitives, à retravailler)
     "paume":{
@@ -53,6 +57,8 @@ CONSTANTES_STATS = {
         'doigts':10,
         'magies':False,
         'items':['Tunique_enchantee'], #Un item défensif très puissant, même si on le confondrait aisément avec un T-shirt. Mais qui est ce mec ?
+        'forme':"gros",
+        'forme_tete':"paume",
         'special':False},
     #La meuf peureuse des premiers monstres (stats non définitives, à retravailler)
     "peureuse":{
@@ -71,6 +77,8 @@ CONSTANTES_STATS = {
         'doigts':10,
         'magies':['Magie_multi_boost','Magie_boost'], #/!\ Ajouter les magies de soutien ici !
         'items':['Robe_magique'], #Peut-être un ou deux anneaux ?
+        'forme':"femme",
+        'forme_tete':"peureuse",
         'special':False},
     #Le mec chelou qui se prend pour Dieu
     "codeur":{
@@ -89,6 +97,8 @@ CONSTANTES_STATS = {
         'doigts':10,
         'magies':False,
         'items':False,
+        'forme':"indefini",
+        'forme_tete':"sans_tete",
         'special':False},
     #Le mec chiant enfermé à clé (stats non définitives, à retravailler)
     "encombrant":{
@@ -107,6 +117,8 @@ CONSTANTES_STATS = {
         'doigts':10,
         'magies':False,
         'items':['Epee_epeiste','Armure_epeiste'],
+        'forme':"homme",
+        'forme_tete':"encombrant",
         'special':False},
     #L'alchimiste de l'étage des potions (stats non défintitves, à retravailler):
     "alchimiste":{
@@ -125,6 +137,8 @@ CONSTANTES_STATS = {
         'doigts':10,
         'magies':['Magie_poing_magique','Magie_secousse'],
         'items':['Tunique_alchimiste'], #Un baton, peut-être ? Ça ne ferait pas beaucoup de sens mais il lui faut des objets
+        'forme':"homme",
+        'forme_tete':"alchimiste",
         'special':False},
     #La sainte monstrophobe (stats non défintitves, à retravailler):
     "peste":{
@@ -143,6 +157,8 @@ CONSTANTES_STATS = {
         'doigts':10,
         'magies':['Magie_soin','Magie_auto_soin','Magie_multi_soin','Magie_purification'], # /!\ Rajouter la purification
         'items':['Soutane'], #Quelques reliques
+        'forme':"femme",
+        'forme_tete':"peste",
         'special':False},
     #La magicienne (stats non défintitves, à retravailler):
     "bombe_atomique":{
@@ -161,6 +177,8 @@ CONSTANTES_STATS = {
         'doigts':10,
         'magies':['Magie_brasier','Magie_poing_ardent','Magie_volcan'],
         'items':['Chapeau_de_sorciere','Robe_de_sorciere'],
+        'forme':"femme",
+        'forme_tete':"bombe_atomique",
         'special':False},
     #Le gros qui extorque des sous (stats non définitives, à retravailler)
     "marchand":{
@@ -179,6 +197,8 @@ CONSTANTES_STATS = {
         'doigts':10,
         'magies':False,
         'items':['Epee_marchand','Armure_marchand'],
+        'forme':"homme",
+        'forme_tete':"marchand",
         'special':False},
     #Le gobelin de base (faible, très faible, presque autant que les slimes en terme de stats brutes)
     "gobelin":{
@@ -197,6 +217,8 @@ CONSTANTES_STATS = {
         'doigts':8,
         'magies':False,
         'items':['Epee_de_gobelin'],
+        'forme':"gobelin",
+        'forme_tete':"gobelin",
         'special':False},
     #Le gobelin sentinelle
     "sentinelle_gobelin":{
@@ -215,6 +237,8 @@ CONSTANTES_STATS = {
         'doigts':8,
         'magies':False,
         'items':['Armure_sentinelle_gobelin','Haume_de_gobelin','Lance_de_gobelin'],
+        'forme':"gobelin",
+        'forme_tete':"gobelin",
         'special':False},
     #Le guerrier gobelin
     "guerrier_gobelin":{
@@ -233,6 +257,8 @@ CONSTANTES_STATS = {
         'doigts':8,
         'magies':False,
         'items':['Cimetere_de_gobelin','Armure_guerrier_gobelin'],
+        'forme':"gobelin",
+        'forme_tete':"gobelin",
         'special':False},
     #L'explorateur gobelin
     "explorateur_gobelin":{
@@ -251,6 +277,8 @@ CONSTANTES_STATS = {
         'doigts':8,
         'magies':False,
         'items':False,
+        'forme':"gobelin",
+        'forme_tete':"gobelin",
         'special':False},
     #Le mage gobelin
     "mage_gobelin":{
@@ -267,8 +295,10 @@ CONSTANTES_STATS = {
         'aff_o':[0,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9],
         'especes':['gobelin'],
         'doigts':8,
-        'magies':['Magie_poing_magique'],
+        'magies':['Magie_poing_magique','Magie_petite_secousse'],
         'items':['Bandeau_de_gobelin'],
+        'forme':"gobelin",
+        'forme_tete':"gobelin",
         'special':False},
     #Le shaman gobelin
     "shaman_gobelin":{
@@ -287,6 +317,8 @@ CONSTANTES_STATS = {
         'doigts':8,
         'magies':['Magie_boost'], # /!\ À modifier
         'items':False,
+        'forme':"gobelin",
+        'forme_tete':"gobelin",
         'special':False},
     #Le chef gobelin
     "chef_gobelin":{
@@ -305,6 +337,8 @@ CONSTANTES_STATS = {
         'doigts':8,
         'magies':False,
         'items':['Armure_sentinelle_gobelin','Haume_de_gobelin','Epee_de_gobelin'], # + quelques anneaux ?
+        'forme':"gobelin",
+        'forme_tete':"gobelin",
         'special':False},
     #Le slime
     "slime":{
@@ -323,6 +357,8 @@ CONSTANTES_STATS = {
         'doigts':0,
         'magies':False, #Pas de magies à la création
         'items':False, #Les slimes ne peuvent pas porter d'équippement
+        'forme':"slime",
+        'forme_tete':"sans_tete",
         'special':False},
     #L'ombriul de base (plus puissant que les autres monstres de base)
     "ombriul":{
@@ -341,6 +377,8 @@ CONSTANTES_STATS = {
         'doigts':10,
         'magies':['Magie_poing_sombre'],
         'items':False,
+        'forme':"ombriul",
+        'forme_tete':"sans_tete",
         'special':False},
         }
 

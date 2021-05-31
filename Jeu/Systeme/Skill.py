@@ -58,6 +58,14 @@ class Skill_magie(Skill):
     def get_skin(self):
         return SKIN_SKILL_MAGIE_GRIS
 
+    def menu_magie(self):
+        res = []
+        for nom in self.magies.keys():
+            type_magie = self.magies[nom]
+            magie = type_magie(self.niveau)
+            res.append(magie)
+        return res
+
     def evo(self,nb_evo=1):
         for i in range(nb_evo):
             """fonction qui procède à l'évolution"""

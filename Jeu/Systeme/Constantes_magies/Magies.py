@@ -26,6 +26,7 @@ from Jeu.Systeme.Constantes_magies.Constantes_obscurite import *
 from Jeu.Systeme.Constantes_magies.Constantes_ombre_furtive import *
 from Jeu.Systeme.Constantes_magies.Constantes_perte_de_pm import *
 from Jeu.Systeme.Constantes_magies.Constantes_perte_de_pv import *
+from Jeu.Systeme.Constantes_magies.Constantes_petite_secousse import *
 from Jeu.Systeme.Constantes_magies.Constantes_poches_trouees import *
 from Jeu.Systeme.Constantes_magies.Constantes_poing_ardent import *
 from Jeu.Systeme.Constantes_magies.Constantes_poing_magique import *
