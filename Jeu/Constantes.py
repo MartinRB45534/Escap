@@ -361,8 +361,16 @@ global COMPLEMENT_CIBLE
 COMPLEMENT_CIBLE = 3
 global COMPLEMENT_COUT
 COMPLEMENT_COUT = 4
+global COMPLEMENT_MENU
+COMPLEMENT_MENU = 5
+global COMPLEMENT_DIR_PARCHEMIN
+COMPLEMENT_DIR_PARCHEMIN = 6
+global COMPLEMENT_CIBLE_PARCHEMIN
+COMPLEMENT_CIBLE_PARCHEMIN = 7
+global COMPLEMENT_COUT_PARCHEMIN
+COMPLEMENT_COUT_PARCHEMIN = 8
 global EVENEMENT
-EVENEMENT = 5
+EVENEMENT = 9
 
 global LEVELUP
 LEVELUP = 0
@@ -372,4 +380,4 @@ global COMPLEMENT_DIALOGUE
 COMPLEMENT_DIALOGUE = 2
 
 global LISTE_EXHAUSTIVE_DES_MAGIES_OFFENSIVES #Les magies qui créent un objet Attaque
-LISTE_EXHAUSTIVE_DES_MAGIES_OFFENSIVES = ["magie poing magique","magie poing ardent","magie secousse","magie volcan","magie explosion de mana","magie laser","magie brasier","magie avalanche"] #Je suis sur qu'il y en a d'autres
+LISTE_EXHAUSTIVE_DES_MAGIES_OFFENSIVES = ["magie poing magique","magie poing ardent","magie secousse","magie petite secousse","magie volcan","magie explosion de mana","magie laser","magie brasier","magie avalanche"] #Je suis sur qu'il y en a d'autres

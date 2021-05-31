@@ -1,8 +1,11 @@
 import pygame
+import copy
 
 pygame.init()
 screen = pygame.display.set_mode((1350, 690))
-##pygame.key.set_repeat(400,200) Ne supporte pas l'utilisation simultanée de plusieurs touches !
+
+global GLOBALS
+GLOBALS = {"controleur":None}
 
 from Jeu import * #Nécessaire ?
 from Jeu.Général import *
@@ -82,6 +85,7 @@ class Main: #Modifier le nom plus tard pour plus de cohérence
             while agissant.latence <= 0 and agissant.skill_courant != None : #Certains peuvent jouer plusieurs fois par tour !
                 self.controleur.fait_agir(agissant)
                 agissant.on_action()
+            agissant.on_action() #Pour les magies de parchemins
 
         for item in self.items_courants :
             while item.hauteur > 0 and item.latence <= 0:
@@ -109,6 +113,13 @@ class Main: #Modifier le nom plus tard pour plus de cohérence
         for esprit in self.esprits_courants:
             esprit.fin_tour()
 
+    def pseudo_fin_tour(self):
+        """La fonction qui fait la deuxième moitiée de chaque tour"""
+
+        joueur = self.controleur.entitees[2]
+        joueur.inventaire.nettoie_item()
+        joueur.affichage.dessine(joueur)
+
     def complement(self):
         #On doit complémenter une magie
 
@@ -121,6 +132,28 @@ class Main: #Modifier le nom plus tard pour plus de cohérence
         #On va laisser tout ça au joueur...
 
         self.controleur.entitees[2].complement() #Ça, c'est pour vérifier que le temps n'est pas écoulé
+
+    def complement_parchemin(self):
+        #On doit complémenter une magie lancée depuis un parchemin
+
+        #Il y a plein de types de magies différentes
+
+        #Il y a aussi une limite de temps
+
+        #Un affichage à gérer
+
+        #On va laisser tout ça au joueur...
+
+        self.controleur.entitees[2].complement_parchemin() #Ça, c'est pour vérifier que le temps n'est pas écoulé
+
+    def complement_menu(self):
+        #On doit choisir un élément d'un menu
+
+        #Sans limite de temps
+
+        #On va aussi laisser ça au joueur
+
+        pass #Rien à faire ici ?
 
     def touches(self):
         #On doit changer les touches du joueur
@@ -136,11 +169,11 @@ class Main: #Modifier le nom plus tard pour plus de cohérence
 
         self.controleur.entitees[2].evenement()
 
-    def affichage(self): #À supprimer quand je l'aurais incorporé
+    def affichage(self):
         pygame.display.flip()
 
-    def patiente(self,temps): #À supprimer quand je l'aurais incorporé
-        self.clock.tick(temps)
+    def patiente(self):
+        self.clock.tick(self.controleur.tour_par_seconde)
 
     def input(self): #À appeler régulièrement !
         """Fonction qui traite tous les inputs"""
@@ -150,6 +183,8 @@ class Main: #Modifier le nom plus tard pour plus de cohérence
         for event in events :
             if event.type == pygame.QUIT :
                 self.quitte() #Sauvegarde la partie en cours et ferme la fenêtre
+            elif (event.type == pygame.ACTIVEEVENT and event.state == 1) and (event.gain == 0 and not self.controleur.pause):
+                self.controleur.toogle_pause()
             elif event.type == pygame.VIDEORESIZE :
                 self.controleur.entitees[2].affichage.recalcule_zones()
             elif event.type == pygame.KEYDOWN :
@@ -174,15 +209,22 @@ class Main: #Modifier le nom plus tard pour plus de cohérence
 
             self.input()
             if self.controleur.phase == TOUR : #On continue un tour normal
-                self.fin_tour()
+                if self.controleur.pause: #Enfin, sauf si on est en pause
+                    self.pseudo_fin_tour()
+                else:
+                    self.fin_tour()
             elif self.controleur.phase  in [COMPLEMENT_CIBLE,COMPLEMENT_COUT,COMPLEMENT_DIR] : #Le joueur complète son choix d'action
                 self.complement()
+            elif self.controleur.phase == COMPLEMENT_MENU : #Le joueur modifie ses touches
+                self.complement_menu()
+            elif self.controleur.phase  in [COMPLEMENT_CIBLE_PARCHEMIN,COMPLEMENT_COUT_PARCHEMIN,COMPLEMENT_DIR_PARCHEMIN] : #Le joueur complète son choix d'action
+                self.complement_parchemin()
             elif self.controleur.phase == TOUCHE : #Le joueur modifie ses touches
                 self.touches()
             elif self.controleur.phase == EVENEMENT : #Un événement (montée de niveau, dialogue...) interrompt le jeu et le joueur doit réagir
                 self.evenement()
             self.affichage()
-            self.patiente(6)
+            self.patiente()
             new_courant = pygame.time.get_ticks()
             duree = new_courant - constantes_temps['courant']
             constantes_temps['reste'] += duree
@@ -209,14 +251,15 @@ class Main: #Modifier le nom plus tard pour plus de cohérence
 
         while run:
             boutons = [[f"Partie n°{i}",[50,30*i],["Un 'controleur'",f"Le joueur est au niveau {self.controleurs[i].entitees[2].niveau},",f"et a atteint l'étage {self.controleurs[i].entitees[2].position[0]}"],self.controleurs[i]] for i in range(len(self.controleurs))] + [
-             ["Nouveau",[50,30*len(self.controleurs)],["Lancer une nouvelle partie"],"new"],
-             ["Quitter",[50,30*len(self.controleurs)+30],["Quitter le 'joueur' et revenir à la liste des joueur"],True]]
+             ["Nouveau",[50,30*len(self.controleurs)],["Lancer une nouvelle partie"],"ctrln"],
+             ["Coller",[50,30*len(self.controleurs)+30],["Ajouter à ce joueur un 'controleur'","Pour transférer une partie d'un joueur à l'autre","Ou pour conserver une sauvegarde"],"ctrlv"],
+             ["Quitter",[50,30*len(self.controleurs)+60],["Quitter le 'joueur' et revenir à la liste des joueur"],True]]
             res = menu(boutons,screen)
             if res == False:
                 run = False
-            elif res == "new":
+            elif res == "ctrln":
                 boutons = [["Tutoriel",[50,30],["Un nouveau tutoriel","Les autres tutoriels en cours ne seront pas effacés","","Découvrez le monde d'Escap et rencontrez les pnjs"],"tuto"],
-                           ["Nouvelle partie",[50,60],["Une nouvelle partie","Les autres parties ne seront pas effacées"],"new"],
+                           ["Nouvelle salle",[50,60],["Une salle de test","N'y faites pas attention"],"new"],
                            ["Quitter",[50,90],["Quitter le menu de création de partie et revenir à la liste des parties en cours"],True]]
                 res = menu(boutons,screen)
                 if res == False:
@@ -233,10 +276,28 @@ class Main: #Modifier le nom plus tard pour plus de cohérence
                     self.controleurs.append(self.controleur)
                     self.controleur.tuto(screen)
                     self.boucle()
+            elif res == "ctrlv":
+                if GLOBALS["controleur"] != None:
+                    self.controleurs.append(copy.deepcopy(GLOBALS["controleur"]))
             elif isinstance(res,Controleur):
-                self.controleur = res
-                ID_MAX.set_id_max(max(self.controleur.entitees.keys()))
-                self.boucle()
+                boutons = [["Ouvrir",[50,30],["Reprendre cette partie où vous l'aviez laissée","","La partie sera automatiquement en pause"],"ctrlo"],
+                           ["Copier",[50,60],["Copier cette partie dans le presse-papier,","Pour pouvoir la coller autre-part"],"ctrlc"],
+                           ["Supprimer",[50,90],["Supprimer définitivement cette partie"],"supr"],
+                           ["Quitter",[50,120],["Quitter le menu d'ouverture de partie et revenir à la liste des parties en cours"],True]]
+                nres = menu(boutons,screen)
+                if nres == False:
+                    run = False
+                elif nres == "ctrlo":
+                    self.controleur = res
+                    ID_MAX.set_id_max(max(self.controleur.entitees.keys()))
+                    self.controleur.entitees[2].affichage.unclear(screen)
+                    self.boucle()
+                    run = False
+                elif nres == "ctrlc":
+                    res.entitees[2].affichage.clear()
+                    GLOBALS["controleur"] = res
+                elif nres == "supr":
+                    self.controleurs.remove(res)
             else:
                 print("Erreur menu true_main, res non reconnu")
                 print(res)

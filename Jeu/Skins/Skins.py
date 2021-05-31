@@ -1,18 +1,11 @@
-import pygame
-
-class Illustration:
-    def __init__(self,nom_fichier):
-        self.image = pygame.image.load("Jeu/Skins/"+nom_fichier).convert_alpha()
-
-    def dessine_toi(self,screen,position):
-        screen.blit(self.image,position)
-
-class Skin(Illustration):
-    def dessine_toi(self,screen,position,taille=40,direction=(0)):
-        screen.blit(pygame.transform.scale(pygame.transform.rotate(self.image,direction*-90),(taille,taille)),position)
+from Jeu.Skins.Vue.Skins_vue import *
 
 global SKIN_VIDE
 SKIN_VIDE = Skin("vide.png")
+global ILLUSTRATION_VIDE
+ILLUSTRATION_VIDE = Illustration("vide.png")
+global IMAGE_VIDE
+IMAGE_VIDE = Image("vide.png")
 global SKIN_DIRECTION
 SKIN_DIRECTION = Skin("direction.png")
 global SKIN_BROUILLARD
@@ -381,6 +374,8 @@ global SKIN_MAGIE_OMBRE_FURTIVE
 SKIN_MAGIE_OMBRE_FURTIVE = Skin("magie_ombre_furtive.png")
 global SKIN_MAGIE_ONDE_DE_CHOC
 SKIN_MAGIE_ONDE_DE_CHOC = Skin("magie_onde_de_choc.png")
+global SKIN_MAGIE_POING_MAGIQUE
+SKIN_MAGIE_POING_MAGIQUE = Skin("magie_poing_magique.png")
 global SKIN_MAGIE_PROTECTION
 SKIN_MAGIE_PROTECTION = Skin("magie_protection.png")
 global SKIN_MAGIE_REANIMATION_ZONE

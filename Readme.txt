@@ -43,22 +43,64 @@ Troisième étape : mains[0][2].boucle() et le jeu reprend immédiatement, attentio
 
 
 
+
+
+
+
+
+
+
+
+
+
+
 À mon attention :
+
+En cours (alchimiste) :
+- Parchemins imprégnés de magie (fait)
+- Parchemins divers
+- Potions de soin (un peu redondant avec la peste et les parchemins impregnés par la peste)
+- Potions de boost (un peu redondant avec la peureuse et les parchemins impregnés par la peureuse)
+- Potions de vitesse (vraiment utile ? tout le monde se plaint d'aller trop vite)
+- Potions diverses
+- Ingrédients (y compris les corps de monstres ?)
+- Identification d'objets (via un skill d'observation ?) (le joueur 'mémorise' l'identification ?)
+- Magie de sauvegarde temporelle
+- Magie de réactivation de la sauvegarde
+- Magies diverses
+- Monétisation
+
 
 Travail à faire :
 - Layout (prison, dialogues)
+  Prison :
+    - Petite salle avec une porte, clé obtenue par dialogue
+    - Petite salle avec deux portes, une clé sur le sol
+    - Couloir, deux sentinelles avec un passe-partout
+    - Salles actuelles (plus d'innaccessibles)
+    - Fin du couloir, escalier et salle du petit-ami (dialogue pour obtenir la clé ?)
+  Cuisine :
+    - Salle avec le PNJ, une porte et des portails
+    - "Dédale" de portails, avec quelques gobelins, des potions/parchemins/ingrédients et la clé
+    - Grande salle , avec quelques gobelins et un shaman (des marmites ? pour introduire la notions d'objets inamovibles)
 - Création (ombriuls)
-- Affichage (rectangle de droite, esprit)
 (- Modifier la fuite pour ne fuir que si un allié est accessible)
 - Équilibrer ! (tours par secondes, combats, jeter un oeil à l'XP obtenu)
 
-Les infos qu'on veut savoir dans le rectangle de droite :
-Pour les humains, leur statut de déplacement (cherche la sortie, à proximité de sa cible, connait le chemin vers sa cible, cherche un chemin vers sa cible, totalement perdu) (éventuellement indiquer s'il est au-dessus/en-dessous du joueur/de sa cible)
-Pour tous, leur statut de combat (pas d'ennemi en vue, fuite, soutien, attaque, se rapproche)
 
 
 
-Rejetter un oeil à la sauvegarde
+
+Retours expérience Clément :
+Pour l'équilibrage : premiers monstres one/two-shot, puis progression (créer des monstres spécialement affaiblis pour le tutoriel ? il faut que je le fasse pour le slime de toute façon)
+Potions : pour quoi faire ? Permanent/non permanent, affecte le joueur/les ennemis... Peut-être la portée
+Archer (impossible, mais des mages qui attaquent à distance, c'est faisable. pour remplacer les mages actuels qui sont vraiment faibles ? comment repérer facilement qui est responsable d'une attaque ? un seul mage par étage, par exemple ?)
+Plus d'accompagnement du joueur, plus d'explications. Diminuer la difficulté. C'est juste un tutoriel !
+
+
+
+
+
 
 Messages d'entrée pour certains étages ?
 
@@ -77,8 +119,6 @@ pour guider les joueurs qui ont pris le hint de Dev vers la voie de la connaissa
    - Mais la lente agonie que causent certaines maladies n'est pas sans rappeler l'engourdissement de la magie de congélation, liée à l'élément glace.
 En réalité, l'affinité élémentale des maladies dépend de la maladie en question, mais aussi parfois du mage responsable de son apparition. Bien malin qui peut dire, sans l'avoir observé, à quel élément est rattaché tel ou tel phénomène."
 pour informer les joueurs sur les maladies, et indiquer que l'observation permet de connaitre l'affinité de quelquechose.
-
-
 
 
 
