@@ -29,6 +29,9 @@ class Id_max:
 global POLICE20
 POLICE20 = pygame.font.SysFont(None, 20)
 
+global POLICE40
+POLICE40 = pygame.font.SysFont(None, 40)
+
 global ID_MAX
 ID_MAX = Id_max()
 

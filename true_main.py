@@ -7,16 +7,52 @@ screen = pygame.display.set_mode((1350, 690))
 global GLOBALS
 GLOBALS = {"controleur":None}
 
+from Menus import *
 from Jeu import * #Nécessaire ?
 from Jeu.Général import *
 from Jeu.Constantes import *
 
-global controleur #Pour pouvoir y accéder depuis l'extérieur / À remplacer par global main autre part
 
-class Main: #Modifier le nom plus tard pour plus de cohérence
+class True_joueur:
+    """Un "joueur". Correspondrait idéalement à une personne, à un compte. Pourrait nécessiter un mot de passe.
+       Contient les parties, les accomplissements (et skills globaux) et les paramètres de base."""
     def __init__(self,screen):
         self.screen = screen
         self.clock = pygame.time.Clock()
+        self.parametres = {"cat_touches":{pygame.K_UP:"directionelle", #Les touches directionnelles tournent le joueur
+                                          pygame.K_DOWN:"directionelle",
+                                          pygame.K_LEFT:"directionelle",
+                                          pygame.K_RIGHT:"directionelle",
+                                          pygame.K_q:"zone", #Les touches de zone déplacent le curseur sur l'affichage
+                                          pygame.K_z:"zone",
+                                          pygame.K_d:"zone",
+                                          pygame.K_s:"zone",
+                                          pygame.K_a:"zone",
+                                          pygame.K_e:"zone",
+                                          pygame.K_p:"skill", #Les skills simples ont leur touche attribuée
+                                          pygame.K_w:"skill",
+                                          pygame.K_x:"skill",
+                                          pygame.K_m:"skill",
+                                          pygame.K_r:"skill",
+                                          pygame.K_SPACE:"courant", #La barre espace sélectionne, valide, etc. l'objet courant. Elle ne peut pas être modifiée
+                                          pygame.K_BACKSPACE:"pause", #La touche d'effacement active/désactive la pause. Elle ne peut pas être modifiée
+                                          pygame.K_RETURN:"touches"}, #La touche Entrée confirme certains choix, ou peut modifier les touches. Elle ne peut pas être modifiée
+                           "dir_touches":{pygame.K_UP:HAUT, #Les touches associées à une direction
+                                          pygame.K_DOWN:BAS,
+                                          pygame.K_LEFT:GAUCHE,
+                                          pygame.K_RIGHT:DROITE,
+                                          pygame.K_q:GAUCHE,
+                                          pygame.K_z:HAUT,
+                                          pygame.K_d:DROITE,
+                                          pygame.K_s:BAS,
+                                          pygame.K_a:IN,
+                                          pygame.K_e:OUT},
+                           "skill_touches":{pygame.K_p:Skill_stomp, #Les touches associées à un skill.
+                                            pygame.K_m:Skill_ramasse,
+                                            pygame.K_w:Skill_deplacement,
+                                            pygame.K_x:Skill_attaque,
+                                            pygame.K_r:Skill_course}, #Rajouter un moyen de changer les paramètres du joueur
+                           "tours_par_seconde":6}
         self.controleurs = []
         self.controleur = None
         self.agissants_courants = []
@@ -65,13 +101,8 @@ class Main: #Modifier le nom plus tard pour plus de cohérence
 
         for agissant in self.agissants_courants :
             self.controleur.make_vue(agissant)
-            agissant.pseudo_debut_tour()
-        for item in self.items_courants :
-            item.pseudo_debut_tour()
         for lab in self.labs_courants:
             lab.pseudo_debut_tour()
-        for esprit in self.esprits_courants:
-            esprit.pseudo_debut_tour()
 
     def fin_tour(self):
         """La fonction qui fait la deuxième moitiée de chaque tour"""
@@ -189,6 +220,8 @@ class Main: #Modifier le nom plus tard pour plus de cohérence
                 self.controleur.entitees[2].affichage.recalcule_zones()
             elif event.type == pygame.KEYDOWN :
                 self.controleur.entitees[2].controle(event.key)
+            elif event.type == pygame.KEYUP :
+                self.controleur.entitees[2].decontrole(event.key)
 
     def quitte(self):
         """Fonction qui quitte le jeu, en sauvegardant le controleur"""
@@ -202,7 +235,7 @@ class Main: #Modifier le nom plus tard pour plus de cohérence
         constantes_temps['courant'] = pygame.time.get_ticks()
         while self.run : #Devient faux quand on quitte
             constantes_temps['tours']+=1
-            if self.controleur.phase == TOUR :
+            if self.controleur.phase == TOUR and not self.controleur.pause:
                 self.debut_tour()
             else :
                 self.pseudo_debut_tour() #Quelques trucs d'affichage
@@ -230,6 +263,116 @@ class Main: #Modifier le nom plus tard pour plus de cohérence
             constantes_temps['reste'] += duree
             constantes_temps['courant'] = new_courant
 
+    def start(self):
+        """Fonction qui commence une partie."""
+        clock = pygame.time.Clock()
+        panneau = 1
+        screen.fill((0,0,0))
+        largeur,hauteur = screen.get_size()
+        marge_haut = int(hauteur//2 - 345)
+        marge_gauche = int(largeur//2 - 675)
+        screen.blit(pygame.image.load("Instructions1.png"),(marge_gauche,marge_haut))
+        screen.blit(POLICE40.render("Échappez-vous du labyrinthe !",True,(255,255,255)),(marge_gauche+80,marge_haut+325))
+        screen.blit(POLICE40.render("Ne vous faites pas",True,(255,255,255)),(marge_gauche+372,marge_haut+450))
+        screen.blit(POLICE40.render("tuer par les monstres.",True,(255,255,255)),(marge_gauche+350,marge_haut+490))
+        screen.blit(POLICE40.render("Retrouvez les autres humains",True,(255,255,255)),(marge_gauche+832,marge_haut+40))
+        screen.blit(POLICE40.render("pour vous échapper tous ensemble.",True,(255,255,255)),(marge_gauche+800,marge_haut+80))
+        while panneau != 0:
+            events = pygame.event.get()
+            for event in events :
+                if event.type == pygame.QUIT :
+                    self.quitte() #Sauvegarde la partie en cours et ferme la fenêtre
+                elif event.type == pygame.VIDEORESIZE :
+                    self.controleur.entitees[2].affichage.recalcule_zones()
+                elif event.type == pygame.KEYDOWN :
+                    screen.fill((0,0,0))
+                    largeur,hauteur = screen.get_size()
+                    marge_haut = int(hauteur//2 - 345)
+                    marge_gauche = int(largeur//2 - 675)
+                    if event.key == pygame.K_LEFT and panneau > 1:
+                        panneau-=1
+                    elif event.key == pygame.K_RIGHT and panneau < 5:
+                        panneau+=1
+                    elif event.key == pygame.K_BACKSPACE:
+                        panneau = 0
+                    if panneau == 1:
+                        screen.blit(pygame.image.load("Instructions1.png"),(marge_gauche,marge_haut))
+                        screen.blit(POLICE40.render("Échappez-vous du labyrinthe !",True,(255,255,255)),(marge_gauche+80,marge_haut+325))
+                        screen.blit(POLICE40.render("Ne vous faites pas",True,(255,255,255)),(marge_gauche+372,marge_haut+450))
+                        screen.blit(POLICE40.render("tuer par les monstres.",True,(255,255,255)),(marge_gauche+350,marge_haut+490))
+                        screen.blit(POLICE40.render("Retrouvez les autres humains",True,(255,255,255)),(marge_gauche+832,marge_haut+40))
+                        screen.blit(POLICE40.render("pour vous échapper tous ensemble.",True,(255,255,255)),(marge_gauche+800,marge_haut+80))
+                    elif panneau == 2:
+                        screen.blit(pygame.image.load("Instructions2.png"),(marge_gauche,marge_haut))
+                        screen.blit(POLICE40.render("Déplacez le curseur",True,(255,255,255)),(marge_gauche+60,marge_haut+60))
+                        screen.blit(POLICE40.render("avec les touches de zone",True,(255,255,255)),(marge_gauche+60,marge_haut+100))
+                        screen.blit(POLICE40.render(f"{self.get_touches_zones()}",True,(255,255,255)),(marge_gauche+60,marge_haut+140))
+                        screen.blit(POLICE40.render("(modifiables)",True,(255,255,255)),(marge_gauche+60,marge_haut+180))
+                        screen.blit(POLICE40.render(f"{self.get_touche_zone(IN)}",True,(255,255,255)),(marge_gauche+140,marge_haut+500))
+                        screen.blit(POLICE40.render(f"{self.get_touche_zone(HAUT)}",True,(255,255,255)),(marge_gauche+230,marge_haut+500))
+                        screen.blit(POLICE40.render(f"{self.get_touche_zone(OUT)}",True,(255,255,255)),(marge_gauche+320,marge_haut+500))
+                        screen.blit(POLICE40.render(f"{self.get_touche_zone(GAUCHE)}",True,(255,255,255)),(marge_gauche+165,marge_haut+590))
+                        screen.blit(POLICE40.render(f"{self.get_touche_zone(BAS)}",True,(255,255,255)),(marge_gauche+255,marge_haut+590))
+                        screen.blit(POLICE40.render(f"{self.get_touche_zone(DROITE)}",True,(255,255,255)),(marge_gauche+345,marge_haut+590))
+                        screen.blit(POLICE20.render(f"Les touches {self.get_touche_zone(HAUT)} et {self.get_touche_zone(BAS)} permettent de",True,(0,255,0)),(marge_gauche+600,marge_haut+80))
+                        screen.blit(POLICE20.render("déplacer le curseur verticalement.",True,(0,255,0)),(marge_gauche+600,marge_haut+100))
+                        screen.blit(POLICE20.render(f"Les touches {self.get_touche_zone(GAUCHE)} et {self.get_touche_zone(DROITE)} permettent de",True,(255,0,0)),(marge_gauche+775,marge_haut+320))
+                        screen.blit(POLICE20.render("déplacer le curseur horizontalement.",True,(255,0,0)),(marge_gauche+775,marge_haut+340))
+                        screen.blit(POLICE20.render(f"Les touches {self.get_touche_zone(IN)} et {self.get_touche_zone(OUT)} permettent",True,(0,0,255)),(marge_gauche+1000,marge_haut+220))
+                        screen.blit(POLICE20.render("d'entrer dans un élément séléctionné",True,(0,0,255)),(marge_gauche+1000,marge_haut+240))
+                        screen.blit(POLICE20.render("et de ressortir vers une zone supérieure.",True,(0,0,255)),(marge_gauche+1000,marge_haut+260))
+                    elif panneau == 3:
+                        screen.blit(pygame.image.load("Instructions3.png"),(marge_gauche,marge_haut))
+                        screen.blit(POLICE40.render("Les flèches directionnelles permettent de diriger le joueur,",True,(255,255,255)),(marge_gauche+280,marge_haut+60))
+                        screen.blit(POLICE40.render("et de se déplacer dans tous les menus qui n'utilisent pas les touches de zone.",True,(255,255,255)),(marge_gauche+140,marge_haut+100))
+                        screen.blit(POLICE20.render("Les flèches directionnelles ne permettent PAS au joueur de se déplacer,",True,(255,255,255)),(marge_gauche+430,marge_haut+140))
+                        screen.blit(POLICE20.render("elles servent seulement à s'orienter (aussi pour les attaque etc.).",True,(255,255,255)),(marge_gauche+450,marge_haut+160))
+
+                        screen.blit(POLICE20.render("Les différentes actions du jeu correspondent généralement à l'utilisation d'un 'skill'.",True,(255,255,255)),(marge_gauche+410,marge_haut+300))
+                        screen.blit(POLICE20.render("Les commandes des skills sont explicitées en temps voulu par les personnages humains.",True,(255,255,255)),(marge_gauche+390,marge_haut+320))
+                        screen.blit(POLICE40.render("Il est donc fortement conseillé aux nouveaux joueur de discuter poliment avec les humains.",True,(255,255,255)),(marge_gauche+50,marge_haut+340))
+                        screen.blit(POLICE20.render("Les humains qui ont un point d'exclamation à côté de la tête requièrent un dialogue,",True,(255,255,255)),(marge_gauche+410,marge_haut+380))
+                        screen.blit(POLICE20.render("mais il est aussi possible de dialoguer de l'initiative du joueur.",True,(255,255,255)),(marge_gauche+450,marge_haut+400))
+                    elif panneau == 4:
+                        screen.blit(pygame.image.load("Instructions4.png"),(marge_gauche,marge_haut))
+                        screen.blit(POLICE20.render("La touche espace est utilisée pour valider certains choix",True,(255,255,255)),(marge_gauche+40,marge_haut+240))
+                        screen.blit(POLICE20.render("(choix de la réplique au cours d'un dialogue par exemple),",True,(255,255,255)),(marge_gauche+40,marge_haut+260))
+                        screen.blit(POLICE20.render("séléctionner une option parmi plusieurs",True,(255,255,255)),(marge_gauche+40,marge_haut+280))
+                        screen.blit(POLICE20.render("(choix des cibles d'une magie par exemple),",True,(255,255,255)),(marge_gauche+40,marge_haut+300))
+                        screen.blit(POLICE20.render("interagir avec l'environnement (dialoguer)",True,(255,255,255)),(marge_gauche+40,marge_haut+320))
+                        screen.blit(POLICE20.render("et utiliser l'élément sélectionné par les touches de zone",True,(255,255,255)),(marge_gauche+40,marge_haut+340))
+                        screen.blit(POLICE20.render("(appeler un allié humain lorsqu'il est loin,",True,(255,255,255)),(marge_gauche+40,marge_haut+360))
+                        screen.blit(POLICE20.render("utiliser/équipper un item, utiliser un skill).",True,(255,255,255)),(marge_gauche+40,marge_haut+380))
+                        screen.blit(POLICE20.render("La touche entrée est utilisée pour valider certains choix",True,(255,255,255)),(marge_gauche+700,marge_haut+400))
+                        screen.blit(POLICE20.render("(valider la sélection des cibles d'une magie par exemple).",True,(255,255,255)),(marge_gauche+700,marge_haut+420))
+                        screen.blit(POLICE20.render("Elle ouvre le menu des touches,",True,(255,255,255)),(marge_gauche+700,marge_haut+440))
+                        screen.blit(POLICE20.render("qui permet de consulter/modifier les touches de zone et de skill.",True,(255,255,255)),(marge_gauche+700,marge_haut+460))
+                        screen.blit(POLICE20.render("La touche retour permet de mettre le jeu en pause et de le remettre en marche.",True,(255,255,255)),(marge_gauche+830,marge_haut+40))
+                        screen.blit(POLICE20.render("Le jeu est automatiquement mis en pause lorsque la fenètre pas en arrière-plan.",True,(255,255,255)),(marge_gauche+830,marge_haut+60))
+                        screen.blit(POLICE20.render("Lorsqu'il est en pause, le jeu répond toujours aux commandes.",True,(255,255,255)),(marge_gauche+830,marge_haut+80))
+                        screen.blit(POLICE20.render("On peut choisir sa prochaine action, utiliser/équipper un item,",True,(255,255,255)),(marge_gauche+830,marge_haut+100))
+                        screen.blit(POLICE20.render("donner des consignes aux alliés, et simplement observer la situation.",True,(255,255,255)),(marge_gauche+830,marge_haut+120))
+                    elif panneau == 5:
+                        screen.blit(pygame.image.load("Instructions5.png"),(marge_gauche,marge_haut))
+                        screen.blit(POLICE40.render("Les touches à retenir :",True,(255,255,255)),(marge_gauche+540,marge_haut+200))
+                        screen.blit(POLICE40.render("La touche entrée pour consulter/modifier les touches paramétrables.",True,(255,255,255)),(marge_gauche+220,marge_haut+240))
+                        screen.blit(POLICE40.render("La touche espace pour dialoguer, sélectionner, utiliser.",True,(255,255,255)),(marge_gauche+280,marge_haut+280))
+                        screen.blit(POLICE40.render("La touche retour pour sortir de la pause, et pour quitter/sauter ces explications.",True,(255,255,255)),(marge_gauche+140,marge_haut+320))
+                        screen.blit(POLICE40.render("Bon jeu !",True,(255,255,255)),(marge_gauche+620,marge_haut+360))
+
+            pygame.display.flip()
+            clock.tick(20)
+        self.boucle()
+
+    def get_touches_zones(self):
+        return f"{self.get_touche_zone(IN)}, {self.get_touche_zone(OUT)}, {self.get_touche_zone(HAUT)}, {self.get_touche_zone(BAS)}, {self.get_touche_zone(GAUCHE)} et {self.get_touche_zone(DROITE)}"
+
+    def get_touche_zone(self,direction):
+        for key in self.parametres["dir_touches"].keys():
+            if self.parametres["cat_touches"][key] == "zone" and self.parametres["dir_touches"][key] == direction:
+                return pygame.key.name(key).upper()
+        return 0
+
     def clear(self):
         """Fonction qui enlève tous les éléments superflus avant une sauvegarde."""
         #On veut juste conserver le (les, bientôt j'espère) controleur
@@ -237,6 +380,7 @@ class Main: #Modifier le nom plus tard pour plus de cohérence
         self.clock = None
         for controleur in self.controleurs:
             controleur.entitees[2].affichage.clear()
+        self.controleur = None
 
     def charge(self,screen):
         self.screen = screen
@@ -250,40 +394,40 @@ class Main: #Modifier le nom plus tard pour plus de cohérence
         global ID_MAX
 
         while run:
-            boutons = [[f"Partie n°{i}",[50,30*i],["Un 'controleur'",f"Le joueur est au niveau {self.controleurs[i].entitees[2].niveau},",f"et a atteint l'étage {self.controleurs[i].entitees[2].position[0]}"],self.controleurs[i]] for i in range(len(self.controleurs))] + [
-             ["Nouveau",[50,30*len(self.controleurs)],["Lancer une nouvelle partie"],"ctrln"],
-             ["Coller",[50,30*len(self.controleurs)+30],["Ajouter à ce joueur un 'controleur'","Pour transférer une partie d'un joueur à l'autre","Ou pour conserver une sauvegarde"],"ctrlv"],
-             ["Quitter",[50,30*len(self.controleurs)+60],["Quitter le 'joueur' et revenir à la liste des joueur"],True]]
+            boutons = [[f"Partie n°{i}",["Un 'controleur'",f"Le joueur est au niveau {self.controleurs[i].entitees[2].niveau},",f"et a atteint l'étage {self.controleurs[i].entitees[2].position[0]}"],self.controleurs[i]] for i in range(len(self.controleurs))] + [
+             ["Nouveau",["Lancer une nouvelle partie"],"ctrln"],
+             ["Coller",["Ajouter à ce joueur un 'controleur'","Pour transférer une partie d'un joueur à l'autre","Ou pour conserver une sauvegarde"],"ctrlv"],
+             ["Quitter",["Quitter le 'joueur' et revenir à la liste des joueur"],True]]
             res = menu(boutons,screen)
             if res == False:
                 run = False
             elif res == "ctrln":
-                boutons = [["Tutoriel",[50,30],["Un nouveau tutoriel","Les autres tutoriels en cours ne seront pas effacés","","Découvrez le monde d'Escap et rencontrez les pnjs"],"tuto"],
-                           ["Nouvelle salle",[50,60],["Une salle de test","N'y faites pas attention"],"new"],
-                           ["Quitter",[50,90],["Quitter le menu de création de partie et revenir à la liste des parties en cours"],True]]
+                boutons = [["Tutoriel",["Un nouveau tutoriel","Les autres tutoriels en cours ne seront pas effacés","","Découvrez le monde d'Escap et rencontrez les pnjs"],"tuto"],
+                           ["Nouvelle salle",["Une salle de test","N'y faites pas attention"],"new"],
+                           ["Quitter",["Quitter le menu de création de partie et revenir à la liste des parties en cours"],True]]
                 res = menu(boutons,screen)
                 if res == False:
                     run = False
                 elif res == "new":
                     ID_MAX.set_id_max(10)
-                    self.controleur = Controleur()
+                    self.controleur = Controleur(self.parametres,self.screen)
                     self.controleurs.append(self.controleur)
                     self.controleur.jeu(screen)
-                    self.boucle()
+                    self.start()
                 elif res == "tuto":
                     ID_MAX.set_id_max(10)
-                    self.controleur = Controleur()
+                    self.controleur = Controleur(self.parametres,self.screen)
                     self.controleurs.append(self.controleur)
                     self.controleur.tuto(screen)
-                    self.boucle()
+                    self.start()
             elif res == "ctrlv":
                 if GLOBALS["controleur"] != None:
                     self.controleurs.append(copy.deepcopy(GLOBALS["controleur"]))
             elif isinstance(res,Controleur):
-                boutons = [["Ouvrir",[50,30],["Reprendre cette partie où vous l'aviez laissée","","La partie sera automatiquement en pause"],"ctrlo"],
-                           ["Copier",[50,60],["Copier cette partie dans le presse-papier,","Pour pouvoir la coller autre-part"],"ctrlc"],
-                           ["Supprimer",[50,90],["Supprimer définitivement cette partie"],"supr"],
-                           ["Quitter",[50,120],["Quitter le menu d'ouverture de partie et revenir à la liste des parties en cours"],True]]
+                boutons = [["Ouvrir",["Reprendre cette partie où vous l'aviez laissée","","La partie sera automatiquement en pause"],"ctrlo"],
+                           ["Copier",["Copier cette partie dans le presse-papier,","Pour pouvoir la coller autre-part"],"ctrlc"],
+                           ["Supprimer",["Supprimer définitivement cette partie"],"supr"],
+                           ["Quitter",["Quitter le menu d'ouverture de partie et revenir à la liste des parties en cours"],True]]
                 nres = menu(boutons,screen)
                 if nres == False:
                     run = False
@@ -291,6 +435,7 @@ class Main: #Modifier le nom plus tard pour plus de cohérence
                     self.controleur = res
                     ID_MAX.set_id_max(max(self.controleur.entitees.keys()))
                     self.controleur.entitees[2].affichage.unclear(screen)
+                    self.controleur.pause = True
                     self.boucle()
                     run = False
                 elif nres == "ctrlc":
@@ -301,53 +446,3 @@ class Main: #Modifier le nom plus tard pour plus de cohérence
             else:
                 print("Erreur menu true_main, res non reconnu")
                 print(res)
-
-def menu(boutons,screen):
-    res = False
-    curseur = 0
-    clock = pygame.time.Clock()
-    while not(res):
-        #Récupération / traitement des inputs :
-        events = pygame.event.get()
-        for event in events:
-            if event.type == pygame.QUIT:
-                res = True
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
-                    res = boutons[curseur][3]
-                elif event.key == pygame.K_UP:
-                    if curseur == 0:
-                        curseur = len(boutons)
-                    curseur -= 1
-                elif event.key == pygame.K_DOWN:
-                    curseur += 1
-                    if curseur == len(boutons):
-                        curseur = 0
-                
-                
-
-        #Affichage :
-        screen.fill((0,0,0))
-        for i in range(len(boutons)) :
-            if i == curseur:
-                pygame.draw.rect(screen,(155,155,155),(boutons[i][1][0]-2,boutons[i][1][1]-2,104,22))
-                descr = boutons[i][2]
-            pygame.draw.rect(screen,(255,255,255),(boutons[i][1][0],boutons[i][1][1],100,18))
-            text = POLICE20.render(boutons[i][0],True,(0,0,0))
-            screen.blit(text,(boutons[i][1][0]+4,boutons[i][1][1]+2))
-
-        y = 20
-        for tex in descr :
-            line = POLICE20.render(tex,True,(255,255,255))
-            screen.blit(line,(150,y))
-            y += 30
-
-        pygame.display.flip()
-        clock.tick(20)
-    if res == True:
-        res = False
-    return res
-
-##global main
-##main = Main(screen)
-##main.start_game()

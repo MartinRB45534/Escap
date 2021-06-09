@@ -58,6 +58,8 @@ Troisième étape : mains[0][2].boucle() et le jeu reprend immédiatement, attentio
 
 En cours (alchimiste) :
 - Parchemins imprégnés de magie (fait)
+- Parchemin de défense (placer un enchantement de défense sur les alliés)
+- Parchemin de téléportation (fait)
 - Parchemins divers
 - Potions de soin (un peu redondant avec la peste et les parchemins impregnés par la peste)
 - Potions de boost (un peu redondant avec la peureuse et les parchemins impregnés par la peureuse)
@@ -69,6 +71,15 @@ En cours (alchimiste) :
 - Magie de réactivation de la sauvegarde
 - Magies diverses
 - Monétisation
+
+
+
+Comment fonctionne l'alchimie ?
+1 ou plusieurs ingrédients + mana + argent = potion ou parchemin
+Éventuellement le résultat final peut être une amélioration d'un item du joueur ?
+Les ingrédients sont une catégorie d'items distincte des autres. On peut en trouver par terre ou les acheter au marchand (?)
+Certains ingrédients proviennent de monstres (dents de gobelin, peau de gobelin, etc.) et peuvent être trouvés là où il y a beaucoup de ces monstres. Mais il n'y a personne dans le labyrinthe qui sache extraire ces ingrédients des cadavres, donc on est obligé de passer par le marchand.
+Recettes simples (pas plus d'un ingrédient par recette dans le tutoriel)
 
 
 Travail à faire :
@@ -87,6 +98,22 @@ Travail à faire :
 (- Modifier la fuite pour ne fuir que si un allié est accessible)
 - Équilibrer ! (tours par secondes, combats, jeter un oeil à l'XP obtenu)
 
+TODO (global) :
+Étages (0/100)
+Dialogues
+Cinématiques
+Menus/interfaces "hors-jeu" (images)
+PNJs
+Skills et classes
+Ennemis
+
+Plus précisément :
+Donner au tank une compétence de provocation
+Décider des ingrédients pour l'alchimiste et implémenter les recettes
+Implémenter les achats/vente
+Modification de la vitesse dans le menu des touches
+Système de 'cible' pour indiquer qui les gens attaquent
+
 
 
 
@@ -98,7 +125,18 @@ Archer (impossible, mais des mages qui attaquent à distance, c'est faisable. pou
 Plus d'accompagnement du joueur, plus d'explications. Diminuer la difficulté. C'est juste un tutoriel !
 
 
-
+Retours expérience Martin + idée potions et parchemins :
+Shaman + mage + guerrier/sentinelle = très puissant (l'étage des potions est devenu difficile)
+Shamans + mages + guerriers/sentinelles = trop puissant (l'étage des meutes est devenu quasi-impossible (et encore, il n'y a pas d'effet de surprise pour moi))
+4 PNJs qui colent le joueur à travers tout l'étage des potions = salles blindées, déplacements difficiles
+Donc :
+Explication des controles de PNJs (les ordres qu'on peut leur donner, comment vérifier leur état avec le rectangle de droite, comment les rappeler)
+Explication de l'inventaire et de la pause (comment ouvrir l'inventaire, y aller, y sélectionner une potion/un parchemin et l'utiliser, et comment mettre le jeu en pause avant de faire tout ça)
+Potions de renforcement temporaire (renforcement de la défense principalement, de la vitesse aussi)
+Parchemins d'attaque à distance puissante, pour éliminer les shamans (ingrédients très rares, donc à utiliser avec modération)
+"Protection sacrée", utilisée par la sainte lorsque tout le monde est full-health, qui bloque certaines attaques ?
+Modifier les consignes de fuite (les PNJs prennent bien trop de risques actuellement)
+2 shaman + 1 mage = une attaque à 40 dégats. Pour des humains qui ont 50 à 150 PVs et blessés par d'autres gobelin, c'est la mort instantannée.
 
 
 

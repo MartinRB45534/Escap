@@ -8,112 +8,90 @@ screen = pygame.display.set_mode((1350, 690))
 
 from true_main import *
 
-#Les objets qu'on va manipuler :
+class Main():
+    """Parce que sans ça on a plein de problèmes avec les variables globales."""
+    def __init__(self):
+        self.mains=[]
+    def observe(self):
+        """Fonction qui observe le répertoire courant et cherche des Main à ouvrir, puis les ouvre
+           En entrée : rien
+           En sortie : rien"""
+        self.quitte() #D'abord, on ferme tout !
 
-global mains #Pour que le programmeur puisse y accéder
-mains = []
-
-#Les fonctions (actions qu'on va faire) :
-
-def observe():
-    """Fonction qui observe le répertoire courant et cherche des Main à ouvrir, puis les ouvre
-       En entrée : rien
-       En sortie : rien"""
-    quitte() #D'abord, on ferme tout !
-
-    #On récupère notre chemin :
-    chemin = os.path.abspath(".")
-    fichiers = os.listdir(chemin)
-    for nom_fichier in fichiers :
-        if nom_fichier [-2:] == ".p":
-            fichier = open(nom_fichier,'rb')
-            try:
-                main_potentiel = pickle.load(fichier)
-            except EOFError:
-                print("Le fichier " + nom_fichier + " est vide. Création d'un nouvel utilisateur.")
-                mains.append([len(mains),nom_fichier[:-2],Main(screen)])
-            else:
-                if isinstance(main_potentiel,Main):
-                    mains.append([len(mains),nom_fichier[:-2],main_potentiel])
-                    main_potentiel.charge(screen)
-                    print("Chargement_réussi !")
+        #On récupère notre chemin :
+        chemin = os.path.abspath(".")
+        fichiers = os.listdir(chemin)
+        for nom_fichier in fichiers :
+            if nom_fichier [-2:] == ".p":
+                print(f"Chargement de {nom_fichier}")
+                fichier = open(nom_fichier,'rb')
+                try:
+                    main_potentiel = pickle.load(fichier)
+                except EOFError:
+                    print(f"Le fichier est vide. Création d'un nouvel utilisateur.")
+                    self.mains.append([len(self.mains),nom_fichier[:-2],True_joueur(screen)])
                 else:
-                    print("Ce fichier n'a pas pu être interprêté comme un main ! Pourquoi ?")
-            fichier.close()
+                    if isinstance(main_potentiel,True_joueur):
+                        self.mains.append([len(self.mains),nom_fichier[:-2],main_potentiel])
+                        main_potentiel.charge(screen)
+                        print("Chargement réussi !")
+                    else:
+                        print("Ce fichier n'a pas pu être interprêté comme un main ! Pourquoi ?")
+                fichier.close()
 
-def sauve(nom):
-    """Fonction qui sauvegarde un main dans le répertoire courant
-       En entrée : le nom du main à sauvegarder
-       En sortie : rien"""
-    #On ne peut pas pickler les pygame.Surface (c'est à dire les images). Comme les skins ne sont pas directement modifiés par le jeu, on peut s'en délester :
-    for i in range(len(mains)):
-        if mains[i][1] == nom:
-            main = mains[i][2]
-    main.clear()
-    #On récupère notre chemin :
-    chemin = os.path.abspath(".")
-    fichier = open(chemin+"/"+nom+".p",'wb')
-    pickle.dump(main,fichier)
-    fichier.close()
-            
-def quitte():
-    """Fonction qui sauvegarde et ferme la fenêtre
-       En entrée : rien
-       En sortie : rien"""
+    def sauve(self,nom):
+        """Fonction qui sauvegarde un main dans le répertoire courant
+           En entrée : le nom du main à sauvegarder
+           En sortie : rien"""
+        #On ne peut pas pickler les pygame.Surface (c'est à dire les images). Comme les skins ne sont pas directement modifiés par le jeu, on peut s'en délester :
+        print(f"Sauvegarde de {nom}.p")
+        for i in range(len(self.mains)):
+            if self.mains[i][1] == nom:
+                main = self.mains[i][2]
+        main.clear()
+        #On récupère notre chemin :
+        chemin = os.path.abspath(".")
+        fichier = open(chemin+"/"+nom+".p",'wb')
+        pickle.dump(main,fichier)
+        fichier.close()
+        print("Sauvegarde réussie")
+                
+    def quitte(self):
+        """Fonction qui sauvegarde et ferme la fenêtre
+           En entrée : rien
+           En sortie : rien"""
 
-    
-    global mains
-    for i in range(len(mains)):
-        sauve(mains[i][1])
-    mains = []
+        print("Début de la sauvegarde...")
+        for i in range(len(self.mains)):
+            self.sauve(self.mains[i][1])
+        self.mains = []
 
-def ouvre(i):
-    main = mains[i][2]
+    def ouvre(self,i):
 
-    return main.ouvre()
+        main = self.mains[i][2]
+        return main.ouvre()
 
-def alll():
-    #On boucle, avec input pour ouvrir un main
-    run = True
+    def alll(self):
+        #On boucle, avec input pour ouvrir un main
+        run = True
 
-    while run:
-        boutons = [[mains[i][1],[50,30*i],[mains[i][1],"Un 'joueur'",f"Il a {len(mains[i][2].controleurs)} parties en cours"],mains[i][2]] for i in range(len(mains))] + [["Charger",[50,30*len(mains)],["Charger un nouveau 'joueur' depuis le dossier courant","Pour créer un nouveau 'joueur', placer un fichier 'nom_du_joueur.p' vide dans le dossier courant"],"new"],["Quitter",[50,30*len(mains)+30],["Quitter le jeu et fermer la fenêtre"],True]]
-        res = menu(boutons,screen)
-        if res == False:
-            run = False
-        elif res == "new":
-            observe()
-        elif isinstance(res,Main):
-            res.ouvre()
-        else:
-            print("Erreur menu main, res non reconnu")
-            print(res)
-            
+        while run:
+            boutons = [[self.mains[i][1],[self.mains[i][1],"Un 'joueur'",f"Il a {len(self.mains[i][2].controleurs)} parties en cours"],self.mains[i][2]] for i in range(len(self.mains))] + [["Charger",["Charger un nouveau 'joueur' depuis le dossier courant","Pour créer un nouveau 'joueur', placer un fichier 'nom_du_joueur.p' vide dans le dossier courant"],"new"],["Quitter",["Quitter le jeu et fermer la fenêtre"],True]]
+            res = menu(boutons,screen)
+            if res == False:
+                run = False
+            elif res == "new":
+                self.observe()
+            elif isinstance(res,True_joueur):
+                res.ouvre()
+            else:
+                print("Erreur menu main, res non reconnu")
+                print(res)
+        self.quitte()
 
-##        for event in pygame.event.get():
-##            if event.type == pygame.QUIT:
-##                run = False
-##            elif event.type == pygame.MOUSEBUTTONDOWN:
-##                if event.button == 1:
-##                    pos_clique = event.pos
-##                    if 50<pos_clique[0]<100:
-##                        for i in range(len(mains)):
-##                            if pos_boutons[i][1] < pos_clique[1] < pos_boutons[i][1] + 18:
-##                                run = ouvre(i)
-##                        #On teste si la souris était sur quelque chose
-##
-##        screen.fill((0,0,0))
-##        for i in range(len(mains)):
-##            pygame.draw.rect(screen,(255,255,255),(pos_boutons[i][0],pos_boutons[i][1],50,18))
-##            titre=POLICE20.render(mains[i][1],True,(0,0,0))
-##            screen.blit(titre,(pos_boutons[i][0]+4,pos_boutons[i][1]+2))
-##
-##        pygame.display.flip()
-
-    quitte()
-
-observe()
-alll()
+main = Main()
+main.observe()
+main.alll()
 
 
 

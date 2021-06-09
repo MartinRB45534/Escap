@@ -135,7 +135,7 @@ CONSTANTES_STATS = {
         'aff_o':[0,1,1,1,1,1,1,1,1,1,1],
         'especes':['humain'],
         'doigts':10,
-        'magies':['Magie_poing_magique','Magie_secousse'],
+        'magies':['Magie_poing_magique','Magie_secousse','Magie_teleportation'],
         'items':['Tunique_alchimiste'], #Un baton, peut-être ? Ça ne ferait pas beaucoup de sens mais il lui faut des objets
         'forme':"homme",
         'forme_tete':"alchimiste",
@@ -155,7 +155,7 @@ CONSTANTES_STATS = {
         'aff_o':[0,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5],
         'especes':['humain'],
         'doigts':10,
-        'magies':['Magie_soin','Magie_auto_soin','Magie_multi_soin','Magie_purification'], # /!\ Rajouter la purification
+        'magies':['Magie_soin','Magie_auto_soin','Magie_multi_soin','Magie_purification','Magie_protection_sacree'],
         'items':['Soutane'], #Quelques reliques
         'forme':"femme",
         'forme_tete':"peste",

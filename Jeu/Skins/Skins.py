@@ -94,6 +94,8 @@ global SKIN_STATUT_SOIN
 SKIN_STATUT_SOIN = Skin("statut_soin.png")
 global SKIN_STATUT_ATTAQUE
 SKIN_STATUT_ATTAQUE = Skin("statut_attaque.png")
+global SKIN_STATUT_ATTAQUE_BOOSTEE
+SKIN_STATUT_ATTAQUE_BOOSTEE = Skin("statut_attaque_boostee.png")
 global SKIN_STATUT_RAPPROCHE
 SKIN_STATUT_RAPPROCHE = Skin("statut_approche.png")
 global SKIN_STATUT_CHERCHE
@@ -246,8 +248,14 @@ global SKIN_ATTAQUE_OMBRE
 SKIN_ATTAQUE_OMBRE = Skin("attaque_8.png")
 global SKIN_DOPAGE
 SKIN_DOPAGE = Skin("dopage.png")
+global SKIN_PROTECTION
+SKIN_PROTECTION = Skin("protection.png")
+global SKIN_PROTECTION_SACREE
+SKIN_PROTECTION_SACREE = Skin("protection_sacree.png")
 global SKIN_SOIN
 SKIN_SOIN = Skin("soin.png")
+global SKIN_TELEPORTATION
+SKIN_TELEPORTATION = Skin("teleportation.png")
 global SKIN_MAGIE
 SKIN_MAGIE = Skin("magie.png")
 
@@ -378,6 +386,10 @@ global SKIN_MAGIE_POING_MAGIQUE
 SKIN_MAGIE_POING_MAGIQUE = Skin("magie_poing_magique.png")
 global SKIN_MAGIE_PROTECTION
 SKIN_MAGIE_PROTECTION = Skin("magie_protection.png")
+global SKIN_MAGIE_PROTECTION_SACREE
+SKIN_MAGIE_PROTECTION_SACREE = Skin("magie_protection_sacree.png")
+global SKIN_MAGIE_PURIFICATION
+SKIN_MAGIE_PURIFICATION = Skin("magie_purification.png")
 global SKIN_MAGIE_REANIMATION_ZONE
 SKIN_MAGIE_REANIMATION_ZONE = Skin("magie_reanimation_zone.png")
 global SKIN_MAGIE_RESERVE
@@ -394,6 +406,8 @@ global SKIN_MAGIE_SOIN_SUPERIEUR
 SKIN_MAGIE_SOIN_SUPERIEUR = Skin("magie_soin_superieur.png")
 global SKIN_MAGIE_SOIN_ZONE
 SKIN_MAGIE_SOIN_ZONE = Skin("magie_soin_zone.png")
+global SKIN_MAGIE_TELEPORTATION
+SKIN_MAGIE_TELEPORTATION = Skin("magie_teleportation.png")
 global SKIN_MAGIE_VISION
 SKIN_MAGIE_VISION = Skin("magie_vision.png")
 
