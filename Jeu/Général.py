@@ -4,6 +4,7 @@ from Jeu.Systeme.Constantes_magies.Magies import *
 from Jeu.Systeme.Constantes_projectiles.Projectiles import *
 from Jeu.Systeme.Constantes_items.Items import *
 from Jeu.Systeme.Constantes_stats import *
+from Jeu.Dialogues.Dialogues import *
 from Jeu.Skins.Skins import *
 import operator
 import random
@@ -65,9 +66,9 @@ class Controleur():
 
         self.esprits["joueur"] = Esprit_humain(2,self)
 
-##        autre = Alchimiste(self,("Étage 1 : test",1,0))
-##        self.ajoute_entitee(autre)
-##        self.esprits["alchimiste"] = Esprit_humain(autre.ID,self)
+        autre = Peste(self,("Étage 1 : test",1,0))
+        self.ajoute_entitee(autre)
+        self.esprits["peste"] = Esprit_humain(autre.ID,self)
 
         gobel1 = Chef_gobelin(self,("Étage 1 : test",11,15),1)
         self.ajoute_entitee(gobel1)
@@ -5875,140 +5876,73 @@ class Receptionniste(Dps,Humain): #Le deuxième humain du jeu, à l'étage 1 (en
         #On initialise nos attributs
         self.replique_courante = 0
         #La plupart dépendent du dialogue
-        if self.dialogue == -1: #Le joueur est venu nous voir de son propre chef
-            self.replique = "Qu'est-ce que je peux faire pour toi ?"
-            self.repliques = ["Va quelque part.","Change ta méthode de combat.","C'est une question personnelle."] #La question personnelle est pour quand le joueur veut faire avancer les interractions.
-        elif self.dialogue == -2: #Le joueur est venu nous voir avant d'être sorti du premier couloir
-            self.replique = "Qu'est-ce qu'il y a ?"
-            self.repliques = ["Je ne trouve pas l'escalier.","Il n'y a pas d'autre chemin ?","Merci encore pour ton aide."]
+        if self.dialogue == -2: #Le joueur est venu nous voir avant d'être sorti du premier couloir
+            self.replique = "dialogue-2phrase1"
+            self.repliques = ["dialogue-2reponse1.1","dialogue-2reponse1.2","dialogue-2reponse1.3"]
         elif self.dialogue == 1: #Le joueur vient de tomber
-            self.replique = "Quelle chute ! Tu vas bien ? Appuie sur Espace si tu peux m'entendre."
-            self.repliques = [""]
+            self.replique = "dialogue1phrase1"
+            self.repliques = ["dialogue1reponse1.1"]
         elif self.dialogue == 2: #Le joueur vient de se dégourdir les jambes
-            self.replique = "Alors, ça va mieux ?"
-            self.repliques = ["Oui, un peu. Où est-on ?","Je suis en pleine forme maintenant ! Où est-ce que je devrais aller ?"]
+            self.replique = "dialogue2phrase1"
+            self.repliques = ["dialogue2reponse1.1","dialogue2reponse1.2"]
 
     def interprete(self,nb_replique):
         #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
-        if nb_replique in range(len(self.repliques)): #Une vérification stupide, au cas où
-            replique = self.repliques[nb_replique] #Donc la réplique est la phrase que le joueur à choisi
-        else:
-            print("Mais quel est l'idiot qui m'a codé ça comme un pied ?")
-            print(self.repliques)
-            print(nb_replique)
-            return
+        replique = self.repliques[nb_replique] #Donc la réplique est la phrase que le joueur à choisi
         #Il suffit de savoir quelle phrase le joueur a choisi pour réagir en conséquence
 
         #Premier dialogue
         #Le receptionniste accueil le joueur
-        if replique == "":
-            self.replique="Tu peux te lever ? Utilise les flèches directionnelles pour te diriger, et W pour marcher. Appuie sur Espace à côté de moi pour revenir me parler."
-            self.repliques = ["Merci pour ton aide."]
-        elif replique == "Merci pour ton aide.":
+        if replique == "dialogue1reponse1.1":
+            self.replique="dialogue1phrase1.1"
+            self.repliques = ["dialogue1reponse1.1.1"]
+        elif replique == "dialogue1reponse1.1.1":
             self.appreciations[0]+= 0.5
             self.end_dialogue(2)
 
         #Deuxième dialogue
         #Le receptionniste guide le joueur vers l'escalier
-        elif replique == "Oui, un peu. Où est-on ?":
-            self.replique = "Dans le labyrinthe de [insérer le nom de la montagne/mine/caverne ici]. La sortie est gardée par un [insérer le nom du boss ici] que je n'ai pas réussi à vaincre."
-            self.repliques = ["Un [insérer le nom du boss ici] ? J'en ai croisé un là-haut, il m'a fait tomber ici.","La sortie ? Où ça ?"]
-        elif replique == "Un [insérer le nom du boss ici] ? J'en ai croisé un là-haut, il m'a fait tomber ici.":
-            self.replique = "Heureusement que ton armure t'a protégé de la chute..."
-            self.repliques = ["Et du coup, où est la sortie ?"]
-        elif replique == "Et du coup, où est la sortie ?":
-            self.replique = "Il y a un escalier au bout du couloir, à droite."
-            self.repliques = [" "]
-        elif replique == "La sortie ? Où ça ?":
-            self.replique = "Il y a un escalier au bout du couloir, à droite."
-            self.repliques = [" "]
-        elif replique == "Je suis en pleine forme maintenant ! Où est-ce que je devrais aller ?":
-            self.replique = "Il y a un escalier au bout du couloir, à droite."
-            self.repliques = [" "]
-        elif replique == " ":
+        elif replique == "dialogue2reponse1.1":
+            self.replique = "dialogue2phrase1.1"
+            self.repliques = ["dialogue2reponse1.1.1","dialogue2reponse1.1.2"]
+        elif replique == "dialogue2reponse1.1.1":
+            self.replique = "dialogue2phrase1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1":
+            self.replique = "dialogue2phrase1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1"]
+        elif replique == "dialogue2reponse1.1.2":
+            self.replique = "dialogue2phrase1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1"]
+        elif replique == "dialogue2reponse1.2":
+            self.replique = "dialogue2phrase1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1":
             self.end_dialogue(-2)
 
-        elif replique == "Je ne trouve pas l'escalier.":
-            self.replique = "Au bout du couloir, à droite."
-            self.repliques = [" "]
-        elif replique == "Il n'y a pas d'autre chemin ?":
-            self.replique = "Il y a bien une porte tout à gauche, mais elle est fermée à clée."
-            self.repliques = ["Tant pis. Je vais essayer l'escalier alors."]
-        elif replique == "Tant pis. Je vais essayer l'escalier alors.":
-            self.replique = "Bon courage !"
-            self.repliques = [" "]
-        elif replique == "Merci encore pour ton aide.":
-            self.replique = "De rien."
-            self.repliques = [" "]
-
-        #Dialogue par défaut:
-        elif replique == "Va quelque part.":
-            self.replique = "Où ?"
-            self.repliques = ["Tu peux suivre quelqu'un ?","Tu vois là-bas ?","Cherche la sortie."]
-        elif replique == "Tu peux suivre quelqu'un ?":
-            self.mouvement = 0
-            self.replique = "Oui, qui ?"
-            self.repliques = ["Moi.","Je vais te montrer."]
-        elif replique == "Moi.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
-        elif replique == "Je vais te montrer.":
-            self.controleur.get_entitee(2).start_select_agissant_dialogue()
-            self.controleur.get_entitee(2).event = COMPLEMENT_DIALOGUE
-        elif replique == "Tu vois là-bas ?":
-            self.controleur.get_entitee(2).start_select_case_dialogue()
-            self.controleur.get_entitee(2).event = COMPLEMENT_DIALOGUE
-        elif replique == "Cherche la sortie.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.mouvement = 1
-        elif replique == "Change ta méthode de combat.":
-            self.replique = "Envers les ennemis, ou les monstres neutres ?"
-            self.repliques = ["Les ennemis, ceux qui nous ont déjà attaqués.","Les neutres."]
-        elif replique == "Les ennemis, ceux qui nous ont déjà attaqués.":
-            self.replique = "Qu'est-ce que je leur fait ?"
-            self.repliques = ["Attaque-les, ils nous ont attaqué en premier.","Ignore-les, on a plus important à faire.","Fuis-les, ça sera plus sûr."]
-        elif replique == "Attaque-les, ils nous ont attaqué en premier.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_ennemis = 0
-        elif replique == "Ignore-les, on a plus important à faire.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_ennemis = 1
-        elif replique == "Fuis-les, ça sera plus sûr.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_ennemis = 2
-        elif replique == "Les neutres.":
-            self.replique = "Qu'est-ce que je leur fait ?"
-            self.repliques = ["Attaque-les, l'attaque est la meilleure défense.","Ignore-les, tant qu'ils ne nous agressent pas.","Fuis-les, tous les monstres sont dangereux."]
-        elif replique == "Attaque-les, l'attaque est la meilleure défense.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_neutres = 0
-        elif replique == "Ignore-les, tant qu'ils ne nous agressent pas.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_neutres = 1
-        elif replique == "Fuis-les, tous les monstres sont dangereux.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_neutres = 2
-        elif replique == "Merci.":
-            self.end_dialogue(-1)
-        elif replique == "C'est une question personnelle.":
-            self.replique = "On a pas vraiment le temps, là..."
-            self.repliques = ["Ah, c'est vrai..."]
-        elif replique == "Ah, c'est vrai...":
-            self.end_dialogue(-1)
+        elif replique == "dialogue-2reponse1.1":
+            self.replique="dialogue-2phrase1.1"
+            self.repliques = ["dialogue-2reponse1.1.1"]
+        elif replique == "dialogue-2reponse1.2":
+            self.replique = "dialogue-2phrase1.2"
+            self.repliques = ["dialogue-2reponse1.2.1"]
+        elif replique == "dialogue-2reponse1.2.1":
+            self.replique = "dialogue-2phrase1.2.1"
+            self.repliques = ["dialogue-2reponse1.1.1"]
+        elif replique == "dialogue-2reponse1.3":
+            self.replique = "dialogue-2phrase1.3"
+            self.repliques = ["dialogue-2reponse1.1.1"]
+        elif replique == "dialogue-2reponse1.1.1":
+            self.end_dialogue(-2)
 
         else:
             self.end_dialogue(self.dialogue)
             print("Je ne connais pas cette réplique !")
 
         self.replique_courante = 0
+
+    def get_replique(self,code):
+        return REPLIQUES_RECEPTIONNISTE[code]
 
     def get_skin_tete(self):
         return SKIN_TETE_RECEPTIONNISTE
@@ -6052,23 +5986,23 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
         self.replique_courante = 0
         #La plupart dépendent du dialogue
         if self.dialogue == -1: #Le joueur est venu nous voir de son propre chef
-            self.replique = "Je peux me rendre utile ?"
-            self.repliques = ["Va quelque part.","Change ta méthode de combat.","J'aimerais parler avec toi."] #La question personnelle est pour quand le joueur veut faire avancer les interractions.
+            self.replique = "dialogue-1phrase1"
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"] #La question personnelle est pour quand le joueur veut faire avancer les interractions.
         elif self.dialogue == -2: #Le joueur nous a très mal traité
-            self.replique = "Quoi ?"
-            self.repliques = ["Rien !","Tu veux que je t'aide à sortir d'ici ?","Je voudrais m'excuser pour ce que j'ai dit."]
+            self.replique = "dialogue-2phrase1"
+            self.repliques = ["dialogue-2reponse1.1","dialogue-2reponse1.2","dialogue-2reponse1.3"]
         elif self.dialogue == 1: #Le joueur vient d'arriver depuis le premier étage
-            self.replique = "Quelle chance, il y a quelqu'un ici !"
-            self.repliques = ["Bonjour...","Je ne fais que passer, au-revoir."]
+            self.replique = "dialogue1phrase1"
+            self.repliques = ["dialogue1reponse1.1","dialogue1reponse1.2"]
         elif self.dialogue == 2: #On a vaincu le premier monstre !
-            self.replique = "Le gobelin est mort !"
-            self.repliques = ["Oui ! Mais il nous a blessés...","Pff, trop facile !","Je n'ai pas tout compris..."]
+            self.replique = "dialogue2phrase1"
+            self.repliques = ["dialogue2reponse1.1","dialogue2reponse1.2","dialogue2reponse1.3"]
         elif self.dialogue == 3: #On a vaincu le premier mage !
-            self.replique = "Il était coriace, celui-là !"
-            self.repliques = ["C'est peu de le dire ! Qu'est-ce que c'était que ces attaques à distance !?","Mais non, c'était facile !"]
+            self.replique = "dialogue3phrase1"
+            self.repliques = ["dialogue3reponse1.1","dialogue3reponse1.2"]
         elif self.dialogue == 4: #On a atteint la prison
-            self.replique = "Est-ce que tu vois ces portes dans les murs autour de toi ?"
-            self.repliques = ["Oui.","Ces barres oranges ?","Évidemment, je ne suis pas aveugle !"]
+            self.replique = "dialogue4phrase1"
+            self.repliques = ["dialogue4reponse1.1","dialogue4reponse1.2","dialogue4reponse1.3"]
 
     def interprete(self,nb_replique):
         #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
@@ -6077,65 +6011,65 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
 
         #Premier dialogue
         #Le joueur arrive par l'escalier
-        if replique == "Bonjour...":
-            self.replique="Où est-ce que tu vas comme ça ?"
-            self.repliques = ["Je cherche la sortie."]
-        elif replique == "Je cherche la sortie.":
-            self.replique="Ces grottes sont un vrai labyrinthe, tu risquerais de te perdre !"
-            self.repliques = ["Je vais y aller quand même.","Il y a un autre chemin ?"]
-        elif replique == "Il y a un autre chemin ?":
-            self.replique="Non..."
-            self.repliques = ["Alors je n'ai pas d'autre choix que d'y aller"]
-        elif replique in ["Je vais y aller quand même.","Alors je n'ai pas d'autre choix que d'y aller"]:
-            self.replique="Ton courage est impressionnant ! Moi, je suis ici depuis plusieurs jours."
-            self.repliques = ["Tu peux venir avec moi, si ça te rassure.","Tu es vraiment pathétique."]
-        elif replique == "Tu peux venir avec moi, si ça te rassure.":
-            self.replique="Merci beaucoup ! N'hésite pas à me demander si tu as besoin de quelque-chose."
-            self.repliques = ["Je ferai appel à toi."]
+        if replique == "dialogue1reponse1.1":
+            self.replique="dialogue1phrase1.1"
+            self.repliques = ["dialogue1reponse1.1.1"]
+        elif replique == "dialogue1reponse1.1.1":
+            self.replique="dialogue1phrase1.1.1"
+            self.repliques = ["dialogue1reponse1.1.1.1","dialogue1reponse1.1.1.2"]
+        elif replique == "dialogue1reponse1.1.1.2":
+            self.replique="dialogue1phrase1.1.1.2"
+            self.repliques = ["dialogue1reponse1.1.1.2.1"]
+        elif replique in ["dialogue1reponse1.1.1.1","dialogue1reponse1.1.1.2.1"]:
+            self.replique="dialogue1phrase1.1.1.1"
+            self.repliques = ["dialogue1reponse1.1.1.1.1","dialogue1reponse1.1.1.1.2"]
+        elif replique == "dialogue1reponse1.1.1.1.1":
+            self.replique="dialogue1phrase1.1.1.1.1"
+            self.repliques = ["dialogue1reponse1.1.1.1.1.1"]
             self.appreciations[0]+= 0.5
-        elif replique == "Je ferai appel à toi.":
-            self.replique="Au fait, tu peux courir avec R, mais évite de me perdre de vue s'il te plaît !"
-            self.repliques=["Merci du conseil."]
-        elif replique == "Merci du conseil.":
+        elif replique == "dialogue1reponse1.1.1.1.1.1":
+            self.replique="dialogue1phrase1.1.1.1.1.1"
+            self.repliques=["dialogue1reponse1.1.1.1.1.1.1"]
+        elif replique == "dialogue1reponse1.1.1.1.1.1.1":
             self.end_dialogue()
             self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
             self.mouvement = 0 #Légèrement redondant ici
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
             self.attente = False
-        elif replique == "Tu es vraiment pathétique.":
+        elif replique == "dialogue1reponse1.1.1.1.2":
             self.appreciations[0]-= 0.5
             self.end_dialogue(-2)
             self.statut_humain = "exploration"
-        elif replique == "Je ne fais que passer, au-revoir.":
+        elif replique == "dialogue1reponse1.2":
             self.appreciations[0]-= 0.5
             self.end_dialogue(-2)
             self.statut_humain = "exploration"
 
         #Dialogue par défaut -2
-        elif replique == "Rien !":
+        elif replique == "dialogue-2reponse1.1":
             self.end_dialogue(-2)
             self.statut_humain = "exploration"
-        elif replique == "Tu veux que je t'aide à sortir d'ici ?":
-            self.replique="Non merci, je préfère rester bloquer que demander ton aide !"
-            self.repliques = ["Eh bien reste-ici !"]
-        elif replique == "Eh bien reste-ici !":
+        elif replique == "dialogue-2reponse1.2":
+            self.replique="dialogue-2phrase1.2"
+            self.repliques = ["dialogue-2reponse1.2.1"]
+        elif replique == "dialogue-2reponse1.2.1":
             self.end_dialogue(-2)
             self.statut_humain = "exploration"
-        elif replique == "Je voudrais m'excuser pour ce que j'ai dit.":
-            self.replique="... Bon, je te pardonne."
-            self.repliques = ["Du coup, on va à la sortie ?"]
+        elif replique == "dialogue-2reponse1.3":
+            self.replique="dialogue-2phrase1.3"
+            self.repliques = ["dialogue-2reponse1.3.1"]
             self.appreciations[0]+= 0.5
-        elif replique == "Du coup, on va à la sortie ?":
-            self.replique="Ok, montre-moi le chemin."
-            self.repliques = ["Tache de ne pas te perdre.","Fais-moi confiance !"]
-        elif replique == "Tache de ne pas te perdre.":
+        elif replique == "dialogue-2reponse1.3.1":
+            self.replique="dialogue-2phrase1.3.1"
+            self.repliques = ["dialogue-2reponse1.3.1.1","dialogue-2reponse1.3.1.2"]
+        elif replique == "dialogue-2reponse1.3.1.1":
             self.appreciations[0]-= 0.5
             self.end_dialogue()
             self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
             self.mouvement = 0 #Légèrement redondant ici
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
             self.attente = False
-        elif replique == "Fais-moi confiance !":
+        elif replique == "dialogue-2reponse1.3.1.2":
             self.end_dialogue()
             self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
             self.mouvement = 0 #Légèrement redondant ici
@@ -6144,117 +6078,84 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
 
         #Deuxième dialogue
         #On vient de tuer le premier gobelin
-        elif replique == "Oui ! Mais il nous a blessés...":
-            self.replique = "Ne t'inquiète pas, nos blessures se soignent avec le temps."
-            self.repliques = ["Ah, tu me rassures. En route alors !","Ouf ! Mais, je ne suis pas sûr d'avoir compris tout ce qui s'est passé."]
-        elif replique in ["Ah, tu me rassures. En route alors !","Pff, trop facile !","Merci, c'est tout ce que je voulais savoir !"]:
+        elif replique == "dialogue2reponse1.1":
+            self.replique = "dialogue2phrase1.1"
+            self.repliques = ["dialogue2reponse1.1.1","dialogue2reponse1.1.2"]
+        elif replique in ["dialogue2reponse1.1.1","dialogue2reponse1.2","dialogue2reponse1.3.1.1"]:
             self.end_dialogue()
-        elif replique in ["Je n'ai pas tout compris...","Ouf ! Mais, je ne suis pas sûr d'avoir compris tout ce qui s'est passé.","Il y a autre chose que je n'ai pas compris."]:
-            self.replique = "Qu'est-ce que tu n'as pas compris ?"
-            self.repliques = ["Comment est-ce que le gobelin est mort ?","C'était quoi, tous les trucs qu'on voyait ?","Pourquoi est-ce qu'il reste quelque chose ?"]
-        elif replique == "Comment est-ce que le gobelin est mort ?":
-            self.replique = "Il avait une barre rouge au-dessus de la tête, comme toi et moi. Cette barre représente ses PVs, et chacune de nos attaques lui a fait perdre des PVs. Quand ses PVs ont atteint 0, il est mort." #/!\ Modifier si la "barre rouge" bouge
-            self.repliques = ["Merci, c'est tout ce que je voulais savoir !","Il y a autre chose que je n'ai pas compris."]
-        elif replique == "C'était quoi, tous les trucs qu'on voyait ?":
-            self.replique = "Les marques marrons représentaient les attaques. Il y avait aussi des points rouges à chaque fois que quelqu'un se faisait blesser." #/!\ Modifier pour mentionner l'attaque avec une arme quand les skins auront été créés
+        elif replique in ["dialogue2reponse1.3","dialogue2reponse1.1.2","dialogue2reponse1.3.1.2"]:
+            self.replique = "dialogue2phrase1.3"
+            self.repliques = ["dialogue2reponse1.3.1","dialogue2reponse1.3.2","dialogue2reponse1.3.3"]
+        elif replique == "dialogue2reponse1.3.1":
+            self.replique = "dialogue2phrase1.3.1" #/!\ Modifier si la "barre rouge" bouge
+            self.repliques = ["dialogue2reponse1.3.1.1","dialogue2reponse1.3.1.2"]
+        elif replique == "dialogue2reponse1.3.2":
+            self.replique = "dialogue2phrase1.3.2" #/!\ Modifier pour mentionner l'attaque avec une arme quand les skins auront été créés
             if self.controleur.get_entitee(5).esprit == "joueur":
-                self.replique += " Et s'il y avait des espèces de cercles oranges sous nos pieds, c'étaient les magies de boost lancés par notre coéquipière. Tu as peut-être pu voir qu'elle-même avait un cercle bleu à chaque fois qu'elle lançait une magie."
-            self.repliques = ["Merci, c'est tout ce que je voulais savoir !","Il y a autre chose que je n'ai pas compris."]
-        elif replique == "Pourquoi est-ce qu'il reste quelque chose ?":
-            self.replique = "Le corps du gobelin n'allait pas disparaître ! Son cadavre est toujours là. Il y a aussi les items qu'il transportait, en l'occurence son équippement."
-            self.repliques = ["Merci, c'est tout ce que je voulais savoir !","Il y a autre chose que je n'ai pas compris."]
+                self.replique = "dialogue2phrase1.3.2/peureuse"
+            self.repliques = ["dialogue2reponse1.3.1.1","dialogue2reponse1.3.1.2"]
+        elif replique == "dialogue2reponse1.3.3":
+            self.replique = "dialogue2phrase1.3.3"
+            self.repliques = ["dialogue2reponse1.3.1.1","dialogue2reponse1.3.1.2"]
 
         #Troisième dialogue
         #On vient de tuer le premier mage gobelin
-        elif replique == "C'est peu de le dire ! Qu'est-ce que c'était que ces attaques à distance !?":
-            self.replique = "Aucune idée. Peut-être de la magie ?"
-            self.repliques = ["J'aimerais pouvoir faire de la magie moi aussi...","Une tactique de faible !"]
-        elif replique == "J'aimerais pouvoir faire de la magie moi aussi...":
-            self.replique = "Ça semble puissant comme ça, mais les mages sont toujours en train de manquer de mana..."
-            self.repliques = ["Et nous de PVs, chacun ses problèmes. Bon, on y retourne ?"]
-        elif replique == "Une tactique de faible !":
-            self.replique = "En tous cas, ce n'était pas suffisant pour nous vaincre."
-            self.repliques = ["Bien dit ! C'est pas tout ça, retournons explorer."]
-        elif replique in ["Bien dit ! C'est pas tout ça, retournons explorer.","Et nous de PVs, chacun ses problèmes. Bon, on y retourne ?"]:
+        elif replique == "dialogue3reponse1.1":
+            self.replique = "dialogue3phrase1.1"
+            self.repliques = ["dialogue3reponse1.1.1","dialogue3reponse1.1.2"]
+        elif replique == "dialogue3reponse1.1.1":
+            self.replique = "dialogue3phrase1.1.1"
+            self.repliques = ["dialogue3reponse1.1.1.1"]
+        elif replique == "dialogue3reponse1.1.2":
+            self.replique = "dialogue3phrase1.1.2"
+            self.repliques = ["dialogue3reponse1.1.2.1"]
+        elif replique in ["dialogue3reponse1.1.2.1","dialogue3reponse1.1.1.1"]:
             self.end_dialogue()
 
         #Dialogue de la prison
-        elif replique == "Oui.":
-            self.replique="Il te faut des clés pour les ouvrir."
-            self.repliques = ["Des clés ? Où est-ce que je peux les trouver ?"]
-        elif replique == "Des clés ? Où est-ce que je peux les trouver ?":
-            self.replique="Par terre, après avoir tué un monstre par exemple. Ramasse-les avec la touche m."
+        elif replique == "dialogue4reponse1.1":
+            self.replique="dialogue4phrase1.1"
+            self.repliques = ["dialogue4reponse1.1.1"]
+        elif replique == "dialogue4reponse1.1.1":
+            self.replique="dialogue4phrase1.1.1"
             self.repliques = ["Ok, je regarderai autour de moi."]
-        elif replique == "Ok, je regarderai autour de moi.":
+        elif replique == "dialogue4reponse1.1.1.1":
             self.end_dialogue()
-        elif replique == "Ces barres oranges ?":
-            self.replique="C'est ça. Il te faut des clés pour les ouvrir."
-            self.repliques = ["Des clés ? Où est-ce que je peux les trouver ?"]
-        elif replique == "Évidemment, je ne suis pas aveugle !":
+        elif replique == "dialogue4reponse1.2":
+            self.replique="dialogue4phrase1.2"
+            self.repliques = ["dialogue4reponse1.1.1"]
+        elif replique == "dialogue4reponse1.3":
             self.appreciations[0]-= 0.5
             self.end_dialogue()
 
         #Dialogue par défaut:
-        elif replique == "Va quelque part.":
-            self.replique = "Où ?"
-            self.repliques = ["Tu peux suivre quelqu'un ?","Tu vois là-bas ?","Cherche la sortie."]
-        elif replique == "Tu peux suivre quelqu'un ?":
+        elif replique == "dialogue-1reponse1.1":
+            self.replique = "dialogue-1phrase1.1"
+            self.repliques = ["dialogue-1reponse1.1.1","dialogue-1reponse1.1.2","dialogue-1reponse1.1.3"]
+        elif replique == "dialogue-1reponse1.1.1":
             self.mouvement = 0
-            self.replique = "Oui, qui ?"
-            self.repliques = ["Moi.","Je vais te montrer."]
-        elif replique == "Moi.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
+            self.replique = "dialogue-1phrase1.1.1"
+            self.repliques = ["dialogue-1reponse1.1.1.1","dialogue-1reponse1.1.1.2"]
+        elif replique == "dialogue-1reponse1.1.1.1":
+            self.replique = "dialogue-1phrase1.1.1.1"
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.3","dialogue-1reponse1.3"]
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
-        elif replique == "Je vais te montrer.":
+        elif replique == "dialogue-1reponse1.1.1.2":
             self.controleur.get_entitee(2).start_select_agissant_dialogue()
             self.controleur.get_entitee(2).event = COMPLEMENT_DIALOGUE
-        elif replique == "Tu vois là-bas ?":
+        elif replique == "dialogue-1reponse1.1.2":
             self.controleur.get_entitee(2).start_select_case_dialogue()
             self.controleur.get_entitee(2).event = COMPLEMENT_DIALOGUE
-        elif replique == "Cherche la sortie.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
+        elif replique == "dialogue-1reponse1.1.3":
+            self.replique = "dialogue-1phrase1.1.3"
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.3","dialogue-1reponse1.3"]
             self.mouvement = 1
-        elif replique == "Change ta méthode de combat.":
-            self.replique = "Envers les ennemis, ou les monstres neutres ?"
-            self.repliques = ["Les ennemis, ceux qui nous ont déjà attaqués.","Les neutres."]
-        elif replique == "Les ennemis, ceux qui nous ont déjà attaqués.":
-            self.replique = "Qu'est-ce que je leur fait ?"
-            self.repliques = ["Attaque-les, ils nous ont attaqué en premier.","Ignore-les, on a plus important à faire.","Fuis-les, ça sera plus sûr."]
-        elif replique == "Attaque-les, ils nous ont attaqué en premier.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_ennemis = 0
-        elif replique == "Ignore-les, on a plus important à faire.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_ennemis = 1
-        elif replique == "Fuis-les, ça sera plus sûr.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_ennemis = 2
-        elif replique == "Les neutres.":
-            self.replique = "Qu'est-ce que je leur fait ?"
-            self.repliques = ["Attaque-les, l'attaque est la meilleure défense.","Ignore-les, tant qu'ils ne nous agressent pas.","Fuis-les, tous les monstres sont dangereux."]
-        elif replique == "Attaque-les, l'attaque est la meilleure défense.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_neutres = 0
-        elif replique == "Ignore-les, tant qu'ils ne nous agressent pas.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_neutres = 1
-        elif replique == "Fuis-les, tous les monstres sont dangereux.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_neutres = 2
-        elif replique == "Merci.":
+        elif replique == "dialogue-1reponse1.3":
             self.end_dialogue(-1)
-        elif replique == "J'aimerais parler avec toi.":
-            self.replique = "On a pas vraiment le temps, là..."
-            self.repliques = ["Ah, c'est vrai..."]
-        elif replique == "Ah, c'est vrai...":
+        elif replique == "dialogue-1reponse1.2":
+            self.replique = "dialogue-1phrase1.2"
+            self.repliques = ["dialogue-1reponse1.2.1"]
+        elif replique == "dialogue-1reponse1.2.1":
             self.end_dialogue(-1)
 
         else:
@@ -6262,6 +6163,9 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
             print("Je ne connais pas cette réplique !")
 
         self.replique_courante = 0
+
+    def get_replique(self,code):
+        return REPLIQUES_PAUME[code]
 
     def get_skin(self):
         if self.etat == "vivant":
@@ -6313,28 +6217,28 @@ class Peureuse(Multi_renforceur,Support_lointain,Humain): #La quatrième humaine
         self.replique_courante = 0
         #La plupart dépendent du dialogue
         if self.dialogue == -1: #Le joueur est venu nous voir de son propre chef
-            self.replique = "Tu as besoin de quelque chose ?"
-            self.repliques = ["Tu pourrais aller quelque part ?","Discutons un peu."] #La question personnelle est pour quand le joueur veut faire avancer les interractions.
+            self.replique = "dialogue-1phrase1"
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"] #La question personnelle est pour quand le joueur veut faire avancer les interractions.
             if self.controleur.entitees[2].a_parchemin_vierge():
-                self.repliques.append("Est-ce que tu pourrais placer une magie sur un parchemin ?")
+                self.repliques.append("dialogue-1reponse1.3")
         elif self.dialogue == -2: #Le joueur nous a mal traîté
-            self.replique = "Tu as du culot de revenir me parler après ce que tu m'as dit !"
-            self.repliques = [""]
+            self.replique = "dialogue-2phrase1"
+            self.repliques = ["dialogue-2reponse1.1"]
         elif self.dialogue == 1: #Le joueur vient d'arriver depuis le deuxième étage
-            self.replique = "Bonjour !"
-            self.repliques = ["Salut...","Bonjour ma jolie."]
+            self.replique = "dialogue1phrase1"
+            self.repliques = ["dialogue1reponse1.1","dialogue1reponse1.2"]
         elif self.dialogue == 2: #On a vaincu le premier monstre !
-            self.replique = "Ouf, ce gobelin est mort."
-            self.repliques = ["Oui ! Mais il nous a blessés...","Pff, trop facile !","Je n'ai pas tout compris..."]
+            self.replique = "dialogue2phrase1"
+            self.repliques = ["dialogue2reponse1.1","dialogue2reponse1.2","dialogue2reponse1.3"]
         elif self.dialogue == 3: #On a vaincu le premier mage !
-            self.replique = "Ouf ! Il était coriace, celui-là."
-            self.repliques = ["C'est peu de le dire ! Qu'est-ce que c'était que ces attaques à distance !?","Mais non, c'était facile !"]
+            self.replique = "dialogue3phrase1"
+            self.repliques = ["dialogue3reponse1.1","dialogue3reponse1.2"]
         elif self.dialogue == 4: #On a atteint les premiers monstres
-            self.replique = "Nous nous rapprochons du camp gobelin, il serait bien que je t'explique quelques trucs sur les monstres."
-            self.repliques = ["Oui, volontiers.","C'est gentil de proposer, mais je n'ai pas besoin d'aide.","Tu me prends pour un débutant ? Tu crois que je ne connais pas les monstres ?"]
+            self.replique = "dialogue4phrase1"
+            self.repliques = ["dialogue4reponse1.1","dialogue4reponse1.2","dialogue4reponse1.3"]
         elif self.dialogue == 5: #On a atteint la prison
-            self.replique = "Est-ce que tu vois ces portes dans les murs autour de toi ?"
-            self.repliques = ["Oui.","Ces barres oranges ?","Évidemment, je ne suis pas aveugle !"]
+            self.replique = "dialogue5phrase1"
+            self.repliques = ["dialogue5reponse1.1","dialogue5reponse1.2","dialogue5reponse1.3"]
 
     def interprete(self,nb_replique):
         #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
@@ -6343,263 +6247,235 @@ class Peureuse(Multi_renforceur,Support_lointain,Humain): #La quatrième humaine
 
         #Premier dialogue
         #Le joueur arrive par l'escalier
-        if replique in ["Salut...","Désolé..."]:
-            self.replique=""
-            self.repliques = ["...qu'est-ce que tu fais ici ?","...où est la sortie ?"]
-        elif replique == "...qu'est-ce que tu fais ici ?":
-            self.replique="Je voudrais continuer, mais il y a des monstres sur le chemin."
-            self.repliques = ["Tu veux que je les tue pour toi ?","Des monstres ? Ils sont dangereux ?"]
-        elif replique == "...où est la sortie ?":
-            self.replique="Tout en bas."
-            self.repliques = ["Pourquoi tu n'y vas pas ?"]
-        elif replique == "Pourquoi tu n'y vas pas ?":
-            self.replique="Il y a des monstres sur le chemin."
-            self.repliques = ["Tu veux que je les tue pour toi ?","Des monstres ? Ils sont dangereux ?"]
-        elif replique == "Tu veux que je les tue pour toi ?":
-            self.replique="S'il te plaît !"
-            self.repliques = ["Laisse-moi faire.","Euh... comment on fait pour combattre ?"]
-        elif replique == "Laisse-moi faire.":
+        if replique in ["dialogue1reponse1.1","dialogue1reponse1.2.1"]:
+            self.replique="dialogue1phrase1.1"
+            self.repliques = ["dialogue1reponse1.1.1","dialogue1reponse1.1.2"]
+        elif replique == "dialogue1reponse1.1.1":
+            self.replique="dialogue1phrase1.1.1"
+            self.repliques = ["dialogue1reponse1.1.1.1","dialogue1reponse1.1.1.2"]
+        elif replique == "dialogue1reponse1.1.2":
+            self.replique="dialogue1phrase1.1.2"
+            self.repliques = ["dialogue1reponse1.1.2.1"]
+        elif replique == "dialogue1reponse1.1.2.1":
+            self.replique="dialogue1phrase1.1.2.1"
+            self.repliques = ["dialogue1reponse1.1.1.1","dialogue1reponse1.1.1.2"]
+        elif replique == "dialogue1reponse1.1.1.1":
+            self.replique="dialogue1phrase1.1.1.1"
+            self.repliques = ["dialogue1reponse1.1.1.1.1","dialogue1reponse1.1.1.1.2"]
+        elif replique == "dialogue1reponse1.1.1.1.1":
             self.appreciations[0] += 0.5
             self.end_dialogue()
             self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
             self.mouvement = 0 #Légèrement redondant ici
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
             self.attente = False
-        elif replique == "Des monstres ? Ils sont dangereux ?":
-            self.replique="Un peu. C'est surtout que je suis fragile..."
-            self.repliques = ["Je vais essayer de les combattre.","Pff... les faibles n'ont qu'à mourir."]
-        elif replique == "Je vais essayer de les combattre.":
-            self.replique="Tu sais faire ?"
-            self.repliques = "Oui.","Euh, non..."
-        elif replique in ["Euh... comment on fait pour combattre ?","Euh, non..."]:
-            self.replique="Tu peux donner un coup de pied au sol avec la touche P, je suppose."
-            self.repliques = ["Un coup de pied au sol ? Ça n'a pas l'air très efficace.","D'accord, je vais y aller."]
-        elif replique == "Un coup de pied au sol ? Ça n'a pas l'air très efficace.":
-            self.replique="Je suppose que tu pourrais utiliser ta lance avec X, mais vu son état ça sera encore moins efficace."
-            self.repliques = ["D'accord, je vais y aller."]
-        elif replique == "D'accord, je vais y aller.":
-            self.replique="Je peux venir avec toi ?"
-            self.repliques = ["Oui, viens.","Non, tu ne ferais que me gêner."]
-        elif replique == "Oui, viens.":
+        elif replique == "dialogue1reponse1.1.1.2":
+            self.replique="dialogue1phrase1.1.1.2"
+            self.repliques = ["dialogue1reponse1.1.1.2.1","dialogue1reponse1.1.1.2.2"]
+        elif replique == "dialogue1reponse1.1.1.2.1":
+            self.replique="dialogue1phrase1.1.1.2.1"
+            self.repliques = "dialogue1reponse1.1.1.2.1.1","dialogue1reponse1.1.1.2.1.2"
+        elif replique in ["dialogue1reponse1.1.1.1.1","dialogue1reponse1.1.1.2.1.2"]:
+            self.replique="dialogue1phrase1.1.1.1.1"
+            self.repliques = ["dialogue1reponse1.1.1.1.1.1","dialogue1reponse1.1.1.1.1.2"]
+        elif replique == "dialogue1reponse1.1.1.1.1.1":
+            self.replique="dialogue1phrase1.1.1.1.1.1"
+            self.repliques = ["dialogue1reponse1.1.1.1.1.2"]
+        elif replique == "dialogue1reponse1.1.1.1.1.2":
+            self.replique="dialogue1phrase1.1.1.1.1.2"
+            self.repliques = ["dialogue1reponse1.1.1.1.1.2.1","dialogue1reponse1.1.1.1.1.2.2"]
+        elif replique == "dialogue1reponse1.1.1.1.1.2.1":
             self.end_dialogue()
             self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
             self.mouvement = 0 #Légèrement redondant ici
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
             self.attente = False
-        elif replique == "Non, tu ne ferais que me gêner.":
+        elif replique == "dialogue1reponse1.1.1.1.1.2.2":
             self.appreciations[0]-= 0.5
             self.end_dialogue(-2)
             self.statut_humain = "exploration"
-        elif replique == "Pff... les faibles n'ont qu'à mourir.":
+        elif replique == "dialogue1reponse1.1.1.2.2":
             self.appreciations[0]-= 0.5
             self.end_dialogue(-2)
             self.statut_humain = "exploration"
-        elif replique == "Bonjour ma jolie.":
-            self.replique="Ne me parle pas si familièrement."
-            self.repliques = ["Désolé...","Allez, fais pas ta timide..."]
-        elif replique == "Allez, fais pas ta timide...":
-            self.replique="Sérieusement, t'es lourd ! J'ai déjà un copain, [insérer le nom du copain ici], alors arrête !"
-            self.repliques = ["Désolé..."]
+        elif replique == "dialogue1reponse1.2":
+            self.replique="dialogue1phrase1.2"
+            self.repliques = ["dialogue1reponse1.2.1","dialogue1reponse1.2.2"]
+        elif replique == "dialogue1reponse1.2.2":
+            self.replique="dialogue1phrase1.2.2"
+            self.repliques = ["dialogue1reponse1.2.1"]
 
         #Dialogue par défaut -2
-        elif replique == "":
+        elif replique == "dialogue-2reponse1.1":
             self.end_dialogue(-2)
             self.statut_humain = "exploration"
 
         #Deuxième dialogue
         #On vient de tuer le premier gobelin
-        elif replique == "Oui ! Mais il nous a blessés...":
-            self.replique = "Heureusement, nos blessures se soignent avec le temps."
-            self.repliques = ["Ah, tu me rassures. En route alors !","Ouf ! Mais, je ne suis pas sûr d'avoir compris tout ce qui s'est passé."]
-        elif replique in ["Ah, tu me rassures. En route alors !","Pff, trop facile !","Merci, c'est tout ce que je voulais savoir !"]:
+        elif replique == "dialogue2reponse1.1":
+            self.replique = "dialogue2phrase1.1"
+            self.repliques = ["dialogue2reponse1.1.1","dialogue2reponse1.1.2"]
+        elif replique in ["dialogue2reponse1.1.1","dialogue2reponse1.2","dialogue2reponse1.3.1.1"]:
             self.end_dialogue()
-        elif replique in ["Je n'ai pas tout compris...","Ouf ! Mais, je ne suis pas sûr d'avoir compris tout ce qui s'est passé.","Il y a autre chose que je n'ai pas compris."]:
-            self.replique = "Qu'est-ce que tu n'as pas compris ?"
-            self.repliques = ["Comment est-ce que le gobelin est mort ?","C'était quoi, tous les trucs qu'on voyait ?","Pourquoi est-ce qu'il reste quelque chose ?"]
-        elif replique == "Comment est-ce que le gobelin est mort ?":
-            self.replique = "Il avait une barre rouge au-dessus de la tête, comme toi et moi. Cette barre représente ses PVs, et chacune de tes attaques lui a fait perdre des PVs. Quand ses PVs ont atteint 0, il est mort." #/!\ Modifier si la "barre rouge" bouge
-            self.repliques = ["Merci, c'est tout ce que je voulais savoir !","Il y a autre chose que je n'ai pas compris."]
-        elif replique == "C'était quoi, tous les trucs qu'on voyait ?":
-            self.replique = "Les marques marrons représentaient les attaques. Il y avait aussi des points rouges à chaque fois que quelqu'un se faisait blesser. Et s'il y avait des espèces de cercles oranges sous tes pieds, c'étaient mes magies de boost. Tu as peut-être pu voir que j'avais moi-même un cercle bleu à chaque fois que je lançais une magie." #/!\ Modifier pour mentionner l'attaque avec une arme quand les skins auront été créés
-            self.repliques = ["Merci, c'est tout ce que je voulais savoir !","Il y a autre chose que je n'ai pas compris."]
-        elif replique == "Pourquoi est-ce qu'il reste quelque chose ?":
-            self.replique = "Le corps du gobelin n'allait pas disparaître ! Son cadavre est toujours là. C'est dégoutant, mais il y a aussi les items qu'il transportait, en l'occurence son équippement."
-            self.repliques = ["Merci, c'est tout ce que je voulais savoir !","Il y a autre chose que je n'ai pas compris."]
+        elif replique in ["dialogue2reponse1.3","dialogue2reponse1.1.2","dialogue2reponse1.3.1.2"]:
+            self.replique = "dialogue2phrase1.3"
+            self.repliques = ["dialogue2reponse1.3.1","dialogue2reponse1.3.2","dialogue2reponse1.3.3"]
+        elif replique == "dialogue2reponse1.3.1":
+            self.replique = "dialogue2phrase1.3.1" #/!\ Modifier si la "barre rouge" bouge
+            self.repliques = ["dialogue2reponse1.3.1.1","dialogue2reponse1.3.1.2"]
+        elif replique == "dialogue2reponse1.3.2":
+            self.replique = "dialogue2phrase1.3.2" #/!\ Modifier pour mentionner l'attaque avec une arme quand les skins auront été créés
+            self.repliques = ["dialogue2reponse1.3.1.1","dialogue2reponse1.3.1.2"]
+        elif replique == "dialogue2reponse1.3.3":
+            self.replique = "dialogue2phrase1.3.3"
+            self.repliques = ["dialogue2reponse1.3.1.1","dialogue2reponse1.3.1.2"]
 
         #Troisième dialogue
         #On vient de tuer le premier mage gobelin
-        elif replique == "C'est peu de le dire ! Qu'est-ce que c'était que ces attaques à distance !?":
-            self.replique = "De la magie. Heureusement qu'il ne peut plus s'en servir quand il tombe à court de mana."
-            self.repliques = ["Tu es une magicienne, non ? Tu peux utiliser ce genre de sorts ?","Effectivement, ce serait infernal sinon !"]
-        elif replique == "Tu es une magicienne, non ? Tu peux utiliser ce genre de sorts ?":
-            self.replique = "Je sous juste une magicienne de soutien, je n'ai pas de sorts d'attaque. Mais je peux doubler tes dégats, et je n'ai même pas besoin de me mettre en danger en première ligne, c'est pas génial ?"
-            self.repliques = ["C'est comme si j'étais deux fois plus nombreux ! Merci pour ton aide.","Pff, inutile..."]
-        elif replique in ["Effectivement, ce serait infernal sinon !","Mais non, c'était facile !"]:
+        elif replique == "dialogue3reponse1.1":
+            self.replique = "dialogue3phrase1.1"
+            self.repliques = ["dialogue3reponse1.1.1","dialogue3reponse1.1.2"]
+        elif replique == "dialogue3reponse1.1.1":
+            self.replique = "dialogue3phrase1.1.1"
+            self.repliques = ["dialogue3reponse1.1.1.1","dialogue3reponse1.1.1.2"]
+        elif replique in ["dialogue3reponse1.1.2","dialogue3reponse1.2"]:
             self.end_dialogue()
-        elif replique == "C'est comme si j'étais deux fois plus nombreux ! Merci pour ton aide.":
+        elif replique == "dialogue3reponse1.1.1.1":
             self.appreciations[0]+= 0.1
             self.end_dialogue()
-        elif replique == "Pff, inutile...":
+        elif replique == "dialogue3reponse1.1.1.2":
             self.appreciations[0]-= 0.3
             self.end_dialogue()
 
         #Dialogue de description des monstres
-        elif replique == "Oui, volontiers.":
-            self.replique="Les monstres sont très différents les uns des autres, aussi bien par leurs comportements que par leurs capacitées."
-            self.repliques = ["Donc, ils ne vont pas tous attendre sans bouger comme ceux de l'étage précédent ?","Leurs capacitées ? Tu veux dire leur puissance de combat ?"]
-        elif replique == "Donc, ils ne vont pas tous attendre sans bouger comme ceux de l'étage précédent ?":
-            self.replique="Exactement. Ceux-là sont des sentinnelles, ils ne bougent que quand ils aperçoivent un ennemi."
-            self.repliques = ["Attendre qu'on vienne à eux est donc plutôt une exception ?","Est-ce qu'il y a d'autres monstres que des gobelins ici ?"]
-        elif replique == "Attendre qu'on vienne à eux est donc plutôt une exception ?":
-            self.replique="Oui. C'est encore plus rare chez les monstres non-humanoïdes comme les slimes."
-            self.repliques = ["Il existe différentes espèces de monstres ?","Et qu'est-ce que tu disais sur leurs capacitées ?"]
-        elif replique in ["Il existe différentes espèces de monstres ?","Est-ce qu'il y a d'autres monstres que des gobelins ici ?"]:
-            self.replique="IL y a les gobelins, les orcs, les slimes, les ombriuls... certains ne sont pas hostiles aux humains, et ne combattront que si on les provoque."
-            self.repliques = ["Et qu'est-ce que tu disais sur leurs capacitées ?"]
-        elif replique == "Et qu'est-ce que tu disais sur leurs capacitées ?":
-            self.replique="Certains ont une meilleure défense, ou une bonne vitesse, d'autres peuvent même utiliser de la magie pour attaquer ou soigner."
-            self.repliques = ["Et il faut qu'on combatte tout ça ? Ah, la galère...","Et bien, nous aussi, donc on s'en sortira !"]
-        elif replique == "Et il faut qu'on combatte tout ça ? Ah, la galère...":
-            self.replique="Hélas..."
-            self.repliques = ["Bon, allons-y."]
-        elif replique == "Et bien, nous aussi, donc on s'en sortira !":
+        elif replique == "dialogue4reponse1.1":
+            self.replique="dialogue4phrase1.1"
+            self.repliques = ["dialogue4reponse1.1.1","dialogue4reponse1.1.2"]
+        elif replique == "dialogue4reponse1.1.1":
+            self.replique="dialogue4phrase1.1.1"
+            self.repliques = ["dialogue4reponse1.1.1.1","dialogue4reponse1.1.1.2"]
+        elif replique == "dialogue4reponse1.1.1.1":
+            self.replique="dialogue4phrase1.1.1.1"
+            self.repliques = ["dialogue4reponse1.1.1.1.1","dialogue4reponse1.1.1.1.2"]
+        elif replique in ["dialogue4reponse1.1.1.1.1","dialogue4reponse1.1.1.2"]:
+            self.replique="dialogue4phrase1.1.1.2"
+            self.repliques = ["dialogue4reponse1.1.1.1.2"]
+        elif replique == "dialogue4reponse1.1.1.1.2":
+            self.replique="dialogue4phrase1.1.1.1.2"
+            self.repliques = ["dialogue4reponse1.1.1.1.2.1","dialogue4reponse1.1.1.1.2.2"]
+        elif replique == "dialogue4reponse1.1.1.1.2.1":
+            self.replique="dialogue4phrase1.1.1.1.2.1"
+            self.repliques = ["dialogue4reponse1.1.1.1.2.1.1"]
+        elif replique == "dialogue4reponse1.1.1.1.2.2":
             self.appreciations[0]+= 0.5
-            self.replique="Oui ! Je te fais confiance !"
-            self.repliques = ["Bon, allons-y."]
-        elif replique == "Leurs capacitées ? Tu veux dire leur puissance de combat ?":
-            self.replique="Entre autre, mais je pensais plutôt aux capacités comme le soin, ou les attaques magiques."
-            self.repliques = ["Ces créatures peuvent utiliser de la magie ?"]
-        elif replique == "Ces crétures peuvent utiliser de la magie ?":
-            self.replique="Les humanoïdes comme les gobelins comptent parfois des mages dans leurs rangs."
-            self.repliques = ["Donc ils ont des rôles spécifiques...","Et les monstres non-humanoïdes ?"]
-        elif replique == "Donc ils ont des rôles spécifiques...":
-            self.replique="Exactement. Les sentinelles qu'on a croisés à l'étage précédent sont spécialisés en défense et ne se déplacent que quand ils aperçoivent un ennemi, alors que d'autres nous cherchent activement."
-            self.repliques = ["Pourquoi faut-il qu'ils veuillent tous notre peau...","Ces gobelins sont bien organisés."]
-        elif replique == "Pourquoi faut-il qu'ils veuillent tous notre peau...":
-            self.replique="La plupart des monstres ont une dent contre les humains, mais pas tous. Il arrive même qu'ils se battent entre espèces."
-            self.repliques = ["Il y a beaucoup d'espèces de monstres ici ?"]
-        elif replique == "Il y a beaucoup d'espèces de monstres ici ?":
-            self.replique="Je ne sais pas, et j'espère en croiser le moins possible..."
-            self.repliques = ["Ne t'inquiète pas, je te protégerai.","On verra bien. Allons-y."]
-        elif replique == "Ne t'inquiète pas, je te protégerai.":
-            self.replique="Merci !"
+            self.replique="dialogue4phrase1.1.1.1.2.2"
+            self.repliques = ["dialogue4reponse1.1.1.1.2.1.1"]
+        elif replique == "dialogue4reponse1.1.2":
+            self.replique="dialogue4phrase1.1.2"
+            self.repliques = ["dialogue4reponse1.1.2.1"]
+        elif replique == "dialogue4reponse1.1.2.1":
+            self.replique="dialogue4phrase1.1.2.1"
+            self.repliques = ["dialogue4reponse1.1.2.1.1","dialogue4reponse1.1.2.1.2"]
+        elif replique == "dialogue4reponse1.1.2.1.1":
+            self.replique="dialogue4phrase1.1.2.1.1"
+            self.repliques = ["dialogue4reponse1.1.2.1.1.1","dialogue4reponse1.1.2.1.1.2"]
+        elif replique == "dialogue4reponse1.1.2.1.1.1":
+            self.replique="dialogue4phrase1.1.2.1.1.1"
+            self.repliques = ["dialogue4reponse1.1.2.1.1.1.1"]
+        elif replique == "dialogue4reponse1.1.2.1.1.1.1":
+            self.replique="dialogue4phrase1.1.2.1.1.1.1"
+            self.repliques = ["dialogue4reponse1.1.2.1.1.1.1.1","dialogue4reponse1.1.2.1.1.1.1.2"]
+        elif replique == "dialogue4reponse1.1.2.1.1.1.1.1":
+            self.replique="dialogue4phrase1.1.2.1.1.1.1.1"
             self.appreciations[0]+=0.5
-            self.repliques = ["Bon, allons-y."]
-        elif replique == "Ces gobelins sont bien organisés.":
-            self.replique="C'est peut-être parce qu'ils ont un chef ? Les orcs sont un peu pareil."
-            self.repliques = ["Je vois... Bon, on y va ?"]
-        elif replique == "Je vois... Bon, on y va ?":
-            self.replique="Oui, allons-y."
-            self.repliques = ["  "]
-        elif replique == "C'est gentil de proposer, mais je n'ai pas besoin d'aide.":
-            self.replique="D'accord, bonne chance."
-            self.repliques = ["  "]
-        elif replique in ["  ","On verra bien. Allons-y.","Bon, allons-y."]:
+            self.repliques = ["dialogue4reponse1.1.1.1.2.1.1"]
+        elif replique == "dialogue4reponse1.1.2.1.1.2":
+            self.replique="dialogue4phrase1.1.2.1.1.2"
+            self.repliques = ["dialogue4reponse1.1.2.1.1.2.1"]
+        elif replique == "dialogue4reponse1.2":
+            self.replique="dialogue4phrase1.2"
+            self.repliques = ["dialogue4reponse1.2.1"]
+        elif replique in ["dialogue4reponse1.2.1","dialogue4reponse1.1.2.1.1.2.1","dialogue4reponse1.1.2.1.1.1.1.2","dialogue4reponse1.1.1.1.2.1.1"]:
             self.end_dialogue()
-        elif replique == "Tu me prends pour un débutant ? Tu crois que je ne connais pas les monstres ?":
-            self.replique="Ne viens pas te plaindre si tu meurs !"
-            self.repliques = [" "]
+        elif replique == "dialogue4reponse1.3":
+            self.replique="dialogue4phrase1.3"
+            self.repliques = ["dialogue4reponse1.2.1"]
+            self.appreciations[0]-= 0.3
 
         #Dialogue de la prison
-        elif replique == "Oui.":
-            self.replique="Il te faut des clés pour les ouvrir."
-            self.repliques = ["Des clés ? Où est-ce que je peux les trouver ?"]
-        elif replique == "Des clés ? Où est-ce que je peux les trouver ?":
-            self.replique="Par terre, après avoir tué un monstre par exemple. Ramasse-les avec la touche m."
-            self.repliques = ["Ok, je regarderai autour de moi."]
-        elif replique == "Ok, je regarderai autour de moi.":
+        elif replique == "dialogue5reponse1.1":
+            self.replique="dialogue5phrase1.1"
+            self.repliques = ["dialogue5reponse1.1.1"]
+        elif replique == "dialogue5reponse1.1.1":
+            self.replique="dialogue5phrase1.1.1"
+            self.repliques = ["dialogue5reponse1.1.1.1"]
+        elif replique == "dialogue5reponse1.1.1.1":
             ID_clee = self.inventaire.get_clee("Porte_entree_encombrant_5")
             self.inventaire.drop(None,ID_clee)
             self.controleur.entitees[2].inventaire.ramasse_item(ID_clee) #On refile au joueur la clé dont il a besoin
-            self.replique="Attends ! J'en ai une, elle te sera peut-être utile."
-            self.repliques = ["Merci. J'y vais alors.","Comment tu l'as trouvée ?"]
-        elif replique == "Merci. J'y vais alors.":
+            self.replique="dialogue5phrase1.1.1.1"
+            self.repliques = ["dialogue5reponse1.1.1.1.1","dialogue5reponse1.1.1.1.2"]
+        elif replique == "dialogue5reponse1.1.1.1.1":
             self.end_dialogue()
-        elif replique == "Comment tu l'as trouvée ?":
-            self.replique="Un des gobelins l'a laissée tomber quand ils ont capturé mon petit-ami."
-            self.repliques = ["Tu crois qu'il est enfermé ici ? Je vais le libérer."]
-        elif replique == "Tu crois qu'il est enfermé ici ? Je vais le libérer.":
+        elif replique == "dialogue5reponse1.1.1.1.2":
+            self.replique="dialogue5phrase1.1.1.1.2"
+            self.repliques = ["dialogue5reponse1.1.1.1.2.1"]
+        elif replique == "dialogue5reponse1.1.1.1.2.1":
             self.appreciations[0]+= 0.5
             self.end_dialogue()
-        elif replique == "Ces barres oranges ?":
-            self.replique="C'est ça. Il te faut des clés pour les ouvrir."
-            self.repliques = ["Des clés ? Où est-ce que je peux les trouver ?"]
-        elif replique == "Évidemment, je ne suis pas aveugle !":
+        elif replique == "dialogue5reponse1.2":
+            self.replique="dialogue5phrase1.2"
+            self.repliques = ["dialogue5reponse1.1.1"]
+        elif replique == "dialogue5reponse1.3":
             ID_clee = self.inventaire.get_clee("Porte_entree_encombrant_5")
             self.inventaire.drop(None,ID_clee)
             self.controleur.entitees[2].inventaire.ramasse_item(ID_clee) #On refile quand même au joueur la clé dont il a besoin
-            self.repliques = [" "]
-        elif replique == " ":
             self.appreciations[0]-= 0.5
             self.end_dialogue()
 
         #Dialogue par défaut:
-        elif replique == "Tu pourrais aller quelque part ?":
-            self.replique = "Où ?"
-            self.repliques = ["Tu peux suivre quelqu'un ?","Tu vois là-bas ?","Cherche la sortie."]
-        elif replique == "Tu peux suivre quelqu'un ?":
+        elif replique == "dialogue-1reponse1.1":
+            self.replique = "dialogue-1phrase1.1"
+            self.repliques = ["dialogue-1reponse1.1.1","dialogue-1reponse1.1.2","dialogue-1reponse1.1.3"]
+        elif replique == "dialogue-1reponse1.1.1":
             self.mouvement = 0
-            self.replique = "Oui, qui ?"
-            self.repliques = ["Moi.","Je vais te montrer."]
-        elif replique == "Moi.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
+            self.replique = "dialogue-1phrase1.1.1"
+            self.repliques = ["dialogue-1reponse1.1.1.1","dialogue-1reponse1.1.1.2"]
+        elif replique == "dialogue-1reponse1.1.1.1":
+            self.replique = "dialogue-1phrase1.1.3"
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"] #La question personnelle est pour quand le joueur veut faire avancer les interractions.
+            if self.controleur.entitees[2].a_parchemin_vierge():
+                self.repliques.append("dialogue-1reponse1.3")
+            self.repliques.append("dialogue-1reponse1.4")
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
-        elif replique == "Je vais te montrer.":
+        elif replique == "dialogue-1reponse1.1.1.2":
             self.controleur.get_entitee(2).start_select_agissant_dialogue()
             self.controleur.get_entitee(2).event = COMPLEMENT_DIALOGUE
-        elif replique == "Tu vois là-bas ?":
+        elif replique == "dialogue-1reponse1.1.2":
             self.controleur.get_entitee(2).start_select_case_dialogue()
             self.controleur.get_entitee(2).event = COMPLEMENT_DIALOGUE
-        elif replique == "Cherche la sortie.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
+        elif replique == "dialogue-1reponse1.1.3":
+            self.replique = "dialogue-1phrase1.1.3"
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"] #La question personnelle est pour quand le joueur veut faire avancer les interractions.
+            if self.controleur.entitees[2].a_parchemin_vierge():
+                self.repliques.append("dialogue-1reponse1.3")
+            self.repliques.append("dialogue-1reponse1.4")
             self.mouvement = 1
-        elif replique == "Change ta méthode de combat.":
-            self.replique = "Envers les ennemis, ou les monstres neutres ?"
-            self.repliques = ["Les ennemis, ceux qui nous ont déjà attaqués.","Les neutres."]
-        elif replique == "Les ennemis, ceux qui nous ont déjà attaqués.":
-            self.replique = "Qu'est-ce que je leur fait ?"
-            self.repliques = ["Attaque-les, ils nous ont attaqué en premier.","Ignore-les, on a plus important à faire.","Fuis-les, ça sera plus sûr."]
-        elif replique == "Attaque-les, ils nous ont attaqué en premier.":
-            self.replique = "Désolé, j'ai trop peur pour les attaquer."
-            self.repliques = ["Ah, c'est vrai..."]
-        elif replique == "Ignore-les, on a plus important à faire.":
-            self.replique = "Désolé, je ne peux pas faire comme s'ils n'étaient pas là !."
-            self.repliques = ["Ah, c'est vrai..."]
-        elif replique == "Fuis-les, ça sera plus sûr.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_ennemis = 2
-        elif replique == "Les neutres.":
-            self.replique = "Qu'est-ce que je leur fait ?"
-            self.repliques = ["Attaque-les, l'attaque est la meilleure défense.","Ignore-les, tant qu'ils ne nous agressent pas.","Fuis-les, tous les monstres sont dangereux."]
-        elif replique == "Attaque-les, l'attaque est la meilleure défense.":
-            self.replique = "Désolé, j'ai trop peur pour les attaquer."
-            self.repliques = ["Ah, c'est vrai..."]
-        elif replique == "Ignore-les, tant qu'ils ne nous agressent pas.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_neutres = 1
-        elif replique == "Fuis-les, tous les monstres sont dangereux.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_neutres = 2
-        elif replique == "Merci.":
+        elif replique == "dialogue-1reponse1.3":
             self.end_dialogue(-1)
-        elif replique == "Discutons un peu.":
-            self.replique = "On a pas vraiment le temps, là..."
-            self.repliques = ["Ah, c'est vrai..."]
-        elif replique == "Ah, c'est vrai...":
+        elif replique == "dialogue-1reponse1.2":
+            self.replique = "dialogue-1phrase1.2"
+            self.repliques = ["dialogue-1reponse1.2.1"]
+        elif replique == "dialogue-1reponse1.2.1":
             self.end_dialogue(-1)
-        elif replique == "Est-ce que tu pourrais placer une magie sur un parchemin ?":
+        elif replique == "dialogue-1reponse1.3":
             if self.controleur.entitees[2].consomme_parchemin_vierge():
-                self.replique = "Bien sûr. Quelle magie veux-tu ?"
-                self.repliques = ["Qu'est-ce que tu as ?"]
+                self.replique = "dialogue-1phrase1.3"
+                self.repliques = ["dialogue-1reponse1.3.1"]
             else:
-                self.replique = "On dirait que tu n'as pas de parchemin vierge... Je peux faire autre chose ?"
-                self.repliques = ["Tu pourrais aller quelque part ?","Discutons un peu."]
-        elif replique == "Qu'est-ce que tu as ?":
+                self.replique = "dialogue-1phrase1.3refus"
+                self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.4"]
+        elif replique == "dialogue-1reponse1.3.1":
             joueur = self.controleur.get_entitee(2)
             joueur.methode_fin = joueur.fin_menu_impregnation
             skill = trouve_skill(self.classe_principale,Skill_magie)
@@ -6611,6 +6487,9 @@ class Peureuse(Multi_renforceur,Support_lointain,Humain): #La quatrième humaine
             print("Je ne connais pas cette réplique !")
 
         self.replique_courante = 0
+
+    def get_replique(self,code):
+        return REPLIQUES_PEUREUSE[code]
 
     def impregne(self,nom):
         skill = trouve_skill(self.classe_principale,Skill_magie)
@@ -6625,18 +6504,19 @@ class Peureuse(Multi_renforceur,Support_lointain,Humain): #La quatrième humaine
             parch = Parchemin_impregne(None,magie,cout//2)
             self.controleur.ajoute_entitee(parch)
             self.controleur.get_entitee(2).inventaire.ajoute(parch)
-            self.replique = "Je peux faire autre chose ?"
-            self.repliques = ["Tu pourrais aller quelque part ?","Discutons un peu."] #La question personnelle est pour quand le joueur veut faire avancer les interractions.
+            self.replique = "dialogue-1phrase1.3.1"
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"] #La question personnelle est pour quand le joueur veut faire avancer les interractions.
             if self.controleur.entitees[2].a_parchemin_vierge():
-                self.repliques.append("Est-ce que tu pourrais placer une magie sur un parchemin ?")
+                self.repliques.append("dialogue-1reponse1.3")
         else:
             parch = Parchemin_vierge(None)
             self.controleur.ajoute_entitee(parch)
             self.controleur.get_entitee(2).inventaire.ajoute(parch)
-            self.replique = "Je n'ai pas assez de mana pour cette magie... Je peux faire autre chose ?"
-            self.repliques = ["Tu pourrais aller quelque part ?","Discutons un peu."] #La question personnelle est pour quand le joueur veut faire avancer les interractions.
+            self.replique = "dialogue-1phrase1.3.1echec"
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"] #La question personnelle est pour quand le joueur veut faire avancer les interractions.
             if self.controleur.entitees[2].a_parchemin_vierge():
-                self.repliques.append("Est-ce que tu pourrais placer une magie sur un parchemin ?")
+                self.repliques.append("dialogue-1reponse1.3")
+            self.repliques.append("dialogue-1reponse1.4")
 
     def get_skin_tete(self):
         return SKIN_TETE_PEUREUSE
@@ -6663,20 +6543,20 @@ class Codeur(Humain): #Le cinquième humain du jeu, à l'étage 4 (répond au no
         self.replique_courante = 0
         #La plupart dépendent du dialogue
         if self.dialogue == -1: #Le joueur est venu nous voir de son propre chef (c'est la seule option pour parler à Dev dans le tuto)
-            self.replique = "Salut, qu'est-ce que tu viens faire ici ?"
-            self.repliques = ["Je me suis perdu !","Je voulais explorer tous les recoins."]
+            self.replique = "dialogue-1phrase1"
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"]
         elif self.dialogue == -2: #Le joueur nous a dit qu'il s'était perdu
-            self.replique = "Salut, qu'est-ce que tu viens faire ici ?"
-            self.repliques = ["Je me suis perdu !","Je voulais explorer tous les recoins. "]
+            self.replique = "dialogue-2phrase1"
+            self.repliques = ["dialogue-2reponse1.1","dialogue-2reponse1.2"]
         elif self.dialogue == -3: #Le joueur ne s'intéresse qu'aux combats
-            self.replique = "Alors, comment vont tes combats ?"
-            self.repliques = ["Bien, merci."]
+            self.replique = "dialogue-3phrase1"
+            self.repliques = ["dialogue-3reponse1.1"]
         elif self.dialogue == -4: #Le joueur est revenu mentir
-            self.replique = "Tu n'obtiendras rien de plus de moi."
-            self.repliques = ["  "]
+            self.replique = "dialogue-4phrase1"
+            self.repliques = ["dialogue-4reponse1.1"]
         elif self.dialogue == -5: #Le joueur a écouté nos conseils
-            self.replique = "Salut, quoi de neuf ?"
-            self.repliques = ["Je passais juste dire bonjour.","Est-ce que je peux entendre tes conseils à nouveaux ?"]
+            self.replique = "dialogue-5phrase1"
+            self.repliques = ["dialogue-5reponse1.1","dialogue-5reponse1.2"]
 
     def interprete(self,nb_replique):
         #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
@@ -6685,53 +6565,62 @@ class Codeur(Humain): #Le cinquième humain du jeu, à l'étage 4 (répond au no
 
         #Premier dialogue
         #Le joueur arrive vers Dev
-        if replique == "Je me suis perdu !":
-            self.replique="Ahah, c'est fait pour. Bonne chance pour la suite."
-            self.repliques = [""]
-        elif replique == "":
+        if replique == "dialogue-1reponse1.1":
+            self.replique="dialogue-1phrase1.1"
+            self.repliques = ["dialogue-1reponse1.1.1"]
+        elif replique == "dialogue-1reponse1.1.1":
             self.end_dialogue(-2)
-        elif replique == "Je voulais explorer tous les recoins.":
-            self.replique="Tu as bien raison. Observe, examine, scrute les moindres détails, cherche la vérité, et tu seras victorieux !"
-            self.repliques = ["Ça va vraiment m'aider à combattre les monstres ?","Quels genre de détails dois-je chercher ?"]
-        elif replique == "Ça va vraiment m'aider à combattre les monstres ?":
-            self.replique="Pas vraiment."
-            self.repliques = ["Je vais y aller alors."]
-        elif replique == "Je vais y aller alors.":
+        elif replique == "dialogue-1reponse1.2":
+            self.replique="dialogue-1phrase1.2"
+            self.repliques = ["dialogue-1reponse1.2.1","dialogue-1reponse1.2.2"]
+        elif replique == "dialogue-1reponse1.2.1":
+            self.replique="dialogue-1phrase1.2.1"
+            self.repliques = ["dialogue-1reponse1.2.1.1"]
+        elif replique == "dialogue-1reponse1.2.1.1":
             self.end_dialogue(-3)
-        elif replique == "Quels genre de détails dois-je chercher ?":
-            self.replique="Tu peux observer les inscriptions sur les murs, écouter ce que les PNJs ont à te dire... la suite viendra plus tard."
-            self.repliques = ["Merci pour ces conseils."]
-        elif replique == "Merci pour ces conseils.":
+        elif replique == "dialogue-1reponse1.2.2":
+            self.replique="dialogue-1phrase1.2.2"
+            self.repliques = ["dialogue-1reponse1.2.2.1"]
+        elif replique == "dialogue-1reponse1.2.2.1":
             self.appreciations[0] += 0.5
             self.end_dialogue(-5)
 
         #Dialogue par défaut -2
-        elif replique == "Je voulais explorer tous les recoins. ":
-            self.replique="Vraiment ? Tu viens de me dire que tu t'étais perdu pourtant..."
-            self.repliques = [" "]
-        elif replique == " ":
-            self.replique="Tu pensais vraiment que je ne m'en souviendrais pas ?"
-            self.repliques = ["Désolé, je ne voulais pas te mentir..."]
-        elif replique == "Désolé, je ne voulais pas te mentir...":
-            self.replique="Allez, vas-y."
-            self.repliques = ["  "]
-        elif replique == "  ":
+        if replique == "dialogue-2reponse1.1":
+            self.replique="dialogue-2phrase1.1"
+            self.repliques = ["dialogue-2reponse1.1.1"]
+        elif replique == "dialogue-2reponse1.1.1":
+            self.end_dialogue(-2)
+        elif replique == "dialogue-2reponse1.2":
+            self.replique="dialogue-2phrase1.2"
+            self.repliques = ["dialogue-2reponse1.2.1"]
+        elif replique == "dialogue-2reponse1.2.1":
+            self.replique="dialogue-2phrase1.2.1"
+            self.repliques = ["dialogue-2reponse1.2.1.1"]
+        elif replique == "dialogue-2reponse1.2.1.1":
+            self.replique="dialogue-2phrase1.2.1.1"
+            self.repliques = ["dialogue-2reponse1.2.1.1.1"]
+        elif replique == "dialogue-2reponse1.2.1.1.1":
             self.end_dialogue(-4)
 
         #Dialogue par défaut -3
-        elif replique == "Bien, merci.":
+        elif replique == "dialogue-3reponse1.1":
             self.end_dialogue(-3)
 
+        #Dialogue par défaut -4
+        elif replique == "dialogue-4reponse1.1":
+            self.end_dialogue(-4)
+
         #Dialogue par défaut -5
-        elif replique == "Je passais juste dire bonjour.":
-            self.replique="Tu as des choses plus importantes à faire..."
-            self.repliques = ["Oui, j'y vais."]
-        elif replique == "Oui, j'y vais":
+        elif replique == "dialogue-5reponse1.2":
+            self.replique="dialogue-5phrase1.2"
+            self.repliques = ["dialogue-5reponse1.2.1"]
+        elif replique == "dialogue-5reponse1.2.1":
             self.end_dialogue(-5)
-        elif replique == "Est-ce que je peux entendre tes conseils à nouveaux ?":
-            self.replique="Quelle partie ? 'Observe, examine, scrute les moindres détails, cherche la vérité, et tu seras victorieux !' ou 'Tu peux observer les inscriptions sur les murs, écouter ce que les PNJs ont à te dire... la suite viendra plus tard.' ?"
-            self.repliques = ["Les deux, merci !"]
-        elif replique == "Les deux, merci !":
+        elif replique == "dialogue-5reponse1.1":
+            self.replique="dialogue-5phrase1.1"
+            self.repliques = ["dialogue-5reponse1.1.1"]
+        elif replique == "dialogue-5reponse1.1.1":
             self.end_dialogue(-5)
 
         else:
@@ -6739,6 +6628,9 @@ class Codeur(Humain): #Le cinquième humain du jeu, à l'étage 4 (répond au no
             print("Je ne connais pas cette réplique !")
 
         self.replique_courante = 0
+
+    def get_replique(self,code):
+        return REPLIQUES_CODEUR[code]
 
     def get_skin(self):
         return SKIN_CODEUR
@@ -6787,14 +6679,14 @@ class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyenne
         self.replique_courante = 0
         #La plupart dépendent du dialogue
         if self.dialogue == -1: #Le joueur est venu nous voir de son propre chef
-            self.replique = "Tu as besoin de quelque chose ?"
-            self.repliques = ["J'ai besoin que tu ailles quelque part.","Change de stratégie au combat.","On peut discuter ?"]
+            self.replique = "dialogue-1phrase1"
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"]
         elif self.dialogue == -2: #Le joueur nous a offensé !
-            self.replique = "Meurs !"
-            self.repliques = [""]
+            self.replique = "dialogue-2phrase1"
+            self.repliques = ["dialogue-2reponse1.1"]
         elif self.dialogue == 1: #Le vient de passer la porte
-            self.replique = "Hey, salut ! Moi c'est [insérer le nom du copain ici]."
-            self.repliques = ["Moi c'est Arvel.","Alors c'est toi, son copain !"] #/!\ N'afficher la réplique du copain que si on a discuté de son copain avec la peureuse
+            self.replique = "dialogue1phrase1"
+            self.repliques = ["dialogue1reponse1.1","dialogue1reponse1.2"] #/!\ N'afficher la réplique du copain que si on a discuté de son copain avec la peureuse
 
     def interprete(self,nb_replique):
         #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
@@ -6803,31 +6695,34 @@ class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyenne
 
         #Premier dialogue
         #Le joueur arrive par la porte
-        if replique == "Moi c'est Arvel.":
-            self.replique="Content de te voir !"
-            self.repliques = ["Moi aussi, mais comment je te fais sortir d'ici ? La porte se referme après mon passage."]
-        elif replique == "Moi aussi, mais comment je te fais sortir d'ici ? La porte se referme après mon passage.":
-            self.replique="Il y a une autre clé ici. Tu peux la ramasser avec la touche M. Elle ouvre la porte là-bas, qui ne se referme pas." #/!\ Faire dépendre de la touche effectivement utilisée par le joueur !
-            self.repliques = ["Cool ! On y va alors !","Je vais ressortir par l'autre porte en fait, au-revoir."]
-        elif replique == "Cool ! On y va alors !":
-            self.replique="Merci pour ça. Je te le revaudrai."
-            self.repliques = ["Alors je te demanderai si j'ai besoin d'aide."]
-        elif replique == "Alors je te demanderai si j'ai besoin d'aide.":
+        if replique == "dialogue1reponse1.1":
+            self.replique="dialogue1phrase1.1"
+            self.repliques = ["dialogue1reponse1.1.1"]
+        elif replique in ["dialogue1reponse1.1.1","dialogue1reponse1.2.1.1"]:
+            self.replique="dialogue1phrase1.1.1" #/!\ Faire dépendre de la touche effectivement utilisée par le joueur !
+            self.repliques = ["dialogue1reponse1.1.1.1","dialogue1reponse1.1.1.2"]
+        elif replique == "dialogue1reponse1.1.1.1":
+            self.replique="dialogue1phrase1.1.1.1"
+            self.repliques = ["dialogue1reponse1.1.1.1.1"]
+        elif replique == "dialogue1reponse1.1.1.1.1":
             self.end_dialogue()
             self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
             self.mouvement = 0 #Légèrement redondant ici
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
             self.attente = False
-        elif replique == "Je vais ressortir par l'autre porte en fait, au-revoir.":
+        elif replique == "dialogue1reponse1.1.1.2":
             self.end_dialogue(-2)
             self.statut_humain = "exploration"
             self.offenses.append([2,0.01])
             #+ modifier le role, ou quelque chose, pour qu'il combatte
             self.attente = False
-        elif replique == "Alors c'est toi, son copain !":
-            self.replique="Quoi ?"
-            self.repliques = ["Je vais te tuer, mais ce n'est rien de personnel."]
-        elif replique == "Je vais te tuer, mais ce n'est rien de personnel.":
+        elif replique == "dialogue1reponse1.2":
+            self.replique="dialogue1phrase1.2"
+            self.repliques = ["dialogue1reponse1.2.1","dialogue1reponse1.2.2"]
+        elif replique == "dialogue1reponse1.2.1":
+            self.replique="dialogue1phrase1.2.1"
+            self.repliques = ["dialogue1reponse1.2.1.1"]
+        elif replique == "dialogue1reponse1.2.2":
             #self.controleur.get_esprit(self.esprit).antagonise(truc comme ça ou une offense ?
             #+ modifier le role, ou quelque chose, pour qu'il combatte
             self.attente = False
@@ -6840,66 +6735,33 @@ class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyenne
             self.statut_humain = "exploration"
 
         #Dialogue par défaut:
-        elif replique == "J'ai besoin que tu ailles quelque part.":
-            self.replique = "Où ?"
-            self.repliques = ["Tu peux suivre quelqu'un ?","Tu vois là-bas ?","Cherche la sortie."]
-        elif replique == "Tu peux suivre quelqu'un ?":
+        elif replique == "dialogue-1reponse1.1":
+            self.replique = "dialogue-1phrase1.1"
+            self.repliques = ["dialogue-1reponse1.1.1","dialogue-1reponse1.1.2","dialogue-1reponse1.1.3"]
+        elif replique == "dialogue-1reponse1.1.1":
             self.mouvement = 0
-            self.replique = "Oui, qui ?"
-            self.repliques = ["Moi.","Je vais te montrer."]
-        elif replique == "Moi.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
+            self.replique = "dialogue-1phrase1.1.1"
+            self.repliques = ["dialogue-1reponse1.1.1.1","dialogue-1reponse1.1.1.2"]
+        elif replique == "dialogue-1reponse1.1.1.1":
+            self.replique = "dialogue-1phrase1.1.3"
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.3"]
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
-        elif replique == "Je vais te montrer.":
+        elif replique == "dialogue-1reponse1.1.1.2":
             self.controleur.get_entitee(2).start_select_agissant_dialogue()
             self.controleur.get_entitee(2).event = COMPLEMENT_DIALOGUE
-        elif replique == "Tu vois là-bas ?":
+        elif replique == "dialogue-1reponse1.1.2":
             self.controleur.get_entitee(2).start_select_case_dialogue()
             self.controleur.get_entitee(2).event = COMPLEMENT_DIALOGUE
-        elif replique == "Cherche la sortie.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
+        elif replique == "dialogue-1reponse1.1.3":
+            self.replique = "dialogue-1phrase1.1.3"
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.3"]
             self.mouvement = 1
-        elif replique == "Change de stratégie au combat.":
-            self.replique = "Envers les ennemis, ou les monstres neutres ?"
-            self.repliques = ["Les ennemis, ceux qui nous ont déjà attaqués.","Les neutres."]
-        elif replique == "Les ennemis, ceux qui nous ont déjà attaqués.":
-            self.replique = "Qu'est-ce que je leur fait ?"
-            self.repliques = ["Attaque-les, ils nous ont attaqué en premier.","Ignore-les, on a plus important à faire.","Fuis-les, ça sera plus sûr."]
-        elif replique == "Attaque-les, ils nous ont attaqué en premier.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_ennemis = 0
-        elif replique == "Ignore-les, on a plus important à faire.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_ennemis = 1
-        elif replique == "Fuis-les, ça sera plus sûr.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_ennemis = 2
-        elif replique == "Les neutres.":
-            self.replique = "Qu'est-ce que je leur fait ?"
-            self.repliques = ["Attaque-les, l'attaque est la meilleure défense.","Ignore-les, tant qu'ils ne nous agressent pas.","Fuis-les, tous les monstres sont dangereux."]
-        elif replique == "Attaque-les, l'attaque est la meilleure défense.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_neutres = 0
-        elif replique == "Ignore-les, tant qu'ils ne nous agressent pas.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_neutres = 1
-        elif replique == "Fuis-les, tous les monstres sont dangereux.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_neutres = 2
-        elif replique == "Merci.":
+        elif replique == "dialogue-1reponse1.3":
             self.end_dialogue(-1)
-        elif replique == "On peut discuter ?":
-            self.replique = "On a pas vraiment le temps, là..."
-            self.repliques = ["Ah, c'est vrai..."]
-        elif replique == "Ah, c'est vrai...":
+        elif replique == "dialogue-1reponse1.2":
+            self.replique = "dialogue-1phrase1.2"
+            self.repliques = ["dialogue-1reponse1.2.1"]
+        elif replique == "dialogue-1reponse1.2.1":
             self.end_dialogue(-1)
 
         else:
@@ -6907,6 +6769,9 @@ class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyenne
             print("Je ne connais pas cette réplique !")
 
         self.replique_courante = 0
+
+    def get_replique(self,code):
+        return REPLIQUES_ENCOMBRANT[code]
 
     def get_skin_tete(self):
         return SKIN_TETE_ENCOMBRANT
@@ -6967,16 +6832,16 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
         self.replique_courante = 0
         #La plupart dépendent du dialogue
         if self.dialogue == -1: #Le joueur est venu nous voir de son propre chef
-            self.replique = "Mes talents sont-ils requis ?"
-            self.repliques = ["J'ai besoin que tu ailles quelque part.","Change de stratégie au combat.","Fais-moi un item.","Examine un item.","Lance un sort.","On peut discuter ?"]
+            self.replique = "dialogue-1phrase1"
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.4"]
             if self.controleur.entitees[2].a_parchemin_vierge():
-                self.repliques.append("Place une magie sur un parchemin.")
+                self.repliques.append("dialogue-1reponse1.3")
         elif self.dialogue == -2: #Le joueur nous a traité de vieillard
-            self.replique = "Qu'est-ce qu'il y a, gamin ?"
-            self.repliques = ["Tu ne voudrais pas rejoindre notre groupe ? Pour ta propre sécurité.","Désolé pour mon comportement."]
+            self.replique = "dialogue-2phrase1"
+            self.repliques = ["dialogue-2reponse1.1","dialogue-2reponse1.2"]
         elif self.dialogue == 1:
-            self.replique = "Ho ho ho ! Y aurait-il d'autres humains coincés ici ?"
-            self.repliques = ["Oui, tu veux nous rejoindre ?","Ne fais pas attention, vieillard, on ne faisait que passer."]
+            self.replique = "dialogue1phrase1"
+            self.repliques = ["dialogue1reponse1.1","dialogue1reponse1.2"]
 
     def interprete(self,nb_replique):
         #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
@@ -6985,42 +6850,42 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
 
         #Premier dialogue
         #Le joueur arrive par la porte
-        if replique == "Oui, tu veux nous rejoindre ?":
-            self.replique="Avec grand plaisir ! Mes talents d'alchimiste vous serons d'une grande aide."
-            self.repliques = ["Un alchimiste ! Qu'est-ce que tu peux faire ?","Je ferais appel à toi."]
-        elif replique == "Un alchimiste ! Qu'est-ce que tu peux faire ?":
-            self.replique="Créer des potions, examiner des potions... Je sais aussi utiliser plein de magies."
-            self.repliques = ["Je ferais appel à toi."]
-        elif replique == "Je ferais appel à toi.":
+        if replique == "dialogue1reponse1.1":
+            self.replique="dialogue1phrase1.1"
+            self.repliques = ["dialogue1reponse1.1.1","dialogue1reponse1.1.2"]
+        elif replique == "dialogue1reponse1.1.1":
+            self.replique="dialogue1phrase1.1.1"
+            self.repliques = ["dialogue1reponse1.1.2"]
+        elif replique == "dialogue1reponse1.1.2":
             self.end_dialogue()
             self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
             self.mouvement = 0 #Légèrement redondant ici
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
             self.attente = False
-        elif replique == "Ne fais pas attention, vieillard, on ne faisait que passer.":
+        elif replique == "dialogue1reponse1.2":
             self.appreciations[0] -= 0.5
             self.end_dialogue(-2)
             self.statut_humain = "exploration"
 
         #Dialogue par défaut -2
-        elif replique == "Tu ne voudrais pas rejoindre notre groupe ? Pour ta propre sécurité.":
-            self.replique="Non merci, je me débrouille très bien tout seul."
-            self.repliques = ["Comme tu voudras.","Ne t'étonne pas de mourir !"]
-        elif replique == "Comme tu voudras.":
+        elif replique == "dialogue-2reponse1.1":
+            self.replique="dialogue-2phrase1.1"
+            self.repliques = ["dialogue-2reponse1.1.1","dialogue-2reponse1.1.2"]
+        elif replique == "dialogue-2reponse1.1.1":
             self.end_dialogue(-2)
             self.statut_humain = "exploration"
-        elif replique == "Ne t'étonne pas de mourir !":
+        elif replique == "dialogue-2reponse1.1.2":
             self.end_dialogue(-2)
             self.offenses.append([2,0.01])
             self.statut_humain = "exploration"
             self.attente = False
-        elif replique == "Désolé pour mon comportement.":
-            self.replique="Disons que ça passe pour cette fois."
-            self.repliques = ["Du coup, est-ce que tu voudrais rejoindre notre groupe ?"]
-        elif replique == "Du coup, est-ce que tu voudrais rejoindre notre groupe ?":
-            self.replique="Pourquoi pas. On n'est plus forts à plusieurs."
-            self.repliques = ["Bienvenu. Et désolé encore."]
-        elif replique == "Bienvenu. Et désolé encore.":
+        elif replique == "dialogue-2reponse1.2":
+            self.replique="dialogue-2phrase1.2"
+            self.repliques = ["dialogue-2reponse1.2.1"]
+        elif replique == "dialogue-2reponse1.2.1":
+            self.replique="dialogue-2phrase1.2.1"
+            self.repliques = ["dialogue-2reponse1.2.1"]
+        elif replique == "dialogue-2reponse1.2.1":
             self.end_dialogue()
             self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
             self.mouvement = 0 #Légèrement redondant ici
@@ -7028,92 +6893,65 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
             self.attente = False
 
         #Dialogue par défaut:
-        elif replique == "J'ai besoin que tu ailles quelque part.":
-            self.replique = "Où ?"
-            self.repliques = ["Tu peux suivre quelqu'un ?","Tu vois là-bas ?","Cherche la sortie."]
-        elif replique == "Tu peux suivre quelqu'un ?":
+        elif replique == "dialogue-1reponse1.1":
+            self.replique = "dialogue-1phrase1.1"
+            self.repliques = ["dialogue-1reponse1.1.1","dialogue-1reponse1.1.2","dialogue-1reponse1.1.3"]
+        elif replique == "dialogue-1reponse1.1.1":
             self.mouvement = 0
-            self.replique = "Oui, qui ?"
-            self.repliques = ["Moi.","Je vais te montrer."]
-        elif replique == "Moi.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
+            self.replique = "dialogue-1phrase1.1.1"
+            self.repliques = ["dialogue-1reponse1.1.1.1","dialogue-1reponse1.1.1.2"]
+        elif replique == "dialogue-1reponse1.1.1.1":
+            self.replique = "dialogue-1phrase1.1.3"
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.4"]
+            if self.controleur.entitees[2].a_parchemin_vierge():
+                self.repliques.append("dialogue-1reponse1.3")
+            self.repliques.append("dialogue-1reponse1.5")
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
-        elif replique == "Je vais te montrer.":
+        elif replique == "dialogue-1reponse1.1.1.2":
             self.controleur.get_entitee(2).start_select_agissant_dialogue()
             self.controleur.get_entitee(2).event = COMPLEMENT_DIALOGUE
-        elif replique == "Tu vois là-bas ?":
+        elif replique == "dialogue-1reponse1.1.2":
             self.controleur.get_entitee(2).start_select_case_dialogue()
             self.controleur.get_entitee(2).event = COMPLEMENT_DIALOGUE
-        elif replique == "Cherche la sortie.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
+        elif replique == "dialogue-1reponse1.1.3":
+            self.replique="dialogue-1phrase1.1.3"
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.4"]
+            if self.controleur.entitees[2].a_parchemin_vierge():
+                self.repliques.append("dialogue-1reponse1.3")
+            self.repliques.append("dialogue-1reponse1.5")
             self.mouvement = 1
-        elif replique == "Change de stratégie au combat.":
-            self.replique = "Envers les ennemis, ou les monstres neutres ?"
-            self.repliques = ["Les ennemis, ceux qui nous ont déjà attaqués.","Les neutres."]
-        elif replique == "Les ennemis, ceux qui nous ont déjà attaqués.":
-            self.replique = "Qu'est-ce que je leur fait ?"
-            self.repliques = ["Attaque-les, ils nous ont attaqué en premier.","Ignore-les, on a plus important à faire.","Fuis-les, ça sera plus sûr."]
-        elif replique == "Attaque-les, ils nous ont attaqué en premier.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_ennemis = 0
-        elif replique == "Ignore-les, on a plus important à faire.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_ennemis = 1
-        elif replique == "Fuis-les, ça sera plus sûr.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_ennemis = 2
-        elif replique == "Les neutres.":
-            self.replique = "Qu'est-ce que je leur fait ?"
-            self.repliques = ["Attaque-les, l'attaque est la meilleure défense.","Ignore-les, tant qu'ils ne nous agressent pas.","Fuis-les, tous les monstres sont dangereux."]
-        elif replique == "Attaque-les, l'attaque est la meilleure défense.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_neutres = 0
-        elif replique == "Ignore-les, tant qu'ils ne nous agressent pas.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_neutres = 1
-        elif replique == "Fuis-les, tous les monstres sont dangereux.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_neutres = 2
-        elif replique == "Merci.":
+        elif replique == "dialogue-1reponse1.5":
             self.end_dialogue(-1)
-        elif replique == "Fais-moi un item.":
-            self.replique = "Bien sûr, quoi ?"
-            self.repliques = ["Parchemin vierge"]
-        elif replique == "Parchemin vierge":
-            self.replique = "Voilà. Tu veux que j'y impregne une magie ?"
-            self.repliques = ["Oui, s'il te plait","Non merci."]
-        elif replique == "Oui, s'il te plait":
+        elif replique == "dialogue-1reponse1.4":
+            self.replique = "dialogue-1phrase1.4"
+            self.repliques = ["dialogue-1reponse1.4.1"]
+        elif replique == "dialogue-1reponse1.4.1":
+            self.replique = "dialogue-1phrase1.4.1"
+            self.repliques = ["dialogue-1reponse1.4.1.1","dialogue-1reponse1.4.1.2"]
+        elif replique == "dialogue-1reponse1.4.1.1":
             joueur = self.controleur.get_entitee(2)
             joueur.methode_fin = joueur.fin_menu_impregnation
             skill = trouve_skill(self.classe_principale,Skill_magie)
             joueur.options_menu = skill.menu_magie()
             joueur.start_menu()
-        elif replique == "Non merci.":
+        elif replique == "dialogue-1reponse1.4.1.2":
             parch = Parchemin_vierge(None)
             self.controleur.ajoute_entitee(parch)
             self.controleur.get_entitee(2).inventaire.ajoute(parch)
             self.end_dialogue(-1)
-        elif replique == "On peut discuter ?":
-            self.replique = "On a pas vraiment le temps, là..."
-            self.repliques = ["Ah, c'est vrai..."]
-        elif replique == "Ah, c'est vrai...":
+        elif replique == "dialogue-1reponse1.2":
+            self.replique = "dialogue-1phrase1.2"
+            self.repliques = ["dialogue-1reponse1.2.1"]
+        elif replique == "dialogue-1reponse1.2.1":
             self.end_dialogue(-1)
-        elif replique == "Place une magie sur un parchemin.":
+        elif replique == "dialogue-1reponse1.3":
             if self.controleur.entitees[2].consomme_parchemin_vierge():
-                self.replique = "Bien sûr. Quelle magie veux-tu ?"
-                self.repliques = ["Qu'est-ce que tu as ?"]
+                self.replique = "dialogue-1phrase1.3"
+                self.repliques = ["dialogue-1reponse1.3.1"]
             else:
-                self.replique = "On dirait que tu n'as pas de parchemin vierge... Je peux faire autre chose ?"
-                self.repliques = ["J'ai besoin que tu ailles quelque part.","Change de stratégie au combat.","Fais-moi un item.","Examine un item.","Lance un sort.","On peut discuter ?"]
-        elif replique == "Qu'est-ce que tu as ?":
+                self.replique = "dialogue-1phrase1.3refus"
+                self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.4","dialogue-1reponse1.5"]
+        elif replique == "dialogue-1reponse1.3.1":
             joueur = self.controleur.get_entitee(2)
             joueur.methode_fin = joueur.fin_menu_impregnation
             skill = trouve_skill(self.classe_principale,Skill_magie)
@@ -7125,6 +6963,9 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
             print("Je ne connais pas cette réplique !")
 
         self.replique_courante = 0
+
+    def get_replique(self,code):
+        return REPLIQUES_ALCHIMISTE[code]
 
     def impregne(self,nom):
         skill = trouve_skill(self.classe_principale,Skill_magie)
@@ -7139,16 +6980,17 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
             parch = Parchemin_impregne(None,magie,cout//2)
             self.controleur.ajoute_entitee(parch)
             self.controleur.get_entitee(2).inventaire.ajoute(parch)
-            self.replique = "Je peux faire autre chose ?"
-            self.repliques = ["J'ai besoin que tu ailles quelque part.","Change de stratégie au combat.","Fais-moi un item.","Examine un item.","Lance un sort.","On peut discuter ?"]
+            self.replique = "dialogue-1phrase1.3.1"
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.4"]
             if self.controleur.entitees[2].a_parchemin_vierge():
-                self.repliques.append("Place une magie sur un parchemin.")
+                self.repliques.append("dialogue-1reponse1.3")
+            self.repliques.append("dialogue-1reponse1.5")
         else:
             parch = Parchemin_vierge(None)
             self.controleur.ajoute_entitee(parch)
             self.controleur.get_entitee(2).inventaire.ajoute(parch)
-            self.replique = "Je n'ai pas assez de mana pour cette magie... Je peux faire autre chose ?"
-            self.repliques = ["J'ai besoin que tu ailles quelque part.","Change de stratégie au combat.","Fais-moi un item.","Examine un item.","Lance un sort.","On peut discuter ?","Place une magie sur un parchemin."]
+            self.replique = "dialogue-1phrase1.3.1echec"
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.4","dialogue-1reponse1.5"]
 
     def get_skin_tete(self):
         return SKIN_TETE_ALCHIMISTE
@@ -7203,22 +7045,22 @@ class Peste(Multi_soigneur_protecteur,Support_lointain,Humain): #La huitième hu
         self.replique_courante = 0
         #La plupart dépendent du dialogue
         if self.dialogue == -1: #Le joueur est venu nous voir de son propre chef
-            self.replique = "Qu'est-ce que je dois faire pour tuer plus de monstres ?"
-            self.repliques = ["Si tu vas à un certain endroit, on pourrait tuer plus de monstres.","Je voulais te parler d'un truc."]
+            self.replique = "dialogue-1phrase1"
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"]
             if self.controleur.entitees[2].a_parchemin_vierge():
-                self.repliques.append("Est-ce que tu pourrais placer une magie sur un parchemin ?")
+                self.repliques.append("dialogue-1reponse1.3")
         elif self.dialogue == -2: #Le joueur veut se débrouiller seul
-            self.replique = "(Je n'arriverai jamais à tuer tous les monstres...)"
-            self.repliques = ["Tu parles toute seule ? Tu ne serais pas un peu folle ?","On peut s'entraider pour tuer les monstres ?"]
+            self.replique = "dialogue-2phrase1"
+            self.repliques = ["dialogue-2reponse1.1","dialogue-2reponse1.2"]
         elif self.dialogue == -3: #Le joueur ne veut pas tuer tous les monstres
-            self.replique = "Tu peux me laisser ? J'ai des monstres à tuer."
-            self.repliques = [" "]
+            self.replique = "dialogue-3phrase1"
+            self.repliques = ["dialogue-3reponse1.1"]
         elif self.dialogue == -4:
-            self.replique = "Meurs !"
-            self.repliques = ["  "]
+            self.replique = "dialogue-4phrase1"
+            self.repliques = ["dialogue-4reponse1.1"]
         elif self.dialogue == 1:
-            self.replique = "Hey, toi !"
-            self.repliques = ["Qu'est-ce qu'il y a ?","Ne me parle pas comme ça !"]
+            self.replique = "dialogue1phrase1"
+            self.repliques = ["dialogue1reponse1.1","dialogue1reponse1.2"]
 
     def interprete(self,nb_replique):
         #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
@@ -7227,48 +7069,63 @@ class Peste(Multi_soigneur_protecteur,Support_lointain,Humain): #La huitième hu
 
         #Premier dialogue
         #Le joueur arrive par la porte
-        if replique == "Qu'est-ce qu'il y a ?":
-            self.replique="J'ai besoin d'aide pour tuer tous ces immondes monstres."
-            self.repliques = ["Tu pourrais rejoindre notre groupe.","Est-on obligé de tous les tuer ?"]
-        elif replique == "Tu pourrais rejoindre notre groupe.":
-            self.replique="Ok. Je peux vous soigner si ces sales monstres vous blessent."
-            self.repliques = ["Tu as des capacité de guérison ?","D'accord."]
-        elif replique == "Tu as des capacité de guérison ?":
-            self.replique="Je suis la Sainte choisie par le grand Dieu [insérer le nom d'un Dieu ici] ! Tu ne trouveras pas de meilleure guérisseuse dans tout [insérer le nom d'une capitale ici]."
-            self.repliques = ["Waoh ! Je compterais sur toi alors."]
-        elif replique in ["Waoh ! Je compterais sur toi alors.","D'accord.","Je veux bien"]:
+        if replique == "dialogue1reponse1.1":
+            self.replique="dialogue1phrase1.1"
+            self.repliques = ["dialogue1reponse1.1.1","dialogue1reponse1.1.2"]
+        elif replique == "dialogue1reponse1.1.1":
+            self.replique="dialogue1phrase1.1.1"
+            self.repliques = ["dialogue1reponse1.1.1.1","dialogue1reponse1.1.1.2"]
+        elif replique == "dialogue1reponse1.1.1.1":
+            self.replique="dialogue1phrase1.1.1.1"
+            self.repliques = ["dialogue1reponse1.1.1.1.1"]
+        elif replique in ["dialogue1reponse1.1.1.1.1","dialogue1reponse1.1.1.2","dialogue1reponse1.1.2.1.2","dialogue1reponse1.2.1.1.1.1"]:
             self.end_dialogue()
             self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
             self.mouvement = 0 #Légèrement redondant ici
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
             self.attente = False
-        elif replique == "Est-on obligé de tous les tuer ?":
+        elif replique == "dialogue1reponse1.1.2":
             self.appreciations[0] -= 0.5
-            self.replique="Tu voudrais laisser ces vermines en vie !?"
-            self.repliques = ["Non, non, bien sûr que non...","Si ça peut nous permettre de rester en vie..."]
-        elif replique == "Non, non, bien sûr que non...":
-            self.replique="Alors, tu m'aides ?"
-            self.repliques = ["Non, je me débrouillerai tout seul.","Je veux bien."]
-        elif replique == "Non, je me débrouillerai tout seul.":
+            self.replique="dialogue1phrase1.1.2"
+            self.repliques = ["dialogue1reponse1.1.2.1","dialogue1reponse1.1.2.2"]
+        elif replique == "dialogue1reponse1.1.2.1":
+            self.replique="dialogue1phrase1.1.2.1"
+            self.repliques = ["dialogue1reponse1.1.2.1.1","dialogue1reponse1.1.2.1.2"]
+        elif replique in ["dialogue1reponse1.1.2.1.1","dialogue1reponse1.2.1.1.2","dialogue1reponse1.2.2.1"]:
             self.end_dialogue(-2)
             self.statut_humain = "exploration"
-        elif replique == "Si ça peut nous permettre de rester en vie...":
+        elif replique == "dialogue1reponse1.1.2.2":
             self.end_dialogue(-3)
             self.statut_humain = "exploration"
+        elif replique == "dialogue1reponse1.2":
+            self.replique="dialogue1phrase1.2"
+            self.repliques = ["dialogue1reponse1.2.1","dialogue1reponse1.2.2"]
+        elif replique == "dialogue1reponse1.2.1":
+            self.replique="dialogue1phrase1.2.1"
+            self.repliques = ["dialogue1reponse1.2.1.1"]
+        elif replique == "dialogue1reponse1.2.1.1":
+            self.replique="dialogue1phrase1.2.1.1"
+            self.repliques = ["dialogue1reponse1.2.1.1.1","dialogue1reponse1.2.1.1.2"]
+        elif replique == "dialogue1reponse1.2.1.1.1":
+            self.replique="dialogue1phrase1.2.1.1.1"
+            self.repliques = ["dialogue1reponse1.2.1.1.1.1"]
+        elif replique == "dialogue1reponse1.2.2":
+            self.replique="dialogue1phrase1.2.2"
+            self.repliques = ["dialogue1reponse1.2.2.1"]
 
         #Dialogue par défaut -2
-        elif replique == "Tu parles toute seule ? Tu ne serais pas un peu folle ?":
-            self.replique="De quel droit m'insulte-tu ? Meurs !"
-            self.repliques = [""]
-        elif replique == "":
+        elif replique == "dialogue-2reponse1.1":
+            self.replique="dialogue-2phrase1.1"
+            self.repliques = ["dialogue-2reponse1.1"]
+        elif replique == "dialogue-2reponse1.1":
             self.end_dialogue(-4)
             self.offenses.append([2,0.01])
             self.statut_humain = "exploration"
             self.attente = False
-        elif replique == "On peut s'entraider pour tuer les monstres ?":
-            self.replique="Humph. D'accord."
-            self.repliques = ["Merci."]
-        elif replique == "Merci":
+        elif replique == "dialogue-2reponse1.2":
+            self.replique="dialogue-2phrase1.2"
+            self.repliques = ["dialogue-2reponse1.2.1"]
+        elif replique == "dialogue-2reponse1.2.1":
             self.end_dialogue()
             self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
             self.mouvement = 0 #Légèrement redondant ici
@@ -7276,80 +7133,56 @@ class Peste(Multi_soigneur_protecteur,Support_lointain,Humain): #La huitième hu
             self.attente = False
 
         #Dialogue par défaut -3
-        elif replique == " ":
+        elif replique == "dialogue-3reponse1.1":
             self.end_dialogue(-3)
 
         #Dialogue par défaut -4
-        elif replique == "  ":
+        elif replique == "dialogue-4reponse1.1":
             self.end_dialogue(-4)
 
         #Dialogue par défaut:
-        elif replique == "Si tu vas à un certain endroit, on pourrait tuer plus de monstres.":
-            self.replique = "Où ?"
-            self.repliques = ["Tu peux suivre quelqu'un ?","Tu vois là-bas ?","Cherche la sortie."]
-        elif replique == "Tu peux suivre quelqu'un ?":
+        elif replique == "dialogue-1reponse1.1":
+            self.replique = "dialogue-1phrase1.1"
+            self.repliques = ["dialogue-1reponse1.1.1","dialogue-1reponse1.1.2","dialogue-1reponse1.1.3"]
+        elif replique == "dialogue-1reponse1.1.1":
             self.mouvement = 0
-            self.replique = "Oui, qui ?"
-            self.repliques = ["Moi.","Je vais te montrer."]
-        elif replique == "Moi.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
+            self.replique = "dialogue-1phrase1.1.1"
+            self.repliques = ["dialogue-1reponse1.1.1.1","dialogue-1reponse1.1.1.2"]
+        elif replique == "dialogue-1reponse1.1.1.1":
+            self.replique = "dialogue-1phrase1.1.1.1"
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"]
+            if self.controleur.entitees[2].a_parchemin_vierge():
+                self.repliques.append("dialogue-1reponse1.3")
+            self.repliques.append("dialogue-1reponse1.4")
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
-        elif replique == "Je vais te montrer.":
+        elif replique == "dialogue-1reponse1.1.1.2":
             self.controleur.get_entitee(2).start_select_agissant_dialogue()
             self.controleur.get_entitee(2).event = COMPLEMENT_DIALOGUE
-        elif replique == "Tu vois là-bas ?":
+        elif replique == "dialogue-1reponse1.1.2":
             self.controleur.get_entitee(2).start_select_case_dialogue()
             self.controleur.get_entitee(2).event = COMPLEMENT_DIALOGUE
-        elif replique == "Cherche la sortie.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
+        elif replique == "dialogue-1reponse1.1.3":
+            self.replique = "dialogue-1phrase1.1.3"
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"]
+            if self.controleur.entitees[2].a_parchemin_vierge():
+                self.repliques.append("dialogue-1reponse1.3")
+            self.repliques.append("dialogue-1reponse1.4")
             self.mouvement = 1
-        elif replique == "Change ta méthode de combat.":
-            self.replique = "Envers les ennemis, ou les monstres neutres ?"
-            self.repliques = ["Les ennemis, ceux qui nous ont déjà attaqués.","Les neutres."]
-        elif replique == "Les ennemis, ceux qui nous ont déjà attaqués.":
-            self.replique = "Qu'est-ce que je leur fait ?"
-            self.repliques = ["Attaque-les, ils nous ont attaqué en premier.","Ignore-les, on a plus important à faire.","Fuis-les, ça sera plus sûr."]
-        elif replique == "Attaque-les, ils nous ont attaqué en premier.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_ennemis = 0
-        elif replique == "Ignore-les, on a plus important à faire.":
-            self.replique = "Ignorer des monstres ? Tu es fou ? Il faut tous les exterminer !"
-            self.repliques = ["Ah, c'est vrai..."]
-        elif replique == "Fuis-les, ça sera plus sûr.":
-            self.replique = "Je ne fuirais jamais devant les monstres !"
-            self.repliques = ["Ah, c'est vrai..."]
-        elif replique == "Les neutres.":
-            self.replique = "Qu'est-ce que je leur fait ?"
-            self.repliques = ["Attaque-les, l'attaque est la meilleure défense.","Ignore-les, tant qu'ils ne nous agressent pas.","Fuis-les, tous les monstres sont dangereux."]
-        elif replique == "Attaque-les, l'attaque est la meilleure défense.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_neutres = 0
-        elif replique == "Ignore-les, tant qu'ils ne nous agressent pas.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_neutres = 1
-        elif replique == "Fuis-les, tous les monstres sont dangereux.":
-            self.replique = "Je ne fuirais jamais devant les monstres !"
-            self.repliques = ["Ah, c'est vrai..."]
-        elif replique == "Merci.":
+        elif replique == "dialogue-1reponse1.4":
             self.end_dialogue(-1)
-        elif replique == "Je voulais te parler d'un truc.":
-            self.replique = "On a pas vraiment le temps, là..."
-            self.repliques = ["Ah, c'est vrai..."]
-        elif replique == "Ah, c'est vrai...":
+        elif replique == "dialogue-1reponse1.2":
+            self.replique = "dialogue-1phrase1.2"
+            self.repliques = ["dialogue-1reponse1.2.1"]
+        elif replique == "dialogue-1reponse1.2.1":
             self.end_dialogue(-1)
-        elif replique == "Est-ce que tu pourrais placer une magie sur un parchemin ?":
+        elif replique == "dialogue-1reponse1.3":
             if self.controleur.entitees[2].consomme_parchemin_vierge():
-                self.replique = "Bien sûr. Quelle magie veux-tu ?"
-                self.repliques = ["Qu'est-ce que tu as ?"]
+                self.replique = "dialogue-1phrase1.3"
+                self.repliques = ["dialogue-1reponse1.3.1"]
             else:
-                self.replique = "On dirait que tu n'as pas de parchemin vierge... Je peux faire autre chose ?"
-                self.repliques = ["Si tu vas à un certain endroit, on pourrait tuer plus de monstres.","Je voulais te parler d'un truc."]
-        elif replique == "Qu'est-ce que tu as ?":
+                self.replique = "dialogue-1phrase1.3refus"
+                self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.4"]
+        elif replique == "dialogue-1reponse1.3.1":
             joueur = self.controleur.get_entitee(2)
             joueur.methode_fin = joueur.fin_menu_impregnation
             skill = trouve_skill(self.classe_principale,Skill_magie)
@@ -7361,6 +7194,9 @@ class Peste(Multi_soigneur_protecteur,Support_lointain,Humain): #La huitième hu
             print("Je ne connais pas cette réplique !")
 
         self.replique_courante = 0
+
+    def get_replique(self,code):
+        return REPLIQUES_PESTE[code]
 
     def impregne(self,nom):
         skill = trouve_skill(self.classe_principale,Skill_magie)
@@ -7375,16 +7211,17 @@ class Peste(Multi_soigneur_protecteur,Support_lointain,Humain): #La huitième hu
             parch = Parchemin_impregne(None,magie,cout//2)
             self.controleur.ajoute_entitee(parch)
             self.controleur.get_entitee(2).inventaire.ajoute(parch)
-            self.replique = "Je peux faire autre chose ?"
-            self.repliques = ["Si tu vas à un certain endroit, on pourrait tuer plus de monstres.","Je voulais te parler d'un truc."]
+            self.replique = "dialogue-1phrase1.3.1"
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"]
             if self.controleur.entitees[2].a_parchemin_vierge():
-                self.repliques.append("Place une magie sur un parchemin.")
+                self.repliques.append("dialogue-1reponse1.3")
+            self.repliques.append("dialogue-1reponse1.4")
         else:
             parch = Parchemin_vierge(None)
             self.controleur.ajoute_entitee(parch)
             self.controleur.get_entitee(2).inventaire.ajoute(parch)
-            self.replique = "Je n'ai pas assez de mana pour cette magie... Je peux faire autre chose ?"
-            self.repliques = ["Si tu vas à un certain endroit, on pourrait tuer plus de monstres.","Je voulais te parler d'un truc.","Place une magie sur un parchemin."]
+            self.replique = "dialogue-1phrase1.3.1echec"
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.4"]
 
     def get_skin_tete(self):
         return SKIN_TETE_PESTE
@@ -7446,19 +7283,19 @@ class Bombe_atomique(Attaquant_magique_case,Support,Humain): #La neuvième humai
         self.replique_courante = 0
         #La plupart dépendent du dialogue
         if self.dialogue == -1: #Le joueur est venu nous voir de son propre chef
-            self.replique = "Tu as besoin d'aide, mon chou ?"
-            self.repliques = ["Est-ce que tu pourrais aller quelque-part ?","C'est à propos des combats.","On peut parler en privé ?"]
+            self.replique = "dialogue-1phrase1"
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"]
             if self.controleur.entitees[2].a_parchemin_vierge():
-                self.repliques.append("Est-ce que tu peux placer une magie sur un parchemin ?")
+                self.repliques.append("dialogue-1reponse1.3")
         elif self.dialogue == -2:
-            self.replique = "Ah, c'est encore toi ?"
-            self.repliques = ["Tu ne voudrais pas m'accompagner ?","Désolé, je me suis trompé de personne."]
+            self.replique = "dialogue-2phrase1"
+            self.repliques = ["dialogue-2reponse1.1","dialogue-2reponse1.2"]
         elif self.dialogue == -3:
-            self.replique = "Meurs !"
-            self.repliques = ["   "]
+            self.replique = "dialogue-3phrase1"
+            self.repliques = ["dialogue-3reponse1.1"]
         elif self.dialogue == 1:
-            self.replique = "Bonjour mon chou..."
-            self.repliques = ["Bonjour ma belle.","Bonjour..."]
+            self.replique = "dialogue1phrase1"
+            self.repliques = ["dialogue1reponse1.1","dialogue1reponse1.2"]
 
     def interprete(self,nb_replique):
         #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
@@ -7467,151 +7304,130 @@ class Bombe_atomique(Attaquant_magique_case,Support,Humain): #La neuvième humai
 
         #Premier dialogue
         #Le joueur arrive par la porte
-        if replique == "Bonjour ma belle.":
+        if replique == "dialogue1reponse1.2":
             self.appreciations[0] += 0.5
-            self.replique="Qu'est-ce qui t'amène ici ?"
-            self.repliques = ["Je cherche la sortie.","Je t'ai aperçue de loin, et j'ai voulu faire ta connaissance."]
-        elif replique == "Je cherche la sortie.":
-            self.replique="Moi aussi. On peut faire un bout de chemin ensemble ?"
-            self.repliques = ["Avec plaisir.","Non merci."]
-        elif replique in ["Avec plaisir.","Comment refuser une compagnie si agréable ?","Merci. ","J'y penserai.","Ok. Accompagne-moi alors."]:
+            self.replique="dialogue1phrase1.1"
+            self.repliques = ["dialogue1reponse1.1.1","dialogue1reponse1.1.2"]
+        elif replique == "dialogue1reponse1.1.1":
+            self.replique="dialogue1phrase1.1.1"
+            self.repliques = ["dialogue1reponse1.1.1.1","dialogue1reponse1.1.1.2"]
+        elif replique in ["dialogue1reponse1.1.1.1","dialogue1reponse1.1.2.1","dialogue1reponse1.1.3.1.1","dialogue1reponse1.1.4.1.1","dialogue1reponse1.1.4.2.2"]:
             self.end_dialogue()
             self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
             self.mouvement = 0 #Légèrement redondant ici
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
             self.attente = False
-        elif replique == "Non merci.":
+        elif replique == "dialogue1reponse1.1.1.2":
             self.end_dialogue(-2)
             self.statut_humain = "exploration"
-        elif replique == "Je t'ai aperçue de loin, et j'ai voulu faire ta connaissance.":
+        elif replique == "dialogue1reponse1.1.2":
             self.appreciations[0] += 0.5
-            self.replique="Ahah... Tu veux que je tienne un peu compagnie ?"
-            self.repliques = ["Comment refuser une compagnie si agréable ?","Non merci."]
-        elif replique == "Bonjour...":
-            self.replique=""
-            self.repliques = ["...tu sais où est la sortie ?","...tu sais te battre ?"]
-        elif replique == "...tu sais où est la sortie ?":
-            self.replique="Au centième étage. Tu as encore du chemin à faire..."
-            self.repliques = ["Tu pourrais m'aider ?","Je n'ai pas de temps à perdre alors. À plus."]
-        elif replique == "Tu pourrais m'aider ?":
-            self.replique="Je suppose que je peux t'accompagner pour un bout du chemin."
-            self.repliques = ["Merci. "]
-        elif replique == "Je n'ai pas de temps à perdre alors. À plus.":
+            self.replique="dialogue1phrase1.1.2"
+            self.repliques = ["dialogue1reponse1.1.2.1","dialogue1reponse1.1.1.2"]
+        elif replique == "Euh... bonjour...":
+            self.replique="dialogue1phrase1.2"
+            self.repliques = ["dialogue1reponse1.2.1","dialogue1reponse1.2.2"]
+        elif replique == "dialogue1reponse1.2.1":
+            self.replique="dialogue1phrase1.2.2"
+            self.repliques = ["dialogue1reponse1.1.3.1","dialogue1reponse1.1.3.2"]
+        elif replique == "dialogue1reponse1.1.3.1":
+            self.replique="dialogue1phrase1.1.3.1"
+            self.repliques = ["dialogue1reponse1.1.3.1.1"]
+        elif replique == "dialogue1reponse1.1.3.2":
             self.end_dialogue(-2)
             self.statut_humain = "exploration"
-        elif replique == "...tu sais te battre ?":
-            self.replique="Tu veux que je te montre ?"
-            self.repliques = ["Non, je te crois. Ça t'intéresserait de venir avec moi ?","Ouais, amène-toi."]
-        elif replique == "Non, je te crois. Ça t'intéresserait de venir avec moi ?":
-            self.replique="Oui. Demande-moi si tu as un monstre à carboniser."
-            self.repliques = ["J'y penserai."]
-        elif replique == "Ouais, amène-toi.":
-            self.replique="Non, je voulais dire, te montrer sur les monstres."
-            self.repliques = ["Je te fais peur ?","Ok. Accompagne-moi alors."]
-        elif replique == "Je te fais peur ?":
-            self.replique="Tu l'auras voulu..."
-            self.repliques = [" "]
-        elif replique == " ":
+        elif replique == "dialogue1reponse1.2.2":
+            self.replique="dialogue1phrase1.2.2"
+            self.repliques = ["dialogue1reponse1.1.4.1","dialogue1reponse1.1.4.2"]
+        elif replique == "dialogue1reponse1.1.4.1":
+            self.replique="dialogue1phrase1.1.4.1"
+            self.repliques = ["dialogue1reponse1.1.4.1.1"]
+        elif replique == "dialogue1reponse1.1.4.2":
+            self.replique="dialogue1phrase1.1.4.2"
+            self.repliques = ["dialogue1reponse1.1.4.2.1","dialogue1reponse1.1.4.2.2"]
+        elif replique == "dialogue1reponse1.1.4.2.1":
+            self.replique="dialogue1phrase1.1.4.2.1"
+            self.repliques = ["dialogue1reponse1.1.4.2.1.1"]
+        elif replique == "dialogue1reponse1.1.4.2.1.1":
             self.end_dialogue(-3)
             self.offenses.append([2,0.01])
             self.statut_humain = "exploration"
             self.attente = False
 
         #Dialogue par défaut -2
-        elif replique == "Tu ne voudrais pas m'accompagner ?":
-            self.replique="Ok."
-            self.repliques = ["  "]
-        elif replique == "  ":
+        elif replique == "dialogue-2reponse1.1":
+            self.replique="dialogue-2phrase1.1"
+            self.repliques = ["dialogue-2reponse1.1.1"]
+        elif replique == "dialogue-2reponse1.1.1":
             self.appreciations[0] -= 0.5
             self.end_dialogue()
-        elif replique == "Désolé, je me suis trompé de personne.":
+        elif replique == "dialogue-2reponse1.2":
             self.end_dialogue(-2)
 
         #Dialogue par défaut -3
-        elif replique == "   ":
+        elif replique == "dialogue-3reponse1.1":
+            self.replique = "dialogue-3phrase1.1"
+            self.repliques = ["dialogue-3reponse1.1.1"]
+        elif replique == "dialogue-3reponse1.1.1":
             self.end_dialogue(-3)
 
         #Dialogue par défaut:
-        elif replique == "Est-ce que tu pourrais aller quelque-part ?":
-            self.replique = "Où ?"
-            self.repliques = ["Tu peux suivre quelqu'un ?","Tu vois là-bas ?","Cherche la sortie."]
-        elif replique == "Tu peux suivre quelqu'un ?":
+        elif replique == "dialogue-1reponse1.1":
+            self.replique = "dialogue-1phrase1.1"
+            self.repliques = ["dialogue-1reponse1.1.1","dialogue-1reponse1.1.2","dialogue-1reponse1.1.3"]
+        elif replique == "dialogue-1reponse1.1.1":
             self.mouvement = 0
-            self.replique = "Oui, qui ?"
-            self.repliques = ["Moi.","Je vais te montrer."]
-        elif replique == "Moi.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
+            self.replique = "dialogue-1phrase1.1.1"
+            self.repliques = ["dialogue-1reponse1.1.1.1","dialogue-1reponse1.1.1.2"]
+        elif replique == "dialogue-1reponse1.1.1.1":
+            self.replique = "dialogue-1phrase1.1.3"
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"]
+            if self.controleur.entitees[2].a_parchemin_vierge():
+                self.repliques.append("dialogue-1reponse1.3")
+            self.repliques.append("dialogue-1reponse1.4")
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
-        elif replique == "Je vais te montrer.":
+        elif replique == "dialogue-1reponse1.1.1.2":
             self.controleur.get_entitee(2).start_select_agissant_dialogue()
             self.controleur.get_entitee(2).event = COMPLEMENT_DIALOGUE
-        elif replique == "Tu vois là-bas ?":
+        elif replique == "dialogue-1reponse1.1.2":
             self.controleur.get_entitee(2).start_select_case_dialogue()
             self.controleur.get_entitee(2).event = COMPLEMENT_DIALOGUE
-        elif replique == "Cherche la sortie.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
+        elif replique == "dialogue-1reponse1.1.3":
+            self.replique = "dialogue-1phrase1.1.3"
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"]
+            if self.controleur.entitees[2].a_parchemin_vierge():
+                self.repliques.append("dialogue-1reponse1.3")
+            self.repliques.append("dialogue-1reponse1.4")
             self.mouvement = 1
-        elif replique == "C'est à propos des combats.":
-            self.replique = "Envers les ennemis, ou les monstres neutres ?"
-            self.repliques = ["Les ennemis, ceux qui nous ont déjà attaqués.","Les neutres."]
-        elif replique == "Les ennemis, ceux qui nous ont déjà attaqués.":
-            self.replique = "Qu'est-ce que je leur fait ?"
-            self.repliques = ["Attaque-les, ils nous ont attaqué en premier.","Ignore-les, on a plus important à faire.","Fuis-les, ça sera plus sûr."]
-        elif replique == "Attaque-les, ils nous ont attaqué en premier.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_ennemis = 0
-        elif replique == "Ignore-les, on a plus important à faire.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_ennemis = 1
-        elif replique == "Fuis-les, ça sera plus sûr.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_ennemis = 2
-        elif replique == "Les neutres.":
-            self.replique = "Qu'est-ce que je leur fait ?"
-            self.repliques = ["Attaque-les, l'attaque est la meilleure défense.","Ignore-les, tant qu'ils ne nous agressent pas.","Fuis-les, tous les monstres sont dangereux."]
-        elif replique == "Attaque-les, l'attaque est la meilleure défense.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_neutres = 0
-        elif replique == "Ignore-les, tant qu'ils ne nous agressent pas.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_neutres = 1
-        elif replique == "Fuis-les, tous les monstres sont dangereux.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_neutres = 2
-        elif replique == "Merci.":
+        elif replique == "dialogue-1reponse1.2":
+            self.replique = "dialogue-1phrase1.2"
+            self.repliques = ["dialogue-1reponse1.2.1"]
+        elif replique == "dialogue-1reponse1.2.1":
             self.end_dialogue(-1)
-        elif replique == "On peut parler en privé ?":
-            self.replique = "On a pas vraiment le temps, là..."
-            self.repliques = ["Ah, c'est vrai..."]
-        elif replique == "Ah, c'est vrai...":
-            self.end_dialogue(-1)
-        elif replique == "Est-ce que tu peux placer une magie sur un parchemin ?":
+        elif replique == "dialogue-1reponse1.3":
             if self.controleur.entitees[2].consomme_parchemin_vierge():
-                self.replique = "Bien sûr. Quelle magie veux-tu ?"
-                self.repliques = ["Qu'est-ce que tu as ?"]
+                self.replique = "dialogue-1phrase1.3"
+                self.repliques = ["dialogue-1reponse1.3.1"]
             else:
-                self.replique = "On dirait que tu n'as pas de parchemin vierge... Je peux faire autre chose ?"
-                self.repliques = ["Est-ce que tu pourrais aller quelque-part ?","C'est à propos des combats.","On peut parler en privé ?"]
-        elif replique == "Qu'est-ce que tu as ?":
+                self.replique = "dialogue-1phrase1.3refus"
+                self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.4"]
+        elif replique == "dialogue-1reponse1.3.1":
             joueur = self.controleur.get_entitee(2)
             joueur.methode_fin = joueur.fin_menu_impregnation
             skill = trouve_skill(self.classe_principale,Skill_magie)
             joueur.options_menu = skill.menu_magie()
             joueur.start_menu()
+        elif replique == "dialogue-1reponse1.4":
+            self.end_dialogue(-1)
 
         else:
             self.end_dialogue(self.dialogue)
             print("Je ne connais pas cette réplique !")
 
         self.replique_courante = 0
+
+    def get_replique(self,code):
+        return REPLIQUES_BOMBE_ATOMIQUE[code]
 
     def impregne(self,nom):
         skill = trouve_skill(self.classe_principale,Skill_magie)
@@ -7626,16 +7442,17 @@ class Bombe_atomique(Attaquant_magique_case,Support,Humain): #La neuvième humai
             parch = Parchemin_impregne(None,magie,cout//2)
             self.controleur.ajoute_entitee(parch)
             self.controleur.get_entitee(2).inventaire.ajoute(parch)
-            self.replique = "Je peux faire autre chose ?"
-            self.repliques = ["Est-ce que tu pourrais aller quelque-part ?","C'est à propos des combats.","On peut parler en privé ?"]
+            self.replique = "dialogue-1phrase1.3.1"
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"]
             if self.controleur.entitees[2].a_parchemin_vierge():
-                self.repliques.append("Est-ce que tu peux placer une magie sur un parchemin ?")
+                self.repliques.append("dialogue-1reponse1.3")
+            self.repliques.append("dialogue-1reponse1.4")
         else:
             parch = Parchemin_vierge(None)
             self.controleur.ajoute_entitee(parch)
             self.controleur.get_entitee(2).inventaire.ajoute(parch)
-            self.replique = "Je n'ai pas assez de mana pour cette magie... Je peux faire autre chose ?"
-            self.repliques = ["Est-ce que tu pourrais aller quelque-part ?","C'est à propos des combats.","On peut parler en privé ?","Est-ce que tu peux placer une magie sur un parchemin ?"]
+            self.replique = "dialogue-1phrase1.3.1echec"
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.3","dialogue-1reponse1.4"]
 
     def get_skin_tete(self):
         return SKIN_TETE_BOMBE_ATOMIQUE
@@ -7679,14 +7496,14 @@ class Marchand(Dps,Humain): #Le dixième humain du jeu, à l'étage 9 (le seul l
         self.replique_courante = 0
         #La plupart dépendent du dialogue
         if self.dialogue == -1: #Le joueur est venu nous voir de son propre chef
-            self.replique = "Un client !"
-            self.repliques = ["Non, je voulais te donner une consigne.","Je voudrais vendre.","Je voudrais acheter"]
+            self.replique = "dialogue-1phrase1"
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.3"]
         elif self.dialogue == -2:
-            self.replique = "Un client !"
-            self.repliques = ["Je voudrais vendre.","Je voudrais acheter"]
+            self.replique = "dialogue-2phrase1"
+            self.repliques = ["dialogue-2reponse1.1","dialogue-2reponse1.2"]
         elif self.dialogue == 1:
-            self.replique = "Vous avez besoin de quelque chose ?"
-            self.repliques = ["Vous pouvez faire quelque chose pour moi ?"]
+            self.replique = "dialogue1phrase1"
+            self.repliques = ["dialogue1reponse1.1"]
 
     def interprete(self,nb_replique):
         #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
@@ -7695,27 +7512,27 @@ class Marchand(Dps,Humain): #Le dixième humain du jeu, à l'étage 9 (le seul l
 
         #Premier dialogue
         #Le joueur arrive par la porte
-        if replique == "Vous pouvez faire quelque chose pour moi ?":
-            self.replique="Bien sûr ! Je suis marchand, et je peux vous proposer toutes sortes d'objets. Certains articles coûtent un peu cher, mais vu les circonstances, vous ne trouverez pas mieux"
-            self.repliques = ["Intéressant... tu veux venir avec moi ?","Je n'ai pas d'argent..."]
-        elif replique == "Je n'ai d'argent...":
-            self.replique="Tu n'as qu'à me vendre ce dont tu ne te sers pas. Même les cadavres de monstre ont de la valeur." #/!\ Donner un peu de sous ?
-            self.repliques = ["Ce serait embêtant de revenir ici à chaque fois que j'ai tué un monstre..."]
-        elif replique == "Ce serait embêtant de revenir ici à chaque fois que j'ai tué un monstre...":
-            self.replique="Je peux t'accompagner."
-            self.repliques = ["Je veux bien.","Non merci."]
-        elif replique == "Je veux bien.":
+        if replique == "dialogue1reponse1.1":
+            self.replique="dialogue1phrase1.1"
+            self.repliques = ["dialogue1reponse1.1.1","dialogue1reponse1.1.2"]
+        elif replique == "dialogue1reponse1.1.2":
+            self.replique="dialogue1phrase1.1.2" #/!\ Donner un peu de sous
+            self.repliques = ["dialogue1reponse1.1.2.1"]
+        elif replique == "dialogue1reponse1.1.2.1":
+            self.replique="dialogue1phrase1.1.2.1"
+            self.repliques = ["dialogue1reponse1.1.2.1.1","dialogue1reponse1.1.2.1.2"]
+        elif replique == "dialogue1reponse1.1.2.1.1":
             self.end_dialogue()
             self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
             self.mouvement = 0 #Légèrement redondant ici
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
             self.attente = False
-        elif replique == "Non merci.":
+        elif replique == "dialogue1reponse1.1.2.1.2":
             self.end_dialogue(-2)
-        elif replique == "Intéressant... tu veux venir avec moi ?":
-            self.replique="Volontiers. Il n'y a pas beaucoup d'autres clients ici."
-            self.repliques = [""]
-        elif replique == "":
+        elif replique == "dialogue1reponse1.1.1":
+            self.replique="dialogue1phrase1.1.1"
+            self.repliques = ["dialogue1reponse1.1.1.1"]
+        elif replique == "dialogue1reponse1.1.1.1":
             self.end_dialogue()
             self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
             self.mouvement = 0 #Légèrement redondant ici
@@ -7723,76 +7540,55 @@ class Marchand(Dps,Humain): #Le dixième humain du jeu, à l'étage 9 (le seul l
             self.attente = False
 
         #Dialogue par défaut:
-        elif replique == "Non, je voulais te donner une consigne.":
-            self.replique = "Bien sûr, quoi ?"
-            self.repliques = ["Va quelque part.","Change ta méthode de combat."]
-        elif replique == "Va quelque part.":
-            self.replique = "Où ?"
-            self.repliques = ["Tu peux suivre quelqu'un ?","Tu vois là-bas ?","Cherche la sortie."]
-        elif replique == "Tu peux suivre quelqu'un ?":
+        elif replique == "dialogue-1reponse1.1":
+            self.replique = "dialogue-1phrase1.1"
+            self.repliques = ["dialogue-1reponse1.1.1"]
+        elif replique == "dialogue-1reponse1.1.1":
+            self.replique = "dialogue-1phrase1.1.1"
+            self.repliques = ["dialogue-1reponse1.1.1.1","dialogue-1reponse1.1.1.2","dialogue-1reponse1.1.1.3"]
+        elif replique == "dialogue-1reponse1.1.1.1":
             self.mouvement = 0
-            self.replique = "Oui, qui ?"
-            self.repliques = ["Moi.","Je vais te montrer."]
-        elif replique == "Moi.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
+            self.replique = "dialogue-1phrase1.1.1.1"
+            self.repliques = ["dialogue-1reponse1.1.1.1.1","dialogue-1reponse1.1.1.1.2"]
+        elif replique == "dialogue-1reponse1.1.1.1.1":
+            self.replique = "dialogue-1phrase1.1.1.1.1"
+            self.repliques = ["dialogue-1reponse1.1.1","dialogue-1reponse1.1.2","dialogue-1reponse1.1.3"]
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
-        elif replique == "Je vais te montrer.":
+        elif replique == "dialogue-1reponse1.1.1.1.2":
             self.controleur.get_entitee(2).start_select_agissant_dialogue()
             self.controleur.get_entitee(2).event = COMPLEMENT_DIALOGUE
-        elif replique == "Tu vois là-bas ?":
+        elif replique == "dialogue-1reponse1.1.1.2":
             self.controleur.get_entitee(2).start_select_case_dialogue()
             self.controleur.get_entitee(2).event = COMPLEMENT_DIALOGUE
-        elif replique == "Cherche la sortie.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
+        elif replique == "dialogue-1reponse1.1.1.3":
+            self.replique = "dialogue-1phrase1.1.1.1.2"
+            self.repliques = ["dialogue-1reponse1.1.1","dialogue-1reponse1.1.2","dialogue-1reponse1.1.3"]
             self.mouvement = 1
-        elif replique == "Change ta méthode de combat.":
-            self.replique = "Envers les ennemis, ou les monstres neutres ?"
-            self.repliques = ["Les ennemis, ceux qui nous ont déjà attaqués.","Les neutres."]
-        elif replique == "Les ennemis, ceux qui nous ont déjà attaqués.":
-            self.replique = "Qu'est-ce que je leur fait ?"
-            self.repliques = ["Attaque-les, ils nous ont attaqué en premier.","Ignore-les, on a plus important à faire.","Fuis-les, ça sera plus sûr."]
-        elif replique == "Attaque-les, ils nous ont attaqué en premier.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_ennemis = 0
-        elif replique == "Ignore-les, on a plus important à faire.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_ennemis = 1
-        elif replique == "Fuis-les, ça sera plus sûr.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_ennemis = 2
-        elif replique == "Les neutres.":
-            self.replique = "Qu'est-ce que je leur fait ?"
-            self.repliques = ["Attaque-les, l'attaque est la meilleure défense.","Ignore-les, tant qu'ils ne nous agressent pas.","Fuis-les, tous les monstres sont dangereux."]
-        elif replique == "Attaque-les, l'attaque est la meilleure défense.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_neutres = 0
-        elif replique == "Ignore-les, tant qu'ils ne nous agressent pas.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_neutres = 1
-        elif replique == "Fuis-les, tous les monstres sont dangereux.":
-            self.replique = "Ok."
-            self.repliques = ["Merci."]
-            self.comportement_neutres = 2
-        elif replique == "Merci.":
+        elif replique == "dialogue-1reponse1.1.3":
             self.end_dialogue(-1)
-        elif replique == "C'est une question personnelle.":
-            self.replique = "On a pas vraiment le temps, là..."
-            self.repliques = ["Ah, c'est vrai..."]
-        elif replique == "Ah, c'est vrai...":
+        elif replique == "dialogue-1reponse1.1.2":
+            self.replique = "dialogue-1phrase1.1.2"
+            self.repliques = ["dialogue-1reponse1.1.2.1"]
+        elif replique == "dialogue-1reponse1.1.2.1":
             self.end_dialogue(-1)
+
+        elif replique == "dialogue-2reponse1.1":
+            self.replique = "dialogue-2phrase1.1"
+            self.repliques = ["dialogue-2reponse1.1.1"]
+        elif replique == "dialogue-2reponse1.2":
+            self.replique = "dialogue-2phrase1.1"
+            self.repliques = ["dialogue-2reponse1.1.1"]
+        elif replique == "dialogue-2reponse1.1.1":
+            self.end_dialogue(-2)
 
         else:
             self.end_dialogue(self.dialogue)
             print("Je ne connais pas cette réplique !")
 
         self.replique_courante = 0
+
+    def get_replique(self,code):
+        return REPLIQUES_MARCHAND[code]
 
     def get_skin_tete(self):
         return SKIN_TETE_MARCHAND
@@ -11265,6 +11061,9 @@ class Protection_mur(Time_limited,On_attack):
             attaque.degats = 0 #Une attaque perçante peut quand même passer
             self.PV -= attaque.degats
 
+    def get_skin(self):
+        return SKIN_PROTECTION
+
 class Protection_sacree(Protection_mur):
     """Particulièrement efficace contre les attaques d'ombre."""
     def action(self,attaque):
@@ -11278,6 +11077,9 @@ class Protection_sacree(Protection_mur):
                 self.PV -= attaque.degats//2
         else:
             Protection_mur.action(self,attaque)
+
+    def get_skin(self):
+        return SKIN_PROTECTION_SACREE
 
 class Blizzard(Evenement,On_post_action):
     """Evenement de blizzard."""
@@ -12604,16 +12406,6 @@ class Magie_cible_dirigee(Magie_cible,Magie_dirigee):
             else:
                 self.miss_fire(lanceur)
             self.termine()
-
-class Sort :
-    """La classe des sorts. Lancer un sort de magie coûte du mana. Les agissants capable d'utiliser de la magie disposent d'un skill qui regroupe toutes les magies.
-       !!! Ne pas confondre Sort et Magie ! Le premier est le produit de la deuxième ! Une magie regroupe 10 sorts, soit les dix formes de la magie, du niveau 1 au niveau 10."""
-    def __init__(self,gain_xp,cout_mp,latence): #Les caractéristiques partagées par tous les sorts
-        self.gain_xp = gain_xp
-        self.cout_mp = cout_mp
-        self.latence = latence
-
-    #Il n'y a pas de méthode commune à tous les sorts
 
 class Portee_limitee(Magie_cible) :
     """La classe des magies qui ciblent quelque chose dans la proximité du joueur avec une portée limitée (sinon elles peuvent viser tout ce qui est dans le champ de vision du joueur)."""
@@ -14947,20 +14739,22 @@ class Affichage:
         marge_gauche = self.position_debut_x_rectangle_2 + 5
 
         #D'abord, la réplique de l'interlocuteur, si il y en a une
-        textes = self.scinde_texte(joueur.interlocuteur.replique,self.largeur_rectangles-10)
+        textes = self.scinde_texte(joueur.interlocuteur.get_replique(joueur.interlocuteur.replique),self.largeur_rectangles-10)
         for texte in textes :
             self.screen.blit(texte,(marge_gauche,marge_haut))
             marge_haut += 20
+        marge_haut += 20
 
         replique_courante = joueur.interlocuteur.replique_courante
         for i in range(len(joueur.interlocuteur.repliques)):
-            replique = joueur.interlocuteur.repliques[i]
+            replique = joueur.interlocuteur.get_replique(joueur.interlocuteur.repliques[i])
             textes = self.scinde_texte(replique,self.largeur_rectangles-25)
             if replique_courante == i:
                 self.screen.blit(pygame.font.SysFont(None, 20).render("->",True,(255,125,0)),(marge_gauche,marge_haut))
             for texte in textes :
                 self.screen.blit(texte,(marge_gauche+15,marge_haut))
                 marge_haut += 20
+            marge_haut += 10
 
     def dessine_droite_magie_cible(self,joueur,proportion_ecoulee = 0): #La fonction qui dessine le rectangle de droite, pendant les choix de cible
 

@@ -10,7 +10,7 @@ global latence_protection_sacree
 latence_protection_sacree = [10,20,20,20,20,20,20,20,20,20]
 
 global pv_protection_sacree
-pv_protection_sacree = [100,5,5,5,6,6,6,7,7,8]
+pv_protection_sacree = [20,5,5,5,6,6,6,7,7,8]
 
 global duree_protection_sacree
 duree_protection_sacree = [100,100,100,100,100,100,100,100,100,100]

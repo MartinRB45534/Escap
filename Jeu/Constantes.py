@@ -1,5 +1,8 @@
 import pygame
 
+global VERSION
+VERSION = "0.0.-1"
+
 def trouve_skill(classe,type_skill): #Vraiment une méthode propre au controleur ?
     trouve = None
     for skill in classe.skills:
