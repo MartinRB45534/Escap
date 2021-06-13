@@ -75,7 +75,7 @@ CONSTANTES_STATS = {
         'aff_o':[0,2,2,2,2,2,2,2,2,2,2],
         'especes':['humain'],
         'doigts':10,
-        'magies':['Magie_multi_boost','Magie_boost'], #/!\ Ajouter les magies de soutien ici !
+        'magies':['Magie_multi_boost','Magie_boost'],
         'items':['Robe_magique'], #Peut-être un ou deux anneaux ?
         'forme':"femme",
         'forme_tete':"peureuse",
