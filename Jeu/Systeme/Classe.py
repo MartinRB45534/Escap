@@ -377,6 +377,28 @@ class Classe_principale(Classe):
             attaque = Skill_attaque()
             skills_intrasecs.append(attaque)
 
+        elif identite == 'premier_monstre':
+            self.evolutif = False
+            deplacement = Skill_deplacement()
+            skills_intrasecs.append(deplacement)
+            vision = Skill_vision()
+            skills_intrasecs.append(vision)
+            stomp = Skill_stomp()
+            skills_intrasecs.append(stomp)
+            attaque = Skill_attaque()
+            skills_intrasecs.append(attaque)
+
+        elif identite == 'troisieme_monstre':
+            self.evolutif = False
+            deplacement = Skill_deplacement()
+            skills_intrasecs.append(deplacement)
+            vision = Skill_vision()
+            skills_intrasecs.append(vision)
+            stomp = Skill_stomp()
+            skills_intrasecs.append(stomp)
+            attaque = Skill_attaque()
+            skills_intrasecs.append(attaque)
+
         elif identite == 'guerrier_gobelin':
             self.evolutif = False
             deplacement = Skill_deplacement()
@@ -400,6 +422,17 @@ class Classe_principale(Classe):
             skills_intrasecs.append(attaque)
 
         elif identite == 'mage_gobelin':
+            self.evolutif = False
+            deplacement = Skill_deplacement()
+            skills_intrasecs.append(deplacement)
+            vision = Skill_vision()
+            skills_intrasecs.append(vision)
+            stomp = Skill_stomp()
+            skills_intrasecs.append(stomp)
+            magie = Skill_magie()
+            skills_intrasecs.append(magie)
+
+        elif identite == 'deuxieme_monstre':
             self.evolutif = False
             deplacement = Skill_deplacement()
             skills_intrasecs.append(deplacement)

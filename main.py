@@ -16,8 +16,6 @@ class Main():
         """Fonction qui observe le répertoire courant et cherche des Main à ouvrir, puis les ouvre
            En entrée : rien
            En sortie : rien"""
-        self.quitte() #D'abord, on ferme tout !
-
         #On récupère notre chemin :
         chemin = os.path.abspath(".")
         fichiers = os.listdir(chemin)
@@ -28,16 +26,19 @@ class Main():
                 try:
                     main_potentiel = pickle.load(fichier)
                 except EOFError:
-                    print(f"Le fichier est vide. Création d'un nouvel utilisateur.")
+                    print("Le fichier est vide. Création d'un nouvel utilisateur.")
                     self.mains.append([len(self.mains),nom_fichier[:-2],True_joueur(screen)])
+                except pickle.UnpicklingError:
+                    print("Le fichier ne peut pas être décodé ?")
                 else:
                     if isinstance(main_potentiel,True_joueur):
                         self.mains.append([len(self.mains),nom_fichier[:-2],main_potentiel])
                         main_potentiel.charge(screen)
                         print("Chargement réussi !")
                     else:
-                        print("Ce fichier n'a pas pu être interprêté comme un main ! Pourquoi ?")
-                fichier.close()
+                        print("Le contenu de ce fichier n'a pas pu être interprêté comme un main ! Pourquoi ?")
+                finally:
+                    fichier.close()
 
     def sauve(self,nom):
         """Fonction qui sauvegarde un main dans le répertoire courant
@@ -81,6 +82,7 @@ class Main():
             if res == False:
                 run = False
             elif res == "new":
+                self.quitte()
                 self.observe()
             elif isinstance(res,True_joueur):
                 res.ouvre()

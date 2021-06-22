@@ -1,196 +1,242 @@
-#Un fichier avec des constantes d'équilibrage.
-#Pour modifier facilement l'équilibrage.
-
-
-#Quelques constantes qui affectent tout le monde :
-global LATENCE_DEPLACEMENT #La latence ajoutée à chaque utilisation du skill de déplacement. Augmenter cette valeur pour ralentir tout le monde
-LATENCE_DEPLACEMENT =
-global LATENCE_COURSE #La latence ajoutée à chaque utilisation du skill de course. Augmenter cette valeur pour ralentir le joueur
-LATENCE_COURSE =
-global LATENCE_STOMP #La latence ajoutée à chaque utilisation du skill de stomp (attaque sans arme). Affecte la fréquence d'attaque de certains humains
-LATENCE_STOMP =
-global LATENCE_ATTAQUE #La latence ajoutée à chaque utilisation du skill d'attaque. Affecte la fréquence d'attaque de presque tous les ennemis et certains humains
-LATENCE_ATTAQUE =
-global TAUX_STOMP #Le taux d'utilisation de la force de l'agissant lors d'un stomp. Augmenter cette valeur pour augmenter les dégats de stomp de tout le monde
-TAUX_STOMP =
-global TAUX_ATTAQUE #Le taux d'utilisation de la force de l'agissant lors d'une attaque. Augmenter cette valeur pour augmenter les dégats d'attaque de tout le monde
-TAUX_ATTAQUE =
-
-
-#Les constantes du joueur :
-global FORCE_JOUEUR #La force du joueur. Augmenter cette valeur pour que le joueur cause plus de dégats
-FORCE_JOUEUR =
-global VITESSE_JOUEUR #La quantité de latence soustraite à chaque tour. Augmenter cette valeur pour accélèrer toutes les actions du joueur. /!\ Si la vitesse est supérieure à la latence de certains skills, le joueur risque d'utiliser le skill plusieurs fois dans un tour
-VITESSE_JOUEUR =
-global PV_JOUEUR #Le nombre maximum de PVs du joueur. Augmenter cette valeur pour que le joueur soit plus difficile à tuer
-PV_JOUEUR =
-global REGEN_JOUEUR #La quantité de PVs restaurés chaque tour. Augmenter cette valeur pour que le joueur se soigne plus vite
-REGEN_JOUEUR =
-
-
-#Queqlues constantes qui affectent plein de gobelins
-global TAUX_LANCE #Le taux d'utilisation de la force de l'agissant lors d'une attaque à la lance. Augmenter cette valeur pour augmenter les dégats causés avec une lance (par les sentinelles gobelin ou le joueur)
-TAUX_LANCE =
-global TAUX_EPEE #Le taux d'utilisation de la force de l'agissant lors d'une attaque à l'épée. Augmenter cette valeur pour augmenter les dégats causés avec une épée (par les gobelins de base, le chef gobelin ou le joueur)
-TAUX_EPEE =
-global TAUX_CIMETERE #Le taux d'utilisation de la force de l'agissant lors d'une attaque au cimetère. Augmenter cette valeur pour augmenter les dégats causés avec un cimetère (par les guerriers gobelins)
-TAUX_CIMETERE =
-global TAUX_ARMURE_SENT #Le taux de dégats bloqués par une armure de sentinelle. Augmenter cette valeur pour que les sentinelles perdent moins de PVs.
-TAUX_ARMURE_SENT =
-global TAUX_HAUME #Le taux de dégats bloqués par un haume. Augmenter cette valeur pour que les sentinelles perdent moins de PVs.
-TAUX_HAUME =
-global TAUX_ARMURE_GUER #Le taux de dégats bloqués par une armure de guerrier. Augmenter cette valeur pour que les guerriers perdent moins de PVs.
-TAUX_ARMURE_GUER =
-global MANA_BANDEAU #La quantité de PMs restaurés par un bandeau à chaque tour. Augmenter cette valeur pour que les mages gobelins récupèrent plus vite leurs PMs (attaquent plus souvent). Ils seront quand même limités par la latence du sort.
-MANA_BANDEAU =
-
-
-#Les constantes du premier monstre :
-global FORCE_PREMIER #La force du premier monstre. On veut qu'il soit spécialement affaibli puisque c'est le premier combat.
-FORCE_PREMIER =
-global VITESSE_PREMIER #La vitesse du premier monstre. On veut qu'il soit spécialement affaibli puisque c'est le premier combat.
-VITESSE_PREMIER =
-global PV_PREMIER #Les PVs du premier monstre. On veut qu'il meurt relativement facilement (c'est long, mais looooong, actuellement !)
-PV_PREMIER =
-
-#Les constantes du deuxième monstre :
-global VITESSE_DEUXIEME #La vitesse du deuxième monstre. On ne veut pas qu'il tue le joueur avant que ce dernier se soit rapproché !
-VITESSE_DEUXIEME =
-global PM_DEUXIEME #Les PMs du deuxième monstre. Permet de limiter sa capacité d'attaque
-PM_DEUXIEME =
-global REGEN_DEUXIEME #La régénération des PMs du deuxième monstre. On pourrait callibrer pour qu'il descende la moitié de la vie du joueur avant de tomber à court de mana et s'enfuir.
-REGEN_DEUXIEME =
-
-#Les constantes du paumé :
-global FORCE_PAUME #La force du paume. On ne veut pas qu'il soit trop fort
-FORCE_PAUME =
-global VITESSE_PAUME #Le paumé doit être suffisament rapide pour manoeuvrer jusqu'en première ligne facilement
-VITESSE_PAUME =
-global PV_PAUME #Le paumé a besoin de beaucoup de PVs pour prendre des coups
-PV_PAUME =
-global REGEN_PAUME #On veut qu'il se régénère vite
-REGEN_PAUME =
-global TAUX_TUNIQUE #La tunique est à calibrer aussi en fonction du joueur (on peut augmenter les PVs pour réduire les stats de la tunique sans modifier les performances du paumé)
-TAUX_TUNIQUE =
-
-#Les constantes de la peureuse :
-global FORCE_PEUREUSE #La peureuse est faible ! Très faible
-FORCE_PEUREUSE =
-global VITESSE_PEUREUSE #La peureuse doit être relativement rapide pour fuir
-VITESSE_PEUREUSE =
-global PV_PEUREUSE #La peureuse est fragile, mais on ne veut pas qu'elle meurt trop facilement non plus
-PV_PEUREUSE =
-global REGEN_PEUREUSE #On ne veut pas qu'elle se régénère trop vite (en même temps, vu ses PVs...)
-REGEN_PEUREUSE =
-global PM_PEUREUSE #Il lui en faut beaucoup... mais c'est combien, beaucoup
-PM_PEUREUSE =
-global REGEN_PM_PEUREUSE #Ce serait bien qu'elle ait presque toujours les PMs pour faire tout ce qu'elle veut
-REGEN_PM_PEUREUSE =
-global REGEN_PM_ROBE #Quelle portion de la regen attribuer à la robe ? La moitiée ?
-REGEN_PM_ROBE =
-global PM_BOOST #Le cout de la magie de boost. Affecte aussi les shamans. Vu que ça se fait de loin, donc sans vraiment de risque on pourrait avoir une efficacité inférieure à 1PV = 2PMs en se basant sur les dégats par attaque des autres agissants
-PM_BOOST =
-global TAUX_BOOST #Le taux de dégats supplémentaires pour la magie de boost. Le prendre ne compte dans le calcul des dégats des différents gobelins
-TAUX_BOOST =
-global LATENCE_BOOST #La latence de la magie de boost. On pourrait réduire la latence et le taux, pour éviter d'avoir un coup surpuissant au milieu d'un tas de faibles
-LATENCE_BOOST =
-global PM_MULTI_BOOST #Le cout de la magie de multi_boost. Rendre un peu plus cher que le boost, pour justifier de se rabbatre sur le boost quand on n'a pas assez d'xp pour le multi_boost
-PM_MULTI_BOOST =
-global TAUX_MULTI_BOOST #Le taux de dégats supplémentaires pour la magie de multi_boost. Faire des statistiques sur le nombre d'agissants boostés en moyenne pour déterminer comment calculer le taux de conversion PV/PM
-TAUX_MULTI_BOOST
-global LATENCE_MULTI_BOOST #La latence de la magie de multi_boost. Pas trop élevée car le coût est le véritable facteur limitant
-LATENCE_MULTI_BOOST
-
-#Les constantes du troisième monstre :
-global FORCE_TROISIEME #Le troisième monstre pourrait être presque au niveau des sentinelles standards
-FORCE_TROISIEME =
+global LATENCE_DEPLACEMENT
+LATENCE_DEPLACEMENT = 4
+global LATENCE_COURSE
+LATENCE_COURSE = 2
+global LATENCE_STOMP
+LATENCE_STOMP = 5
+global LATENCE_ATTAQUE
+LATENCE_ATTAQUE = 3
+global TAUX_STOMP
+TAUX_STOMP = 0.5
+global TAUX_ATTAQUE
+TAUX_ATTAQUE = 0.5
+global FORCE_JOUEUR
+FORCE_JOUEUR = 20
+global VITESSE_JOUEUR
+VITESSE_JOUEUR = 1
+global PV_JOUEUR
+PV_JOUEUR = 100
+global REGEN_JOUEUR
+REGEN_JOUEUR = 0.5
+global TAUX_LANCE
+TAUX_LANCE = 1
+global TAUX_EPEE
+TAUX_EPEE = 1.5
+global TAUX_CIMETERE
+TAUX_CIMETERE = 2
+global TAUX_ARMURE_SENT
+TAUX_ARMURE_SENT = 0.3
+global TAUX_HAUME
+TAUX_HAUME = 0.1
+global TAUX_ARMURE_GUER
+TAUX_ARMURE_GUER = 0.1
+global PM_BANDEAU
+PM_BANDEAU = 1
+global FORCE_PREMIER
+FORCE_PREMIER = 2
+global VITESSE_PREMIER
+VITESSE_PREMIER = 0.5
+global PV_PREMIER
+PV_PREMIER = 50
+global VITESSE_DEUXIEME
+VITESSE_DEUXIEME = 1
+global PV_DEUXIEME
+PV_DEUXIEME = 50
+global PM_DEUXIEME
+PM_DEUXIEME = 75
+global REGEN_DEUXIEME
+REGEN_DEUXIEME = 0
+global FORCE_PAUME
+FORCE_PAUME = 2
+global VITESSE_PAUME
+VITESSE_PAUME = 1.2
+global PV_PAUME
+PV_PAUME = 150
+global REGEN_PAUME
+REGEN_PAUME = 3
+global TAUX_TUNIQUE
+TAUX_TUNIQUE = 0.25
+global FORCE_PEUREUSE
+FORCE_PEUREUSE = 1
+global VITESSE_PEUREUSE
+VITESSE_PEUREUSE = 1.2
+global PV_PEUREUSE
+PV_PEUREUSE = 50
+global REGEN_PEUREUSE
+REGEN_PEUREUSE = 0.2
+global PM_PEUREUSE
+PM_PEUREUSE = 150
+global REGEN_PM_PEUREUSE
+REGEN_PM_PEUREUSE = 2
+global REGEN_PM_ROBE
+REGEN_PM_ROBE = 2
+global PM_BOOST
+PM_BOOST = 3
+global TAUX_BOOST
+TAUX_BOOST = 1.2
+global LATENCE_BOOST
+LATENCE_BOOST = 1
+global PM_MULTI_BOOST
+PM_MULTI_BOOST = 6
+global TAUX_MULTI_BOOST
+TAUX_MULTI_BOOST = 1.5
+global LATENCE_MULTI_BOOST
+LATENCE_MULTI_BOOST = 5
+global FORCE_TROISIEME
+FORCE_TROISIEME = 3.5
 global VITESSE_TROISIEME
-VITESSE_TROISIEME =
-global PV_TROISIEME #Peut-être le faire mourir juste un peu plus vite.
-PV_TROISIEME =
-
-#Les constantes des sentinelles :
-global FORCE_SENT #Les sentinelles ne sont pas très fortes
-FORCE_SENT =
-global VITESSE_SENT #Les sentinelles sont plutôt lentes, pour éviter qu'elles ne s'enfuit trop
-VITESSE_SENT =
-global PV_SENT #Les sentinelles ont beaucoup de PVs
-PV_SENT =
-
-#Les constantes des guerriers :
-global FORCE_GUER #Les guerriers sont très forts
-FORCE_GUER =
-global VITESSE_GUER #Plutôt rapides aussi
-VITESSE_GUER =
-global PV_GUER #Mais assez fragiles
-PV_GUER =
-
-#Les constantes de l'encombrant :
-global FORCE_ENCOMBRANT #On veut qu'il soit relativement fort
-FORCE_ENCOMBRANT =
-global TAUX_EPEE_ENCOMBRANT #Et qu'il ait une arme correcte au cas où le joueur la lui volerai
-TAUX_EPEE_ENCOMBRANT =
-global VITESSE_ENCOMBRANT #Qu'il soit correctement rapide
-VITESSE_ENCOMBRANT =
-global PV_ENCOMBRANT #Qu'il ait des PVs, mais pas trop
-PV_ENCOMBRANT =
-global TAUX_ARMURE_ENCOMBRANT #Qu'il est une armure pas trop puissante
-TAUX_ARMURE_ENCOMBRANT =
-
-#Les constantes de l'alchimiste :
-global FORCE_ALCHIMISTE #L'alchimiste n'est pas bien fort
-FORCE_ALCHIMISTE =
-global VITESSE_ALCHIMISTE #Il n'est pas spécialement rapide
-VITESSE_ALCHIMISTE =
-global PV_ALCHIMISTE #Il a des PVs corrects
-PV_ALCHIMISTE =
-global REGEN_ALCHIMISTE #Une regen standard
-REGEN_ALCHIMISTE =
-global PM_ALCHIMISTE #Plutôt beaucoup de PMs
-PM_ALCHIMISTE =
-global REGEN_PM_ALCHIMISTE #Une regen de PM correcte mais inférieure aux autres mages
-REGEN_PM_ALCHIMISTE =
-global REGEN_PM_TUNIQUE #Est-ce que la tunique aide vraiment avec les PMs ?
-REGEN_PM_TUNIQUE =
-global COUT_SECOUSSE #Le cout de la magie de secousse. Pas très elevé
-COUT_SECOUSSE =
-global DEGATS_SECOUSSE #Pas beaucoup de dégats
-DEGATS_SECOUSSE =
-global PORTEE_SECOUSSE #Une grosse portée
-PORTEE_SECOUSSE =
-global LATENCE_SECOUSSE #Plutôt lent
-LATENCE_SECOUSSE =
-
-#Les constantes des mages :
-global VITESSE_MAGE #Plutôt lents ? Rapides ? À voir
-VITESSE_MAGE =
-global PM_MAGE #Les PMs détermine la durée de la première phase où ils peuvent faire beaucoup de dégats
-PM_MAGE =
-global COUT_MAGE #Le coût du sort des mages gobelins. On pourrait décider de 1 PM = 1 PV comme taux de conversion moyen
-COUT_MAGE =
-global DEGATS_MAGE #Les dégats causés par le sort des mages gobelin. Garder en tête qu'ils peuvent être boostés (multipliés par 2) et qu'on ne veut surtout pas de 1-shot
-DEGATS_MAGE =
-global LATENCE_MAGE #Le temps d'attente entre deux sorts d'un mage gobelin (pendant qu'ils ont assez de PMs)
-LATENCE_MAGE =
-global REGEN_MAGE #Calibrer leut régénération pour qu'ils fassent moins de dégats que les autres gobelins après un certain temps
-REGEN_MAGE =
-global BANDEAU_MAGE
-BANDEAU_MAGE =
-
-#Les constantes des gobelins de base :
-global FORCE_GOB #Les gobelins de base sont faibles
-FORCE_GOB =
-global VITESSE_GOB #Et lents
-VITESSE_GOB =
-global PV_GOB #Et fragiles
-PV_GOB =
-
-#Les constantes des gobelins de base :
-global FORCE_CHEF #Le chef est fort
-FORCE_CHEF =
-global VITESSE_CHEF #Relativement rapide
-VITESSE_CHEF =
-global PV_CHEF #Mais surtour solide
-PV_CHEF =
-global REGEN_CHEF #Et se soigne
-REGEN_CHEF =
+VITESSE_TROISIEME = 0.8
+global PV_TROISIEME
+PV_TROISIEME = 70
+global FORCE_SENT
+FORCE_SENT = 4
+global VITESSE_SENT
+VITESSE_SENT = 1
+global PV_SENT
+PV_SENT = 70
+global FORCE_GUER
+FORCE_GUER = 5
+global VITESSE_GUER
+VITESSE_GUER = 1.2
+global PV_GUER
+PV_GUER = 50
+global FORCE_ENCOMBRANT
+FORCE_ENCOMBRANT = 15
+global TAUX_EPEE_ENCOMBRANT
+TAUX_EPEE_ENCOMBRANT = 1.5
+global VITESSE_ENCOMBRANT
+VITESSE_ENCOMBRANT = 1
+global PV_ENCOMBRANT
+PV_ENCOMBRANT = 100
+global REGEN_ENCOMBRANT
+REGEN_ENCOMBRANT = 0.1
+global TAUX_ARMURE_ENCOMBRANT
+TAUX_ARMURE_ENCOMBRANT = 0.1
+global FORCE_ALCHIMISTE
+FORCE_ALCHIMISTE = 1
+global VITESSE_ALCHIMISTE
+VITESSE_ALCHIMISTE = 1
+global PV_ALCHIMISTE
+PV_ALCHIMISTE = 75
+global REGEN_ALCHIMISTE
+REGEN_ALCHIMISTE = 0.1
+global PM_ALCHIMISTE
+PM_ALCHIMISTE = 100
+global REGEN_PM_ALCHIMISTE
+REGEN_PM_ALCHIMISTE = 1
+global REGEN_PM_TUNIQUE
+REGEN_PM_TUNIQUE = 0.5
+global COUT_SECOUSSE
+COUT_SECOUSSE = 10
+global DEGATS_SECOUSSE
+DEGATS_SECOUSSE = 5
+global PORTEE_SECOUSSE
+PORTEE_SECOUSSE = 4
+global LATENCE_SECOUSSE
+LATENCE_SECOUSSE = 8
+global PV_MAGE
+PV_MAGE = 50
+global VITESSE_MAGE
+VITESSE_MAGE = 1
+global PM_MAGE
+PM_MAGE = 75
+global COUT_MAGE
+COUT_MAGE = 15
+global DEGATS_MAGE
+DEGATS_MAGE = 10
+global LATENCE_MAGE
+LATENCE_MAGE = 5
+global REGEN_MAGE
+REGEN_MAGE = 1
+global PV_SHAMAN
+PV_SHAMAN = 25
+global VITESSE_SHAMAN
+VITESSE_SHAMAN = 1.5
+global PM_SHAMAN
+PM_SHAMAN = 50
+global REGEN_SHAMAN
+REGEN_SHAMAN = 2
+global FORCE_PESTE
+FORCE_PESTE = 1
+global VITESSE_PESTE
+VITESSE_PESTE = 1
+global PV_PESTE
+PV_PESTE = 75
+global REGEN_PESTE
+REGEN_PESTE = 0.1
+global PM_PESTE
+PM_PESTE = 200
+global REGEN_PM_PESTE
+REGEN_PM_PESTE = 3
+global DEGATS_SOUTANE
+DEGATS_SOUTANE = 20
+global PM_SOIN
+PM_SOIN = 15
+global PV_SOIN
+PV_SOIN = 10
+global LATENCE_SOIN
+LATENCE_SOIN = 3
+global PM_MULTI_SOIN
+PM_MULTI_SOIN = 30
+global PV_MULTI_SOIN
+PV_MULTI_SOIN = 15
+global LATENCE_MULTI_SOIN
+LATENCE_MULTI_SOIN = 9
+global FORCE_BOMBE
+FORCE_BOMBE = 1.5
+global VITESSE_BOMBE
+VITESSE_BOMBE = 1
+global PV_BOMBE
+PV_BOMBE = 75
+global REGEN_BOMBE
+REGEN_BOMBE = 0.1
+global PM_BOMBE
+PM_BOMBE = 150
+global REGEN_PM_BOMBE
+REGEN_PM_BOMBE = 2
+global REGEN_PM_ROBE_SORCIERE
+REGEN_PM_ROBE_SORCIERE = 2
+global REGEN_PM_CHAPEAU_SORCIERE
+REGEN_PM_CHAPEAU_SORCIERE = 1
+global COUT_VOLCAN
+COUT_VOLCAN = 20
+global DEGATS_VOLCAN
+DEGATS_VOLCAN = 15
+global PORTEE_VOLCAN
+PORTEE_VOLCAN = 2
+global LATENCE_VOLCAN
+LATENCE_VOLCAN = 8
+global FORCE_GOB
+FORCE_GOB = 3
+global VITESSE_GOB
+VITESSE_GOB = 0.8
+global PV_GOB
+PV_GOB = 50
+global FORCE_MARCHAND
+FORCE_MARCHAND = 3
+global TAUX_EPEE_MARCHAND
+TAUX_EPEE_MARCHAND = 2
+global VITESSE_MARCHAND
+VITESSE_MARCHAND = 1
+global PV_MARCHAND
+PV_MARCHAND = 75
+global REGEN_MARCHAND
+REGEN_MARCHAND = 1
+global TAUX_ARMURE_MARCHAND
+TAUX_ARMURE_MARCHAND = 10
+global FORCE_CHEF
+FORCE_CHEF = 10
+global VITESSE_CHEF
+VITESSE_CHEF = 1.2
+global PV_CHEF
+PV_CHEF = 100
+global REGEN_CHEF
+REGEN_CHEF = 3
+global FORCE_RECEPTIONNISTE
+FORCE_RECEPTIONNISTE = 20
+global VITESSE_RECEPTIONNISTE
+VITESSE_RECEPTIONNISTE = 1.5
+global PV_RECEPTIONNISTE
+PV_RECEPTIONNISTE = 150
+global REGEN_RECEPTIONNISTE
+REGEN_RECEPTIONNISTE = 4

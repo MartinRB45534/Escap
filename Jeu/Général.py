@@ -10,6 +10,208 @@ import operator
 import random
 import copy
 
+try:
+    from Jeu.Equilibrage import *
+    latence_deplacement[0] = LATENCE_DEPLACEMENT
+    latence_course[0] = LATENCE_COURSE
+    latence_stomp[0] = LATENCE_STOMP
+    latence_attaque[0] = LATENCE_ATTAQUE
+    taux_utilisation_stomp[0] = TAUX_STOMP
+    taux_utilisation_attaque[0] = TAUX_ATTAQUE
+    tranchant_lance_gobelin[0] = TAUX_LANCE
+    tranchant_epee_gobelin[0] = TAUX_EPEE
+    tranchant_cimetere_gobelin[0] = TAUX_CIMETERE
+    taux_degats_armure_sentinelle_gobelin[0] = TAUX_ARMURE_SENT
+    taux_degats_haume_gobelin[0] = TAUX_HAUME
+    taux_degats_armure_guerrier_gobelin[0] = TAUX_ARMURE_GUER
+    pm_bandeau_gobelin[0] = PM_BANDEAU
+    taux_degats_tunique_enchantee[0] = TAUX_TUNIQUE
+    pm_robe_magique[0] = REGEN_PM_ROBE
+    tranchant_epee_epeiste[0] = TAUX_EPEE_ENCOMBRANT
+    taux_degats_armure_epeiste[0] = TAUX_ARMURE_ENCOMBRANT
+    pm_tunique_alchimiste[0] = REGEN_PM_TUNIQUE
+    degats_soutane[0] = DEGATS_SOUTANE
+    pm_robe_sorciere[0] = REGEN_PM_ROBE_SORCIERE
+    pm_chapeau_sorciere[0] = REGEN_PM_CHAPEAU_SORCIERE
+    tranchant_epee_marchand[0] = TAUX_EPEE_MARCHAND
+    degats_armure_marchand[0] = TAUX_ARMURE_MARCHAND
+
+    cout_pm_boost[0] = PM_BOOST
+    taux_boost[0] = TAUX_BOOST
+    latence_boost[0] = LATENCE_BOOST
+    cout_pm_multi_boost[0] = PM_MULTI_BOOST
+    taux_multi_boost[0] = TAUX_MULTI_BOOST
+    latence_multi_boost[0] = LATENCE_MULTI_BOOST
+    cout_pm_secousse[0] = COUT_SECOUSSE
+    degats_secousse[0] = DEGATS_SECOUSSE
+    portee_secousse[0] = PORTEE_SECOUSSE
+    latence_secousse[0] = LATENCE_SECOUSSE
+    cout_pm_soin[0] = PM_SOIN
+    gain_pv_soin[0] = PV_SOIN
+    latence_soin[0] = LATENCE_SOIN
+    cout_pm_multi_soin[0] = PM_MULTI_SOIN
+    gain_pv_multi_soin[0] = PV_MULTI_SOIN
+    latence_multi_soin[0] = LATENCE_MULTI_SOIN
+    cout_pm_volcan[0] = COUT_VOLCAN
+    degats_volcan[0] = DEGATS_VOLCAN
+    portee_volcan[0] = PORTEE_VOLCAN
+    latence_volcan[0] = LATENCE_VOLCAN
+    cout_pm_petite_secousse[0] = COUT_MAGE
+    degats_petite_secousse[0] = DEGATS_MAGE
+    latence_petite_secousse[0] = LATENCE_MAGE
+
+    CONSTANTES_STATS["joueur"]["pv"][1] = PV_JOUEUR
+    CONSTANTES_STATS["joueur"]["vitesse"][1] = VITESSE_JOUEUR
+    CONSTANTES_STATS["joueur"]["force"][1] = FORCE_JOUEUR
+    CONSTANTES_STATS["joueur"]["regen_pv"][1] = REGEN_JOUEUR
+    CONSTANTES_STATS["receptionniste"]["pv"][1] = PV_RECEPTIONNISTE
+    CONSTANTES_STATS["receptionniste"]["vitesse"][1] = VITESSE_RECEPTIONNISTE
+    CONSTANTES_STATS["receptionniste"]["force"][1] = FORCE_RECEPTIONNISTE
+    CONSTANTES_STATS["receptionniste"]["regen_pv"][1] = REGEN_RECEPTIONNISTE
+    CONSTANTES_STATS["paume"]["pv"][1] = PV_PAUME
+    CONSTANTES_STATS["paume"]["vitesse"][1] = VITESSE_PAUME
+    CONSTANTES_STATS["paume"]["force"][1] = FORCE_PAUME
+    CONSTANTES_STATS["paume"]["regen_pv"][1] = REGEN_PAUME
+    CONSTANTES_STATS["peureuse"]["pv"][1] = PV_PEUREUSE
+    CONSTANTES_STATS["peureuse"]["vitesse"][1] = VITESSE_PEUREUSE
+    CONSTANTES_STATS["peureuse"]["force"][1] = FORCE_PEUREUSE
+    CONSTANTES_STATS["peureuse"]["regen_pv"][1] = REGEN_PEUREUSE
+    CONSTANTES_STATS["peureuse"]["pm"][1] = PM_PEUREUSE
+    CONSTANTES_STATS["peureuse"]["regen_pm"][1] = REGEN_PM_PEUREUSE
+    CONSTANTES_STATS["encombrant"]["pv"][1] = PV_ENCOMBRANT
+    CONSTANTES_STATS["encombrant"]["vitesse"][1] = VITESSE_ENCOMBRANT
+    CONSTANTES_STATS["encombrant"]["force"][1] = FORCE_ENCOMBRANT
+    CONSTANTES_STATS["encombrant"]["regen_pv"][1] = REGEN_ENCOMBRANT
+    CONSTANTES_STATS["alchimiste"]["pv"][1] = PV_ALCHIMISTE
+    CONSTANTES_STATS["alchimiste"]["vitesse"][1] = VITESSE_ALCHIMISTE
+    CONSTANTES_STATS["alchimiste"]["force"][1] = FORCE_ALCHIMISTE
+    CONSTANTES_STATS["alchimiste"]["regen_pv"][1] = REGEN_ALCHIMISTE
+    CONSTANTES_STATS["alchimiste"]["pm"][1] = PM_ALCHIMISTE
+    CONSTANTES_STATS["alchimiste"]["regen_pm"][1] = REGEN_PM_ALCHIMISTE
+    CONSTANTES_STATS["peste"]["pv"][1] = PV_PESTE
+    CONSTANTES_STATS["peste"]["vitesse"][1] = VITESSE_PESTE
+    CONSTANTES_STATS["peste"]["force"][1] = FORCE_PESTE
+    CONSTANTES_STATS["peste"]["regen_pv"][1] = REGEN_PESTE
+    CONSTANTES_STATS["peste"]["pm"][1] = PM_PESTE
+    CONSTANTES_STATS["peste"]["regen_pm"][1] = REGEN_PM_PESTE
+    CONSTANTES_STATS["bombe_atomique"]["pv"][1] = PV_BOMBE
+    CONSTANTES_STATS["bombe_atomique"]["vitesse"][1] = VITESSE_BOMBE
+    CONSTANTES_STATS["bombe_atomique"]["force"][1] = FORCE_BOMBE
+    CONSTANTES_STATS["bombe_atomique"]["regen_pv"][1] = REGEN_BOMBE
+    CONSTANTES_STATS["bombe_atomique"]["pm"][1] = PM_BOMBE
+    CONSTANTES_STATS["bombe_atomique"]["regen_pm"][1] = REGEN_PM_BOMBE
+    CONSTANTES_STATS["marchand"]["pv"][1] = PV_MARCHAND
+    CONSTANTES_STATS["marchand"]["vitesse"][1] = VITESSE_MARCHAND
+    CONSTANTES_STATS["marchand"]["force"][1] = FORCE_MARCHAND
+    CONSTANTES_STATS["marchand"]["regen_pv"][1] = REGEN_MARCHAND
+    CONSTANTES_STATS["premier_monstre"]["pv"][1] = PV_PREMIER
+    CONSTANTES_STATS["premier_monstre"]["vitesse"][1] = VITESSE_PREMIER
+    CONSTANTES_STATS["premier_monstre"]["force"][1] = FORCE_PREMIER
+    CONSTANTES_STATS["deuxieme_monstre"]["pv"][1] = PV_DEUXIEME
+    CONSTANTES_STATS["deuxieme_monstre"]["vitesse"][1] = VITESSE_DEUXIEME
+    CONSTANTES_STATS["deuxieme_monstre"]["pm"][1] = PM_DEUXIEME
+    CONSTANTES_STATS["deuxieme_monstre"]["regen_pm"][1] = REGEN_DEUXIEME
+    CONSTANTES_STATS["troisieme_monstre"]["pv"][1] = PV_TROISIEME
+    CONSTANTES_STATS["troisieme_monstre"]["vitesse"][1] = VITESSE_TROISIEME
+    CONSTANTES_STATS["troisieme_monstre"]["force"][1] = FORCE_TROISIEME
+    CONSTANTES_STATS["sentinelle_gobelin"]["pv"][1] = PV_SENT
+    CONSTANTES_STATS["sentinelle_gobelin"]["vitesse"][1] = VITESSE_SENT
+    CONSTANTES_STATS["sentinelle_gobelin"]["force"][1] = FORCE_SENT
+    CONSTANTES_STATS["guerrier_gobelin"]["pv"][1] = PV_GUER
+    CONSTANTES_STATS["guerrier_gobelin"]["vitesse"][1] = VITESSE_GUER
+    CONSTANTES_STATS["guerrier_gobelin"]["force"][1] = FORCE_GUER
+    CONSTANTES_STATS["mage_gobelin"]["pv"][1] = PV_MAGE
+    CONSTANTES_STATS["mage_gobelin"]["vitesse"][1] = VITESSE_MAGE
+    CONSTANTES_STATS["mage_gobelin"]["pm"][1] = PM_MAGE
+    CONSTANTES_STATS["mage_gobelin"]["regen_pm"][1] = REGEN_MAGE
+    CONSTANTES_STATS["shaman_gobelin"]["pv"][1] = PV_SHAMAN
+    CONSTANTES_STATS["shaman_gobelin"]["vitesse"][1] = VITESSE_SHAMAN
+    CONSTANTES_STATS["shaman_gobelin"]["pm"][1] = PM_SHAMAN
+    CONSTANTES_STATS["shaman_gobelin"]["regen_pm"][1] = REGEN_SHAMAN
+    CONSTANTES_STATS["gobelin"]["pv"][1] = PV_GOB
+    CONSTANTES_STATS["gobelin"]["vitesse"][1] = VITESSE_GOB
+    CONSTANTES_STATS["gobelin"]["force"][1] = FORCE_GOB
+    CONSTANTES_STATS["chef_gobelin"]["pv"][1] = PV_CHEF
+    CONSTANTES_STATS["chef_gobelin"]["vitesse"][1] = VITESSE_CHEF
+    CONSTANTES_STATS["chef_gobelin"]["force"][1] = FORCE_CHEF
+    CONSTANTES_STATS["chef_gobelin"]["regen_pv"][1] = REGEN_CHEF
+
+    dpt_joueur = FORCE_JOUEUR*TAUX_STOMP*VITESSE_JOUEUR/LATENCE_STOMP
+    dpt_boost_joueur = dpt_joueur * TAUX_BOOST
+    dpt_multi_boost_joueur = dpt_joueur * TAUX_MULTI_BOOST
+    dpt_receptionniste = FORCE_RECEPTIONNISTE*TAUX_ATTAQUE*TAUX_EPEE_ENCOMBRANT*VITESSE_RECEPTIONNISTE/LATENCE_ATTAQUE
+    dpt_boost_receptionniste = dpt_receptionniste * TAUX_BOOST
+    dpt_multi_boost_receptionniste = dpt_receptionniste * TAUX_MULTI_BOOST
+    dpt_paume = FORCE_PAUME*TAUX_STOMP*VITESSE_PAUME/LATENCE_STOMP
+    dpt_boost_paume = dpt_paume * TAUX_BOOST
+    dpt_multi_boost_paume = dpt_paume * TAUX_MULTI_BOOST
+    dpt_encombrant = FORCE_ENCOMBRANT*TAUX_ATTAQUE*TAUX_EPEE_ENCOMBRANT*VITESSE_ENCOMBRANT/LATENCE_ATTAQUE
+    dpt_boost_encombrant = dpt_encombrant * TAUX_BOOST
+    dpt_multi_boost_encombrant = dpt_encombrant * TAUX_MULTI_BOOST
+    dpt1_alchimiste = DEGATS_SECOUSSE*VITESSE_ALCHIMISTE/LATENCE_SECOUSSE
+    dpt1_boost_alchimiste = dpt1_alchimiste * TAUX_BOOST
+    dpt1_multi_boost_alchimiste = dpt1_alchimiste * TAUX_MULTI_BOOST
+    dpt2_alchimiste = DEGATS_SECOUSSE*(REGEN_PM_ALCHIMISTE+REGEN_PM_TUNIQUE)/COUT_SECOUSSE
+    dpt2_boost_alchimiste = dpt2_alchimiste * TAUX_BOOST
+    dpt2_multi_boost_alchimiste = dpt2_alchimiste * TAUX_MULTI_BOOST
+    pvt1_peste = PV_SOIN*VITESSE_PESTE/LATENCE_SOIN
+    pvt2_peste = PV_SOIN*REGEN_PM_PESTE/PM_SOIN
+    pvt1_multi_peste = PV_MULTI_SOIN*VITESSE_PESTE/LATENCE_MULTI_SOIN
+    pvt2_multi_peste = PV_MULTI_SOIN*REGEN_PM_PESTE/PM_MULTI_SOIN
+    dpt1_bombe = DEGATS_VOLCAN*VITESSE_BOMBE/LATENCE_VOLCAN
+    dpt1_boost_bombe = dpt1_bombe * TAUX_BOOST
+    dpt1_multi_boost_bombe = dpt1_bombe * TAUX_MULTI_BOOST
+    dpt2_bombe = DEGATS_VOLCAN*(REGEN_PM_BOMBE+REGEN_PM_ROBE_SORCIERE+REGEN_PM_CHAPEAU_SORCIERE)/COUT_VOLCAN
+    dpt2_boost_bombe = dpt2_bombe * TAUX_BOOST
+    dpt2_multi_boost_bombe = dpt2_bombe * TAUX_MULTI_BOOST
+    dpt_marchand = FORCE_MARCHAND*TAUX_ATTAQUE*TAUX_EPEE_MARCHAND*VITESSE_MARCHAND/LATENCE_ATTAQUE
+    dpt_boost_marchand = dpt_marchand * TAUX_BOOST
+    dpt_multi_boost_marchand = dpt_marchand * TAUX_MULTI_BOOST
+    dpt1_min_peureuse = min(FORCE_JOUEUR*TAUX_STOMP,FORCE_PAUME*TAUX_STOMP,FORCE_ENCOMBRANT*TAUX_ATTAQUE*TAUX_EPEE_ENCOMBRANT,DEGATS_SECOUSSE,DEGATS_VOLCAN,FORCE_MARCHAND*TAUX_ATTAQUE*TAUX_EPEE_MARCHAND)*(TAUX_BOOST-1)*VITESSE_PEUREUSE/LATENCE_BOOST
+    dpt1_max_peureuse = max(FORCE_JOUEUR*TAUX_STOMP,FORCE_PAUME*TAUX_STOMP,FORCE_ENCOMBRANT*TAUX_ATTAQUE*TAUX_EPEE_ENCOMBRANT,DEGATS_SECOUSSE,DEGATS_VOLCAN,FORCE_MARCHAND*TAUX_ATTAQUE*TAUX_EPEE_MARCHAND)*(TAUX_BOOST-1)*VITESSE_PEUREUSE/LATENCE_BOOST
+    dpt2_min_peureuse = min(FORCE_JOUEUR*TAUX_STOMP,FORCE_PAUME*TAUX_STOMP,FORCE_ENCOMBRANT*TAUX_ATTAQUE*TAUX_EPEE_ENCOMBRANT,DEGATS_SECOUSSE,DEGATS_VOLCAN,FORCE_MARCHAND*TAUX_ATTAQUE*TAUX_EPEE_MARCHAND)*(TAUX_BOOST-1)*(REGEN_PM_PEUREUSE+REGEN_PM_ROBE)/PM_BOOST
+    dpt2_max_peureuse = max(FORCE_JOUEUR*TAUX_STOMP,FORCE_PAUME*TAUX_STOMP,FORCE_ENCOMBRANT*TAUX_ATTAQUE*TAUX_EPEE_ENCOMBRANT,DEGATS_SECOUSSE,DEGATS_VOLCAN,FORCE_MARCHAND*TAUX_ATTAQUE*TAUX_EPEE_MARCHAND)*(TAUX_BOOST-1)*(REGEN_PM_PEUREUSE+REGEN_PM_ROBE)/PM_BOOST
+    dpt1_multi_peureuse = (FORCE_JOUEUR*TAUX_STOMP+FORCE_PAUME*TAUX_STOMP+FORCE_ENCOMBRANT*TAUX_ATTAQUE*TAUX_EPEE_ENCOMBRANT+DEGATS_SECOUSSE+DEGATS_VOLCAN+FORCE_MARCHAND*TAUX_ATTAQUE*TAUX_EPEE_MARCHAND)*(TAUX_MULTI_BOOST-1)*VITESSE_PEUREUSE/LATENCE_MULTI_BOOST
+    dpt2_multi_peureuse = (FORCE_JOUEUR*TAUX_STOMP+FORCE_PAUME*TAUX_STOMP+FORCE_ENCOMBRANT*TAUX_ATTAQUE*TAUX_EPEE_ENCOMBRANT+DEGATS_SECOUSSE+DEGATS_VOLCAN+FORCE_MARCHAND*TAUX_ATTAQUE*TAUX_EPEE_MARCHAND)*(TAUX_MULTI_BOOST-1)*(REGEN_PM_PEUREUSE+REGEN_PM_ROBE)/PM_MULTI_BOOST
+    dpt_gob = FORCE_GOB*TAUX_ATTAQUE*TAUX_EPEE*VITESSE_GOB/LATENCE_ATTAQUE
+    dpt_boost_gob = dpt_gob * TAUX_BOOST
+    dpt_sent = FORCE_SENT*TAUX_ATTAQUE*TAUX_LANCE*VITESSE_SENT/LATENCE_ATTAQUE
+    dpt_boost_sent = dpt_sent * TAUX_BOOST
+    dpt_guer = FORCE_GUER*TAUX_ATTAQUE*TAUX_CIMETERE*VITESSE_GUER/LATENCE_ATTAQUE
+    dpt_boost_guer = dpt_guer * TAUX_BOOST
+    dpt1_mage = DEGATS_MAGE*VITESSE_MAGE/LATENCE_MAGE
+    dpt1_boost_mage = dpt1_mage * TAUX_BOOST
+    dpt2_mage = DEGATS_MAGE*(REGEN_MAGE+PM_BANDEAU)/COUT_MAGE
+    dpt2_boost_mage = dpt2_mage * TAUX_BOOST
+    dpt1_min_shaman = min(FORCE_GOB*TAUX_ATTAQUE*TAUX_EPEE,FORCE_SENT*TAUX_ATTAQUE*TAUX_LANCE,FORCE_GUER*TAUX_ATTAQUE*TAUX_CIMETERE,DEGATS_MAGE)*(TAUX_BOOST-1)*VITESSE_SHAMAN/LATENCE_BOOST
+    dpt1_max_shaman = max(FORCE_GOB*TAUX_ATTAQUE*TAUX_EPEE,FORCE_SENT*TAUX_ATTAQUE*TAUX_LANCE,FORCE_GUER*TAUX_ATTAQUE*TAUX_CIMETERE,DEGATS_MAGE)*(TAUX_BOOST-1)*VITESSE_SHAMAN/LATENCE_BOOST
+    dpt2_min_shaman = min(FORCE_GOB*TAUX_ATTAQUE*TAUX_EPEE,FORCE_SENT*TAUX_ATTAQUE*TAUX_LANCE,FORCE_GUER*TAUX_ATTAQUE*TAUX_CIMETERE,DEGATS_MAGE)*(TAUX_BOOST-1)*(REGEN_SHAMAN)/PM_BOOST
+    dpt2_max_shaman = max(FORCE_GOB*TAUX_ATTAQUE*TAUX_EPEE,FORCE_SENT*TAUX_ATTAQUE*TAUX_LANCE,FORCE_GUER*TAUX_ATTAQUE*TAUX_CIMETERE,DEGATS_MAGE)*(TAUX_BOOST-1)*(REGEN_SHAMAN)/PM_BOOST
+    dpt_chef = FORCE_CHEF*TAUX_ATTAQUE*TAUX_EPEE*VITESSE_CHEF/LATENCE_ATTAQUE
+    dpt_boost_chef = dpt_chef * TAUX_BOOST
+    print("Un bref aperçu des stats\n\n")
+    print(f"Joueur :         {PV_JOUEUR:>3} PV, {dpt_joueur:.2f} ({dpt_multi_boost_joueur:.2f}, {dpt_boost_joueur:.2f}) dpt, {REGEN_JOUEUR} regen")
+    print(f"Receptionniste : {PV_RECEPTIONNISTE:>3} PV, {dpt_receptionniste:.2f} ({dpt_multi_boost_receptionniste:.2f}, {dpt_boost_receptionniste:.2f}) dpt, {REGEN_RECEPTIONNISTE} regen, {TAUX_ARMURE_ENCOMBRANT:.2%} degats bloqués")
+    print(f"Paumé :          {PV_PAUME:>3} PV, {dpt_paume:.2f} ({dpt_multi_boost_paume:.2f}, {dpt_boost_paume:.2f}) dpt, {REGEN_PAUME} regen, {TAUX_TUNIQUE:.2%} degats bloqués")
+    print(f"Peureuse :       {PV_PEUREUSE:>3} PV, {dpt1_min_peureuse:.2f}~{dpt1_max_peureuse:.2f} dpt1, {dpt2_min_peureuse:.2f}~{dpt2_max_peureuse:.2f} dpt2, {dpt1_multi_peureuse:.2f} multi-dpt1, {dpt2_multi_peureuse:.2f} multi-dpt2, {REGEN_PEUREUSE} regen")
+    print(f"Encombrant :     {PV_ENCOMBRANT:>3} PV, {dpt_encombrant:.2f} ({dpt_multi_boost_encombrant:.2f}, {dpt_boost_encombrant:.2f}) dpt, {REGEN_ENCOMBRANT} regen, {TAUX_ARMURE_ENCOMBRANT:.2%} degats bloqués")
+    print(f"Alchimiste :     {PV_ALCHIMISTE:>3} PV, {dpt1_alchimiste:.2f} ({dpt1_multi_boost_alchimiste:.2f}, {dpt1_boost_alchimiste:.2f}) dpt1, {dpt2_alchimiste:.2f} ({dpt2_multi_boost_alchimiste:.2f}, {dpt2_boost_alchimiste:.2f}) dpt2, {REGEN_ALCHIMISTE} regen")
+    print(f"Peste :          {PV_PESTE:>3} PV, {pvt1_peste:.2f} ({pvt2_peste:.2f}) soin par tour, {pvt1_multi_peste:.2f} ({pvt2_multi_peste:.2f}) multi-soin par tour, {REGEN_PESTE} regen, {DEGATS_SOUTANE} degats max")
+    print(f"Bombe atomique : {PV_BOMBE:>3} PV, {dpt1_bombe:.2f} ({dpt1_multi_boost_bombe:.2f}, {dpt1_boost_bombe:.2f}) dpt1, {dpt2_bombe:.2f} ({dpt2_multi_boost_bombe:.2f}, {dpt2_boost_bombe:.2f}) dpt2, {REGEN_BOMBE} regen")
+    print(f"Marchand :       {PV_MARCHAND:>3} PV, {dpt_marchand:.2f} ({dpt_multi_boost_marchand:.2f}, {dpt_boost_marchand:.2f}) dpt, {REGEN_MARCHAND} regen, {TAUX_ARMURE_MARCHAND} degats bloqués")
+    print(f"Gobelin :    {PV_GOB:>3} PV, {dpt_gob:.2f} ({dpt_boost_gob:.2f}) dpt")
+    print(f"Sentinelle : {PV_SENT:>3} PV, {dpt_sent:.2f} ({dpt_boost_sent:.2f}) dpt, {1-(1-TAUX_ARMURE_SENT)*(1-TAUX_HAUME):.2%} degats bloqués")
+    print(f"Guerrier :   {PV_GUER:>3} PV, {dpt_guer:.2f} ({dpt_boost_guer:.2f}) dpt, {TAUX_ARMURE_GUER:.2%} degats bloqués")
+    print(f"Mage :       {PV_MAGE:>3} PV, {dpt1_mage:.2f} ({dpt1_boost_mage:.2f}) dpt1, {dpt2_mage:.2f} ({dpt2_boost_mage:.2f}) dpt2")
+    print(f"Shaman :     {PV_SHAMAN:>3} PV, {dpt1_min_shaman:.2f}~{dpt1_max_shaman:.2f}) dpt1, {dpt2_min_shaman:.2f}~{dpt2_max_shaman:.2f}) dpt2")
+    print(f"Chef :       {PV_CHEF:>3} PV, {dpt_chef:.2f} ({dpt_boost_chef:.2f}) dpt, {REGEN_CHEF} regen, {1-(1-TAUX_ARMURE_SENT)*(1-TAUX_HAUME):.2%} degats bloqués")
+
+except SyntaxError:
+    print("La syntaxe du fichier Equilibrage.py est incorrecte.")
+except ModuleNotFoundError:
+    print("Il n'y a pas de fichier Equilibrage.py, on va garder l'équilibrage par défaut.")
+
+
 # /!\ Mettre les lignes à jour !
 # Contenu du fichier :
 # La classe Controleur (lignes 0-500) ;
@@ -2721,7 +2923,7 @@ class Agissant(Entitee): #Tout agissant est un cadavre, tout cadavre n'agit pas.
         self.dir_regard = direction
         self.skill_courant = Skill_deplacement #La plupart des monstres n'ont pas ce skill !
 
-    def agit_en_vue(self,esprit,defaut = None): #Par défaut, on n'a pas d'action à distance
+    def agit_en_vue(self,esprit,defaut = ""): #Par défaut, on n'a pas d'action à distance
         return defaut
 
     def comporte_distance(self):
@@ -3233,7 +3435,7 @@ class Fuyard(Agissant):
 class Soigneur(Agissant):
     """Les agissants capables de soigner les autres."""
 
-    def agit_en_vue(self,esprit,defaut = None):
+    def agit_en_vue(self,esprit,defaut = ""):
         cible = None
         pire = 1
         #On cherche des alliés à soigner
@@ -3259,7 +3461,7 @@ class Soigneur(Agissant):
 class Multi_soigneur(Agissant):
     """Les soigneurs capables de soigner plusieurs agissants à la fois.""" #/!\Est-ce qu'on veut aussi en faire une pour le soin supérieur ou seul le joueur peut l'obtenir ?
 
-    def agit_en_vue(self,esprit,defaut = None):
+    def agit_en_vue(self,esprit,defaut = ""):
         cibles = []
         for ID in esprit.corps.keys():
             corp = self.controleur.get_entitee(ID)
@@ -3297,7 +3499,7 @@ class Multi_soigneur(Agissant):
 class Multi_soigneur_protecteur(Agissant):
     """Les multi_soigneurs capables de placer un sort de protection lorsqu'il n'y a personne à soigner.""" #Vraiment juste la peste
 
-    def agit_en_vue(self,esprit,defaut = None):
+    def agit_en_vue(self,esprit,defaut = ""):
         cibles = []
         for ID in esprit.corps.keys():
             corp = self.controleur.get_entitee(ID)
@@ -3352,7 +3554,7 @@ class Multi_soigneur_protecteur(Agissant):
 class Attaquant_magique_case(Agissant):
     """Les agissants qui combattent en lançant des attaques magiques de loin sur des cases."""
 
-    def agit_en_vue(self,esprit,defaut = None):
+    def agit_en_vue(self,esprit,defaut = ""):
         cibles = []
         #On cherche l'ennemi le plus puissant en vue
         for colonne in self.vue:
@@ -3376,7 +3578,7 @@ class Attaquant_magique_case(Agissant):
 class Attaquant_magique_agissant(Agissant):
     """Les agissants qui combattent en lançant des attaques magiques de loin sur des agissants."""
 
-    def agit_en_vue(self,esprit,defaut = None):
+    def agit_en_vue(self,esprit,defaut = ""):
         cibles = []
         #On cherche l'ennemi le plus puissant en vue
         for colonne in self.vue:
@@ -3400,7 +3602,7 @@ class Attaquant_magique_agissant(Agissant):
 class Renforceur(Agissant):
     """Les agissants qui boostent les attaques de leurs alliés."""
 
-    def agit_en_vue(self,esprit,defaut = None):
+    def agit_en_vue(self,esprit,defaut = ""):
         cible = None
         importance = 0
         #On cherche des alliés à booster
@@ -3425,7 +3627,7 @@ class Renforceur(Agissant):
 class Multi_renforceur(Renforceur):
     """Les agissants qui peuvent booster plusieurs alliés à la fois."""
 
-    def agit_en_vue(self,esprit,defaut = None):
+    def agit_en_vue(self,esprit,defaut = ""):
         cibles = []
         importance = 0
         #On cherche des alliés à booster
@@ -3520,6 +3722,8 @@ class Sentinelle_gobelin(Tank,Gobelin,Sentinelle):
 
 class Premier_monstre(Sentinelle_gobelin):
     """La première sentinelle gobelin. Réduire ses stats pour en faire un 1/2 shot ?"""
+    def __init__(self,controleur,position,niveau):
+        Agissant.__init__(self,controleur,position,"premier_monstre",niveau)
 
     def meurt(self):
         self.controleur.get_entitee(2).first_kill(self.position)
@@ -3527,6 +3731,8 @@ class Premier_monstre(Sentinelle_gobelin):
 
 class Troisieme_monstre(Sentinelle_gobelin):
     """La deuxième sentinelle gobelin. Réduire ses stats pour en faire un 3/4 shot ?"""
+    def __init__(self,controleur,position,niveau):
+        Agissant.__init__(self,controleur,position,"troisieme_monstre",niveau)
 
     def meurt(self):
         self.controleur.get_entitee(2).third_kill(self.position)
@@ -3608,6 +3814,8 @@ class Mage_gobelin(Attaquant_magique_case,Support,Gobelin):
 
 class Deuxieme_monstre(Mage_gobelin):
     """Le premier mage gobelin."""
+    def __init__(self,controleur,position,niveau):
+        Agissant.__init__(self,controleur,position,"deuxieme_monstre",niveau)
 
     def meurt(self):
         self.controleur.get_entitee(2).magic_kill(self.position)
@@ -3768,12 +3976,6 @@ class Humain(Agissant,Entitee_superieure):
                 self.replique_courante = 0
         elif touche == pygame.K_SPACE:
             self.interprete(self.replique_courante)
-
-    def set_cible(self,cible):
-        self.cible_deplacement = cible
-        self.replique = "Ok, j'y vais !"
-        self.repliques = ["Merci."]
-        self.replique_courante = 0
 
     def end_dialogue(self,dialogue=-1):
         self.controleur.get_entitee(2).interlocuteur = None
@@ -3957,6 +4159,8 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
 
     def debut_tour(self):
         self.affichage.dessine(self)
+        if self.latence <= 0:
+            self.nouvel_ordre = False
         Agissant.debut_tour(self)
         if self.get_etage_courant() > self.highest:
             self.highest = self.get_etage_courant()
@@ -6148,7 +6352,7 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
             self.controleur.get_entitee(2).event = COMPLEMENT_DIALOGUE
         elif replique == "dialogue-1reponse1.1.3":
             self.replique = "dialogue-1phrase1.1.3"
-            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.3","dialogue-1reponse1.3"]
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.3"]
             self.mouvement = 1
         elif replique == "dialogue-1reponse1.3":
             self.end_dialogue(-1)
@@ -6164,6 +6368,11 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
 
         self.replique_courante = 0
 
+    def set_cible(self,cible):
+        self.cible_deplacement = cible
+        self.replique = "dialogue-1phrase1.1.1.2"
+        self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.3"]
+
     def get_replique(self,code):
         return REPLIQUES_PAUME[code]
 
@@ -6177,6 +6386,9 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
         return SKIN_TETE_PAUME
 
     def get_texte_descriptif(self):
+        if self.statut == None:
+            self.statut = ""
+            print("Hey, mon statut vaut None, pourquoi !?")
         return [f"Un humain (niveau {self.niveau})",f"ID : {self.ID}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Un humain terrorisé par les labyrinthes. Il espère pouvoir sortir un jour de cet enfer."]
 
 class Peureuse(Multi_renforceur,Support_lointain,Humain): #La quatrième humaine du jeu, à l'étage 3 (terrorisée par les monstres)
@@ -6262,7 +6474,7 @@ class Peureuse(Multi_renforceur,Support_lointain,Humain): #La quatrième humaine
         elif replique == "dialogue1reponse1.1.1.1":
             self.replique="dialogue1phrase1.1.1.1"
             self.repliques = ["dialogue1reponse1.1.1.1.1","dialogue1reponse1.1.1.1.2"]
-        elif replique == "dialogue1reponse1.1.1.1.1":
+        elif replique == "dialogue1reponse1.1.1.1.2":
             self.appreciations[0] += 0.5
             self.end_dialogue()
             self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
@@ -6487,6 +6699,14 @@ class Peureuse(Multi_renforceur,Support_lointain,Humain): #La quatrième humaine
             print("Je ne connais pas cette réplique !")
 
         self.replique_courante = 0
+
+    def set_cible(self,cible):
+        self.cible_deplacement = cible
+        self.replique = "dialogue-1phrase1.1.1.2"
+        self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"]
+        if self.controleur.entitees[2].a_parchemin_vierge():
+            self.repliques.append("dialogue-1reponse1.3")
+        self.repliques.append("dialogue-1reponse1.4")
 
     def get_replique(self,code):
         return REPLIQUES_PEUREUSE[code]
@@ -6770,6 +6990,11 @@ class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyenne
 
         self.replique_courante = 0
 
+    def set_cible(self,cible):
+        self.cible_deplacement = cible
+        self.replique = "dialogue-1phrase1.1.1.2"
+        self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.3"]
+
     def get_replique(self,code):
         return REPLIQUES_ENCOMBRANT[code]
 
@@ -6963,6 +7188,14 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
             print("Je ne connais pas cette réplique !")
 
         self.replique_courante = 0
+
+    def set_cible(self,cible):
+        self.cible_deplacement = cible
+        self.replique = "dialogue-1phrase1.1.1.2"
+        self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.4"]
+        if self.controleur.entitees[2].a_parchemin_vierge():
+            self.repliques.append("dialogue-1reponse1.3")
+        self.repliques.append("dialogue-1reponse1.5")
 
     def get_replique(self,code):
         return REPLIQUES_ALCHIMISTE[code]
@@ -7195,6 +7428,14 @@ class Peste(Multi_soigneur_protecteur,Support_lointain,Humain): #La huitième hu
 
         self.replique_courante = 0
 
+    def set_cible(self,cible):
+        self.cible_deplacement = cible
+        self.replique = "dialogue-1phrase1.1.1.2"
+        self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"]
+        if self.controleur.entitees[2].a_parchemin_vierge():
+            self.repliques.append("dialogue-1reponse1.3")
+        self.repliques.append("dialogue-1reponse1.4")
+
     def get_replique(self,code):
         return REPLIQUES_PESTE[code]
 
@@ -7426,6 +7667,14 @@ class Bombe_atomique(Attaquant_magique_case,Support,Humain): #La neuvième humai
 
         self.replique_courante = 0
 
+    def set_cible(self,cible):
+        self.cible_deplacement = cible
+        self.replique = "dialogue-1phrase1.1.1.2"
+        self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"]
+        if self.controleur.entitees[2].a_parchemin_vierge():
+            self.repliques.append("dialogue-1reponse1.3")
+        self.repliques.append("dialogue-1reponse1.4")
+
     def get_replique(self,code):
         return REPLIQUES_BOMBE_ATOMIQUE[code]
 
@@ -7586,6 +7835,11 @@ class Marchand(Dps,Humain): #Le dixième humain du jeu, à l'étage 9 (le seul l
             print("Je ne connais pas cette réplique !")
 
         self.replique_courante = 0
+
+    def set_cible(self,cible):
+        self.cible_deplacement = cible
+        self.replique = "dialogue-1phrase1.1.1.1.2"
+        self.repliques = ["dialogue-1reponse1.1.1","dialogue-1reponse1.1.2","dialogue-1reponse1.1.3"]
 
     def get_replique(self,code):
         return REPLIQUES_MARCHAND[code]
@@ -10196,7 +10450,7 @@ class Esprit :
                 res = "fuite"
         if res in ["deplacement","fuite"] and corp.latence <= 0:
             if len(cases) == 1: #Pas de cases libres à proximité, on va essayer d'attaquer pour s'en sortir
-                corp.statut = "bloqué"
+                res = "bloqué"
                 corp.skill_courant = None
                 importance = 0
                 for i in range(4):
@@ -10213,9 +10467,9 @@ class Esprit :
                                             corp.attaque(i)
                                             res = "attaque"
             elif tcase[4] == 0: #Et case[3] forcément aussi par la même occasion, donc on est totalement libre de chercher
-                corp.statut = "paix"
+                res = "paix"
                 if not isinstance(corp,Sentinelle) or isinstance(corp,Humain):
-                    corp.statut = "exploration"
+                    res = "exploration"
                     if len(dirs)>1: #On peut se permettre de choisir
                         if corp.dir_regard != None: #L'agissant regarde quelque part
                             dir_back = [HAUT,DROITE,BAS,GAUCHE][corp.dir_regard-2]
@@ -10227,7 +10481,7 @@ class Esprit :
             else:
                 new_cases = sorted(cases,key=operator.itemgetter(2,3))
                 if res == "deplacement":
-                    corp.statut = "approche"
+                    res = "approche"
                     if new_cases[-1][0] != -1: #La dernière case (i.e. les valeurs les plus élevées) n'est pas celle où l'on est
                         corp.va(new_cases[-1][0])
                         if ID == 4:
@@ -10235,13 +10489,13 @@ class Esprit :
                     else:
                         res = corp.agit_en_vue(self)
                 elif res == "fuite":
-                    corp.statut = "fuite"
                     if new_cases[0][0] != -1: #La première case (i.e. les valeurs les moins élevées) n'est pas celle où l'on est
                         corp.va(new_cases[0][0])
                         if ID == 4:
                             constantes_deplacements.append([self.controleur.nb_tours,"fuite",corp.dir_regard,new_cases])
                     else:
                         res = corp.agit_en_vue(self)
+        corp.statut = res
 
     def oublie(self):
         for lab in self.vue.values():
@@ -10789,9 +11043,9 @@ class Esprit_humain(Esprit_type):
                                                     humain.attaque(i)
                                                     res = "attaque"
                     elif case[5] == 0 and  case[4] == 0:
-                        humain.statut = "paix"
+                        res = "paix"
                         if not isinstance(humain,Sentinelle):
-                            humain.statut = "exploration"
+                            res = "exploration"
                             if len(dirs)>1: #On peut se permettre de choisir
                                 if humain.dir_regard != None: #L'agissant regarde quelque part
                                     dir_back = [HAUT,DROITE,BAS,GAUCHE][humain.dir_regard-2]
@@ -10800,7 +11054,7 @@ class Esprit_humain(Esprit_type):
                             humain.va(dirs[random.randint(0,len(dirs)-1)]) #/!\ Ne pas retourner sur ses pas, c'est bien ! Aller vers les endroits inconnus, ce serait mieux. /!\
                     else:
                         if res == "deplacement":
-                            humain.statut = "approche"
+                            res = "approche"
                             new_cases = sorted(cases,key=operator.itemgetter(4,2,3))
                             if new_cases[-1][0] != -1: #La dernière case (i.e. les valeurs les plus élevées) n'est pas celle où l'on est
                                 humain.va(new_cases[-1][0])
@@ -10809,7 +11063,6 @@ class Esprit_humain(Esprit_type):
                             else:
                                 res = humain.agit_en_vue(self)
                         elif res == "fuite":
-                            humain.statut = "fuite"
                             for case in cases:
                                 case[4] *= -1
                             new_cases = sorted(cases,key=operator.itemgetter(4,2,3))
@@ -10819,6 +11072,7 @@ class Esprit_humain(Esprit_type):
                                     constantes_deplacements.append([self.controleur.nb_tours,"fuite loin",humain.dir_regard,new_cases])
                             else:
                                 res = humain.agit_en_vue(self)
+        humain.statut = res
 
 class Esprit_slime(Esprit_type):
     """Un esprit qui dirige un ou plusieurs slimes. Peut interragir avec d'autres esprits slimes."""
