@@ -348,7 +348,7 @@ class True_joueur:
                         screen.blit(POLICE20.render("Elle ouvre le menu des touches,",True,(255,255,255)),(marge_gauche+700,marge_haut+440))
                         screen.blit(POLICE20.render("qui permet de consulter/modifier les touches de zone et de skill.",True,(255,255,255)),(marge_gauche+700,marge_haut+460))
                         screen.blit(POLICE20.render("La touche retour permet de mettre le jeu en pause et de le remettre en marche.",True,(255,255,255)),(marge_gauche+830,marge_haut+40))
-                        screen.blit(POLICE20.render("Le jeu est automatiquement mis en pause lorsque la fenètre pas en arrière-plan.",True,(255,255,255)),(marge_gauche+830,marge_haut+60))
+                        screen.blit(POLICE20.render("Le jeu est automatiquement mis en pause lorsque la fenètre passe en arrière-plan.",True,(255,255,255)),(marge_gauche+830,marge_haut+60))
                         screen.blit(POLICE20.render("Lorsqu'il est en pause, le jeu répond toujours aux commandes.",True,(255,255,255)),(marge_gauche+830,marge_haut+80))
                         screen.blit(POLICE20.render("On peut choisir sa prochaine action, utiliser/équipper un item,",True,(255,255,255)),(marge_gauche+830,marge_haut+100))
                         screen.blit(POLICE20.render("donner des consignes aux alliés, et simplement observer la situation.",True,(255,255,255)),(marge_gauche+830,marge_haut+120))
