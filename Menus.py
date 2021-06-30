@@ -13,12 +13,12 @@ def menu(parametres,screen,couleur=(255,255,255),illustration=SKIN_ESCAP,police=
     res = False
     clock = pygame.time.Clock()
     boutons = [Bouton(*parametre) for parametre in parametres] #J'ai appris quelque chose aujourd'hui !
+    curseur = 0
+    nb = len(boutons)
     while not(res):
         largeur,hauteur = screen.get_size()
         debut_largeur = int((largeur-1350)//2)
         debut_hauteur = int((hauteur-690)//2)
-        curseur = 0
-        nb = len(boutons)
         taille = int(4*police.get_linesize()//3) #La taille du rectangle (aussi la taille 'officielle' de la police
         distance = 2*police.get_linesize() #La distance entre deux débuts de rectangles
         mimax = int(345//distance)-1 #Le nombre maximum de rectangles par demi-écran, avec une marge de principe

@@ -79,7 +79,12 @@ Comment fonctionne l'alchimie ?
 Éventuellement le résultat final peut être une amélioration d'un item du joueur ?
 Les ingrédients sont une catégorie d'items distincte des autres. On peut en trouver par terre ou les acheter au marchand (?)
 Certains ingrédients proviennent de monstres (dents de gobelin, peau de gobelin, etc.) et peuvent être trouvés là où il y a beaucoup de ces monstres. Mais il n'y a personne dans le labyrinthe qui sache extraire ces ingrédients des cadavres, donc on est obligé de passer par le marchand.
-Recettes simples (pas plus d'un ingrédient par recette dans le tutoriel)
+Recettes simples (pas plus de deux ingrédient par recette dans le tutoriel)
+Peau de gobelin -> Parchemin vierge
+Peau de gobelin + pierre dure -> Parchemin de protection
+Dent de gobelin -> Potion de force
+Hypokute -> Potion de soin
+Cristal transparent -> Potion d'invisibilité
 
 
 Travail à faire :

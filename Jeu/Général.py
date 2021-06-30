@@ -389,7 +389,7 @@ class Controleur():
         peureuse = Peureuse(self,("Étage 3 : combat",8,8))
         self.ajoute_entitee(peureuse)
         self.esprits["peureuse"] = Esprit_humain(peureuse.ID,self)
-        cle1 = Cle(("Étage 3 : combat",12,13),["Porte_entree_encombrant_5"])
+        cle1 = Cle(("Étage 3 : combat",12,13),["Porte_avant_prison_5"])
         self.ajoute_entitee(cle1)
         peureuse.inventaire.ajoute(cle1)
         gobel1 = Premier_monstre(self,("Étage 3 : combat",3,8),1)
@@ -405,7 +405,7 @@ class Controleur():
         self.labs["Étage 3 : combat"]=Labyrinthe("Étage 3 : combat",11,11,("Étage 3 : combat",0,0),paterns3,1,1,TERRE,0.4)
         self.construit_escalier(("Étage 2 : labyrinthe",1,5),("Étage 3 : combat",10,10),HAUT,BAS)
 
-        #On crée le quatrième étage et son occupant :
+        #On crée le quatrième étage et ses occupants :
         codeur = Codeur(self,("Étage 4 : monstres",15,1))
         self.ajoute_entitee(codeur)
         self.esprits["codeur"] = Esprit_humain(codeur.ID,self)
@@ -425,60 +425,61 @@ class Controleur():
         encombrant = Encombrant(self,("Étage 5 : portes",2,3))
         self.ajoute_entitee(encombrant)
         self.esprits["encombrant"] = Esprit_humain(encombrant.ID,self)
-        passepartout1 = Cle(("Étage 5 : portes",8,22),["Porte_cellule_slime_5","Porte_cellule_piège_5","Porte_cellule_pré-piège_5","Porte_petite_cellule_droite_5"])
-        self.ajoute_entitee(passepartout1)
-        passepartout2 = Cle(("Étage 5 : portes",9,18),["Porte_petite_cellule_gauche_5","Porte_grande_cellule_droite_5"])
-        self.ajoute_entitee(passepartout2)
-        cle1 = Cle(("Étage 5 : portes",4,15),["Porte_grande_cellule_5"])
+        cle1 = Cle(("Étage 5 : portes",2,3),["Porte_sortie_encombrant_5"])
         self.ajoute_entitee(cle1)
-        cle2 = Cle(("Étage 5 : portes",0,9),["Porte_cellule_ombriul_5"])
+        encombrant.inventaire.ajoute(cle1)
+        passepartout1 = Cle(("Étage 5 : portes",5,5),["Porte_première_cellule_5","Porte_double_cellule_première_5","Porte_grande_cellule_5","Porte_cellule_biscornue_5","Porte_entree_encombrant_5"])
+        self.ajoute_entitee(passepartout1)
+        cle2 = Cle(("Étage 5 : portes",1,9),["Porte_couloir_5"])
         self.ajoute_entitee(cle2)
-        cle3 = Cle(("Étage 5 : portes",9,10),["Porte_double_cellule_première_5"])
+        cle3 = Cle(("Étage 5 : portes",1,2),["Porte_fin_couloir_5"])
         self.ajoute_entitee(cle3)
-        cle4 = Cle(("Étage 5 : portes",1,4),["Porte_sortie_encombrant_5"])
-        self.ajoute_entitee(cle4)
         cle5 = Cle(("Étage 5 : portes",3,6),["Porte_armurerie_6"])
         self.ajoute_entitee(cle5)
         cle6 = Cle(("Étage 5 : portes",0,6),["Porte_quatrième_armurerie_9"])
         self.ajoute_entitee(cle6)
-        cle7 = Cle(("Étage 5 : portes",0,22),["Porte_annexe_droite_7"])
+        cle7 = Cle(("Étage 5 : portes",0,12),["Porte_annexe_droite_7"])
         self.ajoute_entitee(cle7)
-        cle8 = Cle(("Étage 5 : portes",0,16),["Porte_troisième_armurerie_9"])
+        cle8 = Cle(("Étage 5 : portes",0,6),["Porte_troisième_armurerie_9"])
         self.ajoute_entitee(cle8)
         cle9 = Cle(("Étage 5 : portes",9,13),["Porte_anti_anti_chambre_8"])
         self.ajoute_entitee(cle9)
-        gobel1 = Sentinelle_gobelin(self,("Étage 5 : portes",8,22),1) #Une sentinelle veille sur la prison
+        gobel1 = Sentinelle_gobelin(self,("Étage 5 : portes",6,10),1) #Une sentinelle veille sur la prison
         self.ajoute_entitee(gobel1)
         gobel2 = Sentinelle_gobelin(self,("Étage 5 : portes",5,5),1) #Une sentinelle veille sur la prison
         self.ajoute_entitee(gobel2)
         gobel2.inventaire.ajoute(passepartout1)
         gobel3 = Guerrier_gobelin(self,("Étage 5 : portes",8,1),1) #Un renégat mis à l'isolement pour le mater, ou un piège diabolique dirigé contre le joueur ?
         self.ajoute_entitee(gobel3)
-        slime = Slime(self,("Étage 5 : portes",1,20),1) #Un slime ! Est-ce que les gobelins ont pris soin de l'affaiblir ?
+        slime = Slime(self,("Étage 5 : portes",8,7),1) #Un slime ! Est-ce que les gobelins ont pris soin de l'affaiblir ?
         self.ajoute_entitee(slime)
-        ombriul = Ombriul(self,("Étage 5 : portes",8,11),1) #Un prisonnier de guerre
+        ombriul = Ombriul(self,("Étage 5 : portes",7,5),1) #Un prisonnier de guerre
         self.ajoute_entitee(ombriul)
         #Rajouter quelques cadavres pour le nécromancien
         self.esprits["gobelins_portes"]=Esprit_simple("gobelins_portes",[gobel1.ID,gobel2.ID,gobel3.ID],["humain"],self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
         self.esprits["ombriul_captif"]=Esprit_simple("ombriul_captif",[ombriul.ID],["humain"],self)
         esprit_slime = Esprit_slime(slime.ID,self)
         self.esprits[esprit_slime.nom]=esprit_slime #Les esprits des slimes sont presque aussi compliqués que ceux des humains, les ruptures en moins.
-        paterns5 = [Patern(("Étage 5 : portes",0,0),10,24,[]),
-                    Patern(("Étage 5 : portes",0,1),5,5,[("Étage 5 : portes",1,0),("Étage 5 : portes",4,2)],["Porte_sortie_encombrant_5","Porte_entree_encombrant_5"]),
-                    Patern(("Étage 5 : portes",0,6),3,3,[]),
-                    Patern(("Étage 5 : portes",3,6),3,3,[("Étage 5 : portes",2,1),("Étage 5 : portes",0,1)],["Porte_double_cellule_première_5","Porte_double_cellule_deuxième_5"]),
-                    Patern(("Étage 5 : portes",0,9),4,7,[("Étage 5 : portes",3,4)],["Porte_grande_cellule_5"]),
-                    Patern(("Étage 5 : portes",0,16),3,3,[("Étage 5 : portes",2,1)],["Porte_petite_cellule_gauche_5"]),
-                    Patern(("Étage 5 : portes",0,19),4,4,[("Étage 5 : portes",3,2)],["Porte_cellule_slime_5"]),
-                    Patern(("Étage 5 : portes",6,0),4,4,[]),
-                    Patern(("Étage 5 : portes",7,4),3,6,[("Étage 5 : portes",0,3),("Étage 5 : portes",1,0)],["Porte_cellule_pré-piège_5","Porte_cellule_piège_5"]),
-                    Patern(("Étage 5 : portes",5,10),5,3,[("Étage 5 : portes",1,0)],["Porte_cellule_ombriul_5"]),
-                    Patern(("Étage 5 : portes",6,13),4,5,[("Étage 5 : portes",0,2)],["Porte_grande_cellule_droite_5"]),
-                    Patern(("Étage 5 : portes",7,18),3,3,[("Étage 5 : portes",0,1)],["Porte_petite_cellule_droite_5"])]
-        self.labs["Étage 5 : portes"]=Labyrinthe("Étage 5 : portes",10,24,("Étage 5 : portes",0,0),paterns5)
+        paterns5 = [Patern(("Étage 5 : portes",0,0),10,14,[]),
+                    Patern(("Étage 5 : portes",7,11),3,3,[]),
+                    Patern(("Étage 5 : portes",0,5),4,3,[]),
+                    Patern(("Étage 5 : portes",0,1),5,4,[("Étage 5 : portes",1,0),("Étage 5 : portes",4,2)],["Porte_sortie_encombrant_5","Porte_entree_encombrant_5"]),
+                    Patern(("Étage 5 : portes",0,8),3,3,[("Étage 5 : portes",1,0),("Étage 5 : portes",2,1)],["Porte_première_cellule_5","Porte_couloir_5"]),
+                    Patern(("Étage 5 : portes",0,11),4,3,[("Étage 5 : portes",2,0)],["Porte_avant_prison_5"]),
+                    Patern(("Étage 5 : portes",4,11),3,3,[("Étage 5 : portes",1,0),("Étage 5 : portes",2,1)],["Porte_double_cellule_première_5","Porte_double_cellule_deuxième_5"]),
+                    Patern(("Étage 5 : portes",6,0),4,5,[("Étage 5 : portes",2,4)],["Porte_grande_cellule_5"]),
+                    Patern(("Étage 5 : portes",5,6),4,4,[("Étage 5 : portes",3,2)],["Porte_cellule_biscornue_5"]),
+                    Patern(("Étage 5 : portes",3,7),2,2),
+                    Patern(("Étage 5 : portes",4,8),2,2,[("Étage 5 : portes",0,0)]),
+                    Patern(("Étage 5 : portes",5,6),2,2,[("Étage 5 : portes",0,1)])]
+        self.labs["Étage 5 : portes"]=Labyrinthe("Étage 5 : portes",10,14,("Étage 5 : portes",0,0),paterns5)
+        self.labs["Étage 5 : portes"].matrice_cases[6][5].murs[BAS].cree_porte(1,"Porte_cellule_plus_biscornue_5")
+        self.labs["Étage 5 : portes"].matrice_cases[6][6].murs[HAUT].cree_porte(1,"Porte_cellule_plus_biscornue_5")
+        self.labs["Étage 5 : portes"].matrice_cases[4][0].murs[DROITE].cree_porte(1,"Porte_fin_couloir_5")
+        self.labs["Étage 5 : portes"].matrice_cases[5][0].murs[GAUCHE].cree_porte(1,"Porte_fin_couloir_5")
         self.labs["Étage 5 : portes"].matrice_cases[4][3].murs[DROITE].effets[1].auto = True
         self.labs["Étage 5 : portes"].matrice_cases[5][3].murs[GAUCHE].effets[1].auto = True
-        self.construit_escalier(("Étage 4 : monstres",16,7),("Étage 5 : portes",0,23),DROITE,GAUCHE,Premiere_marche)
+        self.construit_escalier(("Étage 4 : monstres",16,7),("Étage 5 : portes",0,13),DROITE,GAUCHE,Premiere_marche)
 
         #On crée le sixième étage et son occupant :
         #Nouvelle version :
@@ -2455,6 +2456,10 @@ class Mur:
                 self.effets.remove(effet)
                 del(effet)
 
+    def cree_porte(self,durete,code):
+        self.brise()
+        self.effets.append(Porte(durete,code))
+
     def get_trajet(self):
         trajet = None
         for effet in self.effets :
@@ -2549,12 +2554,10 @@ class Patern:
                 mur = case.murs[bord]
                 if nb < len(self.codes) :
                     if mur.get_blocage([]) != "Imp": # /!\ Nécessaire ?
-                        mur.brise()
-                        mur.effets.append(Porte(self.durete,self.codes[nb]))
+                        mur.cree_porte(self.durete,self.codes[nb])
                     mur_oppose = self.get_mur_oppose(mur,matrice_lab)
                     if mur_oppose != None and mur_oppose.get_blocage([]) != "Imp":
-                        mur_oppose.brise()
-                        mur_oppose.effets.append(Porte(self.durete,self.codes[nb]))
+                        mur_oppose.cree_porte(self.durete,self.codes[nb])
                 else :
                     mur.brise()
                     mur_oppose = self.get_mur_oppose(mur,matrice_lab)
@@ -4083,7 +4086,6 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         self.place = 0
 
         Humain.__init__(self,controleur,position,self.identite,1,2)
-        self.niveau = 0
 
         self.apreciations = [0,0,0,0,0,0,0,0,0,0]
         self.role = "independant"
@@ -6455,6 +6457,9 @@ class Peureuse(Multi_renforceur,Support_lointain,Humain): #La quatrième humaine
         elif self.dialogue == 5: #On a atteint la prison
             self.replique = "dialogue5phrase1"
             self.repliques = ["dialogue5reponse1.1","dialogue5reponse1.2","dialogue5reponse1.3"]
+        elif self.dialogue == 6: #On a progressé dans la prison
+            self.replique = "dialogue6phrase1"
+            self.repliques = ["dialogue6reponse1.1","dialogue6reponse1.2","dialogue6reponse1.3"]
 
     def interprete(self,nb_replique):
         #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
@@ -6618,34 +6623,47 @@ class Peureuse(Multi_renforceur,Support_lointain,Humain): #La quatrième humaine
             self.repliques = ["dialogue4reponse1.2.1"]
             self.appreciations[0]-= 0.3
 
-        #Dialogue de la prison
+        #Dialogue de la prison, première étape
         elif replique == "dialogue5reponse1.1":
             self.replique="dialogue5phrase1.1"
-            self.repliques = ["dialogue5reponse1.1.1"]
+            self.repliques = ["dialogue5reponse1.1.1","dialogue5reponse1.1.2"]
         elif replique == "dialogue5reponse1.1.1":
             self.replique="dialogue5phrase1.1.1"
             self.repliques = ["dialogue5reponse1.1.1.1"]
+        elif replique == "dialogue5reponse1.1.2":
+            self.replique="dialogue5phrase1.1.2"
+            self.repliques = ["dialogue5reponse1.1.1.1"]
         elif replique == "dialogue5reponse1.1.1.1":
-            ID_clee = self.inventaire.get_clee("Porte_entree_encombrant_5")
+            ID_clee = self.inventaire.get_clee("Porte_avant_prison_5")
             self.inventaire.drop(None,ID_clee)
             self.controleur.entitees[2].inventaire.ramasse_item(ID_clee) #On refile au joueur la clé dont il a besoin
             self.replique="dialogue5phrase1.1.1.1"
-            self.repliques = ["dialogue5reponse1.1.1.1.1","dialogue5reponse1.1.1.1.2"]
+            self.repliques = ["dialogue5reponse1.1.1.1.1"]
         elif replique == "dialogue5reponse1.1.1.1.1":
             self.end_dialogue()
-        elif replique == "dialogue5reponse1.1.1.1.2":
-            self.replique="dialogue5phrase1.1.1.1.2"
-            self.repliques = ["dialogue5reponse1.1.1.1.2.1"]
-        elif replique == "dialogue5reponse1.1.1.1.2.1":
-            self.appreciations[0]+= 0.5
-            self.end_dialogue()
         elif replique == "dialogue5reponse1.2":
-            self.replique="dialogue5phrase1.2"
-            self.repliques = ["dialogue5reponse1.1.1"]
-        elif replique == "dialogue5reponse1.3":
-            ID_clee = self.inventaire.get_clee("Porte_entree_encombrant_5")
+            ID_clee = self.inventaire.get_clee("Porte_avant_prison_5")
             self.inventaire.drop(None,ID_clee)
             self.controleur.entitees[2].inventaire.ramasse_item(ID_clee) #On refile quand même au joueur la clé dont il a besoin
+            self.appreciations[0]+= 0.5
+            self.end_dialogue()
+        elif replique == "dialogue5reponse1.3": #On refile quand même au joueur la clé dont il a besoin
+            self.appreciations[0]-= 0.5
+            self.end_dialogue()
+
+        #Dialogue de la prison, deuxième étape
+        elif replique == "dialogue6reponse1.1":
+            self.replique="dialogue6phrase1.1"
+            self.repliques = ["dialogue6reponse1.1.1"]
+        elif replique == "dialogue6reponse1.1.1":
+            self.replique="dialogue6phrase1.1.1"
+            self.repliques = ["dialogue6reponse1.1.1.1"]
+        elif replique == "dialogue6reponse1.1.1.1":
+            self.end_dialogue()
+        elif replique == "dialogue6reponse1.2":
+            self.appreciations[0]+= 0.5
+            self.end_dialogue()
+        elif replique == "dialogue6reponse1.3":
             self.appreciations[0]-= 0.5
             self.end_dialogue()
 
@@ -6921,10 +6939,13 @@ class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyenne
         #Le joueur arrive par la porte
         if replique == "dialogue1reponse1.1":
             self.replique="dialogue1phrase1.1"
-            self.repliques = ["dialogue1reponse1.1.1"]
+            self.repliques = ["dialogue1reponse1.1.1","dialogue1reponse1.1.2"]
         elif replique in ["dialogue1reponse1.1.1","dialogue1reponse1.2.1.1"]:
-            self.replique="dialogue1phrase1.1.1" #/!\ Faire dépendre de la touche effectivement utilisée par le joueur !
-            self.repliques = ["dialogue1reponse1.1.1.1","dialogue1reponse1.1.1.2"]
+            self.replique="dialogue1phrase1.1.1"
+            ID_clee = self.inventaire.get_clee("Porte_sortie_encombrant_5")
+            self.inventaire.drop(None,ID_clee)
+            self.controleur.entitees[2].inventaire.ramasse_item(ID_clee)
+            self.repliques = ["dialogue1reponse1.1.1.1"]
         elif replique == "dialogue1reponse1.1.1.1":
             self.replique="dialogue1phrase1.1.1.1"
             self.repliques = ["dialogue1reponse1.1.1.1.1"]
@@ -6934,11 +6955,12 @@ class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyenne
             self.mouvement = 0 #Légèrement redondant ici
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
             self.attente = False
-        elif replique == "dialogue1reponse1.1.1.2":
+        elif replique == "dialogue1reponse1.1.2":
+            self.replique="dialogue1phrase1.1.2"
+            self.repliques = ["dialogue1reponse1.1.2.1"]
+        elif replique == "dialogue1reponse1.1.2.1":
             self.end_dialogue(-2)
             self.statut_humain = "exploration"
-            self.offenses.append([2,0.01])
-            #+ modifier le role, ou quelque chose, pour qu'il combatte
             self.attente = False
         elif replique == "dialogue1reponse1.2":
             self.replique="dialogue1phrase1.2"
