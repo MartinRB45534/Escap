@@ -1,6 +1,7 @@
 from Jeu.Dialogues.Dialogues_receptionniste import *
 from Jeu.Dialogues.Dialogues_paume import *
 from Jeu.Dialogues.Dialogues_peureuse import *
+from Jeu.Dialogues.Dialogues_codeur import *
 from Jeu.Dialogues.Dialogues_encombrant import *
 from Jeu.Dialogues.Dialogues_alchimiste import *
 from Jeu.Dialogues.Dialogues_peste import *

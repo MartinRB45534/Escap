@@ -9,20 +9,20 @@ class Bouton:
         self.couleurs = couleurs
         self.image = image
 
-def menu(parametres,screen,couleur=(255,255,255),illustration=SKIN_VIDE,police=POLICE20):
+def menu(parametres,screen,couleur=(255,255,255),illustration=SKIN_ESCAP,police=POLICE20):
     res = False
     clock = pygame.time.Clock()
     boutons = [Bouton(*parametre) for parametre in parametres] #J'ai appris quelque chose aujourd'hui !
-    largeur,hauteur = screen.get_size()
-    debut_largeur = int((largeur-1350)//2)
-    debut_hauteur = int((hauteur-690)//2)
-    curseur = 0
-    nb = len(boutons)
-    taille = int(4*police.get_linesize()//3) #La taille du rectangle (aussi la taille 'officielle' de la police
-    distance = 2*police.get_linesize() #La distance entre deux débuts de rectangles
-    mimax = int(345//distance)-1 #Le nombre maximum de rectangles par demi-écran, avec une marge de principe
-    start = debut_hauteur + int(345-distance*mimax-taille//2) #Le début du premier rectangle
     while not(res):
+        largeur,hauteur = screen.get_size()
+        debut_largeur = int((largeur-1350)//2)
+        debut_hauteur = int((hauteur-690)//2)
+        curseur = 0
+        nb = len(boutons)
+        taille = int(4*police.get_linesize()//3) #La taille du rectangle (aussi la taille 'officielle' de la police
+        distance = 2*police.get_linesize() #La distance entre deux débuts de rectangles
+        mimax = int(345//distance)-1 #Le nombre maximum de rectangles par demi-écran, avec une marge de principe
+        start = debut_hauteur + int(345-distance*mimax-taille//2) #Le début du premier rectangle
         #Calcul des positions des boutons :
         if curseur <= mimax: #On n'a pas de boutons superflus en haut
             imin = 0
@@ -68,9 +68,9 @@ def menu(parametres,screen,couleur=(255,255,255),illustration=SKIN_VIDE,police=P
         marge_gauche = debut_largeur + 50
         for i in range(imin,imax+1) :
             if i == curseur:
-                pygame.draw.rect(screen,boutons[i].couleurs[1],(marge_gauche-2,marge_haut-2,304,taille+4)) #/!\ Remplacer le 154 par une variable calculée en fonction ed la longueur des titres
+                pygame.draw.rect(screen,boutons[i].couleurs[1],(marge_gauche-2,marge_haut-2,304,taille+4)) #/!\ Remplacer le 304 par une variable calculée en fonction de la longueur des titres
                 descr = boutons[i].details
-            pygame.draw.rect(screen,boutons[i].couleurs[0],(marge_gauche,marge_haut,300,taille)) #/!\ Remplacer ce 150 aussi
+            pygame.draw.rect(screen,boutons[i].couleurs[0],(marge_gauche,marge_haut,300,taille)) #/!\ Remplacer ce 300 aussi
             boutons[i].image.dessine_toi(screen,(marge_gauche,marge_haut),(50,taille)) #/!\ Et ce 50 !
             text = police.render(boutons[i].texte,True,boutons[i].couleurs[2])
             screen.blit(text,(marge_gauche+40,marge_haut+3))

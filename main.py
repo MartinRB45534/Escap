@@ -4,9 +4,12 @@ import os
 
 pygame.init()
 
-screen = pygame.display.set_mode((1350, 690))
+screen = pygame.display.set_mode((1350, 690),pygame.RESIZABLE)
 
 from true_main import *
+
+SKIN_ESCAP.dessine_toi(screen,(0,0))
+pygame.display.flip()
 
 class Main():
     """Parce que sans ça on a plein de problèmes avec les variables globales."""

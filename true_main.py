@@ -2,7 +2,7 @@ import pygame
 import copy
 
 pygame.init()
-screen = pygame.display.set_mode((1350, 690))
+screen = pygame.display.set_mode((1350, 690),pygame.RESIZABLE)
 
 global GLOBALS
 GLOBALS = {"controleur":None}
@@ -12,6 +12,7 @@ from Jeu import * #Nécessaire ?
 from Jeu.Général import *
 from Jeu.Constantes import *
 
+SKIN_ESCAP.dessine_toi(screen,(0,0))
 
 class True_joueur:
     """Un "joueur". Correspondrait idéalement à une personne, à un compte. Pourrait nécessiter un mot de passe.

@@ -1296,7 +1296,7 @@ class Controleur():
                         if not issubclass(entitee.get_classe(),Item):
                             cibles_potentielles.append(entitee)
         if isinstance(magie,Portee_limitee):
-            poss = self.get_position_touches(joueur.position,magie.portee_limite)
+            poss = self.get_pos_touches(joueur.position,magie.portee_limite)
             cibles = []
             for agissant in cibles_potentielles:
                 if agissant.position in poss:
@@ -1319,7 +1319,7 @@ class Controleur():
                         else:
                             cibles_potentielles += entitee.inventaire.get_items() #/!\ Rajouter une condition d'observation ! Mais ne pas l'appliquer à soi-même !
         if isinstance(magie,Portee_limitee):
-            poss = self.get_position_touches(joueur.position,magie.portee_limite)
+            poss = self.get_pos_touches(joueur.position,magie.portee_limite)
             cibles = []
             for item in cibles_potentielles:
                 if item.position in poss:
@@ -1337,7 +1337,7 @@ class Controleur():
                 for case in colonne:
                     cibles_potentielles.append(case[0])
         if isinstance(magie,Portee_limitee):
-            poss = self.get_positions_touches(joueur.position,magie.portee_limite)
+            poss = self.get_pos_touches(joueur.position,magie.portee_limite)
             cibles = []
             for pos in cibles_potentielles:
                 if pos in poss:
@@ -3131,7 +3131,7 @@ class Agissant(Entitee): #Tout agissant est un cadavre, tout cadavre n'agit pas.
         self.pv = self.pm = 0
         self.etat = "mort"
         self.dir_regard = HAUT
-        self.taux_regen_pv = self.taux_regen_pm = self.taux_force = self.taux_priorite = self.taux_vitesse = self.taux_aff_o = self.taux_aff_f = self.taux_aff_t = self.taux_aff_g = self.taux_stats = {}
+        self.taux_regen_pv = self.taux_regen_pm = self.taux_force = self.taux_priorite = self.taux_vitesse = self.taux_aff_o = self.taux_aff_f = self.taux_aff_t = self.taux_aff_g = self.taux_stats = {} #/!\ À corriger !
         self.effets = []
         self.inventaire.drop_all(self.position)
 
@@ -4083,6 +4083,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         self.place = 0
 
         Humain.__init__(self,controleur,position,self.identite,1,2)
+        self.niveau = 0
 
         self.apreciations = [0,0,0,0,0,0,0,0,0,0]
         self.role = "independant"
@@ -4140,6 +4141,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         self.dir_touches = copy.deepcopy(parametres["dir_touches"])
         self.skill_touches = copy.deepcopy(parametres["skill_touches"])
         self.magies = {} #Le skill magie contient beaucoup de magie. La touche est associée à la fois au skill magie et à la magie correspondante.
+        self.too_late = 0
         self.methode_courante = None
         magie = Magie_explosion_de_mana
         skill = trouve_skill(self.classe_principale,Skill_magie)
@@ -4377,6 +4379,8 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
                         self.statut = "attaque"
                     elif self.skill_courant == Skill_magie : # Le skill magie contient beaucoup de magies différentes !
                         self.magie_courante = self.magies[touche]
+                        skill = trouve_skill(self.classe_principale,Skill_magie)
+                        self.magie = skill.magies[self.magie_courante](skill.niveau) #Ici on a une magie similaire (juste pour l'initialisation du choix, oubliée après parce que le skill fournira la vrai magie avec utilise())
                         if self.magie_courante in LISTE_EXHAUSTIVE_DES_MAGIES_OFFENSIVES:
                             self.statut = "attaque"
                     elif self.skill_courant == Skill_lancer : # Le skill lancer contient beaucoup d'objets différends
@@ -4399,11 +4403,11 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
            Gère le temps et l'affichage"""
         if self.methode_courante == None :
             if self.controleur.phase == COMPLEMENT_DIR:
-                self.start_select_direction(self.magie_courante)
+                self.start_select_direction(self.magie)
             elif self.controleur.phase == COMPLEMENT_COUT:
-                self.start_select_cout(self.magie_courante)
+                self.start_select_cout(self.magie)
             elif self.controleur.phase == COMPLEMENT_CIBLE:
-                self.start_select_cible(self.magie_courante)
+                self.start_select_cible(self.magie)
         current_time = pygame.time.get_ticks()
         if current_time > self.too_late :
             #Le temps est écoulé !
@@ -4807,7 +4811,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
                 self.element_courant = 0
         elif touche == pygame.K_SPACE :
             self.cible = self.element_courant
-        elif touche == pygame.K_RETURN and self.cible != [] :
+        elif touche == pygame.K_RETURN and self.cible != None :
             self.methode_fin(self.options_menu[self.cible])
             self.controleur.unset_phase(COMPLEMENT_MENU)
             self.methode_courante = None
@@ -5706,7 +5710,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
             elif self.choix_niveaux[CLASSIQUE][2] == ESSENCE_MAGIQUE:
                 if choix == FANTOME:
                     #On rajoute fantome à notre espèce ? À notre pseudo-classe ? C'est une vraie classe ? À voir... Permet de traverser les murs, en tous cas.
-                    self.choix_niveaux[CLASSIQUE][7] = FANTOME #Fun fact : le joueur qui choisi ce skill ne peut pas avoir d'aura à booster à ce stade. Le skill n'est donc pas utilisé et n'aide pas à monter de niveau, mais c'est un investissement payant si le joueur survit (et s'oriente vers les auras...)
+                    self.choix_niveaux[CLASSIQUE][7] = FANTOME
                 elif choix == INSTAKILL:
                     skill = Skill_instakill() #Pour tuer sans se salir les mains (si l'instakill réussit, personne n'est au courant... en général)
                     skill.evo()
