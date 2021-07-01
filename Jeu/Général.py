@@ -453,7 +453,7 @@ class Controleur():
         self.ajoute_entitee(gobel3)
         slime = Slime(self,("Étage 5 : portes",8,7),1) #Un slime ! Est-ce que les gobelins ont pris soin de l'affaiblir ?
         self.ajoute_entitee(slime)
-        ombriul = Ombriul(self,("Étage 5 : portes",7,5),1) #Un prisonnier de guerre
+        ombriul = Ombriul(self,("Étage 5 : portes",5,7),1) #Un prisonnier de guerre
         self.ajoute_entitee(ombriul)
         #Rajouter quelques cadavres pour le nécromancien
         self.esprits["gobelins_portes"]=Esprit_simple("gobelins_portes",[gobel1.ID,gobel2.ID,gobel3.ID],["humain"],self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
@@ -462,14 +462,14 @@ class Controleur():
         self.esprits[esprit_slime.nom]=esprit_slime #Les esprits des slimes sont presque aussi compliqués que ceux des humains, les ruptures en moins.
         paterns5 = [Patern(("Étage 5 : portes",0,0),10,14,[]),
                     Patern(("Étage 5 : portes",7,11),3,3,[]),
-                    Patern(("Étage 5 : portes",0,5),4,3,[]),
+                    Patern(("Étage 5 : portes",0,5),5,3,[]),
                     Patern(("Étage 5 : portes",0,1),5,4,[("Étage 5 : portes",1,0),("Étage 5 : portes",4,2)],["Porte_sortie_encombrant_5","Porte_entree_encombrant_5"]),
                     Patern(("Étage 5 : portes",0,8),3,3,[("Étage 5 : portes",1,0),("Étage 5 : portes",2,1)],["Porte_première_cellule_5","Porte_couloir_5"]),
                     Patern(("Étage 5 : portes",0,11),4,3,[("Étage 5 : portes",2,0)],["Porte_avant_prison_5"]),
                     Patern(("Étage 5 : portes",4,11),3,3,[("Étage 5 : portes",1,0),("Étage 5 : portes",2,1)],["Porte_double_cellule_première_5","Porte_double_cellule_deuxième_5"]),
                     Patern(("Étage 5 : portes",6,0),4,5,[("Étage 5 : portes",2,4)],["Porte_grande_cellule_5"]),
                     Patern(("Étage 5 : portes",5,6),4,4,[("Étage 5 : portes",3,2)],["Porte_cellule_biscornue_5"]),
-                    Patern(("Étage 5 : portes",3,7),2,2),
+                    Patern(("Étage 5 : portes",3,7),2,2,[]),
                     Patern(("Étage 5 : portes",4,8),2,2,[("Étage 5 : portes",0,0)]),
                     Patern(("Étage 5 : portes",5,6),2,2,[("Étage 5 : portes",0,1)])]
         self.labs["Étage 5 : portes"]=Labyrinthe("Étage 5 : portes",10,14,("Étage 5 : portes",0,0),paterns5)
@@ -8088,16 +8088,27 @@ class Potion_soin(Potion):
     def get_description(self,observation):
         return ["Une potion","Soigne les blessures. J'espère."]
 
+class Potion_force(Potion):
+    """Une potion qui augmente les dégats infligés."""
+    def __init__(self,position,taux,duree):
+        Potion.__init__(self,position,Enchantement_force(taux,duree))
+
+    def get_titre(self,observation):
+        return "Potion de force"
+
+    def get_description(self,observation):
+        return ["Une potion","Augmente la force (et donc les dégats infligés)."]
+
 class Potion_defense(Potion):
     """Une potion qui protège des attaques."""
     def __init__(self,position,pv):
         Potion.__init__(self,position,Enchantement_defense(duree,))
 
     def get_titre(self,observation):
-        return "Potion de soin"
+        return "Potion de defense"
 
     def get_description(self,observation):
-        return ["Une potion","Soigne les blessures. J'espère."]
+        return ["Une potion","Protège des attaques."]
 
 class Potion_vitesse(Potion):
     """Une potion qui augmente temporairement la vitesse."""
@@ -8209,6 +8220,9 @@ class Parchemin_impregne(Parchemin):
 
     def get_description(self,observation):
         return["Un parchemin",f"Imprégné d'une magie ({self.effet.nom})"]
+
+##class Parchemin_protection(Parchemin):
+##    def __init__(self,position,
 
 class Poly_de_cours(Parchemin):
     """Un parchemin qui enseigne une magie."""
@@ -11202,6 +11216,10 @@ class Effet :
         return SKIN_EFFET
 
 #On distingue les effets par circonstances d'appel.
+class On_need(Effet) :
+    """Classe des effets appelés lors de circonstances particulières. Ils n'ont pas besoin d'être mis à jour, pris en compte ou quoique ce soit le reste du temps."""
+    pass
+
 class On_tick(Effet) :
     """La classe des effets appelés à chaque tour."""
     def execute(self,porteur): #En général, prend en paramètre le porteur de l'effet. Pas toujours.
@@ -11230,6 +11248,14 @@ class On_pre_attack(On_tick):
 class On_fin_tour(On_tick):
     """La classe des effets appelés à la fin du tour."""
     pass
+
+class One_shot(Effet):
+    """Classe des effets qui n'ont à être appelés qu'une seule fois."""
+
+    def execute(self,parametre): # La plupart des one_shot sont de cette forme...
+        if self.phase == "démarrage" :
+            self.action(parametre)
+            self.termine()
 
 class Evenement(On_tick) :
     """La classe des effets limités par le temps, appelés une seule fois par tour."""
@@ -11277,6 +11303,31 @@ class Protection_general(Evenement,On_post_action):
         cases = get_cases_voisines(agissant.get_position(),0) #Seule la case de l'agissant est protégée par cette version de la protection.
         for case in cases :
             case.effets.append(Protection_bouclier(1,bouclier,[agissant.dir_regard]))
+
+class Protection_zone(One_shot,On_post_action):
+    def __init__(self,protection,cible,position,propagation,portee,direction=None,traverse="tout"):
+        self.affiche = False
+        self.phase = "démarrage"
+        self.position = position
+        self.propagation = propagation
+        self.portee = portee
+        self.direction = direction
+        self.traverse = traverse
+        self.cible = cible
+        self.protection = protection
+
+    def action(self,porteur):
+        if self.cible == "case":
+            cases = porteur.controleur.get_cases_touches(self.position,self.portee,self.propagation,self.direction,self.traverse,porteur.ID)
+            for case in cases :
+                case.effets.append(copy.copy(self.protection))
+        elif self.cible == "agissant":
+            agissants = porteur.controleur.get_touches_pos(self.position,self.portee,self.propagation,self.direction,self.traverse,porteur.ID)
+            for agissant in agissants :
+                agissant.effets.append(copy.copy(self.protection))
+
+class Protection_groupe(One_shot,On_post_action):
+    pass
 
 class Investissement_mana(Evenement,On_debut_tour):
     """Le joueur met du mana de côté, et en a plus après !"""
@@ -11740,10 +11791,6 @@ class Poison(On_debut_tour,On_tick):
         else :
             self.action(victime)
 
-class On_need(Effet) :
-    """Classe des effets appelés lors de circonstances particulières. Ils n'ont pas besoin d'être mis à jour, pris en compte ou quoique ce soit le reste du temps."""
-    pass
-
 class Reserve_mana(On_need):
     """Effet qui correspond à une réserve de mana pour le joueur qui peut piocher dedans lorsqu'il en a besoin, mais ce mana n'est pas compté dans le calcul de son mana max."""
     def __init__(self,mana):
@@ -11760,14 +11807,6 @@ class Reserve_mana(On_need):
         if self.phase == "en cours" :
             self.action(mana)
         if self.mana <= 0 :
-            self.termine()
-
-class One_shot(Effet):
-    """Classe des effets qui n'ont à être appelés qu'une seule fois."""
-
-    def execute(self,parametre): # La plupart des one_shot sont de cette forme...
-        if self.phase == "démarrage" :
-            self.action(parametre)
             self.termine()
 
 class Teleportation(One_shot,On_post_action):
@@ -11851,12 +11890,13 @@ class Impregnation(One_shot,On_fin_tour):
                 porteur.controleur.ajoute_entitee(parch)
                 porteur.inventaire.ajoute(parch)
 
-class Dopage(One_shot):
+class Dopage(One_shot,Time_limited):
     """Effet qui "dope" la prochaine attaque du joueur."""
-    def __init__(self,taux_degats):
+    def __init__(self,taux_degats,duree):
         self.affiche = True
         self.phase = "démarrage"
         self.taux_degats = taux_degats
+        self.temps_restant = duree
 
     def action(self,attaque):
         if self.phase == "démarrage" :
@@ -13960,7 +14000,7 @@ class Magie_dopage(Magie):
         self.affiche = True
 
     def action(self,porteur):
-        porteur.effets.append(Dopage(taux_dopage[self.niveau-1]))
+        porteur.effets.append(Dopage(taux_dopage[self.niveau-1],duree_dopage[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_DOPAGE
@@ -13985,7 +14025,7 @@ class Magie_boost(Cible_agissant):
         self.affiche = True
 
     def action(self,porteur):
-        porteur.controleur.get_entitee(self.cible).effets.append(Dopage(taux_boost[self.niveau-1]))
+        porteur.controleur.get_entitee(self.cible).effets.append(Dopage(taux_boost[self.niveau-1],duree_boost[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_DOPAGE
@@ -14011,7 +14051,7 @@ class Magie_multi_boost(Cible_agissant,Multi_cible):
 
     def action(self,porteur):
         for cible in self.cible:
-            porteur.controleur.get_entitee(cible).effets.append(Dopage(taux_multi_boost[self.niveau-1]))
+            porteur.controleur.get_entitee(cible).effets.append(Dopage(taux_multi_boost[self.niveau-1],duree_multi_boost[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_DOPAGE
