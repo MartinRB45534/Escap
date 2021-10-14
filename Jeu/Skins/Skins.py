@@ -258,6 +258,18 @@ global SKIN_TELEPORTATION
 SKIN_TELEPORTATION = Skin("teleportation.png")
 global SKIN_MAGIE
 SKIN_MAGIE = Skin("magie.png")
+global SKIN_HYPOKUTE
+SKIN_HYPOKUTE = Skin("hypokute.png")
+global SKIN_PIERRE_SOLIDE
+SKIN_PIERRE_SOLIDE = Skin("pierre_solide.png")
+global SKIN_DENT
+SKIN_DENT = Skin("dent.png")
+global SKIN_PEAU_GOBELIN
+SKIN_PEAU_GOBELIN = Skin("peau_gobelin.png")
+global SKIN_PLUS
+SKIN_PLUS = Skin("plus.png")
+global SKIN_EGAL
+SKIN_EGAL = Skin("egal.png")
 
 # Skills :
 

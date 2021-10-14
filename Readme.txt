@@ -56,6 +56,28 @@ Troisième étape : mains[0][2].boucle() et le jeu reprend immédiatement, attentio
 
 À mon attention :
 
+Comment gérer tous les menus/choix de façon simple ?
+
+Il y a :
+Les choix de direction(s) (magies, magies de parchemins) (nécessité d'affichage du labyrinthe/d'une zone ciblée, partie "interactive" sur la droite) 
+Les choix de case(s) (magies, magies de parchemins, ordres) (nécessité d'affichage du labyrinthe/d'une zone ciblée, partie "interactive" au centre, éventuellement décompte sur la droite)
+Les choix d'agissant(s) (magies, magies de parchemins, ordres) (nécessité d'affichage d'une liste d'agissants, possiblement nécessité d'affichage du labyrinthe, partie "interactive" sur la droite)
+Les choix d'item(s) (magies, magies de parchemins) (nécessité d'affichage d'une liste d'items, probablement description à droite)
+Les choix de magie (ordre d'imprégnation de parchemins, utilisation du skill de magie) (nécessité d'affichage d'une liste de magies, probablement description à droite)
+Les choix d'objet (achat, vente) (nécessité d'affichage d'une liste d'items, probablement description à droite)
+Les choix de recettes (alchimie) (nécessité d'affichage d'une liste de recettes, probablement description de la recette et des ingrédients à droite)
+
+Pour les magies, on veut choisir au moment de la sélection de la magie (choix unique, possiblement plusieurs choix à faire)
+Pour les magies de parchemins, on veut choisir au moment de l'utilisation du parchemin (choix unique, possiblement plusieurs choix à faire, possiblement plusieurs parchemins à la suite)
+Pour les ordres, on veut choisir pendant un dialogue (choix unique)
+Pour l'utilisation du skill magie, on veut choisir au moment de la sélection du skill (choix unique)
+Pour l'achat et la vente, on veut choisir pendant un dialogue (autant de choix/transactions que voulu, possiblement dans un "magasin", possiblement regrouper l'achat et la vente)
+Pour les recettes, on veut choisir pendant un dialogue (autant de choix que voulu)
+
+(Je ne sais plus si je voulais que la simplicité soit au niveau de la structure du code (classes, méthodes, etc. impliquées) ou de l'interface. Probablement de la structure, mais j'y ai rejoué récemment et l'interface laisse un peu à désirer. Un gros bouton "Confirmer (entrer)" et la possibilité de sélectionner à la souris seraient les bienvenus.)
+
+
+
 En cours (alchimiste) :
 - Parchemins imprégnés de magie (fait)
 - Parchemin de défense (placer un enchantement de défense sur les alliés)
@@ -74,7 +96,7 @@ En cours (alchimiste) :
 
 
 
-Comment fonctionne l'alchimie ?
+Comment fonctionne l'alchimie ? (Pour l'instant en faisant tout planter (hein !? je viens d'y rejouer et ça ma l'air fonctionnel (je n'ai pas essayé l'alchimie mais tout le reste va bien), j'espère que je ne suis pas en train de commiter un truc beugué)
 1 ou plusieurs ingrédients + mana + argent = potion ou parchemin
 Éventuellement le résultat final peut être une amélioration d'un item du joueur ?
 Les ingrédients sont une catégorie d'items distincte des autres. On peut en trouver par terre ou les acheter au marchand (?)

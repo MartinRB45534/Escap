@@ -496,6 +496,16 @@ class Controleur():
                   Cle(("Étage 6 : potions",11,10),["Porte_salle_commune_7"])]
         self.ajoute_entitees(cles_6)
 
+        consomables_6 = [Parchemin_protection(("Étage 6 : potions",2,13)),
+                         Potion_force(("Étage 6 : potions",1,13))]
+        self.ajoute_entitees(consomables_6)
+
+        ingredients_6 = [Peau_gobelin(("Étage 6 : potions",12,6)),
+                         Dent_gobelin(("Étage 6 : potions",14,8)),
+                         Pierre_solide(("Étage 6 : potions",9,1)),
+                         Hypokute(("Étage 6 : potions",6,7))]
+        self.ajoute_entitees(ingredients_6)
+
         gobel1 = Gobelin(self,("Étage 6 : potions",11,6),1)
         self.ajoute_entitee(gobel1)
         gobel2 = Mage_gobelin(self,("Étage 6 : potions",13,10),1)
@@ -4162,7 +4172,11 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         return False #À modifier pour quand on prend le controle de Dev
 
     def debut_tour(self):
-        self.affichage.dessine(self)
+        try:
+            self.affichage.dessine(self)
+        except:
+            print("Affichage non raffraichi")
+            traceback.print_tb(sys.exc_info()[2])
         if self.latence <= 0:
             self.nouvel_ordre = False
         Agissant.debut_tour(self)
@@ -4775,7 +4789,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
             self.controleur.unset_phase(COMPLEMENT_CIBLE_PARCHEMIN)
             self.methode_courante = None
 
-    def start_menu(self): #On commence le changement de touches
+    def start_menu(self):
         self.controleur.set_phase(COMPLEMENT_MENU)
         self.element_courant = 0
         self.cible = None
@@ -4873,6 +4887,53 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         self.methode_courante = None
         self.methode_fin = None
         self.interlocuteur.achete(choix.ID)
+
+    def start_menu_alchimie(self):
+        self.controleur.set_phase(COMPLEMENT_ALCHIMIE)
+        self.element_courant = 0
+        self.cible = None
+        self.methode_courante = self.continue_menu_alchimie
+        self.affichage.draw_menu_alchimie(self)
+
+    def continue_menu_alchimie(self,touche):
+        if touche == pygame.K_UP :
+            if self.element_courant == 0:
+                self.element_courant = len(trouve_skill(self.interlocuteur.classe_principale,Skill_alchimie).recettes)
+            self.element_courant -= 1
+        elif touche == pygame.K_DOWN :
+            self.element_courant += 1
+            if self.element_courant > len(trouve_skill(self.interlocuteur.classe_principale,Skill_alchimie).recettes):
+                self.element_courant = 0
+        elif touche == pygame.K_SPACE :
+            if element_courant < len(trouve_skill(self.interlocuteur.classe_principale,Skill_alchimie).recettes):
+                self.cible = None
+            else:
+                self.cible = trouve_skill(self.interlocuteur.classe_principale,Skill_alchimie).recettes.keys()[self.element_courant]
+        elif touche == pygame.K_RETURN :
+            if self.cible == None:
+                self.interlocuteur.replique = "dialogue-1phrase1.3.1"
+                self.interlocuteur.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"]
+                if self.a_parchemin_vierge():
+                    self.interlocuteur.repliques.append("dialogue-1reponse1.3")
+                self.interlocuteur.repliques += ["dialogue-1reponse1.1","dialogue-1reponse1.1"]
+            else:
+                alchimie = trouve_skill(self.interlocuteur.classe_principale,Skill_alchimie)
+                for ingredient in alchimie.recettes[self.cible]["ingredients"]:
+                    self.inventaire.consomme(eval(ingredient))
+                self.inventaire.ajoute(eval(self.cible(None)))
+                alchimie.utilise(alchimie.recettes[self.cible]["xp"])
+                self.controleur.unset_phase(COMPLEMENT_ALCHIMIE)
+                self.methode_courante = None
+                if self.cible == "Parchemin_vierge":
+                    self.interlocuteur.replique = "dialogue-1phrase1.4"
+                    self.interlocuteur.repliques = ["dialogue-1reponse1.4.1"]
+                else:
+                    self.interlocuteur.replique = "dialogue-1phrase1.3.1"
+                    self.interlocuteur.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"]
+                    if self.a_parchemin_vierge():
+                        self.interlocuteur.repliques.append("dialogue-1reponse1.3")
+                    self.interlocuteur.repliques += ["dialogue-1reponse1.1","dialogue-1reponse1.1"]
+        self.affichage.draw_menu_alchimie(self)
 
     def start_change_touches(self,etage = -1,element_courant = 0): #On commence le changement de touches
         self.controleur.set_phase(TOUCHE)
@@ -6613,6 +6674,9 @@ class Peureuse(Multi_renforceur,Support_lointain,Humain): #La quatrième humaine
         elif replique == "dialogue4reponse1.1.2.1.1.2":
             self.replique="dialogue4phrase1.1.2.1.1.2"
             self.repliques = ["dialogue4reponse1.1.2.1.1.2.1"]
+        elif replique == "dialogue4reponse1.1.2.1.2":
+            self.replique="dialogue4phrase1.1.2.1.2"
+            self.repliques = ["dialogue4reponse1.1.2.1.1.1.1"]
         elif replique == "dialogue4reponse1.2":
             self.replique="dialogue4phrase1.2"
             self.repliques = ["dialogue4reponse1.2.1"]
@@ -6647,7 +6711,10 @@ class Peureuse(Multi_renforceur,Support_lointain,Humain): #La quatrième humaine
             self.controleur.entitees[2].inventaire.ramasse_item(ID_clee) #On refile quand même au joueur la clé dont il a besoin
             self.appreciations[0]+= 0.5
             self.end_dialogue()
-        elif replique == "dialogue5reponse1.3": #On refile quand même au joueur la clé dont il a besoin
+        elif replique == "dialogue5reponse1.3":
+            ID_clee = self.inventaire.get_clee("Porte_avant_prison_5")
+            self.inventaire.drop(None,ID_clee)
+            self.controleur.entitees[2].inventaire.ramasse_item(ID_clee) #On refile quand même au joueur la clé dont il a besoin
             self.appreciations[0]-= 0.5
             self.end_dialogue()
 
@@ -6695,7 +6762,7 @@ class Peureuse(Multi_renforceur,Support_lointain,Humain): #La quatrième humaine
                 self.repliques.append("dialogue-1reponse1.3")
             self.repliques.append("dialogue-1reponse1.4")
             self.mouvement = 1
-        elif replique == "dialogue-1reponse1.3":
+        elif replique == "dialogue-1reponse1.4":
             self.end_dialogue(-1)
         elif replique == "dialogue-1reponse1.2":
             self.replique = "dialogue-1phrase1.2"
@@ -6828,7 +6895,7 @@ class Codeur(Humain): #Le cinquième humain du jeu, à l'étage 4 (répond au no
             self.end_dialogue(-5)
 
         #Dialogue par défaut -2
-        if replique == "dialogue-2reponse1.1":
+        elif replique == "dialogue-2reponse1.1":
             self.replique="dialogue-2phrase1.1"
             self.repliques = ["dialogue-2reponse1.1.1"]
         elif replique == "dialogue-2reponse1.1.1":
@@ -7174,8 +7241,8 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
         elif replique == "dialogue-1reponse1.5":
             self.end_dialogue(-1)
         elif replique == "dialogue-1reponse1.4":
-            self.replique = "dialogue-1phrase1.4"
-            self.repliques = ["dialogue-1reponse1.4.1"]
+            self.controleur.get_entitee(2).start_menu_alchimie()
+            self.controleur.get_entitee(2).event = COMPLEMENT_ALCHIMIE
         elif replique == "dialogue-1reponse1.4.1":
             self.replique = "dialogue-1phrase1.4.1"
             self.repliques = ["dialogue-1reponse1.4.1.1","dialogue-1reponse1.4.1.2"]
@@ -7257,7 +7324,7 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
     def get_texte_descriptif(self):
         return [f"Un humain (niveau {self.niveau})",f"ID : {self.ID}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Un alchimiste."]
 
-class Peste(Multi_soigneur_protecteur,Support_lointain,Humain): #La huitième humaine du jeu, à l'étage 7 (une sainte très à cheval sur beaucoup trop de trucs)
+class Peste(Multi_soigneur,Support_lointain,Humain): #La huitième humaine du jeu, à l'étage 7 (une sainte très à cheval sur beaucoup trop de trucs)
     """La classe de la peste."""
     def __init__(self,controleur,position):
 
@@ -7571,7 +7638,7 @@ class Bombe_atomique(Attaquant_magique_case,Support,Humain): #La neuvième humai
 
         #Premier dialogue
         #Le joueur arrive par la porte
-        if replique == "dialogue1reponse1.2":
+        if replique == "dialogue1reponse1.1":
             self.appreciations[0] += 0.5
             self.replique="dialogue1phrase1.1"
             self.repliques = ["dialogue1reponse1.1.1","dialogue1reponse1.1.2"]
@@ -7591,31 +7658,31 @@ class Bombe_atomique(Attaquant_magique_case,Support,Humain): #La neuvième humai
             self.appreciations[0] += 0.5
             self.replique="dialogue1phrase1.1.2"
             self.repliques = ["dialogue1reponse1.1.2.1","dialogue1reponse1.1.1.2"]
-        elif replique == "Euh... bonjour...":
+        elif replique == "dialogue1reponse1.2":
             self.replique="dialogue1phrase1.2"
             self.repliques = ["dialogue1reponse1.2.1","dialogue1reponse1.2.2"]
         elif replique == "dialogue1reponse1.2.1":
-            self.replique="dialogue1phrase1.2.2"
-            self.repliques = ["dialogue1reponse1.1.3.1","dialogue1reponse1.1.3.2"]
-        elif replique == "dialogue1reponse1.1.3.1":
-            self.replique="dialogue1phrase1.1.3.1"
-            self.repliques = ["dialogue1reponse1.1.3.1.1"]
-        elif replique == "dialogue1reponse1.1.3.2":
+            self.replique="dialogue1phrase1.2.1"
+            self.repliques = ["dialogue1reponse1.2.1.1","dialogue1reponse1.2.1.2"]
+        elif replique == "dialogue1reponse1.2.1.1":
+            self.replique="dialogue1phrase1.2.1.1"
+            self.repliques = ["dialogue1reponse1.2.1.1.1"]
+        elif replique == "dialogue1reponse1.2.1.2":
             self.end_dialogue(-2)
             self.statut_humain = "exploration"
         elif replique == "dialogue1reponse1.2.2":
             self.replique="dialogue1phrase1.2.2"
-            self.repliques = ["dialogue1reponse1.1.4.1","dialogue1reponse1.1.4.2"]
-        elif replique == "dialogue1reponse1.1.4.1":
-            self.replique="dialogue1phrase1.1.4.1"
-            self.repliques = ["dialogue1reponse1.1.4.1.1"]
-        elif replique == "dialogue1reponse1.1.4.2":
-            self.replique="dialogue1phrase1.1.4.2"
-            self.repliques = ["dialogue1reponse1.1.4.2.1","dialogue1reponse1.1.4.2.2"]
-        elif replique == "dialogue1reponse1.1.4.2.1":
-            self.replique="dialogue1phrase1.1.4.2.1"
-            self.repliques = ["dialogue1reponse1.1.4.2.1.1"]
-        elif replique == "dialogue1reponse1.1.4.2.1.1":
+            self.repliques = ["dialogue1reponse1.2.2.1","dialogue1reponse1.2.2.2"]
+        elif replique == "dialogue1reponse1.2.2.1":
+            self.replique="dialogue1phrase1.2.2.1"
+            self.repliques = ["dialogue1reponse1.2.2.1.1"]
+        elif replique == "dialogue1reponse1.2.2.2":
+            self.replique="dialogue1phrase1.2.2.2"
+            self.repliques = ["dialogue1reponse1.2.2.2.1","dialogue1reponse1.2.2.2.2"]
+        elif replique == "dialogue1reponse1.2.2.2.1":
+            self.replique="dialogue1phrase1.2.2.2.1"
+            self.repliques = ["dialogue1reponse1.2.2.2.1.1"]
+        elif replique == "dialogue1reponse1.2.2.2.1.1":
             self.end_dialogue(-3)
             self.offenses.append([2,0.01])
             self.statut_humain = "exploration"
@@ -7983,6 +8050,9 @@ class Item(Entitee):
     def get_description(self,observation):
         return ["Un item",f"Oopsie, on dirait que je n'ai pas codé la description pour {self}.","Désolé, et bonne chance."]
 
+    def get_image():
+        return SKIN_VIDE
+
 class Cadavre(Item):
 
     def get_titre(self,observation):
@@ -8041,6 +8111,9 @@ class Potion(Consommable):
     def get_skin(self):
         return SKIN_POTION
 
+    def get_image():
+        return SKIN_POTION
+
 class Potion_empoisonnee(Potion):
     """Une potion pas très bonne pour la santé."""
     def __init__(self,position):
@@ -8090,8 +8163,8 @@ class Potion_soin(Potion):
 
 class Potion_force(Potion):
     """Une potion qui augmente les dégats infligés."""
-    def __init__(self,position,taux,duree):
-        Potion.__init__(self,position,Enchantement_force(taux,duree))
+    def __init__(self,position):
+        Potion.__init__(self,position,Enchantement_force(1.5,100))
 
     def get_titre(self,observation):
         return "Potion de force"
@@ -8146,6 +8219,9 @@ class Parchemin(Consommable):
         return Parchemin
 
     def get_skin(self):
+        return SKIN_PARCHEMIN
+
+    def get_image():
         return SKIN_PARCHEMIN
 
 class Parchemin_purification(Parchemin):
@@ -8221,8 +8297,12 @@ class Parchemin_impregne(Parchemin):
     def get_description(self,observation):
         return["Un parchemin",f"Imprégné d'une magie ({self.effet.nom})"]
 
-##class Parchemin_protection(Parchemin):
-##    def __init__(self,position,
+class Parchemin_protection(Parchemin):
+    def __init__(self,position):
+        Parchemin.__init__(self,position,Protection_groupe(500,200),75)
+
+    def get_description(self,observation):
+        return["Un parchemin","Permet de protéger tous ses alliés"]
 
 class Poly_de_cours(Parchemin):
     """Un parchemin qui enseigne une magie."""
@@ -9810,6 +9890,79 @@ class Sceau_roi_gobelin(Anneau,Anoblisseur,Equipement_tribal):
     def get_skin(self):
         return SKIN_ANNEAU
 
+#Quelques ingrédients pour l'alchimie :
+class Ingredient(Item):
+    """La classe des ingrédients d'alchimie."""
+    def get_classe(self):
+        return Ingredient
+
+    def get_image():
+        return SKIN_VIDE
+
+class Hypokute(Ingredient):
+    def __init__(self,position):
+        Item.__init__(self,position)
+        self.poids = 1
+        self.frottements = 5
+        self.nom = "hypokute"
+
+    def get_description(self,observation):
+        return ["Une herbe","Il n'y a pourtant pas de soleil ici..."]
+
+    def get_skin(self):
+        return SKIN_HYPOKUTE
+
+    def get_image():
+        return SKIN_HYPOKUTE
+    
+class Pierre_solide(Ingredient):
+    def __init__(self,position):
+        Item.__init__(self,position)
+        self.poids = 5
+        self.frottements = 5
+        self.nom = "pierre solide"
+
+    def get_description(self,observation):
+        return ["Une pierre","Particulièrement solide"]
+
+    def get_skin(self):
+        return SKIN_PIERRE_SOLIDE
+
+    def get_image():
+        return SKIN_PIERRE_SOLIDE
+    
+class Dent_gobelin(Ingredient):
+    def __init__(self,position):
+        Item.__init__(self,position)
+        self.poids = 5
+        self.frottements = 5
+        self.nom = "dent de gobelin"
+
+    def get_description(self,observation):
+        return ["Une dent","En mauvais état"]
+
+    def get_skin(self):
+        return SKIN_DENT
+
+    def get_image():
+        return SKIN_DENT
+    
+class Peau_gobelin(Ingredient):
+    def __init__(self,position):
+        Item.__init__(self,position)
+        self.poids = 5
+        self.frottements = 5
+        self.nom = "peau de gobelin"
+
+    def get_description(self,observation):
+        return ["Un morceau de peau","Tout vert"]
+
+    def get_skin(self):
+        return SKIN_PEAU_GOBELIN
+
+    def get_image():
+        return SKIN_PEAU_GOBELIN
+
 class Inventaire:
 
     def __init__(self,ID_possesseur,nb_doigts):
@@ -9823,10 +9976,11 @@ class Inventaire:
                       Haume:[], #Les haumes s'équippent et ont des effets passifs
                       Anneau:[], #Les anneaux s'équippent et ont des effets passifs
                       Projectile:[], #Les projectiles se lancent (on peut lancer n'importe quoi, techniquement...)
+                      Ingredient:[],
                       Cadavre:[], #Oui, on peut récupérer des cadavres, et alors, circluez, ya rien à voir...
                       Oeuf:[] #Vous allez quand même pas me dire que c'est l'oeuf qui vous choque ! Il y a marqué cadavre juste au dessus !
                       }
-        self.kiiz = [Potion,Parchemin,Cle,Arme,Bouclier,Armure,Haume,Anneau,Projectile,Cadavre,Oeuf]
+        self.kiiz = [Potion,Parchemin,Cle,Arme,Bouclier,Armure,Haume,Anneau,Projectile,Ingredient,Cadavre,Oeuf]
         self.arme = None #L'arme équipée
         self.bouclier = None #Le bouclier équipé
         self.armure = None #L'armure équipée
@@ -9878,6 +10032,14 @@ class Inventaire:
                 self.set_haume()
             elif isinstance(item,Anneau):
                 self.set_anneau()
+
+    def consomme(self,classe):
+        """Consomme un ingrédient lors d'une opération d'alchimie.""" #/!\ Rien à voir avec les consommables !
+        for ID in self.items[Ingredients]:
+            item = self.controleur.get_entitee(ID)
+            if isinstance(item,classe) and item.etat == "intact":
+                item.etat == "brisé"
+                break
 
     def get_items_visibles(self):
         items_visibles = []
@@ -10973,16 +11135,11 @@ class Esprit_humain(Esprit_type):
                     Esprit.deplace(self,corp)
 
     def deplace_humain(self,ID_humain):
-        res = "attente"
         humain = self.controleur.get_entitee(ID_humain)
         humain.skill_courant = None
         if humain.identite == "joueur":
             humain.recontrole()
             humain.statut_humain = "joueur"
-            if humain.skill_courant in [Skill_stomp,Skill_attaque]:
-                res = "attaque"
-            else:
-                res = "deplacement"
         else:
             humain.statut_humain = "proximite"
             if humain.mouvement == 0: #0 pour aller vers, et 1 pour chercher
@@ -11112,7 +11269,7 @@ class Esprit_humain(Esprit_type):
                                     constantes_deplacements.append([self.controleur.nb_tours,"fuite loin",humain.dir_regard,new_cases])
                             else:
                                 res = humain.agit_en_vue(self)
-        humain.statut = res
+                humain.statut = res
 
 class Esprit_slime(Esprit_type):
     """Un esprit qui dirige un ou plusieurs slimes. Peut interragir avec d'autres esprits slimes."""
@@ -11327,7 +11484,23 @@ class Protection_zone(One_shot,On_post_action):
                 agissant.effets.append(copy.copy(self.protection))
 
 class Protection_groupe(One_shot,On_post_action):
-    pass
+    def __init__(self,duree,degats):
+        self.affiche = False
+        self.phase = "démarrage"
+        self.duree = duree
+        self.degats = degats
+
+    def action(self,porteur):
+        nom_esprit = porteur.esprit
+        cibles = []
+        if nom_esprit != None:
+            esprit = porteur.controleur.get_esprit(nom_esprit)
+            cibles = esprit.get_corps()
+        else:
+            cibles = [responsable]
+        for cible in cibles:
+            if not porteur.controleur.est_item(cible):
+                cible.effets.append(Protection_mur(duree,degats))
 
 class Investissement_mana(Evenement,On_debut_tour):
     """Le joueur met du mana de côté, et en a plus après !"""
@@ -14388,6 +14561,15 @@ class Affichage:
         self.dessine_droite_menu(joueur)
         self.dessine_gauche(joueur)
 
+    def draw_menu_alchimie(self,joueur):
+        """phase de choix d'un element dans une menu"""
+        self.frame += 1
+        self.dessine_zones(joueur)
+
+        self.dessine_menu_alchimie(joueur)
+        self.dessine_droite_alchimie(joueur)
+        self.dessine_gauche(joueur)
+
     def dessine_zones(self,joueur=None):
         self.screen.fill((0,0,0))
         if joueur != None:
@@ -15220,6 +15402,30 @@ class Affichage:
                 self.screen.blit(tex,(marge_gauche,marge_haut))
                 marge_haut += 20
 
+    def dessine_droite_alchimie(self,joueur):
+        skill = trouve_skill(joueur.classe_principale,Skill_observation)
+        observation = 0
+        if skill != None:
+            observation = skill.utilise()
+        produit = trouve_skill(joueur.interlocuteur.classe_principale,Skill_alchimie).recettes.keys()[joueur.element_courant]
+        recette = trouve_skill(joueur.interlocuteur.classe_principale,Skill_alchimie).recettes[produit]
+        marge_haut = self.position_debut_y_rectangles_et_carre + 5
+        marge_gauche = self.position_debut_x_rectangle_2 + 5
+        for tex in self.scinde_texte("Recette :",self.largeur_rectangles-10,30,(255, 127, 0)): #Le titre
+            self.screen.blit(tex,(marge_gauche,marge_haut))
+            marge_haut += 30
+        
+        for texte in eval(produit).get_description(observation) + ["Ingrédients :"]: #La description détaillée
+            for tex in self.scinde_texte(texte,self.largeur_rectangles-10):
+                self.screen.blit(tex,(marge_gauche,marge_haut))
+                marge_haut += 20
+
+        for ingredient in recette["ingredients"]:
+            for texte in eval(ingredient).get_description(observation): #La description détaillée
+                for tex in self.scinde_texte(texte,self.largeur_rectangles-10):
+                    self.screen.blit(tex,(marge_gauche,marge_haut))
+                    marge_haut += 20
+
     def dessine_lab(self,joueur): #La fonction qui dessine le carré au centre. Elle affiche le labyrinthe vu par le joueur, ses occupants, et tout ce que le joueur est capable de percevoir.
         vue = joueur.vue
         position = joueur.get_position()
@@ -15475,6 +15681,27 @@ class Affichage:
             if marge_gauche >= self.position_debut_x_carre+self.largeur_exploitable-60:
                 marge_haut += 50
                 marge_gauche = 10 + self.position_debut_x_carre
+
+    def dessine_menu_alchimie(self,joueur):
+        recettes = trouve_skill(joueur.interlocuteur.classe_principale,Skill_alchimie).recettes
+        courant = joueur.element_courant
+
+        marge_haut = 10 + self.position_debut_y_rectangles_et_carre
+        marge_gauche = 10 + self.position_debut_x_carre
+
+        for produit in recettes.keys():
+            for i in range(len(recettes[produit]["ingredients"])-1):
+                eval(recettes[produit]["ingredients"][i]).get_image().dessine_toi(self.screen,(marge_gauche,marge_haut),40)
+                marge_gauche += 40
+                SKIN_PLUS.dessine_toi(self.screen,(marge_gauche,marge_haut),40)
+                marge_gauche += 40
+            eval(recettes[produit]["ingredients"][-1]).get_image().dessine_toi(self.screen,(marge_gauche,marge_haut),40)
+            marge_gauche += 40
+            SKIN_EGAL.dessine_toi(self.screen,(marge_gauche,marge_haut),40)
+            marge_gauche += 40
+            eval(produit).get_image().dessine_toi(self.screen,(marge_gauche,marge_haut),40)
+            marge_gauche = 10 + self.position_debut_x_carre
+            marge_haut += 60
 
     def choix_touche(self,joueur,zones,skills,magies,lancer):
         """phase de choix d'une touche"""
