@@ -477,6 +477,7 @@ class Controleur():
         self.labs["Étage 5 : portes"].matrice_cases[6][6].murs[HAUT].cree_porte(1,"Porte_cellule_plus_biscornue_5")
         self.labs["Étage 5 : portes"].matrice_cases[4][0].murs[DROITE].cree_porte(1,"Porte_fin_couloir_5")
         self.labs["Étage 5 : portes"].matrice_cases[5][0].murs[GAUCHE].cree_porte(1,"Porte_fin_couloir_5")
+        self.labs["Étage 5 : portes"].matrice_cases[2][11].murs[HAUT].cree_porte(1,"Porte_avant_prison_5",Premiere_porte)
         self.labs["Étage 5 : portes"].matrice_cases[4][3].murs[DROITE].effets[1].auto = True
         self.labs["Étage 5 : portes"].matrice_cases[5][3].murs[GAUCHE].effets[1].auto = True
         self.construit_escalier(("Étage 4 : monstres",16,7),("Étage 5 : portes",0,13),DROITE,GAUCHE,Premiere_marche)
@@ -2466,9 +2467,12 @@ class Mur:
                 self.effets.remove(effet)
                 del(effet)
 
-    def cree_porte(self,durete,code):
+    def cree_porte(self,durete,code,porte=None):
         self.brise()
-        self.effets.append(Porte(durete,code))
+        if porte == None:
+            self.effets.append(Porte(durete,code))
+        else:
+            self.effets.append(porte(durete,code))
 
     def get_trajet(self):
         trajet = None
@@ -4193,12 +4197,12 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         if self.highest == 3 and (self.get_etage_courant() == 3 and self.vue[position[1]][position[2]][2] > 0):
             #On cherche un PNJ volontaire pour aller taper la causette :
             paume = self.controleur.get_entitee(4)
-            if paume.esprit == "joueur" and (paume.get_etage_courant() == 3 and paume.statut_humain in ["proximite","en chemin"]):
+            if paume.esprit == "joueur" and (paume.get_etage_courant() == 3 and paume.statut_humain in ["exploration","proximite","en chemin"]):
                 paume.mouvement = 2
                 paume.dialogue = 2
             else:
                 peureuse = self.controleur.get_entitee(5)
-                if peureuse.esprit == "joueur" and (peureuse.get_etage_courant() == 3 and peureuse.statut_humain in ["proximite","en chemin"]):
+                if peureuse.esprit == "joueur" and (peureuse.get_etage_courant() == 3 and peureuse.statut_humain in ["exploration","proximite","en chemin"]):
                     peureuse.mouvement = 2
                     peureuse.dialogue = 2
 
@@ -4208,12 +4212,12 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         if self.highest == 4 and (self.get_etage_courant() == 4 and self.vue[position[1]][position[2]][2] > 0):
             #On cherche un PNJ volontaire pour aller taper la causette :
             peureuse = self.controleur.get_entitee(5)
-            if peureuse.esprit == "joueur" and (peureuse.get_etage_courant() == 4 and peureuse.statut_humain in ["proximite","en chemin"]):
+            if peureuse.esprit == "joueur" and (peureuse.get_etage_courant() == 4 and peureuse.statut_humain in ["exploration","proximite","en chemin"]):
                 peureuse.mouvement = 2
                 peureuse.dialogue = 3
             else:
                 paume = self.controleur.get_entitee(4)
-                if paume.esprit == "joueur" and (paume.get_etage_courant() == 4 and paume.statut_humain in ["proximite","en chemin"]):
+                if paume.esprit == "joueur" and (paume.get_etage_courant() == 4 and paume.statut_humain in ["exploration","proximite","en chemin"]):
                     paume.mouvement = 2
                     paume.dialogue = 3
 
@@ -4223,24 +4227,32 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         if self.highest == 4 :
             #On cherche un PNJ volontaire pour aller taper la causette :
             peureuse = self.controleur.get_entitee(5)
-            if peureuse.esprit == "joueur" and (peureuse.get_etage_courant() == 4 and peureuse.statut_humain in ["proximite","en chemin"]):
+            if peureuse.esprit == "joueur" and (peureuse.get_etage_courant() == 4 and peureuse.statut_humain in ["exploration","proximite","en chemin"]):
                 peureuse.mouvement = 2
                 peureuse.dialogue = 4
 
     def first_step(self):
         """Fonction appelée quand on entre dans la prison. Déclenche un dialogue d'explications."""
-        #On vérifie que le dialogue a lieu d'être : le joueur franchit cet escalier pour la première fois
-        if self.highest == 4:
-            #On cherche un PNJ volontaire pour aller taper la causette :
-            peureuse = self.controleur.get_entitee(5)
-            if peureuse.esprit == "joueur" and peureuse.statut_humain in ["proximite","en chemin"]:
-                peureuse.mouvement = 2
-                peureuse.dialogue = 5
-            else:
-                paume = self.controleur.get_entitee(4)
-                if paume.esprit == "joueur" and paume.statut_humain in ["proximite","en chemin"]:
-                    paume.mouvement = 2
-                    paume.dialogue = 4
+        #L'escalier qui lance le dialogue certifie qu'on y passe pour la première fois
+        #On cherche un PNJ volontaire pour aller taper la causette :
+        peureuse = self.controleur.get_entitee(5)
+        if peureuse.esprit == "joueur" and peureuse.statut_humain in ["exploration","proximite","en chemin"]:
+            peureuse.mouvement = 2
+            peureuse.dialogue = 5
+        else:
+            paume = self.controleur.get_entitee(4)
+            if paume.esprit == "joueur" and paume.statut_humain in ["exploration","proximite","en chemin"]:
+                paume.mouvement = 2
+                paume.dialogue = 4
+
+    def first_door(self):
+        """Fonction appelée quand on passe la première porte de la prison. Déclenche un dialogue d'explications."""
+        #La porte qui lance le dialogue certifie qu'on y passe pour la première fois
+        #On cherche un PNJ volontaire pour aller taper la causette :
+        peureuse = self.controleur.get_entitee(5)
+        if peureuse.esprit == "joueur" and peureuse.statut_humain in ["exploration","proximite","en chemin"]:
+            peureuse.mouvement = 2
+            peureuse.dialogue = 6
 
     def get_portee_vue(self):
         skill = trouve_skill(self.classe_principale,Skill_vision)
@@ -6409,7 +6421,7 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
             self.repliques = ["dialogue-1reponse1.1.1.1","dialogue-1reponse1.1.1.2"]
         elif replique == "dialogue-1reponse1.1.1.1":
             self.replique = "dialogue-1phrase1.1.1.1"
-            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.3","dialogue-1reponse1.3"]
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.3"]
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
         elif replique == "dialogue-1reponse1.1.1.2":
             self.controleur.get_entitee(2).start_select_agissant_dialogue()
@@ -12453,6 +12465,13 @@ class Porte(On_try_through):
             return SKIN_PORTE
         else:
             return SKIN_PORTE_OUVERTE
+
+class Premiere_porte(Porte):
+    def execute(self,mur,entitee):
+        if entitee.ID == 2:
+            entitee.first_door()
+            Premiere_porte.execute = Porte.execute
+        Porte.execute(self,mur,entitee)
 
 class Barriere(On_try_through):
     """L'effet qui correspond à la présence d'une barrière magique, qui bloque certaines entitées selon certains critères."""
