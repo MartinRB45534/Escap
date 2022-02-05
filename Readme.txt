@@ -96,8 +96,8 @@ En cours (alchimiste) :
 
 
 
-Comment fonctionne l'alchimie ? (Pour l'instant en faisant tout planter (hein !? je viens d'y rejouer et ça ma l'air fonctionnel (je n'ai pas essayé l'alchimie mais tout le reste va bien), j'espère que je ne suis pas en train de commiter un truc beugué)
-1 ou plusieurs ingrédients + mana + argent = potion ou parchemin
+Comment fonctionne l'alchimie ? (Pour l'instant en faisant tout planter (hein !? je viens d'y rejouer et ça ma l'air fonctionnel (je n'ai pas essayé l'alchimie mais tout le reste va bien), j'espère que je ne suis pas en train de commiter un truc beugué))
+1 ou plusieurs ingrédients (+ mana (+ argent)) = potion ou parchemin
 Éventuellement le résultat final peut être une amélioration d'un item du joueur ?
 Les ingrédients sont une catégorie d'items distincte des autres. On peut en trouver par terre ou les acheter au marchand (?)
 Certains ingrédients proviennent de monstres (dents de gobelin, peau de gobelin, etc.) et peuvent être trouvés là où il y a beaucoup de ces monstres. Mais il n'y a personne dans le labyrinthe qui sache extraire ces ingrédients des cadavres, donc on est obligé de passer par le marchand.

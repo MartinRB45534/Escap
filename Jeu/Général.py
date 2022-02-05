@@ -268,9 +268,9 @@ class Controleur():
 
         self.esprits["joueur"] = Esprit_humain(2,self)
 
-        autre = Peste(self,("Étage 1 : test",1,0))
+        autre = Alchimiste(self,("Étage 1 : test",1,0))
         self.ajoute_entitee(autre)
-        self.esprits["peste"] = Esprit_humain(autre.ID,self)
+        self.esprits["alchimiste"] = Esprit_humain(autre.ID,self)
 
         gobel1 = Chef_gobelin(self,("Étage 1 : test",11,15),1)
         self.ajoute_entitee(gobel1)
@@ -935,6 +935,14 @@ class Controleur():
                     vue[pos[1]][pos[2]][8].append(occupant)
         agissant.vue = vue
 
+    # Les fonctions qui suivent sont utilisées dans diverses situations pour trouver les entitées situées sur une case
+    # On distingue plusieurs cas :
+    # Déplacement (on cherche les entitées qui occupent l'espace, auxquelles on ne peut pas superposer d'autres entitées semblables)
+    # Combat (on cherche les entitées qui peuvent subir des dégats, qui ont des PVs)
+    # Ramassage (on cherche les entitées qui peuvent être stockées dans un inventaire)
+    # Effets divers (auras, soins, etc. (comme pour le combat))
+    # Interactions (dialogues, éléments de décors)
+
     def est_item(self,entitee):
         return issubclass(self.get_entitee(entitee).get_classe(),Item)
 
@@ -965,6 +973,13 @@ class Controleur():
             if self.get_entitee(entitee).get_position() == position and self.est_item(entitee):
                 item.append(entitee)
         return item
+
+    def trouve_agissants_courants(self,position):
+        agissants = []
+        for entitee in self.entitees_courantes:
+            if self.get_entitee(entitee).get_position() == position and not self.est_item(entitee):
+                agissants.append(entitee)
+        return agissants
 
     def trouve_agissants_courants(self,position):
         agissants = []
@@ -2817,7 +2832,19 @@ class Fantome(Entitee):
     """La classe des entitées qui traversent les murs."""
     pass
 
-class Agissant(Entitee): #Tout agissant est un cadavre, tout cadavre n'agit pas.
+class Non_superposable(Entitee):
+    """La classe des entitées qui 'occupent' une place, donc qu'on ne peut pas superposer (aux fantômes près)."""
+    pass
+
+class Décors(Non_superposable):
+    """La classe des éléments de décors qu'on ne peut pas traverser. On peut interagir avec certains ?"""
+    pass
+
+class Décors_interactif(Décors):
+    """La classe des éléments de décors avec lesquels on peut interagir."""
+    pass
+
+class Agissant(Non_superposable): #Tout agissant est un cadavre, tout cadavre n'agit pas.
     """La classe des entitées animées. Capable de décision, de différentes actions, etc. Les principales caractéristiques sont l'ID, les stats, et la classe principale."""
     def __init__(self,controleur,position,identite,niveau,ID=None):
         Entitee.__init__(self,position,ID)
@@ -4183,9 +4210,9 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         if self.get_etage_courant() > self.highest:
             self.highest = self.get_etage_courant()
             if self.highest == 1:
-                self.interpele()
+                self.interagit()
             elif self.highest == 2:
-                self.interpele()
+                self.interagit()
 
     def first_kill(self,position):
         """Fonction appelée lorsque le premier gobelin meurt. Déclenche un dialogue de circonstance."""
@@ -4287,7 +4314,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         elif self.curseur == "in_esprit":
             self.controleur.get_esprit(self.esprit).utilise_courant()
         else: #On veut parler à quelqu'un
-            self.interpele() #On interpele les agissants à proximité
+            self.interagit() #On interagir avec quelqu'un ou quelquechose à proximité
 
     def a_parchemin_vierge(self):
         return self.inventaire.a_parchemin_vierge()
@@ -4295,7 +4322,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
     def consomme_parchemin_vierge(self):
         return self.inventaire.consomme_parchemin_vierge()
 
-    def interpele(self):
+    def interagit(self):
         #On cherche la personne :
         if self.dir_regard == HAUT:
             positions = [(self.position[0],self.position[1],self.position[2]-1),(self.position[0],self.position[1]-1,self.position[2]),(self.position[0],self.position[1]+1,self.position[2]),(self.position[0],self.position[1],self.position[2]+1)]
@@ -4316,7 +4343,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
             for ID in agissants:
                 agissant = self.controleur.get_entitee(ID)
                 if isinstance(agissant,Humain) and self.interlocuteur == None and not self.controleur.est_item(ID):
-                    self.interlocuteur = agissant
+                    self.interlocuteur = agissant # Est-ce que je continue à appeler ça un interlocuteur ?
                     self.controleur.set_phase(EVENEMENT)
                     self.event = DIALOGUE
                     self.interlocuteur.start_dialogue()
@@ -4359,7 +4386,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
                             self.controleur.set_phase(COMPLEMENT_DIR)
                         if self.magie_courante in LISTE_EXHAUSTIVE_DES_MAGIES_OFFENSIVES:
                             self.statut = "attaque"
-        elif self.controleur.phase in [COMPLEMENT_CIBLE,COMPLEMENT_COUT,COMPLEMENT_DIR,COMPLEMENT_MENU,COMPLEMENT_CIBLE_PARCHEMIN,COMPLEMENT_COUT_PARCHEMIN,COMPLEMENT_DIR_PARCHEMIN]:
+        elif self.controleur.phase in [COMPLEMENT_CIBLE,COMPLEMENT_COUT,COMPLEMENT_DIR,COMPLEMENT_MENU,COMPLEMENT_CIBLE_PARCHEMIN,COMPLEMENT_COUT_PARCHEMIN,COMPLEMENT_DIR_PARCHEMIN,COMPLEMENT_ALCHIMIE]:
             #Les touches servent alors à choisir le complément
             self.methode_courante(touche)
         elif self.controleur.phase == TOUCHE:
@@ -4902,13 +4929,13 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
             self.element_courant -= 1
         elif touche == pygame.K_DOWN :
             self.element_courant += 1
-            if self.element_courant > len(trouve_skill(self.interlocuteur.classe_principale,Skill_alchimie).recettes):
+            if self.element_courant == len(trouve_skill(self.interlocuteur.classe_principale,Skill_alchimie).recettes):
                 self.element_courant = 0
         elif touche == pygame.K_SPACE :
-            if element_courant < len(trouve_skill(self.interlocuteur.classe_principale,Skill_alchimie).recettes):
+            if self.cible!=None:
                 self.cible = None
             else:
-                self.cible = trouve_skill(self.interlocuteur.classe_principale,Skill_alchimie).recettes.keys()[self.element_courant]
+                self.cible = self.element_courant
         elif touche == pygame.K_RETURN :
             if self.cible == None:
                 self.interlocuteur.replique = "dialogue-1phrase1.3.1"
@@ -4916,10 +4943,11 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
                 if self.a_parchemin_vierge():
                     self.interlocuteur.repliques.append("dialogue-1reponse1.3")
                 self.interlocuteur.repliques += ["dialogue-1reponse1.1","dialogue-1reponse1.1"]
-            else:
+            else: #/!\ Vérifier qu'on a les ingrédients nécessaires
                 alchimie = trouve_skill(self.interlocuteur.classe_principale,Skill_alchimie)
                 for ingredient in alchimie.recettes[self.cible]["ingredients"]:
-                    self.inventaire.consomme(eval(ingredient))
+                    for i in alchimie.recettes[self.cible]["ingredients"][ingredient]:
+                        self.inventaire.consomme(eval(ingredient))
                 self.inventaire.ajoute(eval(self.cible(None)))
                 alchimie.utilise(alchimie.recettes[self.cible]["xp"])
                 self.controleur.unset_phase(COMPLEMENT_ALCHIMIE)
@@ -6409,7 +6437,7 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
             self.repliques = ["dialogue-1reponse1.1.1.1","dialogue-1reponse1.1.1.2"]
         elif replique == "dialogue-1reponse1.1.1.1":
             self.replique = "dialogue-1phrase1.1.1.1"
-            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.3","dialogue-1reponse1.3"]
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.3"]
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
         elif replique == "dialogue-1reponse1.1.1.2":
             self.controleur.get_entitee(2).start_select_agissant_dialogue()
@@ -10033,9 +10061,18 @@ class Inventaire:
             elif isinstance(item,Anneau):
                 self.set_anneau()
 
+    def quantite(self,classe):
+        """Indique la quantité d'items correspondants à une classe voulue.""" #Pour les ingrédients des recettes
+        res=0
+        for ID in self.items[Ingredient]:
+            item = self.controleur.get_entitee(ID)
+            if isinstance(item,classe) and item.etat == "intact":
+                res+=1
+        return res
+
     def consomme(self,classe):
         """Consomme un ingrédient lors d'une opération d'alchimie.""" #/!\ Rien à voir avec les consommables !
-        for ID in self.items[Ingredients]:
+        for ID in self.items[Ingredient]:
             item = self.controleur.get_entitee(ID)
             if isinstance(item,classe) and item.etat == "intact":
                 item.etat == "brisé"
@@ -12290,7 +12327,7 @@ class Teleport(On_through):
             else:
                 entitee.set_position(self.position)
             for occupant in occupants:
-                entitee.heurte_agissant(occupant) #Mais il heurte les agissants
+                entitee.heurte_agissant(occupant) #Mais il heurte les occupants
         else:
             passe = True
             if occupants != []:
@@ -12303,7 +12340,7 @@ class Teleport(On_through):
                 else:
                     passe = False
             if passe:
-                if entitee.get_position()[0]!=self.position[0]: #Un item passe quoi qu'il arrive
+                if entitee.get_position()[0]!=self.position[0]:
                     entitee.controleur.move(self.position,entitee)
                 else:
                     entitee.set_position(self.position)
@@ -15407,21 +15444,21 @@ class Affichage:
         observation = 0
         if skill != None:
             observation = skill.utilise()
-        produit = trouve_skill(joueur.interlocuteur.classe_principale,Skill_alchimie).recettes.keys()[joueur.element_courant]
-        recette = trouve_skill(joueur.interlocuteur.classe_principale,Skill_alchimie).recettes[produit]
+        alchimie = trouve_skill(joueur.interlocuteur.classe_principale,Skill_alchimie)
+        recette = alchimie.recettes[joueur.element_courant]
         marge_haut = self.position_debut_y_rectangles_et_carre + 5
         marge_gauche = self.position_debut_x_rectangle_2 + 5
         for tex in self.scinde_texte("Recette :",self.largeur_rectangles-10,30,(255, 127, 0)): #Le titre
             self.screen.blit(tex,(marge_gauche,marge_haut))
             marge_haut += 30
-        
-        for texte in eval(produit).get_description(observation) + ["Ingrédients :"]: #La description détaillée
+
+        for texte in eval(recette["produit"]).get_description(None,observation) + ["Ingrédients :"]: #La description détaillée /!\ Revoir le get_description
             for tex in self.scinde_texte(texte,self.largeur_rectangles-10):
                 self.screen.blit(tex,(marge_gauche,marge_haut))
                 marge_haut += 20
 
-        for ingredient in recette["ingredients"]:
-            for texte in eval(ingredient).get_description(observation): #La description détaillée
+        for ingredient in recette["ingredients"].keys():
+            for texte in eval(ingredient).get_description(None,observation)+[f"({joueur.inventaire.quantite(eval(ingredient))}/{recette['ingredients'][ingredient]})"]: #La description détaillée
                 for tex in self.scinde_texte(texte,self.largeur_rectangles-10):
                     self.screen.blit(tex,(marge_gauche,marge_haut))
                     marge_haut += 20
@@ -15689,17 +15726,20 @@ class Affichage:
         marge_haut = 10 + self.position_debut_y_rectangles_et_carre
         marge_gauche = 10 + self.position_debut_x_carre
 
-        for produit in recettes.keys():
-            for i in range(len(recettes[produit]["ingredients"])-1):
-                eval(recettes[produit]["ingredients"][i]).get_image().dessine_toi(self.screen,(marge_gauche,marge_haut),40)
+        for recette in recettes:
+            first=True
+            for ingredient in recette["ingredients"].keys():
+                if first:
+                    first=False
+                else:
+                    SKIN_PLUS.dessine_toi(self.screen,(marge_gauche,marge_haut),40)
+                    marge_gauche += 40
+                eval(ingredient).get_image().dessine_toi(self.screen,(marge_gauche,marge_haut),40) #/!\ Peut-être afficher la quantité d'ingrédients plutôt ici ?"
                 marge_gauche += 40
-                SKIN_PLUS.dessine_toi(self.screen,(marge_gauche,marge_haut),40)
-                marge_gauche += 40
-            eval(recettes[produit]["ingredients"][-1]).get_image().dessine_toi(self.screen,(marge_gauche,marge_haut),40)
-            marge_gauche += 40
             SKIN_EGAL.dessine_toi(self.screen,(marge_gauche,marge_haut),40)
             marge_gauche += 40
-            eval(produit).get_image().dessine_toi(self.screen,(marge_gauche,marge_haut),40)
+            eval(recette["produit"]).get_image().dessine_toi(self.screen,(marge_gauche,marge_haut),40) #/!\ Peut-être afficher la quantité d'ingrédients plutôt ici ?"
+            marge_gauche += 40
             marge_gauche = 10 + self.position_debut_x_carre
             marge_haut += 60
 

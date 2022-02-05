@@ -2,24 +2,25 @@
 
 global recettes_alchimie
 recettes_alchimie = [
-    {"Parchemin_vierge":
-     {"ingredients":["Peau_gobelin"],
+    [{"produit":"Parchemin_vierge",
+      "ingredients":{"Peau_gobelin":1},
       "xp":1},
-     "Parchemin_protection":
-     {"ingredients":["Peau_gobelin","Pierre_solide"],
+     {"produit":"Parchemin_protection",
+      "ingredients":{"Peau_gobelin":1,"Pierre_solide":1},
       "xp":2},
-     "Potion_force":
-     {"ingredients":["Dent_gobelin"],
+     {"produit":"Potion_force",
+      "ingredients":{"Dent_gobelin":2},
       "xp":1},
-     "Potion_soin":
-     {"ingredients":["Hypokute"],
-      "xp":1}},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {}]
+     {"produit":"Potion_soin",
+      "ingredients":{"Hypokute":1},
+      "xp":1}],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    []
+    ]
