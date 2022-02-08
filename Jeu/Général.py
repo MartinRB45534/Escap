@@ -943,23 +943,37 @@ class Controleur():
     # Ramassage (on cherche les entitées qui peuvent être stockées dans un inventaire)
     # Effets divers (auras, soins, etc. (comme pour le combat))
     # Interactions (dialogues, éléments de décors)
+    # Pour les déplacements, on veut donc les Non_superposable
+    # Pour les combats, les agissants
+    # Pour les ramassages, les items (y compris les agissants morts (les cadavres))
+    # Pour les interactions, les interactifs (à créer)
+    # Pour les effets divers, le plus souvent les agissants, parfois les movibles (à créer)
 
     def est_item(self,entitee):
         return issubclass(self.get_entitee(entitee).get_classe(),Item)
 
+    def trouve_classe(self,position,classe):
+        entitees = []
+        for ID_entitee in self.entitees.keys():
+            entitee = self.get_entitee(ID_entitee)
+            if entitee.get_position() == position and issubclass(entitee.get_classe(),classe):
+                entitees.append(ID_entitee)
+        return entitees
+
     def trouve_items(self,position):
-        items = []
-        for entitee in self.entitees.keys():
-            if self.get_entitee(entitee).get_position() == position and self.est_item(entitee):
-                items.append(entitee)
-        return items
+        return self.trouve_classe(position,Item)
+
+    def trouve_non_superposables(self,position):
+        return self.trouve_classe(position,Non_superposable)
+
+    def trouve_interactifs(self,position):
+        return self.trouve_classe(position,Interactif)
+
+    def trouve_mobiles(self,position):
+        return self.trouve_classe(position,Mobile)
 
     def trouve_agissants(self,position):
-        agissants = []
-        for entitee in self.entitees.keys():
-            if self.get_entitee(entitee).get_position() == position and not self.est_item(entitee):
-                agissants.append(entitee)
-        return agissants
+        return self.trouve_classe(position,Agissant)
 
     def trouve_occupants(self,position):
         occupants = []
@@ -968,26 +982,28 @@ class Controleur():
                 occupants.append(entitee)
         return occupants
 
+    def trouve_courant_classe(self,position,classe):
+        entitees = []
+        for ID_entitee in self.entitees_courantes:
+            entitee = self.get_entitee(ID_entitee)
+            if entitee.get_position() == position and issubclass(entitee.get_classe(),classe):
+                entitees.append(ID_entitee)
+        return entitees
+
     def trouve_items_courants(self,position):
-        item = []
-        for entitee in self.entitees_courantes:
-            if self.get_entitee(entitee).get_position() == position and self.est_item(entitee):
-                item.append(entitee)
-        return item
+        return self.trouve_classe_courants(position,Item)
+
+    def trouve_non_superposables_courants(self,position):
+        return self.trouve_classe_courants(position,Non_superposable)
+
+    def trouve_interactifs_courants(self,position):
+        return self.trouve_classe_courants(position,Interactif)
+
+    def trouve_mobiles_courants(self,position):
+        return self.trouve_classe_courants(position,Mobile)
 
     def trouve_agissants_courants(self,position):
-        agissants = []
-        for entitee in self.entitees_courantes:
-            if self.get_entitee(entitee).get_position() == position and not self.est_item(entitee):
-                agissants.append(entitee)
-        return agissants
-
-    def trouve_agissants_courants(self,position):
-        agissants = []
-        for entitee in self.entitees_courantes:
-            if self.get_entitee(entitee).get_position() == position and not self.est_item(entitee):
-                agissants.append(entitee)
-        return agissants
+        return self.trouve_classe_courants(position,Agissant)
 
     def trouve_occupants_courants(self,position):
         occupants = []
@@ -1023,7 +1039,7 @@ class Controleur():
                     agissant.inventaire.ramasse_item(item)
                     if isinstance(agissant,Joueur):
                         affichage = agissant.affichage
-                        affichage.message(f"Tu as volé avec succès un {item} à {victime} !")
+                        affichage.message(f"Tu as volé avec succès un {item} à {possesseur} !")
                 else :
                     possesseur.persecuteurs.append(agissant.ID)
                 #refaire les autres vols sur le même modèle /!\
@@ -1124,10 +1140,10 @@ class Controleur():
 
                     taux = taux_skill * taux_manipulation
 
-                    effet = Protection(duree,bouclier) #Dans un monde idéal, les skills de manipulation donnerait accès à d'autres effets
+                    effet = Protection_general(duree,bouclier) #Dans un monde idéal, les skills de manipulation donnerait accès à d'autres effets
 
                     for effet_prec in agissant.effets :
-                        if isinstance(effet_prec,Protection):
+                        if isinstance(effet_prec,Protection_general):
                             agissant.effets.remove(effet_prec) #On ne peut pas avoir deux protections à la fois !
 
                     agissant.add_latence(latence)
@@ -1187,7 +1203,7 @@ class Controleur():
 
 
             elif type_skill in [Skill_reanimation,Skill_reanimation_renforcee] :
-                cadavre = selectionne_item_cadavre()
+                cadavre = self.get_entitee(agissant.cible)
                 latence,taux,sup = skill.utilise()
                 agissant.add_latence(latence)
                 if cadavre.priorite + sup < agissant.priorite :
@@ -1536,7 +1552,7 @@ class Controleur():
         pos_obstacles = []
         if traverse == "rien":
             obstacles = self.get_entitees_etage(position[0])
-            for ID_obstacle in obstacle:
+            for ID_obstacle in obstacles:
                 obstacle = self.get_entitee(ID_obstacle)
                 if not issubclass(obstacle.get_classe(),Item):
                     pos_obstacles.append(obstacle.get_position())
@@ -1573,7 +1589,7 @@ class Controleur():
 
     def clear(self):
         for ID_entitee in self.entitees.keys():
-            self.entitees[ID].clear()
+            self.entitees[ID_entitee].clear()
 
 class Labyrinthe:
     def __init__(self,ID,largeur,hauteur,depart,patterns=None,durete = 1,niveau = 1,element = TERRE,proba=0.1):
@@ -1634,7 +1650,7 @@ class Labyrinthe:
            Se réfère à la case compétente, qui gère tout."""
         self.matrice_cases[intrus.get_position()[1]][intrus.get_position()[2]].veut_passer(intrus,direction)
 
-    def step(coord,entitee):
+    def step(self,coord,entitee):
         self.matrice_cases[coord[0]][coord[1]].step(entitee)
 
     def get_vue(self,agissant):
@@ -2379,20 +2395,20 @@ class Case:
         constantes_temps['courant'] = new_courant
         return self.code
 
-    def get_image(self): #À changer plus tard
-        images_effets = []
-        for effet in self.effets:
-            images_effets.append(effet.get_image())
-        images_murs = []
-        if self.mur_plein(HAUT):
-            images_murs.append(Mur_vue_haut())
-        if self.mur_plein(BAS):
-            images_murs.append(Mur_vue_bas())
-        if self.mur_plein(DROITE):
-            images_murs.append(Mur_vue_droite())
-        if self.mur_plein(GAUCHE):
-            images_murs.append(Mur_vue_gauche())
-        return Case_vue(images_murs,images_effets,self.clarte)
+    # def get_image(self): #À changer plus tard
+    #     images_effets = []
+    #     for effet in self.effets:
+    #         images_effets.append(effet.get_image())
+    #     images_murs = []
+    #     if self.mur_plein(HAUT):
+    #         images_murs.append(Mur_vue_haut())
+    #     if self.mur_plein(BAS):
+    #         images_murs.append(Mur_vue_bas())
+    #     if self.mur_plein(DROITE):
+    #         images_murs.append(Mur_vue_droite())
+    #     if self.mur_plein(GAUCHE):
+    #         images_murs.append(Mur_vue_gauche())
+    #     return Case_vue(images_murs,images_effets,self.clarte)
 
     def get_copie(self):
         copie = Case(self.position,self.niveau,self.element,self.effets,self.opacite)
@@ -2816,12 +2832,6 @@ class Entitee:
     def get_skin(self):
         return SKIN_MYSTERE
 
-    def add_latence(self,latence):
-        self.latence += latence
-
-    def set_latence(self,latence):
-        self.latence = latence
-
     def active(self,controleur):
         self.controleur = controleur
 
@@ -2836,19 +2846,37 @@ class Fantome(Entitee):
     """La classe des entitées qui traversent les murs."""
     pass
 
+class Interactif(Entitee):
+    """La classe des entitées avec lesquelles on peut interagir. Les humains, principalement, et quelques éléments de décors."""
+
 class Non_superposable(Entitee):
     """La classe des entitées qui 'occupent' une place, donc qu'on ne peut pas superposer (aux fantômes près)."""
     pass
 
-class Décors(Non_superposable):
+class Decors(Non_superposable):
     """La classe des éléments de décors qu'on ne peut pas traverser. On peut interagir avec certains ?"""
     pass
 
-class Décors_interactif(Décors):
+class Decors_interactif(Decors,Interactif):
     """La classe des éléments de décors avec lesquels on peut interagir."""
     pass
 
-class Agissant(Non_superposable): #Tout agissant est un cadavre, tout cadavre n'agit pas.
+class Ustensile(Decors_interactif):
+    """Permet de créer un Item à partir d'ingrédients"""
+    def __init__(self,position,recettes,ID=None):
+        Entitee.__init__(self,position,ID)
+        self.recettes = recettes #Les recettes de création d'Item
+
+class Mobile(Entitee):
+    """La classe des entitées qui peuvent se déplacer (par elles-mêmes pour les agissants, en étant lancées pour les items)."""
+
+    def add_latence(self,latence):
+        self.latence += latence
+
+    def set_latence(self,latence):
+        self.latence = latence
+
+class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cadavre n'agit pas.
     """La classe des entitées animées. Capable de décision, de différentes actions, etc. Les principales caractéristiques sont l'ID, les stats, et la classe principale."""
     def __init__(self,controleur,position,identite,niveau,ID=None):
         Entitee.__init__(self,position,ID)
@@ -3377,8 +3405,8 @@ class Agissant(Non_superposable): #Tout agissant est un cadavre, tout cadavre n'
                     essence = trouve_skill(self.classe_principale,Skill_essence_magique)
                     if essence != None :
                         cout = essence.utilise(self.pv)
-                        if peut_payer(cout):
-                            paye(cout)
+                        if self.peut_payer(cout):
+                            self.paye(cout)
                             self.pv = 0
                         else :
                             self.meurt()
@@ -3978,7 +4006,7 @@ class Ombriul(Dps):
     def get_texte_descriptif(self):
         return [f"Un ombriul (niveau {self.niveau})",f"ID : {self.ID}","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Les ombriuls ne font pas partie des espèces endémiques au labyrinthe. Ils y prolifèrent depuis quelques temps grâce à l'ombre, qui est leur élément de prédilection."]
 
-class Humain(Agissant,Entitee_superieure):
+class Humain(Agissant,Interactif,Entitee_superieure):
     """La classe des pnjs et du joueur. A un comportement un peu plus complexe, et une personnalité."""
     def __init__(self,controleur,position,identite,niveau,ID):
         Agissant.__init__(self,controleur,position,identite,niveau,ID)
@@ -4203,11 +4231,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         return False #À modifier pour quand on prend le controle de Dev
 
     def debut_tour(self):
-        try:
-            self.affichage.dessine(self)
-        except:
-            print("Affichage non raffraichi")
-            traceback.print_tb(sys.exc_info()[2])
+        self.affichage.dessine(self)
         if self.latence <= 0:
             self.nouvel_ordre = False
         Agissant.debut_tour(self)
@@ -4351,16 +4375,15 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         self.interlocuteur = None #Normalement c'est déjà le cas
         for i in range(4):
             pos = positions[i]
-            agissants = self.controleur.trouve_agissants_courants(pos)
-            for ID in agissants:
-                agissant = self.controleur.get_entitee(ID)
-                if isinstance(agissant,Humain) and self.interlocuteur == None and not self.controleur.est_item(ID):
-                    self.interlocuteur = agissant # Est-ce que je continue à appeler ça un interlocuteur ?
-                    self.controleur.set_phase(EVENEMENT)
-                    self.event = DIALOGUE
-                    self.interlocuteur.start_dialogue()
-                    self.dir_regard = directions[i]
-                    self.interlocuteur.dir_regard = range(4)[directions[i]-2]
+            interactifs = self.controleur.trouve_interactifs_courants(pos)
+            for ID in interactifs:
+                self.interlocuteur = self.controleur.get_entitee(ID) # Est-ce que je continue à appeler ça un interlocuteur ?
+                self.controleur.set_phase(EVENEMENT)
+                self.event = DIALOGUE
+                self.interlocuteur.start_dialogue()
+                self.dir_regard = directions[i]
+                self.interlocuteur.dir_regard = range(4)[directions[i]-2]
+                break #Probablement mieux que ce que j'avais avant, mais ça me dérange sur le principe
 
     def controle(self,touche):
         if touche in self.cat_touches.keys() and self.cat_touches[touche] == "pause":
@@ -4520,7 +4543,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
             self.choix_cout_magie += self.precision_cout_magie
         elif touche == pygame.K_DOWN and self.choix_cout_magie - self.precision_cout_magie >= 0:
             self.choix_cout_magie -= self.precision_cout_magie
-        elif touche == pygame.K_LEFT and precision_cout_magie > 0:
+        elif touche == pygame.K_LEFT and self.precision_cout_magie > 0:
             self.precision_cout_magie -= 1
         elif touche == pygame.K_RIGHT :
             self.precision_cout_magie += 1
@@ -4732,7 +4755,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
             self.choix_cout_magie += self.precision_cout_magie
         elif touche == pygame.K_DOWN and self.choix_cout_magie - self.precision_cout_magie >= 0:
             self.choix_cout_magie -= self.precision_cout_magie
-        elif touche == pygame.K_LEFT and precision_cout_magie > 0:
+        elif touche == pygame.K_LEFT and self.precision_cout_magie > 0:
             self.precision_cout_magie -= 1
         elif touche == pygame.K_RIGHT :
             self.precision_cout_magie += 1
@@ -5651,7 +5674,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
                     self.classe_principale.skills.append(skill)
                     self.choix_niveaux[CLASSIQUE][5] = VOL
                 elif choix == BOOST_ATTAQUE_EPEE:
-                    skill = Skill_boost_attaque_epee()
+                    skill = Skill_boost_attaque_epee() #À créer
                     skill.evo()
                     self.classe_principale.skills.append(skill)
                     self.choix_niveaux[CLASSIQUE][5] = BOOST_ATTAQUE_EPEE
@@ -7983,7 +8006,7 @@ class Marchand(Dps,Humain): #Le dixième humain du jeu, à l'étage 9 (le seul l
     def get_texte_descriptif(self):
         return [f"Un humain (niveau {self.niveau})",f"ID : {self.ID}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Un marchand perdu dans le labyrinthe. Il peut obtenir des objets de l'extérieur ou en envoyer, mais il ne peut pas sortir lui-même..."]
 
-class Item(Entitee):
+class Item(Mobile):
     """La classe des entitées inanimées. Peuvent se situer dans un inventaire. Peuvent être lancés (déconseillé pour les non-projectiles)."""
     def __init__(self,position):
         Entitee.__init__(self,position)
@@ -8012,11 +8035,11 @@ class Item(Entitee):
             vitesse *= taux
         return vitesse
 
-    def heurte_agissant(self,agissant):
+    def heurte_non_superposable(self,non_superposable:Non_superposable):
         for effet in self.effets :
             if isinstance(effet,On_hit) :
                 effet.execute(self.lanceur,self.position,self.controleur)
-        if isinstance(self,Percant) :
+        if isinstance(non_superposable,Agissant) and isinstance(self,Percant) :
             self.ajoute_effet(En_sursis())
         elif isinstance(self,(Fragile,Evanescent)):
             self.etat = "brisé"
@@ -8138,7 +8161,7 @@ class Consommable(Item):
 
 class Potion(Consommable):
     """La classe des consommables qui peuvent se boire."""
-    def utilise(self,agissant):
+    def utilise(self,agissant:Agissant):
         agissant.ajoute_effet(self.effet)
         self.etat = "brisé"
 
@@ -8212,16 +8235,16 @@ class Potion_force(Potion):
     def get_description(self,observation):
         return ["Une potion","Augmente la force (et donc les dégats infligés)."]
 
-class Potion_defense(Potion):
-    """Une potion qui protège des attaques."""
-    def __init__(self,position,pv):
-        Potion.__init__(self,position,Enchantement_defense(duree,))
-
-    def get_titre(self,observation):
-        return "Potion de defense"
-
-    def get_description(self,observation):
-        return ["Une potion","Protège des attaques."]
+#class Potion_defense(Potion):
+#    """Une potion qui protège des attaques."""
+#    def __init__(self,position,pv):
+#        Potion.__init__(self,position,Enchantement_defense(duree,)) #/!\ Qu'est-ce qui m'est arrivé ici ?
+#
+#    def get_titre(self,observation):
+#        return "Potion de defense"
+#
+#    def get_description(self,observation):
+#        return ["Une potion","Protège des attaques."]
 
 class Potion_vitesse(Potion):
     """Une potion qui augmente temporairement la vitesse."""
@@ -8247,7 +8270,7 @@ class Parchemin(Consommable):
     def get_description(self,observation):
         return ["Un parchemin","C'est quoi ces gribouillis ?"]
 
-    def utilise(self,agissant):
+    def utilise(self,agissant:Agissant):
         if agissant.peut_payer(self.cout) :
             agissant.paye(self.cout)
             agissant.ajoute_effet(self.effet)
@@ -8285,7 +8308,7 @@ class Parchemin_impregne(Parchemin):
     def __init__(self,position,magie,cout): #Le cout dépend du niveau du parchemin d'imprégnation
         Parchemin.__init__(self,position,magie,cout)
 
-    def utilise(self,agissant):
+    def utilise(self,agissant:Agissant):
         if self.etat == "suspens": #On l'a suspendu précédemment, ça devrait être bon maintenant
             if agissant.peut_payer(self.cout) :
                 agissant.paye(self.cout)
@@ -8678,7 +8701,7 @@ class Equipement(Item):
         Item.__init__(self,position)
         self.taux_stats = {}
 
-    def equippe(self,agissant):
+    def equippe(self,agissant:Agissant):
         pass
 
     def desequippe(self):
@@ -8691,7 +8714,7 @@ class Equipement_tribal(Equipement):
         self.espece = espece
         self.taux = taux
 
-    def equippe(self,agissant):
+    def equippe(self,agissant:Agissant):
         if not self.espece in agissant.especes :
             self.taux_stats["incompatibilité porteur"] = self.taux
             if isinstance(agissant,Joueur):
@@ -9015,7 +9038,7 @@ class Bouclier(Degainable):
         if attaque.degats < 0:
             attaque.degats = 0
         else :
-            for taux in taux_stats.values():
+            for taux in self.taux_stats.values():
                 attaque.degats *=  taux
             attaque.degats *= self.taux_degats
 
@@ -9379,7 +9402,7 @@ class Cree_fleche_de_base_skill(Cree_item):
         self.item = Fleche_de_base
         self.nom = "Flèche de base"
 
-    def cree_item(self,agissant): #On ne lui donne que la classe principale, et il se débrouille pour trouver le skill
+    def cree_item(self,agissant:Agissant): #On ne lui donne que la classe principale, et il se débrouille pour trouver le skill
         skill = trouve_skill(agissant.classe_principale,Skill_creation_de_fleches)
         if skill == None:
             print("Euh... Quoi ? Qu'est-ce qui m'est arrivé ?")
@@ -9399,7 +9422,7 @@ class Cree_fleche_percante_skill(Cree_item):
         self.item = Fleche_de_base #Pour l'instant les flèches perçantes n'existent pas
         self.nom = "Flèche percante"
 
-    def cree_item(self,agissant): #On ne lui donne que la classe principale, et il se débrouille pour trouver le skill
+    def cree_item(self,agissant:Agissant): #On ne lui donne que la classe principale, et il se débrouille pour trouver le skill
         skill = trouve_skill(agissant.classe_principale,Skill_creation_de_fleches)
         if skill == None:
             print("Euh... Quoi ? Qu'est-ce qui m'est arrivé ?")
@@ -9419,7 +9442,7 @@ class Cree_fleche_fantome_skill(Cree_item):
         self.item = Fleche_fantome
         self.nom = "Flèche fantome"
 
-    def cree_item(self,agissant): #On ne lui donne que la classe principale, et il se débrouille pour trouver le skill
+    def cree_item(self,agissant:Agissant): #On ne lui donne que la classe principale, et il se débrouille pour trouver le skill
         skill = trouve_skill(agissant.classe_principale,Skill_creation_de_fleches)
         if skill == None:
             print("Euh... Quoi ? Qu'est-ce qui m'est arrivé ?")
@@ -9439,7 +9462,7 @@ class Cree_fleche_lourde_skill(Cree_item):
         self.item = Fleche_lourde
         self.nom = "Flèche lourde"
 
-    def cree_item(self,agissant): #On ne lui donne que la classe principale, et il se débrouille pour trouver le skill
+    def cree_item(self,agissant:Agissant): #On ne lui donne que la classe principale, et il se débrouille pour trouver le skill
         skill = trouve_skill(agissant.classe_principale,Skill_creation_de_fleches)
         if skill == None:
             print("Euh... Quoi ? Qu'est-ce qui m'est arrivé ?")
@@ -9459,7 +9482,7 @@ class Cree_fleche_legere_skill(Cree_item):
         self.item = Fleche_legere
         self.nom = "Flèche legere"
 
-    def cree_item(self,agissant): #On ne lui donne que la classe principale, et il se débrouille pour trouver le skill
+    def cree_item(self,agissant:Agissant): #On ne lui donne que la classe principale, et il se débrouille pour trouver le skill
         skill = trouve_skill(agissant.classe_principale,Skill_creation_de_fleches)
         if skill == None:
             print("Euh... Quoi ? Qu'est-ce qui m'est arrivé ?")
@@ -9479,7 +9502,7 @@ class Cree_fleche_explosive_skill(Cree_item):
         self.item = Fleche_explosive
         self.nom = "Flèche explosive"
 
-    def cree_item(self,agissant): #On ne lui donne que la classe principale, et il se débrouille pour trouver le skill
+    def cree_item(self,agissant:Agissant): #On ne lui donne que la classe principale, et il se débrouille pour trouver le skill
         skill_fleche = trouve_skill(agissant.classe_principale,Skill_creation_de_fleches)
         skill_explosif = trouve_skill(agissant.classe_principale,Skill_creation_d_explosifs)
         if skill_fleche == skill_explosif == None:
@@ -9514,7 +9537,7 @@ class Cree_charge_de_base_skill(Cree_item):
         self.item = Charge_de_base
         self.nom = "Charge de base"
 
-    def cree_item(self,agissant): #On ne lui donne que la classe principale, et il se débrouille pour trouver le skill
+    def cree_item(self,agissant:Agissant): #On ne lui donne que la classe principale, et il se débrouille pour trouver le skill
         skill = trouve_skill(agissant.classe_principale,Skill_creation_d_explosifs)
         if skill == None:
             print("Euh... Quoi ? Qu'est-ce qui m'est arrivé ?")
@@ -9534,7 +9557,7 @@ class Cree_charge_lourde_skill(Cree_item):
         self.item = Charge_lourde
         self.nom = "Charge lourde"
 
-    def cree_item(self,agissant): #On ne lui donne que la classe principale, et il se débrouille pour trouver le skill
+    def cree_item(self,agissant:Agissant): #On ne lui donne que la classe principale, et il se débrouille pour trouver le skill
         skill = trouve_skill(agissant.classe_principale,Skill_creation_d_explosifs)
         if skill == None:
             print("Euh... Quoi ? Qu'est-ce qui m'est arrivé ?")
@@ -9554,7 +9577,7 @@ class Cree_charge_etendue_skill(Cree_item):
         self.item = Charge_etendue
         self.nom = "Charge etendue"
 
-    def cree_item(self,agissant): #On ne lui donne que la classe principale, et il se débrouille pour trouver le skill
+    def cree_item(self,agissant:Agissant): #On ne lui donne que la classe principale, et il se débrouille pour trouver le skill
         skill = trouve_skill(agissant.classe_principale,Skill_creation_d_explosifs)
         if skill == None:
             print("Euh... Quoi ? Qu'est-ce qui m'est arrivé ?")
@@ -11353,7 +11376,7 @@ class Esprit_slime(Esprit_type):
         self.controleur.esprits.pop(nom)
         self.merge_classe(esprit.classe)
 
-    def merge_classe(classe):
+    def merge_classe(self,classe):
         #On va comparer tous les skills de chaque classe
         #Les slimes ont trois skills intrasecs : la fusion, pour unir deux groupes de slimes en un seul, la division, pour créer un nouveau slime, et l'absorption, pour ramasser un cadavre et voler ses skills
         #Ils peuvent avoir beaucoup de skills non-intrasecs, et n'utilisent souvent que les passifs
@@ -11408,8 +11431,8 @@ class Effet :
         """La fonction qui est appelée par le controleur. Détermine, d'après les informations transmises par le controleur, si l'action doit être effectuée ou pas. Vérifie si l'effet doit encore exister ou non."""
         print("a surdéfinir")
 
-    def get_image(self):
-        return Effet_vue()
+#    def get_image(self):
+#        return Effet_vue()
 
     def termine(self):
         """La fonction qui termine l'effet."""
@@ -11505,10 +11528,10 @@ class Protection_general(Evenement,On_post_action):
         self.phase = "démarrage"
         self.bouclier = bouclier #Techniquement c'est le bouclier qui intercepte.
 
-    def action(self,agissant):
-        cases = get_cases_voisines(agissant.get_position(),0) #Seule la case de l'agissant est protégée par cette version de la protection.
+    def action(self,agissant:Agissant):
+        cases = agissant.controleur.get_cases_touches(agissant.get_position(),0) #Seule la case de l'agissant est protégée par cette version de la protection.
         for case in cases :
-            case.effets.append(Protection_bouclier(1,bouclier,[agissant.dir_regard]))
+            case.effets.append(Protection_bouclier(1,self.bouclier,[agissant.dir_regard]))
 
 class Protection_zone(One_shot,On_post_action):
     def __init__(self,protection,cible,position,propagation,portee,direction=None,traverse="tout"):
@@ -11546,10 +11569,10 @@ class Protection_groupe(One_shot,On_post_action):
             esprit = porteur.controleur.get_esprit(nom_esprit)
             cibles = esprit.get_corps()
         else:
-            cibles = [responsable]
+            cibles = [porteur.ID]
         for cible in cibles:
             if not porteur.controleur.est_item(cible):
-                cible.effets.append(Protection_mur(duree,degats))
+                cible.effets.append(Protection_mur(self.duree,self.degats))
 
 class Investissement_mana(Evenement,On_debut_tour):
     """Le joueur met du mana de côté, et en a plus après !"""
@@ -11560,7 +11583,7 @@ class Investissement_mana(Evenement,On_debut_tour):
         self.mana = mana
         self.phase = "en cours"
 
-    def action(self,agissant):
+    def action(self,agissant:Agissant):
         if self.phase == "terminé":
             agissant.pm += self.mana
 
@@ -11570,7 +11593,7 @@ class Obscurite(Evenement,On_debut_tour):
         self.affiche = False
         self.temps_restant = duree_obscurite[niveau-1]
         self.phase = "démarrage"
-        self.gain_opacite = gain_obscurite[niveau-1]
+        self.gain_opacite = gain_opacite_obscurite[niveau-1]
 
     def action(self,case): #La case affectée devient plus impénétrable à la lumière
         if self.phase == "démarrage" :
@@ -11593,7 +11616,7 @@ class Protection_bouclier(Time_limited,On_attack):
         self.directions = directions
 
     def action(self,attaque):
-        if get_dir_opposee(attaque.direction) in self.directions:
+        if range(4)[attaque.direction-2] in self.directions: #/!\ Changer pour quelque chose de plus universel
             self.bouclier.intercepte(attaque)
 
 class Protection_mur(Time_limited,On_attack):
@@ -11644,7 +11667,7 @@ class Blizzard(Evenement,On_post_action):
 
     def action(self,case,position):
         if self.phase == "en cours":
-            occupants = case.controleur.trouve_agissants_courants(position)
+            occupants = case.controleur.trouve_mobiles_courants(position)
             for occupant in occupants :
                 case.controleur.get_entitee(occupant).latence.add_latence(self.gain_latence)
 
@@ -11676,7 +11699,7 @@ class Enchantement_force(Enchantement,On_debut_tour):
         self.phase = "démarrage"
         self.gain_force = gain_force
 
-    def action(self,agissant):
+    def action(self,agissant:Agissant):
         if self.phase == "démarrage" and "enchantf" not in agissant.taux_force :
             agissant.taux_force["enchantf"] = gain_force
         elif self.phase == "terminé":
@@ -11690,7 +11713,7 @@ class Enchantement_vision(Enchantement,On_debut_tour):
         self.phase = "démarrage"
         self.gain_vision = gain_vision
 
-    def action(self,agissant):
+    def action(self,agissant:Agissant):
         skill = trouve_skill(agissant.classe_principale,Skill_vision)
         if self.phase == "démarrage" :
             skill.portee += gain_vision
@@ -11705,11 +11728,11 @@ class Enchantement_pv(Enchantement,On_debut_tour):
         self.phase = "démarrage"
         self.gain_pv = gain_pv
 
-    def action(self,agissant):
+    def action(self,agissant:Agissant):
         if self.phase == "démarrage" :
-            agissant.regen_pv += gain_pv
+            agissant.regen_pv += self.gain_pv
         elif self.phase == "terminé":
-            agissant.regen_pv -= gain_pv
+            agissant.regen_pv -= self.gain_pv
 
 class Enchantement_pm(Enchantement,On_debut_tour):
     """Les enchantements qui affectent la régénération des PM (en positif ou négatif)."""
@@ -11719,11 +11742,11 @@ class Enchantement_pm(Enchantement,On_debut_tour):
         self.phase = "démarrage"
         self.gain_pm = gain_pm
 
-    def action(self,agissant):
+    def action(self,agissant:Agissant):
         if self.phase == "démarrage" :
-            agissant.regen_pm += gain_pm
+            agissant.regen_pm += self.gain_pm
         elif self.phase == "terminé":
-            agissant.regen_pm -= gain_pm
+            agissant.regen_pm -= self.gain_pm
 
 class Enchantement_confusion(Enchantement,On_post_decision):
     """Les enchantements qui provoque des erreurs de direction."""
@@ -11733,14 +11756,14 @@ class Enchantement_confusion(Enchantement,On_post_decision):
         self.phase = "démarrage"
         self.taux_erreur = taux_erreur
 
-    def action(self,agissant):
+    def action(self,agissant:Agissant):
         if self.phase == "en cours":
+            dir_voulue = agissant.dir_regard
             if random.random() < self.taux_erreur and dir_voulue != None and agissant.latence <= 0 :
-                dir_voulue = agissant.dir_regard
                 dir_possibles = [HAUT,BAS,GAUCHE,DROITE].remove(dir_voulue)
-                agissant.dir_regard = dir_possible[random.randint(0,2)]
+                agissant.dir_regard = dir_possibles[random.randint(0,2)]
 
-    def execute(self,agissant):
+    def execute(self,agissant:Agissant):
         self.temps_restant -= 1
         if self.phase == "démarrage" :
             self.phase = "en cours"
@@ -11757,12 +11780,12 @@ class Enchantement_poches_trouees(Enchantement,On_debut_tour):
         self.phase = "démarrage"
         self.taux_drop = taux_drop
 
-    def action(self,agissant):
+    def action(self,agissant:Agissant):
         if self.phase == "en cours":
             if random.random() < self.taux_drop :
                 agissant.drop_random()
 
-    def execute(self,agissant):
+    def execute(self,agissant:Agissant):
         self.temps_restant -= 1
         if self.phase == "démarrage" :
             self.phase = "en cours"
@@ -11779,7 +11802,7 @@ class Enchantement_vitesse(Enchantement,On_debut_tour):
         self.phase = "démarrage"
         self.gain_vitesse = gain_vitesse
 
-    def action(self,agissant):
+    def action(self,agissant:Agissant):
         if self.phase == "démarrage" and "enchantv" not in agissant.taux_vitesse :
             agissant.taux_vitesse["enchantv"] = gain_vitesse
         elif self.phase == "terminé":
@@ -11793,16 +11816,16 @@ class Enchantement_immunite(Enchantement,On_debut_tour):
         self.phase = "démarrage"
         self.superiorite = superiorite
 
-    def action(self,agissant):
+    def action(self,agissant:Agissant):
         if self.phase == "en cours":
             for effet in agissant.effets :
                 if issubclass(type(effet),Maladie):
-                    if maladie.priorite + self.superiorite < agissant.superiorite :
+                    if effet.priorite + self.superiorite < agissant.superiorite :
                         effet.phase = "terminé"
                         effet.action(agissant)
                         agissant.effets.remove(effet)
 
-    def execute(self,agissant):
+    def execute(self,agissant:Agissant):
         self.temps_restant -= 1
         if self.phase == "démarrage" :
             self.phase = "en cours"
@@ -11819,9 +11842,9 @@ class Enchantement_flamme(Enchantement,On_debut_tour):
         self.phase = "démarrage"
         self.gain_aff = gain_aff
 
-    def action(self,agissant):
+    def action(self,agissant:Agissant):
         if self.phase == "démarrage" and "enchantf" not in agissant.taux_aff_f :
-            agissant.taux_aff_f["enchantf"] = gain_aff
+            agissant.taux_aff_f["enchantf"] = self.gain_aff
         elif self.phase == "terminé":
             agissant.taux_aff_f.pop("enchantf")
 
@@ -11833,9 +11856,9 @@ class Enchantement_neige(Enchantement,On_debut_tour):
         self.phase = "démarrage"
         self.gain_aff = gain_aff
 
-    def action(self,agissant):
+    def action(self,agissant:Agissant):
         if self.phase == "démarrage" and "enchantf" not in agissant.taux_aff_g :
-            agissant.taux_aff_g["enchantn"] = gain_aff
+            agissant.taux_aff_g["enchantn"] = self.gain_aff
         elif self.phase == "terminé":
             agissant.taux_aff_g.pop("enchantn")
 
@@ -11847,9 +11870,9 @@ class Enchantement_sable(Enchantement,On_debut_tour):
         self.phase = "démarrage"
         self.gain_aff = gain_aff
 
-    def action(self,agissant):
+    def action(self,agissant:Agissant):
         if self.phase == "démarrage" and "enchants" not in agissant.taux_aff_t :
-            agissant.taux_aff_t["enchants"] = gain_aff
+            agissant.taux_aff_t["enchants"] = self.gain_aff
         elif self.phase == "terminé":
             agissant.taux_aff_t.pop("enchants")
 
@@ -11861,9 +11884,9 @@ class Enchantement_tenebre(Enchantement,On_debut_tour):
         self.phase = "démarrage"
         self.gain_aff = gain_aff
 
-    def action(self,agissant):
+    def action(self,agissant:Agissant):
         if self.phase == "démarrage" and "enchantt" not in agissant.taux_aff_o :
-            agissant.taux_aff_o["enchantt"] = gain_aff
+            agissant.taux_aff_o["enchantt"] = self.gain_aff
         elif self.phase == "terminé":
             agissant.taux_aff_o.pop("enchantt")
 
@@ -11878,11 +11901,11 @@ class Enchantement_arme(Enchantement,On_debut_tour):
 
     def action(self,arme):
         if self.phase == "démarrage" and "enchantf" not in arme.taux_force :
-            arme.taux_force["enchantf"] = gain_force
+            arme.taux_force["enchantf"] = self.gain_force
         elif self.phase == "terminé":
             arme.taux_force.pop("enchantf")
         if self.phase == "démarrage" and "enchantp" not in arme.taux_portee :
-            arme.taux_portee["enchantp"] = gain_portee
+            arme.taux_portee["enchantp"] = self.gain_portee
         elif self.phase == "terminé":
             arme.taux_portee.pop("enchantp")
 
@@ -11910,16 +11933,16 @@ class Maladie(On_post_decision,On_tick):
         self.persistence = persistence
         self.immunite = 0
 
-    def action(self,malade):
+    def action(self,malade:Agissant):
         print("À surdéfinir !")
 
-    def contagion(self,malade): #Méthode propre aux maladies
-        voisins = get_voisins(malade,distance)
+    def contagion(self,malade:Agissant): #Méthode propre aux maladies
+        voisins = malade.controleur.trouve_agissants(malade,self.distance)
         for voisin in voisins :
-            if random.random() < contagiosite and (type(self) != type(effet) for effet in voisin.effets): #On ne tombe pas deux fois malade de la même maladie
+            if random.random() < self.contagiosite and (type(self) != type(effet) for effet in voisin.effets): #On ne tombe pas deux fois malade de la même maladie
                 voisin.effets.append(type(self)(self.contagiosite,self.distance,self.persistence,self.virulence)) #Nid à problèmes très potentiel !
 
-    def execute(self,malade):
+    def execute(self,malade:Agissant):
         if self.phase == "démarrage" :
             self.phase = "en cours"
         elif self.immunite <= self.persistence :
@@ -11938,7 +11961,7 @@ class Tirnogose(Maladie):
         self.immunite = 0
         self.virulence = virulence
 
-    def action(self,malade):
+    def action(self,malade:Agissant):
         if self.phase == "en cours" :
             malade.pv -= self.virulence
             self.immunite += 1
@@ -11954,15 +11977,15 @@ class Fibaluse(Maladie):
         self.immunite = 0
         self.virulence = virulence
 
-    def action(self,malade):
+    def action(self,malade:Agissant):
         if self.phase == "démarrage" and "maladf" not in malade.taux_stats :
-            malade.taux_stats["maladf"] = virulence
+            malade.taux_stats["maladf"] = self.virulence
         elif self.phase == "en cours" :
             self.immunite += 1
         elif self.phase == "terminé" :
             malade.taux_stats.pop("maladf")
 
-    def execute(self,malade):
+    def execute(self,malade:Agissant):
         if self.phase == "démarrage" :
             self.action(malade)
             self.phase = "en cours"
@@ -11983,8 +12006,8 @@ class Ibsutiomialgie(Maladie):
         self.immunite = 0
         self.virulence = virulence
 
-    def action(self,malade):
-        if self.phase == "démarrage" and random.random() < virulence :
+    def action(self,malade:Agissant):
+        if self.phase == "démarrage" and random.random() < self.virulence :
             malade.meurt()
         elif self.phase == "en cours" :
             self.immunite += 1
@@ -12227,7 +12250,7 @@ class Attaque_case(One_shot):
                 if self.autre == None :
                     case.controleur.get_entitee(victime_potentielle).effets.append(Attaque_particulier(self.responsable,self.degats,self.element,self.direction))
                 elif self.autre == "piercing":
-                    case.controleur.get_entitee(victime_potentielle).effets.append(Attaque_percante(self.responsable,self.degats,self.element,self.direction,taux_perce))
+                    case.controleur.get_entitee(victime_potentielle).effets.append(Attaque_percante(self.responsable,self.degats,self.element,self.direction,self.taux_autre))
 
     def execute(self,case,position):
         if self.phase == "démarrage":
@@ -12330,16 +12353,16 @@ class Teleport(On_through):
         self.affiche = surnaturel
         self.position = position
 
-    def action(self,entitee):
+    def action(self,entitee:Entitee):
         # On va chercher un éventuel occupant de la case cible
-        occupants = entitee.controleur.trouve_agissants(self.position)
+        occupants = entitee.controleur.trouve_non_superposables(self.position)
         if issubclass(entitee.get_classe(),Item):
             if entitee.get_position()[0]!=self.position[0]: #Un item passe quoi qu'il arrive
                 entitee.controleur.move(self.position,entitee)
             else:
                 entitee.set_position(self.position)
             for occupant in occupants:
-                entitee.heurte_agissant(occupant) #Mais il heurte les occupants
+                entitee.heurte_non_superposable(occupant) #Mais il heurte les occupants
         else:
             passe = True
             if occupants != []:
@@ -12729,7 +12752,7 @@ class Glace(One_shot,Aura_elementale):
 
     def action(self,case,position):
         contr = case.controleur
-        occupants = contr.trouve_agissants_courants(position)
+        occupants = contr.trouve_mobiles_courants(position)
         lanceur = contr.get_entitee(self.responsable)
         for occupant in occupants :
             agissant = contr.get_entitee(occupant)
@@ -12754,7 +12777,7 @@ class Glace_permanente(Aura_permanente):
 
     def action(self,case,position):
         contr = case.controleur
-        occupants = contr.trouve_agissants_courants(position)
+        occupants = contr.trouve_mobiles_courants(position)
         for occupant in occupants :
             agissant = contr.get_entitee(occupant)
             if GLACE not in agissant.immunites :
@@ -12870,7 +12893,7 @@ class Aura_ombre(One_shot,On_debut_tour):
 
 class Magie(On_action):
     """La classe des magies. Un effet qui s'attache au lanceur le temps de remplir les paramètres, puis se lance avant la phase d'attaque."""
-    def __init__(self,gain_xp,cout_pm,latence): #Toutes ces caractéristiques sont déterminées par la sous-classe au moment de l'instanciation, en fonction de la magie utilisée et du niveau.
+    def __init__(self,gain_xp,cout_mp,latence): #Toutes ces caractéristiques sont déterminées par la sous-classe au moment de l'instanciation, en fonction de la magie utilisée et du niveau.
         self.gain_xp = gain_xp
         self.cout_mp = cout_mp
         self.latence = latence
@@ -13464,7 +13487,7 @@ class Magie_eclair_noir(Magie_dirigee):
         return f"Magie d'éclair noir (niveau {self.niveau})"
 
     def get_description(self,observation):
-        return ["Une magie de projectile","Invoque un éclair noir {self.niveau} à l'emplacement du lanceur.","L'éclair noir inflige des dégats de terre au contact d'un agissant, explose au contact d'un mur ou d'un agissant et inflige des dégats de terre à proximité, et poursuit sa course si l'agissant meurt.",f"Coût : {self.cout_pm} PMs",f"Dégats de contact : {degats_choc_eclair_noir[self.niveau-1]}",f"Dégats d'explosion : {degats_explosion_eclair_noir[self.niveau-1]}",f"Portée de l'explosion : {portee_explosion_eclair_noir[self.niveau-1]}",f"Latence : {self.latence}"]
+        return ["Une magie de projectile","Invoque un éclair noir {self.niveau} à l'emplacement du lanceur.","L'éclair noir inflige des dégats de terre au contact d'un agissant, explose au contact d'un mur ou d'un agissant et inflige des dégats de terre à proximité, et poursuit sa course si l'agissant meurt.",f"Coût : {self.cout_pm} PMs",f"Dégats de contact : {degats_choc_eclair_noir[self.niveau-1]}",f"Dégats d'explosion : {degats_explosifs_eclair_noir[self.niveau-1]}",f"Portée de l'explosion : {portee_eclair_noir[self.niveau-1]}",f"Latence : {self.latence}"]
 
 # C'est tout pour les projectiles.
 # On passe aux enchantements :
@@ -13567,7 +13590,7 @@ class Magie_enchantement_perte_de_pm(Enchante_agissant):
         return f"Enchantement de perte de PMs (niveau {self.niveau})"
 
     def get_description(self,observation):
-        return ["Un enchantement","Affecte un agissant à proximité du lanceur.","L'enchantement de perte de PMs retire des PMs à l'agissant à chaque tour pour une certaine durée.",f"Coût : {self.cout_pm} PMs",f"PMs perdus par tour : {gain_pv_perte_de_pm[self.niveau-1]}",f"Durée de l'enchantement : {duree_perte_de_pm[self.niveau-1]}",f"Latence : {self.latence}"]
+        return ["Un enchantement","Affecte un agissant à proximité du lanceur.","L'enchantement de perte de PMs retire des PMs à l'agissant à chaque tour pour une certaine durée.",f"Coût : {self.cout_pm} PMs",f"PMs perdus par tour : {gain_pm_perte_de_pm[self.niveau-1]}",f"Durée de l'enchantement : {duree_perte_de_pm[self.niveau-1]}",f"Latence : {self.latence}"]
 
 class Magie_enchantement_confusion(Enchante_agissant):
     """La magie qui place un enchantement de confusion sur un agissant."""
@@ -13717,7 +13740,7 @@ class Magie_enchantement_absorption(Enchante_agissant):
         return f"Enchantement d'absorption (niveau {self.niveau})"
 
     def get_description(self,observation):
-        return ["Un enchantement","Affecte un agissant à proximité du lanceur.","L'enchantement d'absorption donne des PMs à l'agissant à chaque tour pour une certaine durée.",f"Coût : {self.cout_pm} PMs",f"PMs gagnés par tour : {gain_pm_absorption[self.niveau-1]}",f"Durée de l'enchantement : {duree_absoprtion[self.niveau-1]}",f"Latence : {self.latence}"]
+        return ["Un enchantement","Affecte un agissant à proximité du lanceur.","L'enchantement d'absorption donne des PMs à l'agissant à chaque tour pour une certaine durée.",f"Coût : {self.cout_pm} PMs",f"PMs gagnés par tour : {gain_pm_absorption[self.niveau-1]}",f"Durée de l'enchantement : {duree_absorption[self.niveau-1]}",f"Latence : {self.latence}"]
 
 class Magie_enchantement_celerite(Enchante_agissant):
     """La magie qui place un enchantement de célérité sur un agissant."""
@@ -15716,12 +15739,12 @@ class Affichage:
         debut = 0
         fin = len(options)
         if elements_par_colone > elements_par_ligne: #On n'a pas la place de tout afficher
-            ligne = courant//element_par_ligne
+            ligne = courant//elements_par_ligne
             if ligne < elements_par_ligne//2:
                 fin = elements_par_ligne*elements_par_ligne
-            elif ligne < elements_par_colone+elements_par_ligne//2-element_par_ligne:
-                debut = element_par_ligne*(ligne-elements_par_ligne//2)
-                fin = debut+element_par_ligne*element_par_ligne
+            elif ligne < elements_par_colone+elements_par_ligne//2-elements_par_ligne:
+                debut = elements_par_ligne*(ligne-elements_par_ligne//2)
+                fin = debut+elements_par_ligne*elements_par_colone #colone ou ligne ici /!\
             else:
                 debut = elements_par_ligne*(elements_par_colone-elements_par_ligne)
 

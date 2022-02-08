@@ -6,6 +6,7 @@ from Jeu.Systeme.Constantes_magies.Constantes_boost import *
 from Jeu.Systeme.Constantes_magies.Constantes_boule_de_feu import *
 from Jeu.Systeme.Constantes_magies.Constantes_brasier import *
 from Jeu.Systeme.Constantes_magies.Constantes_cecite import *
+from Jeu.Systeme.Constantes_magies.Constantes_celerite import *
 from Jeu.Systeme.Constantes_magies.Constantes_confusion import *
 from Jeu.Systeme.Constantes_magies.Constantes_dopage import *
 from Jeu.Systeme.Constantes_magies.Constantes_eclair_noir import *

@@ -287,6 +287,8 @@ global SKIN_SKILL_BOOST_AURA
 SKIN_SKILL_BOOST_AURA = Skin("skill_boost_aura.png")
 global SKIN_SKILL_BOOST_DEGATS_FLECHES
 SKIN_SKILL_BOOST_DEGATS_FLECHES = Skin("skill_boost_degats_fleches.png")
+global SKIN_SKILL_BOOST_DEGATS_MAGIQUES
+SKIN_SKILL_BOOST_DEGATS_MAGIQUES = Skin("skill_boost_degats_magiques.png")
 global SKIN_SKILL_BOOST_DEGATS_PROJECTILES
 SKIN_SKILL_BOOST_DEGATS_PROJECTILES = Skin("skill_boost_degats_projectiles.png")
 global SKIN_SKILL_BOOST_ENCHANTEMENT
@@ -297,6 +299,8 @@ global SKIN_SKILL_BOOST_LANCE
 SKIN_SKILL_BOOST_LANCE = Skin("skill_boost_lance.png")
 global SKIN_SKILL_BOOST_PRIORITE_AURA
 SKIN_SKILL_BOOST_PRIORITE_AURA = Skin("skill_boost_priorite_aura.png")
+global SKIN_SKILL_BOOST_PRIORITE_EXPLOSIFS
+SKIN_SKILL_BOOST_PRIORITE_EXPLOSIFS = Skin("skill_boost_priorite_explosifs.png")
 global SKIN_SKILL_BOOST_PRIORITE_FLECHE
 SKIN_SKILL_BOOST_PRIORITE_FLECHE = Skin("skill_boost_priorite_fleches.png")
 global SKIN_SKILL_BOOST_PRIORITE_MAGIQUE
@@ -305,6 +309,8 @@ global SKIN_SKILL_BOOST_RESTAURATIONS
 SKIN_SKILL_BOOST_RESTAURATIONS = Skin("skill_boost_restaurations.png")
 global SKIN_SKILL_BOOST_SOIN
 SKIN_SKILL_BOOST_SOIN = Skin("skill_boost_soin.png")
+global SKIN_SKILL_BOOST_VITESSE_EXPLOSIFS
+SKIN_SKILL_BOOST_VITESSE_EXPLOSIFS = Skin("skill_boost_vitesse_explosifs.png")
 global SKIN_SKILL_BOOST_ZONE_RESTAURATION
 SKIN_SKILL_BOOST_ZONE_RESTAURATION = Skin("skill_boost_zone_restaurations.png")
 global SKIN_SKILL_CREATION_EXPLOSIF
