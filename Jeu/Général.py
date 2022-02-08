@@ -982,7 +982,7 @@ class Controleur():
                 occupants.append(entitee)
         return occupants
 
-    def trouve_courant_classe(self,position,classe):
+    def trouve_classe_courants(self,position,classe):
         entitees = []
         for ID_entitee in self.entitees_courantes:
             entitee = self.get_entitee(ID_entitee)
@@ -2863,9 +2863,17 @@ class Decors_interactif(Decors,Interactif):
 
 class Ustensile(Decors_interactif):
     """Permet de créer un Item à partir d'ingrédients"""
-    def __init__(self,position,recettes,ID=None):
-        Entitee.__init__(self,position,ID)
+    def __init__(self,position,recettes):
+        Entitee.__init__(self,position)
         self.recettes = recettes #Les recettes de création d'Item
+
+class Chaudron_gobelin(Ustensile):
+    """Un chaudron, trouvé en général dans un camp de gobelins."""
+    def __init__(self,position):
+        Ustensile.__init__(self,position,[{"produit":"Parchemin_vierge","ingredients":{"Peau_gobelin":1},"xp":1}]) # Remplacer par autre chose, et faire un fichier avec une constante globale pour cette recette
+
+    def get_description(self,observation):
+        return ["Un chaudron","Il y a des recettes accrochées à côté.","Ça pu le gobelin..."]
 
 class Mobile(Entitee):
     """La classe des entitées qui peuvent se déplacer (par elles-mêmes pour les agissants, en étant lancées pour les items)."""
@@ -3212,7 +3220,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
 
     def get_classe(self):
         if self.etat == "vivant":
-            return Agissant
+            return self.__class__
         if self.etat == "mort":
             return Cadavre
         if self.etat == "oeuf":
@@ -4376,14 +4384,20 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         for i in range(4):
             pos = positions[i]
             interactifs = self.controleur.trouve_interactifs_courants(pos)
-            for ID in interactifs:
-                self.interlocuteur = self.controleur.get_entitee(ID) # Est-ce que je continue à appeler ça un interlocuteur ?
-                self.controleur.set_phase(EVENEMENT)
-                self.event = DIALOGUE
-                self.interlocuteur.start_dialogue()
-                self.dir_regard = directions[i]
-                self.interlocuteur.dir_regard = range(4)[directions[i]-2]
-                break #Probablement mieux que ce que j'avais avant, mais ça me dérange sur le principe
+            if interactifs!=[]:
+                interactif = self.controleur.get_entitee(interactifs[0]) # Est-ce que je continue à appeler ça un interlocuteur ?
+                if isinstance(interactif,Humain):
+                    self.interlocuteur = interactif
+                    self.controleur.set_phase(EVENEMENT)
+                    self.event = DIALOGUE
+                    interactif.start_dialogue()
+                    self.dir_regard = directions[i]
+                    interactif.dir_regard = range(4)[directions[i]-2]
+                elif isinstance(interactif,Decors_interactif):
+                    self.objet_interactif = interactif
+                    self.dir_regard = directions[i]
+                    if isinstance(interactif,Ustensile):
+                        self.start_menu_cuisine()
 
     def controle(self,touche):
         if touche in self.cat_touches.keys() and self.cat_touches[touche] == "pause":
@@ -4421,7 +4435,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
                             self.controleur.set_phase(COMPLEMENT_DIR)
                         if self.magie_courante in LISTE_EXHAUSTIVE_DES_MAGIES_OFFENSIVES:
                             self.statut = "attaque"
-        elif self.controleur.phase in [COMPLEMENT_CIBLE,COMPLEMENT_COUT,COMPLEMENT_DIR,COMPLEMENT_MENU,COMPLEMENT_CIBLE_PARCHEMIN,COMPLEMENT_COUT_PARCHEMIN,COMPLEMENT_DIR_PARCHEMIN,COMPLEMENT_ALCHIMIE]:
+        elif self.controleur.phase in [COMPLEMENT_CIBLE,COMPLEMENT_COUT,COMPLEMENT_DIR,COMPLEMENT_MENU,COMPLEMENT_CIBLE_PARCHEMIN,COMPLEMENT_COUT_PARCHEMIN,COMPLEMENT_DIR_PARCHEMIN,COMPLEMENT_ALCHIMIE,COMPLEMENT_CUISINE]:
             #Les touches servent alors à choisir le complément
             self.methode_courante(touche)
         elif self.controleur.phase == TOUCHE:
@@ -4950,8 +4964,47 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         self.methode_fin = None
         self.interlocuteur.achete(choix.ID)
 
+    def start_menu_cuisine(self):
+        self.controleur.set_phase(COMPLEMENT_CUISINE)
+        self.element_courant = 0
+        self.cible = None
+        self.methode_courante = self.continue_menu_cuisine
+        self.affichage.draw_menu_cuisine(self)
+
+    def continue_menu_cuisine(self,touche): #/!\ Remplacer l'alchimie par la cuisine /!\
+        if touche == pygame.K_UP :
+            if self.element_courant == 0:
+                self.element_courant = len(self.objet_interactif.recettes)
+            self.element_courant -= 1
+        elif touche == pygame.K_DOWN :
+            self.element_courant += 1
+            if self.element_courant == len(self.objet_interactif.recettes):
+                self.element_courant = 0
+        elif touche == pygame.K_SPACE :
+            if self.cible!=None:
+                self.cible = None
+            else:
+                self.cible = self.element_courant
+        elif touche == pygame.K_RETURN :
+            if self.cible == None:
+                # Maybe have an exit option instead ?
+                self.controleur.unset_phase(COMPLEMENT_CUISINE)
+                self.methode_courante = None
+            else:
+                recette = self.objet_interactif.recettes[self.cible]
+                if [(self.inventaire.quantite(eval(ingredient))>=recette["ingredients"][ingredient])for ingredient in recette["ingredients"].keys()]:
+                    for ingredient in recette["ingredients"].keys():
+                        for i in range(recette["ingredients"][ingredient]):
+                            self.inventaire.consomme(eval(ingredient))
+                    produit = eval(recette["produit"])(None)
+                    self.controleur.ajoute_entitee(produit)
+                    self.inventaire.ajoute(produit)
+                self.controleur.unset_phase(COMPLEMENT_CUISINE)
+                self.methode_courante = None
+        self.affichage.draw_menu_cuisine(self)
+
     def start_menu_alchimie(self):
-        self.controleur.set_phase(COMPLEMENT_ALCHIMIE)
+        self.event = COMPLEMENT_DIALOGUE
         self.element_courant = 0
         self.cible = None
         self.methode_courante = self.continue_menu_alchimie
@@ -4973,19 +5026,26 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
                 self.cible = self.element_courant
         elif touche == pygame.K_RETURN :
             if self.cible == None:
+                # Peut-être plutôt avoir une option de sortie ?
                 self.interlocuteur.replique = "dialogue-1phrase1.3.1"
                 self.interlocuteur.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"]
                 if self.a_parchemin_vierge():
                     self.interlocuteur.repliques.append("dialogue-1reponse1.3")
-                self.interlocuteur.repliques += ["dialogue-1reponse1.1","dialogue-1reponse1.1"]
-            else: #/!\ Vérifier qu'on a les ingrédients nécessaires
+                self.interlocuteur.repliques += ["dialogue-1reponse1.4","dialogue-1reponse1.5"]
+                self.event = DIALOGUE
+                self.methode_courante = None
+            else:
                 alchimie = trouve_skill(self.interlocuteur.classe_principale,Skill_alchimie)
-                for ingredient in alchimie.recettes[self.cible]["ingredients"]:
-                    for i in alchimie.recettes[self.cible]["ingredients"][ingredient]:
-                        self.inventaire.consomme(eval(ingredient))
-                self.inventaire.ajoute(eval(self.cible(None)))
-                alchimie.utilise(alchimie.recettes[self.cible]["xp"])
-                self.controleur.unset_phase(COMPLEMENT_ALCHIMIE)
+                recette = alchimie.recettes[self.cible]
+                if [(self.inventaire.quantite(eval(ingredient))>=recette["ingredients"][ingredient])for ingredient in recette["ingredients"].keys()]:
+                    for ingredient in recette["ingredients"].keys():
+                        for i in range(recette["ingredients"][ingredient]):
+                            self.inventaire.consomme(eval(ingredient))
+                    produit = eval(recette["produit"])(None)
+                    self.controleur.ajoute_entitee(produit)
+                    self.inventaire.ajoute(produit)
+                    alchimie.utilise(recette["xp"])
+                self.event = DIALOGUE
                 self.methode_courante = None
                 if self.cible == "Parchemin_vierge":
                     self.interlocuteur.replique = "dialogue-1phrase1.4"
@@ -4995,7 +5055,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
                     self.interlocuteur.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"]
                     if self.a_parchemin_vierge():
                         self.interlocuteur.repliques.append("dialogue-1reponse1.3")
-                    self.interlocuteur.repliques += ["dialogue-1reponse1.1","dialogue-1reponse1.1"]
+                    self.interlocuteur.repliques += ["dialogue-1reponse1.4","dialogue-1reponse1.5"]
         self.affichage.draw_menu_alchimie(self)
 
     def start_change_touches(self,etage = -1,element_courant = 0): #On commence le changement de touches
@@ -7305,7 +7365,7 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
             self.end_dialogue(-1)
         elif replique == "dialogue-1reponse1.4":
             self.controleur.get_entitee(2).start_menu_alchimie()
-            self.controleur.get_entitee(2).event = COMPLEMENT_ALCHIMIE
+            self.controleur.get_entitee(2).event = COMPLEMENT_DIALOGUE
         elif replique == "dialogue-1reponse1.4.1":
             self.replique = "dialogue-1phrase1.4.1"
             self.repliques = ["dialogue-1reponse1.4.1.1","dialogue-1reponse1.4.1.2"]
