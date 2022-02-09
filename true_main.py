@@ -247,16 +247,19 @@ class True_joueur:
                     self.pseudo_fin_tour()
                 else:
                     self.fin_tour()
-            elif self.controleur.phase  in [COMPLEMENT_CIBLE,COMPLEMENT_COUT,COMPLEMENT_DIR] : #Le joueur complète son choix d'action
-                self.complement()
-            elif self.controleur.phase == COMPLEMENT_MENU : #Le joueur modifie ses touches
-                self.complement_menu()
-            elif self.controleur.phase  in [COMPLEMENT_CIBLE_PARCHEMIN,COMPLEMENT_COUT_PARCHEMIN,COMPLEMENT_DIR_PARCHEMIN] : #Le joueur complète son choix d'action
-                self.complement_parchemin()
-            elif self.controleur.phase == TOUCHE : #Le joueur modifie ses touches
-                self.touches()
-            elif self.controleur.phase == EVENEMENT : #Un événement (montée de niveau, dialogue...) interrompt le jeu et le joueur doit réagir
-                self.evenement()
+            else:
+                if self.controleur.phase  in [COMPLEMENT_CIBLE,COMPLEMENT_COUT,COMPLEMENT_DIR] : #Le joueur complète son choix d'action
+                    self.complement()
+                elif self.controleur.phase == COMPLEMENT_MENU : #Le joueur modifie ses touches
+                    self.complement_menu()
+                elif self.controleur.phase  in [COMPLEMENT_CIBLE_PARCHEMIN,COMPLEMENT_COUT_PARCHEMIN,COMPLEMENT_DIR_PARCHEMIN] : #Le joueur complète son choix d'action
+                    self.complement_parchemin()
+                elif self.controleur.phase == TOUCHE : #Le joueur modifie ses touches
+                    self.touches()
+                elif self.controleur.phase == EVENEMENT : #Un événement (montée de niveau, dialogue...) interrompt le jeu et le joueur doit réagir
+                    self.evenement()
+                joueur = self.controleur.entitees[2]
+                joueur.inventaire.nettoie_item()
             self.affichage()
             self.patiente()
             new_courant = pygame.time.get_ticks()
@@ -577,7 +580,7 @@ class True_joueur:
                         if key != None:
                             run = False
                             self.parametres["cat_touches"][key] = "skill"
-                            self.parametres["dir_touches"][key] = Skill_ramassage
+                            self.parametres["dir_touches"][key] = Skill_ramasse
                     elif not(event.key in self.parametres["cat_touches"].keys()):
                         key = event.key
                 elif event.type == pygame.QUIT:

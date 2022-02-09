@@ -1,6 +1,6 @@
 from Jeu.Constantes import *
 from Jeu.Systeme.Classe import *
-from Jeu.systeme.Constantes_decors.Decors import *
+from Jeu.Systeme.Constantes_decors.Decors import *
 from Jeu.Systeme.Constantes_magies.Magies import *
 from Jeu.Systeme.Constantes_projectiles.Projectiles import *
 from Jeu.Systeme.Constantes_items.Items import *
@@ -273,6 +273,12 @@ class Controleur():
         self.ajoute_entitee(autre)
         self.esprits["alchimiste"] = Esprit_humain(autre.ID,self)
 
+        chaudron = Chaudron_gobelin(("Étage 1 : test",1,3))
+        self.ajoute_entitee(chaudron)
+
+        peaux = [Peau_gobelin(("Étage 1 : test",1,2)),Peau_gobelin(("Étage 1 : test",1,4))]
+        self.ajoute_entitees(peaux)
+
         gobel1 = Chef_gobelin(self,("Étage 1 : test",11,15),1)
         self.ajoute_entitee(gobel1)
         #self.esprits["gobel1"]=Esprit_simple("gobel1",[gobel1.ID],["humain"],self)
@@ -488,6 +494,10 @@ class Controleur():
         alchimiste = Alchimiste(self,("Étage 6 : potions",13,1))
         self.ajoute_entitee(alchimiste)
         self.esprits["alchimiste"] = Esprit_humain(alchimiste.ID,self)
+
+        chaudrons_6 = [Chaudron_gobelin(("Étage 6 : potions",12,5)),
+                       Chaudron_gobelin(("Étage 6 : potions",14,6))]
+        self.ajoute_entitees(chaudrons_6)
 
         cles_6 = [Cle(("Étage 6 : potions",4,1),["Porte_cuisine"]), #(0)
                   Cle(("Étage 6 : potions",11,6),["Première_porte_potions"]), #(1)
@@ -1373,7 +1383,7 @@ class Controleur():
 
     def get_especes(self,ID):
         entitee = self.get_entitee(ID)
-        if not issubclass(entitee.get_classe(),Item):
+        if issubclass(entitee.get_classe(),Agissant):
             return entitee.especes
         else:
             return []
@@ -2827,7 +2837,12 @@ class Non_superposable(Entitee):
 
 class Decors(Non_superposable):
     """La classe des éléments de décors qu'on ne peut pas traverser. On peut interagir avec certains ?"""
-    pass
+    def __init__(self,position):
+        Entitee.__init__(self,position)
+        self.etat  = "intact"
+
+    def get_classe(self):
+        return Decors
 
 class Decors_interactif(Decors,Interactif):
     """La classe des éléments de décors avec lesquels on peut interagir."""
@@ -2836,8 +2851,11 @@ class Decors_interactif(Decors,Interactif):
 class Ustensile(Decors_interactif):
     """Permet de créer un Item à partir d'ingrédients"""
     def __init__(self,position,recettes):
-        Entitee.__init__(self,position)
+        Decors.__init__(self,position)
         self.recettes = recettes #Les recettes de création d'Item
+
+    def get_classe(self):
+        return Ustensile
 
 class Chaudron_gobelin(Ustensile):
     """Un chaudron, trouvé en général dans un camp de gobelins."""
@@ -2848,8 +2866,10 @@ class Chaudron_gobelin(Ustensile):
         return ["Un chaudron","Il y a des recettes accrochées à côté.","Ça pu le gobelin..."]
 
     def get_skin(self):
-        if self.etat == "vivant":
+        if self.etat == "intact":
             return SKIN_CHAUDRON_GOBELIN
+        else:
+            return SKIN_CHAUDRON_GOBELIN_BRISE # Pour le skill d'écrasement
 
 class Mobile(Entitee):
     """La classe des entitées qui peuvent se déplacer (par elles-mêmes pour les agissants, en étant lancées pour les items)."""
@@ -4085,9 +4105,10 @@ class Humain(Agissant,Interactif,Entitee_superieure):
         elif self.antagonise_offensifs:
             for colonne in self.vue:
                 for case in colonne:
-                    for entitee in case[8]:
-                        if not self.controleur.est_item(entitee):
-                            if self.ID in self.controleur.get_esprit(self.controleur.get_entitee(entitee).esprit).ennemis.keys():
+                    for ID_entitee in case[8]:
+                        entitee = self.controleur.get_entitee(ID_entitee)
+                        if issubclass(entitee.get_classe(),Agissant):
+                            if self.ID in self.controleur.get_esprit(entitee.esprit).ennemis.keys():
                                 self.insurge(entitee,0.01)
 
     def get_skin(self):
@@ -4399,6 +4420,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
                     self.dir_regard = directions[i]
                     if isinstance(interactif,Ustensile):
                         self.start_menu_cuisine()
+                break
 
     def controle(self,touche):
         if touche in self.cat_touches.keys() and self.cat_touches[touche] == "pause":
@@ -4972,7 +4994,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         self.methode_courante = self.continue_menu_cuisine
         self.affichage.draw_menu_cuisine(self)
 
-    def continue_menu_cuisine(self,touche): #/!\ Remplacer l'alchimie par la cuisine /!\
+    def continue_menu_cuisine(self,touche):
         if touche == pygame.K_UP :
             if self.element_courant == 0:
                 self.element_courant = len(self.objet_interactif.recettes)
@@ -4982,7 +5004,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
             if self.element_courant == len(self.objet_interactif.recettes):
                 self.element_courant = 0
         elif touche == pygame.K_SPACE :
-            if self.cible!=None:
+            if self.cible!=None and self.cible == self.element_courant:
                 self.cible = None
             else:
                 self.cible = self.element_courant
@@ -4991,9 +5013,10 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
                 # Maybe have an exit option instead ?
                 self.controleur.unset_phase(COMPLEMENT_CUISINE)
                 self.methode_courante = None
+                # Et informer que la cuisine n'a pas été faite
             else:
                 recette = self.objet_interactif.recettes[self.cible]
-                if [(self.inventaire.quantite(eval(ingredient))>=recette["ingredients"][ingredient])for ingredient in recette["ingredients"].keys()]:
+                if not (False in [(self.inventaire.quantite(eval(ingredient))>=recette["ingredients"][ingredient])for ingredient in recette["ingredients"].keys()]):
                     for ingredient in recette["ingredients"].keys():
                         for i in range(recette["ingredients"][ingredient]):
                             self.inventaire.consomme(eval(ingredient))
@@ -5021,7 +5044,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
             if self.element_courant == len(trouve_skill(self.interlocuteur.classe_principale,Skill_alchimie).recettes):
                 self.element_courant = 0
         elif touche == pygame.K_SPACE :
-            if self.cible!=None:
+            if self.cible!=None and self.cible == self.element_courant:
                 self.cible = None
             else:
                 self.cible = self.element_courant
@@ -5038,7 +5061,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
             else:
                 alchimie = trouve_skill(self.interlocuteur.classe_principale,Skill_alchimie)
                 recette = alchimie.recettes[self.cible]
-                if [(self.inventaire.quantite(eval(ingredient))>=recette["ingredients"][ingredient])for ingredient in recette["ingredients"].keys()]:
+                if not (False in [(self.inventaire.quantite(eval(ingredient))>=recette["ingredients"][ingredient])for ingredient in recette["ingredients"].keys()]):
                     for ingredient in recette["ingredients"].keys():
                         for i in range(recette["ingredients"][ingredient]):
                             self.inventaire.consomme(eval(ingredient))
@@ -10179,7 +10202,7 @@ class Inventaire:
         for ID in self.items[Ingredient]:
             item = self.controleur.get_entitee(ID)
             if isinstance(item,classe) and item.etat == "intact":
-                item.etat == "brisé"
+                item.etat = "brisé"
                 break
 
     def get_items_visibles(self):
@@ -10359,7 +10382,7 @@ class Inventaire:
 
     def debut_tour(self):
         items = []
-        for cat_item in [Potion,Parchemin,Cle,Arme,Bouclier,Armure,Haume,Anneau,Projectile] : #On sépare les 'vrais' items des faux.
+        for cat_item in [Potion,Parchemin,Cle,Arme,Bouclier,Armure,Haume,Anneau,Projectile,Ingredient] : #On sépare les 'vrais' items des faux.
             items += self.items[cat_item]
         for ID_item in items :
             item = self.controleur.get_entitee(ID_item)
@@ -10376,7 +10399,7 @@ class Inventaire:
 
     def pseudo_debut_tour(self):
         items = []
-        for cat_item in [Potion,Parchemin,Cle,Arme,Bouclier,Armure,Haume,Anneau,Projectile] : #On sépare les 'vrais' items des faux.
+        for cat_item in [Potion,Parchemin,Cle,Arme,Bouclier,Armure,Haume,Anneau,Projectile,Ingredient] : #On sépare les 'vrais' items des faux.
             items += self.items[cat_item]
         for ID_item in items :
             item = self.controleur.get_entitee(ID_item)
@@ -10384,7 +10407,7 @@ class Inventaire:
 
     def fin_tour(self):
         items = []
-        for item in [Potion,Parchemin,Cle,Arme,Bouclier,Armure,Haume,Anneau,Projectile] : #On sépare les 'vrais' items des faux.
+        for item in [Potion,Parchemin,Cle,Arme,Bouclier,Armure,Haume,Anneau,Projectile,Ingredient] : #On sépare les 'vrais' items des faux.
             items += self.items[item]
         for ID_item in items :
             item = self.controleur.get_entitee(ID_item)
@@ -10396,11 +10419,13 @@ class Sac_a_dos(Inventaire): #L'inventaire du joueur
     def __init__(self):
         Inventaire.__init__(self,2,10)
         self.cat_courante = 0
+        self.deplacement = 1
         self.item_courant = 0
         self.profondeur = 0
 
     def complete(self):
         self.cat_courante = 0
+        self.deplacement = 1
         self.item_courant = 0
         self.profondeur = 0
 
@@ -10425,19 +10450,21 @@ class Sac_a_dos(Inventaire): #L'inventaire du joueur
         elif direction == BAS:
             if self.profondeur == 0:
                 self.cat_courante += 1
-                if self.cat_courante >= 10:
+                if self.cat_courante >= len(self.items):
                     self.cat_courante = 0
                 self.item_courant = 0
+                self.deplacement = 1
             elif self.profondeur == 1:
                 self.item_courant += 1
                 if self.item_courant >= len(self.items[self.kiiz[self.cat_courante]]):
                     self.item_courant = 0
         elif direction == HAUT:
             if self.profondeur == 0:
+                if self.cat_courante <= 0:
+                    self.cat_courante = len(self.items)
                 self.cat_courante -= 1
-                if self.cat_courante < 0:
-                    self.cat_courante = 9
                 self.item_courant = 0
+                self.deplacement = -1
             elif self.profondeur == 1:
                 self.item_courant -= 1
                 if self.item_courant < 0:
@@ -10493,7 +10520,7 @@ class Sac_a_dos(Inventaire): #L'inventaire du joueur
             self.item_courant = 0
         else :
             while len(self.items[self.kiiz[self.cat_courante]]) == 0: #On a au moins une catégorie non vide.
-                self.cat_courante = (self.cat_courante + 1) % 11
+                self.cat_courante = (self.cat_courante + self.deplacement) % len(self.items)
             if self.item_courant == -1 : #Ce devrait être le cas si on est passé dans la boucle précédente, et ce n'est pas très souhaitable...
                 self.item_courant = 0
                 self.profondeur = 0
@@ -12474,7 +12501,7 @@ class Premier_portail(Teleport):
     def execute(self,entitee):
         if entitee.ID == 2:
             entitee.first_teleport()
-            Premiere_portail.execute = Teleport.execute
+            Premier_portail.execute = Teleport.execute
         Teleport.execute(self,entitee)
 
 class Escalier(Teleport):
@@ -14725,6 +14752,15 @@ class Affichage:
         self.dessine_droite_alchimie(joueur)
         self.dessine_gauche(joueur)
 
+    def draw_menu_cuisine(self,joueur):
+        """phase de choix d'un element dans une menu"""
+        self.frame += 1
+        self.dessine_zones(joueur)
+
+        self.dessine_menu_cuisine(joueur)
+        self.dessine_droite_cuisine(joueur)
+        self.dessine_gauche(joueur)
+
     def dessine_zones(self,joueur=None):
         self.screen.fill((0,0,0))
         if joueur != None:
@@ -15581,6 +15617,29 @@ class Affichage:
                     self.screen.blit(tex,(marge_gauche,marge_haut))
                     marge_haut += 20
 
+    def dessine_droite_cuisine(self,joueur:Joueur):
+        skill = trouve_skill(joueur.classe_principale,Skill_observation)
+        observation = 0
+        if skill != None:
+            observation = skill.utilise()
+        recette = joueur.objet_interactif.recettes[joueur.element_courant]
+        marge_haut = self.position_debut_y_rectangles_et_carre + 5
+        marge_gauche = self.position_debut_x_rectangle_2 + 5
+        for tex in self.scinde_texte("Recette :",self.largeur_rectangles-10,30,(255, 127, 0)): #Le titre
+            self.screen.blit(tex,(marge_gauche,marge_haut))
+            marge_haut += 30
+
+        for texte in eval(recette["produit"]).get_description(None,observation) + ["Ingrédients :"]: #La description détaillée /!\ Revoir le get_description
+            for tex in self.scinde_texte(texte,self.largeur_rectangles-10):
+                self.screen.blit(tex,(marge_gauche,marge_haut))
+                marge_haut += 20
+
+        for ingredient in recette["ingredients"].keys():
+            for texte in eval(ingredient).get_description(None,observation)+[f"({joueur.inventaire.quantite(eval(ingredient))}/{recette['ingredients'][ingredient]})"," "]: #La description détaillée
+                for tex in self.scinde_texte(texte,self.largeur_rectangles-10):
+                    self.screen.blit(tex,(marge_gauche,marge_haut))
+                    marge_haut += 20
+
     def dessine_lab(self,joueur): #La fonction qui dessine le carré au centre. Elle affiche le labyrinthe vu par le joueur, ses occupants, et tout ce que le joueur est capable de percevoir.
         vue = joueur.vue
         position = joueur.get_position()
@@ -15844,13 +15903,48 @@ class Affichage:
         marge_haut = 10 + self.position_debut_y_rectangles_et_carre
         marge_gauche = 10 + self.position_debut_x_carre
 
+        i=0
+
         for recette in recettes:
-            if i == joueur.element_courant:
-                pygame.draw.rect(self.screen,(225,225,225),(marge_gauche-5,marge_haut-5,10+40*(2*len(recette["ingredients"])+2),50))
-                pygame.draw.rect(self.screen,(0,0,0),(marge_gauche-2,marge_haut-2,4+40*(2*len(recette["ingredients"])+2),44))
-            elif i == joueur.cible:
-                pygame.draw.rect(self.screen,(125,125,125),(marge_gauche-5,marge_haut-5,10+40*(2*len(recette["ingredients"])+2),50))
-                pygame.draw.rect(self.screen,(0,0,0),(marge_gauche-2,marge_haut-2,4+40*(2*len(recette["ingredients"])+2),44))
+            if i == joueur.cible:
+                pygame.draw.rect(self.screen,(255,64,0),(marge_gauche-5,marge_haut-5,10+40*(2*len(recette["ingredients"])+1),50))
+                pygame.draw.rect(self.screen,(0,0,0),(marge_gauche-2,marge_haut-2,4+40*(2*len(recette["ingredients"])+1),44))
+            elif i == joueur.element_courant:
+                pygame.draw.rect(self.screen,(225,225,225),(marge_gauche-5,marge_haut-5,10+40*(2*len(recette["ingredients"])+1),50))
+                pygame.draw.rect(self.screen,(0,0,0),(marge_gauche-2,marge_haut-2,4+40*(2*len(recette["ingredients"])+1),44))
+            first=True
+            for ingredient in recette["ingredients"].keys():
+                if first:
+                    first=False
+                else:
+                    SKIN_PLUS.dessine_toi(self.screen,(marge_gauche,marge_haut),40)
+                    marge_gauche += 40
+                eval(ingredient).get_image().dessine_toi(self.screen,(marge_gauche,marge_haut),40) #/!\ Peut-être afficher la quantité d'ingrédients plutôt ici ?"
+                marge_gauche += 40
+            SKIN_EGAL.dessine_toi(self.screen,(marge_gauche,marge_haut),40)
+            marge_gauche += 40
+            eval(recette["produit"]).get_image().dessine_toi(self.screen,(marge_gauche,marge_haut),40)
+            marge_gauche += 40
+            marge_gauche = 10 + self.position_debut_x_carre
+            marge_haut += 60
+            i+=1
+
+    def dessine_menu_cuisine(self,joueur:Joueur):
+        recettes = joueur.objet_interactif.recettes
+        courant = joueur.element_courant
+
+        marge_haut = 10 + self.position_debut_y_rectangles_et_carre
+        marge_gauche = 10 + self.position_debut_x_carre
+
+        i=0
+
+        for recette in recettes:
+            if i == joueur.cible:
+                pygame.draw.rect(self.screen,(255,64,0),(marge_gauche-5,marge_haut-5,10+40*(2*len(recette["ingredients"])+1),50))
+                pygame.draw.rect(self.screen,(0,0,0),(marge_gauche-2,marge_haut-2,4+40*(2*len(recette["ingredients"])+1),44))
+            elif i == joueur.element_courant:
+                pygame.draw.rect(self.screen,(225,225,225),(marge_gauche-5,marge_haut-5,10+40*(2*len(recette["ingredients"])+1),50))
+                pygame.draw.rect(self.screen,(0,0,0),(marge_gauche-2,marge_haut-2,4+40*(2*len(recette["ingredients"])+1),44))
             first=True
             for ingredient in recette["ingredients"].keys():
                 if first:
@@ -17338,6 +17432,8 @@ class Affichage:
                 entitee = joueur.controleur.get_entitee(ID_entitee)
                 if issubclass(entitee.get_classe(),Item):
                     entitee.get_skin().dessine_toi(self.screen,position,taille,entitee.get_direction()) #La direction est surtout utile pour les projectiles, sinon ils devraient tous être dans le même sens.
+                elif issubclass(entitee.get_classe(),Decors):
+                    entitee.get_skin().dessine_toi(self.screen,position,taille)
                 else:
                     agissant = entitee
             if agissant != None: #Enfin l'agissant (s'il y en a un)

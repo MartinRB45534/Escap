@@ -31,7 +31,9 @@ SKIN_CASE_7 = Skin("case_7.png")
 global SKIN_CASE_8
 SKIN_CASE_8 = Skin("case_8.png")
 global SKIN_CHAUDRON_GOBELIN
-SKIN_CHAUDRON_GOBELIN = Skin("vide.png") #/!\ Créer le skin
+SKIN_CHAUDRON_GOBELIN = Skin("chaudron_gobelin.png") #/!\ Créer le skin
+global SKIN_CHAUDRON_GOBELIN_BRISE
+SKIN_CHAUDRON_GOBELIN_BRISE = Skin("vide.png") #/!\ Créer le skin
 global SKIN_AGISSANT
 SKIN_AGISSANT = Skin("agissant.png")
 global SKIN_ROUGE
