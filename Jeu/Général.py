@@ -1,5 +1,6 @@
 from Jeu.Constantes import *
 from Jeu.Systeme.Classe import *
+from Jeu.systeme.Constantes_decors.Decors import *
 from Jeu.Systeme.Constantes_magies.Magies import *
 from Jeu.Systeme.Constantes_projectiles.Projectiles import *
 from Jeu.Systeme.Constantes_items.Items import *
@@ -545,8 +546,8 @@ class Controleur():
                     Patern(("Étage 6 : potions",0,12),5,3,[("Étage 6 : potions",4,1)],["Porte_armurerie_6"])]
         self.labs["Étage 6 : potions"]=Labyrinthe("Étage 6 : potions",15,15,("Étage 6 : potions",14,14),paterns6,1,1,TERRE,0.2)
 
-        self.set_teleport(("Étage 6 : potions",11,2),("Étage 6 : potions",8,3),GAUCHE,HAUT) # 1,2
-        self.set_teleport(("Étage 6 : potions",13,0),("Étage 6 : potions",1,6),HAUT,DROITE) # 1,3
+        self.set_teleport(("Étage 6 : potions",11,2),("Étage 6 : potions",8,3),GAUCHE,HAUT,Premier_portail) # 1,2
+        self.set_teleport(("Étage 6 : potions",13,0),("Étage 6 : potions",1,6),HAUT,DROITE,Premier_portail) # 1,3
         self.set_teleport(("Étage 6 : potions",3,8),("Étage 6 : potions",6,0),BAS,GAUCHE) # 4,5
         self.set_teleport(("Étage 6 : potions",4,8),("Étage 6 : potions",13,9),BAS,HAUT) # 4,6
         self.set_teleport(("Étage 6 : potions",5,8),("Étage 6 : potions",4,11),BAS,BAS) # 4,9
@@ -559,37 +560,6 @@ class Controleur():
         self.set_teleport(("Étage 6 : potions",5,10),("Étage 6 : potions",0,4),DROITE,GAUCHE) # 9,10
 
         self.construit_escalier(("Étage 5 : portes",0,0),("Étage 6 : potions",14,0),GAUCHE,DROITE)
-
-        #Ancienne, par sécurité et pour copier-coller au besoin
-##        alchimiste = Alchimiste(self,("Étage 6 : potions",13,1))
-##        self.ajoute_entitee(alchimiste)
-##        self.esprits["alchimiste"] = Esprit_humain(alchimiste.ID,self)
-##        cle1 = Cle(("Étage 6 : potions",0,11),["Porte_double_cellule_deuxième_5"])
-##        self.ajoute_entitee(cle1)
-##        cle2 = Cle(("Étage 6 : potions",11,10),["Porte_salle_commune_7"])
-##        self.ajoute_entitee(cle2)
-##        gobel1 = Guerrier_gobelin(self,("Étage 6 : potions",7,8),1)
-##        self.ajoute_entitee(gobel1)
-##        gobel2 = Guerrier_gobelin(self,("Étage 6 : potions",11,8),1)
-##        self.ajoute_entitee(gobel2)
-##        gobel3 = Mage_gobelin(self,("Étage 6 : potions",8,8),1)
-##        self.ajoute_entitee(gobel3)
-##        gobel4 = Mage_gobelin(self,("Étage 6 : potions",13,8),1)
-##        self.ajoute_entitee(gobel4)
-##        gobel5 = Shaman_gobelin(self,("Étage 6 : potions",10,8),1)
-##        self.ajoute_entitee(gobel5)
-##        self.esprits["gobelins_potions"]=Esprit_simple("gobelins_potions",[gobel1.ID,gobel2.ID,gobel3.ID,gobel4.ID,gobel5.ID],["humain"],self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
-##        paterns6 = [Patern(("Étage 6 : potions",0,0),3,5,[("Étage 6 : potions",2,3)]),
-##                    Patern(("Étage 6 : potions",0,10),5,3,[("Étage 6 : potions",4,1)],["Porte_armurerie_6"]),
-##                    Patern(("Étage 6 : potions",6,3),9,7,[])]#,[("Étage 6 : potions",0,6),("Étage 6 : potions",8,0),("Étage 6 : potions",8,11)])]
-##        self.labs["Étage 6 : potions"]=Labyrinthe("Étage 6 : potions",15,13,("Étage 6 : potions",0,0),paterns6,1,1,TERRE,0.2)
-##        self.labs["Étage 6 : potions"].matrice_cases[6][6].murs[GAUCHE].brise()
-##        self.labs["Étage 6 : potions"].matrice_cases[5][6].murs[DROITE].brise()
-##        self.labs["Étage 6 : potions"].matrice_cases[8][2].murs[BAS].brise()
-##        self.labs["Étage 6 : potions"].matrice_cases[8][3].murs[HAUT].brise()
-##        self.labs["Étage 6 : potions"].matrice_cases[12][9].murs[BAS].brise()
-##        self.labs["Étage 6 : potions"].matrice_cases[12][10].murs[HAUT].brise()
-##        self.construit_escalier(("Étage 5 : portes",0,0),("Étage 6 : potions",14,0),GAUCHE,DROITE)
 
         #On crée le septième étage et son occupante :
         peste = Peste(self,("Étage 7 : meutes",2,0))
@@ -898,15 +868,15 @@ class Controleur():
     def get_lab(self,num_lab):
         return self.labs[num_lab]
 
-    def set_teleport(self,pos_dep,pos_arr,dir_dep,dir_arr):
+    def set_teleport(self,pos_dep,pos_arr,dir_dep,dir_arr,portail=None):
         case_dep = self.get_case(pos_dep)
         case_arr = self.get_case(pos_arr)
         mur_dep = case_dep.get_mur_dir(dir_dep)
         mur_arr = case_arr.get_mur_dir(dir_arr)
         mur_dep.detruit()
         mur_arr.detruit()
-        mur_dep.set_cible(pos_arr,True)
-        mur_arr.set_cible(pos_dep,True)
+        mur_dep.set_cible(pos_arr,True,portail)
+        mur_arr.set_cible(pos_dep,True,portail)
 
     def construit_escalier(self,pos_dep,pos_arr,dir_dep,dir_arr,escalier=None):
         case_dep = self.get_case(pos_dep)
@@ -2539,13 +2509,15 @@ class Mur:
             return False
         return cible
 
-    def set_cible(self,position,surnaturel = False):
+    def set_cible(self,position,surnaturel=False,portail=None):
         for effet in self.effets:
             if isinstance(effet,Teleport):
                 self.effets.remove(effet)
-        self.effets.append(Teleport(position,surnaturel))
+        if portail == None:
+            portail = Teleport
+        self.effets.append(portail(position,surnaturel))
 
-    def set_escalier(self,position,sens,escalier):
+    def set_escalier(self,position,sens,escalier=None):
         for effet in self.effets:
             if isinstance(effet,Teleport):
                 self.effets.remove(effet)
@@ -2870,10 +2842,14 @@ class Ustensile(Decors_interactif):
 class Chaudron_gobelin(Ustensile):
     """Un chaudron, trouvé en général dans un camp de gobelins."""
     def __init__(self,position):
-        Ustensile.__init__(self,position,[{"produit":"Parchemin_vierge","ingredients":{"Peau_gobelin":1},"xp":1}]) # Remplacer par autre chose, et faire un fichier avec une constante globale pour cette recette
+        Ustensile.__init__(self,position,recettes_chaudron_gobelin) # Remplacer par autre chose, et faire un fichier avec une constante globale pour cette recette
 
     def get_description(self,observation):
         return ["Un chaudron","Il y a des recettes accrochées à côté.","Ça pu le gobelin..."]
+
+    def get_skin(self):
+        if self.etat == "vivant":
+            return SKIN_CHAUDRON_GOBELIN
 
 class Mobile(Entitee):
     """La classe des entitées qui peuvent se déplacer (par elles-mêmes pour les agissants, en étant lancées pour les items)."""
@@ -4312,6 +4288,31 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         if peureuse.esprit == "joueur" and peureuse.statut_humain in ["exploration","proximite","en chemin"]:
             peureuse.mouvement = 2
             peureuse.dialogue = 6
+
+    def first_teleport(self):
+        """Fonction appelée quand on passe le premier téléporteur. Déclenche un dialogue d'explications."""
+        #Le téléporteur qui lance le dialogue certifie qu'on y passe pour la première fois
+        #On cherche un PNJ volontaire pour aller taper la causette :
+        alchimiste = self.controleur.get_entitee(7)
+        if alchimiste.esprit == "joueur" and alchimiste.statut_humain in ["exploration","proximite","en chemin"]:
+            alchimiste.mouvement = 2
+            alchimiste.dialogue = 2
+        else:
+            peureuse = self.controleur.get_entitee(5)
+            if peureuse.esprit == "joueur" and peureuse.statut_humain in ["exploration","proximite","en chemin"]:
+                peureuse.mouvement = 2
+                peureuse.dialogue = 7
+            else:
+                encombrant = self.controleur.get_entitee(6)
+                if encombrant.esprit == "joueur" and encombrant.statut_humain in ["exploration","proximite","en chemin"]:
+                    encombrant.mouvement = 2
+                    encombrant.dialogue = 2
+                else:
+                    paume = self.controleur.get_entitee(4)
+                    if encombrant.esprit == "joueur" and encombrant.statut_humain in ["exploration","proximite","en chemin"]:
+                        encombrant.mouvement = 2
+                        encombrant.dialogue = 5
+        # /!\ Coder ces dialogues
 
     def get_portee_vue(self):
         skill = trouve_skill(self.classe_principale,Skill_vision)
@@ -6397,6 +6398,8 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
         elif self.dialogue == 4: #On a atteint la prison
             self.replique = "dialogue4phrase1"
             self.repliques = ["dialogue4reponse1.1","dialogue4reponse1.2","dialogue4reponse1.3"]
+        elif self.dialogue == 5:
+            pass
 
     def interprete(self,nb_replique):
         #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
@@ -6644,6 +6647,8 @@ class Peureuse(Multi_renforceur,Support_lointain,Humain): #La quatrième humaine
         elif self.dialogue == 6: #On a progressé dans la prison
             self.replique = "dialogue6phrase1"
             self.repliques = ["dialogue6reponse1.1","dialogue6reponse1.2","dialogue6reponse1.3"]
+        elif self.dialogue == 7:
+            pass
 
     def interprete(self,nb_replique):
         #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
@@ -7116,9 +7121,11 @@ class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyenne
         elif self.dialogue == -2: #Le joueur nous a offensé !
             self.replique = "dialogue-2phrase1"
             self.repliques = ["dialogue-2reponse1.1"]
-        elif self.dialogue == 1: #Le vient de passer la porte
+        elif self.dialogue == 1: #Le joueur vient de passer la porte
             self.replique = "dialogue1phrase1"
             self.repliques = ["dialogue1reponse1.1","dialogue1reponse1.2"] #/!\ N'afficher la réplique du copain que si on a discuté de son copain avec la peureuse
+        elif self.dialogue == 2:
+            pass
 
     def interprete(self,nb_replique):
         #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
@@ -7283,6 +7290,8 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
         elif self.dialogue == 1:
             self.replique = "dialogue1phrase1"
             self.repliques = ["dialogue1reponse1.1","dialogue1reponse1.2"]
+        elif self.dialogue == 2:
+            pass #Remplir ici
 
     def interprete(self,nb_replique):
         #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
@@ -7733,7 +7742,7 @@ class Bombe_atomique(Attaquant_magique_case,Support,Humain): #La neuvième humai
             self.magie_courante = "magie poing ardent"
         else:
             self.skill_courant = Skill_stomp
-        self.statut_humain = "attaque"
+        self.statut = "attaque"
 
     def start_dialogue(self): #On commence un nouveau dialogue !
         #On initialise nos attributs
@@ -12461,6 +12470,13 @@ class Teleport(On_through):
     def get_skin(self):
         return SKIN_PORTAIL
 
+class Premier_portail(Teleport):
+    def execute(self,entitee):
+        if entitee.ID == 2:
+            entitee.first_teleport()
+            Premiere_portail.execute = Teleport.execute
+        Teleport.execute(self,entitee)
+
 class Escalier(Teleport):
     def __init__(self,position,sens):
         self.affiche = True
@@ -15560,7 +15576,7 @@ class Affichage:
                 marge_haut += 20
 
         for ingredient in recette["ingredients"].keys():
-            for texte in eval(ingredient).get_description(None,observation)+[f"({joueur.inventaire.quantite(eval(ingredient))}/{recette['ingredients'][ingredient]})"]: #La description détaillée
+            for texte in eval(ingredient).get_description(None,observation)+[f"({joueur.inventaire.quantite(eval(ingredient))}/{recette['ingredients'][ingredient]})"," "]: #La description détaillée
                 for tex in self.scinde_texte(texte,self.largeur_rectangles-10):
                     self.screen.blit(tex,(marge_gauche,marge_haut))
                     marge_haut += 20
@@ -15829,6 +15845,12 @@ class Affichage:
         marge_gauche = 10 + self.position_debut_x_carre
 
         for recette in recettes:
+            if i == joueur.element_courant:
+                pygame.draw.rect(self.screen,(225,225,225),(marge_gauche-5,marge_haut-5,10+40*(2*len(recette["ingredients"])+2),50))
+                pygame.draw.rect(self.screen,(0,0,0),(marge_gauche-2,marge_haut-2,4+40*(2*len(recette["ingredients"])+2),44))
+            elif i == joueur.cible:
+                pygame.draw.rect(self.screen,(125,125,125),(marge_gauche-5,marge_haut-5,10+40*(2*len(recette["ingredients"])+2),50))
+                pygame.draw.rect(self.screen,(0,0,0),(marge_gauche-2,marge_haut-2,4+40*(2*len(recette["ingredients"])+2),44))
             first=True
             for ingredient in recette["ingredients"].keys():
                 if first:
@@ -15840,10 +15862,11 @@ class Affichage:
                 marge_gauche += 40
             SKIN_EGAL.dessine_toi(self.screen,(marge_gauche,marge_haut),40)
             marge_gauche += 40
-            eval(recette["produit"]).get_image().dessine_toi(self.screen,(marge_gauche,marge_haut),40) #/!\ Peut-être afficher la quantité d'ingrédients plutôt ici ?"
+            eval(recette["produit"]).get_image().dessine_toi(self.screen,(marge_gauche,marge_haut),40)
             marge_gauche += 40
             marge_gauche = 10 + self.position_debut_x_carre
             marge_haut += 60
+            i+=1
 
     def choix_touche(self,joueur,zones,skills,magies,lancer):
         """phase de choix d'une touche"""

@@ -1,45 +1,45 @@
-À l'attention du joueur :
+ï¿½ l'attention du joueur :
 
 Escap version 0 : le tutoriel
 
 Quelques petites remarques :
-1 - Le jeu s'arrête avant la fin du tutoriel, au moment de vaincre le boss gobelin à  l'étage 10. Il n'y a pas encore de moyen d'ouvrir la porte de l'étage 10, mais le boss dropera la clé quand j'aurai codé les monstres derrière la porte.
-2 - Le jeu est TRÈS déséquilibré ! J'apprécie beaucoup les retours, et l'équilibrage peut être modifié (voir plus bas).
-3 - Désolé pour les graphismes, je vais sûrement les améliorer mais j'ai la flemme pour l'instant.
-4 - Il reste quelques bugs dans le jeu. Je ne crois pas qu'il y ait de situation qui fasse planter le programme à l'heure actuelle, mais on peut se retrouver bloqué. Par exemple :
-	- Si deux agissants s'affrontent et que chacun subit moins de dégats qu'il ne récupère de PV (les humains sont les seuls, avec le boss de fin, à récupérer des PVs donc ça devrait aller).
-	- Si un agissant avec peu de PVs s'enfuit (ça devrait moins arriver avec les limitations que j'ai placées sur la fuite, mais c'est toujours plus pratique d'attaquer à 2 pour encercler).
-	- Si le joueur est dans une impasse avec tous les PNJs derrière lui (les PNJs sont codés pour rester à une certaine distance du joueur, donc le plus loin refuserait de s'éloigner et tout le monde serait immobilisé) (on peut facilement éviter ça en demandant aux PNJs de suivre un autre PNJ qui lui suit le joueur, mais c'est plus difficile de vérifier qui s'est perdu et en cas de mort du PNJ suivi on risque de perdre les autres PNJs).
-	- Si un agissant de type Sentinelle s'arrète sur l'escalier. Typiquement, un des gardes du boss. Sans humain dans la salle du boss, impossible de le faire bouger, et l'escalier restera condamné à jamais.
-    La meilleure solution dans ce cas est de considérer ça comme une défaite et de recommencer, mais on peut aussi modifier le jeu (voir plus bas).
-5 - Certaines commandes ne sont pas expliqués. A et E pour entrer et sortir d'un item d'un menu (pendant le jeu), ZQSD pour haut droite bas gauche dans ces même menus, et espace pour utiliser l'item de menu courant. Typiquement, Q pour passer de la zone centrale à la zone de gauche (un pourtour rouge indique la zone courante), puis A pour entrer dans la zone de gauche et Z/S pour séléctionner l'inventaire/la classe principale, puis A pour entrer dans l'inventaire/la classe principale, de nouveau Z, S, A et E pour naviguer dans l'inventaire/la classe principale et enfin espace pour équipper l'item séléctionné/boire la potion séléctionnée/lancer le projectile séléctionné (pas encore de projectiles à ce niveau)/utiliser le skill séléctionné (utile quand un skill s'utilise deux fois d'affilée par les moyens normaux). Attention, les zones ne sont pas toutes codées et se déplacer ou sortir d'une zone non codée fait planter le jeu, donc se limiter aux skills et items est une bonne pratique.
-6 - Le ramassage des objets n'est pas automatique. C'est une action dont la commande est expliquée en temps voulu. Cette action prend un certain temps pour chaque objet à ramasser, et ramasse tous les objets sur la case. De plus les cadavres de monstres, comme chaque pièce de leur équippements, sont des objets, donc tuer plusieurs monstres sur la même case puis récupérer la clée lachée par le dernier peut prendre pas mal de temps et donner l'impression que le jeu ne répond plus. Il suffit d'être patient et de ne pas se faire attaquer par d'autres monstres au même moment.
-7 - Les commandes sont expliquées au fur et à mesure qu'elles deviennent utiles, par les PNJs. Pour modifier ces commandes et/ou se les remettre en mémoire, appuyer sur la touche retour/entrée.
+1 - Le jeu s'arrï¿½te avant la fin du tutoriel, au moment de vaincre le boss gobelin ï¿½  l'ï¿½tage 10. Il n'y a pas encore de moyen d'ouvrir la porte de l'ï¿½tage 10, mais le boss dropera la clï¿½ quand j'aurai codï¿½ les monstres derriï¿½re la porte.
+2 - Le jeu est TRï¿½S dï¿½sï¿½quilibrï¿½ ! J'apprï¿½cie beaucoup les retours, et l'ï¿½quilibrage peut ï¿½tre modifiï¿½ (voir plus bas).
+3 - Dï¿½solï¿½ pour les graphismes, je vais sï¿½rement les amï¿½liorer mais j'ai la flemme pour l'instant.
+4 - Il reste quelques bugs dans le jeu. Je ne crois pas qu'il y ait de situation qui fasse planter le programme ï¿½ l'heure actuelle, mais on peut se retrouvï¿½ bloquï¿½. Par exemple :
+	- Si deux agissants s'affrontent et que chacun subit moins de dï¿½gats qu'il ne rï¿½cupï¿½re de PV (les humains sont les seuls, avec le boss de fin, ï¿½ rï¿½cupï¿½rer des PVs donc ï¿½a devrait aller).
+	- Si un agissant avec peu de PVs s'enfuit (ï¿½a devrait moins arriver avec les limitations que j'ai placï¿½es sur la fuite, mais c'est toujours plus pratique d'attaquer ï¿½ 2 pour encercler).
+	- Si le joueur est dans une impasse avec tous les PNJs derriï¿½re lui (les PNJs sont codï¿½s pour rester ï¿½ une certaine distance du joueur, donc le plus loin refuserait de s'ï¿½loigner et tout le monde serait immobilisï¿½) (on peut facilement ï¿½viter ï¿½a en demandant aux PNJs de suivre un autre PNJ qui lui suit le joueur, mais c'est plus difficile de vï¿½rifier qui s'est perdu et en cas de mort du PNJ suivi on risque de perdre les autres PNJs).
+	- Si un agissant de type Sentinelle s'arrï¿½te sur l'escalier. Typiquement, un des gardes du boss. Sans humain dans la salle du boss, impossible de le faire bouger, et l'escalier restera condamnï¿½ ï¿½ jamais.
+    La meilleure solution dans ce cas est de considï¿½rer ï¿½a comme une dï¿½faite et de recommencer, mais on peut aussi modifier le jeu (voir plus bas).
+5 - Certaines commandes ne sont pas expliquï¿½s. A et E pour entrer et sortir d'un item d'un menu (pendant le jeu), ZQSD pour haut droite bas gauche dans ces mï¿½me menus, et espace pour utiliser l'item de menu courant. Typiquement, Q pour passer de la zone centrale ï¿½ la zone de gauche (un pourtour rouge indique la zone courante), puis A pour entrer dans la zone de gauche et Z/S pour sï¿½lï¿½ctionner l'inventaire/la classe principale, puis A pour entrer dans l'inventaire/la classe principale, de nouveau Z, S, A et E pour naviguer dans l'inventaire/la classe principale et enfin espace pour ï¿½quipper l'item sï¿½lï¿½ctionnï¿½/boire la potion sï¿½lï¿½ctionnï¿½e/lancer le projectile sï¿½lï¿½ctionnï¿½ (pas encore de projectiles ï¿½ ce niveau)/utiliser le skill sï¿½lï¿½ctionnï¿½ (utile quand un skill s'utilise deux fois d'affilï¿½e par les moyens normaux). Attention, les zones ne sont pas toutes codï¿½es et se dï¿½placer ou sortir d'une zone non codï¿½e fait planter le jeu, donc se limiter aux skills et items est une bonne pratique.
+6 - Le ramassage des objets n'est pas automatique. C'est une action dont la commande est expliquï¿½e en temps voulu. Cette action prend un certain temps pour chaque objet ï¿½ ramasser, et ramasse tous les objets sur la case. De plus les cadavres de monstres, comme chaque piï¿½ce de leur ï¿½quippements, sont des objets, donc tuer plusieurs monstres sur la mï¿½me case puis rï¿½cupï¿½rer la clï¿½e lachï¿½e par le dernier peut prendre pas mal de temps et donner l'impression que le jeu ne rï¿½pond plus. Il suffit d'ï¿½tre patient et de ne pas se faire attaquer par d'autres monstres au mï¿½me moment.
+7 - Les commandes sont expliquï¿½es au fur et ï¿½ mesure qu'elles deviennent utiles, par les PNJs. Pour modifier ces commandes et/ou se les remettre en mï¿½moire, appuyer sur la touche retour/entrï¿½e.
 
 Pour aller plus loin :
 
-Modifier l'équilibrage
-Tout est dans Jeu/Systeme. Le fichier Constantes_stats.py contient un dictionnaire avec les stats de base de chaque agissant, ainsi que son équippement et ses magies. Les skills sont créés dans le fichier Classe.py, dans la fonction __init__ de la Classe_principale, mais je vais probablement les déplacer dans le fichier Constantes_stats à l'occasion.
-Les dossiers Constantes_items, Constantes_magies, Constantes_skills contiennent les stats pour les items, les magies, et les skills respectivement. La vitesse des frames se modifie dans la fonction attend (ou peut-être affiche ?) du fichier True_main, un pygame.wait() quelque part. Ces deux fichiers et trois dossiers devraient contenir toutes les valeur numériques actuellement utilisées par le jeu.
+Modifier l'ï¿½quilibrage
+Tout est dans Jeu/Systeme. Le fichier Constantes_stats.py contient un dictionnaire avec les stats de base de chaque agissant, ainsi que son ï¿½quippement et ses magies. Les skills sont crï¿½ï¿½s dans le fichier Classe.py, dans la fonction __init__ de la Classe_principale, mais je vais probablement les dï¿½placer dans le fichier Constantes_stats ï¿½ l'occasion.
+Les dossiers Constantes_items, Constantes_magies, Constantes_skills contiennent les stats pour les items, les magies, et les skills respectivement. La vitesse des frames se modifie dans la fonction attend (ou peut-ï¿½tre affiche ?) du fichier True_main, un pygame.wait() quelque part. Ces deux fichiers et trois dossiers devraient contenir toutes les valeur numï¿½riques actuellement utilisï¿½es par le jeu.
 
-Débloquer une situation
-Première étape : Controle + C dans le shell pour interrompre l'exécution.
-Deuxième étape : depuis le shell, mains est une variable globale qui liste tous les objets Main en cours d'utilisation (les fichiers .p dans le répertoire à la dernière vérification). s'il y a un seul Main, mains[0][2] y accédera. Le controleur de la partie interrompue sauvagement devrait être mains[0][2].controleur, et le controleur donne accès à tous les éléments du jeu. Quelques exemple :
+Dï¿½bloquer une situation
+Premiï¿½re ï¿½tape : Controle + C dans le shell pour interrompre l'exï¿½cution.
+Deuxiï¿½me ï¿½tape : depuis le shell, mains est une variable globale qui liste tous les objets Main en cours d'utilisation (les fichiers .p dans le rï¿½pertoire ï¿½ la derniï¿½re vï¿½rification). s'il y a un seul Main, mains[0][2] y accï¿½dera. Le controleur de la partie interrompue sauvagement devrait ï¿½tre mains[0][2].controleur, et le controleur donne accï¿½s ï¿½ tous les ï¿½lï¿½ments du jeu. Quelques exemple :
 	- mains[0][2].controleur.entitees[2] est le joueur, donc :
-	- mains[0][2].controleur.entitees[2].pv = 100 pour remettre les pvs du joueur à 100 , ou
-	- mains[0][2].controleur.entitees[2].position = ('Étage 10 : Boss',0,0) pour déplacer le joueur à l'étage du boss, dans le coin en haut à droite
-	les ID de 1 à 10 sont réservées aux humains, donc elles sont fixes, pour les autre :
-	- mains[0][2].controleur.entitees donne le dictionnaire de toutes les entitees, (agissants et items) classées par ID, ensuite, c'est de l'essai erreur pour trouver la bonne
-	- mains[0][2].controleur.labs donne le dictionnaire de tous les labyrinthes (~= étages pour l'instant) classés par nom, ce qui aide pour la première coordonnée des positions
+	- mains[0][2].controleur.entitees[2].pv = 100 pour remettre les pvs du joueur ï¿½ 100 , ou
+	- mains[0][2].controleur.entitees[2].position = ('ï¿½tage 10 : Boss',0,0) pour dï¿½placer le joueur ï¿½ l'ï¿½tage du boss, dans le coin en haut ï¿½ droite
+	les ID de 1 ï¿½ 10 sont rï¿½servï¿½es aux humains, donc elles sont fixes, pour les autre :
+	- mains[0][2].controleur.entitees donne le dictionnaire de toutes les entitees, (agissants et items) classï¿½es par ID, ensuite, c'est de l'essai erreur pour trouver la bonne
+	- mains[0][2].controleur.labs donne le dictionnaire de tous les labyrinthes (~= ï¿½tages pour l'instant) classï¿½s par nom, ce qui aide pour la premiï¿½re coordonnï¿½e des positions
 	- mains[0][2].controleur.esprits donne le dictionnaire des esprits, et :
-	- mains[0][2].controleur.entitees[ID].esprit donne le nom de l'esprit de l'entitée correspondant à ID, donc :
-	- mains[0][2].controleur.esprits[mains[0][2].controleur.entitees[ID].esprit].ennemis pour le dictionnaire des ennemis de l'esprit de l'entitée correspondant à ID
-	- mains[0][2].controleur.labs[mains[0][2].controleur.entitees[ID].position[0]].matrice_cases[mains[0][2].controleur.entitees[ID].position[1]][mains[0][2].controleur.entitees[ID].position[2]].murs[mains[0][2].controleur.entitees[ID].dir_regard].effets donnerai la liste des effets du mur juste en face de l'entitée correspondant à ID (probablement un Teleport qui conduit à la case voisine et éventuellement un Mur ou une Porte qui bloque le passage)
-	- mains[0][2].controleur.entitees_courantes pour la liste des IDs des entitées en activité, et
+	- mains[0][2].controleur.entitees[ID].esprit donne le nom de l'esprit de l'entitï¿½e correspondant ï¿½ ID, donc :
+	- mains[0][2].controleur.esprits[mains[0][2].controleur.entitees[ID].esprit].ennemis pour le dictionnaire des ennemis de l'esprit de l'entitï¿½e correspondant ï¿½ l'identifiant ID
+	- mains[0][2].controleur.labs[mains[0][2].controleur.entitees[ID].position[0]].matrice_cases[mains[0][2].controleur.entitees[ID].position[1]][mains[0][2].controleur.entitees[ID].position[2]].murs[mains[0][2].controleur.entitees[ID].dir_regard].effets donnerai la liste des effets du mur juste en face de l'entitï¿½e correspondant ï¿½ l'identifiant ID (probablement un Teleport qui conduit ï¿½ la case voisine et ï¿½ventuellement un Mur ou une Porte qui bloque le passage)
+	- mains[0][2].controleur.entitees_courantes pour la liste des IDs des entitï¿½es en activitï¿½, et
 	- mains[0][2].controleur.labs_courants pour la liste des noms des labyrinthe actifs
-Honnêtement la modification de position est la seule chose utile de ce que je viens de citer, dès qu'on commence à ramener des entitees à la vie ça s'appelle tricher... Attention quand même quand on se rend dans un étage inactif, penser à l'activer ou toute interraction avec l'environnement (les monstres ou les humains, par exemple) fera planter le jeu (prendre l'escalier pour sortir de l'étage et y revenir réactive l'étage, sinon mains[0][2].controleur.active_lab(nom_du_lab_à_activer) en remplaçant nom_du_lab_à_activer par le nom du labyrinthe à activer.
+Honnï¿½tement la modification de position est la seule chose utile de ce que je viens de citer, dï¿½s qu'on commence ï¿½ ramener des entitees ï¿½ la vie ï¿½a s'appelle tricher... Attention quand mï¿½me quand on se rend dans un ï¿½tage inactif, penser ï¿½ l'activer ou toute interraction avec l'environnement (les monstres ou les humains, par exemple) fera planter le jeu (prendre l'escalier pour sortir de l'ï¿½tage et y revenir rï¿½active l'ï¿½tage, sinon mains[0][2].controleur.active_lab(nom_du_lab_ï¿½_activer) en remplaï¿½ant nom_du_lab_ï¿½_activer par le nom du labyrinthe ï¿½ activer.
 Si le controleur (la "partie") n'est pas sur le premier Main de la liste, il faut remplacer le 0 dans mains[0][2] par l'indice du Main (bonne indication : quand mains[0][2].controleur renvoie None, c'est qu'on est pas sur le bon Main).
-Troisième étape : mains[0][2].boucle() et le jeu reprend immédiatement, attention aux surprises quand l'affichage se met à jour pour prendre en compte les nouvelles modifications !
+Troisiï¿½me ï¿½tape : mains[0][2].boucle() et le jeu reprend immï¿½diatement, attention aux surprises quand l'affichage se met ï¿½ jour pour prendre en compte les nouvelles modifications !
 
 
 
@@ -54,155 +54,155 @@ Troisième étape : mains[0][2].boucle() et le jeu reprend immédiatement, attentio
 
 
 
-À mon attention :
+ï¿½ mon attention :
 
-Comment gérer tous les menus/choix de façon simple ?
+Comment gï¿½rer tous les menus/choix de faï¿½on simple ?
 
 Il y a :
-Les choix de direction(s) (magies, magies de parchemins) (nécessité d'affichage du labyrinthe/d'une zone ciblée, partie "interactive" sur la droite) 
-Les choix de case(s) (magies, magies de parchemins, ordres) (nécessité d'affichage du labyrinthe/d'une zone ciblée, partie "interactive" au centre, éventuellement décompte sur la droite)
-Les choix d'agissant(s) (magies, magies de parchemins, ordres) (nécessité d'affichage d'une liste d'agissants, possiblement nécessité d'affichage du labyrinthe, partie "interactive" sur la droite)
-Les choix d'item(s) (magies, magies de parchemins) (nécessité d'affichage d'une liste d'items, probablement description à droite)
-Les choix de magie (ordre d'imprégnation de parchemins, utilisation du skill de magie) (nécessité d'affichage d'une liste de magies, probablement description à droite)
-Les choix d'objet (achat, vente) (nécessité d'affichage d'une liste d'items, probablement description à droite)
-Les choix de recettes (alchimie) (nécessité d'affichage d'une liste de recettes, probablement description de la recette et des ingrédients à droite)
+Les choix de direction(s) (magies, magies de parchemins) (nï¿½cessitï¿½ d'affichage du labyrinthe/d'une zone ciblï¿½e, partie "interactive" sur la droite) 
+Les choix de case(s) (magies, magies de parchemins, ordres) (nï¿½cessitï¿½ d'affichage du labyrinthe/d'une zone ciblï¿½e, partie "interactive" au centre, ï¿½ventuellement dï¿½compte sur la droite)
+Les choix d'agissant(s) (magies, magies de parchemins, ordres) (nï¿½cessitï¿½ d'affichage d'une liste d'agissants, possiblement nï¿½cessitï¿½ d'affichage du labyrinthe, partie "interactive" sur la droite)
+Les choix d'item(s) (magies, magies de parchemins) (nï¿½cessitï¿½ d'affichage d'une liste d'items, probablement description ï¿½ droite)
+Les choix de magie (ordre d'imprï¿½gnation de parchemins, utilisation du skill de magie) (nï¿½cessitï¿½ d'affichage d'une liste de magies, probablement description ï¿½ droite)
+Les choix d'objet (achat, vente) (nï¿½cessitï¿½ d'affichage d'une liste d'items, probablement description ï¿½ droite)
+Les choix de recettes (alchimie) (nï¿½cessitï¿½ d'affichage d'une liste de recettes, probablement description de la recette et des ingrï¿½dients ï¿½ droite)
 
-Pour les magies, on veut choisir au moment de la sélection de la magie (choix unique, possiblement plusieurs choix à faire)
-Pour les magies de parchemins, on veut choisir au moment de l'utilisation du parchemin (choix unique, possiblement plusieurs choix à faire, possiblement plusieurs parchemins à la suite)
+Pour les magies, on veut choisir au moment de la sï¿½lection de la magie (choix unique, possiblement plusieurs choix ï¿½ faire)
+Pour les magies de parchemins, on veut choisir au moment de l'utilisation du parchemin (choix unique, possiblement plusieurs choix ï¿½ faire, possiblement plusieurs parchemins ï¿½ la suite)
 Pour les ordres, on veut choisir pendant un dialogue (choix unique)
-Pour l'utilisation du skill magie, on veut choisir au moment de la sélection du skill (choix unique)
+Pour l'utilisation du skill magie, on veut choisir au moment de la sï¿½lection du skill (choix unique)
 Pour l'achat et la vente, on veut choisir pendant un dialogue (autant de choix/transactions que voulu, possiblement dans un "magasin", possiblement regrouper l'achat et la vente)
 Pour les recettes, on veut choisir pendant un dialogue (autant de choix que voulu)
 
-(Je ne sais plus si je voulais que la simplicité soit au niveau de la structure du code (classes, méthodes, etc. impliquées) ou de l'interface. Probablement de la structure, mais j'y ai rejoué récemment et l'interface laisse un peu à désirer. Un gros bouton "Confirmer (entrer)" et la possibilité de sélectionner à la souris seraient les bienvenus.)
+(Je ne sais plus si je voulais que la simplicitï¿½ soit au niveau de la structure du code (classes, mï¿½thodes, etc. impliquï¿½es) ou de l'interface. Probablement de la structure, mais j'y ai rejouï¿½ rï¿½cemment et l'interface laisse un peu ï¿½ dï¿½sirer. Un gros bouton "Confirmer (entrer)" et la possibilitï¿½ de sï¿½lectionner ï¿½ la souris seraient les bienvenus.)
 
 
 
 En cours (alchimiste) :
-- Parchemins imprégnés de magie (fait)
-- Parchemin de défense (placer un enchantement de défense sur les alliés)
-- Parchemin de téléportation (fait)
+- Parchemins imprï¿½gnï¿½s de magie (fait)
+- Parchemin de dï¿½fense (placer un enchantement de dï¿½fense sur les alliï¿½s)
+- Parchemin de tï¿½lï¿½portation (fait)
 - Parchemins divers
-- Potions de soin (un peu redondant avec la peste et les parchemins impregnés par la peste)
-- Potions de boost (un peu redondant avec la peureuse et les parchemins impregnés par la peureuse)
+- Potions de soin (un peu redondant avec la peste et les parchemins impregnï¿½s par la peste)
+- Potions de boost (un peu redondant avec la peureuse et les parchemins impregnï¿½s par la peureuse)
 - Potions de vitesse (vraiment utile ? tout le monde se plaint d'aller trop vite)
 - Potions diverses
-- Ingrédients (y compris les corps de monstres ?)
-- Identification d'objets (via un skill d'observation ?) (le joueur 'mémorise' l'identification ?)
+- Ingrï¿½dients (y compris les corps de monstres ?)
+- Identification d'objets (via un skill d'observation ?) (le joueur 'mï¿½morise' l'identification ?)
 - Magie de sauvegarde temporelle
-- Magie de réactivation de la sauvegarde
+- Magie de rï¿½activation de la sauvegarde
 - Magies diverses
-- Monétisation
+- Monï¿½tisation
 
 
 
-Comment fonctionne l'alchimie ? (Pour l'instant en faisant tout planter (hein !? je viens d'y rejouer et ça ma l'air fonctionnel (je n'ai pas essayé l'alchimie mais tout le reste va bien), j'espère que je ne suis pas en train de commiter un truc beugué))
-1 ou plusieurs ingrédients (+ mana (+ argent)) = potion ou parchemin
-Éventuellement le résultat final peut être une amélioration d'un item du joueur ?
-Les ingrédients sont une catégorie d'items distincte des autres. On peut en trouver par terre ou les acheter au marchand (?)
-Certains ingrédients proviennent de monstres (dents de gobelin, peau de gobelin, etc.) et peuvent être trouvés là où il y a beaucoup de ces monstres. Mais il n'y a personne dans le labyrinthe qui sache extraire ces ingrédients des cadavres, donc on est obligé de passer par le marchand.
-Recettes simples (pas plus de deux ingrédient par recette dans le tutoriel)
+Comment fonctionne l'alchimie ? (Pour l'instant en faisant tout planter (hein !? je viens d'y rejouer et ï¿½a ma l'air fonctionnel (je n'ai pas essayï¿½ l'alchimie mais tout le reste va bien), j'espï¿½re que je ne suis pas en train de commiter un truc beuguï¿½))
+1 ou plusieurs ingrï¿½dients (+ mana (+ argent)) = potion ou parchemin
+ï¿½ventuellement le rï¿½sultat final peut ï¿½tre une amï¿½lioration d'un item du joueur ?
+Les ingrï¿½dients sont une catï¿½gorie d'items distincte des autres. On peut en trouver par terre ou les acheter au marchand (?)
+Certains ingrï¿½dients proviennent de monstres (dents de gobelin, peau de gobelin, etc.) et peuvent ï¿½tre trouvï¿½s lï¿½ oï¿½ il y a beaucoup de ces monstres. Mais il n'y a personne dans le labyrinthe qui sache extraire ces ingrï¿½dients des cadavres, donc on est obligï¿½ de passer par le marchand.
+Recettes simples (pas plus de deux ingrï¿½dient par recette dans le tutoriel)
 Peau de gobelin -> Parchemin vierge
 Peau de gobelin + pierre dure -> Parchemin de protection
 Dent de gobelin -> Potion de force
 Hypokute -> Potion de soin
-Cristal transparent -> Potion d'invisibilité
+Cristal transparent -> Potion d'invisibilitï¿½
 
 
-Travail à faire :
+Travail ï¿½ faire :
 - Layout (prison, dialogues)
   Prison :
-    - Petite salle avec une porte, clé obtenue par dialogue
-    - Petite salle avec deux portes, une clé sur le sol
+    - Petite salle avec une porte, clï¿½ obtenue par dialogue
+    - Petite salle avec deux portes, une clï¿½ sur le sol
     - Couloir, deux sentinelles avec un passe-partout
     - Salles actuelles (plus d'innaccessibles)
-    - Fin du couloir, escalier et salle du petit-ami (dialogue pour obtenir la clé ?)
+    - Fin du couloir, escalier et salle du petit-ami (dialogue pour obtenir la clï¿½ ?)
   Cuisine :
     - Salle avec le PNJ, une porte et des portails
-    - "Dédale" de portails, avec quelques gobelins, des potions/parchemins/ingrédients et la clé
+    - "Dï¿½dale" de portails, avec quelques gobelins, des potions/parchemins/ingrï¿½dients et la clï¿½
     - Grande salle , avec quelques gobelins et un shaman (des marmites ? pour introduire la notions d'objets inamovibles)
-- Création (ombriuls)
-(- Modifier la fuite pour ne fuir que si un allié est accessible)
-- Équilibrer ! (tours par secondes, combats, jeter un oeil à l'XP obtenu)
+- Crï¿½ation (ombriuls)
+(- Modifier la fuite pour ne fuir que si un alliï¿½ est accessible)
+- ï¿½quilibrer ! (tours par secondes, combats, jeter un oeil ï¿½ l'XP obtenu)
 
 TODO (global) :
-Étages (0/100)
+ï¿½tages (0/100)
 Dialogues
-Cinématiques
+Cinï¿½matiques
 Menus/interfaces "hors-jeu" (images)
 PNJs
 Skills et classes
 Ennemis
 
-Plus précisément :
-Donner au tank une compétence de provocation
-Décider des ingrédients pour l'alchimiste et implémenter les recettes
-Implémenter les achats/vente
+Plus prï¿½cisï¿½ment :
+Donner au tank une compï¿½tence de provocation
+Dï¿½cider des ingrï¿½dients pour l'alchimiste et implï¿½menter les recettes
+Implï¿½menter les achats/vente
 Modification de la vitesse dans le menu des touches
-Système de 'cible' pour indiquer qui les gens attaquent
+Systï¿½me de 'cible' pour indiquer qui les gens attaquent
 
 
 
 
 
-Retours expérience Clément :
-Pour l'équilibrage : premiers monstres one/two-shot, puis progression (créer des monstres spécialement affaiblis pour le tutoriel ? il faut que je le fasse pour le slime de toute façon)
-Potions : pour quoi faire ? Permanent/non permanent, affecte le joueur/les ennemis... Peut-être la portée
-Archer (impossible, mais des mages qui attaquent à distance, c'est faisable. pour remplacer les mages actuels qui sont vraiment faibles ? comment repérer facilement qui est responsable d'une attaque ? un seul mage par étage, par exemple ?)
-Plus d'accompagnement du joueur, plus d'explications. Diminuer la difficulté. C'est juste un tutoriel !
+Retours expï¿½rience Clï¿½ment :
+Pour l'ï¿½quilibrage : premiers monstres one/two-shot, puis progression (crï¿½er des monstres spï¿½cialement affaiblis pour le tutoriel ? il faut que je le fasse pour le slime de toute faï¿½on)
+Potions : pour quoi faire ? Permanent/non permanent, affecte le joueur/les ennemis... Peut-ï¿½tre la portï¿½e
+Archer (impossible, mais des mages qui attaquent ï¿½ distance, c'est faisable. pour remplacer les mages actuels qui sont vraiment faibles ? comment repï¿½rer facilement qui est responsable d'une attaque ? un seul mage par ï¿½tage, par exemple ?)
+Plus d'accompagnement du joueur, plus d'explications. Diminuer la difficultï¿½. C'est juste un tutoriel !
 
 
-Retours expérience Martin + idée potions et parchemins :
-Shaman + mage + guerrier/sentinelle = très puissant (l'étage des potions est devenu difficile)
-Shamans + mages + guerriers/sentinelles = trop puissant (l'étage des meutes est devenu quasi-impossible (et encore, il n'y a pas d'effet de surprise pour moi))
-4 PNJs qui colent le joueur à travers tout l'étage des potions = salles blindées, déplacements difficiles
+Retours expï¿½rience Martin + idï¿½e potions et parchemins :
+Shaman + mage + guerrier/sentinelle = trï¿½s puissant (l'ï¿½tage des potions est devenu difficile)
+Shamans + mages + guerriers/sentinelles = trop puissant (l'ï¿½tage des meutes est devenu quasi-impossible (et encore, il n'y a pas d'effet de surprise pour moi))
+4 PNJs qui colent le joueur ï¿½ travers tout l'ï¿½tage des potions = salles blindï¿½es, dï¿½placements difficiles
 Donc :
-Explication des controles de PNJs (les ordres qu'on peut leur donner, comment vérifier leur état avec le rectangle de droite, comment les rappeler)
-Explication de l'inventaire et de la pause (comment ouvrir l'inventaire, y aller, y sélectionner une potion/un parchemin et l'utiliser, et comment mettre le jeu en pause avant de faire tout ça)
-Potions de renforcement temporaire (renforcement de la défense principalement, de la vitesse aussi)
-Parchemins d'attaque à distance puissante, pour éliminer les shamans (ingrédients très rares, donc à utiliser avec modération)
-"Protection sacrée", utilisée par la sainte lorsque tout le monde est full-health, qui bloque certaines attaques ?
+Explication des controles de PNJs (les ordres qu'on peut leur donner, comment vï¿½rifier leur ï¿½tat avec le rectangle de droite, comment les rappeler)
+Explication de l'inventaire et de la pause (comment ouvrir l'inventaire, y aller, y sï¿½lectionner une potion/un parchemin et l'utiliser, et comment mettre le jeu en pause avant de faire tout ï¿½a)
+Potions de renforcement temporaire (renforcement de la dï¿½fense principalement, de la vitesse aussi)
+Parchemins d'attaque ï¿½ distance puissante, pour ï¿½liminer les shamans (ingrï¿½dients trï¿½s rares, donc ï¿½ utiliser avec modï¿½ration)
+"Protection sacrï¿½e", utilisï¿½e par la sainte lorsque tout le monde est full-health, qui bloque certaines attaques ?
 Modifier les consignes de fuite (les PNJs prennent bien trop de risques actuellement)
-2 shaman + 1 mage = une attaque à 40 dégats. Pour des humains qui ont 50 à 150 PVs et blessés par d'autres gobelin, c'est la mort instantannée.
+2 shaman + 1 mage = une attaque ï¿½ 40 dï¿½gats. Pour des humains qui ont 50 ï¿½ 150 PVs et blessï¿½s par d'autres gobelin, c'est la mort instantannï¿½e.
 
 
 
-Messages d'entrée pour certains étages ?
+Messages d'entrï¿½e pour certains ï¿½tages ?
 
-Idée : l'une des améliorations des flèches, voire de tous le projectiles pourrait consister à les faire traverser les alliés sans les toucher
-
-
-Idées de lore à disperser dans les niveaux :
-
-"Nombreux sont ceux qui pensent que la voie de la magie est aussi la voie de la connaissance. Mais la magie est avant tout la voie de l'imagination, du refus de la réalité."
-pour guider les joueurs qui ont pris le hint de Dev vers la voie de la connaissance, donc avant la première montée de niveau.
-
-"Les attribus élémentaires sont un sujet complexe et mystérieux. Prenons l'exemple des maladies :
-   - Les maladies sont un instrument de mort. Dans le labyrinthe, où voir ses ennemis peut faire toute la différence, la mort est associée à l'ombre. On pourrait donc penser que les maladies sont associées à l'élément ombre.
-   - Mais les maladies se propagent par le biais de virus, qui sont une forme de vie. Invoquer une maladie revient donc à créer la vie, et dans le labyrinthe, la vie est associée à l'élément terre.
-   - Le caractère contagieux, presque éruptif des maladies les lient au contraire à l'élément feu.
-   - Mais la lente agonie que causent certaines maladies n'est pas sans rappeler l'engourdissement de la magie de congélation, liée à l'élément glace.
-En réalité, l'affinité élémentale des maladies dépend de la maladie en question, mais aussi parfois du mage responsable de son apparition. Bien malin qui peut dire, sans l'avoir observé, à quel élément est rattaché tel ou tel phénomène."
-pour informer les joueurs sur les maladies, et indiquer que l'observation permet de connaitre l'affinité de quelquechose.
+Idï¿½e : l'une des amï¿½liorations des flï¿½ches, voire de tous le projectiles pourrait consister ï¿½ les faire traverser les alliï¿½s sans les toucher
 
 
+Idï¿½es de lore ï¿½ disperser dans les niveaux :
 
-À réflechir sérieusement :
-- Il serait bien de ne pas faire reposer tout le développement de personnage sur les choix des montées de niveau (les arbres). En particulier, le joueur doit pouvoir progresser après avoir atteint le niveau 10.
-- Les sous-classes obtenues à la fin vont bien-sûr ce développer plus tardivement, et permettre au joueur de continuer à se développer (mais sans changer d'orientation, puisqu'il ne peut plus faire de choix).
-- Le joueur peut aussi se développer grâce aux objets qu'il trouve (exemple : le personnage de type Tank, qui progresse en remplaçant son armure par une nouvelle plus forte).
-- Risque : un joueur centré sur la magie peut récupérer une armure destinée à un joueur de type défensif, et obtenir une très bonne défense qui déséquilibre son personnage (et le rend trop fort).
+"Nombreux sont ceux qui pensent que la voie de la magie est aussi la voie de la connaissance. Mais la magie est avant tout la voie de l'imagination, du refus de la rï¿½alitï¿½."
+pour guider les joueurs qui ont pris le hint de Dev vers la voie de la connaissance, donc avant la premiï¿½re montï¿½e de niveau.
+
+"Les attribus ï¿½lï¿½mentaires sont un sujet complexe et mystï¿½rieux. Prenons l'exemple des maladies :
+   - Les maladies sont un instrument de mort. Dans le labyrinthe, oï¿½ voir ses ennemis peut faire toute la diffï¿½rence, la mort est associï¿½e ï¿½ l'ombre. On pourrait donc penser que les maladies sont associï¿½es ï¿½ l'ï¿½lï¿½ment ombre.
+   - Mais les maladies se propagent par le biais de virus, qui sont une forme de vie. Invoquer une maladie revient donc ï¿½ crï¿½er la vie, et dans le labyrinthe, la vie est associï¿½e ï¿½ l'ï¿½lï¿½ment terre.
+   - Le caractï¿½re contagieux, presque ï¿½ruptif des maladies les lient au contraire ï¿½ l'ï¿½lï¿½ment feu.
+   - Mais la lente agonie que causent certaines maladies n'est pas sans rappeler l'engourdissement de la magie de congï¿½lation, liï¿½e ï¿½ l'ï¿½lï¿½ment glace.
+En rï¿½alitï¿½, l'affinitï¿½ ï¿½lï¿½mentale des maladies dï¿½pend de la maladie en question, mais aussi parfois du mage responsable de son apparition. Bien malin qui peut dire, sans l'avoir observï¿½, ï¿½ quel ï¿½lï¿½ment est rattachï¿½ tel ou tel phï¿½nomï¿½ne."
+pour informer les joueurs sur les maladies, et indiquer que l'observation permet de connaitre l'affinitï¿½ de quelquechose.
+
+
+
+ï¿½ rï¿½flechir sï¿½rieusement :
+- Il serait bien de ne pas faire reposer tout le dï¿½veloppement de personnage sur les choix des montï¿½es de niveau (les arbres). En particulier, le joueur doit pouvoir progresser aprï¿½s avoir atteint le niveau 10.
+- Les sous-classes obtenues ï¿½ la fin vont bien-sï¿½r ce dï¿½velopper plus tardivement, et permettre au joueur de continuer ï¿½ se dï¿½velopper (mais sans changer d'orientation, puisqu'il ne peut plus faire de choix).
+- Le joueur peut aussi se dï¿½velopper grï¿½ce aux objets qu'il trouve (exemple : le personnage de type Tank, qui progresse en remplaï¿½ant son armure par une nouvelle plus forte).
+- Risque : un joueur centrï¿½ sur la magie peut rï¿½cupï¿½rer une armure destinï¿½e ï¿½ un joueur de type dï¿½fensif, et obtenir une trï¿½s bonne dï¿½fense qui dï¿½sï¿½quilibre son personnage (et le rend trop fort).
 - Contre-mesure : modifier les items disponibles en fonction des choix du joueur ;
-- Mais : je n'ai pas envie de faire ça comme ça, et ces items peuvent servir aux compagnons du joueur.
-- Autre contre-mesure : un joueur qui n'a pas choisi le skill Lancer ne pourra jamais rien faire d'utile avec une flèche. Cette contre-mesure est dificilement applicable au port d'armures.
-- Aussi : un sort, aussi puissant soit-il, ne sert à rien si on n'a pas suffisament de mana pour le lancer. /!\ Faire attention à ce que l'on peut ou ne peut pas obtenir à l'aide d'objets.
-- Je suis en mesure de créer des zones qui refusent tel ou tel type d'agissant, y compris sur des critères de classes. Mais le joueur avec une construction centrée sur l'observation doit pouvoir tout explorer, donc pas de loots distincts.
-- Attention aussi au voleur, qui pourra récupérer beaucoup d'objets différends. En même temps, c'est sa façon de gagner. Faire de la capacité à voir et collecter les objets une stratégie à part entière ?
-- Idée : certains objets sont nécessaires à l'évolution de certaines classes ou skills. Par exemple, un objet possédé par l'un des humains du jeu est nécessaire au développement d'un voleur.
-- Aussi : avoir monté une classe à un certain niveau, ou posséder un certain objet est une condition de déverouillage d'un choix de la classe principale.
+- Mais : je n'ai pas envie de faire ï¿½a comme ï¿½a, et ces items peuvent servir aux compagnons du joueur.
+- Autre contre-mesure : un joueur qui n'a pas choisi le skill Lancer ne pourra jamais rien faire d'utile avec une flï¿½che. Cette contre-mesure est dificilement applicable au port d'armures.
+- Aussi : un sort, aussi puissant soit-il, ne sert ï¿½ rien si on n'a pas suffisament de mana pour le lancer. /!\ Faire attention ï¿½ ce que l'on peut ou ne peut pas obtenir ï¿½ l'aide d'objets.
+- Je suis en mesure de crï¿½er des zones qui refusent tel ou tel type d'agissant, y compris sur des critï¿½res de classes. Mais le joueur avec une construction centrï¿½e sur l'observation doit pouvoir tout explorer, donc pas de loots distincts.
+- Attention aussi au voleur, qui pourra rï¿½cupï¿½rer beaucoup d'objets diffï¿½rends. En mï¿½me temps, c'est sa faï¿½on de gagner. Faire de la capacitï¿½ ï¿½ voir et collecter les objets une stratï¿½gie ï¿½ part entiï¿½re ?
+- Idï¿½e : certains objets sont nï¿½cessaires ï¿½ l'ï¿½volution de certaines classes ou skills. Par exemple, un objet possï¿½dï¿½ par l'un des humains du jeu est nï¿½cessaire au dï¿½veloppement d'un voleur.
+- Aussi : avoir montï¿½ une classe ï¿½ un certain niveau, ou possï¿½der un certain objet est une condition de dï¿½verouillage d'un choix de la classe principale.
 - Ou encore : passer telle classe du niveau x au niveau y est un des choix de la classe principale.
-- Sauf qu'il faut arriver au bon niveau de la classe principale au bon moment, peu probable. Une dépendance à des objets uniques rend le jeu impossible pour un non-initié, et les objets utiles à une autre construction de personnage sont déjà suffisament ennuyeux en un seul exemplaire.
-- Certaines classes ne peuvent pas se reposer non plus sur leurs alliés humains. Tout ça fait beaucoup d'interdépendances des éléments du jeu à gérer, mais c'est ce qui le rend marrant !
+- Sauf qu'il faut arriver au bon niveau de la classe principale au bon moment, peu probable. Une dï¿½pendance ï¿½ des objets uniques rend le jeu impossible pour un non-initiï¿½, et les objets utiles ï¿½ une autre construction de personnage sont dï¿½jï¿½ suffisament ennuyeux en un seul exemplaire.
+- Certaines classes ne peuvent pas se reposer non plus sur leurs alliï¿½s humains. Tout ï¿½a fait beaucoup d'interdï¿½pendances des ï¿½lï¿½ments du jeu ï¿½ gï¿½rer, mais c'est ce qui le rend marrant !
 
 
 Garder une trace du code couleur, pour faciliter les modifications futures.
@@ -211,10 +211,10 @@ Garder une trace du code couleur, pour faciliter les modifications futures.
 
 
 Fonctionnement des dialogues/interractions :
-Du point de vue d'un joueur, les pnjs ont un dialogue par défaut (si le joueur les accoste sans raison) et des dialogues conditionnés (indiqués par un ! ou ? au dessus de leur tête).
+Du point de vue d'un joueur, les pnjs ont un dialogue par dï¿½faut (si le joueur les accoste sans raison) et des dialogues conditionnï¿½s (indiquï¿½s par un ! ou ? au dessus de leur tï¿½te).
 
-Quelques objets/skills obtenus dans des quètes :
-- La carte. Permet de consulter la vue de l'esprit (donc de tous les alliés) en mettant le jeu en pause.
-- La thélépathie. Permet de déclencher un dialogue avec un pnj qui n'est pas sur une case voisine.
-- La concentration de bataille. Quand elle est activée, le jeu se déroule en tour par tour (au sens où le joueur doit "terminer le tour" pour passer au suivant.
-En combinant les trois, le joueur peut donner des ordres plus précis aux pnjs ("déplace-toi d'une case à gauche" ou "utilise tel sort sur tel ennemi", au lieu de "suis-moi", "fuit", "combat" etc. où les détails sont gérés par l'esprit)
+Quelques objets/skills obtenus dans des quï¿½tes :
+- La carte. Permet de consulter la vue de l'esprit (donc de tous les alliï¿½s) en mettant le jeu en pause.
+- La thï¿½lï¿½pathie. Permet de dï¿½clencher un dialogue avec un pnj qui n'est pas sur une case voisine.
+- La concentration de bataille. Quand elle est activï¿½e, le jeu se dï¿½roule en tour par tour (au sens oï¿½ le joueur doit "terminer le tour" pour passer au suivant.
+En combinant les trois, le joueur peut donner des ordres plus prï¿½cis aux pnjs ("dï¿½place-toi d'une case ï¿½ gauche" ou "utilise tel sort sur tel ennemi", au lieu de "suis-moi", "fuit", "combat" etc. oï¿½ les dï¿½tails sont gï¿½rï¿½s par l'esprit)
