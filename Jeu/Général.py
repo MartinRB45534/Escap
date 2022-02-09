@@ -204,7 +204,7 @@ try:
     print(f"Sentinelle : {PV_SENT:>3} PV, {dpt_sent:.2f} ({dpt_boost_sent:.2f}) dpt, {1-(1-TAUX_ARMURE_SENT)*(1-TAUX_HAUME):.2%} degats bloqués")
     print(f"Guerrier :   {PV_GUER:>3} PV, {dpt_guer:.2f} ({dpt_boost_guer:.2f}) dpt, {TAUX_ARMURE_GUER:.2%} degats bloqués")
     print(f"Mage :       {PV_MAGE:>3} PV, {dpt1_mage:.2f} ({dpt1_boost_mage:.2f}) dpt1, {dpt2_mage:.2f} ({dpt2_boost_mage:.2f}) dpt2")
-    print(f"Shaman :     {PV_SHAMAN:>3} PV, {dpt1_min_shaman:.2f}~{dpt1_max_shaman:.2f}) dpt1, {dpt2_min_shaman:.2f}~{dpt2_max_shaman:.2f}) dpt2")
+    print(f"Shaman :     {PV_SHAMAN:>3} PV, {dpt1_min_shaman:.2f}~{dpt1_max_shaman:.2f} dpt1, {dpt2_min_shaman:.2f}~{dpt2_max_shaman:.2f} dpt2")
     print(f"Chef :       {PV_CHEF:>3} PV, {dpt_chef:.2f} ({dpt_boost_chef:.2f}) dpt, {REGEN_CHEF} regen, {1-(1-TAUX_ARMURE_SENT)*(1-TAUX_HAUME):.2%} degats bloqués")
 
 except SyntaxError:
@@ -7314,7 +7314,8 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
             self.replique = "dialogue1phrase1"
             self.repliques = ["dialogue1reponse1.1","dialogue1reponse1.2"]
         elif self.dialogue == 2:
-            pass #Remplir ici
+            self.replique = "dialogue2phrase1"
+            self.repliques = ["dialogue2reponse1.1","dialogue2reponse1.2","dialogue2reponse1.3"]
 
     def interprete(self,nb_replique):
         #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
@@ -7339,6 +7340,125 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
             self.appreciations[0] -= 0.5
             self.end_dialogue(-2)
             self.statut_humain = "exploration"
+
+        #Deuxième dialogue
+        #Le joueur a utilisé un téléporteur
+        elif replique == "dialogue2reponse1.1":
+            self.replique="dialogue2phrase1.1"
+            self.repliques = ["dialogue2reponse1.1.1","dialogue2reponse1.1.2","dialogue2reponse1.1.3"]
+        elif replique == "dialogue2reponse1.2":
+            self.replique="dialogue2phrase1.2"
+            self.repliques = ["dialogue2reponse1.2.1"]
+        elif replique == "dialogue2reponse1.3":
+            self.end_dialogue()
+            self.appreciations[0] -= 0.2
+        elif replique == "dialogue2reponse1.1.1":
+            self.replique="dialogue2phrase1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1","dialogue2reponse1.1.1.2"]
+        elif replique == "dialogue2reponse1.1.2":
+            self.replique="dialogue2phrase1.1.2"
+            self.repliques = ["dialogue2reponse1.1.2.1"]
+        elif replique == "dialogue2reponse1.1.3":
+            self.appreciations[0] -= 0.1
+            self.replique="dialogue2phrase1.1.3"
+            self.repliques = ["dialogue2reponse1.1.3.1","dialogue2reponse1.1.3.2"]
+        elif replique == "dialogue2reponse1.2.1":
+            self.replique="dialogue2phrase1.1"
+            self.repliques = ["dialogue2reponse1.1.1","dialogue2reponse1.1.2","dialogue2reponse1.1.3"]
+        elif replique == "dialogue2reponse1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1","dialogue2reponse1.1.1.1.2"]
+        elif replique == "dialogue2reponse1.1.1.2":
+            self.end_dialogue()
+        elif replique == "dialogue2reponse1.1.2.1":
+            self.replique="dialogue2phrase1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1","dialogue2reponse1.1.1.2"]
+        elif replique == "dialogue2reponse1.1.3.1":
+            self.appreciations[0] -= 0.1
+            self.replique="dialogue2phrase1.1.3.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1","dialogue2reponse1.1.1.1.2"]
+        elif replique == "dialogue2reponse1.1.3.2":
+            self.end_dialogue()
+            self.appreciations[0] -= 0.2
+        elif replique == "dialogue2reponse1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.1","dialogue2reponse1.1.1.1.1.2"]#Euh, non/oui, l'épéiste
+        elif replique == "dialogue2reponse1.1.1.1.2":
+            self.end_dialogue()
+        elif replique == "dialogue2reponse1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.1.1","dialogue2reponse1.1.1.1.1.1.2"]#Oulà, zone/je m'en souviens
+        elif replique == "dialogue2reponse1.1.1.1.1.2":
+            self.replique="dialogue2phrase1.1.1.1.1.2"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.2.1"]#Tout ce que je veux ?
+        elif replique == "dialogue2reponse1.1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.1.1.1"]#il ne se passe rien
+        elif replique == "dialogue2reponse1.1.1.1.1.1.2":
+            self.replique="dialogue2phrase1.1.1.1.1.2"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.2.1"]#Tout ce que je veux ?
+        elif replique == "dialogue2reponse1.1.1.1.1.2.1":
+            self.replique="dialogue2phrase1.1.1.1.1.2.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.2.1.1"]#Ah zut
+        elif replique == "dialogue2reponse1.1.1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.2.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.2.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.2.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.2.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.2.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.2.1.1.1.1","dialogue2reponse1.1.1.1.1.2.1.1.1.2"]#Euh... rappel/oui, dans quel zone?
+        elif replique == "dialogue2reponse1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.2.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.2.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.2.1.1.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.2.1.1.1.2":
+            self.replique="dialogue2phrase1.1.1.1.1.2.1.1.1.2"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.2.1.1.1.2.1"]#Je vois merci
+        elif replique == "dialogue2reponse1.1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.2.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.2.1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.2.1.1.1.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.2.1.1.1.2.1":
+            self.end_dialogue()
+        elif replique == "dialogue2reponse1.1.1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.2.1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.2.1.1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.2.1.1.1.1.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.2.1.1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.2.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.2.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.2.1.1.1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.2.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.2.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.1.1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.2.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.2.1.1.1.2"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.2.1.1.1.2.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.2.1.1.1.2"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.2.1.1.1.2.1"]
 
         #Dialogue par défaut -2
         elif replique == "dialogue-2reponse1.1":
