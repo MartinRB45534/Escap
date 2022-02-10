@@ -115,4 +115,4 @@ REPLIQUES_ALCHIMISTE = {
     "dialogue-2reponse1.1.2":"Ne t'étonne pas de mourir !",
     "dialogue-2reponse1.2.1":"Du coup, est-ce que tu voudrais rejoindre notre groupe ?",
     "dialogue-2phrase1.2.1":"Pourquoi pas. On est plus forts à plusieurs.",
-    "dialogue-2reponse1.2.1":"Bienvenu. Et encore désolé."} #À compléter avec plus de répliques
+    "dialogue-2reponse1.2.1.1":"Bienvenu. Et encore désolé."} #À compléter avec plus de répliques

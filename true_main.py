@@ -334,7 +334,7 @@ class True_joueur:
 
                         screen.blit(POLICE20.render("Les différentes actions du jeu correspondent généralement à l'utilisation d'un 'skill'.",True,(255,255,255)),(marge_gauche+410,marge_haut+300))
                         screen.blit(POLICE20.render("Les commandes des skills sont explicitées en temps voulu par les personnages humains.",True,(255,255,255)),(marge_gauche+390,marge_haut+320))
-                        screen.blit(POLICE40.render("Il est donc fortement conseillé aux nouveaux joueur de discuter poliment avec les humains.",True,(255,255,255)),(marge_gauche+50,marge_haut+340))
+                        screen.blit(POLICE40.render("Il est donc fortement conseillé aux nouveaux joueurs de discuter poliment avec les humains.",True,(255,255,255)),(marge_gauche+50,marge_haut+340))
                         screen.blit(POLICE20.render("Les humains qui ont un point d'exclamation à côté de la tête requièrent un dialogue,",True,(255,255,255)),(marge_gauche+410,marge_haut+380))
                         screen.blit(POLICE20.render("mais il est aussi possible de dialoguer de l'initiative du joueur.",True,(255,255,255)),(marge_gauche+450,marge_haut+400))
                     elif panneau == 4:

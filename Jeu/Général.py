@@ -1466,14 +1466,14 @@ class Controleur():
                 victimes_possibles.remove(victime_possible)
             elif bloquable:
                 victime = self.get_entitee(victime_possible)
-                if not issubclass(victime.get_classe(),Item):
+                if issubclass(victime.get_classe(),Agissant):
                     position_v = victime.get_position()
                     obstacles.append(position_v)
         labyrinthe.attaque(position,portee,propagation,direction,obstacles)
         victimes = []
         for victime_possible in victimes_possibles :
             victime = self.get_entitee(victime_possible)
-            if not issubclass(victime.get_classe(),Item):
+            if issubclass(victime.get_classe(),Agissant):
                 position_v = victime.get_position()
                 if labyrinthe.matrice_cases[position_v[1]][position_v[2]].clarte > 0 :
                     victimes.append(victime)
@@ -1534,7 +1534,7 @@ class Controleur():
             obstacles = self.get_entitees_etage(position[0])
             for ID_obstacle in obstacles:
                 obstacle = self.get_entitee(ID_obstacle)
-                if not issubclass(obstacle.get_classe(),Item):
+                if issubclass(obstacle.get_classe(),Non_superposable):
                     pos_obstacles.append(obstacle.get_position())
         elif traverse == "alliés":
             obstacles_possibles = self.get_entitees_etage(position[0])
@@ -1542,8 +1542,11 @@ class Controleur():
             if nom_esprit != None:
                 for ID_obstacle in obstacles_possibles:
                     obstacle = self.get_entitee(ID_obstacle)
-                    if not issubclass(obstacle.get_classe(),Item):
-                        if obstacle.esprit != nom_esprit:
+                    if issubclass(obstacle.get_classe(),Non_superposable):
+                        if issubclass(obstacle.get_classe(),Agissant):
+                            if obstacle.esprit != nom_esprit:
+                                pos_obstacles.append(obstacle.get_position())
+                        else:
                             pos_obstacles.append(obstacle.get_position())
         elif traverse == "ennemis":
             obstacles_possibles = self.get_entitees_etage(position[0])
@@ -1551,8 +1554,11 @@ class Controleur():
             if nom_esprit != None:
                 for ID_obstacle in obstacles_possibles:
                     obstacle = self.get_entitee(ID_obstacle)
-                    if not issubclass(obstacle.get_classe(),Item):
-                        if obstacle.esprit == nom_esprit:
+                    if issubclass(obstacle.get_classe(),Non_superposable):
+                        if issubclass(obstacle.get_classe(),Agissant):
+                            if obstacle.esprit == nom_esprit:
+                                pos_obstacles.append(obstacle.get_position())
+                        else:
                             pos_obstacles.append(obstacle.get_position())
         elif traverse == "tout":
             pass
@@ -2458,6 +2464,13 @@ class Mur:
         elif issubclass(intrus.get_classe(),Item):
             intrus.heurte_mur()
 
+    def peut_voir(self):
+        visible = True
+        for effet in self.effets :
+            if (isinstance(effet,Mur_impassable) or (isinstance(effet,Mur_plein) and not(effet.casse)) or (isinstance(effet,Porte) and (effet.ferme and not(effet.code in clees)))) or (isinstance(effet,Teleport) and effet.affiche):
+                visible = False
+        return visible
+
     def interdit(self):
         self.effets.append(Mur_impassable())
 
@@ -3044,6 +3057,9 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         if self.etat != "vivant" or self.controleur == None:
             etat = "incapacite"
         return offenses, etat
+
+    def peut_voir(self,direction):
+        return self.controleur.get_case(self.position).get_mur_dir(direction).peut_voir()
 
     def get_aff(self,element):
         affinite = 1
@@ -4109,7 +4125,7 @@ class Humain(Agissant,Interactif,Entitee_superieure):
                         entitee = self.controleur.get_entitee(ID_entitee)
                         if issubclass(entitee.get_classe(),Agissant):
                             if self.ID in self.controleur.get_esprit(entitee.esprit).ennemis.keys():
-                                self.insurge(entitee,0.01)
+                                self.insurge(ID_entitee,0.01)
 
     def get_skin(self):
         if self.etat == "vivant":
@@ -4404,23 +4420,24 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
             directions = [DROITE,HAUT,BAS,GAUCHE]
         self.interlocuteur = None #Normalement c'est déjà le cas
         for i in range(4):
-            pos = positions[i]
-            interactifs = self.controleur.trouve_interactifs_courants(pos)
-            if interactifs!=[]:
-                interactif = self.controleur.get_entitee(interactifs[0]) # Est-ce que je continue à appeler ça un interlocuteur ?
-                if isinstance(interactif,Humain):
-                    self.interlocuteur = interactif
-                    self.controleur.set_phase(EVENEMENT)
-                    self.event = DIALOGUE
-                    interactif.start_dialogue()
-                    self.dir_regard = directions[i]
-                    interactif.dir_regard = range(4)[directions[i]-2]
-                elif isinstance(interactif,Decors_interactif):
-                    self.objet_interactif = interactif
-                    self.dir_regard = directions[i]
-                    if isinstance(interactif,Ustensile):
-                        self.start_menu_cuisine()
-                break
+            if self.peut_voir(directions[i]):
+                pos = positions[i]
+                interactifs = self.controleur.trouve_interactifs_courants(pos)
+                if interactifs!=[]:
+                    interactif = self.controleur.get_entitee(interactifs[0]) # Est-ce que je continue à appeler ça un interlocuteur ?
+                    if isinstance(interactif,Humain):
+                        self.interlocuteur = interactif
+                        self.controleur.set_phase(EVENEMENT)
+                        self.event = DIALOGUE
+                        interactif.start_dialogue()
+                        self.dir_regard = directions[i]
+                        interactif.dir_regard = range(4)[directions[i]-2]
+                    elif isinstance(interactif,Decors_interactif):
+                        self.objet_interactif = interactif
+                        self.dir_regard = directions[i]
+                        if isinstance(interactif,Ustensile):
+                            self.start_menu_cuisine()
+                    break
 
     def controle(self,touche):
         if touche in self.cat_touches.keys() and self.cat_touches[touche] == "pause":
@@ -6422,12 +6439,11 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
             self.replique = "dialogue4phrase1"
             self.repliques = ["dialogue4reponse1.1","dialogue4reponse1.2","dialogue4reponse1.3"]
         elif self.dialogue == 5:
-            pass
+            self.replique = "dialogue5phrase1"
+            self.repliques = ["dialogue5reponse1.1","dialogue5reponse1.2","dialogue5reponse1.3"]
 
     def interprete(self,nb_replique):
-        #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
-        replique = self.repliques[nb_replique] #Donc la réplique est la phrase que le joueur à choisi
-        #Il suffit de savoir quelle phrase le joueur a choisi pour réagir en conséquence
+        replique = self.repliques[nb_replique]
 
         #Premier dialogue
         #Le joueur arrive par l'escalier
@@ -6447,12 +6463,12 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
             self.replique="dialogue1phrase1.1.1.1.1"
             self.repliques = ["dialogue1reponse1.1.1.1.1.1"]
             self.appreciations[0]+= 0.5
+            self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
         elif replique == "dialogue1reponse1.1.1.1.1.1":
             self.replique="dialogue1phrase1.1.1.1.1.1"
             self.repliques=["dialogue1reponse1.1.1.1.1.1.1"]
         elif replique == "dialogue1reponse1.1.1.1.1.1.1":
             self.end_dialogue()
-            self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
             self.mouvement = 0 #Légèrement redondant ici
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
             self.attente = False
@@ -6482,16 +6498,15 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
         elif replique == "dialogue-2reponse1.3.1":
             self.replique="dialogue-2phrase1.3.1"
             self.repliques = ["dialogue-2reponse1.3.1.1","dialogue-2reponse1.3.1.2"]
+            self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
         elif replique == "dialogue-2reponse1.3.1.1":
             self.appreciations[0]-= 0.5
             self.end_dialogue()
-            self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
             self.mouvement = 0 #Légèrement redondant ici
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
             self.attente = False
         elif replique == "dialogue-2reponse1.3.1.2":
             self.end_dialogue()
-            self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
             self.mouvement = 0 #Légèrement redondant ici
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
             self.attente = False
@@ -6547,6 +6562,125 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
         elif replique == "dialogue4reponse1.3":
             self.appreciations[0]-= 0.5
             self.end_dialogue()
+
+        #Cinquième dialogue
+        #Le joueur a utilisé un téléporteur
+        elif replique == "dialogue5reponse1.1":
+            self.replique="dialogue5phrase1.1"
+            self.repliques = ["dialogue5reponse1.1.1","dialogue5reponse1.1.2","dialogue5reponse1.1.3"]
+        elif replique == "dialogue5reponse1.2":
+            self.replique="dialogue5phrase1.2"
+            self.repliques = ["dialogue5reponse1.2.1"]
+        elif replique == "dialogue5reponse1.3":
+            self.end_dialogue()
+            self.appreciations[0] -= 0.2
+        elif replique == "dialogue5reponse1.1.1":
+            self.replique="dialogue5phrase1.1.1"
+            self.repliques = ["dialogue5reponse1.1.1.1","dialogue5reponse1.1.1.2"]
+        elif replique == "dialogue5reponse1.1.2":
+            self.replique="dialogue5phrase1.1.2"
+            self.repliques = ["dialogue5reponse1.1.2.1"]
+        elif replique == "dialogue5reponse1.1.3":
+            self.appreciations[0] -= 0.1
+            self.replique="dialogue5phrase1.1.3"
+            self.repliques = ["dialogue5reponse1.1.3.1","dialogue5reponse1.1.3.2"]
+        elif replique == "dialogue5reponse1.2.1":
+            self.replique="dialogue5phrase1.1"
+            self.repliques = ["dialogue5reponse1.1.1","dialogue5reponse1.1.2","dialogue5reponse1.1.3"]
+        elif replique == "dialogue5reponse1.1.1.1":
+            self.replique="dialogue5phrase1.1.1.1"
+            self.repliques = ["dialogue5reponse1.1.1.1.1","dialogue5reponse1.1.1.1.2"]
+        elif replique == "dialogue5reponse1.1.1.2":
+            self.end_dialogue()
+        elif replique == "dialogue5reponse1.1.2.1":
+            self.replique="dialogue5phrase1.1.1"
+            self.repliques = ["dialogue5reponse1.1.1.1","dialogue5reponse1.1.1.2"]
+        elif replique == "dialogue5reponse1.1.3.1":
+            self.appreciations[0] -= 0.1
+            self.replique="dialogue5phrase1.1.3.1"
+            self.repliques = ["dialogue5reponse1.1.1.1.1","dialogue5reponse1.1.1.1.2"]
+        elif replique == "dialogue5reponse1.1.3.2":
+            self.end_dialogue()
+            self.appreciations[0] -= 0.2
+        elif replique == "dialogue5reponse1.1.1.1.1":
+            self.replique="dialogue5phrase1.1.1.1.1"
+            self.repliques = ["dialogue5reponse1.1.1.1.1.1","dialogue5reponse1.1.1.1.1.2"]#Euh, non/oui, l'épéiste
+        elif replique == "dialogue5reponse1.1.1.1.2":
+            self.end_dialogue()
+        elif replique == "dialogue5reponse1.1.1.1.1.1":
+            self.replique="dialogue5phrase1.1.1.1.1.1"
+            self.repliques = ["dialogue5reponse1.1.1.1.1.1.1","dialogue5reponse1.1.1.1.1.1.2"]#Oulà, zone/je m'en souviens
+        elif replique == "dialogue5reponse1.1.1.1.1.2":
+            self.replique="dialogue5phrase1.1.1.1.1.2"
+            self.repliques = ["dialogue5reponse1.1.1.1.1.2.1"]#Tout ce que je veux ?
+        elif replique == "dialogue5reponse1.1.1.1.1.1.1":
+            self.replique="dialogue5phrase1.1.1.1.1.1.1"
+            self.repliques = ["dialogue5reponse1.1.1.1.1.1.1.1"]#il ne se passe rien
+        elif replique == "dialogue5reponse1.1.1.1.1.1.2":
+            self.replique="dialogue5phrase1.1.1.1.1.2"
+            self.repliques = ["dialogue5reponse1.1.1.1.1.2.1"]#Tout ce que je veux ?
+        elif replique == "dialogue5reponse1.1.1.1.1.2.1":
+            self.replique="dialogue5phrase1.1.1.1.1.2.1"
+            self.repliques = ["dialogue5reponse1.1.1.1.1.2.1.1"]#Ah zut
+        elif replique == "dialogue5reponse1.1.1.1.1.1.1.1":
+            self.replique="dialogue5phrase1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue5reponse1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue5reponse1.1.1.1.1.2.1.1":
+            self.replique="dialogue5phrase1.1.1.1.1.2.1.1"
+            self.repliques = ["dialogue5reponse1.1.1.1.1.2.1.1.1"]
+        elif replique == "dialogue5reponse1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue5phrase1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue5reponse1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue5reponse1.1.1.1.1.2.1.1.1":
+            self.replique="dialogue5phrase1.1.1.1.1.2.1.1.1"
+            self.repliques = ["dialogue5reponse1.1.1.1.1.2.1.1.1.1","dialogue5reponse1.1.1.1.1.2.1.1.1.2"]#Euh... rappel/oui, dans quel zone?
+        elif replique == "dialogue5reponse1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue5phrase1.1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue5reponse1.1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue5reponse1.1.1.1.1.2.1.1.1.1":
+            self.replique="dialogue5phrase1.1.1.1.1.2.1.1.1.1"
+            self.repliques = ["dialogue5reponse1.1.1.1.1.2.1.1.1.1.1"]
+        elif replique == "dialogue5reponse1.1.1.1.1.2.1.1.1.2":
+            self.replique="dialogue5phrase1.1.1.1.1.2.1.1.1.2"
+            self.repliques = ["dialogue5reponse1.1.1.1.1.2.1.1.1.2.1"]#Je vois merci
+        elif replique == "dialogue5reponse1.1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue5phrase1.1.1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue5reponse1.1.1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue5reponse1.1.1.1.1.2.1.1.1.1.1":
+            self.replique="dialogue5phrase1.1.1.1.1.2.1.1.1.1.1"
+            self.repliques = ["dialogue5reponse1.1.1.1.1.2.1.1.1.1.1.1"]
+        elif replique == "dialogue5reponse1.1.1.1.1.2.1.1.1.2.1":
+            self.end_dialogue()
+        elif replique == "dialogue5reponse1.1.1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue5phrase1.1.1.1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue5reponse1.1.1.1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue5reponse1.1.1.1.1.2.1.1.1.1.1.1":
+            self.replique="dialogue5phrase1.1.1.1.1.2.1.1.1.1.1.1"
+            self.repliques = ["dialogue5reponse1.1.1.1.1.2.1.1.1.1.1.1.1"]
+        elif replique == "dialogue5reponse1.1.1.1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue5phrase1.1.1.1.1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue5reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue5reponse1.1.1.1.1.2.1.1.1.1.1.1.1":
+            self.replique="dialogue5phrase1.1.1.1.1.2.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue5reponse1.1.1.1.1.2.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue5reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue5phrase1.1.1.1.1.1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue5reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue5reponse1.1.1.1.1.2.1.1.1.1.1.1.1.1":
+            self.replique="dialogue5phrase1.1.1.1.1.2.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue5reponse1.1.1.1.1.2.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue5reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue5phrase1.1.1.1.1.1.1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue5reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue5reponse1.1.1.1.1.2.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue5phrase1.1.1.1.1.2.1.1.1.2"
+            self.repliques = ["dialogue5reponse1.1.1.1.1.2.1.1.1.2.1"]
+        elif replique == "dialogue5reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue5phrase1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue5reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue5reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue5phrase1.1.1.1.1.2.1.1.1.2"
+            self.repliques = ["dialogue5reponse1.1.1.1.1.2.1.1.1.2.1"]
 
         #Dialogue par défaut:
         elif replique == "dialogue-1reponse1.1":
@@ -6671,7 +6805,8 @@ class Peureuse(Multi_renforceur,Support_lointain,Humain): #La quatrième humaine
             self.replique = "dialogue6phrase1"
             self.repliques = ["dialogue6reponse1.1","dialogue6reponse1.2","dialogue6reponse1.3"]
         elif self.dialogue == 7:
-            pass
+            self.replique = "dialogue7phrase1"
+            self.repliques = ["dialogue7reponse1.1","dialogue7reponse1.2","dialogue7reponse1.3"]
 
     def interprete(self,nb_replique):
         #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
@@ -6884,6 +7019,125 @@ class Peureuse(Multi_renforceur,Support_lointain,Humain): #La quatrième humaine
         elif replique == "dialogue6reponse1.3":
             self.appreciations[0]-= 0.5
             self.end_dialogue()
+
+        #Septième dialogue
+        #Le joueur a utilisé un téléporteur
+        elif replique == "dialogue7reponse1.1":
+            self.replique="dialogue7phrase1.1"
+            self.repliques = ["dialogue7reponse1.1.1","dialogue7reponse1.1.2","dialogue7reponse1.1.3"]
+        elif replique == "dialogue7reponse1.2":
+            self.replique="dialogue7phrase1.2"
+            self.repliques = ["dialogue7reponse1.2.1"]
+        elif replique == "dialogue7reponse1.3":
+            self.end_dialogue()
+            self.appreciations[0] -= 0.2
+        elif replique == "dialogue7reponse1.1.1":
+            self.replique="dialogue7phrase1.1.1"
+            self.repliques = ["dialogue7reponse1.1.1.1","dialogue7reponse1.1.1.2"]
+        elif replique == "dialogue7reponse1.1.2":
+            self.replique="dialogue7phrase1.1.2"
+            self.repliques = ["dialogue7reponse1.1.2.1"]
+        elif replique == "dialogue7reponse1.1.3":
+            self.appreciations[0] -= 0.1
+            self.replique="dialogue7phrase1.1.3"
+            self.repliques = ["dialogue7reponse1.1.3.1","dialogue7reponse1.1.3.2"]
+        elif replique == "dialogue7reponse1.2.1":
+            self.replique="dialogue7phrase1.1"
+            self.repliques = ["dialogue7reponse1.1.1","dialogue7reponse1.1.2","dialogue7reponse1.1.3"]
+        elif replique == "dialogue7reponse1.1.1.1":
+            self.replique="dialogue7phrase1.1.1.1"
+            self.repliques = ["dialogue7reponse1.1.1.1.1","dialogue7reponse1.1.1.1.2"]
+        elif replique == "dialogue7reponse1.1.1.2":
+            self.end_dialogue()
+        elif replique == "dialogue7reponse1.1.2.1":
+            self.replique="dialogue7phrase1.1.1"
+            self.repliques = ["dialogue7reponse1.1.1.1","dialogue7reponse1.1.1.2"]
+        elif replique == "dialogue7reponse1.1.3.1":
+            self.appreciations[0] -= 0.1
+            self.replique="dialogue7phrase1.1.3.1"
+            self.repliques = ["dialogue7reponse1.1.1.1.1","dialogue7reponse1.1.1.1.2"]
+        elif replique == "dialogue7reponse1.1.3.2":
+            self.end_dialogue()
+            self.appreciations[0] -= 0.2
+        elif replique == "dialogue7reponse1.1.1.1.1":
+            self.replique="dialogue7phrase1.1.1.1.1"
+            self.repliques = ["dialogue7reponse1.1.1.1.1.1","dialogue7reponse1.1.1.1.1.2"]#Euh, non/oui, l'épéiste
+        elif replique == "dialogue7reponse1.1.1.1.2":
+            self.end_dialogue()
+        elif replique == "dialogue7reponse1.1.1.1.1.1":
+            self.replique="dialogue7phrase1.1.1.1.1.1"
+            self.repliques = ["dialogue7reponse1.1.1.1.1.1.1","dialogue7reponse1.1.1.1.1.1.2"]#Oulà, zone/je m'en souviens
+        elif replique == "dialogue7reponse1.1.1.1.1.2":
+            self.replique="dialogue7phrase1.1.1.1.1.2"
+            self.repliques = ["dialogue7reponse1.1.1.1.1.2.1"]#Tout ce que je veux ?
+        elif replique == "dialogue7reponse1.1.1.1.1.1.1":
+            self.replique="dialogue7phrase1.1.1.1.1.1.1"
+            self.repliques = ["dialogue7reponse1.1.1.1.1.1.1.1"]#il ne se passe rien
+        elif replique == "dialogue7reponse1.1.1.1.1.1.2":
+            self.replique="dialogue7phrase1.1.1.1.1.2"
+            self.repliques = ["dialogue7reponse1.1.1.1.1.2.1"]#Tout ce que je veux ?
+        elif replique == "dialogue7reponse1.1.1.1.1.2.1":
+            self.replique="dialogue7phrase1.1.1.1.1.2.1"
+            self.repliques = ["dialogue7reponse1.1.1.1.1.2.1.1"]#Ah zut
+        elif replique == "dialogue7reponse1.1.1.1.1.1.1.1":
+            self.replique="dialogue7phrase1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue7reponse1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue7reponse1.1.1.1.1.2.1.1":
+            self.replique="dialogue7phrase1.1.1.1.1.2.1.1"
+            self.repliques = ["dialogue7reponse1.1.1.1.1.2.1.1.1"]
+        elif replique == "dialogue7reponse1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue7phrase1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue7reponse1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue7reponse1.1.1.1.1.2.1.1.1":
+            self.replique="dialogue7phrase1.1.1.1.1.2.1.1.1"
+            self.repliques = ["dialogue7reponse1.1.1.1.1.2.1.1.1.1","dialogue7reponse1.1.1.1.1.2.1.1.1.2"]#Euh... rappel/oui, dans quel zone?
+        elif replique == "dialogue7reponse1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue7phrase1.1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue7reponse1.1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue7reponse1.1.1.1.1.2.1.1.1.1":
+            self.replique="dialogue7phrase1.1.1.1.1.2.1.1.1.1"
+            self.repliques = ["dialogue7reponse1.1.1.1.1.2.1.1.1.1.1"]
+        elif replique == "dialogue7reponse1.1.1.1.1.2.1.1.1.2":
+            self.replique="dialogue7phrase1.1.1.1.1.2.1.1.1.2"
+            self.repliques = ["dialogue7reponse1.1.1.1.1.2.1.1.1.2.1"]#Je vois merci
+        elif replique == "dialogue7reponse1.1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue7phrase1.1.1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue7reponse1.1.1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue7reponse1.1.1.1.1.2.1.1.1.1.1":
+            self.replique="dialogue7phrase1.1.1.1.1.2.1.1.1.1.1"
+            self.repliques = ["dialogue7reponse1.1.1.1.1.2.1.1.1.1.1.1"]
+        elif replique == "dialogue7reponse1.1.1.1.1.2.1.1.1.2.1":
+            self.end_dialogue()
+        elif replique == "dialogue7reponse1.1.1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue7phrase1.1.1.1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue7reponse1.1.1.1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue7reponse1.1.1.1.1.2.1.1.1.1.1.1":
+            self.replique="dialogue7phrase1.1.1.1.1.2.1.1.1.1.1.1"
+            self.repliques = ["dialogue7reponse1.1.1.1.1.2.1.1.1.1.1.1.1"]
+        elif replique == "dialogue7reponse1.1.1.1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue7phrase1.1.1.1.1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue7reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue7reponse1.1.1.1.1.2.1.1.1.1.1.1.1":
+            self.replique="dialogue7phrase1.1.1.1.1.2.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue7reponse1.1.1.1.1.2.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue7reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue7phrase1.1.1.1.1.1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue7reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue7reponse1.1.1.1.1.2.1.1.1.1.1.1.1.1":
+            self.replique="dialogue7phrase1.1.1.1.1.2.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue7reponse1.1.1.1.1.2.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue7reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue7phrase1.1.1.1.1.1.1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue7reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue7reponse1.1.1.1.1.2.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue7phrase1.1.1.1.1.2.1.1.1.2"
+            self.repliques = ["dialogue7reponse1.1.1.1.1.2.1.1.1.2.1"]
+        elif replique == "dialogue7reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue7phrase1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue7reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue7reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue7phrase1.1.1.1.1.2.1.1.1.2"
+            self.repliques = ["dialogue7reponse1.1.1.1.1.2.1.1.1.2.1"]
 
         #Dialogue par défaut:
         elif replique == "dialogue-1reponse1.1":
@@ -7148,7 +7402,8 @@ class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyenne
             self.replique = "dialogue1phrase1"
             self.repliques = ["dialogue1reponse1.1","dialogue1reponse1.2"] #/!\ N'afficher la réplique du copain que si on a discuté de son copain avec la peureuse
         elif self.dialogue == 2:
-            pass
+            self.replique = "dialogue2phrase1"
+            self.repliques = ["dialogue2reponse1.1","dialogue2reponse1.2","dialogue2reponse1.3"]
 
     def interprete(self,nb_replique):
         #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
@@ -7166,12 +7421,12 @@ class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyenne
             self.inventaire.drop(None,ID_clee)
             self.controleur.entitees[2].inventaire.ramasse_item(ID_clee)
             self.repliques = ["dialogue1reponse1.1.1.1"]
+            self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
         elif replique == "dialogue1reponse1.1.1.1":
             self.replique="dialogue1phrase1.1.1.1"
             self.repliques = ["dialogue1reponse1.1.1.1.1"]
         elif replique == "dialogue1reponse1.1.1.1.1":
             self.end_dialogue()
-            self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
             self.mouvement = 0 #Légèrement redondant ici
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
             self.attente = False
@@ -7194,6 +7449,125 @@ class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyenne
             self.attente = False
             self.end_dialogue(-2)
             self.statut_humain = "exploration"
+
+        #Septième dialogue
+        #Le joueur a utilisé un téléporteur
+        elif replique == "dialogue2reponse1.1":
+            self.replique="dialogue2phrase1.1"
+            self.repliques = ["dialogue2reponse1.1.1","dialogue2reponse1.1.2","dialogue2reponse1.1.3"]
+        elif replique == "dialogue2reponse1.2":
+            self.replique="dialogue2phrase1.2"
+            self.repliques = ["dialogue2reponse1.2.1"]
+        elif replique == "dialogue2reponse1.3":
+            self.end_dialogue()
+            self.appreciations[0] -= 0.2
+        elif replique == "dialogue2reponse1.1.1":
+            self.replique="dialogue2phrase1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1","dialogue2reponse1.1.1.2"]
+        elif replique == "dialogue2reponse1.1.2":
+            self.replique="dialogue2phrase1.1.2"
+            self.repliques = ["dialogue2reponse1.1.2.1"]
+        elif replique == "dialogue2reponse1.1.3":
+            self.appreciations[0] -= 0.1
+            self.replique="dialogue2phrase1.1.3"
+            self.repliques = ["dialogue2reponse1.1.3.1","dialogue2reponse1.1.3.2"]
+        elif replique == "dialogue2reponse1.2.1":
+            self.replique="dialogue2phrase1.1"
+            self.repliques = ["dialogue2reponse1.1.1","dialogue2reponse1.1.2","dialogue2reponse1.1.3"]
+        elif replique == "dialogue2reponse1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1","dialogue2reponse1.1.1.1.2"]
+        elif replique == "dialogue2reponse1.1.1.2":
+            self.end_dialogue()
+        elif replique == "dialogue2reponse1.1.2.1":
+            self.replique="dialogue2phrase1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1","dialogue2reponse1.1.1.2"]
+        elif replique == "dialogue2reponse1.1.3.1":
+            self.appreciations[0] -= 0.1
+            self.replique="dialogue2phrase1.1.3.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1","dialogue2reponse1.1.1.1.2"]
+        elif replique == "dialogue2reponse1.1.3.2":
+            self.end_dialogue()
+            self.appreciations[0] -= 0.2
+        elif replique == "dialogue2reponse1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.1","dialogue2reponse1.1.1.1.1.2"]#Euh, non/oui, l'épéiste
+        elif replique == "dialogue2reponse1.1.1.1.2":
+            self.end_dialogue()
+        elif replique == "dialogue2reponse1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.1.1","dialogue2reponse1.1.1.1.1.1.2"]#Oulà, zone/je m'en souviens
+        elif replique == "dialogue2reponse1.1.1.1.1.2":
+            self.replique="dialogue2phrase1.1.1.1.1.2"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.2.1"]#Tout ce que je veux ?
+        elif replique == "dialogue2reponse1.1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.1.1.1"]#il ne se passe rien
+        elif replique == "dialogue2reponse1.1.1.1.1.1.2":
+            self.replique="dialogue2phrase1.1.1.1.1.2"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.2.1"]#Tout ce que je veux ?
+        elif replique == "dialogue2reponse1.1.1.1.1.2.1":
+            self.replique="dialogue2phrase1.1.1.1.1.2.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.2.1.1"]#Ah zut
+        elif replique == "dialogue2reponse1.1.1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.2.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.2.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.2.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.2.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.2.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.2.1.1.1.1","dialogue2reponse1.1.1.1.1.2.1.1.1.2"]#Euh... rappel/oui, dans quel zone?
+        elif replique == "dialogue2reponse1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.2.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.2.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.2.1.1.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.2.1.1.1.2":
+            self.replique="dialogue2phrase1.1.1.1.1.2.1.1.1.2"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.2.1.1.1.2.1"]#Je vois merci
+        elif replique == "dialogue2reponse1.1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.2.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.2.1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.2.1.1.1.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.2.1.1.1.2.1":
+            self.end_dialogue()
+        elif replique == "dialogue2reponse1.1.1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.2.1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.2.1.1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.2.1.1.1.1.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.2.1.1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.2.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.2.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.2.1.1.1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.2.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.2.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.1.1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.2.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.2.1.1.1.2"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.2.1.1.1.2.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1"]
+        elif replique == "dialogue2reponse1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1":
+            self.replique="dialogue2phrase1.1.1.1.1.2.1.1.1.2"
+            self.repliques = ["dialogue2reponse1.1.1.1.1.2.1.1.1.2.1"]
 
         #Dialogue par défaut -2
         elif replique == "":
@@ -7327,12 +7701,12 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
         if replique == "dialogue1reponse1.1":
             self.replique="dialogue1phrase1.1"
             self.repliques = ["dialogue1reponse1.1.1","dialogue1reponse1.1.2"]
+            self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
         elif replique == "dialogue1reponse1.1.1":
             self.replique="dialogue1phrase1.1.1"
             self.repliques = ["dialogue1reponse1.1.2"]
         elif replique == "dialogue1reponse1.1.2":
             self.end_dialogue()
-            self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
             self.mouvement = 0 #Légèrement redondant ici
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
             self.attente = False
@@ -7477,10 +7851,10 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
             self.repliques = ["dialogue-2reponse1.2.1"]
         elif replique == "dialogue-2reponse1.2.1":
             self.replique="dialogue-2phrase1.2.1"
-            self.repliques = ["dialogue-2reponse1.2.1"]
-        elif replique == "dialogue-2reponse1.2.1":
-            self.end_dialogue()
+            self.repliques = ["dialogue-2reponse1.2.1.1"]
             self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
+        elif replique == "dialogue-2reponse1.2.1.1":
+            self.end_dialogue()
             self.mouvement = 0 #Légèrement redondant ici
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
             self.attente = False
@@ -7676,6 +8050,7 @@ class Peste(Multi_soigneur,Support_lointain,Humain): #La huitième humaine du je
         elif replique == "dialogue1reponse1.1.1":
             self.replique="dialogue1phrase1.1.1"
             self.repliques = ["dialogue1reponse1.1.1.1","dialogue1reponse1.1.1.2"]
+            self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
         elif replique == "dialogue1reponse1.1.1.1":
             self.replique="dialogue1phrase1.1.1.1"
             self.repliques = ["dialogue1reponse1.1.1.1.1"]
@@ -7710,6 +8085,7 @@ class Peste(Multi_soigneur,Support_lointain,Humain): #La huitième humaine du je
         elif replique == "dialogue1reponse1.2.1.1.1":
             self.replique="dialogue1phrase1.2.1.1.1"
             self.repliques = ["dialogue1reponse1.2.1.1.1.1"]
+            self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
         elif replique == "dialogue1reponse1.2.2":
             self.replique="dialogue1phrase1.2.2"
             self.repliques = ["dialogue1reponse1.2.2.1"]
@@ -7726,9 +8102,9 @@ class Peste(Multi_soigneur,Support_lointain,Humain): #La huitième humaine du je
         elif replique == "dialogue-2reponse1.2":
             self.replique="dialogue-2phrase1.2"
             self.repliques = ["dialogue-2reponse1.2.1"]
+            self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
         elif replique == "dialogue-2reponse1.2.1":
             self.end_dialogue()
-            self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
             self.mouvement = 0 #Légèrement redondant ici
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
             self.attente = False
@@ -7920,7 +8296,7 @@ class Bombe_atomique(Attaquant_magique_case,Support,Humain): #La neuvième humai
         elif replique == "dialogue1reponse1.1.1":
             self.replique="dialogue1phrase1.1.1"
             self.repliques = ["dialogue1reponse1.1.1.1","dialogue1reponse1.1.1.2"]
-        elif replique in ["dialogue1reponse1.1.1.1","dialogue1reponse1.1.2.1","dialogue1reponse1.1.3.1.1","dialogue1reponse1.1.4.1.1","dialogue1reponse1.1.4.2.2"]:
+        elif replique in ["dialogue1reponse1.1.1.1","dialogue1reponse1.1.2.1","dialogue1reponse1.1.3.1.1","dialogue1reponse1.1.4.1.1","dialogue1reponse1.1.4.2.2","dialogue1reponse1.2.2.2.2"]:
             self.end_dialogue()
             self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
             self.mouvement = 0 #Légèrement redondant ici
@@ -7951,6 +8327,7 @@ class Bombe_atomique(Attaquant_magique_case,Support,Humain): #La neuvième humai
         elif replique == "dialogue1reponse1.2.2.1":
             self.replique="dialogue1phrase1.2.2.1"
             self.repliques = ["dialogue1reponse1.2.2.1.1"]
+            self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
         elif replique == "dialogue1reponse1.2.2.2":
             self.replique="dialogue1phrase1.2.2.2"
             self.repliques = ["dialogue1reponse1.2.2.2.1","dialogue1reponse1.2.2.2.2"]
@@ -8149,9 +8526,9 @@ class Marchand(Dps,Humain): #Le dixième humain du jeu, à l'étage 9 (le seul l
         elif replique == "dialogue1reponse1.1.1":
             self.replique="dialogue1phrase1.1.1"
             self.repliques = ["dialogue1reponse1.1.1.1"]
+            self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
         elif replique == "dialogue1reponse1.1.1.1":
             self.end_dialogue()
-            self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
             self.mouvement = 0 #Légèrement redondant ici
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
             self.attente = False
@@ -11307,26 +11684,27 @@ class Esprit_humain(Esprit_type):
                                 self.ennemis[coennemi] = 0.01
 
     def merge(self,nom): #Regroupe deux esprits, lorsque des humains forment un groupe
-        esprit = self.controleur.get_esprit(nom)
-        for corp in esprit.corps.keys():
-            self.ajoute_corp(corp)
-            if corp in self.ennemis.keys():
-                self.ennemis.pop(corp)
-        for ennemi in esprit.ennemis.keys():
-            if ennemi in self.corps.keys():
-                self.ennemis.pop(ennemi)
-            elif ennemi in self.ennemis.keys():
-                self.ennemis[ennemi] = max(self.ennemis[ennemi],esprit.ennemis[ennemi])
-            else:
-                self.ennemis[ennemi] = esprit.ennemis[ennemi]
-        for vue in esprit.vue.values():
-            niveau = vue[0][0][0][0] #La première coordonée de la position (première information) de la première case de la première colonne
-            if niveau in self.vue.keys(): 
-                self.maj_vue(vue,niveau)
-            else:
-                self.ajoute_vue(vue,niveau)
-        self.controleur.esprits.pop(nom)
-        self.chef = self.elit()
+        if self.nom != nom:
+            esprit = self.controleur.get_esprit(nom)
+            for corp in esprit.corps.keys():
+                self.ajoute_corp(corp)
+                if corp in self.ennemis.keys():
+                    self.ennemis.pop(corp)
+            for ennemi in esprit.ennemis.keys():
+                if ennemi in self.corps.keys():
+                    self.ennemis.pop(ennemi)
+                elif ennemi in self.ennemis.keys():
+                    self.ennemis[ennemi] = max(self.ennemis[ennemi],esprit.ennemis[ennemi])
+                else:
+                    self.ennemis[ennemi] = esprit.ennemis[ennemi]
+            for vue in esprit.vue.values():
+                niveau = vue[0][0][0][0] #La première coordonée de la position (première information) de la première case de la première colonne
+                if niveau in self.vue.keys(): 
+                    self.maj_vue(vue,niveau)
+                else:
+                    self.ajoute_vue(vue,niveau)
+            self.controleur.esprits.pop(nom)
+            self.chef = self.elit()
 
     def elit(self):
         if 2 in self.corps.keys():
@@ -11423,7 +11801,7 @@ class Esprit_humain(Esprit_type):
                     Esprit.deplace(self,corp)
 
     def deplace_humain(self,ID_humain):
-        humain = self.controleur.get_entitee(ID_humain)
+        humain:Humain = self.controleur.get_entitee(ID_humain)
         humain.skill_courant = None
         if humain.identite == "joueur":
             humain.recontrole()
@@ -11481,7 +11859,7 @@ class Esprit_humain(Esprit_type):
                             for ID_entitee in entitees:
                                 entitee = humain.controleur.get_entitee(ID_entitee)
                                 if not issubclass(entitee.get_classe(),Item): #Un agissant !
-                                    if case[7][i][0] == position[0] and ID_entitee in self.ennemis.keys(): #Un ennemi !
+                                    if humain.peut_voir(i) and ID_entitee in self.ennemis.keys(): #Un ennemi !
                                         if humain.veut_attaquer(): #Et le feu vert pour l'attaquer
                                             if self.ennemis[ID_entitee] > importance:
                                                 importance = self.ennemis[ID_entitee]
@@ -11489,7 +11867,7 @@ class Esprit_humain(Esprit_type):
                                                 res = "attaque"
                                         elif humain.veut_fuir(): #Et un ordre de fuite !
                                             res = "fuite"
-                                    elif humain.mouvement == 2 and ((ID_entitee == humain.cible_deplacement and ID_entitee == 2) and case[7][i][0] == position[0]): #Le PNJs peut enfin parler au joueur
+                                    elif humain.mouvement == 2 and ((ID_entitee == humain.cible_deplacement and ID_entitee == 2) and humain.peut_voir(i)): #Le PNJs peut enfin parler au joueur
                                         self.controleur.get_entitee(2).interlocuteur = humain
                                         self.controleur.set_phase(EVENEMENT)
                                         self.controleur.get_entitee(2).event = DIALOGUE
@@ -17491,7 +17869,7 @@ class Affichage:
                             skin.dessine_toi(self.screen,(x,y),(largeur,hauteur))
                         break
 
-    def affiche(self,joueur,vue,position,taille):
+    def affiche(self,joueur:Joueur,vue,position,taille):
         self.affichables=[]
         if vue[1]==0:
             SKIN_BROUILLARD.dessine_toi(self.screen,position,taille)
@@ -17572,13 +17950,20 @@ class Affichage:
                 agissant.get_skin_tete().dessine_toi(self.screen,position,taille,direction) #Avoir éventuellement la tête dans une autre direction ?
                 if haume != None:
                     joueur.controleur.get_entitee(haume).get_skin().dessine_toi(self.screen,position,taille,direction)
-                if isinstance(agissant,Humain) and agissant.dialogue > 0: #Est-ce qu'on veut vraiment avoir cet indicatif en-dessous des effets ?
-                    SKIN_DIALOGUE.dessine_toi(self.screen,position,taille)
                 for effet in agissant.effets:
                     if effet.affiche:
                         effet.get_skin().dessine_toi(self.screen,position,taille,direction)
-                self.screen.blit(pygame.transform.scale(pygame.image.load("Jeu/Skins/barre_de_vie.png").convert_alpha(),(int(taille*((15*agissant.pv)/(19*agissant.pv_max))),int(taille*(15/19)))),(position[0]+int(taille*(2/19)),position[1]+int(taille*(2/19))))
-                
+                esprit = joueur.controleur.get_esprit(joueur.esprit)
+                if agissant.ID in esprit.ennemis.keys():
+                    fichier = "Jeu/Skins/barre_de_vie_ennemis.png"
+                elif agissant.ID in esprit.corps.keys():
+                    fichier = "Jeu/Skins/barre_de_vie_allies.png"
+                else:
+                    fichier = "Jeu/Skins/barre_de_vie_neutres.png"
+                self.screen.blit(pygame.transform.scale(pygame.image.load(fichier).convert_alpha(),(int(taille*((15*agissant.pv)/(19*agissant.pv_max))),int(taille*(15/19)))),(position[0]+int(taille*(2/19)),position[1]+int(taille*(2/19))))
+                if isinstance(agissant,Humain) and agissant.dialogue > 0: #Est-ce qu'on veut vraiment avoir cet indicatif en-dessous des effets ?
+                    SKIN_DIALOGUE.dessine_toi(self.screen,position,taille)
+
             #Rajouter des conditions d'observation
 
     def clear(self):
