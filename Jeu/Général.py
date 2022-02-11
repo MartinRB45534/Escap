@@ -2467,7 +2467,7 @@ class Mur:
     def peut_voir(self):
         visible = True
         for effet in self.effets :
-            if (isinstance(effet,Mur_impassable) or (isinstance(effet,Mur_plein) and not(effet.casse)) or (isinstance(effet,Porte) and (effet.ferme and not(effet.code in clees)))) or (isinstance(effet,Teleport) and effet.affiche):
+            if (isinstance(effet,Mur_impassable) or (isinstance(effet,Mur_plein) and not(effet.casse)) or (isinstance(effet,Porte) and effet.ferme)) or (isinstance(effet,Teleport) and effet.affiche):
                 visible = False
         return visible
 
@@ -8812,6 +8812,11 @@ class Potion_soin(Potion):
 
     def get_description(self,observation):
         return ["Une potion","Soigne les blessures. J'espère."]
+
+class Potion_hypokute(Potion_soin):
+    """Une potion qui restaure les PVs."""
+    def __init__(self,position):
+        Potion_soin.__init__(self,position,soin_potion_hypokute)
 
 class Potion_force(Potion):
     """Une potion qui augmente les dégats infligés."""

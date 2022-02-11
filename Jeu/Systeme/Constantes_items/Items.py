@@ -14,6 +14,7 @@ from Jeu.Systeme.Constantes_items.Constantes_epee_gobelin import *
 from Jeu.Systeme.Constantes_items.Constantes_epee_marchand import *
 from Jeu.Systeme.Constantes_items.Constantes_haume_gobelin import *
 from Jeu.Systeme.Constantes_items.Constantes_lance_gobelin import *
+from Jeu.Systeme.Constantes_items.Constantes_potion_hypokute import *
 from Jeu.Systeme.Constantes_items.Constantes_robe_magique import *
 from Jeu.Systeme.Constantes_items.Constantes_robe_sorciere import *
 from Jeu.Systeme.Constantes_items.Constantes_sceau_roi_gobelin import *

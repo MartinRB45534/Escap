@@ -11,7 +11,7 @@ recettes_alchimie = [
      {"produit":"Potion_force",
       "ingredients":{"Dent_gobelin":2},
       "xp":1},
-     {"produit":"Potion_soin",
+     {"produit":"Potion_hypokute",
       "ingredients":{"Hypokute":1},
       "xp":1}],
     [],
