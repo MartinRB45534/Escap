@@ -14,3 +14,6 @@ degats_secousse = [5,20,30,40,50,60,70,80,90,100]
 
 global portee_secousse
 portee_secousse = [4,6,6,7,7,8,8,9,9,10]
+
+global delai_secousse
+delai_secousse = [6,6,6,6,5,5,5,4,4,3]

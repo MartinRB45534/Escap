@@ -46,6 +46,8 @@ global SKIN_CRANE
 SKIN_CRANE = Skin("crane.png")
 global SKIN_OEUF
 SKIN_OEUF = Skin("oeuf.png")
+global SKIN_INGREDIENT
+SKIN_INGREDIENT = Skin("ingredient.png")
 global SKIN_BLESSURE
 SKIN_BLESSURE = Skin("blessure.png")
 global SKIN_TETE_JOUEUR
@@ -116,8 +118,8 @@ global SKIN_MYSTERE
 SKIN_MYSTERE = Skin("mystere.png")
 global SKIN_BOUCLIER
 SKIN_BOUCLIER = Skin("bouclier.png")
-global SKIN_BOUCLIER_BIS
-SKIN_BOUCLIER_BIS = Skin("bouclier_bis.png")
+global SKIN_BOUCLIER_BOIS
+SKIN_BOUCLIER_BOIS = Skin("bouclier_bois.png")
 global SKIN_CLE
 SKIN_CLE = Skin("cle.png")
 global SKIN_POTION
@@ -148,8 +150,8 @@ global SKIN_ARMURE_DOR
 SKIN_ARMURE_DOR = Skin("armure_dor.png")
 global SKIN_ARMURE_GOBELIN
 SKIN_ARMURE_GOBELIN = Skin("armure_gobelin.png")
-global SKIN_ARMURE_BIS
-SKIN_ARMURE_BIS = Skin("armure_bis.png")
+global SKIN_ARMURE_BASIQUE
+SKIN_ARMURE_BASIQUE = Skin("armure_basique.png")
 global SKIN_TUNIQUE_ENCHANTEE
 SKIN_TUNIQUE_ENCHANTEE = Skin("tunique_enchantee.png")
 global SKIN_SOUTANE
@@ -162,6 +164,8 @@ global SKIN_ROBE_SORCIERE
 SKIN_ROBE_SORCIERE = Skin("robe_sorciere.png")
 global SKIN_CASQUE
 SKIN_CASQUE = Skin("casque.png")
+global SKIN_CASQUE_BASIQUE
+SKIN_CASQUE_BASIQUE = Skin("casque_basique.png")
 global SKIN_CHAPEAU_DE_SORCIERE
 SKIN_CHAPEAU_DE_SORCIERE = Skin("chapeau_de_sorciere.png")
 global SKIN_CASQUE_GOBELIN

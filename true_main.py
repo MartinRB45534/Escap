@@ -723,6 +723,7 @@ class True_joueur:
                     self.controleur = res
                     ID_MAX.set_id_max(max(self.controleur.entitees.keys()))
                     self.controleur.entitees[2].affichage.unclear(screen)
+                    self.controleur.entitees[2].affichage.recalcule_zones()
                     self.controleur.pause = True
                     self.boucle()
                     run = False

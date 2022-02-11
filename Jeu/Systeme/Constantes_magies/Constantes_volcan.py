@@ -14,3 +14,6 @@ degats_volcan = [10,40,60,80,100,120,140,160,180,200]
 
 global portee_volcan
 portee_volcan = [2,3,6,7,7,8,8,9,9,10]
+
+global delai_volcan
+delai_volcan = [2,2,2,2,2,1,1,1,1,1]
