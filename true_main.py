@@ -665,6 +665,10 @@ class True_joueur:
         for controleur in self.controleurs:
             controleur.entitees[2].affichage.clear()
         self.controleur = None
+        self.agissants_courants = []
+        self.items_courants = []
+        self.labs_courants = []
+        self.esprits_courants = []
 
     def charge(self,screen):
         self.screen = screen

@@ -913,7 +913,7 @@ class Controleur():
             pos = self.get_entitee(occupant).position
             if pos != None and pos[0] == num_lab:
                 if vue[pos[1]][pos[2]][1] > 0:
-                    vue[pos[1]][pos[2]][8].append(occupant)
+                    vue[pos[1]][pos[2]][6].append(occupant)
         agissant.vue = vue
 
     # Les fonctions qui suivent sont utilisées dans diverses situations pour trouver les entitées situées sur une case
@@ -1314,7 +1314,7 @@ class Controleur():
         for etage in self.esprits["joueur"].vue.values():
             for colonne in etage:
                 for case in colonne:
-                    for ID_entitee in case[8]:
+                    for ID_entitee in case[5]:
                         entitee = self.get_entitee(ID_entitee)
                         if issubclass(entitee.get_classe(),Agissant):
                             cibles_potentielles.append(entitee)
@@ -1335,7 +1335,7 @@ class Controleur():
         for etage in self.esprits["joueur"].vue.values():
             for colonne in etage:
                 for case in colonne:
-                    for ID_entitee in case[8]:
+                    for ID_entitee in case[5]:
                         entitee = self.get_entitee(ID_entitee)
                         if issubclass(entitee.get_classe(),Item):
                             cibles_potentielles.append(entitee)
@@ -2279,6 +2279,8 @@ class Case:
                         priorite_max = prio
                 elif isinstance(effet,On_attack):
                     on_attaques.append(effet)
+                elif (isinstance(effet,Attaque_case_delayee) and effet.delai > 0):
+                    effet.execute(self,position) #On diminue le délai
                 elif isinstance(effet,Attaque_case):
                     attaques.append(effet)
                 elif isinstance(effet,On_post_action): #Les auras non-élémentales sont aussi des On_post_action
@@ -2371,17 +2373,20 @@ class Case:
     def get_opacite(self):
         return self.opacite + self.opacite_bonus
 
-    def get_infos(self,clees):
+    def get_infos(self,clees): #Est-ce que ce serait plus clair sous forme de dictionnaire ? Ou d'objet ?
         return [self.position, #La position de la case, sous forme de tuple
                 self.clarte, #La clarté, qui vient d'être calculée pour l'agissant
                 0, #Pour le décompte de l'oubli
-                0, #Pour les trajets (importance des ennemis), en contournant les agissants
-                0, #Pour les trajets (importance des ennemis), en traversant les agissant
-                0, #Pour les trajets (dangerosité) /!\On voudra peut-être distinguer les éléments ?
-                0, #Pour les autres trajets (qui ne concernent qu'un seul agissant)
+                [0, #Pour les trajets (importance des ennemis), en contournant les agissants
+                 0, #Pour les trajets (importance des ennemis), en traversant les agissants
+                 0, #Pour les trajets (dangerosité), en contournant les agissants
+                 0, #Pour les trajets (dangerosité), en traversant les agissants
+                 0, #Pour les autres trajets (pour calculer de façon unique, effacé avant chaque calcul)
+                 False],
                 self.calcule_code(), #Le code correspondant aux auras et autres effets
                 [self.murs[i].get_cible_ferme(clees) for i in range(4)], #Les murs et leur traversabilité pour l'agissant
-                []] #Pour stocker les entitées
+                [], #Pour stocker les entitées
+                self.get_codes_effets()] #Pour stocker les effets (attaques delayées)
 
     def calcule_code(self):#La fonction qui calcule le code correpondant à l'état de la case. De base, 0. Modifié d'après les effets subits par la case.
         new_courant = pygame.time.get_ticks()
@@ -2389,6 +2394,13 @@ class Case:
         constantes_temps['reste'] += duree
         constantes_temps['courant'] = new_courant
         return self.code
+
+    def get_codes_effets(self):
+        effets=[]
+        for effet in self.effets:
+            if isinstance(effet,Attaque_case_delayee):
+                effets.append([effet.responsable,effet.delai,effet.degats])
+        return effets
 
     def get_copie(self):
         copie = Case(self.position,self.niveau,self.element,self.effets,self.opacite)
@@ -3645,7 +3657,7 @@ class Attaquant_magique_case(Agissant):
         #On cherche l'ennemi le plus puissant en vue
         for colonne in self.vue:
             for case in colonne:
-                for ID in case[9]:
+                for ID in case[6]:
                     if ID in esprit.ennemis.keys() and not self.controleur.est_item(ID):
                         cibles.append([esprit.ennemis[ID],case[0]])
         skill = trouve_skill(self.classe_principale,Skill_magie)
@@ -3669,7 +3681,7 @@ class Attaquant_magique_agissant(Agissant):
         #On cherche l'ennemi le plus puissant en vue
         for colonne in self.vue:
             for case in colonne:
-                for ID in case[9]:
+                for ID in case[6]:
                     if ID in esprit.ennemis.keys() and not self.controleur.est_item(ID):
                         cibles.append([esprit.ennemis[ID],ID])
         skill = trouve_skill(self.classe_principale,Skill_magie)
@@ -4108,14 +4120,14 @@ class Humain(Agissant,Interactif,Entitee_superieure):
         if self.antagonise_neutres:
             for colonne in self.vue:
                 for case in colonne:
-                    for entitee in case[9]:
+                    for entitee in case[6]:
                         if not self.controleur.est_item(entitee):
                             if not entitee in self.controleur.get_esprit(self.esprit).ennemis.keys():
                                 self.insurge(entitee,0.01)
         elif self.antagonise_offensifs:
             for colonne in self.vue:
                 for case in colonne:
-                    for ID_entitee in case[9]:
+                    for ID_entitee in case[6]:
                         entitee = self.controleur.get_entitee(ID_entitee)
                         if issubclass(entitee.get_classe(),Agissant):
                             if self.ID in self.controleur.get_esprit(entitee.esprit).ennemis.keys():
@@ -6697,7 +6709,6 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
         elif replique == "dialogue-1reponse1.1.3":
             self.replique = "dialogue-1phrase1.1.3"
             self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.3"]
-            self.mouvement = 1
         elif replique == "dialogue-1reponse1.3":
             self.end_dialogue(-1)
         elif replique == "dialogue-1reponse1.2":
@@ -11080,18 +11091,14 @@ class Esprit :
 
     def get_importance(self,position):
         importance = 0
-        if position[0] in self.vue.keys():
-            lab = self.vue[position[0]]
-            if position[1] >= 0 and position[1] < len(lab):
-                colone = lab[position[1]]
-                if position[2] >= 0 and position[2] < len(colone):
-                    case = colone[position[2]]
-                    for ID in case[9]:
-                        if self.controleur.get_entitee(ID).etat == "vivant":
-                            if ID in self.ennemis:
-                                new_importance = self.ennemis[ID]
-                                if new_importance > importance:
-                                    importance = new_importance
+        if (position[0] in self.vue.keys()) and (position[1] >= 0 and position[1] < len(self.vue[position[0]])) and (position[2] >= 0 and position[2] < len(self.vue[position[0]][position[1]])):
+            case = self.vue[position[0]][position[1]][position[2]]
+            for ID in case[6]:
+                if self.controleur.get_entitee(ID).etat == "vivant":
+                    if ID in self.ennemis:
+                        new_importance = self.ennemis[ID]
+                        if new_importance > importance:
+                            importance = new_importance
         return importance
 
     def ajoute_vue(self,vue,niveau):
@@ -11101,8 +11108,8 @@ class Esprit :
         for i in range(len(vue)):
             for j in range(len(vue[0])):
                 case = vue[i][j]
-                case[2] = self.oubli
                 if case[1] > 0: #Si la clarté est positive
+                    case[2] = self.oubli
                     self.vue[niveau][i][j] = case #On remplace par la dernière version de la vision
 
     def trouve_agissants(self,vue):
@@ -11110,7 +11117,7 @@ class Esprit :
         for i in range(len(vue)):
             for j in range(len(vue[0])):
                 case = vue[i][j]
-                agissants += case[9]
+                agissants += case[6]
         return agissants
 
     def oublie_agissants(self,agissants):
@@ -11119,8 +11126,8 @@ class Esprit :
                 for j in range(len(vue[0])):
                     case = vue[i][j]
                     for ID in agissants:
-                        if ID in case[9]:
-                            case[9].remove(ID)
+                        if ID in case[6]:
+                            case[6].remove(ID)
 
     def refait_vue(self):
         vues = []
@@ -11156,29 +11163,81 @@ class Esprit :
                 else:
                     self.ennemis[ID_offenseur] = gravite
 
+    def get_pos_vues(self):
+        positions = []
+        for corp in self.corps.keys():
+            if self.corps[corp] != "incapacite":
+                agissant = self.controleur.get_entitee(corp)
+                positions.append(agissant.position)
+        return positions
+
     def calcule_trajets(self):
+
+        # On détermine la dangerosité de chaque case en fonction des dégats qui vont y avoir lieu
+        coef=7 #/!\ Expérimenter avec ce coef à l'occasion
+        for etage in self.vue.values():
+            for colonne in etage:
+                for case in colonne:
+                    for effet in case[7]:
+                        dangerosite = coef*effet[2]/(effet[1]+coef)
+                        case[3][2] += dangerosite
+                        case[3][3] += dangerosite
+        
+        # On modifie légèrement pour pouvoir sortir des zones concernées
+        coef_croissant = 1.1
+        # On commence par trouver les seuils, vers lesquels on va vouloir aller
+        seuils = self.trouve_seuils(self.get_pos_vues()) # On part des différents endroit d'où l'on voit, qui devraient théoriquement nous donner accès à toute notre vision
+        self.propage(seuils,coef_croissant,3,-1) # On propage de façon croissante à partir des seuils (à l'intérieur)
+        self.propage(seuils,coef_croissant,2,True,-1) # On propage de façon croissante à partir des seuils (à l'intérieur), en contournant les obstacles
+
+        # On rajoute les ennemis
+        coef_importance = 0.9
+        coef_dangerosite = 0.9
+        dangerosites = seuils
+        importances = []
         for ID_ennemi in self.ennemis.keys():
             ennemi = self.controleur.get_entitee(ID_ennemi)
             if ennemi.etat == "vivant":
                 position = ennemi.get_position()
                 if position[0] in self.vue.keys():
-                    self.resoud(position,self.ennemis[ID_ennemi]) #Traversée
-                    self.resoud(position,self.ennemis[ID_ennemi],3,True) #Contournement
+                    importance = self.ennemis[ID_ennemi]
+                    dangerosite = self.ennemis[ID_ennemi] #/!\ Changer ça !
+                    if importance > self.vue[position[0]][position[1]][position[2]][3][0]:
+                        self.vue[position[0]][position[1]][position[2]][3][0]=importance
+                        self.vue[position[0]][position[1]][position[2]][3][1]=importance
+                        importances.append(position)
+                    if dangerosite > self.vue[position[0]][position[1]][position[2]][3][2]:
+                        self.vue[position[0]][position[1]][position[2]][3][2]=dangerosite
+                        if not position in dangerosites: # On peut avoir des doublons (ennemis sur les seuils par exemple)
+                            dangerosites.append(position)
+                    if dangerosite > self.vue[position[0]][position[1]][position[2]][3][3]:
+                        self.vue[position[0]][position[1]][position[2]][3][3]=dangerosite
+                        if not position in dangerosites:
+                            dangerosites.append(position)
+        # On propage l'importance de façon décroissante à partir des ennemis
+        self.propage(importances,coef_importance) #Traversée
+        self.propage(importances,coef_importance,0,True) #Contournement (<= Traversée)
+        # On propage la dangerosité de façon décroissante à partir des ennemis et des seuils
+        self.propage(dangerosites,coef_dangerosite,3) #Traversée
+        self.propage(dangerosites,coef_dangerosite,2,True) #Contournement
 
-    def resoud(self,position,portee,indice=4,dead_ends=False):
+        # /!\ Prendre aussi en compte les alliés, et les cases inconnues (mais on va déjà tester ça)
 
-        if indice == 6:
+    def resoud(self,position,portee,indice=1,dead_ends=False):
+        """'Résoud' un labyrinthe à partir d'une case donnée."""
+
+        if indice == 4:
             for vue in self.vue.values():
                 for colonne in vue:
                     for case in colonne:
-                        case[6] = 0
+                        case[3][4] = 0
 
         #la queue est une liste de positions
         queue=[position]
 
         if position[0] in self.vue.keys():
 
-            self.vue[position[0]][position[1]][position[2]][indice] = portee
+            self.vue[position[0]][position[1]][position[2]][3][indice] = portee
 
             arret_obstacle = False
 
@@ -11186,7 +11245,7 @@ class Esprit :
 
                 position = queue[0]
 
-                clarte = self.vue[position[0]][position[1]][position[2]][indice]*self.dispersion_spatiale
+                clarte = self.vue[position[0]][position[1]][position[2]][3][indice]*self.dispersion_spatiale
                 #enlever position dans queue
                 queue.pop(0)
 
@@ -11197,12 +11256,88 @@ class Esprit :
                 arret_obstacle = dead_ends
 
                 for pos in pos_explorables:
-                    if clarte > self.vue[pos[0]][pos[1]][pos[2]][indice]:
+                    if clarte > self.vue[pos[0]][pos[1]][pos[2]][3][indice]:
                         #on marque la case comme visitée
-                        self.vue[pos[0]][pos[1]][pos[2]][indice] = clarte
+                        self.vue[pos[0]][pos[1]][pos[2]][3][indice] = clarte
                         
                         #on ajoute toutes les directions explorables
                         queue.append(pos)
+
+    def propage(self,positions,coef,indice=1,dead_ends=False,comparateur=1):
+        """'Résoud' un labyrinthe à partir de plusieurs points"""
+
+        if indice == 4:
+            for vue in self.vue.values():
+                for colonne in vue:
+                    for case in colonne:
+                        case[3][4] = 0
+
+        #la queue est une liste de positions
+        queue = positions
+
+        arret_obstacle = False
+
+        while len(queue)!=0 :
+
+            position = queue[0]
+
+            valeur = self.vue[position[0]][position[1]][position[2]][3][indice]*coef
+            #enlever position dans queue
+            queue.pop(0)
+
+            #trouver les positions explorables
+
+            pos_explorables = self.positions_utilisables(position,arret_obstacle)
+
+            arret_obstacle = dead_ends
+
+            for pos in pos_explorables:
+                if valeur*comparateur > self.vue[pos[0]][pos[1]][pos[2]][3][indice]*comparateur:
+                    #on marque la case comme visitée
+                    self.vue[pos[0]][pos[1]][pos[2]][3][indice] = valeur
+
+                    #on ajoute toutes les directions explorables
+                    queue.append(pos)
+
+    def trouve_seuils(self,positions,indice=2,dead_ends=False):
+        """Fonction qui trouve les 'seuils', c'est à  dire les cases qui ont un valeur plus grande que leurs voisines"""
+
+        for vue in self.vue.values():
+            for colonne in vue:
+                for case in colonne:
+                    case[3][5] = False
+
+        seuils = []
+
+        #la queue est une liste de positions
+        queue=positions
+
+        arret_obstacle = False
+
+        while len(queue)!=0 :
+
+            position = queue[0]
+            #enlever position dans queue
+            queue.pop(0)
+
+            #trouver les positions explorables
+
+            pos_explorables = self.positions_utilisables(position,arret_obstacle)
+
+            arret_obstacle = dead_ends
+
+            for pos in pos_explorables:
+                if self.vue[position[0]][position[1]][position[2]][3][indice] > self.vue[pos[0]][pos[1]][pos[2]][3][indice] and not position in seuils:
+                    seuils.append(position)
+                elif self.vue[position[0]][position[1]][position[2]][3][indice] < self.vue[pos[0]][pos[1]][pos[2]][3][indice] and not pos in seuils:
+                    seuils.append(pos)
+                if not self.vue[pos[0]][pos[1]][pos[2]][3][5]:
+                    #on marque la case comme visitée
+                    self.vue[pos[0]][pos[1]][pos[2]][3][5] = True
+                        
+                    #on ajoute toutes les directions explorables
+                    queue.append(pos)
+        return seuils
 
     def print_vue(self):
         for etage in self.vue.keys():
@@ -11221,22 +11356,22 @@ class Esprit :
                         bas += " ~~~ "
                     else:
                         haut+= " "
-                        if case[8][0]:
+                        if case[5][0]:
                             haut += "   "
                         else:
                             haut += "---"
                         haut += " "
-                        if case[8][3]:
+                        if case[5][3]:
                             centre += " "
                         else:
                             centre += "|"
-                        if case[8] > 0:
+                        if case[5] > 0:
                             centre += "x"
                         else:
                             centre += " "
-                        if case[9] != []:
+                        if case[6] != []:
                             occ = " "
-                            for occupant in case[9]:
+                            for occupant in case[6]:
                                 if occupant in self.corps.keys():
                                     occ = "O"
                                 elif occupant in self.ennemis.keys():
@@ -11244,16 +11379,16 @@ class Esprit :
                             centre += occ
                         else:
                             centre += " "
-                        if case[4] > 0:
+                        if case[3][1] > 0:
                             centre += "x"
                         else:
                             centre += " "
-                        if case[8][1]:
+                        if case[5][1]:
                             centre += " "
                         else:
                             centre += "|"
                         bas += " "
-                        if case[8][2]:
+                        if case[5][2]:
                             bas += "   "
                         else:
                             bas += "---"
@@ -11268,8 +11403,8 @@ class Esprit :
         case = self.vue[position[0]][position[1]][position[2]]
 
         for direction in range(4):
-            if case[8][direction] and not(dead_ends and case[9]!=[]) and case[8][direction][0] in self.vue.keys():
-                pos_utilisables.append(case[8][direction])
+            if case[5][direction] and not(dead_ends and case[6]!=[]) and case[5][direction][0] in self.vue.keys():
+                pos_utilisables.append(case[5][direction])
 
         return pos_utilisables
 
@@ -11294,15 +11429,15 @@ class Esprit :
         position = corp.get_position()
         case = corp.vue[position[1]][position[2]]
         tcase = self.vue[position[0]][position[1]][position[2]]
-        cases = [[-1,tcase[0],tcase[3],tcase[4],-tcase[5],tcase[5]]]
+        cases = [[-1,tcase[0],tcase[3][0],tcase[3][1],-tcase[3][2],tcase[3][2]]]
         dirs = []
         importance = 0
         res = "attente"
         for i in range(4): #On commence par se renseigner sur les possibilités :
-            if case[8][i]:
-                if case[8][i][0] == position[0] and corp.vue[case[8][i][1]][case[8][i][2]][1]>0:
-                    case_pot = self.vue[case[8][i][0]][case[8][i][1]][case[8][i][2]]
-                    entitees = case_pot[9]
+            if case[5][i]:
+                if case[5][i][0] == position[0] and corp.vue[case[5][i][1]][case[5][i][2]][1]>0:
+                    case_pot = self.vue[case[5][i][0]][case[5][i][1]][case[5][i][2]]
+                    entitees = case_pot[6]
                     libre = True
                     for ID_entitee in entitees:
                         entitee = self.controleur.get_entitee(ID_entitee)
@@ -11318,7 +11453,7 @@ class Esprit :
                                     elif corp.veut_fuir() and self.fuite_utile(ID): #On veut fuire lorsqu'on croise un ennemi au corps à corps
                                         res = "fuite"
                     if libre:
-                        cases.append([i,case_pot[0],case_pot[3],case_pot[4],-case_pot[5],case_pot[5]])
+                        cases.append([i,case_pot[0],case_pot[3][0],case_pot[3][1],-case_pot[3][2],case_pot[3][2]])
                         dirs.append(i)
         if res == "attente": #Quelques comportements possibles :
             comportement = corp.comporte_distance()
@@ -11336,10 +11471,10 @@ class Esprit :
                 corp.skill_courant = None
                 importance = 0
                 for i in range(4):
-                    if case[8][i]:
-                        if case[8][i][0] in self.vue.keys():
-                            case_pot = self.vue[case[8][i][0]][case[8][i][1]][case[8][i][2]]
-                            entitees = case_pot[9]
+                    if case[5][i]:
+                        if case[5][i][0] in self.vue.keys():
+                            case_pot = self.vue[case[5][i][0]][case[5][i][1]][case[5][i][2]]
+                            entitees = case_pot[6]
                             for ID_entitee in entitees:
                                 entitee = corp.controleur.get_entitee(ID_entitee)
                                 if issubclass(entitee.get_classe(),Agissant): #Cette case est occupée par un agissant
@@ -11348,7 +11483,7 @@ class Esprit :
                                             importance = self.ennemis[ID_entitee]
                                             corp.attaque(i)
                                             res = "attaque"
-            elif tcase[4] == 0: #Et case[3] forcément aussi par la même occasion, donc on est totalement libre de chercher
+            elif tcase[3][1] == 0: #Et tcase[3] forcément aussi par la même occasion, donc on est totalement libre de chercher
                 res = "paix"
                 if not isinstance(corp,Sentinelle) or isinstance(corp,Humain):
                     res = "exploration"
@@ -11358,7 +11493,7 @@ class Esprit :
                             if dir_back in dirs: #On ne veut pas y retourner
                                 dirs.remove(dir_back)
                     corp.va(dirs[random.randint(0,len(dirs)-1)]) #/!\ Ne pas retourner sur ses pas, c'est bien ! Aller vers les endroits inconnus, ce serait mieux. /!\
-                    if ID == 4: # /!\ Nettoyer quand plus nécessaire
+                    if ID == 4: # /!\ Ne pas nettoyer, c'est très utile par moment
                         constantes_deplacements.append([self.controleur.nb_tours,"cherche",corp.dir_regard,cases])
             else:
                 if res == "deplacement":
@@ -11389,13 +11524,11 @@ class Esprit :
                         case[2] -= 1
                     if case[2] <= 0:
                         case[1] = 0
-                        case[7] = 0
-                        case[8] = [False,False,False,False]
-                        case[9] = []
-                    case[3] = 0
-                    case[4] = 0
-                    case[5] = 0
-                    case[6] = 0
+                        case[4] = 0
+                        case[5] = [False,False,False,False]
+                        case[6] = []
+                        case[7] = []
+                    case[3] = [0,0,0,0,0,False]
 
     #Découvront le déroulé d'un tour avec esprit-sensei :
     def debut_tour(self):
@@ -11759,7 +11892,7 @@ class Esprit_humain(Esprit_type):
             for colonne in vue:
                 for case in colonne:
                     if case[2] > 0:
-                        for ID in case[9]:
+                        for ID in case[6]:
                             if not(self.controleur.est_item(ID)):
                                 agissants.append(ID)
         agissants.sort()
@@ -11795,13 +11928,11 @@ class Esprit_humain(Esprit_type):
                             case[2] -= 1
                     if case[2] <= 0:
                         case[1] = 0
-                        case[7] = 0
-                        case[8] = [False,False,False,False]
-                        case[9] = []
-                    case[3] = 0
-                    case[4] = 0
-                    case[5] = 0
-                    case[6] = 0
+                        case[4] = 0
+                        case[5] = [False,False,False,False]
+                        case[6] = []
+                        case[7] = []
+                    case[3] = [0,0,0,0,0,False]
 
     def peureuse(self):
         return 5 in self.corps.keys() and self.corps[5] in ["humain","attente","fuite","deplacement","attaque","vivant"] #J'ai un doute sur la possibilité des deux derniers mais bon...
@@ -11857,22 +11988,22 @@ class Esprit_humain(Esprit_type):
                 Esprit.deplace(self,ID_humain)
             else:
                 res = "recherche"
-                self.resoud(cible,10,6)
+                self.resoud(cible,10,4)
                 position = humain.get_position()
                 case = self.vue[position[0]][position[1]][position[2]]
-                cases = [[-1,case[0],case[3],case[4],-case[5]],case[5],case[6]]
+                cases = [[-1,case[0],case[3][0],case[3][1],-case[3][2],case[3][2],case[3][4]]]
                 dirs = []
                 importance = 0
                 humain.statut_humain = "en chemin"
-                if case[6] == 0:
+                if case[3][4] == 0:
                     humain.statut_humain = "perdu"
                     if humain.ID == 4:
                         humain.statut_humain = "paume"
                 for i in range(4):
-                    if case[8][i]:
-                        if case[8][i][0] in self.vue.keys():
-                            case_pot = self.vue[case[8][i][0]][case[8][i][1]][case[8][i][2]]
-                            entitees = case_pot[9]
+                    if case[5][i]:
+                        if case[5][i][0] in self.vue.keys():
+                            case_pot = self.vue[case[5][i][0]][case[5][i][1]][case[5][i][2]]
+                            entitees = case_pot[6]
                             libre = True
                             for ID_entitee in entitees:
                                 entitee = humain.controleur.get_entitee(ID_entitee)
@@ -11895,7 +12026,7 @@ class Esprit_humain(Esprit_type):
                                             humain.dir_regard = i
                                             self.controleur.get_entitee(2).dir_regard = range(4)[i-2]
                             if libre:
-                                cases.append([i,case_pot[0],case_pot[3],case_pot[4],-case_pot[5],case[5],case_pot[6]])
+                                cases.append([i,case_pot[0],case_pot[3][0],case_pot[3][1],-case_pot[3][2],case[3][2],case_pot[3][4]])
                                 dirs.append(i)
                 if res == "recherche": #On n'a pas d'ennemi à portée directe (ou on ne souhaite pas attaquer ni fuir)
                     comportement = humain.comporte_distance()
@@ -11911,10 +12042,10 @@ class Esprit_humain(Esprit_type):
                         humain.skill_courant = None
                         importance = 0
                         for i in range(4):
-                            if case[8][i]:
-                                if case[8][i][0] in self.vue.keys():
-                                    case_pot = self.vue[case[8][i][0]][case[8][i][1]][case[8][i][2]]
-                                    entitees = case_pot[9]
+                            if case[5][i]:
+                                if case[5][i][0] in self.vue.keys():
+                                    case_pot = self.vue[case[5][i][0]][case[5][i][1]][case[5][i][2]]
+                                    entitees = case_pot[6]
                                     libre = True
                                     for ID_entitee in entitees:
                                         entitee = humain.controleur.get_entitee(ID_entitee)
@@ -11924,7 +12055,7 @@ class Esprit_humain(Esprit_type):
                                                     importance = self.ennemis[ID_entitee]
                                                     humain.attaque(i)
                                                     res = "attaque"
-                    elif not(case[4] or case[5] or case[6]):
+                    elif not(case[3] or case[5] or case[6]):
                         res = "paix"
                         if not isinstance(humain,Sentinelle):
                             res = "exploration"
@@ -11946,8 +12077,8 @@ class Esprit_humain(Esprit_type):
                                 res = humain.agit_en_vue(self)
                         elif res == "fuite":
                             for case in cases:
-                                case[4] *= -1
-                            new_cases = sorted(cases,key=operator.itemgetter(4,5,2,3))
+                                case[6] *= -1
+                            new_cases = sorted(cases,key=operator.itemgetter(6,5,2,3))
                             if new_cases[0][0] != -1: #La première case (i.e. les valeurs les moins élevées) n'est pas celle où l'on est
                                 humain.va(new_cases[0][0])
                                 if ID_humain == 4:
@@ -12843,7 +12974,7 @@ class Attaque_decentree(Attaque_magique):
         for position_touche in positions_touches:
             controleur.labs[self.position[0]].matrice_cases[position_touche[1]][position_touche[2]].effets.append(Attaque_case(self.responsable,self.degats,self.element,self.direction,self.autre,self.taux_autre))
 
-class Attaque_delayee(Attaque_magique,Delaye):
+class Attaque_delayee(Attaque_magique):
     """Une attaque qui se fera plus tard."""
     def __init__(self,delai,responsable=0,degats=0,element=TERRE,portee=1,propagation="C__S___",direction=None,autre=None,taux_autre=None):
         Attaque_magique.__init__(self,responsable,degats,element,portee,propagation,direction,autre,taux_autre)
@@ -12856,6 +12987,11 @@ class Attaque_decentree_delayee(Attaque_decentree,Attaque_delayee):
         Attaque_magique.__init__(self,responsable,degats,element,portee,propagation,direction,autre,taux_autre)
         self.position = position
         self.delai = delai
+
+    def action(self,controleur):
+        positions_touches = controleur.get_pos_touches(self.position,self.portee,self.propagation,self.direction,"tout",self.responsable)
+        for position_touche in positions_touches:
+            controleur.labs[self.position[0]].matrice_cases[position_touche[1]][position_touche[2]].effets.append(Attaque_case_delayee(self.delai,self.responsable,self.degats,self.element,self.direction,self.autre,self.taux_autre))
 
 class Attaque_case(One_shot):
     """L'effet d'attaque dans sa version intermédiaire. Créée par une attaque (version générale), chargé d'attacher une attaque particulière aux agissants de la case, en passant d'abord les défenses de la case. Attachée à la case."""
@@ -12892,6 +13028,21 @@ class Attaque_case(One_shot):
             return SKIN_ATTAQUE_GLACE
         elif self.element == OMBRE:
             return SKIN_ATTAQUE_OMBRE
+
+class Attaque_case_delayee(Attaque_case,Delaye):
+    def __init__(self,delai,responsable,degats,element,direction = None,autre=None,taux_autre=None):
+        Attaque_case.__init__(self,responsable,degats,element,direction,autre,taux_autre)
+        self.affiche = False
+        self.delai=delai
+
+    def execute(self,case,position):
+        if self.phase == "démarrage":
+            if self.delai > 0:
+                self.delai -= 1
+            else:
+                self.affiche = True
+                self.action(case,position)
+                self.termine()
 
 class Attaque_particulier(One_shot):
     """L'effet d'attaque dans sa version particulière. Créée par une attaque (version intermèdiaire), chargé d'infligé les dégats, en passant d'abord les défenses de l'agissant. Attachée à la victime."""
@@ -17793,7 +17944,7 @@ class Affichage:
                         skins.append(SKINS_CASES_NOIRES_VUES[distance][0])
                     elif case[1] > 0:
                         skins.append(SKINS_CASES_VUES[distance][0])
-                        if not case[7][direction]:
+                        if not case[5][direction]:
                             skins.append(SKINS_MURS_FACE_VUS[distance][0])
                         else:
                             traj = joueur.controleur.get_trajet(case[0],direction)
@@ -17801,7 +17952,7 @@ class Affichage:
                                 skins.append(SKINS_ESCALIERS_BAS_FACE_VUS[distance][0])
                             elif traj == "escalier haut":
                                 skins.append(SKINS_ESCALIERS_HAUT_FACE_VUS[distance][0])
-                        if not case[7][direction-1]:
+                        if not case[5][direction-1]:
                             skins.append(SKINS_MURS_VUS[distance][0][0])
                         else:
                             traj = joueur.controleur.get_trajet(case[0],direction-1)
@@ -17809,7 +17960,7 @@ class Affichage:
                                 skins.append(SKINS_ESCALIERS_BAS_VUS[distance][0][0])
                             elif traj == "escalier haut":
                                 skins.append(SKINS_ESCALIERS_HAUT_VUS[distance][0][0])
-                        if not case[7][direction-3]:
+                        if not case[5][direction-3]:
                             skins.append(SKINS_MURS_VUS[distance][0][1])
                         else:
                             traj = joueur.controleur.get_trajet(case[0],direction-3)
@@ -17837,7 +17988,7 @@ class Affichage:
                             skins.append(SKINS_CASES_NOIRES_VUES[distance][ecart])
                         elif case[1] > 0:
                             skins.append(SKINS_CASES_VUES[distance][ecart])#Rajouter les affinités etc. plus tard
-                            if not case[7][direction]:
+                            if not case[5][direction]:
                                 skins.append(SKINS_MURS_FACE_VUS[distance][ecart])#Rajouter aussi les distinctions des téléportations
                             else:
                                 traj = joueur.controleur.get_trajet(case[0],direction)
@@ -17845,7 +17996,7 @@ class Affichage:
                                     skins.append(SKINS_ESCALIERS_BAS_FACE_VUS[distance][ecart])
                                 elif traj == "escalier haut":
                                     skins.append(SKINS_ESCALIERS_HAUT_FACE_VUS[distance][ecart])
-                            if not case[7][direction-3]:
+                            if not case[5][direction-3]:
                                 skins.append(SKINS_MURS_VUS[distance][ecart])#Pareil
                             else:
                                 traj = joueur.controleur.get_trajet(case[0],direction-3)
@@ -17872,7 +18023,7 @@ class Affichage:
                             skins.append(SKINS_CASES_NOIRES_VUES[distance][ecart])
                         elif case[1] > 0:
                             skins.append(SKINS_CASES_VUES[distance][ecart])
-                            if not case[7][direction]:
+                            if not case[5][direction]:
                                 skins.append(SKINS_MURS_FACE_VUS[distance][ecart])
                             else:
                                 traj = joueur.controleur.get_trajet(case[0],direction)
@@ -17880,7 +18031,7 @@ class Affichage:
                                     skins.append(SKINS_ESCALIERS_BAS_FACE_VUS[distance][ecart])
                                 elif traj == "escalier haut":
                                     skins.append(SKINS_ESCALIERS_HAUT_FACE_VUS[distance][ecart])
-                            if not case[7][direction-1]:
+                            if not case[5][direction-1]:
                                 skins.append(SKINS_MURS_VUS[distance][ecart])
                             else:
                                 traj = joueur.controleur.get_trajet(case[0],direction-1)
@@ -17892,7 +18043,7 @@ class Affichage:
             for skin in skins:
                 skin.dessine_toi(self.screen,(x,y),(largeur,hauteur))
 
-            for ID in joueur.vue[position[1]][position[2]][8]:
+            for ID in joueur.vue[position[1]][position[2]][6]:
                 if ID < 11:
                     entitee = joueur.controleur.get_entitee(ID)
                     if issubclass(entitee.get_classe(),Agissant):
@@ -17907,39 +18058,39 @@ class Affichage:
         elif vue[1]==-1: #On a affaire à un case accessible mais pas vue
             SKIN_BROUILLARD.dessine_toi(self.screen,position,taille)
             if vue[0][2] > 0:
-                if vue[7][HAUT]:
+                if vue[5][HAUT]:
                     if joueur.vue[vue[0][1]][vue[0][2]-1][1]>0:
                         SKIN_MUR_BROUILLARD.dessine_toi(self.screen,position,taille,HAUT)
             if vue[0][1] < len(joueur.vue) - 1:
-                if vue[7][DROITE]:
+                if vue[5][DROITE]:
                     if joueur.vue[vue[0][1]+1][vue[0][2]][1]>0:
                         SKIN_MUR_BROUILLARD.dessine_toi(self.screen,position,taille,DROITE)
             if vue[0][2] < len(joueur.vue[0]) -1:
-                if vue[7][BAS]:
+                if vue[5][BAS]:
                     if joueur.vue[vue[0][1]][vue[0][2]+1][1]>0:
                         SKIN_MUR_BROUILLARD.dessine_toi(self.screen,position,taille,BAS)
             if vue[0][1] > 0:
-                if vue[7][GAUCHE]:
+                if vue[5][GAUCHE]:
                     if joueur.vue[vue[0][1]-1][vue[0][2]][1]>0:
                         SKIN_MUR_BROUILLARD.dessine_toi(self.screen,position,taille,GAUCHE)
         else:
-            if vue[6]==0: #On teste le code de la case pour déterminer son image
+            if vue[4]==0: #On teste le code de la case pour déterminer son image
                 SKIN_CASE.dessine_toi(self.screen,position,taille) #La case en premier, donc en bas
-            elif vue[6]==1: #On teste le code de la case pour déterminer son image
+            elif vue[4]==1: #On teste le code de la case pour déterminer son image
                 SKIN_CASE_1.dessine_toi(self.screen,position,taille) #La case en premier, donc en bas
-            elif vue[6]==2: #On teste le code de la case pour déterminer son image
+            elif vue[4]==2: #On teste le code de la case pour déterminer son image
                 SKIN_CASE_2.dessine_toi(self.screen,position,taille) #La case en premier, donc en bas
-            elif vue[6]==3: #On teste le code de la case pour déterminer son image
+            elif vue[4]==3: #On teste le code de la case pour déterminer son image
                 SKIN_CASE_3.dessine_toi(self.screen,position,taille) #La case en premier, donc en bas
-            elif vue[6]==4: #On teste le code de la case pour déterminer son image
+            elif vue[4]==4: #On teste le code de la case pour déterminer son image
                 SKIN_CASE_4.dessine_toi(self.screen,position,taille) #La case en premier, donc en bas
-            elif vue[6]==5: #On teste le code de la case pour déterminer son image
+            elif vue[4]==5: #On teste le code de la case pour déterminer son image
                 SKIN_CASE_5.dessine_toi(self.screen,position,taille) #La case en premier, donc en bas
-            elif vue[6]==6: #On teste le code de la case pour déterminer son image
+            elif vue[4]==6: #On teste le code de la case pour déterminer son image
                 SKIN_CASE_6.dessine_toi(self.screen,position,taille) #La case en premier, donc en bas
-            elif vue[6]==7: #On teste le code de la case pour déterminer son image
+            elif vue[4]==7: #On teste le code de la case pour déterminer son image
                 SKIN_CASE_7.dessine_toi(self.screen,position,taille) #La case en premier, donc en bas
-            elif vue[6]==8: #On teste le code de la case pour déterminer son image
+            elif vue[4]==8: #On teste le code de la case pour déterminer son image
                 SKIN_CASE_8.dessine_toi(self.screen,position,taille) #La case en premier, donc en bas
             case = joueur.controleur.get_case(vue[0])
             for i in range(4):
@@ -17949,13 +18100,13 @@ class Affichage:
                         if isinstance(effet,Porte) :
                             effet.get_skin(joueur.get_clees()).dessine_toi(self.screen,position,taille,i)
                         elif isinstance(effet,(Mur_plein,Mur_impassable)) :
-                            effet.get_skin(vue[6]).dessine_toi(self.screen,position,taille,i)
+                            effet.get_skin(vue[4]).dessine_toi(self.screen,position,taille,i)
                         else :
                             effet.get_skin().dessine_toi(self.screen,position,taille,i)
             for effet in case.effets:
                 if effet.affiche:
                     effet.get_skin().dessine_toi(self.screen,position,taille)
-            entitees = vue[8]
+            entitees = vue[6]
             agissant = None
             for ID_entitee in entitees : #Puis les items au sol
                 entitee = joueur.controleur.get_entitee(ID_entitee)
@@ -17994,6 +18145,8 @@ class Affichage:
                 self.screen.blit(pygame.transform.scale(pygame.image.load(fichier).convert_alpha(),(int(taille*((15*agissant.pv)/(19*agissant.pv_max))),int(taille*(15/19)))),(position[0]+int(taille*(2/19)),position[1]+int(taille*(2/19))))
                 if isinstance(agissant,Humain) and agissant.dialogue > 0: #Est-ce qu'on veut vraiment avoir cet indicatif en-dessous des effets ?
                     SKIN_DIALOGUE.dessine_toi(self.screen,position,taille)
+            if vue[7] != []:
+                SKIN_ATTAQUE_DELAYEE.dessine_toi(self.screen,position,taille)
 
             #Rajouter des conditions d'observation
 

@@ -56,6 +56,47 @@ Troisi�me �tape : mains[0][2].boucle() et le jeu reprend imm�diatement, at
 
 � mon attention :
 
+À propos des déplacements
+Différents objectifs :
+- Attaquer
+- Survivre
+- (Explorer)
+
+Pour ce qui est d'attaquer, on a besoin d'être à portée (éventuellement au corps-à-corps) et on veut privilégier certains ennemis (ceux qui sont responsable du plus de dégats).
+Pour ce qui est de survivre, on veut ne pas être pris dans les attaques (pour les sorts délayés) et s'éloigner des ennemis qui font beaucoup de dégat au corps à corps (est-ce qu'on veut fuir aussi les mages offensifs ?)
+Concrètement, on va sélectionner la case où l'on se déplace sur la base de plusieurs critères :
+ + proximité avec des ennemis importants (responsables de beaucoup de dégats/haïts pour d'autres raisons genre racisme), ne concerne pas tout le monde
+ - proximité avec des ennemis dangereux (capables d'infliger beaucoup de dégats en corps-à-corps)
+ - attaque magique prévue à cet endroit
+ - proximité avec un endroit où une attaque magique est prévue (on ne veut pas foncer dans les attaques magiques)
+ + proximité avec un endroit où il n'y a pas d'attaque magique (puisque les attaques magiques ciblent plusieurs cases, il faut aller vers le 'bord' et sortir de la zone)
+ + proximité avec un allié 'protecteur' (quelqu'un qui va prendre les coups à notre place, typiquement un tank, ou un dps cac si on est un dps distance)
+ - proximité avec un endroit invisible (absence de vision = danger potentiel), surtout quand on est affaibli ou support
+ + proximité avec un endroit invisible (exploration = possibilité de dénicher un soutien qui se cache à l'écart de la mélée), à nuancer pour prendre en compte l'emplacement supposé des agissants vus précédemment
+ + proximité avec un endroit/agissant ciblé (comme pour les humains qui suivent le joueur)
+
+Le choix dépend aussi de la situation dans laquelle se trouve l'agissant :
+- En état d'attaquer au corps-à-corps (cherche à se rapprocher des combats)
+- En état d'attaquer à distance (cherche à se rapprocher des combats, mais potentiellement en s'assurant un bouclier humain/une forte concentration d'ennemis/etc.)
+- En état d'agir en support (cherche à être en sécurité, protégé par d'autres où loin)
+- Blessé 'sévèrement' (cherche à être en sécurité)
+- Dans la zone d'effet d'une attaque magique 'peu dangereuse' (sortir de la zone est secondaire, mais préférable toutes choses égales par ailleurs)
+- Dans la zone d'effet d'une attaque magique 'dangereuse' par ses dégats (il faut sortir de la zone, mais plutôt vers la direction des ennemis)
+- Dans la zone d'effet d'une attaque magique 'dangereuse' parce qu'on est faible/blessé (il faut sortir de la zone, plutôt en se mettant à l'abri)
+
+Options :
+- Une 'équation' pour chaque situation de l'agissant, qui regroupe tous les critères en une valeur de la case (dépend probablement des PVs de l'agissant et d'autres trucs, donc à recalculer à chaque fois)
+- Un tri selon les critères, en appliquant le critère suivant si le premier ne permet pas de trancher (l'ordre des critères dépend de la situation de l'agissant, les critères peuvent être calculés pour tout le monde d'un coup, où presque)
+- Une combinaison des deux (par exemple regrouper la proximité avec les ennemis dangereux et la proximité avec les alliés protecteurs en un critère de dangerosité de la case)
+
+(Pourquoi améliorer les déplacements ? Pour que les actions des agissants (et surtout des humains) semblent 'intelligentes' au joueur. Pour apporter un challenge d'ordre stratégique au joueur. Pour éviter que les humains meurent 'par malchance'. Avec un système de déplacements efficace, il sera aussi possible de créer des esprits plus 'bêtes' (en faisant dépendre de la présence de stratèges par exemple) ou qui tomberont dans certains pièges/auront des tendances à commetre certaines erreurs. Par exemple, on peut supposer que les monstres du tutoriel soient moins bien organisés, ce qui les rendra plus facile à vaincre.)
+
+Comment faire pour les attaques de zone ?
+
+
+
+
+
 Comment g�rer tous les menus/choix de fa�on simple ?
 
 Il y a :
