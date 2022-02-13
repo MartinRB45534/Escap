@@ -11187,7 +11187,7 @@ class Esprit :
         coef_croissant = 1.1
         # On commence par trouver les seuils, vers lesquels on va vouloir aller
         seuils = self.trouve_seuils(self.get_pos_vues()) # On part des différents endroit d'où l'on voit, qui devraient théoriquement nous donner accès à toute notre vision
-        self.propage(seuils,coef_croissant,3,-1) # On propage de façon croissante à partir des seuils (à l'intérieur)
+        self.propage(seuils,coef_croissant,3,False,-1) # On propage de façon croissante à partir des seuils (à l'intérieur)
         self.propage(seuils,coef_croissant,2,True,-1) # On propage de façon croissante à partir des seuils (à l'intérieur), en contournant les obstacles
 
         # On rajoute les ennemis
@@ -11273,9 +11273,11 @@ class Esprit :
                         case[3][4] = 0
 
         #la queue est une liste de positions
-        queue = positions
+        queue = [position for position in positions]
 
         arret_obstacle = False
+
+        departs = len(positions)
 
         while len(queue)!=0 :
 
@@ -11287,9 +11289,12 @@ class Esprit :
 
             #trouver les positions explorables
 
-            pos_explorables = self.positions_utilisables(position,arret_obstacle)
+            if departs == 0:
+                arret_obstacle = dead_ends
+            else:
+                departs -= 1
 
-            arret_obstacle = dead_ends
+            pos_explorables = self.positions_utilisables(position,arret_obstacle)
 
             for pos in pos_explorables:
                 if valeur*comparateur > self.vue[pos[0]][pos[1]][pos[2]][3][indice]*comparateur:
@@ -11310,9 +11315,11 @@ class Esprit :
         seuils = []
 
         #la queue est une liste de positions
-        queue=positions
+        queue = [position for position in positions]
 
         arret_obstacle = False
+
+        departs = len(positions)
 
         while len(queue)!=0 :
 
@@ -11322,9 +11329,12 @@ class Esprit :
 
             #trouver les positions explorables
 
-            pos_explorables = self.positions_utilisables(position,arret_obstacle)
+            if departs == 0:
+                arret_obstacle = dead_ends
+            else:
+                departs -= 1
 
-            arret_obstacle = dead_ends
+            pos_explorables = self.positions_utilisables(position,arret_obstacle)
 
             for pos in pos_explorables:
                 if self.vue[position[0]][position[1]][position[2]][3][indice] > self.vue[pos[0]][pos[1]][pos[2]][3][indice] and not position in seuils:
@@ -11497,7 +11507,7 @@ class Esprit :
                         constantes_deplacements.append([self.controleur.nb_tours,"cherche",corp.dir_regard,cases])
             else:
                 if res == "deplacement":
-                    new_cases = sorted(cases,key=operator.itemgetter(2,3,4)) #2 pour le chemin d'accès direct, 3 pour le chemin d'accès à travers
+                    new_cases = sorted(cases,key=operator.itemgetter(2,3,4)) #2 pour le chemin d'accès indirect, 3 pour le chemin d'accès direct
                     res = "approche"
                     if new_cases[-1][0] != -1: #La dernière case (i.e. les valeurs les plus élevées) n'est pas celle où l'on est
                         corp.va(new_cases[-1][0])
@@ -11506,7 +11516,7 @@ class Esprit :
                     else:
                         res = corp.agit_en_vue(self)
                 elif res == "fuite":
-                    new_cases = sorted(cases,key=operator.itemgetter(5,2,3)) #2 pour le chemin d'accès direct, 3 pour le chemin d'accès à travers
+                    new_cases = sorted(cases,key=operator.itemgetter(5,2,3)) #2 pour le chemin d'accès indirect, 3 pour le chemin d'accès direct
                     if new_cases[0][0] != -1: #La première case (i.e. les valeurs les moins élevées) n'est pas celle où l'on est
                         corp.va(new_cases[0][0])
                         if ID == 4:
@@ -11517,9 +11527,8 @@ class Esprit :
 
     def oublie(self):
         for lab in self.vue.values():
-            for i in range(len(lab)):
-                for j in range(len(lab[0])):
-                    case = lab[i][j]
+            for colonne in lab:
+                for case in colonne:
                     if case[2] > 0:
                         case[2] -= 1
                     if case[2] <= 0:
@@ -11527,8 +11536,10 @@ class Esprit :
                         case[4] = 0
                         case[5] = [False,False,False,False]
                         case[6] = []
-                        case[7] = []
+                    case[7] = []
                     case[3] = [0,0,0,0,0,False]
+                    if case[7] != []:
+                        print(case)
 
     #Découvront le déroulé d'un tour avec esprit-sensei :
     def debut_tour(self):
@@ -11918,9 +11929,8 @@ class Esprit_humain(Esprit_type):
 
     def oublie(self):
         for lab in self.vue.values():
-            for i in range(len(lab)):
-                for j in range(len(lab[0])):
-                    case = lab[i][j]
+            for colonne in lab:
+                for case in colonne:
                     if case[2] > 0:
                         if self.peureuse():
                             case[2] = self.oubli
@@ -11931,8 +11941,10 @@ class Esprit_humain(Esprit_type):
                         case[4] = 0
                         case[5] = [False,False,False,False]
                         case[6] = []
-                        case[7] = []
+                    case[7] = []
                     case[3] = [0,0,0,0,0,False]
+                    if case[7] != []:
+                        print(case)
 
     def peureuse(self):
         return 5 in self.corps.keys() and self.corps[5] in ["humain","attente","fuite","deplacement","attaque","vivant"] #J'ai un doute sur la possibilité des deux derniers mais bon...
@@ -12055,7 +12067,7 @@ class Esprit_humain(Esprit_type):
                                                     importance = self.ennemis[ID_entitee]
                                                     humain.attaque(i)
                                                     res = "attaque"
-                    elif not(case[3] or case[5] or case[6]):
+                    elif not(case[3] or case[5]) and humain.statut_humain == "perdu":
                         res = "paix"
                         if not isinstance(humain,Sentinelle):
                             res = "exploration"
@@ -12065,6 +12077,8 @@ class Esprit_humain(Esprit_type):
                                     if dir_back in dirs: #On ne veut pas y retourner
                                         dirs.remove(dir_back)
                             humain.va(dirs[random.randint(0,len(dirs)-1)]) #/!\ Ne pas retourner sur ses pas, c'est bien ! Aller vers les endroits inconnus, ce serait mieux. /!\
+                    elif humain.statut_humain == "paume":
+                        pass
                     else:
                         if res == "deplacement":
                             res = "approche"
@@ -15957,7 +15971,7 @@ class Affichage:
 
             marge_haut += 25
 
-    def dessine_droite(self,joueur): #La fonction qui dessine le rectangle de droite. Elle affiche le joueur, son interlocuteur ou son ennemi, sur fond de labyrinthe. Elle fait appel a des graphiques presque déjà complets (une couche pour le labyrinthe, une autre pour l'agissant, une troisième pour les équippements de l'agissant, une quatrième pour une expression du visage.
+    def dessine_droite(self,joueur):
 
         marge_gauche = self.position_debut_x_rectangle_2+9
         marge_haut = self.position_debut_y_rectangles_et_carre+5
@@ -15976,7 +15990,7 @@ class Affichage:
 
         curseur_in = esprit.curseur
 
-        corps = esprit.get_corps_vus()
+        corps = sorted(esprit.get_corps_vus())
         ennemis = esprit.get_ennemis_vus()
         if (curseur_in == "corps" or curseur_in == "in_corps") and corps != []:
             ID_courant = corps[esprit.allie_courant]

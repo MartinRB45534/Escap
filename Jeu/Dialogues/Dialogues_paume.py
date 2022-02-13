@@ -28,7 +28,7 @@ REPLIQUES_PAUME = {
     "dialogue2reponse1.3.1":"Comment est-ce que le gobelin est mort ?",
     "dialogue2reponse1.3.2":"C'était quoi, tous les trucs qu'on voyait ?",
     "dialogue2reponse1.3.3":"Pourquoi est-ce qu'il reste quelque chose ?",
-    "dialogue2phrase1.3.1":"Il avait une barre rouge au-dessus de la tête, comme toi et moi. Cette barre représente ses PVs, et chacune de nos attaques lui a fait perdre des PVs. Quand ses PVs ont atteint 0, il est mort.",
+    "dialogue2phrase1.3.1":"Il avait une barre rouge au-dessus de la tête, comme toi et moi avons une barre verte. Cette barre représente ses PVs, et chacune de nos attaques lui a fait perdre des PVs. Quand ses PVs ont atteint 0, il est mort.",
     "dialogue2phrase1.3.2":"Les marques marrons représentaient les attaques. Il y avait aussi des points rouges à chaque fois que quelqu'un se faisait blesser.",
     "dialogue2phrase1.3.2/peureuse":"Les marques marrons représentaient les attaques. Il y avait aussi des points rouges à chaque fois que quelqu'un se faisait blesser. Et s'il y avait des espèces de cercles oranges sous nos pieds, c'étaient les magies de boost lancés par notre coéquipière. Tu as peut-être pu voir qu'elle-même avait un cercle bleu à chaque fois qu'elle lançait une magie.",
     "dialogue2phrase1.3.3":"Le corps du gobelin n'allait pas disparaître ! Son cadavre est toujours là. Il y a aussi les items qu'il transportait, en l'occurence son équippement.",
