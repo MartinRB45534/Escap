@@ -13019,7 +13019,7 @@ class Attaque_decentree_delayee(Attaque_decentree,Attaque_delayee):
     def action(self,controleur):
         positions_touches = controleur.get_pos_touches(self.position,self.portee,self.propagation,self.direction,"tout",self.responsable)
         for position_touche in positions_touches:
-            controleur.labs[self.position[0]].matrice_cases[position_touche[1]][position_touche[2]].effets.append(Attaque_case_delayee(self.delai,self.responsable,self.degats,self.distance,self.element,self.direction,self.autre,self.taux_autre))
+            controleur.labs[self.position[0]].matrice_cases[position_touche[1]][position_touche[2]].effets.append(Attaque_case_delayee(self.delai,self.responsable,self.degats,self.element,self.distance,self.direction,self.autre,self.taux_autre))
 
 class Attaque_case(One_shot):
     """L'effet d'attaque dans sa version intermédiaire. Créée par une attaque (version générale), chargé d'attacher une attaque particulière aux agissants de la case, en passant d'abord les défenses de la case. Attachée à la case."""
@@ -13057,6 +13057,10 @@ class Attaque_case(One_shot):
             return SKIN_ATTAQUE_GLACE
         elif self.element == OMBRE:
             return SKIN_ATTAQUE_OMBRE
+        else:
+            print("Euh, quel est cet élément ?")
+            print(self.element)
+            return SKIN_VIDE
 
 class Attaque_case_delayee(Attaque_case,Delaye):
     def __init__(self,delai,responsable,degats,element,distance="distance",direction = None,autre=None,taux_autre=None):
