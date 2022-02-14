@@ -1045,7 +1045,7 @@ class Controleur():
                 latence,taux,portee = skill.utilise()
 
                 degats = force*taux*affinite
-                attaque = Attaque(ID,degats,TERRE,portee)
+                attaque = Attaque(ID,degats,TERRE,"contact",portee)
 
                 agissant.add_latence(latence)
                 agissant.effets.append(attaque)
@@ -1090,7 +1090,7 @@ class Controleur():
                         print("Quelle est cette arme ? " + agissant.arme)
 
                     degats = force*affinite*tranchant*taux*taux_manipulation
-                    attaque = Attaque(ID,degats,element,portee,forme,direction)
+                    attaque = Attaque(ID,degats,element,"contact",portee,forme,direction)
 
                     agissant.add_latence(latence)
                     agissant.effets.append(attaque)
@@ -1233,7 +1233,7 @@ class Controleur():
 
             elif type_skill in [Scythe,Lesser_Scythe] :
                 perce,element,taux = skill.utilise()
-                attaque = Attaque(agissant.ID,agissant.force*taux,element,1,"R__T_Pb",agissant.direction,"piercing",perce)
+                attaque = Attaque(agissant.ID,agissant.force*taux,element,"contact",1,"R__T_Pb",agissant.direction,"piercing",perce)
                 self.tentative_attaque(attaque)
 
 
@@ -3052,9 +3052,9 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
             projectile = self.projectile_courant.cree_item(self) #Le 'self.projectile_courant' est un créateur de projectile
         return projectile
 
-    def insurge(self,offenseur,gravite):
+    def insurge(self,offenseur,gravite,dangerosite):
         if offenseur != 0:
-            self.offenses.append([offenseur,gravite])
+            self.offenses.append([offenseur,gravite,dangerosite])
 
     def get_offenses(self):
         offenses = self.offenses
@@ -3192,8 +3192,15 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
                 priorite *= item.augmente_priorite(priorite)
         return priorite
 
-    def subit(self,degats,element=TERRE,ID=0): #L'ID 0 ne correspond à personne
+    def subit(self,degats,distance="contact",element=TERRE,ID=0): #L'ID 0 ne correspond à personne
         gravite = degats/self.pv_max
+        dangerosite = 0
+        if distance == "contact":
+            dangerosite = degats*2
+        elif distance == "proximité":
+            dangerosite = degats
+        elif distance == "distance":
+            dangerosite = degats*0.2
         if gravite > 1: #Si c'est de l'overkill, ce n'est pas la faute de l'attaquant non plus !
             gravite = 1
         if self.pv <= self.pv_max//3: #Frapper un blessé, ça ne se fait pas !
@@ -3204,7 +3211,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
             self.pv -= degats/self.get_aff(element)
         if self.pv <= 0: #Alors tuer les gens, je ne vous en parle pas !!!
             gravite += 0.5
-        self.insurge(ID,gravite)
+        self.insurge(ID,gravite,dangerosite)
 
     def instakill(self,ID=0):
         immortel = self.controleur.trouve_skill(self.classe_principale,Skill_immortel)
@@ -3659,7 +3666,7 @@ class Attaquant_magique_case(Agissant):
             for case in colonne:
                 for ID in case[6]:
                     if ID in esprit.ennemis.keys() and not self.controleur.est_item(ID):
-                        cibles.append([esprit.ennemis[ID],case[0]])
+                        cibles.append([esprit.ennemis[ID][0],case[0]])
         skill = trouve_skill(self.classe_principale,Skill_magie)
         if cibles != [] and self.peut_caster(skill.niveau):
             new_cibles = sorted(cibles, key=lambda ennemi: ennemi[0])
@@ -3683,7 +3690,7 @@ class Attaquant_magique_agissant(Agissant):
             for case in colonne:
                 for ID in case[6]:
                     if ID in esprit.ennemis.keys() and not self.controleur.est_item(ID):
-                        cibles.append([esprit.ennemis[ID],ID])
+                        cibles.append([esprit.ennemis[ID][0],ID])
         skill = trouve_skill(self.classe_principale,Skill_magie)
         if cibles != [] and self.peut_caster(skill.niveau):
             new_cibles = sorted(cibles, key=lambda ennemi: ennemi[0])
@@ -4123,7 +4130,7 @@ class Humain(Agissant,Interactif,Entitee_superieure):
                     for entitee in case[6]:
                         if not self.controleur.est_item(entitee):
                             if not entitee in self.controleur.get_esprit(self.esprit).ennemis.keys():
-                                self.insurge(entitee,0.01)
+                                self.insurge(entitee,0.01,0)
         elif self.antagonise_offensifs:
             for colonne in self.vue:
                 for case in colonne:
@@ -4131,7 +4138,7 @@ class Humain(Agissant,Interactif,Entitee_superieure):
                         entitee = self.controleur.get_entitee(ID_entitee)
                         if issubclass(entitee.get_classe(),Agissant):
                             if self.ID in self.controleur.get_esprit(entitee.esprit).ennemis.keys():
-                                self.insurge(ID_entitee,0.01)
+                                self.insurge(ID_entitee,0.01,0)
 
     def get_skin(self):
         if self.etat == "vivant":
@@ -4153,8 +4160,15 @@ class Humain(Agissant,Interactif,Entitee_superieure):
             skins.append(SKIN_STATUT_PAUME)
         return skins
 
-    def subit(self,degats,element=TERRE,ID=0): #L'ID 0 ne correspond à personne
+    def subit(self,degats,distance="contact",element=TERRE,ID=0): #L'ID 0 ne correspond à personne
         gravite = degats/self.pv_max
+        dangerosite = 0
+        if distance == "contact":
+            dangerosite = degats*2
+        elif distance == "proximité":
+            dangerosite = degats
+        elif distance == "distance":
+            dangerosite = degats*0.2
         if gravite > 1: #Si c'est de l'overkill, ce n'est pas la faute de l'attaquant non plus !
             gravite = 1
         if self.pv <= self.pv_max//3: #Frapper un blessé, ça ne se fait pas !
@@ -4172,7 +4186,7 @@ class Humain(Agissant,Interactif,Entitee_superieure):
             self.effets_mortuaires = self.effets
             self.effets_mortuaires_tueur = self.controleur.get_entitee(ID).effets
             self.controleur.pause = True
-        self.insurge(ID,gravite)
+        self.insurge(ID,gravite,dangerosite) #L'ID 0 ne correspond à personne
 
 class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, c'est le personnage principal !)
     """La classe du joueur."""
@@ -7848,7 +7862,7 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
             self.statut_humain = "exploration"
         elif replique == "dialogue-2reponse1.1.2":
             self.end_dialogue(-2)
-            self.offenses.append([2,0.01])
+            self.offenses.append([2,0.01,0])
             self.statut_humain = "exploration"
             self.attente = False
         elif replique == "dialogue-2reponse1.2":
@@ -8101,7 +8115,7 @@ class Peste(Multi_soigneur,Support_lointain,Humain): #La huitième humaine du je
             self.repliques = ["dialogue-2reponse1.1"]
         elif replique == "dialogue-2reponse1.1":
             self.end_dialogue(-4)
-            self.offenses.append([2,0.01])
+            self.offenses.append([2,0.01,0])
             self.statut_humain = "exploration"
             self.attente = False
         elif replique == "dialogue-2reponse1.2":
@@ -8341,7 +8355,7 @@ class Bombe_atomique(Attaquant_magique_case,Support,Humain): #La neuvième humai
             self.repliques = ["dialogue1reponse1.2.2.2.1.1"]
         elif replique == "dialogue1reponse1.2.2.2.1.1":
             self.end_dialogue(-3)
-            self.offenses.append([2,0.01])
+            self.offenses.append([2,0.01,0])
             self.statut_humain = "exploration"
             self.attente = False
 
@@ -8819,7 +8833,7 @@ class Potion_medicament(Potion):
 class Potion_soin(Potion):
     """Une potion qui restaure les PVs."""
     def __init__(self,position,pv):
-        Potion.__init__(self,position,Soin(pv))
+        Potion.__init__(self,position,Soin(0,pv))
 
     def get_titre(self,observation):
         return "Potion de soin"
@@ -11096,7 +11110,7 @@ class Esprit :
             for ID in case[6]:
                 if self.controleur.get_entitee(ID).etat == "vivant":
                     if ID in self.ennemis:
-                        new_importance = self.ennemis[ID]
+                        new_importance = self.ennemis[ID][0]
                         if new_importance > importance:
                             importance = new_importance
         return importance
@@ -11142,7 +11156,7 @@ class Esprit :
             if not(ID_agissant in self.ennemis.keys() or ID_agissant in self.corps.keys()):
                 for espece in self.controleur.get_especes(ID_agissant):
                     if espece in self.prejuges:
-                        self.ennemis[ID_agissant] = 0.01
+                        self.ennemis[ID_agissant] = [0.01,0]
         for vue in vues :
             niveau = vue[0][0][0][0] #La première coordonée de la position (première information) de la première case de la première colonne
             if niveau in self.vue.keys(): 
@@ -11156,12 +11170,21 @@ class Esprit :
             offenses,etat = agissant.get_offenses()
             self.corps[corp] = etat
             for offense in offenses:
-                ID_offenseur = offense[0]
-                gravite = offense[1]
-                if ID_offenseur in self.ennemis:
-                    self.ennemis[ID_offenseur] += gravite
-                else:
-                    self.ennemis[ID_offenseur] = gravite
+                self.antagonise_attaquant(offense)
+                self.antagonise_supports(offense)
+        
+    def antagonise_attaquant(self,offense):
+        ID_offenseur = offense[0]
+        gravite = offense[1]
+        degats = offense[2]
+        if ID_offenseur in self.ennemis:
+            self.ennemis[ID_offenseur][0] += gravite
+            self.ennemis[ID_offenseur][1] += degats
+        else:
+            self.ennemis[ID_offenseur] = [gravite,degats]
+
+    def antagonise_supports(self,offense):
+        pass
 
     def get_pos_vues(self):
         positions = []
@@ -11200,8 +11223,8 @@ class Esprit :
             if ennemi.etat == "vivant":
                 position = ennemi.get_position()
                 if position[0] in self.vue.keys():
-                    importance = self.ennemis[ID_ennemi]
-                    dangerosite = self.ennemis[ID_ennemi] #/!\ Changer ça !
+                    importance = self.ennemis[ID_ennemi][0]
+                    dangerosite = self.ennemis[ID_ennemi][1]
                     if importance > self.vue[position[0]][position[1]][position[2]][3][0]:
                         self.vue[position[0]][position[1]][position[2]][3][0]=importance
                         self.vue[position[0]][position[1]][position[2]][3][1]=importance
@@ -11421,7 +11444,7 @@ class Esprit :
     def antagonise(self,nom_esprit):
         for corp in self.controleur.get_esprit(nom_esprit).get_corps():
             if not corp in self.ennemis.keys():
-                self.ennemis[corp] = 0.1
+                self.ennemis[corp] = [0.1,0]
 
     def decide(self):
         for corp in self.corps.keys():
@@ -11456,8 +11479,8 @@ class Esprit :
                             if issubclass(entitee.get_classe(),Agissant): #Elle est occupée par un agissant
                                 if ID_entitee in self.ennemis.keys(): #Et c'est un ennemi !
                                     if corp.peut_voir(i) and (corp.veut_attaquer() or (corp.veut_fuir() and not self.fuite_utile(ID))) : #On veut attaquer lorsqu'on croise un ennemi au corps à corps (et on a assez de mana pour, si on utilise la magie)
-                                        if self.ennemis[ID_entitee] > importance:
-                                            importance = self.ennemis[ID_entitee]
+                                        if self.ennemis[ID_entitee][0] > importance:
+                                            importance = self.ennemis[ID_entitee][0]
                                             corp.attaque(i)
                                             res = "attaque"
                                     elif corp.veut_fuir() and self.fuite_utile(ID): #On veut fuire lorsqu'on croise un ennemi au corps à corps
@@ -11489,8 +11512,8 @@ class Esprit :
                                 entitee = corp.controleur.get_entitee(ID_entitee)
                                 if issubclass(entitee.get_classe(),Agissant): #Cette case est occupée par un agissant
                                     if corp.peut_voir(i) and ID_entitee in self.ennemis.keys(): #Et c'est un ennemi !
-                                        if self.ennemis[ID_entitee] > importance:
-                                            importance = self.ennemis[ID_entitee]
+                                        if self.ennemis[ID_entitee][0] > importance:
+                                            importance = self.ennemis[ID_entitee][0]
                                             corp.attaque(i)
                                             res = "attaque"
             elif tcase[3][1] == 0: #Et tcase[3] forcément aussi par la même occasion, donc on est totalement libre de chercher
@@ -11588,32 +11611,25 @@ class Esprit_type(Esprit):
 class Esprit_sans_scrupule(Esprit_type):
     """Un esprit qui s'en prend principalement aux soigneurs et aux soutiens."""
 
-    def get_offenses(self):
-        for corp in self.corps.keys(): #On vérifie si quelqu'un nous a offensé
-            agissant = self.controleur.get_entitee(corp)
-            offenses,etat = agissant.get_offenses()
-            self.corps[corp] = etat
-            for offense in offenses:
-                ID_offenseur = offense[0]
-                gravite = offense[1]
-                if ID_offenseur in self.ennemis:
-                    self.ennemis[ID_offenseur] += gravite
-                else:
-                    self.ennemis[ID_offenseur] = gravite
-                offenseur = self.controleur.get_entitee(ID_offenseur)
-                esprit_offenseur = self.controleur.get_esprit(offenseur.esprit)
-                corps_ennemis = esprit_offenseur.corps
-                for ID in corps_ennemis.keys():
-                    if corps_ennemis[ID] == "soin":
-                        if ID in self.ennemis:
-                            self.ennemis[ID] += gravite
-                        else:
-                            self.ennemis[ID] = gravite
-                    elif corps_ennemis[ID] == "soutien":
-                        if ID in self.ennemis:
-                            self.ennemis[ID] += gravite/2
-                        else:
-                            self.ennemis[ID] = gravite/2
+    def antagonise_supports(self,offense):
+        offenseur = self.controleur.get_entitee(offense[0])
+        for effet in offenseur.effets:
+            if isinstance(effet,Dopage):
+                ID = effet.responsable
+                if ID != offense[0] and effet.phase == "affiche":
+                    responsabilite = (effet.taux_degats-1)*offense[1]
+                    if ID in self.ennemis:
+                        self.ennemis[ID][0] += responsabilite
+                    else:
+                        self.ennemis[ID] = [responsabilite,0]
+            elif isinstance(effet,Soin):
+                ID = effet.responsable
+                if ID != offense[0] and effet.phase == "affiche":
+                    responsabilite = (effet.gain_pv/offenseur.pv)*offense[1]
+                    if ID in self.ennemis:
+                        self.ennemis[ID][0] += responsabilite
+                    else:
+                        self.ennemis[ID] = [responsabilite,0]
 
 class Esprit_bourrin(Esprit_type): #À supprimer, plus nécessaire
     """Un esprit sans soigneurs ni soutiens."""
@@ -11805,7 +11821,7 @@ class Esprit_humain(Esprit_type):
             if not(ID_agissant in self.ennemis.keys() or ID_agissant in self.corps.keys()):
                 for espece in self.controleur.get_especes(ID_agissant):
                     if espece in self.prejuges:
-                        self.ennemis[ID_agissant] = 0.01
+                        self.ennemis[ID_agissant] = [0.01,0]
             if ID_agissant in self.ennemis.keys() and not(ID_agissant in self.ennemis_vus or self.controleur.est_item(ID_agissant)):
                 self.ennemis_vus.append(ID_agissant)
                 if not attr:
@@ -11819,7 +11835,6 @@ class Esprit_humain(Esprit_type):
                 self.ajoute_vue(vue,niveau)
 
     def get_offenses(self):
-        self.allies_vivants = 0
         for corp in self.corps.keys(): #On vérifie si quelqu'un nous a offensé
             agissant = self.controleur.get_entitee(corp)
             offenses,etat = agissant.get_offenses()
@@ -11833,16 +11848,12 @@ class Esprit_humain(Esprit_type):
                 self.allies_vivants += 1
             self.corps[corp] = etat
             for offense in offenses:
-                ID_offenseur = offense[0]
-                gravite = offense[1]
-                if ID_offenseur in self.ennemis:
-                    self.ennemis[ID_offenseur] += gravite
-                else:
-                    self.ennemis[ID_offenseur] = gravite
-                    if self.peureuse():
-                        for coennemi in self.controleur.get_esprit(self.controleur.get_entitee(ID_offenseur).esprit).corps.keys():
-                            if not coennemi in self.ennemis:
-                                self.ennemis[coennemi] = 0.01
+                self.antagonise_attaquant(offense)
+                self.antagonise_supports(offense)
+                if self.peureuse():
+                    for coennemi in self.controleur.get_esprit(self.controleur.get_entitee(offense[0]).esprit).corps.keys():
+                        if not coennemi in self.ennemis:
+                            self.ennemis[coennemi] = [0.01,0]
 
     def merge(self,nom): #Regroupe deux esprits, lorsque des humains forment un groupe
         if self.nom != nom:
@@ -12024,8 +12035,8 @@ class Esprit_humain(Esprit_type):
                                     if issubclass(entitee.get_classe(),Agissant): #Elle est occupée par un agissant
                                         if humain.peut_voir(i) and ID_entitee in self.ennemis.keys(): #Et c'est un ennemi !
                                             if humain.veut_attaquer(): #Et le feu vert pour l'attaquer
-                                                if self.ennemis[ID_entitee] > importance:
-                                                    importance = self.ennemis[ID_entitee]
+                                                if self.ennemis[ID_entitee][0] > importance:
+                                                    importance = self.ennemis[ID_entitee][0]
                                                     humain.attaque(i)
                                                     res = "attaque"
                                             elif humain.veut_fuir(): #Et un ordre de fuite !
@@ -12063,8 +12074,8 @@ class Esprit_humain(Esprit_type):
                                         entitee = humain.controleur.get_entitee(ID_entitee)
                                         if issubclass(entitee.get_classe(),Agissant): #Cette case est occupée par un agissant
                                             if humain.peut_voir(i) and ID_entitee in self.ennemis.keys(): #Et c'est un ennemi !
-                                                if self.ennemis[ID_entitee] > importance:
-                                                    importance = self.ennemis[ID_entitee]
+                                                if self.ennemis[ID_entitee][0] > importance:
+                                                    importance = self.ennemis[ID_entitee][0]
                                                     humain.attaque(i)
                                                     res = "attaque"
                     elif not(case[3] or case[5]) and humain.statut_humain == "perdu":
@@ -12122,7 +12133,7 @@ class Esprit_slime(Esprit_type):
             self.ajoute_corp(corp)
         for ennemi in esprit.ennemis.keys():
             if ennemi in self.ennemis.keys():
-                self.ennemis[ennemi] = max(self.ennemis[ennemi],esprit.ennemis[ennemi])
+                self.ennemis[ennemi] = [max(self.ennemis[ennemi][0],esprit.ennemis[ennemi][0]),max(self.ennemis[ennemi][0],esprit.ennemis[ennemi][0])]
             else:
                 self.ennemis[ennemi] = esprit.ennemis[ennemi]
         for vue in esprit.vue.values():
@@ -12903,9 +12914,10 @@ class Impregnation(One_shot,On_fin_tour):
 
 class Dopage(One_shot,Time_limited):
     """Effet qui "dope" la prochaine attaque du joueur."""
-    def __init__(self,taux_degats,duree):
+    def __init__(self,responsable,taux_degats,duree):
         self.affiche = True
         self.phase = "démarrage"
+        self.responsable = responsable
         self.taux_degats = taux_degats
         self.temps_restant = duree
 
@@ -12950,7 +12962,7 @@ class En_sursis(One_shot,On_fin_tour):
         
 class Attaque(One_shot):
     """L'effet d'attaque dans sa version générale. Pour chaque case dans la zone, crée une attaque (version intermèdiaire). Attachée au responsable."""
-    def __init__(self,responsable=0,degats=0,element=TERRE,portee=1,propagation="C__S___",direction=None,autre=None,taux_autre=None):
+    def __init__(self,responsable=0,degats=0,element=TERRE,distance="contact",portee=1,propagation="C__S___",direction=None,autre=None,taux_autre=None):
         self.affiche = False
         self.phase = "démarrage"
         self.responsable = responsable
@@ -12961,55 +12973,57 @@ class Attaque(One_shot):
         self.direction = direction
         self.autre = autre
         self.taux_autre = taux_autre
+        self.distance = distance
 
     def action(self,controleur):
         position = controleur.get_entitee(self.responsable).get_position()
         positions_touches = controleur.get_pos_touches(position,self.portee,self.propagation,self.direction,"alliés",self.responsable)
         for position_touche in positions_touches:
-            controleur.labs[position[0]].matrice_cases[position_touche[1]][position_touche[2]].effets.append(Attaque_case(self.responsable,self.degats,self.element,self.direction,self.autre,self.taux_autre))
+            controleur.labs[position[0]].matrice_cases[position_touche[1]][position_touche[2]].effets.append(Attaque_case(self.responsable,self.degats,self.element,self.distance,self.direction,self.autre,self.taux_autre))
         
 class Attaque_magique(Attaque):
     """Une attaque créée par magie."""
+    def __init__(self,responsable=0,degats=0,element=TERRE,distance="proximité",portee=1,propagation="C__S___",direction=None,autre=None,taux_autre=None):
+        Attaque.__init__(self,responsable,degats,element,distance,portee,propagation,direction,autre,taux_autre)
 
     def action(self,controleur):
         position = controleur.get_entitee(self.responsable).get_position()
         positions_touches = controleur.get_pos_touches(position,self.portee,self.propagation,self.direction,"tout",self.responsable)
         for position_touche in positions_touches:
-            controleur.labs[position[0]].matrice_cases[position_touche[1]][position_touche[2]].effets.append(Attaque_case(self.responsable,self.degats,self.element,self.direction,self.autre,self.taux_autre))
+            controleur.labs[position[0]].matrice_cases[position_touche[1]][position_touche[2]].effets.append(Attaque_case(self.responsable,self.degats,self.element,self.distance,self.direction,self.autre,self.taux_autre))
         
 class Attaque_decentree(Attaque_magique):
     """Une attaque magique qui affecte une zone plus ou moins éloignée."""
-    def __init__(self,position,responsable=0,degats=0,element=TERRE,portee=1,propagation="C__S___",direction=None,autre=None,taux_autre=None):
-        Attaque_magique.__init__(self,responsable,degats,element,portee,propagation,direction,autre,taux_autre)
+    def __init__(self,position,responsable=0,degats=0,element=TERRE,distance="distance",portee=1,propagation="C__S___",direction=None,autre=None,taux_autre=None):
+        Attaque_magique.__init__(self,responsable,degats,element,distance,portee,propagation,direction,autre,taux_autre)
         self.position = position
 
     def action(self,controleur):
         positions_touches = controleur.get_pos_touches(self.position,self.portee,self.propagation,self.direction,"tout",self.responsable)
         for position_touche in positions_touches:
-            controleur.labs[self.position[0]].matrice_cases[position_touche[1]][position_touche[2]].effets.append(Attaque_case(self.responsable,self.degats,self.element,self.direction,self.autre,self.taux_autre))
+            controleur.labs[self.position[0]].matrice_cases[position_touche[1]][position_touche[2]].effets.append(Attaque_case(self.responsable,self.degats,self.element,self.distance,self.direction,self.autre,self.taux_autre))
 
 class Attaque_delayee(Attaque_magique):
     """Une attaque qui se fera plus tard."""
-    def __init__(self,delai,responsable=0,degats=0,element=TERRE,portee=1,propagation="C__S___",direction=None,autre=None,taux_autre=None):
-        Attaque_magique.__init__(self,responsable,degats,element,portee,propagation,direction,autre,taux_autre)
+    def __init__(self,delai,responsable=0,degats=0,element=TERRE,portee=1,distance="distance",propagation="C__S___",direction=None,autre=None,taux_autre=None):
+        Attaque_magique.__init__(self,responsable,degats,element,portee,distance,propagation,direction,autre,taux_autre)
         self.delai = delai
 
 class Attaque_decentree_delayee(Attaque_decentree,Attaque_delayee):
     """Une attaque magique typique : affecte une zone éloignée après un temps de retard."""
-    
-    def __init__(self,position,delai,responsable=0,degats=0,element=TERRE,portee=1,propagation="C__S___",direction=None,autre=None,taux_autre=None):
-        Attaque_magique.__init__(self,responsable,degats,element,portee,propagation,direction,autre,taux_autre)
+    def __init__(self,position,delai,responsable=0,degats=0,element=TERRE,portee=1,distance="distance",propagation="C__S___",direction=None,autre=None,taux_autre=None):
+        Attaque_magique.__init__(self,responsable,degats,element,portee,distance,propagation,direction,autre,taux_autre)
         self.position = position
         self.delai = delai
 
     def action(self,controleur):
         positions_touches = controleur.get_pos_touches(self.position,self.portee,self.propagation,self.direction,"tout",self.responsable)
         for position_touche in positions_touches:
-            controleur.labs[self.position[0]].matrice_cases[position_touche[1]][position_touche[2]].effets.append(Attaque_case_delayee(self.delai,self.responsable,self.degats,self.element,self.direction,self.autre,self.taux_autre))
+            controleur.labs[self.position[0]].matrice_cases[position_touche[1]][position_touche[2]].effets.append(Attaque_case_delayee(self.delai,self.responsable,self.degats,self.distance,self.element,self.direction,self.autre,self.taux_autre))
 
 class Attaque_case(One_shot):
     """L'effet d'attaque dans sa version intermédiaire. Créée par une attaque (version générale), chargé d'attacher une attaque particulière aux agissants de la case, en passant d'abord les défenses de la case. Attachée à la case."""
-    def __init__(self,responsable,degats,element,direction = None,autre=None,taux_autre=None):
+    def __init__(self,responsable,degats,element,distance="contact",direction = None,autre=None,taux_autre=None):
         self.affiche = True
         self.phase = "démarrage"
         self.responsable = responsable
@@ -13018,15 +13032,16 @@ class Attaque_case(One_shot):
         self.direction = direction
         self.autre = autre
         self.taux_autre = taux_autre
+        self.distance = distance
 
     def action(self,case,position):
         victimes_potentielles = case.controleur.trouve_agissants_courants(position)
         for victime_potentielle in victimes_potentielles:
             if not victime_potentielle in case.controleur.get_esprit(case.controleur.get_entitee(self.responsable).esprit).get_corps():
                 if self.autre == None :
-                    case.controleur.get_entitee(victime_potentielle).effets.append(Attaque_particulier(self.responsable,self.degats,self.element,self.direction))
+                    case.controleur.get_entitee(victime_potentielle).effets.append(Attaque_particulier(self.responsable,self.degats,self.element,self.distance,self.direction))
                 elif self.autre == "piercing":
-                    case.controleur.get_entitee(victime_potentielle).effets.append(Attaque_percante(self.responsable,self.degats,self.element,self.direction,self.taux_autre))
+                    case.controleur.get_entitee(victime_potentielle).effets.append(Attaque_percante(self.responsable,self.degats,self.element,self.distance,self.direction,self.taux_autre))
 
     def execute(self,case,position):
         if self.phase == "démarrage":
@@ -13044,8 +13059,8 @@ class Attaque_case(One_shot):
             return SKIN_ATTAQUE_OMBRE
 
 class Attaque_case_delayee(Attaque_case,Delaye):
-    def __init__(self,delai,responsable,degats,element,direction = None,autre=None,taux_autre=None):
-        Attaque_case.__init__(self,responsable,degats,element,direction,autre,taux_autre)
+    def __init__(self,delai,responsable,degats,element,distance="distance",direction = None,autre=None,taux_autre=None):
+        Attaque_case.__init__(self,responsable,degats,element,distance,direction,autre,taux_autre)
         self.affiche = False
         self.delai=delai
 
@@ -13060,23 +13075,24 @@ class Attaque_case_delayee(Attaque_case,Delaye):
 
 class Attaque_particulier(One_shot):
     """L'effet d'attaque dans sa version particulière. Créée par une attaque (version intermèdiaire), chargé d'infligé les dégats, en passant d'abord les défenses de l'agissant. Attachée à la victime."""
-    def __init__(self,responsable,degats,element,direction = None):
+    def __init__(self,responsable,degats,element,distance="contact",direction = None):
         self.affiche = True
         self.phase = "démarrage"
         self.responsable = responsable
         self.degats = degats
         self.element = element
         self.direction = direction
+        self.distance = distance
 
     def action(self,victime):
-        victime.subit(self.degats,self.element,self.responsable)
+        victime.subit(self.degats,self.distance,self.element,self.responsable)
 
     def get_skin(self):
         return SKIN_BLESSURE
 
 class Attaque_percante(Attaque_particulier): #Attention ! Perçant pour une attaque signifie qu'elle traverse les defenses. C'est totalement différend pour un item !
     """L'effet d'attaque dans sa version particulière. Créée par une attaque (version générale), chargé d'infligé les dégats, en passant d'abord les défenses de la case puis celles de l'agissant. Attachée à la victime. En prime, une partie de ses dégats ne sont pas bloquables."""
-    def __init__(self,responsable,degats,element,direction = None,taux_perce = 0):
+    def __init__(self,responsable,degats,element,distance="contact",direction = None,taux_perce = 0):
         self.affiche = True
         self.phase = "démarrage"
         self.responsable = responsable
@@ -13084,10 +13100,11 @@ class Attaque_percante(Attaque_particulier): #Attention ! Perçant pour une atta
         self.degats_imbloquables = degats - self.degats #Ces dégats ne seront pas affectés par les bloquages.
         self.element = element
         self.direction = direction
+        self.distance = distance
 
     def action(self,victime):
         self.degats += self.degats_imbloquables
-        victime.subit(self.degats,self.element,self.responsable)
+        victime.subit(self.degats,self.distance,self.element,self.responsable)
 
     def get_skin(self):
         return SKIN_BLESSURE
@@ -13121,7 +13138,7 @@ class On_hit(Effet):
     def action(self,lanceur,position,controleur):
         positions_touches = controleur.get_pos_touches(position,self.portee)
         for position_touche in positions_touches:
-            controleur.labs[position[0]].matrice_cases[position_touche[1]][position_touche[2]].effets.append(Attaque_case(lanceur,self.degats,self.element))
+            controleur.labs[position[0]].matrice_cases[position_touche[1]][position_touche[2]].effets.append(Attaque_case(lanceur,self.degats,self.element,"distance"))
 
     def execute(self,lanceur,position,controleur):
         self.action(lanceur,position,controleur)
@@ -13506,7 +13523,7 @@ class Feu(Evenement,Aura_elementale):
         for occupant in occupants :
             agissant = contr.get_entitee(occupant)
             if agissant.esprit != lanceur.esprit :
-                agissant.subit(self.temps_restant,FEU,self.responsable)
+                agissant.subit(self.temps_restant,"proximité",FEU,self.responsable)
         case.code += 2 #0 ou 2, selon que la case a une aura de Feu ou non
 
     def execute(self,case,position):
@@ -13534,7 +13551,7 @@ class Feu_permanent(Aura_permanente):
         occupants = contr.trouve_agissants_courants(position)
         for occupant in occupants :
             agissant = contr.get_entitee(occupant)
-            agissant.subit(self.degats,FEU)
+            agissant.subit(self.degats,"distance",FEU)
         case.code += 2 #0 ou 2, selon que la case a une aura de Feu ou non
 
 class Glace(One_shot,Aura_elementale):
@@ -13875,7 +13892,7 @@ class Magie_soin(Cible_agissant):
 
     def action(self,lanceur):
         agissant_cible = lanceur.controleur.get_entitee(self.cible)
-        agissant_cible.effets.append(Soin(self.gain_pv))
+        agissant_cible.effets.append(Soin(lanceur.ID,self.gain_pv))
 
     def get_image(self):
         return SKIN_MAGIE_SOIN
@@ -13902,7 +13919,7 @@ class Magie_multi_soin(Cible_agissant,Multi_cible):
     def action(self,lanceur):
         for cible in self.cible:
             agissant_cible = lanceur.controleur.get_entitee(cible)
-            agissant_cible.effets.append(Soin(self.gain_pv))
+            agissant_cible.effets.append(Soin(lanceur.ID,self.gain_pv))
 
     def get_image(self):
         return SKIN_MAGIE_SOIN
@@ -13928,7 +13945,7 @@ class Magie_soin_superieur(Cible_agissant):
 
     def action(self,lanceur):
         agissant_cible = lanceur.controleur.get_entitee(self.cible)
-        agissant_cible.effets.append(Soin(self.gain_pv))
+        agissant_cible.effets.append(Soin(lanceur.ID,self.gain_pv))
 
     def get_image(self):
         return SKIN_MAGIE_SOIN_SUPERIEUR
@@ -13956,7 +13973,7 @@ class Magie_soin_de_zone(Cible_case):
     def action(self,lanceur):
         poss = lanceur.controleur.get_pos_touches(self.cible,self.portee)
         for pos in poss:
-            lanceur.controleur.labs[pos[0]].matrice_cases[pos[1]][pos[2]].effets.append(Soin_case(self.gain_pv),lanceur.ID)
+            lanceur.controleur.labs[pos[0]].matrice_cases[pos[1]][pos[2]].effets.append(Soin_case(self.gain_pv,lanceur.ID))
 
     def get_image(self):
         return SKIN_MAGIE_SOIN_ZONE
@@ -13979,7 +13996,7 @@ class Magie_auto_soin(Magie):
         self.affiche = True
 
     def action(self,lanceur):
-        lanceur.effets.append(Soin(self.gain_pv))
+        lanceur.effets.append(Soin(lanceur.ID,self.gain_pv))
 
     def get_image(self):
         return SKIN_MAGIE_AUTO_SOIN
@@ -14003,15 +14020,15 @@ class Soin_case(On_post_action):
         cibles_potentielles = case.controleur.trouve_agissants_courants(position)
         for cible_potentielle in cibles_potentielles:
             if self.responsable == 0: #Pas de responsable. Sérieusement ?
-                case.controleur.get_entitee(cible_potentielle).effets.append(Soin(self.gain_pv))
+                case.controleur.get_entitee(cible_potentielle).effets.append(Soin(self.responsable,self.gain_pv))
             else:
                 esprit = case.controleur.get_esprit(case.controleur.get_entitee(self.responsable).esprit)
                 if esprit == None: #Pas d'esprit ? Sérieusement ?
-                    case.controleur.get_entitee(cible_potentielle).effets.append(Soin(self.gain_pv))
+                    case.controleur.get_entitee(cible_potentielle).effets.append(Soin(self.responsable,self.gain_pv))
                 elif self.cible == "alliés" and cible_potentielle in case.controleur.get_esprit(case.controleur.get_entitee(self.responsable).esprit).get_corps():
-                    case.controleur.get_entitee(cible_potentielle).effets.append(Soin(self.gain_pv))
+                    case.controleur.get_entitee(cible_potentielle).effets.append(Soin(self.responsable,self.gain_pv))
                 elif self.cible == "neutres" and not cible_potentielle in case.controleur.get_esprit(case.controleur.get_entitee(self.responsable).esprit).get_ennemis():
-                    case.controleur.get_entitee(cible_potentielle).effets.append(Soin(self.gain_pv))
+                    case.controleur.get_entitee(cible_potentielle).effets.append(Soin(self.responsable,self.gain_pv))
 
     def execute(self,case,position):
         if self.phase == "démarrage" :
@@ -14020,8 +14037,9 @@ class Soin_case(On_post_action):
 
 class Soin(On_fin_tour):
     """Un effet de soin. Généralement placé sur l'agissant par une magie de soin, de soin de zone, ou d'auto-soin."""
-    def __init__(self,gain_pv):
+    def __init__(self,responsable,gain_pv):
         self.phase = "démarrage"
+        self.responsable = responsable
         self.gain_pv = gain_pv
         self.affiche = True
 
@@ -14829,7 +14847,7 @@ class Magie_explosion_de_mana(Magie_cout):
         self.affiche = True
 
     def action(self,porteur):
-        porteur.effets.append(Attaque_magique(porteur.ID,self.cout_pm*taux_degats_explosion_de_mana[self.niveau-1],TERRE,portee_explosion_de_mana[self.niveau-1]))
+        porteur.effets.append(Attaque_magique(porteur.ID,self.cout_pm*taux_degats_explosion_de_mana[self.niveau-1],TERRE,"contact",portee_explosion_de_mana[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_EXPLOSION_DE_MANA
@@ -14854,7 +14872,7 @@ class Magie_laser(Magie_dirigee):
         self.affiche = True
 
     def action(self,porteur):
-        porteur.effets.append(Attaque_magique(porteur.ID,degats_laser[self.niveau-1],TERRE,portee_laser[self.niveau-1],"R__T___",self.direction))
+        porteur.effets.append(Attaque_magique(porteur.ID,degats_laser[self.niveau-1],TERRE,'proximité',portee_laser[self.niveau-1],"R__T___",self.direction))
 
     def get_image(self):
         return SKIN_MAGIE_LASER
@@ -14879,7 +14897,7 @@ class Magie_poing_magique(Magie_dirigee): #À modifier selon l'espèce qui l'uti
         self.affiche = True
 
     def action(self,porteur):
-        porteur.effets.append(Attaque_magique(porteur.ID,degats_poing_magique[self.niveau-1],TERRE,portee_poing_magique[self.niveau-1],"Sd_T___",self.direction))
+        porteur.effets.append(Attaque_magique(porteur.ID,degats_poing_magique[self.niveau-1],TERRE,"contact",portee_poing_magique[self.niveau-1],"Sd_T___",self.direction))
 
     def get_image(self):
         return SKIN_MAGIE_POING_MAGIQUE
@@ -14904,7 +14922,7 @@ class Magie_poing_ardent(Magie_dirigee): #L'attaque de mélée de la bombe atomi
         self.affiche = True
 
     def action(self,porteur):
-        porteur.effets.append(Attaque_magique(porteur.ID,degats_poing_ardent[self.niveau-1],FEU,portee_poing_ardent[self.niveau-1],"Sd_T___",self.direction))
+        porteur.effets.append(Attaque_magique(porteur.ID,degats_poing_ardent[self.niveau-1],FEU,"contact",portee_poing_ardent[self.niveau-1],"Sd_T___",self.direction))
 
     def get_image(self):
         return SKIN_MAGIE_POING_MAGIQUE
@@ -14929,7 +14947,7 @@ class Magie_poing_sombre(Magie_dirigee): #L'attaque de mélée de la bombe atomi
         self.affiche = True
 
     def action(self,porteur):
-        porteur.effets.append(Attaque_magique(porteur.ID,degats_poing_sombre[self.niveau-1],OMBRE,portee_poing_sombre[self.niveau-1],"Sd_T___",self.direction))
+        porteur.effets.append(Attaque_magique(porteur.ID,degats_poing_sombre[self.niveau-1],OMBRE,"contact",portee_poing_sombre[self.niveau-1],"Sd_T___",self.direction))
 
     def get_image(self):
         return SKIN_MAGIE_POING_MAGIQUE
@@ -14952,7 +14970,7 @@ class Magie_brasier(Magie):
         self.affiche = True
 
     def action(self,porteur):
-        porteur.effets.append(Attaque_magique(porteur.ID,degats_brasier[self.niveau-1],FEU,portee_brasier[self.niveau-1]))
+        porteur.effets.append(Attaque_magique(porteur.ID,degats_brasier[self.niveau-1],FEU,"proximité",portee_brasier[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_BRASIER
@@ -14977,7 +14995,7 @@ class Magie_avalanche(Magie_dirigee):
         self.affiche = True
 
     def action(self,porteur):
-        porteur.effets.append(Attaque_magique(porteur.ID,degats_avalanche[self.niveau-1],TERRE,portee_avalanche[self.niveau-1],"S__S_Pb",self.direction))
+        porteur.effets.append(Attaque_magique(porteur.ID,degats_avalanche[self.niveau-1],TERRE,"proximité",portee_avalanche[self.niveau-1],"S__S_Pb",self.direction))
 
     def get_image(self):
         return SKIN_MAGIE_AVALANCHE
@@ -15050,7 +15068,7 @@ class Magie_dopage(Magie):
         self.affiche = True
 
     def action(self,porteur):
-        porteur.effets.append(Dopage(taux_dopage[self.niveau-1],duree_dopage[self.niveau-1]))
+        porteur.effets.append(Dopage(porteur.ID,taux_dopage[self.niveau-1],duree_dopage[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_DOPAGE
@@ -15075,7 +15093,7 @@ class Magie_boost(Cible_agissant):
         self.affiche = True
 
     def action(self,porteur):
-        porteur.controleur.get_entitee(self.cible).effets.append(Dopage(taux_boost[self.niveau-1],duree_boost[self.niveau-1]))
+        porteur.controleur.get_entitee(self.cible).effets.append(Dopage(porteur.ID,taux_boost[self.niveau-1],duree_boost[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_DOPAGE
@@ -15101,7 +15119,7 @@ class Magie_multi_boost(Cible_agissant,Multi_cible):
 
     def action(self,porteur):
         for cible in self.cible:
-            porteur.controleur.get_entitee(cible).effets.append(Dopage(taux_multi_boost[self.niveau-1],duree_multi_boost[self.niveau-1]))
+            porteur.controleur.get_entitee(cible).effets.append(Dopage(porteur.ID,taux_multi_boost[self.niveau-1],duree_multi_boost[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_DOPAGE
@@ -15200,7 +15218,7 @@ class Magie_volcan(Cible_case):
         self.affiche = True
 
     def action(self,porteur):
-        porteur.effets.append(Attaque_decentree_delayee(self.cible,delai_volcan[self.niveau-1],porteur.ID,degats_volcan[self.niveau-1],FEU,portee_volcan[self.niveau-1]))
+        porteur.effets.append(Attaque_decentree_delayee(self.cible,delai_volcan[self.niveau-1],porteur.ID,degats_volcan[self.niveau-1],FEU,"distance",portee_volcan[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_BRASIER
@@ -15225,7 +15243,7 @@ class Magie_secousse(Cible_case):
         self.affiche = True
 
     def action(self,porteur):
-        porteur.effets.append(Attaque_decentree_delayee(self.cible,delai_secousse[self.niveau-1],porteur.ID,degats_secousse[self.niveau-1],TERRE,portee_secousse[self.niveau-1]))
+        porteur.effets.append(Attaque_decentree_delayee(self.cible,delai_secousse[self.niveau-1],porteur.ID,degats_secousse[self.niveau-1],TERRE,"distance",portee_secousse[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_AVALANCHE
@@ -15250,7 +15268,7 @@ class Magie_petite_secousse(Cible_case):
         self.affiche = True
 
     def action(self,porteur):
-        porteur.effets.append(Attaque_decentree_delayee(self.cible,delai_petite_secousse[self.niveau-1],porteur.ID,degats_petite_secousse[self.niveau-1],TERRE,portee_petite_secousse[self.niveau-1]))
+        porteur.effets.append(Attaque_decentree_delayee(self.cible,delai_petite_secousse[self.niveau-1],porteur.ID,degats_petite_secousse[self.niveau-1],TERRE,"distance",portee_petite_secousse[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_AVALANCHE
