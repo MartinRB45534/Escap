@@ -3468,62 +3468,62 @@ class Sentinelle(Agissant):
 class Bourrin(Agissant):
     """Les agissants qui combattent en fonçant dans le tas."""
 
-    def veut_fuir(self):
-        return not(self.veut_attaquer()) #Il n'y a pas d'autre choix que fuir ou attaquer
+    def veut_fuir(self,degats=0):
+        return not(self.veut_attaquer(degats)) #Il n'y a pas d'autre choix que fuir ou attaquer
 
 class Tank(Bourrin):
     """Les agissants avec une bonne défense, supposés prendre les dégats."""
 
-    def comporte_distance(self):
-        if self.pv/self.pv_max > 0.2:
+    def comporte_distance(self,degats):
+        if (self.pv-degats)/self.pv_max > 0.2:
             return 0
         else:
             return 3
 
-    def veut_attaquer(self):
-        return self.pv/self.pv_max > 0.2
+    def veut_attaquer(self,degats=0):
+        return (self.pv-degats)/self.pv_max > 0.2 #Appliquer un multiplicateur aux dégats en fonction des moyens de défense du tank
 
 class Dps(Bourrin):
     """Les agissants chargé d'infliger les dégats."""
 
-    def comporte_distance(self):
-        if self.pv/self.pv_max > 0.3:
+    def comporte_distance(self,degats):
+        if (self.pv-degats)/self.pv_max > 0.3:
             return 0
         else:
             return 3
 
-    def veut_attaquer(self):
-        return self.pv/self.pv_max > 0.3
+    def veut_attaquer(self,degats):
+        return (self.pv-degats)/self.pv_max > 0.3 #Appliquer un multiplicateur aux dégats en fonction des moyens de défense du DPS
 
 class Support(Agissant):
     """Les agissants qui combattent proche de la ligne de front.""" #Ils auront un "agit en vue" ou assimilé selon leur type de combat
 
-    def comporte_distance(self):
-        if self.pv/self.pv_max >= 0.4:
+    def comporte_distance(self,degats):
+        if (self.pv-degats)/self.pv_max >= 0.4:
             return 1
         else:
             return 3
 
-    def veut_attaquer(self):
-        return self.pv/self.pv_max < 0.7 and self.pv/self.pv_max >= 0.4
+    def veut_attaquer(self,degats=0):
+        return (self.pv-degats)/self.pv_max < 0.7 and (self.pv-degats)/self.pv_max >= 0.4
 
-    def veut_fuir(self):
-        return self.pv/self.pv_max < 0.4
+    def veut_fuir(self,degats):
+        return (self.pv-degats)/self.pv_max < 0.4
 
 class Support_lointain(Agissant):
     """Les agissants qui combattent loin de la ligne de front."""
 
-    def comporte_distance(self):
-        if self.pv/self.pv_max >= 0.7:
+    def comporte_distance(self,degats):
+        if (self.pv-degats)/self.pv_max >= 0.7:
             return 2
         else:
             return 3
 
-    def veut_attaquer(self):
-        return self.pv <= self.pv_max and self.pv/self.pv_max >= 0.7
+    def veut_attaquer(self,degats):
+        return (self.pv-degats) <= self.pv_max and (self.pv-degats)/self.pv_max >= 0.7
 
-    def veut_fuir(self):
-        return self.pv/self.pv_max < 0.7
+    def veut_fuir(self,degats):
+        return (self.pv-degats)/self.pv_max < 0.7
 
 class Fuyard(Agissant):
     """Des agissants qui ne font que fuire ? À quoi bon ?"""
@@ -3678,7 +3678,10 @@ class Attaquant_magique_case(Agissant):
         return defaut
 
     def get_impact(self):
-        return self.cible_magie
+        if self.cible_magie != None:
+            return self.cible_magie
+        else:
+            return Agissant.get_impact(self)
 
 class Attaquant_magique_agissant(Agissant):
     """Les agissants qui combattent en lançant des attaques magiques de loin sur des agissants."""
@@ -3702,7 +3705,10 @@ class Attaquant_magique_agissant(Agissant):
         return defaut
 
     def get_impact(self):
-        return self.controleur.get_entitee(self.cible_magie).position
+        if self.cible_magie != None:
+            return self.controleur.get_entitee(self.cible_magie).position
+        else:
+            return Agissant.get_impact(self)
 
 class Renforceur(Agissant):
     """Les agissants qui boostent les attaques de leurs alliés."""
@@ -4058,17 +4064,17 @@ class Humain(Agissant,Interactif,Entitee_superieure):
 
         self.attente = True #Les humains attendent le joueur au début du jeu
 
-    def comporte_distance(self):
-        if self.fuite():
+    def comporte_distance(self,degats):
+        if self.fuite(degats):
             return 3
         else:
             return self.comportement_corps_a_corps
 
-    def veut_attaquer(self):
-        return self.comportement_corps_a_corps == 0 and not self.fuite()
+    def veut_attaquer(self,degats):
+        return self.comportement_corps_a_corps == 0 and not self.fuite(degats)
 
-    def veut_fuir(self):
-        return self.comportement_corps_a_corps == 2 or self.fuite()
+    def veut_fuir(self,degats):
+        return self.comportement_corps_a_corps == 2 or self.fuite(degats)
 
     def parle(self,touche):
         if touche == pygame.K_UP:
@@ -11179,7 +11185,8 @@ class Esprit :
         degats = offense[2]
         if ID_offenseur in self.ennemis:
             self.ennemis[ID_offenseur][0] += gravite
-            self.ennemis[ID_offenseur][1] += degats
+            if self.ennemis[ID_offenseur][1] < degats:
+                self.ennemis[ID_offenseur][1] = degats
         else:
             self.ennemis[ID_offenseur] = [gravite,degats]
 
@@ -11462,34 +11469,36 @@ class Esprit :
         position = corp.get_position()
         case = corp.vue[position[1]][position[2]]
         tcase = self.vue[position[0]][position[1]][position[2]]
-        cases = [[-1,tcase[0],tcase[3][0],tcase[3][1],-tcase[3][2],tcase[3][2]]]
+        cases = [[-1,tcase[0],tcase[3][0],tcase[3][1],-tcase[3][2],tcase[3][2],-tcase[3][3],tcase[3][3]]]
         dirs = []
         importance = 0
+        fuite = corp.veut_fuir(tcase[3][2])
+        attaque = corp.veut_attaquer(tcase[3][2])
         res = "attente"
         for i in range(4): #On commence par se renseigner sur les possibilités :
             if case[5][i]:
                 if case[5][i][0] == position[0] and corp.vue[case[5][i][1]][case[5][i][2]][1]>0:
                     case_pot = self.vue[case[5][i][0]][case[5][i][1]][case[5][i][2]]
                     entitees = case_pot[6]
-                    libre = True
+                    libre = True #On n'y va pas pour s'en enfuir après
                     for ID_entitee in entitees:
                         entitee = self.controleur.get_entitee(ID_entitee)
                         if issubclass(entitee.get_classe(),Non_superposable): #On ne peut pas aller sur cette case
                             libre = False
                             if issubclass(entitee.get_classe(),Agissant): #Elle est occupée par un agissant
                                 if ID_entitee in self.ennemis.keys(): #Et c'est un ennemi !
-                                    if corp.peut_voir(i) and (corp.veut_attaquer() or (corp.veut_fuir() and not self.fuite_utile(ID))) : #On veut attaquer lorsqu'on croise un ennemi au corps à corps (et on a assez de mana pour, si on utilise la magie)
+                                    if corp.peut_voir(i) and (attaque or (fuite and not self.fuite_utile(ID))) : #On veut attaquer lorsqu'on croise un ennemi au corps à corps (et on a assez de mana pour, si on utilise la magie)
                                         if self.ennemis[ID_entitee][0] > importance:
                                             importance = self.ennemis[ID_entitee][0]
                                             corp.attaque(i)
                                             res = "attaque"
-                                    elif corp.veut_fuir() and self.fuite_utile(ID): #On veut fuire lorsqu'on croise un ennemi au corps à corps
+                                    elif fuite and self.fuite_utile(ID): #On veut fuire lorsqu'on croise un ennemi au corps à corps
                                         res = "fuite"
                     if libre:
-                        cases.append([i,case_pot[0],case_pot[3][0],case_pot[3][1],-case_pot[3][2],case_pot[3][2]])
+                        cases.append([i,case_pot[0],case_pot[3][0],case_pot[3][1],-case_pot[3][2],case_pot[3][2],-case_pot[3][3],case_pot[3][3]])
                         dirs.append(i)
         if res == "attente": #Quelques comportements possibles :
-            comportement = corp.comporte_distance()
+            comportement = corp.comporte_distance(tcase[3][2])
             if comportement == 0 : #Foncer tête baissée ! Pour les combattants au corps à corps
                 res = "deplacement"
             elif comportement == 1 or (comportement > 1 and not self.fuite_utile(ID)): #Tenter une action, puis approcher. Pour les effets à distance qui ont besoin de ne pas être trop loin.
@@ -11530,7 +11539,7 @@ class Esprit :
                         constantes_deplacements.append([self.controleur.nb_tours,"cherche",corp.dir_regard,cases])
             else:
                 if res == "deplacement":
-                    new_cases = sorted(cases,key=operator.itemgetter(2,3,4)) #2 pour le chemin d'accès indirect, 3 pour le chemin d'accès direct
+                    new_cases = sorted(cases,key=operator.itemgetter(2,3,4,6)) #2 pour le chemin d'accès indirect, 3 pour le chemin d'accès direct
                     res = "approche"
                     if new_cases[-1][0] != -1: #La dernière case (i.e. les valeurs les plus élevées) n'est pas celle où l'on est
                         corp.va(new_cases[-1][0])
@@ -11538,14 +11547,18 @@ class Esprit :
                             constantes_deplacements.append([self.controleur.nb_tours,"deplacement",corp.dir_regard,new_cases])
                     else:
                         res = corp.agit_en_vue(self)
+                    if ID == 9:
+                        print(new_cases)
                 elif res == "fuite":
-                    new_cases = sorted(cases,key=operator.itemgetter(5,2,3)) #2 pour le chemin d'accès indirect, 3 pour le chemin d'accès direct
+                    new_cases = sorted(cases,key=operator.itemgetter(5,7,2,3)) #2 pour le chemin d'accès indirect, 3 pour le chemin d'accès direct
                     if new_cases[0][0] != -1: #La première case (i.e. les valeurs les moins élevées) n'est pas celle où l'on est
                         corp.va(new_cases[0][0])
                         if ID == 4:
                             constantes_deplacements.append([self.controleur.nb_tours,"fuite",corp.dir_regard,new_cases])
                     else:
                         res = corp.agit_en_vue(self)
+                    if ID == 9:
+                        print(new_cases)
         corp.statut = res
 
     def oublie(self):
@@ -11835,6 +11848,7 @@ class Esprit_humain(Esprit_type):
                 self.ajoute_vue(vue,niveau)
 
     def get_offenses(self):
+        self.allies_vivants=0
         for corp in self.corps.keys(): #On vérifie si quelqu'un nous a offensé
             agissant = self.controleur.get_entitee(corp)
             offenses,etat = agissant.get_offenses()
@@ -12014,9 +12028,11 @@ class Esprit_humain(Esprit_type):
                 self.resoud(cible,10,4)
                 position = humain.get_position()
                 case = self.vue[position[0]][position[1]][position[2]]
-                cases = [[-1,case[0],case[3][0],case[3][1],-case[3][2],case[3][2],case[3][4]]]
+                cases = [[-1,case[0],case[3][0],case[3][1],-case[3][2],case[3][2],-case[3][3],case[3][3],case[3][4]]]
                 dirs = []
                 importance = 0
+                fuite = humain.veut_fuir(case[3][2])
+                attaque = humain.veut_attaquer(case[3][2])
                 humain.statut_humain = "en chemin"
                 if case[3][4] == 0:
                     humain.statut_humain = "perdu"
@@ -12034,12 +12050,12 @@ class Esprit_humain(Esprit_type):
                                     libre = False
                                     if issubclass(entitee.get_classe(),Agissant): #Elle est occupée par un agissant
                                         if humain.peut_voir(i) and ID_entitee in self.ennemis.keys(): #Et c'est un ennemi !
-                                            if humain.veut_attaquer(): #Et le feu vert pour l'attaquer
+                                            if attaque: #Et le feu vert pour l'attaquer
                                                 if self.ennemis[ID_entitee][0] > importance:
                                                     importance = self.ennemis[ID_entitee][0]
                                                     humain.attaque(i)
                                                     res = "attaque"
-                                            elif humain.veut_fuir(): #Et un ordre de fuite !
+                                            elif fuite : #Et un ordre de fuite !
                                                 res = "fuite"
                                         elif humain.mouvement == 2 and ((ID_entitee == humain.cible_deplacement and ID_entitee == 2) and humain.peut_voir(i)): #Le PNJs peut enfin parler au joueur
                                             self.controleur.get_entitee(2).interlocuteur = humain
@@ -12049,10 +12065,10 @@ class Esprit_humain(Esprit_type):
                                             humain.dir_regard = i
                                             self.controleur.get_entitee(2).dir_regard = range(4)[i-2]
                             if libre:
-                                cases.append([i,case_pot[0],case_pot[3][0],case_pot[3][1],-case_pot[3][2],case[3][2],case_pot[3][4]])
+                                cases.append([i,case_pot[0],case_pot[3][0],case_pot[3][1],-case_pot[3][2],case_pot[3][2],-case_pot[3][3],case_pot[3][3],case_pot[3][4]])
                                 dirs.append(i)
                 if res == "recherche": #On n'a pas d'ennemi à portée directe (ou on ne souhaite pas attaquer ni fuir)
-                    comportement = humain.comporte_distance()
+                    comportement = humain.comporte_distance(case[3][2])
                     if comportement == 0 : #Foncer tête baissée ! Pour les combattants au corps à corps
                         res = "deplacement"
                     elif comportement == 1: #Tenter une action, puis approcher. Pour les effets à distance qui ont besoin de ne pas être trop loin.
@@ -12093,7 +12109,7 @@ class Esprit_humain(Esprit_type):
                     else:
                         if res == "deplacement":
                             res = "approche"
-                            new_cases = sorted(cases,key=operator.itemgetter(6,2,3,4))
+                            new_cases = sorted(cases,key=operator.itemgetter(8,2,3,4,6))
                             if new_cases[-1][0] != -1: #La dernière case (i.e. les valeurs les plus élevées) n'est pas celle où l'on est
                                 humain.va(new_cases[-1][0])
                                 if ID_humain == 4:
@@ -12102,8 +12118,8 @@ class Esprit_humain(Esprit_type):
                                 res = humain.agit_en_vue(self)
                         elif res == "fuite":
                             for case in cases:
-                                case[6] *= -1
-                            new_cases = sorted(cases,key=operator.itemgetter(6,5,2,3))
+                                case[8] *= -1
+                            new_cases = sorted(cases,key=operator.itemgetter(8,5,7,2,3))
                             if new_cases[0][0] != -1: #La première case (i.e. les valeurs les moins élevées) n'est pas celle où l'on est
                                 humain.va(new_cases[0][0])
                                 if ID_humain == 4:
