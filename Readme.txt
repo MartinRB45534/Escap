@@ -93,6 +93,11 @@ Options :
 
 Comment faire pour les attaques de zone ?
 
+Parfois, un agissant est bloqué par un autre, pourrait le contourner pour se rapprocher plus, mais serait bloqué plus loin. Avec la résolution actuelle, il reste bloqué.
+Comment faire ?
+
+Et pour qu'un agissant sorte du passage si quelqu'un veut aller là où il est (le joueur par exemple)
+
 
 
 

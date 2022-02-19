@@ -380,7 +380,7 @@ class Controleur():
         receptionniste = Receptionniste(self,("Étage 1 : couloir",14,0))
         self.ajoute_entitee(receptionniste)
         self.esprits["receptionniste"] = Esprit_humain(receptionniste.ID,self)
-        paterns1 = [Patern(("Étage 1 : couloir",9,0),10,3,[("Étage 1 : couloir",0,1)],["clé couloir"])]
+        paterns1 = [Patern(("Étage 1 : couloir",9,0),10,3,[("Étage 1 : couloir",0,1)],["clé_couloir"])]
         self.labs["Étage 1 : couloir"]=Labyrinthe("Étage 1 : couloir",19,3,("Étage 1 : couloir",0,0),paterns1,1,1,TERRE,1)
 
         #On crée le deuxième étage et son occupant :
@@ -495,8 +495,8 @@ class Controleur():
         self.ajoute_entitee(alchimiste)
         self.esprits["alchimiste"] = Esprit_humain(alchimiste.ID,self)
 
-        chaudrons_6 = [Chaudron_gobelin(("Étage 6 : potions",12,5)),
-                       Chaudron_gobelin(("Étage 6 : potions",14,6))]
+        chaudrons_6 = [Chaudron_gobelin(("Étage 6 : potions",12,4)),
+                       Chaudron_gobelin(("Étage 6 : potions",14,8))]
         self.ajoute_entitees(chaudrons_6)
 
         cles_6 = [Cle(("Étage 6 : potions",4,1),["Porte_cuisine"]), #(0)
@@ -612,6 +612,8 @@ class Controleur():
         cle1 = Cle(("Étage 8 : magie",0,7),["Porte_deuxième_armurerie_9"])
         self.ajoute_entitee(cle1)
         cle2 = Cle(("Étage 8 : magie",12,8),["Porte_anti_chambre_8"])
+        self.ajoute_entitee(cle3)
+        cle3 = Cle(("Étage 8 : magie",3,2),["Porte_annexe_gauche_7"])
         self.ajoute_entitee(cle2)
         gobel1 = Mage_gobelin(self,("Étage 8 : magie",1,1),1)
         self.ajoute_entitee(gobel1)
@@ -4297,11 +4299,13 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
             paume = self.controleur.get_entitee(4)
             if paume.esprit == "joueur" and (paume.get_etage_courant() == 3 and paume.statut_humain in ["exploration","proximite","en chemin"]):
                 paume.mouvement = 2
+                paume.cible_deplacement = 2
                 paume.dialogue = 2
             else:
                 peureuse = self.controleur.get_entitee(5)
                 if peureuse.esprit == "joueur" and (peureuse.get_etage_courant() == 3 and peureuse.statut_humain in ["exploration","proximite","en chemin"]):
                     peureuse.mouvement = 2
+                    peureuse.cible_deplacement = 2
                     peureuse.dialogue = 2
 
     def magic_kill(self,position):
@@ -4312,11 +4316,13 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
             peureuse = self.controleur.get_entitee(5)
             if peureuse.esprit == "joueur" and (peureuse.get_etage_courant() == 4 and peureuse.statut_humain in ["exploration","proximite","en chemin"]):
                 peureuse.mouvement = 2
+                peureuse.cible_deplacement = 2
                 peureuse.dialogue = 3
             else:
                 paume = self.controleur.get_entitee(4)
                 if paume.esprit == "joueur" and (paume.get_etage_courant() == 4 and paume.statut_humain in ["exploration","proximite","en chemin"]):
                     paume.mouvement = 2
+                    paume.cible_deplacement = 2
                     paume.dialogue = 3
 
     def third_kill(self,position):
@@ -4327,6 +4333,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
             peureuse = self.controleur.get_entitee(5)
             if peureuse.esprit == "joueur" and (peureuse.get_etage_courant() == 4 and peureuse.statut_humain in ["exploration","proximite","en chemin"]):
                 peureuse.mouvement = 2
+                peureuse.cible_deplacement = 2
                 peureuse.dialogue = 4
 
     def first_step(self):
@@ -4336,11 +4343,13 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         peureuse = self.controleur.get_entitee(5)
         if peureuse.esprit == "joueur" and peureuse.statut_humain in ["exploration","proximite","en chemin"]:
             peureuse.mouvement = 2
+            peureuse.cible_deplacement = 2
             peureuse.dialogue = 5
         else:
             paume = self.controleur.get_entitee(4)
             if paume.esprit == "joueur" and paume.statut_humain in ["exploration","proximite","en chemin"]:
                 paume.mouvement = 2
+                paume.cible_deplacement = 2
                 paume.dialogue = 4
 
     def first_door(self):
@@ -4350,6 +4359,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         peureuse = self.controleur.get_entitee(5)
         if peureuse.esprit == "joueur" and peureuse.statut_humain in ["exploration","proximite","en chemin"]:
             peureuse.mouvement = 2
+            peureuse.cible_deplacement = 2
             peureuse.dialogue = 6
 
     def first_teleport(self):
@@ -4364,17 +4374,20 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
             peureuse = self.controleur.get_entitee(5)
             if peureuse.esprit == "joueur" and peureuse.statut_humain in ["exploration","proximite","en chemin"]:
                 peureuse.mouvement = 2
+                peureuse.cible_deplacement = 2
                 peureuse.dialogue = 7
             else:
                 encombrant = self.controleur.get_entitee(6)
                 if encombrant.esprit == "joueur" and encombrant.statut_humain in ["exploration","proximite","en chemin"]:
                     encombrant.mouvement = 2
+                    encombrant.cible_deplacement = 2
                     encombrant.dialogue = 2
                 else:
                     paume = self.controleur.get_entitee(4)
-                    if encombrant.esprit == "joueur" and encombrant.statut_humain in ["exploration","proximite","en chemin"]:
-                        encombrant.mouvement = 2
-                        encombrant.dialogue = 5
+                    if paume.esprit == "joueur" and paume.statut_humain in ["exploration","proximite","en chemin"]:
+                        paume.mouvement = 2
+                        paume.cible_deplacement = 2
+                        paume.dialogue = 5
         # /!\ Coder ces dialogues
 
     def get_portee_vue(self):
@@ -6570,7 +6583,7 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
         elif replique == "dialogue3reponse1.1.2":
             self.replique = "dialogue3phrase1.1.2"
             self.repliques = ["dialogue3reponse1.1.2.1"]
-        elif replique in ["dialogue3reponse1.1.2.1","dialogue3reponse1.1.1.1"]:
+        elif replique in ["dialogue3reponse1.2","dialogue3reponse1.1.2.1","dialogue3reponse1.1.1.1"]:
             self.end_dialogue()
 
         #Dialogue de la prison
@@ -11547,8 +11560,6 @@ class Esprit :
                             constantes_deplacements.append([self.controleur.nb_tours,"deplacement",corp.dir_regard,new_cases])
                     else:
                         res = corp.agit_en_vue(self)
-                    if ID == 9:
-                        print(new_cases)
                 elif res == "fuite":
                     new_cases = sorted(cases,key=operator.itemgetter(5,7,2,3)) #2 pour le chemin d'accès indirect, 3 pour le chemin d'accès direct
                     if new_cases[0][0] != -1: #La première case (i.e. les valeurs les moins élevées) n'est pas celle où l'on est
@@ -11557,8 +11568,6 @@ class Esprit :
                             constantes_deplacements.append([self.controleur.nb_tours,"fuite",corp.dir_regard,new_cases])
                     else:
                         res = corp.agit_en_vue(self)
-                    if ID == 9:
-                        print(new_cases)
         corp.statut = res
 
     def oublie(self):
@@ -11574,8 +11583,6 @@ class Esprit :
                         case[6] = []
                     case[7] = []
                     case[3] = [0,0,0,0,0,False]
-                    if case[7] != []:
-                        print(case)
 
     #Découvront le déroulé d'un tour avec esprit-sensei :
     def debut_tour(self):
@@ -11968,8 +11975,6 @@ class Esprit_humain(Esprit_type):
                         case[6] = []
                     case[7] = []
                     case[3] = [0,0,0,0,0,False]
-                    if case[7] != []:
-                        print(case)
 
     def peureuse(self):
         return 5 in self.corps.keys() and self.corps[5] in ["humain","attente","fuite","deplacement","attaque","vivant"] #J'ai un doute sur la possibilité des deux derniers mais bon...
