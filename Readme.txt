@@ -56,22 +56,6 @@ Troisi�me �tape : mains[0][2].boucle() et le jeu reprend imm�diatement, at
 
 � mon attention :
 
-Problème actuel :
-Pourquoi les gobelins voient à travers les portails, mais ne les traversent pas ?
-Parce qu'on vérifie si leur vue de la case a une visibilité positive pour ajouter la case aux choix possibles.
-
-Proposition : les esprits sont capables ou non de voir au travers des portails. S'ils sont capables de voir, tous leurs corps peuvent traverser, et leurs résolutions aussi (toutes). Sinon, leurs corps ne peuvent pas traverser, et leurs résolutions non plus.
-/!\ Le fait que les résolutions ne traversent pas ne suffit pas pour que les corps ne traversent pas. Et pour que les résolutions ne traversent pas, il faudrait que la vue montre un mur fermé. Comment prendre en compte le portail dans la dangerosité ?
-Même chose (avec plus d'esprits incapables) pour les escaliers.
-
-
-
-
-
-À faire : cases "repoussantes"
-Pour les arrivées des escaliers par exemple. Des cases que leurs occupants voudront quitter si possible.
-À mettre en lien avec le fait que les PNJs laissent passer le joueur ? Et plus généralement que les gens se laissent passer si possible ?
-
 
 
 

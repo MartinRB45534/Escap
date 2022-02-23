@@ -16,4 +16,4 @@ global portee_petite_secousse
 portee_petite_secousse = [2,2,2,2,2,2,2,2,2,2]
 
 global delai_petite_secousse
-delai_petite_secousse = [7,7,7,6,6,6,5,5,4,4]
+delai_petite_secousse = [5,7,7,6,6,6,5,5,4,4]

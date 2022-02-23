@@ -3912,7 +3912,7 @@ class Troisieme_monstre(Sentinelle_gobelin):
         Agissant.__init__(self,controleur,position,"troisieme_monstre",niveau)
 
     def meurt(self):
-        self.controleur.get_entitee(2).third_kill(self.position)
+        self.controleur.get_entitee(2).third_kill()
         Agissant.meurt(self)
 
 class Guerrier_gobelin(Gobelin):
@@ -4274,6 +4274,13 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         self.inventaire.__class__ = Sac_a_dos
         self.inventaire.complete()
 
+        self.first_kill_=True
+        self.magic_kill_=True
+        self.third_kill_=True
+        self.first_step_=True
+        self.first_door_=True
+        self.first_teleport_=True
+
         #Il doit afficher tout ce qu'il voit...
         #print("Initialisation du joueur")
         self.affichage = Affichage(screen)
@@ -4357,102 +4364,111 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
 
     def first_kill(self,position):
         """Fonction appelée lorsque le premier gobelin meurt. Déclenche un dialogue de circonstance."""
-        #On vérifie que le dialogue a lieu d'être : le joueur n'a pas rencontré d'autre monstre et il a assisté à la mort du gobelin
-        if self.highest == 3 and (self.get_etage_courant() == 3 and self.vue[position[1]][position[2]][2] > 0):
-            #On cherche un PNJ volontaire pour aller taper la causette :
-            paume = self.controleur.get_entitee(4)
-            if paume.esprit == "joueur" and (paume.get_etage_courant() == 3 and paume.statut_humain in ["exploration","proximite","en chemin"]):
-                paume.mouvement = 2
-                paume.cible_deplacement = 2
-                paume.dialogue = 2
-            else:
-                peureuse = self.controleur.get_entitee(5)
-                if peureuse.esprit == "joueur" and (peureuse.get_etage_courant() == 3 and peureuse.statut_humain in ["exploration","proximite","en chemin"]):
-                    peureuse.mouvement = 2
-                    peureuse.cible_deplacement = 2
-                    peureuse.dialogue = 2
+        if self.first_kill_:
+            self.first_kill_=False
+            #On vérifie que le dialogue a lieu d'être : le joueur n'a pas rencontré d'autre monstre et il a assisté à la mort du gobelin
+            if self.highest == 3 and (self.get_etage_courant() == 3 and self.vue[position[1]][position[2]][2] > 0):
+                #On cherche un PNJ volontaire pour aller taper la causette :
+                paume = self.controleur.get_entitee(4)
+                if paume.esprit == "joueur" and (paume.get_etage_courant() == 3 and paume.statut_humain in ["exploration","proximite","en chemin"]):
+                    paume.mouvement = 2
+                    paume.cible_deplacement = 2
+                    paume.dialogue = 2
+                else:
+                    peureuse = self.controleur.get_entitee(5)
+                    if peureuse.esprit == "joueur" and (peureuse.get_etage_courant() == 3 and peureuse.statut_humain in ["exploration","proximite","en chemin"]):
+                        peureuse.mouvement = 2
+                        peureuse.cible_deplacement = 2
+                        peureuse.dialogue = 2
 
     def magic_kill(self,position):
         """Fonction appelée lorsque le premier mage gobelin meurt. Déclenche un dialogue de circonstance."""
-        #On vérifie que le dialogue a lieu d'être : le joueur a assisté à la mort du mage gobelin (et donc probablement à ses attaques)
-        if self.highest == 4 and (self.get_etage_courant() == 4 and self.vue[position[1]][position[2]][2] > 0):
-            #On cherche un PNJ volontaire pour aller taper la causette :
-            peureuse = self.controleur.get_entitee(5)
-            if peureuse.esprit == "joueur" and (peureuse.get_etage_courant() == 4 and peureuse.statut_humain in ["exploration","proximite","en chemin"]):
-                peureuse.mouvement = 2
-                peureuse.cible_deplacement = 2
-                peureuse.dialogue = 3
-            else:
-                paume = self.controleur.get_entitee(4)
-                if paume.esprit == "joueur" and (paume.get_etage_courant() == 4 and paume.statut_humain in ["exploration","proximite","en chemin"]):
-                    paume.mouvement = 2
-                    paume.cible_deplacement = 2
-                    paume.dialogue = 3
+        if self.magic_kill_:
+            self.magic_kill_=False
+            #On vérifie que le dialogue a lieu d'être : le joueur a assisté à la mort du mage gobelin (et donc probablement à ses attaques)
+            if self.highest == 4 and (self.get_etage_courant() == 4 and self.vue[position[1]][position[2]][2] > 0):
+                #On cherche un PNJ volontaire pour aller taper la causette :
+                peureuse = self.controleur.get_entitee(5)
+                if peureuse.esprit == "joueur" and (peureuse.get_etage_courant() == 4 and peureuse.statut_humain in ["exploration","proximite","en chemin"]):
+                    peureuse.mouvement = 2
+                    peureuse.cible_deplacement = 2
+                    peureuse.dialogue = 3
+                else:
+                    paume = self.controleur.get_entitee(4)
+                    if paume.esprit == "joueur" and (paume.get_etage_courant() == 4 and paume.statut_humain in ["exploration","proximite","en chemin"]):
+                        paume.mouvement = 2
+                        paume.cible_deplacement = 2
+                        paume.dialogue = 3
 
-    def third_kill(self,position):
-        """Fonction appelée lorsque le troisième gobelin meurt. Déclenche un dialogue de circonstance."""
-        #On vérifie que le dialogue a lieu d'être : le joueur n'est pas encore passé à l'étage suivant
-        if self.highest == 4 :
-            #On cherche un PNJ volontaire pour aller taper la causette :
-            peureuse = self.controleur.get_entitee(5)
-            if peureuse.esprit == "joueur" and (peureuse.get_etage_courant() == 4 and peureuse.statut_humain in ["exploration","proximite","en chemin"]):
-                peureuse.mouvement = 2
-                peureuse.cible_deplacement = 2
-                peureuse.dialogue = 4
+    def third_kill(self):
+        """Fonction appelée lorsque le troisième gobelin meurt. Déclenche un dialogue d'explications."""
+        if self.third_kill_:
+            self.third_kill_=False
+            #On vérifie que le dialogue a lieu d'être : le joueur n'est pas encore passé à l'étage suivant
+            if self.highest == 4 :
+                #On cherche un PNJ volontaire pour aller taper la causette :
+                peureuse = self.controleur.get_entitee(5)
+                if peureuse.esprit == "joueur" and (peureuse.get_etage_courant() == 4 and peureuse.statut_humain in ["exploration","proximite","en chemin"]):
+                    peureuse.mouvement = 2
+                    peureuse.cible_deplacement = 2
+                    peureuse.dialogue = 4
 
     def first_step(self):
         """Fonction appelée quand on entre dans la prison. Déclenche un dialogue d'explications."""
-        #L'escalier qui lance le dialogue certifie qu'on y passe pour la première fois
-        #On cherche un PNJ volontaire pour aller taper la causette :
-        peureuse = self.controleur.get_entitee(5)
-        if peureuse.esprit == "joueur" and peureuse.statut_humain in ["exploration","proximite","en chemin"]:
-            peureuse.mouvement = 2
-            peureuse.cible_deplacement = 2
-            peureuse.dialogue = 5
-        else:
-            paume = self.controleur.get_entitee(4)
-            if paume.esprit == "joueur" and paume.statut_humain in ["exploration","proximite","en chemin"]:
-                paume.mouvement = 2
-                paume.cible_deplacement = 2
-                paume.dialogue = 4
-
-    def first_door(self):
-        """Fonction appelée quand on passe la première porte de la prison. Déclenche un dialogue d'explications."""
-        #La porte qui lance le dialogue certifie qu'on y passe pour la première fois
-        #On cherche un PNJ volontaire pour aller taper la causette :
-        peureuse = self.controleur.get_entitee(5)
-        if peureuse.esprit == "joueur" and peureuse.statut_humain in ["exploration","proximite","en chemin"]:
-            peureuse.mouvement = 2
-            peureuse.cible_deplacement = 2
-            peureuse.dialogue = 6
-
-    def first_teleport(self):
-        """Fonction appelée quand on passe le premier téléporteur. Déclenche un dialogue d'explications."""
-        #Le téléporteur qui lance le dialogue certifie qu'on y passe pour la première fois
-        #On cherche un PNJ volontaire pour aller taper la causette :
-        alchimiste = self.controleur.get_entitee(7)
-        if alchimiste.esprit == "joueur" and alchimiste.statut_humain in ["exploration","proximite","en chemin"]:
-            alchimiste.mouvement = 2
-            alchimiste.dialogue = 2
-        else:
+        if self.first_step_:
+            self.first_step_=False
+            #On cherche un PNJ volontaire pour aller taper la causette :
             peureuse = self.controleur.get_entitee(5)
             if peureuse.esprit == "joueur" and peureuse.statut_humain in ["exploration","proximite","en chemin"]:
                 peureuse.mouvement = 2
                 peureuse.cible_deplacement = 2
-                peureuse.dialogue = 7
+                peureuse.dialogue = 5
             else:
-                encombrant = self.controleur.get_entitee(6)
-                if encombrant.esprit == "joueur" and encombrant.statut_humain in ["exploration","proximite","en chemin"]:
-                    encombrant.mouvement = 2
-                    encombrant.cible_deplacement = 2
-                    encombrant.dialogue = 2
+                paume = self.controleur.get_entitee(4)
+                if paume.esprit == "joueur" and paume.statut_humain in ["exploration","proximite","en chemin"]:
+                    paume.mouvement = 2
+                    paume.cible_deplacement = 2
+                    paume.dialogue = 4
+
+    def first_door(self):
+        """Fonction appelée quand on passe la première porte de la prison. Déclenche un dialogue d'explications."""
+        if self.first_door_:
+            self.first_door_=False
+            #La porte qui lance le dialogue certifie qu'on y passe pour la première fois
+            #On cherche un PNJ volontaire pour aller taper la causette :
+            peureuse = self.controleur.get_entitee(5)
+            if peureuse.esprit == "joueur" and peureuse.statut_humain in ["exploration","proximite","en chemin"]:
+                peureuse.mouvement = 2
+                peureuse.cible_deplacement = 2
+                peureuse.dialogue = 6
+
+    def first_teleport(self):
+        """Fonction appelée quand on passe le premier téléporteur. Déclenche un dialogue d'explications."""
+        if self.first_teleport_:
+            self.first_teleport_=False
+            #On cherche un PNJ volontaire pour aller taper la causette :
+            alchimiste = self.controleur.get_entitee(7)
+            if alchimiste.esprit == "joueur" and alchimiste.statut_humain in ["exploration","proximite","en chemin"]:
+                alchimiste.mouvement = 2
+                alchimiste.dialogue = 2
+            else:
+                peureuse = self.controleur.get_entitee(5)
+                if peureuse.esprit == "joueur" and peureuse.statut_humain in ["exploration","proximite","en chemin"]:
+                    peureuse.mouvement = 2
+                    peureuse.cible_deplacement = 2
+                    peureuse.dialogue = 7
                 else:
-                    paume = self.controleur.get_entitee(4)
-                    if paume.esprit == "joueur" and paume.statut_humain in ["exploration","proximite","en chemin"]:
-                        paume.mouvement = 2
-                        paume.cible_deplacement = 2
-                        paume.dialogue = 5
-        # /!\ Coder ces dialogues
+                    encombrant = self.controleur.get_entitee(6)
+                    if encombrant.esprit == "joueur" and encombrant.statut_humain in ["exploration","proximite","en chemin"]:
+                        encombrant.mouvement = 2
+                        encombrant.cible_deplacement = 2
+                        encombrant.dialogue = 2
+                    else:
+                        paume = self.controleur.get_entitee(4)
+                        if paume.esprit == "joueur" and paume.statut_humain in ["exploration","proximite","en chemin"]:
+                            paume.mouvement = 2
+                            paume.cible_deplacement = 2
+                            paume.dialogue = 5
 
     def get_portee_vue(self):
         skill = trouve_skill(self.classe_principale,Skill_vision)
@@ -18320,10 +18336,14 @@ class Affichage:
                 else:
                     fichier = "Jeu/Skins/barre_de_vie_neutres.png"
                 self.screen.blit(pygame.transform.scale(pygame.image.load(fichier).convert_alpha(),(int(taille*((15*agissant.pv)/(19*agissant.pv_max))),int(taille*(15/19)))),(position[0]+int(taille*(2/19)),position[1]+int(taille*(2/19))))
-                if isinstance(agissant,Humain) and agissant.dialogue > 0: #Est-ce qu'on veut vraiment avoir cet indicatif en-dessous des effets ?
+                if isinstance(agissant,Humain) and agissant.dialogue > 0: #Est-ce qu'on veut vraiment avoir cet indicatif au-dessus des effets ?
                     SKIN_DIALOGUE.dessine_toi(self.screen,position,taille)
             if vue[7] != []:
-                SKIN_ATTAQUE_DELAYEE.dessine_toi(self.screen,position,taille)
+                esprit = joueur.controleur.get_esprit(joueur.esprit)
+                if any([effet[2] in esprit.corps.keys() for effet in vue[7]]):
+                    SKIN_ATTAQUE_DELAYEE_ALLIE.dessine_toi(self.screen,position,taille)
+                else:
+                    SKIN_ATTAQUE_DELAYEE.dessine_toi(self.screen,position,taille)
 
             #Rajouter des conditions d'observation
 

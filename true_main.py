@@ -205,7 +205,7 @@ class True_joueur:
         pygame.display.flip()
 
     def patiente(self):
-        self.clock.tick(self.controleur.tour_par_seconde)
+        self.clock.tick(self.controleur.tour_par_seconde*3)
 
     def input(self): #À appeler régulièrement !
         """Fonction qui traite tous les inputs"""
@@ -240,8 +240,12 @@ class True_joueur:
                 self.debut_tour()
             else :
                 self.pseudo_debut_tour() #Quelques trucs d'affichage
+            self.affichage(1)
+            self.patiente()
 
             self.input()
+            self.affichage(2)
+            self.patiente()
             if self.controleur.phase == TOUR : #On continue un tour normal
                 if self.controleur.pause: #Enfin, sauf si on est en pause
                     self.pseudo_fin_tour()
@@ -258,9 +262,9 @@ class True_joueur:
                     self.touches()
                 elif self.controleur.phase == EVENEMENT : #Un événement (montée de niveau, dialogue...) interrompt le jeu et le joueur doit réagir
                     self.evenement()
-                joueur = self.controleur.entitees[2]
+                joueur = self.controleur.get_entitee(2)
                 joueur.inventaire.nettoie_item()
-            self.affichage()
+            self.affichage(3)
             self.patiente()
             new_courant = pygame.time.get_ticks()
             duree = new_courant - constantes_temps['courant']

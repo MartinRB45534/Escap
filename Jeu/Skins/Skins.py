@@ -51,7 +51,9 @@ SKIN_INGREDIENT = Skin("ingredient.png")
 global SKIN_BLESSURE
 SKIN_BLESSURE = Skin("blessure.png")
 global SKIN_ATTAQUE_DELAYEE
-SKIN_ATTAQUE_DELAYEE = Skin("blessure.png")
+SKIN_ATTAQUE_DELAYEE = Skin("attaque_delayee.png")
+global SKIN_ATTAQUE_DELAYEE_ALLIE
+SKIN_ATTAQUE_DELAYEE_ALLIE = Skin("attaque_delayee_allie.png")
 global SKIN_TETE_JOUEUR
 SKIN_TETE_JOUEUR = Skin("joueur_tete.png")
 global SKIN_TETE_RECEPTIONNISTE
