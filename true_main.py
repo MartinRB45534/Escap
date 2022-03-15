@@ -201,11 +201,12 @@ class True_joueur:
 
         self.controleur.entitees[2].evenement()
 
-    def affichage(self):
+    def affichage(self,frame,frame_par_tour):
         pygame.display.flip()
+        self.patiente(frame_par_tour)
 
-    def patiente(self):
-        self.clock.tick(self.controleur.tour_par_seconde*3)
+    def patiente(self,frame_par_tour):
+        self.clock.tick(self.controleur.tour_par_seconde*frame_par_tour)
 
     def input(self): #À appeler régulièrement !
         """Fonction qui traite tous les inputs"""
@@ -240,12 +241,8 @@ class True_joueur:
                 self.debut_tour()
             else :
                 self.pseudo_debut_tour() #Quelques trucs d'affichage
-            self.affichage(1)
-            self.patiente()
 
             self.input()
-            self.affichage(2)
-            self.patiente()
             if self.controleur.phase == TOUR : #On continue un tour normal
                 if self.controleur.pause: #Enfin, sauf si on est en pause
                     self.pseudo_fin_tour()
@@ -264,8 +261,7 @@ class True_joueur:
                     self.evenement()
                 joueur = self.controleur.get_entitee(2)
                 joueur.inventaire.nettoie_item()
-            self.affichage(3)
-            self.patiente()
+            self.affichage(1,1)
             new_courant = pygame.time.get_ticks()
             duree = new_courant - constantes_temps['courant']
             constantes_temps['reste'] += duree

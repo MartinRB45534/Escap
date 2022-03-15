@@ -3089,7 +3089,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
     def veut_attaquer(self):
         pass
 
-    def veut_fuir(self):
+    def veut_fuir(self,degats=0):
         pass
 
     def get_direction(self):
@@ -3573,7 +3573,7 @@ class Support(Agissant):
     def veut_attaquer(self,degats=0):
         return (self.pv-degats)/self.pv_max < 0.7 and (self.pv-degats)/self.pv_max >= 0.4
 
-    def veut_fuir(self,degats):
+    def veut_fuir(self,degats=0):
         return (self.pv-degats)/self.pv_max < 0.4
 
 class Support_lointain(Agissant):
@@ -3588,7 +3588,7 @@ class Support_lointain(Agissant):
     def veut_attaquer(self,degats):
         return (self.pv-degats) <= self.pv_max and (self.pv-degats)/self.pv_max >= 0.7
 
-    def veut_fuir(self,degats):
+    def veut_fuir(self,degats=0):
         return (self.pv-degats)/self.pv_max < 0.7
 
 class Fuyard(Agissant):
@@ -3600,7 +3600,7 @@ class Fuyard(Agissant):
     def veut_attaquer(self):
         return False
 
-    def veut_fuir(self):
+    def veut_fuir(self,degats=0):
         return True
 
 class Soigneur(Agissant):
@@ -4283,7 +4283,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
 
         #Il doit afficher tout ce qu'il voit...
         #print("Initialisation du joueur")
-        self.affichage = Affichage(screen)
+        self.affichage = Faux_affichage(screen)
         self.event = None
         self.etage = 0
         self.arbre = True
@@ -4347,7 +4347,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
     def get_texte_descriptif(self):
         return [f"Un humain (niveau {self.niveau})",f"ID : {self.ID}","Nom : Arvel","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Un humain récemment arrivé dans le labyrinthe."]
 
-    def fuite(self):
+    def fuite(self,degats=0):
         return False #À modifier pour quand on prend le controle de Dev
 
     def debut_tour(self):
@@ -6417,11 +6417,11 @@ class Receptionniste(Dps,Humain): #Le deuxième humain du jeu, à l'étage 1 (en
         #                        d'explorer (chercher la sortie),
         #                        de suivre (se déplacer avec le joueur, combattre les monstres en chemin, aller vers la sortie lorsque quelqu'un l'a trouvée)
 
-    def fuite(self):
+    def fuite(self,degats=0):
         #On fuit si on est en danger (pv trop bas) à condition d'avoir un chemin de fuite, et qu'il n'y ait aucun allié en danger au front
         #Pour l'instant on va juste vérifier les pv :
         taux_limite = 0.2 + 0.01*self.appreciations[1] #Quand on se hait, on devient plus suicidaire
-        return self.pv / self.pv_max <= taux_limite
+        return (self.pv-degats) / self.pv_max <= taux_limite
 
     # /!\ Pour améliorer ça : modifier le taux limite en fonction des autres humains en danger au front et de l'appréciation qu'on a pour eux
     # et ne pas fuir s'il n'y a nulle part où fuir ou si le joueur a donné ordre de ne pas fuir et qu'on a suffisamment d'appréciation pour lui (rajouter un modificateur au taux_limite ?)
@@ -6526,11 +6526,11 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
         #                        de fuir (se mettre à l'abri en évitant les combats),
         #                        de suivre (se déplacer avec le joueur, combattre les monstres en chemin, aller vers la sortie lorsque quelqu'un l'a trouvée)
 
-    def fuite(self):
+    def fuite(self,degats=0):
         #On fuit si on est en danger (pv trop bas) à condition d'avoir un chemin de fuite
         #Pour l'instant on va juste vérifier les pv :
         taux_limite = 0.1 + 0.01*self.appreciations[1] #Quand on se hait, on devient plus suicidaire
-        return self.pv / self.pv_max <= taux_limite
+        return (self.pv-degats) / self.pv_max <= taux_limite
 
     # /!\ Pour améliorer ça : modifier le taux limite en fonction des autres humains en danger au front et de l'appréciation qu'on a pour eux (exceptionnel, pour le cas où le paumé serait amoureux, sinon il obéit et fuit normalement)
     # et ne pas fuir s'il n'y a nulle part où fuir ou si le joueur a donné ordre de ne pas fuir et qu'on a suffisamment d'appréciation pour lui (rajouter un modificateur au taux_limite ?)
@@ -6885,11 +6885,11 @@ class Peureuse(Multi_renforceur,Support_lointain,Stratege,Humain): #La quatrièm
         #                        d'explorer (chercher la sortie),
         #                        de suivre (se déplacer avec le joueur, combattre les monstres en chemin, aller vers la sortie lorsque quelqu'un l'a trouvée)
 
-    def fuite(self):
+    def fuite(self,degats=0):
         #On fuit si on est en danger (pv trop bas) ou en présence d'un monstre à condition d'avoir un chemin de fuite
         #Pour l'instant on va juste vérifier les pv :
         taux_limite = 0.7 + 0.01*self.appreciations[1] #Quand on se hait, on devient plus suicidaire
-        return self.pv / self.pv_max <= taux_limite
+        return (self.pv-degats) / self.pv_max <= taux_limite
 
     # /!\ Pour améliorer ça : fuire dès qu'il y a un monstre en vue et accessible
     # et ne pas fuir s'il n'y a nulle part où fuir ou si le joueur a donné ordre de ne pas fuir et qu'on a suffisamment d'appréciation pour lui (rajouter un modificateur au taux_limite ?)
@@ -7369,7 +7369,7 @@ class Codeur(Humain): #Le cinquième humain du jeu, à l'étage 4 (répond au no
 
         self.appreciations = [5,0,0,0,0,0,0,0,0,0]
 
-    def fuite(self):
+    def fuite(self,degats=0):
         return False
 
     def start_dialogue(self): #On commence un nouveau dialogue !
@@ -7500,11 +7500,11 @@ class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyenne
         #                        d'explorer (chercher la sortie),
         #                        de suivre (se déplacer avec le joueur, combattre les monstres en chemin, aller vers la sortie lorsque quelqu'un l'a trouvée)
 
-    def fuite(self):
+    def fuite(self,degats=0):
         #On fuit si on est en danger (pv trop bas) à condition d'avoir un chemin de fuite
         #Pour l'instant on va juste vérifier les pv :
         taux_limite = 0.4 + 0.01*self.appreciations[1] #Quand on se hait, on devient plus suicidaire
-        return self.pv / self.pv_max <= taux_limite
+        return (self.pv-degats) / self.pv_max <= taux_limite
 
     # /!\ Pour améliorer ça : ne pas fuir s'il n'y a nulle part où fuir
 
@@ -7770,11 +7770,11 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
         #                        d'explorer (chercher la sortie),
         #                        de suivre (se déplacer avec le joueur, combattre les monstres en chemin, aller vers la sortie lorsque quelqu'un l'a trouvée)
 
-    def fuite(self):
+    def fuite(self,degats=0):
         #On fuit si on est en danger (pv trop bas) à condition d'avoir un chemin de fuite
         #Pour l'instant on va juste vérifier les pv :
         taux_limite = 0.5 + 0.01*self.appreciations[1] #Quand on se hait, on devient plus suicidaire
-        return self.pv / self.pv_max <= taux_limite
+        return (self.pv-degats) / self.pv_max <= taux_limite
 
     def peut_caster(self,niveau):
         return self.peut_payer(cout_pm_secousse[niveau-1])
@@ -8117,11 +8117,11 @@ class Peste(Multi_soigneur,Support_lointain,Humain): #La huitième humaine du je
         #                        d'explorer (chercher la sortie),
         #                        de suivre (se déplacer avec le joueur, combattre les monstres en chemin, aller vers la sortie lorsque quelqu'un l'a trouvée)
 
-    def fuite(self):
+    def fuite(self,degats=0):
         #On fuit si on est en danger (pv trop bas)
         #Pour l'instant on va juste vérifier les pv :
         taux_limite = 0.1 + 0.01*self.appreciations[7] #Quand on se hait, on devient plus suicidaire
-        return self.pv / self.pv_max <= taux_limite
+        return (self.pv-degats) / self.pv_max <= taux_limite
 
     # /!\ Pour améliorer ça : ne pas fuir s'il n'y a nulle part où fuir et ne pas fuir si on n'est pas à portée de monstre
 
@@ -8361,11 +8361,11 @@ class Bombe_atomique(Attaquant_magique_case,Support,Humain): #La neuvième humai
         #                        d'explorer (chercher la sortie),
         #                        de suivre (se déplacer avec le joueur, combattre les monstres en chemin, aller vers la sortie lorsque quelqu'un l'a trouvée)
 
-    def fuite(self):
+    def fuite(self,degats=0):
         #On fuit si on est en danger (pv trop bas) ou en présence d'un monstre à condition d'avoir un chemin de fuite
         #Pour l'instant on va juste vérifier les pv :
         taux_limite = 0.5 + 0.01*self.appreciations[8] #Quand on se hait, on devient plus suicidaire
-        return self.pv / self.pv_max <= taux_limite
+        return (self.pv-degats) / self.pv_max <= taux_limite
 
     def peut_caster(self,niveau):
         return self.peut_payer(cout_pm_volcan[niveau-1])
@@ -8597,11 +8597,11 @@ class Marchand(Dps,Humain): #Le dixième humain du jeu, à l'étage 9 (le seul l
         #                        d'explorer (chercher la sortie),
         #                        de suivre (se déplacer avec le joueur, combattre les monstres en chemin, aller vers la sortie lorsque quelqu'un l'a trouvée)
 
-    def fuite(self):
+    def fuite(self,degats=0):
         #On fuit si on est en danger (pv trop bas)
         #Pour l'instant on va juste vérifier les pv :
         taux_limite = 0.4 + 0.01*self.appreciations[9] #Quand on se hait, on devient plus suicidaire
-        return self.pv / self.pv_max <= taux_limite
+        return (self.pv-degats) / self.pv_max <= taux_limite
 
     # /!\ Pour améliorer ça : ne pas fuir s'il n'y a nulle part où fuir ou si le joueur a donné ordre de ne pas fuir et qu'on a suffisamment d'appréciation pour lui (rajouter un modificateur au taux_limite ?)
 
@@ -15467,7 +15467,7 @@ class Magie_teleportation(Multi_cible,Cible_case):
     def get_description(self,observation):
         return ["Une magie de téléportation","Affecte les entitées sur les cases sélectionnées.","Les entitées de chaque case sont déplacées sur la case précédente. Les entitées de la première case sont envoyées sur la dernière case.",f"Coût : {self.cout_pm}",f"Latence : {self.latence}"]
 
-class Affichage:
+class Old_affichage:
     def __init__(self,screen):
         #print("Initialisation de l'affichage")
         self.screen = screen
@@ -16211,23 +16211,23 @@ class Affichage:
                 direction = agissant.get_direction()
                 arme = agissant.inventaire.arme
                 if arme != None:
-                    joueur.controleur.get_entitee(arme).get_skin().dessine_toi(self.screen,position,taille,direction)
-                agissant.get_skin().dessine_toi(self.screen,position,taille,direction)
+                    joueur.controleur.get_entitee(arme).get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
+                agissant.get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
                 armure = agissant.inventaire.armure
                 if armure != None:
-                    joueur.controleur.get_entitee(armure).get_skin().dessine_toi(self.screen,position,taille,direction)
+                    joueur.controleur.get_entitee(armure).get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
                 bouclier = agissant.inventaire.bouclier
                 if bouclier != None:
-                    joueur.controleur.get_entitee(bouclier).get_skin().dessine_toi(self.screen,position,taille,direction)
+                    joueur.controleur.get_entitee(bouclier).get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
                 haume = agissant.inventaire.haume
-                agissant.get_skin_tete().dessine_toi(self.screen,position,taille,direction) #Avoir éventuellement la tête dans une autre direction ?
+                agissant.get_skin_tete().dessine_toi(self.screen,position,taille,1,1,direction) #Avoir éventuellement la tête dans une autre direction ?
                 if haume != None:
-                    joueur.controleur.get_entitee(haume).get_skin().dessine_toi(self.screen,position,taille,direction)
+                    joueur.controleur.get_entitee(haume).get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
                 for statut in agissant.get_skins_statuts():
                     statut.dessine_toi(self.screen,position,taille)
                 for effet in agissant.effets:
                     if effet.affiche:
-                        effet.get_skin().dessine_toi(self.screen,position,taille,direction)
+                        effet.get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
                 self.screen.blit(pygame.transform.scale(pygame.image.load("Jeu/Skins/barre_de_vie.png").convert_alpha(),(int(taille*((15*agissant.pv)/(19*agissant.pv_max))),int(taille*(15/19)))),(position[0]+int(taille*(2/19)),position[1]+int(taille*(15/19))))
                 marge_haut += 44
 
@@ -16265,23 +16265,23 @@ class Affichage:
                     direction = agissant.get_direction()
                     arme = agissant.inventaire.arme
                     if arme != None:
-                        joueur.controleur.get_entitee(arme).get_skin().dessine_toi(self.screen,position,taille,direction)
-                    agissant.get_skin().dessine_toi(self.screen,position,taille,direction)
+                        joueur.controleur.get_entitee(arme).get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
+                    agissant.get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
                     armure = agissant.inventaire.armure
                     if armure != None:
-                        joueur.controleur.get_entitee(armure).get_skin().dessine_toi(self.screen,position,taille,direction)
+                        joueur.controleur.get_entitee(armure).get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
                     bouclier = agissant.inventaire.bouclier
                     if bouclier != None:
-                        joueur.controleur.get_entitee(bouclier).get_skin().dessine_toi(self.screen,position,taille,direction)
+                        joueur.controleur.get_entitee(bouclier).get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
                     haume = agissant.inventaire.haume
-                    agissant.get_skin_tete().dessine_toi(self.screen,position,taille,direction) #Avoir éventuellement la tête dans une autre direction ?
+                    agissant.get_skin_tete().dessine_toi(self.screen,position,taille,1,1,direction) #Avoir éventuellement la tête dans une autre direction ?
                     if haume != None:
-                        joueur.controleur.get_entitee(haume).get_skin().dessine_toi(self.screen,position,taille,direction)
+                        joueur.controleur.get_entitee(haume).get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
                     for statut in agissant.get_skins_statuts():
                         statut.dessine_toi(self.screen,position,taille)
                     for effet in agissant.effets:
                         if effet.affiche:
-                            effet.get_skin().dessine_toi(self.screen,position,taille,direction)
+                            effet.get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
                     self.screen.blit(pygame.transform.scale(pygame.image.load("Jeu/Skins/barre_de_vie.png").convert_alpha(),(int(taille*((15*agissant.pv)/(19*agissant.pv_max))),int(taille*(15/19)))),(position[0]+int(taille*(2/19)),position[1]+int(taille*(15/19))))
                     marge_haut += 44
 
@@ -16350,23 +16350,23 @@ class Affichage:
             direction = agissant.get_direction()
             arme = agissant.inventaire.arme
             if arme != None:
-                joueur.controleur.get_entitee(arme).get_skin().dessine_toi(self.screen,position,taille,direction)
-            agissant.get_skin().dessine_toi(self.screen,position,taille,direction)
+                joueur.controleur.get_entitee(arme).get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
+            agissant.get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
             armure = agissant.inventaire.armure
             if armure != None:
-                joueur.controleur.get_entitee(armure).get_skin().dessine_toi(self.screen,position,taille,direction)
+                joueur.controleur.get_entitee(armure).get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
             bouclier = agissant.inventaire.bouclier
             if bouclier != None:
-                joueur.controleur.get_entitee(bouclier).get_skin().dessine_toi(self.screen,position,taille,direction)
+                joueur.controleur.get_entitee(bouclier).get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
             haume = agissant.inventaire.haume
-            agissant.get_skin_tete().dessine_toi(self.screen,position,taille,direction) #Avoir éventuellement la tête dans une autre direction ?
+            agissant.get_skin_tete().dessine_toi(self.screen,position,taille,1,1,direction) #Avoir éventuellement la tête dans une autre direction ?
             if haume != None:
-                joueur.controleur.get_entitee(haume).get_skin().dessine_toi(self.screen,position,taille,direction)
+                joueur.controleur.get_entitee(haume).get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
             if isinstance(agissant,Humain) and agissant.dialogue > 0: #Est-ce qu'on veut vraiment avoir cet indicatif en-dessous des effets ?
                 SKIN_DIALOGUE.dessine_toi(self.screen,position,taille)
             for effet in agissant.effets:
                 if effet.affiche:
-                    effet.get_skin().dessine_toi(self.screen,position,taille,direction)
+                    effet.get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
             self.screen.blit(pygame.transform.scale(pygame.image.load("Jeu/Skins/barre_de_vie.png").convert_alpha(),(int(taille*((15*agissant.pv)/(19*agissant.pv_max))),int(taille*(15/19)))),(position[0]+int(taille*(2/19)),position[1]+int(taille*(2/19))))
             marge_haut += 50
         marge_gauche += 50
@@ -16388,7 +16388,7 @@ class Affichage:
         marge_haut = self.position_debut_y_rectangles_et_carre + 5
         marge_gauche = self.position_debut_x_rectangle_2 + 5
 
-        SKIN_DIRECTION.dessine_toi(self.screen,(marge_gauche,marge_haut),40,joueur.dir_regard)
+        SKIN_DIRECTION.dessine_toi(self.screen,(marge_gauche,marge_haut),40,1,1,joueur.dir_regard)
 
         #On cherche à placer une barre au bas du rectangle de droite
         pos_haut = self.position_debut_y_rectangles_et_carre + self.hauteur_exploitable - 15
@@ -18253,19 +18253,19 @@ class Affichage:
             if vue[0][2] > 0:
                 if vue[5][HAUT][0]:
                     if joueur.vue[vue[0][1]][vue[0][2]-1][1]>0:
-                        SKIN_MUR_BROUILLARD.dessine_toi(self.screen,position,taille,HAUT)
+                        SKIN_MUR_BROUILLARD.dessine_toi(self.screen,position,taille,1,1,HAUT)
             if vue[0][1] < len(joueur.vue) - 1:
                 if vue[5][DROITE][0]:
                     if joueur.vue[vue[0][1]+1][vue[0][2]][1]>0:
-                        SKIN_MUR_BROUILLARD.dessine_toi(self.screen,position,taille,DROITE)
+                        SKIN_MUR_BROUILLARD.dessine_toi(self.screen,position,taille,1,1,DROITE)
             if vue[0][2] < len(joueur.vue[0]) -1:
                 if vue[5][BAS][0]:
                     if joueur.vue[vue[0][1]][vue[0][2]+1][1]>0:
-                        SKIN_MUR_BROUILLARD.dessine_toi(self.screen,position,taille,BAS)
+                        SKIN_MUR_BROUILLARD.dessine_toi(self.screen,position,taille,1,1,BAS)
             if vue[0][1] > 0:
                 if vue[5][GAUCHE][0]:
                     if joueur.vue[vue[0][1]-1][vue[0][2]][1]>0:
-                        SKIN_MUR_BROUILLARD.dessine_toi(self.screen,position,taille,GAUCHE)
+                        SKIN_MUR_BROUILLARD.dessine_toi(self.screen,position,taille,1,1,GAUCHE)
         else:
             if vue[4]==0: #On teste le code de la case pour déterminer son image
                 SKIN_CASE.dessine_toi(self.screen,position,taille) #La case en premier, donc en bas
@@ -18291,11 +18291,11 @@ class Affichage:
                 for effet in mur.effets:
                     if effet.affiche:
                         if isinstance(effet,Porte) :
-                            effet.get_skin(joueur.get_clees()).dessine_toi(self.screen,position,taille,i)
+                            effet.get_skin(joueur.get_clees()).dessine_toi(self.screen,position,taille,1,1,i)
                         elif isinstance(effet,(Mur_plein,Mur_impassable)) :
-                            effet.get_skin(vue[4]).dessine_toi(self.screen,position,taille,i)
+                            effet.get_skin(vue[4]).dessine_toi(self.screen,position,taille,1,1,i)
                         else :
-                            effet.get_skin().dessine_toi(self.screen,position,taille,i)
+                            effet.get_skin().dessine_toi(self.screen,position,taille,1,1,i)
             for effet in case.effets:
                 if effet.affiche:
                     effet.get_skin().dessine_toi(self.screen,position,taille)
@@ -18304,7 +18304,7 @@ class Affichage:
             for ID_entitee in entitees : #Puis les items au sol
                 entitee = joueur.controleur.get_entitee(ID_entitee)
                 if issubclass(entitee.get_classe(),Item):
-                    entitee.get_skin().dessine_toi(self.screen,position,taille,entitee.get_direction()) #La direction est surtout utile pour les projectiles, sinon ils devraient tous être dans le même sens.
+                    entitee.get_skin().dessine_toi(self.screen,position,taille,1,1,entitee.get_direction()) #La direction est surtout utile pour les projectiles, sinon ils devraient tous être dans le même sens.
                 elif issubclass(entitee.get_classe(),Decors):
                     entitee.get_skin().dessine_toi(self.screen,position,taille)
                 else:
@@ -18313,21 +18313,21 @@ class Affichage:
                 direction = agissant.get_direction()
                 arme = agissant.inventaire.arme
                 if arme != None:
-                    joueur.controleur.get_entitee(arme).get_skin().dessine_toi(self.screen,position,taille,direction)
-                agissant.get_skin().dessine_toi(self.screen,position,taille,direction)
+                    joueur.controleur.get_entitee(arme).get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
+                agissant.get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
                 armure = agissant.inventaire.armure
                 if armure != None:
-                    joueur.controleur.get_entitee(armure).get_skin().dessine_toi(self.screen,position,taille,direction)
+                    joueur.controleur.get_entitee(armure).get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
                 bouclier = agissant.inventaire.bouclier
                 if bouclier != None:
-                    joueur.controleur.get_entitee(bouclier).get_skin().dessine_toi(self.screen,position,taille,direction)
+                    joueur.controleur.get_entitee(bouclier).get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
                 haume = agissant.inventaire.haume
-                agissant.get_skin_tete().dessine_toi(self.screen,position,taille,direction) #Avoir éventuellement la tête dans une autre direction ?
+                agissant.get_skin_tete().dessine_toi(self.screen,position,taille,1,1,direction) #Avoir éventuellement la tête dans une autre direction ?
                 if haume != None:
-                    joueur.controleur.get_entitee(haume).get_skin().dessine_toi(self.screen,position,taille,direction)
+                    joueur.controleur.get_entitee(haume).get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
                 for effet in agissant.effets:
                     if effet.affiche:
-                        effet.get_skin().dessine_toi(self.screen,position,taille,direction)
+                        effet.get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
                 esprit = joueur.controleur.get_esprit(joueur.esprit)
                 if agissant.ID in esprit.ennemis.keys():
                     fichier = "Jeu/Skins/barre_de_vie_ennemis.png"
@@ -18352,3 +18352,330 @@ class Affichage:
 
     def unclear(self,screen):
         self.screen = screen
+
+
+class Affichage:
+    """Un élément de l'affichage. Peut contenir des sous-éléments."""
+    def __init__(self):
+        self.objets = [] #La liste des objets à afficher
+
+    def set_objets(self,objets):
+        self.objets = objets
+
+    def affiche(self,screen,frame=1,frame_par_tour=1):
+        #Fait afficher ses objets
+        for objet in self.objets:
+            objet.affiche(screen,frame,frame_par_tour)
+
+    def survol(self,position):
+        #Trouve l'élément survolé par la souris et le renvoie
+        res = False
+        for objet in self.objets:
+            res_objet = objet.survol(position)
+            if res_objet:
+                res = res_objet
+        return res
+
+class Affichable:
+    """Un élément qui s'affiche. Apparaît à l'écran."""
+    def __init__(self):
+        self.tailles = [0,0] #La largeur et la hauteur (ou l'inverse ?)
+        self.position = [0,0]
+
+    def set_tailles(self,tailles):
+        self.tailles = tailles
+
+    def set_position(self,position):
+        self.position = position
+
+    def affiche(self,screen,frame=1,frame_par_tour=1):
+        pass
+
+class Vignette(Affichable):
+    """Un élément qui est juste une image."""
+    def __init__(self,position,tailles,skin):
+        self.tailles = tailles
+        self.position = position
+        self.skin:Skin = skin
+
+    def affiche(self,screen,frame=1,frame_par_tour=1):
+        self.skin.dessine_toi(screen,self.position,self.tailles[0],frame,frame_par_tour,0)
+
+class Conteneur(Affichable):
+    """Un élément qui peut en 'contenir' d'autres, c'est-à-dire qu'il va les afficher 'à l'interieur' et ils ne pourront pas déborder."""
+    def __init__(self):
+        self.objets = [] #Il peut quand même avoir des objets 'normaux'
+        self.contenu = [] #Les objets qu'il 'contient'
+        self.fond = (0,0,0)
+        self.tailles = [0,0] #La largeur et la hauteur (ou l'inverse ?)
+        self.position = [0,0]
+    
+    def set_contenu(self,contenu):
+        self.contenu = contenu
+
+    def set_fond(self,fond):
+        self.fond = fond
+
+    def decale(self,decalage):
+        self.position[0] += decalage[0]
+        self.position[1] += decalage[1]
+        for objet in self.objets:
+            objet.decale(decalage)
+    
+    def affiche(self,screen,frame=1,frame_par_tour=1):
+        surf = pygame.Surface(self.tailles)
+        surf.fill(self.fond)
+        for contenu in self.contenu:
+            contenu.affiche(surf,frame,frame_par_tour)
+        screen.blit(surf,self.position)
+        for objet in self.objets:
+            objet.affiche(screen,frame,frame_par_tour)
+
+    def survol(self,position):
+        #Trouve l'élément survolé par la souris et le renvoie
+        res = False
+        if position[0]>=self.position[0] and position[1]>=self.position[1] and position[0]<self.position[0]+self.tailles[0] and position[1]<self.position[1]+self.tailles[1]:
+            for contenu in self.contenu:
+                res_contenu = contenu.survol(position)
+                if res_contenu:
+                    res = res_contenu
+        for objet in self.objets:
+            res_objet = objet.survol(position)
+            if res_objet:
+                res = res_objet
+        return res
+
+class Survolable(Affichable):
+    """Un élément qui réagit au survol"""
+    def survol(self,position):
+        #Trouve l'élément survolé par la souris et le renvoie
+        res = False
+        if position[0]>=self.position[0] and position[1]>=self.position[1] and position[0]<self.position[0]+self.tailles[0] and position[1]<self.position[1]+self.tailles[1]:
+            res=self
+        for objet in self.objets:
+            res_objet = objet.survol(position)
+            if res_objet:
+                res = res_objet
+        return res
+
+    def highlight(self):
+        #Change l'apparence pour indiquer que la souris était là.
+        pass
+
+    def get_description(self,observation):
+        return ["Hey, je réagis au passage de la souris !",f"C'est cool, non ?","","P.S. Si tu croises Martin, dit lui qu'il y a un problème avec la description de {self} !"]
+
+class Cliquable(Survolable): #Il faut être survolable pour être cliquable
+    """Un élément qui réagit aux cliques"""
+    def clique(self): #Lui donner un autre paramètre ? Le joueur par exemple ?
+        pass #À voir sur les cas particuliers
+
+print("Hey, pense à remplacer le faux affichage !")
+class Faux_affichage(Conteneur,Old_affichage):
+    """Classe temporaire.
+       Affiche l'ancien affichage avec les méthodes du nouveau, presque."""
+    def __init__(self,screen):
+        Old_affichage.__init__(self,screen)
+        Conteneur.__init__(self)
+        self.contenu = [Faux_lab()]
+
+    def dessine_lab(self,joueur): #La fonction qui dessine le carré au centre. Elle affiche le labyrinthe vu par le joueur, ses occupants, et tout ce que le joueur est capable de percevoir.
+        vue = joueur.vue
+        position = joueur.get_position()
+        visible_x = [len(vue)-1,0]
+        visible_y = [len(vue[0])-1,0]
+        for i in range(len(vue)):
+            for j in range(len(vue[0])):
+                if vue[i][j][1] > 0:
+                    if i < visible_x[0]:
+                        visible_x[0] = i
+                    if i > visible_x[1]:
+                        visible_x[1] = i
+                    if j < visible_y[0]:
+                        visible_y[0] = j
+                    if j > visible_y[1]:
+                        visible_y[1] = j
+        distance = max(position[1]-visible_x[0],visible_x[1]-position[1],position[2]-visible_y[0],visible_y[1]-position[2]) + 1 #On cherche à déterminer le carré qui comprend toutes les cases utiles de la vue
+        vue_x = position[1] - distance
+        vue_y = position[2] - distance
+        nb_cases = distance*2 + 1
+        taille_case = int(self.hauteur_exploitable // (nb_cases-1))
+        taille_affichee = nb_cases* int(self.hauteur_exploitable // nb_cases)
+        self.set_tailles((self.hauteur_exploitable,self.hauteur_exploitable))
+        hauteur_exploitee = taille_case * nb_cases
+        marge = (self.hauteur_exploitable - hauteur_exploitee) // 2
+        self.set_position((self.position_debut_x_carre,self.position_debut_y_rectangles_et_carre))
+        self.contenu[0].vue = vue
+        self.contenu[0].joueur = joueur
+        self.contenu[0].position = [0,0]
+        self.contenu[0].tailles = [hauteur_exploitee,hauteur_exploitee]
+        self.contenu[0].vues = [vue_x,vue_y]
+        self.contenu[0].taille_case = taille_case
+        self.contenu[0].nb_cases = nb_cases
+        Conteneur.affiche(self,self.screen)
+
+    def dessine_lab_magie(self,joueur):
+        vue = joueur.vue
+        position = joueur.get_position()
+        visible_x = [len(vue)-1,0]
+        visible_y = [len(vue[0])-1,0]
+        for i in range(len(vue)):
+            for j in range(len(vue[0])):
+                if vue[i][j][1] > 0:
+                    if i < visible_x[0]:
+                        visible_x[0] = i
+                    if i > visible_x[1]:
+                        visible_x[1] = i
+                    if j < visible_y[0]:
+                        visible_y[0] = j
+                    if j > visible_y[1]:
+                        visible_y[1] = j
+        distance = max(position[1]-visible_x[0],visible_x[1]-position[1],position[2]-visible_y[0],visible_y[1]-position[2]) + 1 #On cherche à déterminer le carré qui comprend toutes les cases utiles de la vue
+        vue_x = position[1] - distance
+        vue_y = position[2] - distance
+        nb_cases = distance*2 + 1
+        taille_case = int(self.hauteur_exploitable // nb_cases)
+        hauteur_exploitee = taille_case * nb_cases
+        marge = (self.hauteur_exploitable - hauteur_exploitee) // 2
+        marge_haut = marge + self.position_debut_y_rectangles_et_carre
+        for j in range(nb_cases):
+            marge_gauche = marge + self.position_debut_x_carre
+            for i in range(nb_cases):
+                if (position[0],vue_x+i,vue_y+j) in joueur.cibles:
+                    Old_affichage.affiche(self,joueur,vue[vue_x + i][vue_y + j],(marge_gauche,marge_haut),taille_case)
+                else:
+                    SKIN_BROUILLARD.dessine_toi(self.screen,(marge_gauche,marge_haut),taille_case)
+                if (position[0],vue_x+i,vue_y+j) == joueur.element_courant:
+                    pygame.draw.rect(self.screen,(255,64,0),(marge_gauche,marge_haut,taille_case,taille_case),2)
+                elif (position[0],vue_x+i,vue_y+j) in joueur.cible:
+                    pygame.draw.rect(self.screen,(170,170,170),(marge_gauche,marge_haut,taille_case,taille_case),2)
+                marge_gauche += taille_case
+            marge_haut += taille_case
+
+class Faux_lab(Affichable): #Remplacer à l'occasion par Affichable
+    def __init__(self):
+        self.position=[0,0]
+        self.tailles=[0,0]
+        self.objets=[]
+        self.vue = None
+        self.joueur = None
+        self.vues = [0,0]
+        self.taille_case = 0
+        self.nb_cases = 0
+
+    def affiche(self,screen,frame,frame_par_tour):
+        vue_x=self.vues[0]
+        vue_y=self.vues[1]
+        marge_haut = self.position[1]-self.taille_case//2
+        for j in range(self.nb_cases):
+            marge_gauche = self.position[0]-self.taille_case//2
+            for i in range(self.nb_cases):
+                if 0 <= vue_x + i < len(self.vue) and 0 <= vue_y + j < len(self.vue[0]):
+                    self.old_affiche(screen,self.joueur,self.vue[vue_x + i][vue_y + j],(marge_gauche,marge_haut),self.taille_case)
+                else:
+                    SKIN_BROUILLARD.dessine_toi(screen,(marge_gauche,marge_haut),self.taille_case)
+                marge_gauche += self.taille_case
+            marge_haut += self.taille_case
+
+    def old_affiche(self,screen,joueur:Joueur,vue,position,taille):
+        self.affichables=[]
+        if vue[1]==0:
+            SKIN_BROUILLARD.dessine_toi(screen,position,taille)
+        elif vue[1]==-1: #On a affaire à un case accessible mais pas vue
+            SKIN_BROUILLARD.dessine_toi(screen,position,taille)
+            if vue[0][2] > 0:
+                if vue[5][HAUT][0]:
+                    if joueur.vue[vue[0][1]][vue[0][2]-1][1]>0:
+                        SKIN_MUR_BROUILLARD.dessine_toi(screen,position,taille,HAUT)
+            if vue[0][1] < len(joueur.vue) - 1:
+                if vue[5][DROITE][0]:
+                    if joueur.vue[vue[0][1]+1][vue[0][2]][1]>0:
+                        SKIN_MUR_BROUILLARD.dessine_toi(screen,position,taille,DROITE)
+            if vue[0][2] < len(joueur.vue[0]) -1:
+                if vue[5][BAS][0]:
+                    if joueur.vue[vue[0][1]][vue[0][2]+1][1]>0:
+                        SKIN_MUR_BROUILLARD.dessine_toi(screen,position,taille,BAS)
+            if vue[0][1] > 0:
+                if vue[5][GAUCHE][0]:
+                    if joueur.vue[vue[0][1]-1][vue[0][2]][1]>0:
+                        SKIN_MUR_BROUILLARD.dessine_toi(screen,position,taille,GAUCHE)
+        else:
+            if vue[4]==0: #On teste le code de la case pour déterminer son image
+                SKIN_CASE.dessine_toi(screen,position,taille) #La case en premier, donc en bas
+            elif vue[4]==1: #On teste le code de la case pour déterminer son image
+                SKIN_CASE_1.dessine_toi(screen,position,taille) #La case en premier, donc en bas
+            elif vue[4]==2: #On teste le code de la case pour déterminer son image
+                SKIN_CASE_2.dessine_toi(screen,position,taille) #La case en premier, donc en bas
+            elif vue[4]==3: #On teste le code de la case pour déterminer son image
+                SKIN_CASE_3.dessine_toi(screen,position,taille) #La case en premier, donc en bas
+            elif vue[4]==4: #On teste le code de la case pour déterminer son image
+                SKIN_CASE_4.dessine_toi(screen,position,taille) #La case en premier, donc en bas
+            elif vue[4]==5: #On teste le code de la case pour déterminer son image
+                SKIN_CASE_5.dessine_toi(screen,position,taille) #La case en premier, donc en bas
+            elif vue[4]==6: #On teste le code de la case pour déterminer son image
+                SKIN_CASE_6.dessine_toi(screen,position,taille) #La case en premier, donc en bas
+            elif vue[4]==7: #On teste le code de la case pour déterminer son image
+                SKIN_CASE_7.dessine_toi(screen,position,taille) #La case en premier, donc en bas
+            elif vue[4]==8: #On teste le code de la case pour déterminer son image
+                SKIN_CASE_8.dessine_toi(screen,position,taille) #La case en premier, donc en bas
+            case = joueur.controleur.get_case(vue[0])
+            for i in range(4):
+                mur = case.get_mur_dir(i)
+                for effet in mur.effets:
+                    if effet.affiche:
+                        if isinstance(effet,Porte) :
+                            effet.get_skin(joueur.get_clees()).dessine_toi(screen,position,taille,1,1,i)
+                        elif isinstance(effet,(Mur_plein,Mur_impassable)) :
+                            effet.get_skin(vue[4]).dessine_toi(screen,position,taille,1,1,i)
+                        else :
+                            effet.get_skin().dessine_toi(screen,position,taille,1,1,i)
+            for effet in case.effets:
+                if effet.affiche:
+                    effet.get_skin().dessine_toi(screen,position,taille)
+            entitees = vue[6]
+            agissant = None
+            for ID_entitee in entitees : #Puis les items au sol
+                entitee = joueur.controleur.get_entitee(ID_entitee)
+                if issubclass(entitee.get_classe(),Item):
+                    entitee.get_skin().dessine_toi(screen,position,taille,1,1,entitee.get_direction()) #La direction est surtout utile pour les projectiles, sinon ils devraient tous être dans le même sens.
+                elif issubclass(entitee.get_classe(),Decors):
+                    entitee.get_skin().dessine_toi(screen,position,taille)
+                else:
+                    agissant = entitee
+            if agissant != None: #Enfin l'agissant (s'il y en a un)
+                direction = agissant.get_direction()
+                arme = agissant.inventaire.arme
+                if arme != None:
+                    joueur.controleur.get_entitee(arme).get_skin().dessine_toi(screen,position,taille,1,1,direction)
+                agissant.get_skin().dessine_toi(screen,position,taille,1,1,direction)
+                armure = agissant.inventaire.armure
+                if armure != None:
+                    joueur.controleur.get_entitee(armure).get_skin().dessine_toi(screen,position,taille,1,1,direction)
+                bouclier = agissant.inventaire.bouclier
+                if bouclier != None:
+                    joueur.controleur.get_entitee(bouclier).get_skin().dessine_toi(screen,position,taille,1,1,direction)
+                haume = agissant.inventaire.haume
+                agissant.get_skin_tete().dessine_toi(screen,position,taille,1,1,direction) #Avoir éventuellement la tête dans une autre direction ?
+                if haume != None:
+                    joueur.controleur.get_entitee(haume).get_skin().dessine_toi(screen,position,taille,1,1,direction)
+                for effet in agissant.effets:
+                    if effet.affiche:
+                        effet.get_skin().dessine_toi(screen,position,taille,1,1,direction)
+                esprit = joueur.controleur.get_esprit(joueur.esprit)
+                if agissant.ID in esprit.ennemis.keys():
+                    fichier = "Jeu/Skins/barre_de_vie_ennemis.png"
+                elif agissant.ID in esprit.corps.keys():
+                    fichier = "Jeu/Skins/barre_de_vie_allies.png"
+                else:
+                    fichier = "Jeu/Skins/barre_de_vie_neutres.png"
+                screen.blit(pygame.transform.scale(pygame.image.load(fichier).convert_alpha(),(int(taille*((15*agissant.pv)/(19*agissant.pv_max))),int(taille*(15/19)))),(position[0]+int(taille*(2/19)),position[1]+int(taille*(2/19))))
+                if isinstance(agissant,Humain) and agissant.dialogue > 0: #Est-ce qu'on veut vraiment avoir cet indicatif au-dessus des effets ?
+                    SKIN_DIALOGUE.dessine_toi(screen,position,taille)
+            if vue[7] != []:
+                esprit = joueur.controleur.get_esprit(joueur.esprit)
+                if any([effet[2] in esprit.corps.keys() for effet in vue[7]]):
+                    SKIN_ATTAQUE_DELAYEE_ALLIE.dessine_toi(screen,position,taille)
+                else:
+                    SKIN_ATTAQUE_DELAYEE.dessine_toi(screen,position,taille)
+
+            #Rajouter des conditions d'observation

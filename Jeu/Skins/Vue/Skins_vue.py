@@ -8,15 +8,15 @@ class Illustration:
             self.image = pygame.image.load("Jeu/Skins/vide.png").convert_alpha()
             print(f"N'a pas pu charger {nom_fichier}, remplacé par vide.png")
 
-    def dessine_toi(self,screen,position):
+    def dessine_toi(self,screen,position,frame=1,frame_par_tour=1):
         screen.blit(self.image,position)
 
 class Image(Illustration):
-    def dessine_toi(self,screen,position,tailles=(40,40),direction=(0)):
+    def dessine_toi(self,screen,position,tailles=(40,40),frame=1,frame_par_tour=1,direction=0):
         screen.blit(pygame.transform.scale(pygame.transform.rotate(self.image,direction*-90),tailles),position)
 
 class Skin(Illustration):
-    def dessine_toi(self,screen,position,taille=40,direction=(0)):
+    def dessine_toi(self,screen,position,taille=40,frame=1,frame_par_tour=1,direction=0):
         screen.blit(pygame.transform.scale(pygame.transform.rotate(self.image,direction*-90),(taille,taille)),position)
 
 global PROFONDEUR_DE_CHAMP
@@ -42,9 +42,9 @@ SKINS_ESCALIERS_HAUT_VUS = [[[Image(f"Vue/Case/Escalier_haut/skin_mur_gauche_{di
 
 
 global FORMES_CORPS
-FORMES_CORPS = ["indefini","homme","femme","gros"] #Rajouter "gros","gobelin","orc","slime","ombriul", etc.
+FORMES_CORPS = ["indefini","homme","femme","gros"] #Rajouter "gobelin", "orc", "slime", "ombriul", etc.
 global FORMES_TETES
-FORMES_TETES = ["sans_tete","joueur","receptionniste","paume","peureuse","encombrant","alchimiste","peste","bombe_atomique","marchand"] #Rajouter "gobelin","orc"
+FORMES_TETES = ["sans_tete","joueur","receptionniste","paume","peureuse","encombrant","alchimiste","peste","bombe_atomique","marchand"] #Rajouter "gobelin", "orc"
 global FORMES_ITEMS
 FORMES_ITEMS = ["item","armure_dor","armure_dor_cassee","lance_dor","lance_dor_cassee","epee","epee_epeiste","armure_epeiste","tunique_enchantee","robe_magique","tunique_alchimiste","soutane","robe_sorciere","chapeau_sorciere","epee_marchand","armure_marchand"] #Rajouter tous les items existants
 

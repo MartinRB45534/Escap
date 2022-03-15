@@ -54,8 +54,82 @@ Troisi�me �tape : mains[0][2].boucle() et le jeu reprend imm�diatement, at
 
 
 
-� mon attention :
+À mon attention :
 
+À faire : rework affichage/menus
+Objectifs : Marchand fonctionnel, meilleure alchimie, actions à la souris, affichage mouvant
+
+
+
+
+Idée pour l'affichage :
+
+L'affichage a une liste de tout ce qui s'affiche à un moment donné.
+Lorsqu'on raffraichit l'écran, on parcourt la liste en affichant tout (superposition déterminée par l'ordre dans la liste).
+Lorsqu'on clique, on parcourt la liste pour trouver l'élément cliqué.
+Éventuellement, on réagit à la présence de la souris sur l'élément (ne réagir que pour un seul).
+Les actions actuelles d'affichage sont remplacées par un renouvellement de la liste.
+
+Les éléments de la liste sont des objets avec :
+des paramètres qui indiquent la taille, etc.;
+une méthode pour afficher;
+une méthode pour vérifier s'il y a contact avec la souris;
+éventuellement d'autres éléments à l'intérieur ?
+
+
+
+
+Comment gérer tous les menus/choix de façon simple ?
+
+Il y a :
+Les choix de direction(s) (magies, magies de parchemins) (nécéssité d'affichage du labyrinthe/d'une zone ciblée, partie "interactive" sur la droite) 
+Les choix de case(s) (magies, magies de parchemins, ordres) (nécéssité d'affichage du labyrinthe/d'une zone ciblée, partie "interactive" au centre, éventuellement décompte sur la droite)
+Les choix d'agissant(s) (magies, magies de parchemins, ordres) (nécéssité d'affichage d'une liste d'agissants, possiblement nécessité d'affichage du labyrinthe, partie "interactive" sur la droite)
+Les choix d'item(s) (magies, magies de parchemins) (nécéssité d'affichage d'une liste d'items, probablement description à droite)
+Les choix de magie (ordre d'imprégnation de parchemins, utilisation du skill de magie) (nécéssité d'affichage d'une liste de magies, probablement description à droite)
+Les choix d'objet (achat, vente) (nécéssité d'affichage d'une liste d'items, probablement description à droite)
+Les choix de recettes (alchimie) (nécéssité d'affichage d'une liste de recettes, probablement description de la recette et des ingrédients à droite)
+
+Pour les magies, on veut choisir au moment de la sélection de la magie (choix unique, possiblement plusieurs choix à faire)
+Pour les magies de parchemins, on veut choisir au moment de l'utilisation du parchemin (choix unique, possiblement plusieurs choix à faire, possiblement plusieurs parchemins à la suite)
+Pour les ordres, on veut choisir pendant un dialogue (choix unique)
+Pour l'utilisation du skill magie, on veut choisir au moment de la sélection du skill (choix unique)
+Pour l'achat et la vente, on veut choisir pendant un dialogue (autant de choix/transactions que voulu, possiblement dans un "magasin", possiblement regrouper l'achat et la vente)
+Pour les recettes, on veut choisir pendant un dialogue (autant de choix que voulu)
+
+(Je ne sais plus si je voulais que la simplicité soit au niveau de la structure du code (classes, méthodes, etc. impliquées) ou de l'interface. Probablement de la structure, mais j'y ai rejoué récemment et l'interface laisse un peu à désirer. Un gros bouton "Confirmer (entrer)" et la possibilité de sélectionner à la souris seraient les bienvenus.)
+
+
+
+En cours (alchimiste) :
+- Parchemins imprégnés de magie (fait)
+- Parchemin de défense (placer un enchantement de défense sur les alliés)
+- Parchemin de téléportation (fait)
+- Parchemins divers
+- Potions de soin (un peu redondant avec la peste et les parchemins impregnés par la peste)
+- Potions de boost (un peu redondant avec la peureuse et les parchemins impregnés par la peureuse)
+- Potions de vitesse (vraiment utile ? tout le monde se plaint d'aller trop vite)
+- Potions diverses
+- Ingrédients (y compris les corps de monstres ?)
+- Identification d'objets (via un skill d'observation ?) (le joueur 'mémorise' l'identification ?)
+- Magie de sauvegarde temporelle
+- Magie de réactivation de la sauvegarde
+- Magies diverses
+- Monétisation
+
+
+
+Comment fonctionne l'alchimie ? (Pour l'instant en faisant tout planter (hein !? je viens d'y rejouer et ça ma l'air fonctionnel (je n'ai pas essayé l'alchimie mais tout le reste va bien), j'espère que je ne suis pas en train de commiter un truc beugué))
+1 ou plusieurs ingrédients (+ mana (+ argent)) = potion ou parchemin
+éventuellement le résultat final peut être une amélioration d'un item du joueur ?
+Les ingrédients sont une catégorie d'items distincte des autres. On peut en trouver par terre ou les acheter au marchand (?)
+Certains ingrédients proviennent de monstres (dents de gobelin, peau de gobelin, etc.) et peuvent être trouvés là où il y a beaucoup de ces monstres. Mais il n'y a personne dans le labyrinthe qui sache extraire ces ingrédients des cadavres, donc on est obligé de passer par le marchand.
+Recettes simples (pas plus de deux ingrédient par recette dans le tutoriel)
+Peau de gobelin -> Parchemin vierge
+Peau de gobelin + pierre dure -> Parchemin de protection
+Dent de gobelin -> Potion de force
+Hypokute -> Potion de soin
+Cristal transparent -> Potion d'invisibilité
 
 
 
@@ -102,93 +176,37 @@ Comment faire ?
 Et pour qu'un agissant sorte du passage si quelqu'un veut aller là où il est (le joueur par exemple)
 
 
-
-
-
-Comment g�rer tous les menus/choix de fa�on simple ?
-
-Il y a :
-Les choix de direction(s) (magies, magies de parchemins) (n�cessit� d'affichage du labyrinthe/d'une zone cibl�e, partie "interactive" sur la droite) 
-Les choix de case(s) (magies, magies de parchemins, ordres) (n�cessit� d'affichage du labyrinthe/d'une zone cibl�e, partie "interactive" au centre, �ventuellement d�compte sur la droite)
-Les choix d'agissant(s) (magies, magies de parchemins, ordres) (n�cessit� d'affichage d'une liste d'agissants, possiblement n�cessit� d'affichage du labyrinthe, partie "interactive" sur la droite)
-Les choix d'item(s) (magies, magies de parchemins) (n�cessit� d'affichage d'une liste d'items, probablement description � droite)
-Les choix de magie (ordre d'impr�gnation de parchemins, utilisation du skill de magie) (n�cessit� d'affichage d'une liste de magies, probablement description � droite)
-Les choix d'objet (achat, vente) (n�cessit� d'affichage d'une liste d'items, probablement description � droite)
-Les choix de recettes (alchimie) (n�cessit� d'affichage d'une liste de recettes, probablement description de la recette et des ingr�dients � droite)
-
-Pour les magies, on veut choisir au moment de la s�lection de la magie (choix unique, possiblement plusieurs choix � faire)
-Pour les magies de parchemins, on veut choisir au moment de l'utilisation du parchemin (choix unique, possiblement plusieurs choix � faire, possiblement plusieurs parchemins � la suite)
-Pour les ordres, on veut choisir pendant un dialogue (choix unique)
-Pour l'utilisation du skill magie, on veut choisir au moment de la s�lection du skill (choix unique)
-Pour l'achat et la vente, on veut choisir pendant un dialogue (autant de choix/transactions que voulu, possiblement dans un "magasin", possiblement regrouper l'achat et la vente)
-Pour les recettes, on veut choisir pendant un dialogue (autant de choix que voulu)
-
-(Je ne sais plus si je voulais que la simplicit� soit au niveau de la structure du code (classes, m�thodes, etc. impliqu�es) ou de l'interface. Probablement de la structure, mais j'y ai rejou� r�cemment et l'interface laisse un peu � d�sirer. Un gros bouton "Confirmer (entrer)" et la possibilit� de s�lectionner � la souris seraient les bienvenus.)
-
-
-
-En cours (alchimiste) :
-- Parchemins impr�gn�s de magie (fait)
-- Parchemin de d�fense (placer un enchantement de d�fense sur les alli�s)
-- Parchemin de t�l�portation (fait)
-- Parchemins divers
-- Potions de soin (un peu redondant avec la peste et les parchemins impregn�s par la peste)
-- Potions de boost (un peu redondant avec la peureuse et les parchemins impregn�s par la peureuse)
-- Potions de vitesse (vraiment utile ? tout le monde se plaint d'aller trop vite)
-- Potions diverses
-- Ingr�dients (y compris les corps de monstres ?)
-- Identification d'objets (via un skill d'observation ?) (le joueur 'm�morise' l'identification ?)
-- Magie de sauvegarde temporelle
-- Magie de r�activation de la sauvegarde
-- Magies diverses
-- Mon�tisation
-
-
-
-Comment fonctionne l'alchimie ? (Pour l'instant en faisant tout planter (hein !? je viens d'y rejouer et �a ma l'air fonctionnel (je n'ai pas essay� l'alchimie mais tout le reste va bien), j'esp�re que je ne suis pas en train de commiter un truc beugu�))
-1 ou plusieurs ingr�dients (+ mana (+ argent)) = potion ou parchemin
-�ventuellement le r�sultat final peut �tre une am�lioration d'un item du joueur ?
-Les ingr�dients sont une cat�gorie d'items distincte des autres. On peut en trouver par terre ou les acheter au marchand (?)
-Certains ingr�dients proviennent de monstres (dents de gobelin, peau de gobelin, etc.) et peuvent �tre trouv�s l� o� il y a beaucoup de ces monstres. Mais il n'y a personne dans le labyrinthe qui sache extraire ces ingr�dients des cadavres, donc on est oblig� de passer par le marchand.
-Recettes simples (pas plus de deux ingr�dient par recette dans le tutoriel)
-Peau de gobelin -> Parchemin vierge
-Peau de gobelin + pierre dure -> Parchemin de protection
-Dent de gobelin -> Potion de force
-Hypokute -> Potion de soin
-Cristal transparent -> Potion d'invisibilit�
-
-
-Travail � faire :
+Travail à faire :
 - Layout (prison, dialogues)
   Prison :
-    - Petite salle avec une porte, cl� obtenue par dialogue
-    - Petite salle avec deux portes, une cl� sur le sol
+    - Petite salle avec une porte, clé obtenue par dialogue
+    - Petite salle avec deux portes, une clé sur le sol
     - Couloir, deux sentinelles avec un passe-partout
     - Salles actuelles (plus d'innaccessibles)
-    - Fin du couloir, escalier et salle du petit-ami (dialogue pour obtenir la cl� ?)
+    - Fin du couloir, escalier et salle du petit-ami (dialogue pour obtenir la clé ?)
   Cuisine :
     - Salle avec le PNJ, une porte et des portails
-    - "D�dale" de portails, avec quelques gobelins, des potions/parchemins/ingr�dients et la cl�
+    - "Dédale" de portails, avec quelques gobelins, des potions/parchemins/ingrédients et la clé
     - Grande salle , avec quelques gobelins et un shaman (des marmites ? pour introduire la notions d'objets inamovibles)
-- Cr�ation (ombriuls)
-(- Modifier la fuite pour ne fuir que si un alli� est accessible)
-- �quilibrer ! (tours par secondes, combats, jeter un oeil � l'XP obtenu)
+- Création (ombriuls)
+(- Modifier la fuite pour ne fuir que si un allié est accessible)
+- Équilibrer ! (tours par secondes, combats, jeter un oeil à l'XP obtenu)
 
 TODO (global) :
-�tages (0/100)
+Étages (0/100)
 Dialogues
-Cin�matiques
+Cinématiques
 Menus/interfaces "hors-jeu" (images)
 PNJs
 Skills et classes
 Ennemis
 
-Plus pr�cis�ment :
-Donner au tank une comp�tence de provocation
-D�cider des ingr�dients pour l'alchimiste et impl�menter les recettes
-Impl�menter les achats/vente
+Plus précisément :
+Donner au tank une compétence de provocation
+Décider des ingrédients pour l'alchimiste et implémenter les recettes
+Implémenter les achats/vente
 Modification de la vitesse dans le menu des touches
-Syst�me de 'cible' pour indiquer qui les gens attaquent
+Système de 'cible' pour indiquer qui les gens attaquent
 
 
 
