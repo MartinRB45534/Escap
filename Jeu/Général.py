@@ -18552,7 +18552,7 @@ class Faux_affichage(Conteneur,Old_affichage):
                 marge_gauche += taille_case
             marge_haut += taille_case
 
-class Faux_lab(Affichable): #Remplacer à l'occasion par Affichable
+class Faux_lab(Affichable):
     def __init__(self):
         self.position=[0,0]
         self.tailles=[0,0]
@@ -18586,19 +18586,19 @@ class Faux_lab(Affichable): #Remplacer à l'occasion par Affichable
             if vue[0][2] > 0:
                 if vue[5][HAUT][0]:
                     if joueur.vue[vue[0][1]][vue[0][2]-1][1]>0:
-                        SKIN_MUR_BROUILLARD.dessine_toi(screen,position,taille,HAUT)
+                        SKIN_MUR_BROUILLARD.dessine_toi(screen,position,taille,1,1,HAUT)
             if vue[0][1] < len(joueur.vue) - 1:
                 if vue[5][DROITE][0]:
                     if joueur.vue[vue[0][1]+1][vue[0][2]][1]>0:
-                        SKIN_MUR_BROUILLARD.dessine_toi(screen,position,taille,DROITE)
+                        SKIN_MUR_BROUILLARD.dessine_toi(screen,position,taille,1,1,DROITE)
             if vue[0][2] < len(joueur.vue[0]) -1:
                 if vue[5][BAS][0]:
                     if joueur.vue[vue[0][1]][vue[0][2]+1][1]>0:
-                        SKIN_MUR_BROUILLARD.dessine_toi(screen,position,taille,BAS)
+                        SKIN_MUR_BROUILLARD.dessine_toi(screen,position,taille,1,1,BAS)
             if vue[0][1] > 0:
                 if vue[5][GAUCHE][0]:
                     if joueur.vue[vue[0][1]-1][vue[0][2]][1]>0:
-                        SKIN_MUR_BROUILLARD.dessine_toi(screen,position,taille,GAUCHE)
+                        SKIN_MUR_BROUILLARD.dessine_toi(screen,position,taille,1,1,GAUCHE)
         else:
             if vue[4]==0: #On teste le code de la case pour déterminer son image
                 SKIN_CASE.dessine_toi(screen,position,taille) #La case en premier, donc en bas
