@@ -9,6 +9,7 @@ from Jeu.Systeme.Constantes_items.Items import *
 from Jeu.Systeme.Constantes_stats import *
 from Jeu.Dialogues.Dialogues import *
 from Jeu.Skins.Skins import *
+from Modifiers import *
 import operator
 import random
 import copy
@@ -3098,6 +3099,10 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         else:
             return HAUT
 
+    def regarde(self,direction):
+        if direction != None:
+            self.dir_regard = direction
+
     def get_arme(self):
         return self.inventaire.get_arme()
 
@@ -4328,9 +4333,9 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         self.prem_glace = None
         self.prem_ombre = None
 
-        self.cat_touches = copy.deepcopy(parametres["cat_touches"])
-        self.dir_touches = copy.deepcopy(parametres["dir_touches"])
-        self.skill_touches = copy.deepcopy(parametres["skill_touches"])
+        self.meta_touches = copy.deepcopy(parametres["meta-touches"])
+        self.touches = copy.deepcopy(parametres["touches"])
+
         self.magies = {} #Le skill magie contient beaucoup de magie. La touche est associée à la fois au skill magie et à la magie correspondante.
         self.too_late = 0
         self.methode_courante = None
@@ -4558,32 +4563,34 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
                             self.start_menu_cuisine()
                     break
 
-    def controle(self,touche):
-        if touche in self.cat_touches.keys() and self.cat_touches[touche] == "pause":
-            self.controleur.toogle_pause()
+    def controle(self,touche,mods=()):
         if self.controleur.phase == TOUR:
-            if touche in self.cat_touches.keys():
-                if self.cat_touches[touche] == "zone":
-                    direction = self.dir_touches[touche]
-                    self.change_zone(direction)
-                elif self.cat_touches[touche] == "courant" : # On a affaire à la touche qui utilise le skill ou l'objet courant
-                    self.utilise_courant()
-                elif self.cat_touches[touche] == "touches" : # On veut changer les touches
-                    self.start_change_touches()
-                elif self.cat_touches[touche] == "directionelle" : # On a affaire à une touche directionnelle
-                    self.dir_regard = self.dir_touches[touche]
-                elif self.cat_touches[touche] == "skill" : # On a affaire à l'une des touches qui ont été choisies comme raccourci d'un skill
+            meta = self.meta_touches.get(touche) #Certaines touches ont un meta-effet, indépendant des modificateurs
+            if meta == "pause": # La touche de pause
+                self.controleur.toogle_pause()
+            elif meta == "courant" : # On a affaire à la touche qui utilise le skill ou l'objet courant
+                self.utilise_courant()
+            elif meta == "touches" : # On veut changer les touches
+                self.start_change_touches()
+            if mods in self.touches.keys(): #mods est une liste des touches de modifications (Ctrl, Maj, Alt etc.) tenues lors de l'appui de la touche
+                touches = self.touches[mods] #Si on a des touches enregistrées avec ce modificateur, on peut rechercher si celle qu'on veut y est
+                direction = touches["direction"].get(touche)
+                self.regarde(direction)
+                dir_zone = touches["dir_zone"].get(touche)
+                self.change_zone(dir_zone)
+                skill = touches["skill"].get(touche)
+                if skill != None:
                     self.nouvel_ordre = True
-                    self.skill_courant = self.skill_touches[touche]
+                    self.skill_courant = skill
                     if self.skill_courant == Skill_stomp :
                         self.statut = "attaque"
                     elif self.skill_courant == Skill_attaque :
                         self.statut = "attaque"
                     elif self.skill_courant == Skill_lancer : # Le skill lancer contient beaucoup d'objets différends
-                        self.projectile_courant = self.projectiles[touche]
+                        self.projectile_courant = touches["projectile"].get(touche)
                         self.statut = "lancer"
                     elif self.skill_courant == Skill_magie : # Le skill magie contient beaucoup de magies différentes !
-                        self.magie_courante = self.magies[touche] #self.magie_courante n'est que le nom de la magie
+                        self.magie_courante = touches["magie"].get(touche) #self.magie_courante n'est que le nom de la magie
                         skill = trouve_skill(self.classe_principale,Skill_magie)
                         self.magie = skill.magies[self.magie_courante](skill.niveau) #Ici on a une magie similaire (juste pour l'initialisation du choix, oubliée après parce que le skill fournira la vrai magie avec utilise())
                         if isinstance(self.magie,Magie_cible):
@@ -4620,31 +4627,35 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         # On ne veut pas interférer avec les touches nouvellement descendues :
         if not self.nouvel_ordre :
             # On commence par trouver à quelle catégorie appartient la touche :
-            touches = pygame.key.get_pressed()
-            for touche in self.skill_touches.keys():
-                if touches[touche]:
-                    self.skill_courant = self.skill_touches[touche]
-                    if self.skill_courant == Skill_stomp :
-                        self.statut = "attaque"
-                    elif self.skill_courant == Skill_attaque :
-                        self.statut = "attaque"
-                    elif self.skill_courant == Skill_magie : # Le skill magie contient beaucoup de magies différentes !
-                        self.magie_courante = self.magies[touche]
-                        skill = trouve_skill(self.classe_principale,Skill_magie)
-                        self.magie = skill.magies[self.magie_courante](skill.niveau) #Ici on a une magie similaire (juste pour l'initialisation du choix, oubliée après parce que le skill fournira la vrai magie avec utilise())
-                        if self.magie_courante in LISTE_EXHAUSTIVE_DES_MAGIES_OFFENSIVES:
+            mods = get_modifiers(pygame.key.get_mods())
+            touches = self.touches.get(mods)
+            if touches != None:
+                pressees = pygame.key.get_pressed()
+                for touche in touches["skill"].keys():
+                    if pressees[touche]:
+                        skill = touches["skill"].get(touche)
+                        self.skill_courant = skill
+                        if self.skill_courant == Skill_stomp :
                             self.statut = "attaque"
-                    elif self.skill_courant == Skill_lancer : # Le skill lancer contient beaucoup d'objets différends
-                        self.projectile_courant = self.projectiles[touche]
-                        self.statut = "lancer"
+                        elif self.skill_courant == Skill_attaque :
+                            self.statut = "attaque"
+                        elif self.skill_courant == Skill_magie : # Le skill magie contient beaucoup de magies différentes !
+                            self.magie_courante = self.magies[touche]
+                            skill = trouve_skill(self.classe_principale,Skill_magie)
+                            self.magie = skill.magies[self.magie_courante](skill.niveau) #Ici on a une magie similaire (juste pour l'initialisation du choix, oubliée après parce que le skill fournira la vrai magie avec utilise())
+                            if self.magie_courante in LISTE_EXHAUSTIVE_DES_MAGIES_OFFENSIVES:
+                                self.statut = "attaque"
+                        elif self.skill_courant == Skill_lancer : # Le skill lancer contient beaucoup d'objets différends
+                            self.projectile_courant = self.projectiles[touche]
+                            self.statut = "lancer"
 
     def decontrole(self,touche):
         #Une touche s'est relevée
         if not self.nouvel_ordre: #Le skill courant actuel ne vient pas d'une touche récente
             if self.controleur.phase == TOUR:
-                if touche in self.cat_touches.keys():
-                    if self.cat_touches[touche] == "skill":
-                        if self.skill_touches[touche] == self.skill_courant: #La touche relachée est celle du skill courant
+                for touches in self.touches.values():
+                    if touche in touches["skill"].keys():
+                        if touches["skill"].get(touche) == self.skill_courant: #La touche relachée est celle du skill courant
                             self.statut = "joueur"
                             self.skill_courant = None
                             self.recontrole()

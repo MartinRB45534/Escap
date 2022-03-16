@@ -8,6 +8,7 @@ global GLOBALS
 GLOBALS = {"controleur":None}
 
 from Menus import *
+from Modifiers import *
 from Jeu import * #Nécessaire ?
 from Jeu.Général import *
 from Jeu.Constantes import *
@@ -20,40 +21,66 @@ class True_joueur:
     def __init__(self,screen):
         self.screen = screen
         self.clock = pygame.time.Clock()
-        self.parametres = {"cat_touches":{pygame.K_UP:"directionelle", #Les touches directionnelles tournent le joueur
-                                          pygame.K_DOWN:"directionelle",
-                                          pygame.K_LEFT:"directionelle",
-                                          pygame.K_RIGHT:"directionelle",
-                                          pygame.K_q:"zone", #Les touches de zone déplacent le curseur sur l'affichage
-                                          pygame.K_z:"zone",
-                                          pygame.K_d:"zone",
-                                          pygame.K_s:"zone",
-                                          pygame.K_a:"zone",
-                                          pygame.K_e:"zone",
-                                          pygame.K_p:"skill", #Les skills simples ont leur touche attribuée
-                                          pygame.K_w:"skill",
-                                          pygame.K_x:"skill",
-                                          pygame.K_m:"skill",
-                                          pygame.K_r:"skill",
-                                          pygame.K_SPACE:"courant", #La barre espace sélectionne, valide, etc. l'objet courant. Elle ne peut pas être modifiée
-                                          pygame.K_BACKSPACE:"pause", #La touche d'effacement active/désactive la pause. Elle ne peut pas être modifiée
-                                          pygame.K_RETURN:"touches"}, #La touche Entrée confirme certains choix, ou peut modifier les touches. Elle ne peut pas être modifiée
-                           "dir_touches":{pygame.K_UP:HAUT, #Les touches associées à une direction
-                                          pygame.K_DOWN:BAS,
-                                          pygame.K_LEFT:GAUCHE,
-                                          pygame.K_RIGHT:DROITE,
-                                          pygame.K_q:GAUCHE,
-                                          pygame.K_z:HAUT,
-                                          pygame.K_d:DROITE,
-                                          pygame.K_s:BAS,
-                                          pygame.K_a:IN,
-                                          pygame.K_e:OUT},
-                           "skill_touches":{pygame.K_p:Skill_stomp, #Les touches associées à un skill.
-                                            pygame.K_m:Skill_ramasse,
-                                            pygame.K_w:Skill_deplacement,
-                                            pygame.K_x:Skill_attaque,
-                                            pygame.K_r:Skill_course}, #Rajouter un moyen de changer les paramètres du joueur
-                           "tours_par_seconde":6}
+        self.parametres = {
+            "meta-touches":{ #Quelques touches spéciales, à part
+                pygame.K_SPACE:"courant", #La barre espace sélectionne, valide, etc. l'objet courant. Elle ne peut pas être modifiée
+                pygame.K_BACKSPACE:"pause", #La touche d'effacement active/désactive la pause. Elle ne peut pas être modifiée
+                pygame.K_RETURN:"touches",
+            },
+            "touches":{
+                ():{ #Les touches qui n'ont pas de modificateur
+                    "direction":{
+                        pygame.K_UP:HAUT,
+                        pygame.K_DOWN:BAS,
+                        pygame.K_LEFT:GAUCHE,
+                        pygame.K_RIGHT:DROITE,
+                    },
+                    "dir_zone":{
+                        pygame.K_q:GAUCHE,
+                        pygame.K_z:HAUT,
+                        pygame.K_d:DROITE,
+                        pygame.K_s:BAS,
+                        pygame.K_a:IN,
+                        pygame.K_e:OUT,
+                    },
+                    "skill":{
+                        pygame.K_UP:Skill_deplacement,
+                        pygame.K_DOWN:Skill_deplacement,
+                        pygame.K_LEFT:Skill_deplacement,
+                        pygame.K_RIGHT:Skill_deplacement,
+                        pygame.K_x:Skill_stomp, 
+                        pygame.K_c:Skill_ramasse,
+                    },
+                },
+                (pygame.KMOD_LSHIFT,):{ #L'ordre des modificateurs est très important ! (Et la virgule aussi, ne me demandez pas pourquoi...)
+                    "direction":{
+                        pygame.K_UP:HAUT,
+                        pygame.K_DOWN:BAS,
+                        pygame.K_LEFT:GAUCHE,
+                        pygame.K_RIGHT:DROITE,
+                    },
+                    "dir_zone":{},
+                    "skill":{
+                        pygame.K_UP:Skill_course,
+                        pygame.K_DOWN:Skill_course,
+                        pygame.K_LEFT:Skill_course,
+                        pygame.K_RIGHT:Skill_course,
+                        pygame.K_x:Skill_attaque,
+                    },
+                },
+                (pygame.KMOD_LCTRL,):{ #L'ordre des modificateurs est très important ! (Et la virgule aussi, ne me demandez pas pourquoi...)
+                    "direction":{
+                        pygame.K_UP:HAUT,
+                        pygame.K_DOWN:BAS,
+                        pygame.K_LEFT:GAUCHE,
+                        pygame.K_RIGHT:DROITE,
+                    },
+                    "dir_zone":{},
+                    "skill":{},
+                },
+            },
+            "tours_par_seconde":6,
+        }
         self.controleurs = []
         self.controleur = None
         self.agissants_courants = []
@@ -221,7 +248,7 @@ class True_joueur:
             elif event.type == pygame.VIDEORESIZE :
                 self.controleur.entitees[2].affichage.recalcule_zones()
             elif event.type == pygame.KEYDOWN :
-                self.controleur.entitees[2].controle(event.key)
+                self.controleur.entitees[2].controle(event.key,get_modifiers(event.mod))
             elif event.type == pygame.KEYUP :
                 self.controleur.entitees[2].decontrole(event.key)
 

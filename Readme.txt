@@ -62,6 +62,29 @@ Objectifs : Marchand fonctionnel, meilleure alchimie, actions à la souris, affi
 
 
 
+Pour le rework des inputs :
+On veut pouvoir, à une seule touche, associer plusieurs effets (skill+direction typiquement)
+On veut aussi pouvoir changer l'effet avec un modificateur
+
+
+
+
+
+
+Comment organiser le nouvel affichage ?
+
+On veut pouvoir accéder à :
+L'inventaire
+La classe principale
+Les stats
+Les alliés
+Les ennemis
+D'autres choses ?
+
+
+
+
+
 Idée pour l'affichage :
 
 L'affichage a une liste de tout ce qui s'affiche à un moment donné.
@@ -75,6 +98,18 @@ des paramètres qui indiquent la taille, etc.;
 une méthode pour afficher;
 une méthode pour vérifier s'il y a contact avec la souris;
 éventuellement d'autres éléments à l'intérieur ?
+
+
+Que retournent les éléments cliqués ?
+Exemple :
+Ouvrir l'inventaire (ou la classe principale, ou autre) (modification de l'affichage) (peut être fait directement par l'affichage ?)
+Utiliser un item (ou un skill, ou autre) (équivalent de l'actual "utilise_courant" du joueur) (appel d'une méthode du joueur)
+Choisir une réplique de dialogue (il y a une méthode du joueur qui transmet à l'interlocuteur, non ?)
+Choisir une recette d'alchimie (ou un objet du marchand, ou autre) (probablement un méthode du joueur ?)
+Choisir une case pour un déplacement (encore un méthode du joueur ?)
+Donc :
+Retourne l'argument à donner à une méthode du joueur, éventuellement la méthode aussi ?
+
 
 
 
