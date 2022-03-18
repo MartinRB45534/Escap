@@ -1,0 +1,10 @@
+from Jeu.Entitees.Agissant.Humain.Alchimiste import*
+from Jeu.Entitees.Agissant.Humain.Bombe_atomique import*
+from Jeu.Entitees.Agissant.Humain.Codeur import*
+from Jeu.Entitees.Agissant.Humain.Encombrant import*
+from Jeu.Entitees.Agissant.Humain.Joueur import*
+from Jeu.Entitees.Agissant.Humain.Marchand import*
+from Jeu.Entitees.Agissant.Humain.Paume import*
+from Jeu.Entitees.Agissant.Humain.Peste import*
+from Jeu.Entitees.Agissant.Humain.Peureuse import*
+from Jeu.Entitees.Agissant.Humain.Receptionniste import*

@@ -56,6 +56,8 @@ Troisi�me �tape : mains[0][2].boucle() et le jeu reprend imm�diatement, at
 
 À mon attention :
 
+/!\ Modifier les rôles qui se réfèrent directement au fichier de constantes de leur magie. Remplacer par caste() comme les attaquants magiques
+
 À faire : rework affichage/menus
 Objectifs : Marchand fonctionnel, meilleure alchimie, actions à la souris, affichage mouvant
 

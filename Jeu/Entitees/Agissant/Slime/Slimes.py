@@ -1,0 +1,1 @@
+from Jeu.Entitees.Agissant.Slime.Slime import *
