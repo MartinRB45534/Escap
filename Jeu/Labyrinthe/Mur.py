@@ -1,4 +1,5 @@
 from Jeu.Constantes import *
+from Jeu.Entitee.Item.Item import *
 from Jeu.Effet.Effets import *
 
 class Mur:

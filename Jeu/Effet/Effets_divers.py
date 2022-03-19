@@ -154,4 +154,4 @@ class Instakill(One_shot,On_post_action):
             self.action(porteur)
             self.termine()
 
-from Jeu.Entitees.Item.Parchemin.Parchemins import Parchemin_impregne
+from Jeu.Entitee.Item.Parchemin.Parchemins import Parchemin_impregne

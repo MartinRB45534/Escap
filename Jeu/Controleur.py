@@ -1,8 +1,8 @@
 from typing import Dict, List
 from Jeu.Constantes import *
-from Jeu.Entitees.Entitees import *
+from Jeu.Entitee.Entitees import *
 from Jeu.Labyrinthe.Labyrinthe import *
-from Jeu.Effet.Magies import *
+from Jeu.Effet.Magie.Magies import *
 from Jeu.Esprit.Esprits import *
 from Modifiers import *
 import random

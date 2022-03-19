@@ -1,9 +1,7 @@
 from Jeu.Effet.Effet import *
-from Jeu.Effet.Maladies import *
-from Jeu.Constantes import *
+from Jeu.Effet.Sante.Maladies.Maladie import *
 from Jeu.Systeme.Constantes_magies.Magies import *
-from Jeu.Systeme.Kumo_desu_ga_nanika import *
-import random
+from Jeu.Systeme.Classe import *
 
 class Enchantement_force(Enchantement,On_debut_tour):
     """Les enchantements qui affectent la force (en positif ou négatif)."""

@@ -3216,9 +3216,9 @@ class Faux_lab(Affichable):
 
             #Rajouter des conditions d'observation
 
-from Jeu.Entitees.Decors.Decors import *
-from Jeu.Entitees.Item.Item import *
-from Jeu.Entitees.Agissant.Humain.Humain import Humain
-from Jeu.Effet.Blocages import *
+from Jeu.Entitee.Decors.Decors import *
+from Jeu.Entitee.Item.Item import *
+from Jeu.Entitee.Agissant.Humain.Humain import Humain
+from Jeu.Effet.Effets_mouvement.Blocages import *
 from Jeu.Effet.Effets import *
 from Jeu.Systeme.Classe import *

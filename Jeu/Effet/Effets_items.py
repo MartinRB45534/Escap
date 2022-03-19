@@ -1,5 +1,5 @@
 from Jeu.Effet.Effet import *
-from Jeu.Effet.Attaques import *
+from Jeu.Effet.Attaque.Attaque import *
 
 class En_sursis(One_shot,On_fin_tour):
     """L'effet de sursis d'un projectile perçant qui a jusqu'à la fin du tour pour tuer l'agissant sur sa case."""
@@ -30,5 +30,5 @@ class On_hit(Effet):
     def execute(self,lanceur,position,controleur):
         self.action(lanceur,position,controleur)
 
-from Jeu.Entitees.Item.Item import Fragile,Evanescent
+from Jeu.Entitee.Item.Item import Fragile,Evanescent
 from Jeu.Constantes import *

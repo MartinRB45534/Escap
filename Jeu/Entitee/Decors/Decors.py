@@ -1,0 +1,1 @@
+from Jeu.Entitee.Decors.Chaudron_gobelin import *

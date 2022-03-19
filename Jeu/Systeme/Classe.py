@@ -624,7 +624,7 @@ class Lancier(Classe):
 
         lance = Skill_manipulation_lance()
         arme = Skill_manipulation_arme()
-        skills_intrasecs = [lance,arme] #Le skill est au niveau 0, ainsi le controleur proposera de le réunir avec un skill identique de plus haut niveau si l'agissant en a, puis détruira tous les skills de niveau 0.
+        skills = [lance,arme] #Le skill est au niveau 0, ainsi le controleur proposera de le réunir avec un skill identique de plus haut niveau si l'agissant en a, puis détruira tous les skills de niveau 0.
 
         boosts = Skill_boost_lance()
 

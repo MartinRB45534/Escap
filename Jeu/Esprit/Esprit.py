@@ -1,4 +1,4 @@
-from Jeu.Entitees.Agissant.Agissants import *
+from Jeu.Entitee.Agissant.Agissants import *
 import operator
 
 class Esprit :
