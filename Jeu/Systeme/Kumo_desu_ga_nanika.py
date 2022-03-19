@@ -550,7 +550,7 @@ class Lesser_Scythe(Scythe,Skill_intrasec):
     def __init__(self):
         Skill.__init__(self)
         self.perce = 0.75 #La capacité de l'attaque à trancer les armures. Le coefficient placé devant le pourcentage de dégats bloqués.
-        self.element = Terre #Les nightmare vestiges peuvent chosir l'ombre ou la terre comme élément.
+        self.element = TERRE #Les nightmare vestiges peuvent chosir l'ombre ou la terre comme élément.
         self.taux = 0.5 #La proportion de la stat d'attaque des nightmare vestiges qui sera traduite en dégats. Cette proportion est supérieure à 100%.
         self.gain_xp = 0.1
 
