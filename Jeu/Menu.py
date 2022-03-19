@@ -1,4 +1,4 @@
-from pygame import *
+import pygame
 
 class Menu:
     #Une classe inutile
@@ -215,7 +215,7 @@ class Menu_multi_agissant_timed(Menu_multi_agissant,Menu_timed):
         """magie, la magie qu'on cherche à lancer
            origine, selon que la magie est castée par le skill ou depuis un parchemin
            position, l'endroit du labyrinthe à afficher"""
-        Menu_multi_agissants.__init__(self,agissants,methode,position,magie,origine)
+        Menu_multi_agissant.__init__(self,agissants,methode,position,magie,origine)
         Menu_timed.__init__(self,temps)
 
 class Menu_item(Menu):
