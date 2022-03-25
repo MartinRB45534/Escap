@@ -979,13 +979,17 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         zones,skills,magies,lancer = self.get_touches_courantes()
         self.affichage.choix_touche(self,zones,skills,magies,lancer)
 
-    def continue_change_touche(self,touche):
+    def continue_change_touche(self,touche,modificateurs=()):
         zones,skills,magies,lancer = self.get_touches_courantes()
+        touches = self.touches[modificateurs]
+        self.controleur.unset_phase(TOUCHE)
+        self.affichage.message("Désolé, pas de modification des touches pour l'instant.")
+        return
         if self.suspens:
             if touche == pygame.K_RETURN : # On ne souhaite pas attribuer de nouvelle touche
                 self.suspens = False
-            elif touche in self.cat_touches.keys() : # La touche est déjà attribuée !
-                self.affichage.message("Cette touche est déjà utilisée !")
+            elif True:# touche in touches["direction"].keys() : # La touche est déjà attribuée !
+                self.affichage.message("Cette touche est déjà utilisée ! (Ou pas. Mais pour l'instant, pas de modification des touches, désolé.)")
             else :
                 if self.etage == 0 :
                     self.cat_touches[touche] = "zone"
@@ -2147,4 +2151,4 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
     def discute(self,touche):
         self.interlocuteur.parle(touche)
 
-from Jeu.Affichage.Affichage import *
+from Jeu.Affichage.Affichages import *

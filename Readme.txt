@@ -58,6 +58,7 @@ Troisi�me �tape : mains[0][2].boucle() et le jeu reprend imm�diatement, at
 
 /!\ Modifier les rôles qui se réfèrent directement au fichier de constantes de leur magie. Remplacer par caste() comme les attaquants magiques
 
+Idée : rework de la regen (augmentation progressive/mode réduit)
 À faire : rework affichage/menus
 Objectifs : Marchand fonctionnel, meilleure alchimie, actions à la souris, affichage mouvant
 
@@ -70,6 +71,34 @@ On veut aussi pouvoir changer l'effet avec un modificateur
 
 
 
+
+
+
+Pour le nouvel affichage :
+Qu'est-ce qui compose l'affichage ?
+Certains éléments contiennent d'autres éléments qui ne se superposent pas (Pavage).
+Certains éléments sont limités en taille par leur contenant (max).
+D'autres sont limités par leur contenu (min).
+Il y a des listes verticales (suite d'éléments, verticaux, placés les uns à la suite des autres).
+Il y a des listes horizontales.
+Il y a les "menus" avec des éléments jusqu'à remplir la ligne, puis d'autres sur la ligne suivante, etc. jusqu'à avoir tout affiché.
+Une liste qui est limitée par son contenant doit permettre de circuler (molette de la souris, etc.).
+Il y a (en tous cas actuellement) des surfaces divisées de façon préétablie.
+
+Idée : rentrer une "taille" de chaque élément. Si positive, à suivre absolument, si négative, représente un proportion par rapport aux autres négatifs.
+
+Pour les trois zones, on veut faire en proportion de la largeur totale de la fenêtre.
+Pour la zone de gauche, on veut afficher les éléments fermés en plein et l'élément actif sur ce qu'il reste.
+Dans l'inventaire, on veut afficher les classes à gauche en plein et leur contenu sur ce qu'il reste à droite.
+
+
+
+
+
+
+
+
+Le joueur doit pouvoir "créer" l'affichage. Partiellement en fonction de ses propres attributs. Faire aussi dépendre de variables (dictionnaires ?) de configuration pour placer chaque chose au bon endroit.
 
 
 
