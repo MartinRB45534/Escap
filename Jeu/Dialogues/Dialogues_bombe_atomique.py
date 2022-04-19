@@ -1,4 +1,4 @@
-global REPLIQUES_BOMBE_ATOMIQUE
+# global REPLIQUES_BOMBE_ATOMIQUE
 REPLIQUES_BOMBE_ATOMIQUE = {
     "dialogue1phrase1":"Bonjour mon chou...",
     "dialogue1reponse1.1":"Bonjour ma belle.",

@@ -66,7 +66,7 @@ class Protection_bouclier(Time_limited,On_attack):
         self.directions = directions
 
     def action(self,attaque):
-        if range(4)[attaque.direction-2] in self.directions: #/!\ Changer pour quelque chose de plus universel
+        if attaque.direction+2 in self.directions: #/!\ Changer pour quelque chose de plus universel
             self.bouclier.intercepte(attaque)
 
 class Protection_mur(Time_limited,On_attack):

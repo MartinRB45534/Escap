@@ -25,7 +25,7 @@ class On_hit(Effet):
     def action(self,lanceur,position,controleur):
         positions_touches = controleur.get_pos_touches(position,self.portee)
         for position_touche in positions_touches:
-            controleur.labs[position[0]].matrice_cases[position_touche[1]][position_touche[2]].effets.append(Attaque_case(lanceur,self.degats,self.element,"distance"))
+            controleur[position_touche].effets.append(Attaque_case(lanceur,self.degats,self.element,"distance"))
 
     def execute(self,lanceur,position,controleur):
         self.action(lanceur,position,controleur)

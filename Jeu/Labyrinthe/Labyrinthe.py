@@ -2,28 +2,28 @@ from Jeu.Constantes import *
 from Jeu.Effet.Effets import *
 from Jeu.Labyrinthe.Generateur import *
 from Jeu.Labyrinthe.Pattern import *
+from Jeu.Labyrinthe.Vue import *
 
-class Labyrinthe:
-    def __init__(self,ID,largeur,hauteur,depart,patterns=None,durete = 1,niveau = 1,element = TERRE,proba=0.1):
+class Labyrinthe(Vue):
+    def __init__(self,ID,decalage,depart,patterns=None,durete = 1,niveau = 1,element = TERRE,proba=0.1):
         #print("Initialisation du labyrinthe")
         self.id = ID #Correspond à la clé du labyrinthe. Créer un init différend pour chaque lab ?
-        self.largeur = largeur
-        self.hauteur = hauteur
+        self.decalage = decalage
         self.durete = durete
         self.niveau = niveau #Est-ce que la dureté des murs et le niveau des cases sont une seule et même chose ?
         self.element = element
 
         self.depart = depart
 
-        self.matrice_cases = [[Case((self.id,j,i),niveau,element) for i in range(hauteur)]for j in range(largeur)]
+        self.matrice_cases = [[Case(Position(self.id,j,i),niveau,element) for i in range(decalage.y)]for j in range(decalage.x)]
 
-        for i in range(self.largeur):
-            self.matrice_cases[i][0].murs[HAUT].effets = [Mur_impassable()]
-            self.matrice_cases[i][self.hauteur-1].murs[BAS].effets = [Mur_impassable()]
+        for i in range(decalage.x):
+            self.matrice_cases[i][0][HAUT].effets = [Mur_impassable()]
+            self.matrice_cases[i][decalage.y-1][BAS].effets = [Mur_impassable()]
 
-        for j in range(self.hauteur):
-            self.matrice_cases[0][j].murs[GAUCHE].effets = [Mur_impassable()]
-            self.matrice_cases[self.largeur-1][j].murs[DROITE].effets = [Mur_impassable()]
+        for j in range(decalage.y):
+            self.matrice_cases[0][j][GAUCHE].effets = [Mur_impassable()]
+            self.matrice_cases[decalage.x-1][j][DROITE].effets = [Mur_impassable()]
 
         self.patterns=patterns
         self.cases_visitees = None
@@ -33,6 +33,30 @@ class Labyrinthe:
 
         self.generation(proba,None,None)
         #print("Génération : check")
+
+    def __getitem__(self,key):
+        if isinstance(key,tuple):
+            return self.matrice_cases[key[0].x][key[0].y][key[1]]
+        elif isinstance(key,(Decalage,Position)):
+            return self.matrice_cases[key.x][key.y]
+        return NotImplemented
+
+    def __setitem__(self,key,value):
+        if isinstance(key,tuple):
+            self.matrice_cases[key[0].x][key[0].y][key[1]] = value
+        elif isinstance(key,(Decalage,Position)):
+            self.matrice_cases[key.x][key.y] = value
+        else:
+            return NotImplemented
+
+    def __contains__(self,item):
+        if item is None:
+            return False
+        elif isinstance(item,Position):
+            return item.lab == self.id and 0<=item.x<self.decalage.x and 0<=item.y<self.decalage.y
+        elif isinstance(item,Decalage):
+            return 0<=item.x<self.decalage.x and 0<=item.y<self.decalage.y
+        return NotImplemented
 
     def generation(self,proba=None,nbMurs=None,pourcentage=None):
         """
@@ -53,55 +77,55 @@ class Labyrinthe:
         
         #génération en profondeur via l'objet generateur
         #print("Génération du labyrinthe")
-        gene=Generateur(self.matrice_cases,self.depart,self.largeur,self.hauteur,self.patterns)
+        gene=Generateur(self.matrice_cases,self.depart,self.decalage.x,self.decalage.y,self.patterns)
         #print("Générateur : check")
-        self.matrice_cases=gene.generation(proba,nbMurs,pourcentage)
+        gene.generation(proba,nbMurs,pourcentage)
 
     def veut_passer(self,intrus,direction):
         """Fonction qui tente de faire passer une entitée.
            Se réfère à la case compétente, qui gère tout."""
-        self.matrice_cases[intrus.get_position()[1]][intrus.get_position()[2]].veut_passer(intrus,direction)
+        self[intrus.get_position(),direction].veut_passer(intrus)
 
     def step(self,coord,entitee):
-        self.matrice_cases[coord[0]][coord[1]].step(entitee)
+        self[coord].step(entitee)
 
     def get_vue(self,agissant):
-        return self.resoud(agissant.get_position(),agissant.get_portee_vue())
+        return Vue(self.id,self.resoud(agissant.get_position(),agissant.get_portee_vue()),self.decalage)
             
     def getMatrice_cases(self):
         #on obtient une copie indépendante du labyrinthe
-        new_mat = [[self.matrice_cases[j][i].get_copie() for i in range(self.hauteur)]for j in range(self.largeur)]
+        new_mat = [[self.matrice_cases[j][i].get_copie() for i in range(self.decalage.y)]for j in range(self.decalage.x)]
         return new_mat
 
     def get_case(self,position):
-        return self.matrice_cases[position[1]][position[2]]
+        return self[position]
 
     #Découvrons le déroulé d'un tour, avec Labyrinthe-ni :
     def debut_tour(self): #On commence le tour
-        for i in range(self.largeur):
-            for j in range(self.hauteur):
+        for i in range(self.decalage.x):
+            for j in range(self.decalage.y):
                 self.matrice_cases[i][j].debut_tour()
 
     def pseudo_debut_tour(self): #On commence le tour
-        for i in range(self.largeur):
-            for j in range(self.hauteur):
+        for i in range(self.decalage.x):
+            for j in range(self.decalage.y):
                 self.matrice_cases[i][j].pseudo_debut_tour()
 
     def post_action(self): #On agit sur les actions en suspens (les attaques en particulier)
-        for i in range(self.largeur):
-            for j in range(self.hauteur):
-                self.matrice_cases[i][j].post_action((self.id,i,j))
+        for i in range(self.decalage.x):
+            for j in range(self.decalage.y):
+                self.matrice_cases[i][j].post_action()
 
     def fin_tour(self):
-        for i in range(self.largeur):
-            for j in range(self.hauteur):
+        for i in range(self.decalage.x):
+            for j in range(self.decalage.y):
                 self.matrice_cases[i][j].fin_tour()
         if self.temps_restant >= 0:
             if self.temps_restant == 0:
                 self.controleur.desactive_lab(self.id)
                 self.controleur = None
-                for i in range(self.largeur):
-                    for j in range(self.hauteur):
+                for i in range(self.decalage.x):
+                    for j in range(self.decalage.y):
                         self.matrice_cases[i][j].desactive()
             self.temps_restant -= 1
     #Et c'est la fin du tour !
@@ -112,8 +136,8 @@ class Labyrinthe:
     def active(self,controleur):
         self.controleur = controleur
         self.temps_restant = -1 #Au cas où
-        for i in range(self.largeur):
-            for j in range(self.hauteur):
+        for i in range(self.decalage.x):
+            for j in range(self.decalage.y):
                 self.matrice_cases[i][j].active(controleur)
 
     def attaque(self,position,portee,propagation,direction,obstacles):
@@ -140,7 +164,7 @@ class Labyrinthe:
                 for j in range(len(self.matrice_cases[0])):
                     self.matrice_cases[i][j].clarte = 0
 
-        dirs = [HAUT,DROITE,BAS,GAUCHE]
+        dirs = [Direction(i) for i in range(NB_DIRECTIONS)]
         forme = propagation[0]
         if forme == "R":
             dirs = [direction]
@@ -152,7 +176,7 @@ class Labyrinthe:
 
         queue=[(position,dirs,propagation)]
 
-        self.matrice_cases[position[1]][position[2]].clarte = portee
+        self[position].clarte = portee
 
         retrait = 1
 
@@ -161,8 +185,8 @@ class Labyrinthe:
             data=queue[0]
             position = data[0]
             if action == "vue":
-                retrait = self.matrice_cases[position[1]][position[2]].get_opacite()
-            clarte = self.matrice_cases[position[1]][position[2]].clarte - retrait
+                retrait = self[position].get_opacite()
+            clarte = self[position].clarte - retrait
             #enlever position dans queue
             queue.pop(0)
 
@@ -174,14 +198,14 @@ class Labyrinthe:
 
                 for data_explorable in datas_explorables:
                     pos = data_explorable[0]
-                    clarte_cible = self.matrice_cases[pos[1]][pos[2]].clarte
+                    clarte_cible = self[pos].clarte
 
                     if clarte <= 0 and clarte_cible <= 0:
-                        self.matrice_cases[pos[1]][pos[2]].clarte = -1
+                        self[pos].clarte = -1
 
                     elif clarte > clarte_cible :
                         #on marque la case comme visitée
-                        self.matrice_cases[pos[1]][pos[2]].clarte = clarte
+                        self[pos].clarte = clarte
                         
                         #on ajoute toutes les directions explorables
                         queue.append(data_explorable)
@@ -210,35 +234,16 @@ class Labyrinthe:
         deplacement = propagation[3]
         positions_voisins=[]
         #on élimine les voisins aux extrémitées
-        if deplacement == "S":
-            if position[2]-1>=0:
-                positions_voisins.append((position[0],position[1],position[2]-1))
+        for i in DIRECTIONS:
+            if deplacement == "S":
+                cible = position+i
+            elif deplacement == "T":
+                cible = self[position,i].get_cible()
             else:
-                positions_voisins.append(None)
-                
-            if position[1]+1<self.largeur:
-                positions_voisins.append((position[0],position[1]+1,position[2]))
-            else:
-                positions_voisins.append(None)
-                
-            if position[2]+1<self.hauteur:
-                positions_voisins.append((position[0],position[1],position[2]+1))
-            else:
-                positions_voisins.append(None)
-                
-            if position[1]-1>=0:
-                positions_voisins.append((position[0],position[1]-1,position[2]))
-            else:
-                positions_voisins.append(None)
-        elif deplacement == "T":
-            for i in range(4):
-                cible = self.matrice_cases[position[1]][position[2]].murs[i].get_cible()
-                if cible != None:
-                    if cible[0] != position[0]:
-                        cible = None
-                positions_voisins.append(cible)
-        else:
-            print("Propagation inconnue")
+                print("Propagation inconnue")
+            if not cible in self:
+                cible = None
+            positions_voisins.append(cible)
 
         return positions_voisins
 
@@ -259,14 +264,13 @@ class Labyrinthe:
         deplacement = propagation[3]
         passage = propagation[6]
         datas_utilisables=[]
-        cardinaux = [HAUT,DROITE,BAS,GAUCHE]
 
         for direction in directions:
             if positions_voisins[direction]!=None:
                 voisin = positions_voisins[direction]
 
                 #on vérifie si on peut passer
-                blocage = self.matrice_cases[position[1]][position[2]].get_mur_dir(direction).get_blocage(clees)
+                blocage = self[position].get_mur_dir(direction).get_blocage(clees)
                 if blocage != "Imp" and (passage=="m" or (blocage!="Ple" and ((passage=="p" and (blocage == "Por" or blocage == "P_b")) or (passage=="b" and (blocage == "Bar" or blocage == "P_b")) or (blocage == "Esc" and deplacement == "T") or (blocage == "Tel" and deplacement == "T") or blocage == None))):
                     #On détermine éventuellement la nouvelle forme de propagation
                     if degenerescence == "d":
@@ -289,11 +293,11 @@ class Labyrinthe:
                     elif forme!="C":
                         #On détermine la direction d'où l'on vient
                         if deplacement=="S":
-                            dir_back = cardinaux[direction-2]
+                            dir_back = direction+2
                         elif deplacement=="T":
                             dir_back = 0
-                            for i in cardinaux:
-                                if self.matrice_cases[voisin[1]][voisin[2]].get_mur_dir(i).get_cible()==position:
+                            for i in DIRECTIONS:
+                                if self[voisin,i].get_cible()==position:
                                     dir_back = i
                         #On n'y retournera pas !
                         nouv_dir=[]
@@ -301,9 +305,10 @@ class Labyrinthe:
                             if i!=dir_back:
                                 nouv_dir.append(i)
                     else:
-                        nouv_dir=[HAUT,DROITE,BAS,GAUCHE]
+                        nouv_dir=[dire for dire in DIRECTIONS]
 
                     nouv_data=(voisin,nouv_dir,nouv_prop)
 
                     datas_utilisables.append(nouv_data)
+
         return datas_utilisables

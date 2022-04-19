@@ -1,4 +1,4 @@
-global CONSTANTES_STATS
+# global CONSTANTES_STATS
 CONSTANTES_STATS = {
     #Le joueur n'est jamais sensé être initialisé avec d'autres statistiques que le niveau 1, mais on ne sait jamais
     "joueur":{
@@ -442,12 +442,12 @@ CONSTANTES_STATS = {
         'special':False},
         }
 
-global constantes_temps
+# global constantes_temps
 constantes_temps = {'tours':0,
                     'agissants.debut_tour':0,
                     'esprits':0,
                     'reste':0,
                     'courant':0}
 
-global constantes_deplacements
+# global constantes_deplacements
 constantes_deplacements = []

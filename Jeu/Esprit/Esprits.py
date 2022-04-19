@@ -12,7 +12,7 @@ class Esprit_type(Esprit):
         self.prejuges = []
         self.pardon = 0.9 #La décroissance de l'importance avec le temps. Peut être supérieure à 1 pour s'en prendre en priorité aux ennemis ancestraux.
         self.resolution = 0
-        self.vue = {}
+        self.vue = Vues()
         self.corps = {}
         if niveau == 1:
             corps = [Tank(position,1),Dps(position,1),Dps(position,1)]
@@ -24,7 +24,7 @@ class Esprit_type(Esprit):
         i = 0
         random.shuffle(corps)
         for corp in corps:
-            corp.position = (position[0],position[1],position[2]+i)
+            corp.position = position+i*BAS
             i+=1
 
 class Esprit_sans_scrupule(Esprit_type):
@@ -62,7 +62,7 @@ class Esprit_bourrin(Esprit_type): #À supprimer, plus nécessaire
         self.prejuges = []
         self.pardon = 0.9 #La décroissance de l'importance avec le temps. Peut être supérieure à 1 pour s'en prendre en priorité aux ennemis ancestraux.
         self.resolution = 0
-        self.vue = {}
+        self.vue = Vues()
         self.corps = {}
         if niveau == 1:
             corps = [Dps(position,1),Dps(position,1),Dps(position,1)]
@@ -74,7 +74,7 @@ class Esprit_bourrin(Esprit_type): #À supprimer, plus nécessaire
         i = 0
         random.shuffle(corps)
         for corp in corps:
-            corp.position = (position[0],position[1],position[2]+i)
+            corp.position = position+i*BAS
             i+=1
 
 class Esprit_defensif(Esprit_type): #À supprimer, plus nécessaire
@@ -89,7 +89,7 @@ class Esprit_defensif(Esprit_type): #À supprimer, plus nécessaire
         self.prejuges = []
         self.pardon = 0.9 #La décroissance de l'importance avec le temps. Peut être supérieure à 1 pour s'en prendre en priorité aux ennemis ancestraux.
         self.resolution = 0
-        self.vue = {}
+        self.vue = Vues()
         self.corps = {}
         if niveau == 1:
             corps = [Tank(position,1),Tank(position,1),Dps(position,1)]
@@ -101,7 +101,7 @@ class Esprit_defensif(Esprit_type): #À supprimer, plus nécessaire
         i = 0
         random.shuffle(corps)
         for corp in corps:
-            corp.position = (position[0],position[1],position[2]+i)
+            corp.position = position+i*BAS
             i+=1
 
 class Esprit_solitaire(Esprit_type):
@@ -115,7 +115,7 @@ class Esprit_solitaire(Esprit_type):
         self.prejuges = []
         self.pardon = 0.9 #La décroissance de l'importance avec le temps. Peut être supérieure à 1 pour s'en prendre en priorité aux ennemis ancestraux.
         self.resolution = 0
-        self.vue = {}
+        self.vue = Vues()
         self.corps = {}
         self.ajoute_corp(corp)
 
@@ -130,7 +130,7 @@ class Esprit_simple(Esprit_type):
         self.prejuges = prejuges
         self.pardon = 0.9 #La décroissance de l'importance avec le temps. Peut être supérieure à 1 pour s'en prendre en priorité aux ennemis ancestraux.
         self.resolution = 0
-        self.vue = {}
+        self.vue = Vues()
         self.corps = {}
         self.ajoute_corps(corps)
 
@@ -145,7 +145,7 @@ class Esprit_humain(Esprit_type):
         self.prejuges = [] #Peut-être quelques boss ?
         self.pardon = 0.9
         self.resolution = 0
-        self.vue = {}
+        self.vue = Vues()
         self.corps = {}
         Esprit_type.ajoute_corp(self,corp)
         self.chef = corp #Les humains ne peuvent pas s'empêcher d'avoir des chefs
@@ -252,7 +252,7 @@ class Esprit_humain(Esprit_type):
                     if ID_agissant <= ennemi_courant:
                         self.ennemi_courant = len(self.ennemis_vus)-1
         for vue in vues :
-            niveau = vue[0][0][0][0] #La première coordonée de la position (première information) de la première case de la première colonne
+            niveau = vue.id #La première coordonée de la position (première information) de la première case de la première colonne
             if niveau in self.vue.keys(): 
                 self.maj_vue(vue,niveau)
             else:
@@ -295,7 +295,7 @@ class Esprit_humain(Esprit_type):
                 else:
                     self.ennemis[ennemi] = esprit.ennemis[ennemi]
             for vue in esprit.vue.values():
-                niveau = vue[0][0][0][0] #La première coordonée de la position (première information) de la première case de la première colonne
+                niveau = vue.id #La première coordonée de la position (première information) de la première case de la première colonne
                 if niveau in self.vue.keys(): 
                     self.maj_vue(vue,niveau)
                 else:
@@ -335,13 +335,11 @@ class Esprit_humain(Esprit_type):
 
     def get_agissants_vus(self,humain):
         agissants = []
-        for vue in self.vue.values():
-            for colonne in vue:
-                for case in colonne:
-                    if case[2] > 0:
-                        for ID in case[6]:
-                            if not(self.controleur.est_item(ID)):
-                                agissants.append(ID)
+        for case in self.vue:
+            if case[2] > 0:
+                for ID in case[6]:
+                    if not(self.controleur.est_item(ID)):
+                        agissants.append(ID)
         agissants.sort()
         return agissants
 
@@ -357,29 +355,26 @@ class Esprit_humain(Esprit_type):
 
     def get_cases_vues(self,humain):
         cases = []
-        for colonne in self.vue[humain.position[0]]:
-            for case in colonne:
-                if case[2] > 0:
-                     cases.append(case[0])
+        for case in self.vue[humain.position]:
+            if case[2] > 0:
+                cases.append(case[0])
         return cases
 
     def oublie(self):
-        for lab in self.vue.values():
-            for colonne in lab:
-                for case in colonne:
-                    if case[2] > 0:
-                        if self.peureuse():
-                            case[2] = self.oubli
-                        else:
-                            case[2] -= 1
-                    if case[2] <= 0:
-                        case[1] = 0
-                        case[4] = 0
-                        case[5] = [[False,False,False,False,False],[False,False,False,False,False],[False,False,False,False,False],[False,False,False,False,False]]
-                        case[6] = []
-                    case[3] = [0,0,0,0,0,False]
-                    case[7] = []
-                    case[8] = False
+        for case in self.vue:
+            if case[2] > 0:
+                if self.peureuse():
+                    case[2] = self.oubli
+                else:
+                    case[2] -= 1
+            if case[2] <= 0:
+                case[1] = 0
+                case[4] = 0
+                case[5] = [[False,False,False,False,False],[False,False,False,False,False],[False,False,False,False,False],[False,False,False,False,False]]
+                case[6] = []
+            case[3] = [0,0,0,0,0,False]
+            case[7] = []
+            case[8] = False
 
     def peureuse(self):
         return 5 in self.corps.keys() and self.corps[5] in ["humain","attente","fuite","deplacement","attaque","vivant"] #J'ai un doute sur la possibilité des deux derniers mais bon...
@@ -389,10 +384,10 @@ class Esprit_humain(Esprit_type):
             if corp == 2:
                 joueur = self.controleur.get_entitee(2)
                 joueur.recontrole()
-                if joueur.skill_courant != None and issubclass(joueur.skill_courant,(Skill_course,Skill_deplacement)) and joueur.position[0] in self.vue.keys():
-                    cible = self.vue[joueur.position[0]][joueur.position[1]][joueur.position[2]][5][joueur.dir_regard][4]
-                    if cible and cible[0] in self.vue.keys():
-                        self.vue[cible[0]][cible[1]][cible[2]][8]=True
+                if joueur.skill_courant != None and issubclass(joueur.skill_courant,(Skill_course,Skill_deplacement)) and joueur.position.lab in self.vue.keys():
+                    cible = self.vue[joueur.position][5][joueur.dir_regard][4]
+                    if cible and cible.lab in self.vue.keys():
+                        self.vue[cible][8]=True
             elif self.corps[corp] in ["attaque","fuite","soin","soutien"]:
                 Esprit.deplace(self,corp)
             elif self.corps[corp] == "humain":
@@ -442,7 +437,7 @@ class Esprit_humain(Esprit_type):
                 res = "recherche"
                 self.resoud(cible,10,4)
                 position = humain.get_position()
-                case = self.vue[position[0]][position[1]][position[2]]
+                case = self.vue[position]
                 repoussante = case[8]
                 cases = [[-1,case[0],case[3][0],case[3][1],-case[3][2],case[3][2],-case[3][3],case[3][3],case[3][4]]]
                 dirs = []
@@ -454,11 +449,11 @@ class Esprit_humain(Esprit_type):
                     humain.statut_humain = "perdu"
                     if humain.ID == 4:
                         humain.statut_humain = "paume"
-                for i in range(4):
+                for i in DIRECTIONS:
                     mur = case[5][i][self.resolution]
                     if mur:
-                        if mur[0] in self.vue.keys():
-                            case_pot = self.vue[mur[0]][mur[1]][mur[2]]
+                        if mur.lab in self.vue.keys():
+                            case_pot = self.vue[mur]
                             entitees = case_pot[6]
                             libre = True
                             for ID_entitee in entitees:
@@ -480,7 +475,7 @@ class Esprit_humain(Esprit_type):
                                             self.controleur.get_entitee(2).event = DIALOGUE
                                             humain.start_dialogue()
                                             humain.dir_regard = i
-                                            self.controleur.get_entitee(2).dir_regard = range(4)[i-2]
+                                            self.controleur.get_entitee(2).dir_regard = i+2
                             if libre:
                                 cases.append([i,case_pot[0],case_pot[3][0],case_pot[3][1],-case_pot[3][2],case_pot[3][2],-case_pot[3][3],case_pot[3][3],case_pot[3][4]])
                                 dirs.append(i)
@@ -501,11 +496,11 @@ class Esprit_humain(Esprit_type):
                     if len(cases) == 1: #Pas de cases libres à proximité, on va essayer d'attaquer pour s'en sortir
                         humain.skill_courant = None
                         importance = 0
-                        for i in range(4):
+                        for i in DIRECTIONS:
                             mur = case[5][i][self.resolution]
                             if mur:
-                                if mur[0] in self.vue.keys():
-                                    case_pot = self.vue[mur[0]][mur[1]][mur[2]]
+                                if mur.lab in self.vue.keys():
+                                    case_pot = self.vue[mur]
                                     entitees = case_pot[6]
                                     libre = True
                                     for ID_entitee in entitees:
@@ -522,7 +517,7 @@ class Esprit_humain(Esprit_type):
                             res = "exploration"
                             if len(dirs)>1: #On peut se permettre de choisir
                                 if humain.dir_regard != None: #L'agissant regarde quelque part
-                                    dir_back = [HAUT,DROITE,BAS,GAUCHE][humain.dir_regard-2]
+                                    dir_back = humain.dir_regard+2
                                     if dir_back in dirs: #On ne veut pas y retourner
                                         dirs.remove(dir_back)
                             humain.va(dirs[random.randint(0,len(dirs)-1)]) #/!\ Ne pas retourner sur ses pas, c'est bien ! Aller vers les endroits inconnus, ce serait mieux. /!\
@@ -532,7 +527,7 @@ class Esprit_humain(Esprit_type):
                             res = "exploration"
                             if len(dirs)>1: #On peut se permettre de choisir
                                 if humain.dir_regard != None: #L'agissant regarde quelque part
-                                    dir_back = [HAUT,DROITE,BAS,GAUCHE][humain.dir_regard-2]
+                                    dir_back = humain.dir_regard+2
                                     if dir_back in dirs: #On ne veut pas y retourner
                                         dirs.remove(dir_back)
                             humain.va(dirs[random.randint(0,len(dirs)-1)]) #/!\ Ne pas retourner sur ses pas, c'est bien ! Aller vers les endroits inconnus, ce serait mieux. /!\
@@ -571,7 +566,7 @@ class Esprit_slime(Esprit_type):
         self.prejuges = ["humain"] #Vraiment ?
         self.pardon = 0.9 #La décroissance de l'importance avec le temps. Peut être supérieure à 1 pour s'en prendre en priorité aux ennemis ancestraux.
         self.resolution = 0
-        self.vue = {}
+        self.vue = Vues()
         self.corps = {}
         self.classe = controleur.get_entitee(corp).classe_principale
         self.ajoute_corp(corp)
@@ -586,7 +581,7 @@ class Esprit_slime(Esprit_type):
             else:
                 self.ennemis[ennemi] = esprit.ennemis[ennemi]
         for vue in esprit.vue.values():
-            niveau = vue[0][0][0][0] #La première coordonée de la position (première information) de la première case de la première colonne
+            niveau = vue.id
             if niveau in self.vue.keys(): 
                 self.maj_vue(vue,niveau)
             else:

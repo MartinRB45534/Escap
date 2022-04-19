@@ -1,7 +1,8 @@
 from Jeu.Constantes import *
+from Jeu.Labyrinthe.Structure_spatiale.Espace import *
 import random
 
-class Generateur:
+class Generateur(Espace):
     def __init__(self,matrice_cases,depart,largeur,hauteur,paterns,modeGeneration="Profondeur"):
         #print("Initialisation du générateur")
         self.depart = depart
@@ -11,6 +12,23 @@ class Generateur:
         self.modeGeneration = modeGeneration
         self.paterns = paterns
         self.poids = [1,1,1,1]
+
+    def __getitem__(self,key):
+        if isinstance(key,tuple):
+            return self.matrice_cases[key[0].x][key[0].y][key[1]]
+        elif isinstance(key,Position):
+            return self.matrice_cases[key.x][key.y]
+        else:
+            return NotImplemented
+
+    def __contains__(self,item):
+        if item is None:
+            return False
+        elif isinstance(item,Position):
+            return item.lab == self.ID and 0<=item.x<self.largeur and 0<=item.y<self.hauteur
+        elif isinstance(item,Decalage):
+            return 0<=item.x<self.largeur and 0<=item.y<self.hauteur
+        return NotImplemented
 
     def generation(self,proba=None,nbMurs=None,pourcentage=None):
         """
@@ -23,12 +41,11 @@ class Generateur:
         Sorties:une matrice de cases générée
         """
         #print("Génération")
-        matrice=None
         
         self.pre_gene_paterns()
         if self.modeGeneration=="Profondeur":
             #print("Mode de génération : profondeur")
-            matrice= self.generation_en_profondeur()
+            self.generation_en_profondeur()
             #print("Génération en profondeur : check")
             #on casse les murs conformément aux paramètres
             self.casser_X_murs(proba,nbMurs,pourcentage)
@@ -37,15 +54,13 @@ class Generateur:
 
         self.post_gene_paterns()
 
-        for case in matrice[0]:
-            case.murs[3].interdit()
-        for case in matrice[-1]:
-            case.murs[1].interdit()
-        for colonne in matrice:
-            colonne[0].murs[0].interdit()
-            colonne[-1].murs[2].interdit()
-        
-        return matrice
+        for case in self.matrice_cases[0]:
+            case[3].interdit()
+        for case in self.matrice_cases[-1]:
+            case[1].interdit()
+        for colonne in self.matrice_cases:
+            colonne[0][0].interdit()
+            colonne[-1][2].interdit()
 
     def pre_gene_paterns(self):
         """
@@ -101,7 +116,7 @@ class Generateur:
                 #direction du mur à casser
                 direction_mur=murs_generables[num_mur]
 
-                mur = self.matrice_cases[position[1]][position[2]].murs[direction_mur]
+                mur = self[position,direction_mur]
 
                 self.casser_mur(mur)
 
@@ -113,8 +128,6 @@ class Generateur:
                 stack.pop()
 
         #print("Fini")
-        
-        return self.matrice_cases
 
     def murs_utilisables(self,position,murs_requis = 4):
         """
@@ -124,11 +137,11 @@ class Generateur:
         """
         murs_utilisables=[]
 
-        for i in range(4):
-            mur = self.matrice_cases[position[1]][position[2]].murs[i] #mur = self.matrice_cases[position[1][0]][position[1][1]].murs[i]
+        for i in DIRECTIONS:
+            mur = self[position,i]
             cible = mur.get_cible()
-            if cible != None and cible[0]==self.depart[0]:
-                case_cible = self.matrice_cases[cible[1]][cible[2]]
+            if cible in self.depart:
+                case_cible = self[cible]
                 mur_oppose = self.get_mur_oppose(mur)
                 if mur_oppose != None and case_cible.nb_murs_pleins()>=murs_requis and mur_oppose.is_touchable() and mur.is_touchable():
                     murs_utilisables.append(i)
@@ -202,8 +215,8 @@ class Generateur:
         """
         directions_interdites=[]
 
-        murs=self.matrice_cases[coord_case[0]][coord_case[1]].get_murs()
-        for i in range(0,4):
+        murs=self[coord_case].get_murs()
+        for i in DIRECTIONS:
             if not(murs[i].is_touchable):
                 directions_interdites.append(i)
             
@@ -216,10 +229,10 @@ class Generateur:
         """
         casser = False
 
-        murs=self.murs_utilisables(self.voisins_case(position_case[0],position_case[1]))
+        murs=self.murs_utilisables(self.voisins_case(position_case))
         if len(murs)!=0:
             mur_a_casser=random.randrange(0,len(murs))
-            self.casser_mur(self.matrice_cases[position_case[0]][position_case[1]].murs[murs[mur_a_casser]])
+            self.casser_mur(self[position_case,murs[mur_a_casser]])
             casser = True
         return casser
 
@@ -231,12 +244,13 @@ class Generateur:
         """
         for x in range(1,self.largeur) :
             for y in range(1,self.hauteur) :
-                case = self.matrice_cases[x][y]
-                murs=self.murs_utilisables((self.depart[0],x,y),0)
+                pos=Position(self.depart.lab,x,y)
+                case = self[pos]
+                murs=self.murs_utilisables(pos,0)
                 if HAUT in murs and random.random() <= proba :
-                    self.casser_mur(case.murs[HAUT])
+                    self.casser_mur(case[HAUT])
                 if GAUCHE in murs and random.random() <= proba :
-                    self.casser_mur(case.murs[GAUCHE])
+                    self.casser_mur(case[GAUCHE])
                     
     def casser_mur(self,mur):
         """
@@ -259,19 +273,19 @@ class Generateur:
         Fonction qui renvoie le nombres de murs pleins contenus dans le labyrinthe
         """
         murs_pleins=0
-        for x in range(0,self.largeur):
-            for y in range(0,self.hauteur):
-                murs_pleins+=self.matrice_cases[x][y].nb_murs_pleins()
+        for x in range(self.largeur):
+            for y in range(self.hauteur):
+                murs_pleins+=self[Position(self.depart.lab,x,y)].nb_murs_pleins()
         
         return int((murs_pleins-self.hauteur*2-self.largeur*2)/2)
 
     def get_mur_oppose(self,mur):
         cible = mur.get_cible()
         mur_oppose = None
-        if cible != None and cible[0] == self.depart[0]:
-            for mur_potentiel in self.matrice_cases[cible[1]][cible[2]].murs :
+        if cible in self.depart:
+            for mur_potentiel in self[cible].murs :
                 cible_potentielle = mur_potentiel.get_cible()
-                if cible_potentielle != None and cible_potentielle[0] == self.depart[0]:
-                    if mur in self.matrice_cases[cible_potentielle[1]][cible_potentielle[2]].murs : #Les murs sont réciproques (attention deux murs d'une même case ne peuvent pas mener à la même autre case !
+                if cible_potentielle in self.depart:
+                    if mur in self[cible_potentielle].murs : #Les murs sont réciproques (attention deux murs d'une même case ne peuvent pas mener à la même autre case !
                         mur_oppose = mur_potentiel
         return mur_oppose

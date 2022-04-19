@@ -1,4 +1,4 @@
-global REPLIQUES_PEUREUSE
+# global REPLIQUES_PEUREUSE
 REPLIQUES_PEUREUSE = {
     "dialogue1phrase1":"Bonjour !",
     "dialogue1reponse1.1":"Salut...",

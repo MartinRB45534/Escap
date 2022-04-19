@@ -1,3 +1,4 @@
+from jinja2 import pass_eval_context
 from Jeu.Entitee.Agissant.Humain.Humain import *
 from Jeu.Entitee.Decors.Decors import *
 from Jeu.Entitee.Agissant.Inventaire import Sac_a_dos
@@ -86,6 +87,72 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
 
         self.projectiles = {} #Le skill lancer peut s'utiliser de plusieurs façon : en le combinant à un skill de création de projectile, les touches sont associées comme pour les magies# sur l'item courant de l'inventaire, par le biais d'une touche du skill lancer ou, si l'item est un projectile, directement depuis l'inventaire
 
+    def cree_affichage(self):
+        """Fonction qui crée l'affichage du joueur"""
+        #Pour l'instant juste en période de navigation normale du labyrinthe
+        #L'affichage est une liste verticale
+        #Le premier élément, en haut, est le nom de l'étage où l'on se trouve
+        nom_etage = Texte((0,0),(0,0),self.vue[0][0][0][0]) #Les tailles (deuxième argument) ne servent à rien pour l'instant pour un texte
+        #Le deuxième élément, ensuite, est un pavage horizontal
+            #Le premier élément, à gauche, est un pavage vertical
+            #Elle contient les stats, l'inventaire et la classe
+            #On va déléguer le boulot de créer ces trois-là
+        stats = self.cree_affichage_stats()
+        inventaire = self.inventaire.cree_affichage()
+        classe = self.classe_principale.cree_affichage()
+            #Les tailles des éléments du pavage dépendent de ce qui est sélectionné
+        if self.curseur == "in_stats":
+            tailles_gauche = [-1,0,0]
+        elif self.curseur == "in_stats":
+            tailles_gauche = [0,-1,0]
+        elif self.curseur == "in_stats":
+            tailles_gauche = [0,0,-1]
+        else:
+            tailles_gauche = [0,0,0]
+        gauche=Pavage_vertical()
+        gauche.set_contenu([stats,inventaire,classe],tailles_gauche)
+            #Le deuxième élément, au centre, est le labyrinthe
+            #On va le déléguer entièrement pour l'instant
+        centre=Faux_lab()
+            #Le troisième élément, à droite, est un pavage vertical
+            #Il contient la vue 3D du labyrinthe ou la vue de l'esprit
+        if self.curseur == "carré":
+            contenu_droite = self.cree_affichage_vue()
+            droite=Conteneur()
+            droite.set_contenu(contenu_droite)
+        elif self.curseur == "esprit" or self.curseur == "in_esprit":
+            contenu_droite = self.esprit.cree_affichage()
+            droite=Pavage_vertical()
+            tailles_droite=[-1,-1]
+            droite.set_contenu(contenu_droite,tailles_droite)
+        else:
+            droite=Conteneur()
+        bas = Pavage_horizontal()
+        bas.set_contenu([Marge(),gauche,Marge(),centre,Marge(),droite,Marge()],[5,-1,5,-2,5,-1,5])
+        tout = Liste()
+        tout.set_contenu([nom_etage,Marge(),bas])
+
+    def cree_affichage_stats(self):
+        """Fonction qui crée l'affichage des stats"""
+        #L'affichage des stats varie selon les circonstances
+        if self.curseur == "in_stats":
+            #Les stats sont un pavage
+            #On commence par les informations sur les PVs
+            PVs = Pavage_horizontal()
+            PV_pleins=Conteneur()
+            PV_vides=Conteneur()
+            PV_pleins.set_fond((255,0,0))
+            PV_vides.set_fond((255,160,160))
+            PVs.set_contenu([PV_pleins,PV_vides],[-self.pv,self.pv-self.pv_max]) #Faire un cas pour l'immortalité
+
+            PMs = Pavage_horizontal()
+            PM_pleins=Conteneur()
+            PM_vides=Conteneur()
+            PM_pleins.set_fond((160,255,255))
+            PM_vides.set_fond((32,255,255))
+            PMs.set_contenu([PM_pleins,PM_vides],[-self.pm,self.pm-self.pm_max]) #Faire un cas pour la magie infinie
+            
+
     def get_skin_tete(self):
         return SKIN_TETE_JOUEUR
 
@@ -112,7 +179,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         if self.first_kill_:
             self.first_kill_=False
             #On vérifie que le dialogue a lieu d'être : le joueur n'a pas rencontré d'autre monstre et il a assisté à la mort du gobelin
-            if self.highest == 3 and (self.get_etage_courant() == 3 and self.vue[position[1]][position[2]][2] > 0):
+            if self.highest == 3 and (self.get_etage_courant() == 3 and self.vue[position][2] > 0):
                 #On cherche un PNJ volontaire pour aller taper la causette :
                 paume = self.controleur.get_entitee(4)
                 if paume.esprit == "joueur" and (paume.get_etage_courant() == 3 and paume.statut_humain in ["exploration","proximite","en chemin"]):
@@ -131,7 +198,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         if self.magic_kill_:
             self.magic_kill_=False
             #On vérifie que le dialogue a lieu d'être : le joueur a assisté à la mort du mage gobelin (et donc probablement à ses attaques)
-            if self.highest == 4 and (self.get_etage_courant() == 4 and self.vue[position[1]][position[2]][2] > 0):
+            if self.highest == 4 and (self.get_etage_courant() == 4 and self.vue[position][2] > 0):
                 #On cherche un PNJ volontaire pour aller taper la causette :
                 peureuse = self.controleur.get_entitee(5)
                 if peureuse.esprit == "joueur" and (peureuse.get_etage_courant() == 4 and peureuse.statut_humain in ["exploration","proximite","en chemin"]):
@@ -272,22 +339,10 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
 
     def interagit(self):
         #On cherche la personne :
-        if self.dir_regard == HAUT:
-            positions = [(self.position[0],self.position[1],self.position[2]-1),(self.position[0],self.position[1]-1,self.position[2]),(self.position[0],self.position[1]+1,self.position[2]),(self.position[0],self.position[1],self.position[2]+1)]
-            directions = [HAUT,GAUCHE,DROITE,BAS]
-        elif self.dir_regard == BAS:
-            positions = [(self.position[0],self.position[1],self.position[2]+1),(self.position[0],self.position[1]-1,self.position[2]),(self.position[0],self.position[1]+1,self.position[2]),(self.position[0],self.position[1],self.position[2]-1)]
-            directions = [BAS,GAUCHE,DROITE,HAUT]
-        elif self.dir_regard == GAUCHE:
-            positions = [(self.position[0],self.position[1]-1,self.position[2]),(self.position[0],self.position[1],self.position[2]-1),(self.position[0],self.position[1],self.position[2]+1),(self.position[0],self.position[1]+1,self.position[2])]
-            directions = [GAUCHE,HAUT,BAS,DROITE]
-        elif self.dir_regard == DROITE:
-            positions = [(self.position[0],self.position[1]+1,self.position[2]),(self.position[0],self.position[1],self.position[2]-1),(self.position[0],self.position[1],self.position[2]+1),(self.position[0],self.position[1]-1,self.position[2])]
-            directions = [DROITE,HAUT,BAS,GAUCHE]
         self.interlocuteur = None #Normalement c'est déjà le cas
-        for i in range(4):
-            if self.peut_voir(directions[i]):
-                pos = positions[i]
+        for i in [0,-1,1,2]:
+            if self.peut_voir(self.dir_regard+i):
+                pos = self.position+(self.dir_regard+i)
                 interactifs = self.controleur.trouve_interactifs_courants(pos)
                 if interactifs!=[]:
                     interactif = self.controleur.get_entitee(interactifs[0]) # Est-ce que je continue à appeler ça un interlocuteur ?
@@ -296,11 +351,11 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
                         self.controleur.set_phase(EVENEMENT)
                         self.event = DIALOGUE
                         interactif.start_dialogue()
-                        self.dir_regard = directions[i]
-                        interactif.dir_regard = range(4)[directions[i]-2]
+                        self.dir_regard+=i
+                        interactif.dir_regard = self.dir_regard+2
                     elif isinstance(interactif,Decors_interactif):
                         self.objet_interactif = interactif
-                        self.dir_regard = directions[i]
+                        self.dir_regard+=i
                         if isinstance(interactif,Ustensile):
                             self.start_menu_cuisine()
                     break
@@ -533,7 +588,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
     def start_select_cible_case(self,magie):
         self.methode_courante = self.continue_select_case
         self.cibles = self.controleur.get_cibles_potentielles_cases(magie,self)
-        self.element_courant = (self.position[0],self.position[1],self.position[2]) #Je recycle
+        self.element_courant = self.position #Je recycle
         self.cible = []
         self.affichage.draw_magie_case(self)
         self.temps = magie.temps
@@ -542,13 +597,13 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
 
     def continue_select_case(self,touche):
         if touche == pygame.K_UP :
-            self.element_courant = (self.element_courant[0],self.element_courant[1],self.element_courant[2]-1)
+            self.element_courant = self.element_courant + HAUT
         elif touche == pygame.K_DOWN :
-            self.element_courant = (self.element_courant[0],self.element_courant[1],self.element_courant[2]+1)
+            self.element_courant = self.element_courant + BAS
         elif touche == pygame.K_LEFT :
-            self.element_courant = (self.element_courant[0],self.element_courant[1]-1,self.element_courant[2])
+            self.element_courant = self.element_courant + GAUCHE
         elif touche == pygame.K_RIGHT :
-            self.element_courant = (self.element_courant[0],self.element_courant[1]+1,self.element_courant[2])
+            self.element_courant = self.element_courant + DROITE
         elif touche == pygame.K_SPACE and self.element_courant in self.cibles:
             if self.multi : #Si jamais une magie peut cibler plusieurs cibles.
                 if self.element_courant in self.cible :
@@ -593,20 +648,20 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
     def start_select_case_dialogue(self):
         self.methode_courante = self.continue_select_case_dialogue
         self.cibles = self.controleur.get_esprit(self.esprit).get_cases_vues(self)
-        self.element_courant = (self.position[0],self.position[1],self.position[2]) #Je recycle
+        self.element_courant = self.position #Je recycle
         self.cible = []
         self.affichage.draw_magie_case(self)
         self.multi = False
 
     def continue_select_case_dialogue(self,touche):
         if touche == pygame.K_UP :
-            self.element_courant = (self.element_courant[0],self.element_courant[1],self.element_courant[2]-1)
+            self.element_courant = self.element_courant + HAUT
         elif touche == pygame.K_DOWN :
-            self.element_courant = (self.element_courant[0],self.element_courant[1],self.element_courant[2]+1)
+            self.element_courant = self.element_courant + BAS
         elif touche == pygame.K_LEFT :
-            self.element_courant = (self.element_courant[0],self.element_courant[1]-1,self.element_courant[2])
+            self.element_courant = self.element_courant + GAUCHE
         elif touche == pygame.K_RIGHT :
-            self.element_courant = (self.element_courant[0],self.element_courant[1]+1,self.element_courant[2])
+            self.element_courant = self.element_courant + DROITE
         elif touche == pygame.K_SPACE and self.element_courant in self.cibles:
             self.cible = [self.element_courant]
         elif touche == pygame.K_RETURN and self.cible != [] :
@@ -745,7 +800,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
     def start_select_cible_case_parchemin(self,magie):
         self.methode_courante = self.continue_select_case_parchemin
         self.cibles = self.controleur.get_cibles_potentielles_cases(magie,self)
-        self.element_courant = (self.position[0],self.position[1],self.position[2]) #Je recycle
+        self.element_courant = self.position #Je recycle
         self.cible = []
         self.affichage.draw_magie_case(self)
         self.temps = magie.temps
@@ -754,13 +809,13 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
 
     def continue_select_case_parchemin(self,touche):
         if touche == pygame.K_UP :
-            self.element_courant = (self.element_courant[0],self.element_courant[1],self.element_courant[2]-1)
+            self.element_courant = self.element_courant + HAUT
         elif touche == pygame.K_DOWN :
-            self.element_courant = (self.element_courant[0],self.element_courant[1],self.element_courant[2]+1)
+            self.element_courant = self.element_courant + BAS
         elif touche == pygame.K_LEFT :
-            self.element_courant = (self.element_courant[0],self.element_courant[1]-1,self.element_courant[2])
+            self.element_courant = self.element_courant + GAUCHE
         elif touche == pygame.K_RIGHT :
-            self.element_courant = (self.element_courant[0],self.element_courant[1]+1,self.element_courant[2])
+            self.element_courant = self.element_courant + DROITE
         elif touche == pygame.K_SPACE and self.element_courant in self.cibles:
             if self.multi : #Si jamais une magie peut cibler plusieurs cibles.
                 if self.element_courant in self.cible :

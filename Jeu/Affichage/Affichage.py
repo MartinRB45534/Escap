@@ -283,9 +283,6 @@ class Texte(Affichable):
         self.position = position
         self.texte=texte
 
-    def set_tailles(self,tailles):
-        self.tailles = tailles
-
     def affiche(self,screen,frame=1,frame_par_tour=1):
         texte=POLICE20.render(self.texte,True,(0,0,0))
         screen.blit(texte,self.position)

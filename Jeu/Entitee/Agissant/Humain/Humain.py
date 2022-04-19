@@ -89,20 +89,18 @@ class Humain(Agissant,Interactif,Entitee_superieure):
     def debut_tour(self):
         Agissant.debut_tour(self)
         if self.antagonise_neutres:
-            for colonne in self.vue:
-                for case in colonne:
-                    for entitee in case[6]:
-                        if not self.controleur.est_item(entitee):
-                            if not entitee in self.controleur.get_esprit(self.esprit).ennemis.keys():
-                                self.insurge(entitee,0.01,0)
+            for case in self.vue:
+                for entitee in case[6]:
+                    if not self.controleur.est_item(entitee):
+                        if not entitee in self.controleur.get_esprit(self.esprit).ennemis.keys():
+                            self.insurge(entitee,0.01,0)
         elif self.antagonise_offensifs:
-            for colonne in self.vue:
-                for case in colonne:
-                    for ID_entitee in case[6]:
-                        entitee = self.controleur.get_entitee(ID_entitee)
-                        if issubclass(entitee.get_classe(),Agissant):
-                            if self.ID in self.controleur.get_esprit(entitee.esprit).ennemis.keys():
-                                self.insurge(ID_entitee,0.01,0)
+            for case in self.vue:
+                for ID_entitee in case[6]:
+                    entitee = self.controleur.get_entitee(ID_entitee)
+                    if issubclass(entitee.get_classe(),Agissant):
+                        if self.ID in self.controleur.get_esprit(entitee.esprit).ennemis.keys():
+                            self.insurge(ID_entitee,0.01,0)
 
     def get_skin(self):
         if self.etat == "vivant":

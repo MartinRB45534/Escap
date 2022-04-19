@@ -100,7 +100,7 @@ class Magie_soin_de_zone(Cible_case):
     def action(self,lanceur):
         poss = lanceur.controleur.get_pos_touches(self.cible,self.portee)
         for pos in poss:
-            lanceur.controleur.labs[pos[0]].matrice_cases[pos[1]][pos[2]].effets.append(Soin_case(self.gain_pv,lanceur.ID))
+            lanceur.controleur[pos].effets.append(Soin_case(self.gain_pv,lanceur.ID))
 
     def get_image(self):
         return SKIN_MAGIE_SOIN_ZONE

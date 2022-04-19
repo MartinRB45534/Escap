@@ -20,7 +20,7 @@ class Attaque(One_shot):
         position = controleur.get_entitee(self.responsable).get_position()
         positions_touches = controleur.get_pos_touches(position,self.portee,self.propagation,self.direction,"alliés",self.responsable)
         for position_touche in positions_touches:
-            controleur.labs[position[0]].matrice_cases[position_touche[1]][position_touche[2]].effets.append(Attaque_case(self.responsable,self.degats,self.element,self.distance,self.direction,self.autre,self.taux_autre))
+            controleur[position_touche].effets.append(Attaque_case(self.responsable,self.degats,self.element,self.distance,self.direction,self.autre,self.taux_autre))
 
 class Attaque_magique(Attaque):
     """Une attaque créée par magie."""
@@ -31,7 +31,7 @@ class Attaque_magique(Attaque):
         position = controleur.get_entitee(self.responsable).get_position()
         positions_touches = controleur.get_pos_touches(position,self.portee,self.propagation,self.direction,"tout",self.responsable)
         for position_touche in positions_touches:
-            controleur.labs[position[0]].matrice_cases[position_touche[1]][position_touche[2]].effets.append(Attaque_case(self.responsable,self.degats,self.element,self.distance,self.direction,self.autre,self.taux_autre))
+            controleur[position_touche].effets.append(Attaque_case(self.responsable,self.degats,self.element,self.distance,self.direction,self.autre,self.taux_autre))
 
 class Attaque_decentree(Attaque_magique):
     """Une attaque magique qui affecte une zone plus ou moins éloignée."""
@@ -42,7 +42,7 @@ class Attaque_decentree(Attaque_magique):
     def action(self,controleur):
         positions_touches = controleur.get_pos_touches(self.position,self.portee,self.propagation,self.direction,"tout",self.responsable)
         for position_touche in positions_touches:
-            controleur.labs[self.position[0]].matrice_cases[position_touche[1]][position_touche[2]].effets.append(Attaque_case(self.responsable,self.degats,self.element,self.distance,self.direction,self.autre,self.taux_autre))
+            controleur[position_touche].effets.append(Attaque_case(self.responsable,self.degats,self.element,self.distance,self.direction,self.autre,self.taux_autre))
 
 class Attaque_delayee(Attaque_magique):
     """Une attaque qui se fera plus tard."""
@@ -60,7 +60,7 @@ class Attaque_decentree_delayee(Attaque_decentree,Attaque_delayee):
     def action(self,controleur):
         positions_touches = controleur.get_pos_touches(self.position,self.portee,self.propagation,self.direction,"tout",self.responsable)
         for position_touche in positions_touches:
-            controleur.labs[self.position[0]].matrice_cases[position_touche[1]][position_touche[2]].effets.append(Attaque_case_delayee(self.delai,self.responsable,self.degats,self.element,self.distance,self.direction,self.autre,self.taux_autre))
+            controleur[position_touche].effets.append(Attaque_case_delayee(self.delai,self.responsable,self.degats,self.element,self.distance,self.direction,self.autre,self.taux_autre))
 
 class Attaque_case(One_shot):
     """L'effet d'attaque dans sa version intermédiaire. Créée par une attaque (version générale), chargé d'attacher une attaque particulière aux agissants de la case, en passant d'abord les défenses de la case. Attachée à la case."""
@@ -75,8 +75,8 @@ class Attaque_case(One_shot):
         self.taux_autre = taux_autre
         self.distance = distance
 
-    def action(self,case,position):
-        victimes_potentielles = case.controleur.trouve_agissants_courants(position)
+    def action(self,case):
+        victimes_potentielles = case.controleur.trouve_agissants_courants(case.position)
         for victime_potentielle in victimes_potentielles:
             if not victime_potentielle in case.controleur.get_esprit(case.controleur.get_entitee(self.responsable).esprit).get_corps():
                 if self.autre == None :
@@ -84,9 +84,9 @@ class Attaque_case(One_shot):
                 elif self.autre == "piercing":
                     case.controleur.get_entitee(victime_potentielle).effets.append(Attaque_percante(self.responsable,self.degats,self.element,self.distance,self.direction,self.taux_autre))
 
-    def execute(self,case,position):
+    def execute(self,case):
         if self.phase == "démarrage":
-            self.action(case,position)
+            self.action(case)
             self.termine()
 
     def get_skin(self):
@@ -109,13 +109,13 @@ class Attaque_case_delayee(Attaque_case,Delaye):
         self.affiche = False
         self.delai=delai
 
-    def execute(self,case,position):
+    def execute(self,case):
         if self.phase == "démarrage":
             if self.delai > 0:
                 self.delai -= 1
             else:
                 self.affiche = True
-                self.action(case,position)
+                self.action(case)
                 self.termine()
 
 class Attaque_particulier(One_shot):

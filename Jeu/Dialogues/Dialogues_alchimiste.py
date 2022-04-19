@@ -1,4 +1,4 @@
-global REPLIQUES_ALCHIMISTE
+# global REPLIQUES_ALCHIMISTE
 REPLIQUES_ALCHIMISTE = {
     "dialogue1phrase1":"Ho ho ho ! Y aurait-il d'autres humains coincés ici ?",
     "dialogue1reponse1.1":"Oui, tu veux nous rejoindre ?",

@@ -23,7 +23,7 @@ class Entitee:
         return self.position
 
     def get_direction(self):
-        return HAUT
+        return DIRECTIONS[0]
 
     def get_description(self,observation):
         return ["Une entitee","N'aurait pas dû être instanciée.","Probablement une erreur..."]

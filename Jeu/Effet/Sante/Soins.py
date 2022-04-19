@@ -45,8 +45,8 @@ class Soin_case(On_post_action):
         self.cible = cible
         self.affiche = True
 
-    def action(self,case,position):
-        cibles_potentielles = case.controleur.trouve_agissants_courants(position)
+    def action(self,case):
+        cibles_potentielles = case.controleur.trouve_agissants_courants(case.position)
         for cible_potentielle in cibles_potentielles:
             if self.responsable == 0: #Pas de responsable. Sérieusement ?
                 case.controleur.get_entitee(cible_potentielle).effets.append(Soin(self.responsable,self.gain_pv))
@@ -59,9 +59,9 @@ class Soin_case(On_post_action):
                 elif self.cible == "neutres" and not cible_potentielle in case.controleur.get_esprit(case.controleur.get_entitee(self.responsable).esprit).get_ennemis():
                     case.controleur.get_entitee(cible_potentielle).effets.append(Soin(self.responsable,self.gain_pv))
 
-    def execute(self,case,position):
+    def execute(self,case):
         if self.phase == "démarrage" :
-            self.action(case,position)
+            self.action(case)
             self.termine()
 
 class Soin(On_fin_tour):

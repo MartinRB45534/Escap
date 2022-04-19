@@ -1,13 +1,13 @@
 from Jeu.Constantes import *
 from Jeu.Effet.Effets import *
 from Jeu.Labyrinthe.Case import *
+from Jeu.Labyrinthe.Structure_spatiale.Espace import *
 
-class Patern:
-    def __init__(self,position,largeur,hauteur,entrees=[(0,1,0)],codes=[],vide = True,durete = 1,niveau = 1,element = TERRE):
+class Patern(Espace):
+    def __init__(self,position,decalage,entrees=[Decalage(1,0)],codes=[],vide = True,durete = 1,niveau = 1,element = TERRE):
         self.position = position
-        self.hauteur = hauteur
-        self.largeur = largeur
-        self.matrice_cases = [[Case((self.position[0],j+self.position[1],i+self.position[2]),niveau,element) for i in range(hauteur)]for j in range(largeur)]
+        self.decalage = decalage
+        self.matrice_cases = [[Case(self.position+j*DROITE+i*BAS) for i in range(decalage.y)]for j in range(decalage.x)]
         self.entrees = entrees
         self.codes = codes
         self.vide = vide
@@ -15,17 +15,38 @@ class Patern:
         self.niveau = niveau
         self.element = element
 
+    def __getitem__(self,key):
+        if isinstance(key,tuple):
+            return self[key[0]][key[1]]
+        elif isinstance(key,Decalage):
+            return self.matrice_cases[key.x][key.y]
+        elif isinstance(key,Position):
+            return self[key-self.position]
+        else:
+            return NotImplemented
+
+    def __contains__(self,item):
+        if item is None:
+            return False
+        elif isinstance(item,Position):
+            return self.converti(item) in self
+        elif isinstance(item,Decalage):
+            return 0<=item.x<self.decalage.x and 0<=item.y<self.decalage.y
+        return NotImplemented
+
+    def converti(self,position):
+        return position-self.position
+
     def post_gen_entrees(self,matrice_lab):
         """
         Fonction qui transforme les entrées en portes ou en murs vides
         """
-        
+
         for nb in range(len(self.entrees)):
-            x = self.entrees[nb][1]+self.position[1]
-            y = self.entrees[nb][2]+self.position[2]
-            case = matrice_lab[x][y]
+            pos_entree = self.position+self.entrees[nb]
+            case = matrice_lab[pos_entree.x][pos_entree.y]
             for bord in self.contraintes_cases(self.entrees[nb]):
-                mur = case.murs[bord]
+                mur = case[bord]
                 if nb < len(self.codes) :
                     if mur.get_blocage([]) != "Imp": # /!\ Nécessaire ?
                         mur.cree_porte(self.durete,self.codes[nb])
@@ -44,22 +65,32 @@ class Patern:
             la matrice de cases du labyrinthe
         et qui pre génère les cases du patern
         """
-        coordonnee_x = self.position[1]
-        coordonnee_y = self.position[2]
-        for i in range(coordonnee_x,coordonnee_x+self.largeur):
-            for j in range(coordonnee_y,coordonnee_y+self.hauteur):
-                x_pat=i-coordonnee_x
-                y_pat=j-coordonnee_y
-                #on ne doit générer que les cases au bords
-                #plus précisement on doit empêcher le générateur d'y toucher
-                if not self.case_est_une_entree((self.position[0],x_pat,y_pat)) and self.case_au_bord((self.position[0],x_pat,y_pat)):
-                    dirs_intouchables=self.contraintes_cases((self.position[0],x_pat,y_pat))
-                    for direction in dirs_intouchables:
-                        mur = matrice_lab[i][j].murs[direction]
-                        mur.interdit()
-                        mur_oppose = self.get_mur_oppose(mur,matrice_lab)
-                        if mur_oppose != None :
-                            mur_oppose.interdit()
+        for i in range(self.decalage.x):
+            if not Decalage(i,0) in self.entrees:
+                mur = matrice_lab[self.position.x+i][self.position.y][HAUT]
+                mur.interdit()
+                mur_oppose = self.get_mur_oppose(mur,matrice_lab)
+                if mur_oppose != None :
+                    mur_oppose.interdit()
+            if not Decalage(i,self.decalage.y-1) in self.entrees:
+                mur = matrice_lab[self.position.x+i][self.position.y+self.decalage.y-1][BAS]
+                mur.interdit()
+                mur_oppose = self.get_mur_oppose(mur,matrice_lab)
+                if mur_oppose != None :
+                    mur_oppose.interdit()
+        for j in range(self.decalage.y):
+            if not Decalage(0,j) in self.entrees:
+                mur = matrice_lab[self.position.x][self.position.y+j][GAUCHE]
+                mur.interdit()
+                mur_oppose = self.get_mur_oppose(mur,matrice_lab)
+                if mur_oppose != None :
+                    mur_oppose.interdit()
+            if not Decalage(self.decalage.x-1,j) in self.entrees:
+                mur = matrice_lab[self.position.x+self.decalage.x-1][self.position.y+j][DROITE]
+                mur.interdit()
+                mur_oppose = self.get_mur_oppose(mur,matrice_lab)
+                if mur_oppose != None :
+                    mur_oppose.interdit()
 
     def post_generation(self,matrice_lab):
         """
@@ -67,15 +98,15 @@ class Patern:
             la matrice de cases du labyrinthe
         et qui clear la salle
         """
-        for i in range(self.position[1],self.position[1]+self.largeur):
-            for j in range(self.position[2],self.position[2]+self.hauteur):
-                pos_pat = (self.position[0],i-self.position[1],j-self.position[2])
+        for i in range(self.decalage.x):
+            for j in range(self.decalage.y):
+                pos_pat = Position(self.position.lab,i,j)
                 #on enlève les murs intouchables
                 dirs_intouchables=[]
                 if self.case_au_bord(pos_pat):
                     dirs_intouchables=self.contraintes_cases(pos_pat)
-                for direction in [HAUT,DROITE,BAS,GAUCHE]:
-                    mur = matrice_lab[i][j].murs[direction]
+                for direction in DIRECTIONS:
+                    mur = matrice_lab[self.position.x+i][self.position.y+j][direction]
                     if direction in dirs_intouchables:
                         mur.detruit()
                         mur.construit(self.durete)
@@ -105,14 +136,14 @@ class Patern:
             les coordonnées de la case
         et qui renvoie un booléen indiquant si la case est au bord ou non
         """
-        return (position[1] == 0 or position[1] == self.largeur-1)or(position[2] == 0 or position[2] == self.hauteur-1)
+        return (position.x == 0 or position.x == self.decalage.x-1)or(position.y == 0 or position.y == self.decalage.y-1)
         
     def clear_case(self,position):
         """
         Fonction qui clear la case selectionner
         """
-        for i in range(0,4):
-            self.matrice_cases[position[1]][position[2]].casser_mur(i)
+        for i in range(4):
+            self[position].casser_mur(i)
     
     def incorporation_case(self,position):
         """
@@ -121,20 +152,18 @@ class Patern:
             et génère les murs en fonction de sa position
         """
         #on casse les murs qui ne sont pas aux extrèmes
-        if position[1]!=0:
-            self.matrice_cases[position[1]][position[2]].casser_mur(GAUCHE)
+        if position.x!=0:
+            self[position].casser_mur(GAUCHE)
             
-        if position[1]!=(self.largeur-1):
-            self.matrice_cases[position[1]][position[2]].casser_mur(DROITE)
+        if position.x!=(self.decalage.x-1):
+            self[position].casser_mur(DROITE)
 
-        if position[2]!=0:
-            self.matrice_cases[position[1]][position[2]].casser_mur(HAUT)
+        if position.y!=0:
+            self[position].casser_mur(HAUT)
             
-        if position[2]!=(self.hauteur-1):
-            self.matrice_cases[position[1]][position[2]].casser_mur(BAS)
+        if position.y!=(self.decalage.y-1):
+            self[position].casser_mur(BAS)
 
-    
-    
     def integration_case(self,position,matrice_lab):
         """
         Fonction qui prend en enetrées:
@@ -147,7 +176,7 @@ class Patern:
         bords=self.case_bord(position,len(matrice_lab),len(matrice_lab[0]))
 
         for bord in bords:
-            mur = matrice_lab[position[1]][position[2]].murs[bord]
+            mur = matrice_lab[position.x][position.y][bord]
             mur_oppose=self.get_mur_oppose(mur,matrice_lab)
             if mur_oppose!=None and not(mur.is_ferme()):
                 mur.briser()
@@ -162,16 +191,16 @@ class Patern:
         bords=[]
         
         #on ajoute les murs qui ne sont pas aux extrèmes
-        if position[1]!=0:
+        if position.x!=0:
             bords+=[GAUCHE]
             
-        if position[1]!=(largeur_mat-1):
+        if position.x!=(largeur_mat-1):
             bords+=[DROITE]
 
-        if position[2]!=0:
+        if position.y!=0:
             bords+=[HAUT]
             
-        if position[2]!=(hauteur_mat-1):
+        if position.y!=(hauteur_mat-1):
             bords+=[BAS]
 
         return bords
@@ -188,16 +217,16 @@ class Patern:
         #pour l'instant les contraintes se limites justes au bords de la matrice
         bords=[]
         
-        if position[1]==0:
+        if position.x==0:
             bords+=[GAUCHE]
             
-        if position[1]==(self.largeur-1):
+        if position.x==(self.decalage.x-1):
             bords+=[DROITE]
 
-        if position[2]==0:
+        if position.y==0:
             bords+=[HAUT]
             
-        if position[2]==(self.hauteur-1):
+        if position.y==(self.decalage.y-1):
             bords+=[BAS]
 
         return bords
@@ -209,10 +238,10 @@ class Patern:
             la matrice de cases du labyrinthe
         et qui copie les cases du patern dans le labyrinthe
         """
-        for i in range(position[1],position[1]+self.largeur):
-            for j in range(position[2],position[2]+self.hauteur):
-                matrice_lab[i][j]=self.matrice_cases[i-position[1]][j-position[2]]
-                self.integration_case((self.position[0],i,j),matrice_lab)
+        for i in range(self.decalage.x):
+            for j in range(self.decalage.y):
+                matrice_lab[position.x+i][position.y+j]=self.matrice_cases[i][j]
+                self.integration_case(self.position+i*DROITE+j*BAS,matrice_lab)
         return matrice_lab
 
     def get_pos(self):
@@ -222,11 +251,10 @@ class Patern:
         cible = mur.get_cible()
         mur_oppose = None
         if cible != None:
-            if cible[0] == self.position[0]:
-                for mur_potentiel in matrice_lab[cible[1]][cible[2]].murs :
+            if cible in self.position:
+                for mur_potentiel in matrice_lab[cible.x][cible.y].murs :
                     cible_potentielle = mur_potentiel.get_cible()
-                    if cible_potentielle != None:
-                        if cible_potentielle[0] == self.position[0]:
-                            if mur in matrice_lab[cible_potentielle[1]][cible_potentielle[2]].murs : #Les murs sont réciproques (attention deux murs d'une même case ne peuvent pas mener à la même autre case !
-                                mur_oppose = mur_potentiel
+                    if cible_potentielle in self.position:
+                        if mur in matrice_lab[cible_potentielle.x][cible_potentielle.y].murs : #Les murs sont réciproques (attention deux murs d'une même case ne peuvent pas mener à la même autre case !
+                            mur_oppose = mur_potentiel
         return mur_oppose

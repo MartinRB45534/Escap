@@ -24,7 +24,7 @@ class Item(Mobile):
         if self.direction != None:
             return self.direction
         else:
-            return HAUT
+            return DIRECTIONS[0]
 
     def get_vitesse(self):
         vitesse = self.vitesse

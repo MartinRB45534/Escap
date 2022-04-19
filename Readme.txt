@@ -34,7 +34,7 @@ Deuxi�me �tape : depuis le shell, mains est une variable globale qui liste t
 	- mains[0][2].controleur.esprits donne le dictionnaire des esprits, et :
 	- mains[0][2].controleur.entitees[ID].esprit donne le nom de l'esprit de l'entit�e correspondant � ID, donc :
 	- mains[0][2].controleur.esprits[mains[0][2].controleur.entitees[ID].esprit].ennemis pour le dictionnaire des ennemis de l'esprit de l'entit�e correspondant � l'identifiant ID
-	- mains[0][2].controleur.labs[mains[0][2].controleur.entitees[ID].position[0]].matrice_cases[mains[0][2].controleur.entitees[ID].position[1]][mains[0][2].controleur.entitees[ID].position[2]].murs[mains[0][2].controleur.entitees[ID].dir_regard].effets donnerai la liste des effets du mur juste en face de l'entit�e correspondant � l'identifiant ID (probablement un Teleport qui conduit � la case voisine et �ventuellement un Mur ou une Porte qui bloque le passage)
+	- mains[0][2].controleur[mains[0][2].controleur.entitees[ID].position,mains[0][2].controleur.entitees[ID].dir_regard].effets donnerai la liste des effets du mur juste en face de l'entit�e correspondant � l'identifiant ID (probablement un Teleport qui conduit � la case voisine et �ventuellement un Mur ou une Porte qui bloque le passage)
 	- mains[0][2].controleur.entitees_courantes pour la liste des IDs des entit�es en activit�, et
 	- mains[0][2].controleur.labs_courants pour la liste des noms des labyrinthe actifs
 Honn�tement la modification de position est la seule chose utile de ce que je viens de citer, d�s qu'on commence � ramener des entitees � la vie �a s'appelle tricher... Attention quand m�me quand on se rend dans un �tage inactif, penser � l'activer ou toute interraction avec l'environnement (les monstres ou les humains, par exemple) fera planter le jeu (prendre l'escalier pour sortir de l'�tage et y revenir r�active l'�tage, sinon mains[0][2].controleur.active_lab(nom_du_lab_�_activer) en rempla�ant nom_du_lab_�_activer par le nom du labyrinthe � activer.
@@ -55,6 +55,8 @@ Troisi�me �tape : mains[0][2].boucle() et le jeu reprend imm�diatement, at
 
 
 À mon attention :
+
+/!\ TODO: revoir la génération du labyrinthe
 
 /!\ Modifier les rôles qui se réfèrent directement au fichier de constantes de leur magie. Remplacer par caste() comme les attaquants magiques
 
@@ -113,6 +115,9 @@ Les ennemis
 D'autres choses ?
 
 
+
+Un bon nombre des éléments de l'affichage correspondent à un objet (inventaire, classe).
+Est-ce que les deux sont liés pour que l'objet puisse modifier son affichage sans tout changer ?
 
 
 
@@ -257,6 +262,8 @@ Travail à faire :
 - Création (ombriuls)
 (- Modifier la fuite pour ne fuir que si un allié est accessible)
 - Équilibrer ! (tours par secondes, combats, jeter un oeil à l'XP obtenu)
+
+Note : sans la peureuse, les humains ne savent pas changer d'étage !
 
 TODO (global) :
 Étages (0/100)

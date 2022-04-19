@@ -1,4 +1,4 @@
-global REPLIQUES_MARCHAND
+# global REPLIQUES_MARCHAND
 REPLIQUES_MARCHAND = {
     "dialogue1phrase1":"Vous avez besoin de quelque chose ?",
     "dialogue1reponse1.1":"Vous pouvez faire quelque chose pour moi ?",

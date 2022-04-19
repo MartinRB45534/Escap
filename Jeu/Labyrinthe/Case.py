@@ -6,7 +6,7 @@ class Case:
     def __init__(self,position,niveau = 1,element = TERRE,effets = [],opacite = 1):
         # Par défaut, pas de murs.
         self.position = position
-        self.murs = [Mur([Teleport((position[0],position[1],position[2]-1))]),Mur([Teleport((position[0],position[1]+1,position[2]))]),Mur([Teleport((position[0],position[1],position[2]+1))]),Mur([Teleport((position[0],position[1]-1,position[2]))])]
+        self.murs = [Mur([Teleport(position+direction)]) for direction in DIRECTIONS]
         self.opacite = opacite
         self.opacite_bonus = 0
         self.niveau = niveau
@@ -25,6 +25,12 @@ class Case:
         elif self.element == OMBRE:
             self.effets.append(Ombre_permanente(self.niveau,self.niveau/2))
         self.controleur = None
+
+    def __getitem__(self,key):
+        return self.murs[key]
+
+    def __setitem__(self,key,value):
+        self.murs[key] = value
 
     #Découvrons le déroulé d'un tour, avec case-chan :
 
@@ -84,7 +90,7 @@ class Case:
     def veut_passer(self,intrus,direction):
         """Fonction qui tente de faire passer une entitée.
            Se réfère au mur compétent, qui gère tout."""
-        self.murs[direction].veut_passer(intrus)
+        self[direction].veut_passer(intrus)
 
     def step_out(self,entitee):
         for effet in self.effets:
@@ -97,12 +103,12 @@ class Case:
                 effet.execute(entitee) #On agit sur les agissants qui arrivent (pièges, téléportation, etc.)
 
     #Tout le monde a fini de se déplacer.
-    def post_action(self,position):
+    def post_action(self):
         self.opacite_bonus = 0 # On reset ça à chaque tour, sinon ça va devenir tout noir
         self.code = 0
         if len(self.effets) == 1: #On a un seul effet ! L'effet d'aura.
             if self.element != TERRE: #Les auras de terre sont juste là pour embêter les autres de toute façon
-                self.effets[0].execute(self,position)
+                self.effets[0].execute(self)
             else :
                 self.code += 1
         else:
@@ -126,19 +132,19 @@ class Case:
                 elif isinstance(effet,On_attack):
                     on_attaques.append(effet)
                 elif (isinstance(effet,Attaque_case_delayee) and effet.delai > 0):
-                    effet.execute(self,position) #On diminue le délai
+                    effet.execute(self) #On diminue le délai
                 elif isinstance(effet,Attaque_case):
                     attaques.append(effet)
                 elif isinstance(effet,On_post_action): #Les auras non-élémentales sont aussi des On_post_action
-                    effet.execute(self,position)
+                    effet.execute(self)
 
             for aura in auras[IDmax]:
-                aura.execute(self,position)
+                aura.execute(self)
 
             for attaque in attaques:
                 for protection in on_attaques:
                     protection.execute(attaque)
-                attaque.execute(self,position)
+                attaque.execute(self)
 
     def fin_tour(self):
         for i in range(len(self.effets)-1,-1,-1) :
@@ -165,56 +171,56 @@ class Case:
         """
         Fonction qui casse le mur dans la direction indiquée
         """
-        self.murs[direction].brise()
+        self[direction].brise()
 
     def construire_mur(self,direction,durete):
         """
         Fonction qui construit le mur dans la direction indiquée
         """
-        self.murs[direction].construit(durete)
+        self[direction].construit(durete)
 
     def interdire_mur(self,direction):
         """
         Fonction qui construit le mur impassable dans la direction indiquée
         """
-        self.murs[direction].interdit()
+        self[direction].interdit()
 
     def mur_plein(self,direction):
         """
         Fonction qui indique si le mur indiquée par la direction est plein ou non
         """
-        return self.murs[direction].is_ferme()
+        return self[direction].is_ferme()
 
     def acces(self,direction,clees=[]):
-        return not(self.murs[direction].is_ferme(clees)) and self.murs[direction].get_cible()
+        return not(self[direction].is_ferme(clees)) and self[direction].get_cible()
 
     def murs_pleins(self):
         directions = []
-        for direction in [HAUT,DROITE,BAS,GAUCHE]:
+        for direction in DIRECTIONS:
             if self.mur_plein[direction]:
                 directions.append(direction)
         return directions
 
     def get_mur_dir(self,direction):
-        return self.murs[direction]
+        return self[direction]
 
     def get_murs(self):
         return self.murs
 
     def get_mur_haut(self):
-        return self.murs[0]
+        return self[0]
 
     def get_mur_droit(self):
-        return self.murs[1]
+        return self[1]
 
     def get_mur_bas(self):
-        return self.murs[2]
+        return self[2]
 
     def get_mur_gauche(self):
-        return self.murs[3]
+        return self[3]
 
     def toString(self):
-        return "haut "+str(self.murs[0].get_etat())+" droite "+str(self.murs[1].get_etat())+" bas "+str(self.murs[2].get_etat())+" gauche "+str(self.murs[3].get_etat())+"  "
+        return "haut "+str(self[0].get_etat())+" droite "+str(self[1].get_etat())+" bas "+str(self[2].get_etat())+" gauche "+str(self[3].get_etat())+"  "
 
     def get_opacite(self):
         return self.opacite + self.opacite_bonus
@@ -230,7 +236,7 @@ class Case:
                  0, #Pour les autres trajets (pour calculer de façon unique, effacé avant chaque calcul)
                  False],
                 self.calcule_code(), #Le code correspondant aux auras et autres effets
-                [self.murs[i].get_cible_ferme(clees) for i in range(4)], #Les murs et leur traversabilité pour l'agissant
+                [self[i].get_cible_ferme(clees) for i in DIRECTIONS], #Les murs et leur traversabilité pour l'agissant
                 [], #Pour stocker les entitées
                 self.get_codes_effets(), #Pour stocker les effets (attaques delayées)
                 self.repoussante] #Pour savoir si on peut y rester

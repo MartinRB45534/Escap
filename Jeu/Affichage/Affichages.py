@@ -1,3 +1,4 @@
+from turtle import pos
 from Jeu.Constantes import *
 from Jeu.Affichage.Affichage import *
 from Jeu.Skins.Skins import *
@@ -174,7 +175,7 @@ class Old_affichage:
     def dessine_zones(self,joueur=None):
         self.screen.fill((0,0,0))
         if joueur != None:
-            emplacement = joueur.position[0]
+            emplacement = joueur.position.lab
             if joueur.controleur.pause:
                 emplacement += " (en pause)"
             curseur = joueur.curseur
@@ -830,7 +831,7 @@ class Old_affichage:
                     marge_haut += 20
 
         if curseur == "carré":
-            self.observe(joueur,joueur.position,range(4)[joueur.dir_regard-2],(self.position_debut_x_rectangle_2+15,self.position_debut_y_rectangles_et_carre+15,300,400))
+            self.observe(joueur,joueur.position,joueur.dir_regard+2,(self.position_debut_x_rectangle_2+15,self.position_debut_y_rectangles_et_carre+15,300,400))
 
     def dessine_droite_dialogue(self,joueur): #La fonction qui écrit les dialogues à droite
         #Dans un jeu parfait, on aurait une image de l'interlocuteur au dessus des répliques
@@ -1052,10 +1053,10 @@ class Old_affichage:
     def dessine_lab(self,joueur): #La fonction qui dessine le carré au centre. Elle affiche le labyrinthe vu par le joueur, ses occupants, et tout ce que le joueur est capable de percevoir.
         vue = joueur.vue
         position = joueur.get_position()
-        visible_x = [len(vue)-1,0]
-        visible_y = [len(vue[0])-1,0]
-        for i in range(len(vue)):
-            for j in range(len(vue[0])):
+        visible_x = [vue.decalage.x-1,0]
+        visible_y = [vue.decalage.y-1,0]
+        for i in range(vue.decalage.x):
+            for j in range(vue.decalage.y):
                 if vue[i][j][1] > 0:
                     if i < visible_x[0]:
                         visible_x[0] = i
@@ -1065,9 +1066,9 @@ class Old_affichage:
                         visible_y[0] = j
                     if j > visible_y[1]:
                         visible_y[1] = j
-        distance = max(position[1]-visible_x[0],visible_x[1]-position[1],position[2]-visible_y[0],visible_y[1]-position[2]) + 1 #On cherche à déterminer le carré qui comprend toutes les cases utiles de la vue
-        vue_x = position[1] - distance
-        vue_y = position[2] - distance
+        distance = max(position.x-visible_x[0],visible_x[1]-position.x,position.y-visible_y[0],visible_y[1]-position.y) + 1 #On cherche à déterminer le carré qui comprend toutes les cases utiles de la vue
+        vue_x = position.x - distance
+        vue_y = position.y - distance
         nb_cases = distance*2 + 1
         taille_case = int(self.hauteur_exploitable // nb_cases)
         hauteur_exploitee = taille_case * nb_cases
@@ -1076,7 +1077,7 @@ class Old_affichage:
         for j in range(nb_cases):
             marge_gauche = marge + self.position_debut_x_carre
             for i in range(nb_cases):
-                if 0 <= vue_x + i < len(vue) and 0 <= vue_y + j < len(vue[0]):
+                if 0 <= vue_x + i < vue.decalage.x and 0 <= vue_y + j < vue.decalage.y:
                     self.affiche(joueur,vue[vue_x + i][vue_y + j],(marge_gauche,marge_haut),taille_case)
                 else:
                     SKIN_BROUILLARD.dessine_toi(self.screen,(marge_gauche,marge_haut),taille_case)
@@ -1086,10 +1087,10 @@ class Old_affichage:
     def dessine_lab_magie(self,joueur):
         vue = joueur.vue
         position = joueur.get_position()
-        visible_x = [len(vue)-1,0]
-        visible_y = [len(vue[0])-1,0]
-        for i in range(len(vue)):
-            for j in range(len(vue[0])):
+        visible_x = [vue.decalage.x-1,0]
+        visible_y = [vue.decalage.y-1,0]
+        for i in range(vue.decalage.x):
+            for j in range(vue.decalage.y):
                 if vue[i][j][1] > 0:
                     if i < visible_x[0]:
                         visible_x[0] = i
@@ -1099,9 +1100,9 @@ class Old_affichage:
                         visible_y[0] = j
                     if j > visible_y[1]:
                         visible_y[1] = j
-        distance = max(position[1]-visible_x[0],visible_x[1]-position[1],position[2]-visible_y[0],visible_y[1]-position[2]) + 1 #On cherche à déterminer le carré qui comprend toutes les cases utiles de la vue
-        vue_x = position[1] - distance
-        vue_y = position[2] - distance
+        distance = max(position.x-visible_x[0],visible_x[1]-position.x,position.y-visible_y[0],visible_y[1]-position.y) + 1 #On cherche à déterminer le carré qui comprend toutes les cases utiles de la vue
+        vue_x = position.x - distance
+        vue_y = position.y - distance
         nb_cases = distance*2 + 1
         taille_case = int(self.hauteur_exploitable // nb_cases)
         hauteur_exploitee = taille_case * nb_cases
@@ -2643,7 +2644,7 @@ class Old_affichage:
         """Fonction qui montre ce que voit le joueur.
            On précise la position (celle du joueur, ou la case en face de lui), la direction, et le rectangle où dessiner le résultat."""
         #/!\ Refaire en plus joli !
-        if position[0] != joueur.position[0]:
+        if position.lab != joueur.position.lab:
             print("Euh... On veut voir où la ?")
             return
         else:
@@ -2655,20 +2656,9 @@ class Old_affichage:
         # Version plus jolie :
             skins = []
             for distance in range(PROFONDEUR_DE_CHAMP): #On ne va pas plus loin que ça pour l'instant
-                case = None
-                if direction == HAUT:
-                    if position[2]-distance>=0 :
-                        case = joueur.vue[position[1]][position[2]-distance]
-                elif direction == DROITE:
-                    if position[1]+distance<len(joueur.vue):
-                        case = joueur.vue[position[1]+distance][position[2]]
-                elif direction == BAS:
-                    if position[2]+distance<len(joueur.vue[0]):
-                        case = joueur.vue[position[1]][position[2]+distance]
-                elif direction == GAUCHE:
-                    if position[1]-distance>=0 :
-                        case = joueur.vue[position[1]-distance][position[2]]
-                if case != None:
+                pos_case_centre = position + direction*distance
+                if pos_case_centre in joueur.vue:
+                    case = joueur.vue[pos_case_centre]
                     if case[1] == -1:
                         skins.append(SKINS_CASES_NOIRES_VUES[distance][0])
                     elif case[1] > 0:
@@ -2699,20 +2689,9 @@ class Old_affichage:
                                 skins.append(SKINS_ESCALIERS_HAUT_VUS[distance][0][1])
                 for ecart_ in range(distance//2+1):
                     ecart = ecart_+1
-                    case = None
-                    if direction == HAUT:
-                        if position[2]-distance>=0 and position[1]+ecart in range(len(joueur.vue)):
-                            case = joueur.vue[position[1]+ecart][position[2]-distance]
-                    elif direction == DROITE:
-                        if position[1]+distance<len(joueur.vue) and position[2]+ecart in range(len(joueur.vue[0])):
-                            case = joueur.vue[position[1]+distance][position[2]+ecart]
-                    elif direction == BAS:
-                        if position[2]+distance<len(joueur.vue[0]) and position[1]-ecart in range(len(joueur.vue)):
-                            case = joueur.vue[position[1]-ecart][position[2]+distance]
-                    elif direction == GAUCHE:
-                        if position[1]-distance>=0 and position[2]-ecart in range(len(joueur.vue[0])):
-                            case = joueur.vue[position[1]-distance][position[2]-ecart]
-                    if case != None:
+                    pos_case_droite = pos_case_centre + (direction+1)*ecart #À droite du point de vue du joueur
+                    if pos_case_droite in joueur.vue:
+                        case = joueur.vue[pos_case_droite]
                         if case[1] == -1:
                             skins.append(SKINS_CASES_NOIRES_VUES[distance][ecart])
                         elif case[1] > 0:
@@ -2733,21 +2712,10 @@ class Old_affichage:
                                     skins.append(SKINS_ESCALIERS_BAS_VUS[distance][ecart])
                                 elif traj == "escalier haut":
                                     skins.append(SKINS_ESCALIERS_HAUT_VUS[distance][ecart])
-                    ecart = -ecart
-                    case = None
-                    if direction == HAUT:
-                        if position[2]-distance>=0 and position[1]+ecart in range(len(joueur.vue)):
-                            case = joueur.vue[position[1]+ecart][position[2]-distance]
-                    elif direction == DROITE:
-                        if position[1]+distance<len(joueur.vue) and position[2]+ecart in range(len(joueur.vue[0])):
-                            case = joueur.vue[position[1]+distance][position[2]+ecart]
-                    elif direction == BAS:
-                        if position[2]+distance<len(joueur.vue[0]) and position[1]-ecart in range(len(joueur.vue)):
-                            case = joueur.vue[position[1]-ecart][position[2]+distance]
-                    elif direction == GAUCHE:
-                        if position[1]-distance>=0 and position[2]-ecart in range(len(joueur.vue[0])):
-                            case = joueur.vue[position[1]-distance][position[2]-ecart]
-                    if case != None:
+                    pos_case_droite = pos_case_centre + (direction-1)*ecart #À droite du point de vue du joueur
+                    if pos_case_droite in joueur.vue:
+                        case = joueur.vue[pos_case_droite]
+                        ecart = -ecart
                         if case[1] == -1:
                             skins.append(SKINS_CASES_NOIRES_VUES[distance][ecart])
                         elif case[1] > 0:
@@ -2772,7 +2740,7 @@ class Old_affichage:
             for skin in skins:
                 skin.dessine_toi(self.screen,(x,y),(largeur,hauteur))
 
-            for ID in joueur.vue[position[1]][position[2]][6]:
+            for ID in joueur.vue[position][6]:
                 if ID < 11:
                     entitee = joueur.controleur.get_entitee(ID)
                     if issubclass(entitee.get_classe(),Agissant):
@@ -2786,21 +2754,21 @@ class Old_affichage:
             SKIN_BROUILLARD.dessine_toi(self.screen,position,taille)
         elif vue[1]==-1: #On a affaire à un case accessible mais pas vue
             SKIN_BROUILLARD.dessine_toi(self.screen,position,taille)
-            if vue[0][2] > 0:
+            if vue[0].y > 0:
                 if vue[5][HAUT][0]:
-                    if joueur.vue[vue[0][1]][vue[0][2]-1][1]>0:
+                    if joueur.vue[vue[0].x][vue[0].y-1][1]>0:
                         SKIN_MUR_BROUILLARD.dessine_toi(self.screen,position,taille,1,1,HAUT)
-            if vue[0][1] < len(joueur.vue) - 1:
+            if vue[0].x < len(joueur.vue) - 1:
                 if vue[5][DROITE][0]:
-                    if joueur.vue[vue[0][1]+1][vue[0][2]][1]>0:
+                    if joueur.vue[vue[0].x+1][vue[0].y][1]>0:
                         SKIN_MUR_BROUILLARD.dessine_toi(self.screen,position,taille,1,1,DROITE)
-            if vue[0][2] < len(joueur.vue[0]) -1:
+            if vue[0].y < len(joueur.vue[0]) -1:
                 if vue[5][BAS][0]:
-                    if joueur.vue[vue[0][1]][vue[0][2]+1][1]>0:
+                    if joueur.vue[vue[0].x][vue[0].y+1][1]>0:
                         SKIN_MUR_BROUILLARD.dessine_toi(self.screen,position,taille,1,1,BAS)
-            if vue[0][1] > 0:
+            if vue[0].x > 0:
                 if vue[5][GAUCHE][0]:
-                    if joueur.vue[vue[0][1]-1][vue[0][2]][1]>0:
+                    if joueur.vue[vue[0].x-1][vue[0].y][1]>0:
                         SKIN_MUR_BROUILLARD.dessine_toi(self.screen,position,taille,1,1,GAUCHE)
         else:
             if vue[4]==0: #On teste le code de la case pour déterminer son image
@@ -2822,7 +2790,7 @@ class Old_affichage:
             elif vue[4]==8: #On teste le code de la case pour déterminer son image
                 SKIN_CASE_8.dessine_toi(self.screen,position,taille) #La case en premier, donc en bas
             case = joueur.controleur.get_case(vue[0])
-            for i in range(4):
+            for i in DIRECTIONS:
                 mur = case.get_mur_dir(i)
                 for effet in mur.effets:
                     if effet.affiche:
@@ -2902,11 +2870,11 @@ class Faux_affichage(Conteneur,Old_affichage):
     def dessine_lab(self,joueur): #La fonction qui dessine le carré au centre. Elle affiche le labyrinthe vu par le joueur, ses occupants, et tout ce que le joueur est capable de percevoir.
         vue = joueur.vue
         position = joueur.get_position()
-        visible_x = [len(vue)-1,0]
-        visible_y = [len(vue[0])-1,0]
-        for i in range(len(vue)):
-            for j in range(len(vue[0])):
-                if vue[i][j][1] > 0:
+        visible_x = [vue.decalage.x-1,0]
+        visible_y = [vue.decalage.y-1,0]
+        for i in range(vue.decalage.x):
+            for j in range(vue.decalage.y):
+                if vue[Decalage(i,j)][1] > 0:
                     if i < visible_x[0]:
                         visible_x[0] = i
                     if i > visible_x[1]:
@@ -2915,9 +2883,9 @@ class Faux_affichage(Conteneur,Old_affichage):
                         visible_y[0] = j
                     if j > visible_y[1]:
                         visible_y[1] = j
-        distance = max(position[1]-visible_x[0],visible_x[1]-position[1],position[2]-visible_y[0],visible_y[1]-position[2]) + 1 #On cherche à déterminer le carré qui comprend toutes les cases utiles de la vue
-        vue_x = position[1] - distance
-        vue_y = position[2] - distance
+        distance = max(position.x-visible_x[0],visible_x[1]-position.x,position.y-visible_y[0],visible_y[1]-position.y) + 1 #On cherche à déterminer le carré qui comprend toutes les cases utiles de la vue
+        vue_x = position.x - distance
+        vue_y = position.y - distance
         nb_cases = distance*2 + 1
         taille_case = int(self.hauteur_exploitable // (nb_cases-1))
         taille_affichee = nb_cases* int(self.hauteur_exploitable // nb_cases)
@@ -2937,10 +2905,10 @@ class Faux_affichage(Conteneur,Old_affichage):
     def dessine_lab_magie(self,joueur):
         vue = joueur.vue
         position = joueur.get_position()
-        visible_x = [len(vue)-1,0]
-        visible_y = [len(vue[0])-1,0]
-        for i in range(len(vue)):
-            for j in range(len(vue[0])):
+        visible_x = [vue.decalage.x-1,0]
+        visible_y = [vue.decalage.y-1,0]
+        for i in range(vue.decalage.x):
+            for j in range(vue.decalage.y):
                 if vue[i][j][1] > 0:
                     if i < visible_x[0]:
                         visible_x[0] = i
@@ -2950,9 +2918,9 @@ class Faux_affichage(Conteneur,Old_affichage):
                         visible_y[0] = j
                     if j > visible_y[1]:
                         visible_y[1] = j
-        distance = max(position[1]-visible_x[0],visible_x[1]-position[1],position[2]-visible_y[0],visible_y[1]-position[2]) + 1 #On cherche à déterminer le carré qui comprend toutes les cases utiles de la vue
-        vue_x = position[1] - distance
-        vue_y = position[2] - distance
+        distance = max(position.x-visible_x[0],visible_x[1]-position.x,position.y-visible_y[0],visible_y[1]-position.y) + 1 #On cherche à déterminer le carré qui comprend toutes les cases utiles de la vue
+        vue_x = position.x - distance
+        vue_y = position.y - distance
         nb_cases = distance*2 + 1
         taille_case = int(self.hauteur_exploitable // nb_cases)
         hauteur_exploitee = taille_case * nb_cases
@@ -2990,8 +2958,9 @@ class Faux_lab(Affichable):
         for j in range(self.nb_cases):
             marge_gauche = self.position[0]-self.taille_case//2
             for i in range(self.nb_cases):
-                if 0 <= vue_x + i < len(self.vue) and 0 <= vue_y + j < len(self.vue[0]):
-                    self.old_affiche(screen,self.joueur,self.vue[vue_x + i][vue_y + j],(marge_gauche,marge_haut),self.taille_case)
+                pos = Decalage(vue_x+i,vue_y+j)
+                if pos in self.joueur.vue:
+                    self.old_affiche(screen,self.joueur,self.vue[pos],(marge_gauche,marge_haut),self.taille_case)
                 else:
                     SKIN_BROUILLARD.dessine_toi(screen,(marge_gauche,marge_haut),self.taille_case)
                 marge_gauche += self.taille_case
@@ -3003,22 +2972,11 @@ class Faux_lab(Affichable):
             SKIN_BROUILLARD.dessine_toi(screen,position,taille)
         elif vue[1]==-1: #On a affaire à un case accessible mais pas vue
             SKIN_BROUILLARD.dessine_toi(screen,position,taille)
-            if vue[0][2] > 0:
-                if vue[5][HAUT][0]:
-                    if joueur.vue[vue[0][1]][vue[0][2]-1][1]>0:
-                        SKIN_MUR_BROUILLARD.dessine_toi(screen,position,taille,1,1,HAUT)
-            if vue[0][1] < len(joueur.vue) - 1:
-                if vue[5][DROITE][0]:
-                    if joueur.vue[vue[0][1]+1][vue[0][2]][1]>0:
-                        SKIN_MUR_BROUILLARD.dessine_toi(screen,position,taille,1,1,DROITE)
-            if vue[0][2] < len(joueur.vue[0]) -1:
-                if vue[5][BAS][0]:
-                    if joueur.vue[vue[0][1]][vue[0][2]+1][1]>0:
-                        SKIN_MUR_BROUILLARD.dessine_toi(screen,position,taille,1,1,BAS)
-            if vue[0][1] > 0:
-                if vue[5][GAUCHE][0]:
-                    if joueur.vue[vue[0][1]-1][vue[0][2]][1]>0:
-                        SKIN_MUR_BROUILLARD.dessine_toi(screen,position,taille,1,1,GAUCHE)
+            for i in DIRECTIONS:
+                if vue[5][i][0]:
+                    pos_voisin = vue[0]+i
+                    if pos_voisin in joueur.vue and joueur.vue[pos_voisin][1]>0:
+                        SKIN_MUR_BROUILLARD.dessine_toi(screen,position,taille,1,1,i)
         else:
             if vue[4]==0: #On teste le code de la case pour déterminer son image
                 SKIN_CASE.dessine_toi(screen,position,taille) #La case en premier, donc en bas
@@ -3039,7 +2997,7 @@ class Faux_lab(Affichable):
             elif vue[4]==8: #On teste le code de la case pour déterminer son image
                 SKIN_CASE_8.dessine_toi(screen,position,taille) #La case en premier, donc en bas
             case = joueur.controleur.get_case(vue[0])
-            for i in range(4):
+            for i in DIRECTIONS:
                 mur = case.get_mur_dir(i)
                 for effet in mur.effets:
                     if effet.affiche:

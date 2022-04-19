@@ -63,7 +63,7 @@ class Menu_case(Menu):
         self.fin = False
         self.methode = methode
         self.cases = cases
-        self.element_courant = [position[0],position[1],position[2]]
+        self.element_courant = [position.lab,position.x,position.y]
 
     def controle(self,touche):
         if touche == pygame.K_UP:
@@ -94,7 +94,7 @@ class Menu_multi_case(Menu):
         self.fin = False
         self.methode = methode
         self.cases = cases
-        self.element_courant = [position[0],position[1],position[2]]
+        self.element_courant = [position.lab,position.x,position.y]
 
     def controle(self,touche):
         if touche == pygame.K_UP:

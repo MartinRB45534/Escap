@@ -1,19 +1,19 @@
 #Les stats de la magie de volcan
 
-global gain_xp_volcan
+# global gain_xp_volcan
 gain_xp_volcan = [0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1]
 
-global cout_pm_volcan
+# global cout_pm_volcan
 cout_pm_volcan = [20,18,16,15,14,13,11,10,10,10]
 
-global latence_volcan
+# global latence_volcan
 latence_volcan = [7,9,9,8,8,8,7,7,7,7]
 
-global degats_volcan
+# global degats_volcan
 degats_volcan = [10,40,60,80,100,120,140,160,180,200]
 
-global portee_volcan
+# global portee_volcan
 portee_volcan = [2,3,6,7,7,8,8,9,9,10]
 
-global delai_volcan
+# global delai_volcan
 delai_volcan = [2,2,2,2,2,1,1,1,1,1]

@@ -1,6 +1,6 @@
 import pygame
 
-global VERSION
+# global VERSION
 VERSION = "0.0.-1"
 
 def trouve_skill(classe,type_skill): #Vraiment une méthode propre au controleur ?
@@ -29,72 +29,72 @@ class Id_max:
     def set_id_max(self,n):
         self.valeur = n
 
-global POLICE20
+# global POLICE20
 POLICE20 = pygame.font.SysFont(None, 20)
 
-global POLICE40
+# global POLICE40
 POLICE40 = pygame.font.SysFont(None, 40)
 
-global ID_MAX
+# global ID_MAX
 ID_MAX = Id_max()
 
 #constantes
-global HAUT
-HAUT=0
-global DROITE
-DROITE=1
-global BAS
-BAS=2
-global GAUCHE
-GAUCHE=3
-global IN
+# global NB_DIRECTIONS
+NB_DIRECTIONS = 4
+from Jeu.Labyrinthe.Structure_spatiale.Direction import *
+# global DIRECTIONS #Toutes les directions disponibles
+DIRECTIONS = [Direction(i) for i in range(NB_DIRECTIONS)]
+
+# global IN #Ne devrait, un jour, plus être nécessaire
 IN=4
-global OUT
+# global OUT
 OUT=5
 
-global TERRE
+from Jeu.Labyrinthe.Structure_spatiale.Position import *
+
+# global TERRE
 TERRE = 0
-global FEU
+# global FEU
 FEU = 1
-global GLACE
+# global GLACE
 GLACE = 2
-global OMBRE
+# global OMBRE
 OMBRE = 3
 
 #Les positions possibles du curseur :
-global RECTANGLE_G #Le rectangle gauche de l'affichage
+# global RECTANGLE_G #Le rectangle gauche de l'affichage
 RECTANGLE_G = 0
-global CARRE #Le carré au centre de l'affichage, correspond à la vue du joueur, elle a son propre sous-curseur
+# global CARRE #Le carré au centre de l'affichage, correspond à la vue du joueur, elle a son propre sous-curseur
 CARRE = 1
-global RECTANGLE_D #Le rectangle droit de l'affichage
+# global RECTANGLE_D #Le rectangle droit de l'affichage
 RECTANGLE_D = 2
 
 #Dans le rectangle gauche :
-global STATS #Les stats du joueur
+# global STATS #Les stats du joueur
 STATS = 0
-global INVENTAIRE #L'inventaire contient la liste des possessions du joueur, il a son propre sous-curseur
+# global INVENTAIRE #L'inventaire contient la liste des possessions du joueur, il a son propre sous-curseur
 INVENTAIRE = 1
-global SKILLS #Les skills tels que décrits par la classe principale du joueur, ils ont leur propre sous-curseur
+# global SKILLS #Les skills tels que décrits par la classe principale du joueur, ils ont leur propre sous-curseur
 SKILLS = 2
 
 #Dans les stats du joueur :
-global VIE #Les informations sur la vie du joueur
+# global VIE #Les informations sur la vie du joueur
 VIE = 0
-global MANA #Les informations sur le mana du joueur
+# global MANA #Les informations sur le mana du joueur
 MANA = 1
-global PRIORITE #Les informations sur la priorite du joueur (visible à partir d'un certain niveau d'observation)
+# global PRIORITE #Les informations sur la priorite du joueur (visible à partir d'un certain niveau d'observation)
 PRIORITE = 2
 
 #Dans les informations sur la vie du joueur :
-global TITRE #Le titre devant la barre de vie
+# global TITRE #Le titre devant la barre de vie
 TITRE = 0
-global BARRE #La barre de vie
+# global BARRE #La barre de vie
 BARRE = 1
-global MIN #Le 0 de la barre de vie (visible à partir d'un certain niveau d'observation)
+# global MIN #Le 0 de la barre de vie (visible à partir d'un certain niveau d'observation)
 MIN = 2
-global VAL #La valeur de la partie pleine de la barre de vie (visible à partir d'un certain niveau d'observation)
+# global VAL #La valeur de la partie pleine de la barre de vie (visible à partir d'un certain niveau d'observation)
 VAL = 3
-global MAX #La valeur maximal que peut atteindre naturellement la barre de vie (visible à partir d'un certain niveau d'observation)
+# global MAX #La valeur maximal que peut atteindre naturellement la barre de vie (visible à partir d'un certain niveau d'observation)
 MAX = 4
 
 #Les informations sur le mana du joueur sont indentiques aux informations sur la vie du joueur, mais si le joueur a des réserves de magies, un curseur indique la limite haute de quelle réserve est observée (0 pour la réserve naturelle) et quelle barre est observée (0 pour la réserve naturelle)
@@ -105,289 +105,289 @@ MAX = 4
 #Dans le rectangle droit :
 #Le rectangle droit peut contenir les informations d'un agissant séléctionné dans la vue (visible à partir d'un certain niveau d'observation, auquel cas le curseur est comme précédemment
 #Le rectangle droit peut contenir les informations d'un item séléctionné dans un inventaire (celui du joueur ou d'un agissant observé dans la vue) :
-global NOM #Les informations sur le nom de l'item
+# global NOM #Les informations sur le nom de l'item
 NOM = 0
 #Dans le cas d'une potion, on observera aussi l'effet :
-global EFFET #Les informations sur l'effet de la potion
+# global EFFET #Les informations sur l'effet de la potion
 EFFET = 1
 #Dans le cas d'un parchemin, il y aura aussi une information sur le cout d'utilisation :
-global COUT #Les informations sur le cout du parchemin
+# global COUT #Les informations sur le cout du parchemin
 COUT = 2
 #Dans le cas d'un 
 
-global ARBORESCENCE
+# global ARBORESCENCE
 ARBORESCENCE = [[RECTANGLE_G,CARRE,RECTANGLE_D],
                 [[STATS,INVENTAIRE,SKILLS],[],[]],
                 [[[VIE,MANA,PRIORITE],[],[]],[],[]],
                 [[[[TITRE,BARRE,MIN,VAL,MAX],[TITRE,BARRE,MIN,VAL,MAX],[TITRE,VAL]],[],[]],[],[]]]
 
-global CLASSIQUE
+# global CLASSIQUE
 CLASSIQUE = True
-global ELEMENTAL
+# global ELEMENTAL
 ELEMENTAL = False
 
-global physique
+# global physique
 physique = 0
-global magique
+# global magique
 magique = 1
 
-global affinite
+# global affinite
 affinite = 0
-global aura
+# global aura
 aura = 1
-global MAGIE
+# global MAGIE
 MAGIE = 2
-global elemental
+# global elemental
 elemental = 3
 
-global affinite_terre
+# global affinite_terre
 affinite_terre = 0
-global aura_terre
+# global aura_terre
 aura_terre = 1
-global magie_terre
+# global magie_terre
 magie_terre = 2
-global elemental_terre
+# global elemental_terre
 elemental_terre = 3
 
-global affinite_feu
+# global affinite_feu
 affinite_feu = 10
-global aura_feu
+# global aura_feu
 aura_feu = 11
-global magie_feu
+# global magie_feu
 magie_feu = 12
-global elemental_feu
+# global elemental_feu
 elemental_feu = 13
 
-global affinite_glace
+# global affinite_glace
 affinite_glace = 20
-global aura_glace
+# global aura_glace
 aura_glace = 21
-global magie_glace
+# global magie_glace
 magie_glace = 22
-global elemental_glace
+# global elemental_glace
 elemental_glace = 23
 
-global affinite_ombre
+# global affinite_ombre
 affinite_ombre = 30
-global aura_ombre
+# global aura_ombre
 aura_ombre = 31
-global magie_ombre
+# global magie_ombre
 magie_ombre = 32
-global elemental_ombre
+# global elemental_ombre
 elemental_ombre = 33
 
 # 0,1,2 et 3 sont déjà pris
-global REGEN_HP
+# global REGEN_HP
 REGEN_HP = 4
-global REGEN_MP
+# global REGEN_MP
 REGEN_MP = 5
-global DEFENSE
+# global DEFENSE
 DEFENSE = 6
-global LANCER
+# global LANCER
 LANCER = 7
-global ESSENCE_MAGIQUE
+# global ESSENCE_MAGIQUE
 ESSENCE_MAGIQUE = 8
-global MAGIE_INFINIE
+# global MAGIE_INFINIE
 MAGIE_INFINIE = 9
 #10,11,12 et 13 sont déjà pris
-global BOOST_PRIORITE
+# global BOOST_PRIORITE
 BOOST_PRIORITE = 14
-global BOOST_PV
+# global BOOST_PV
 BOOST_PV = 15
-global BOOST_DE_PRIORITE_D_ATTAQUE
+# global BOOST_DE_PRIORITE_D_ATTAQUE
 BOOST_DE_PRIORITE_D_ATTAQUE = 16
-global CREATION_FLECHES
+# global CREATION_FLECHES
 CREATION_FLECHES = 17
-global SORT_ACCELERATION
+# global SORT_ACCELERATION
 SORT_ACCELERATION = 18
-global BOOST_AURA
+# global BOOST_AURA
 BOOST_AURA = 19
 #20,21,22 et 23 sont déjà pris
-global BOOST_PM
+# global BOOST_PM
 BOOST_PM = 24
-global ONDE_DE_CHOC
+# global ONDE_DE_CHOC
 ONDE_DE_CHOC = 25
-global SORT_DE_SOIN_SUPERIEUR
+# global SORT_DE_SOIN_SUPERIEUR
 SORT_DE_SOIN_SUPERIEUR = 26
-global ENCHANTEMENT_FORCE
+# global ENCHANTEMENT_FORCE
 ENCHANTEMENT_FORCE = 27
-global PROJECTION_ENERGIE
+# global PROJECTION_ENERGIE
 PROJECTION_ENERGIE = 28
-global ECRASEMENT
+# global ECRASEMENT
 ECRASEMENT = 29
 #30,31,32 et 33 sont déjà pris
-global OBSERVATION
+# global OBSERVATION
 OBSERVATION = 34
-global MANIPULATION_EPEE
+# global MANIPULATION_EPEE
 MANIPULATION_EPEE = 35
-global BOOST_PORTEE
+# global BOOST_PORTEE
 BOOST_PORTEE = 36
-global SORT_VISION
+# global SORT_VISION
 SORT_VISION = 37
-global CREATION_EXPLOSIF
+# global CREATION_EXPLOSIF
 CREATION_EXPLOSIF = 38
-global ELEMENTALISTE
+# global ELEMENTALISTE
 ELEMENTALISTE = 39
-global RAYON_THERMIQUE
+# global RAYON_THERMIQUE
 RAYON_THERMIQUE = 40
-global ENCHANTEMENT_DEFENSE
+# global ENCHANTEMENT_DEFENSE
 ENCHANTEMENT_DEFENSE = 41
-global REGEN_PM
+# global REGEN_PM
 REGEN_PM = 42 #À ne surtout pas confondre avec REGEN_MP !
-global ANALYSE
+# global ANALYSE
 ANALYSE = 44
-global VOL
+# global VOL
 VOL = 45
-global BOOST_ATTAQUE_EPEE
+# global BOOST_ATTAQUE_EPEE
 BOOST_ATTAQUE_EPEE = 46
-global FLECHE_PERCANTE
+# global FLECHE_PERCANTE
 FLECHE_PERCANTE = 47
-global FLECHE_EXPLOSIVE
+# global FLECHE_EXPLOSIVE
 FLECHE_EXPLOSIVE = 48
-global IMMORTALITE
+# global IMMORTALITE
 IMMORTALITE = 49
-global BOOST_DEGATS_MAGIQUES
+# global BOOST_DEGATS_MAGIQUES
 BOOST_DEGATS_MAGIQUES = 50
-global BOOST_PRIORITE_MAGIQUE
+# global BOOST_PRIORITE_MAGIQUE
 BOOST_PRIORITE_MAGIQUE = 51
-global ENCHANTEMENT_FAIBLESSE
+# global ENCHANTEMENT_FAIBLESSE
 ENCHANTEMENT_FAIBLESSE = 52
-global EPEISTE
+# global EPEISTE
 EPEISTE = 53
-global BOOST_RESTAURATIONS
+# global BOOST_RESTAURATIONS
 BOOST_RESTAURATIONS = 54
-global MANIPULATION_BOUCLIER
+# global MANIPULATION_BOUCLIER
 MANIPULATION_BOUCLIER = 55
-global BOOST_PRIORITE_OBSERVATION
+# global BOOST_PRIORITE_OBSERVATION
 BOOST_PRIORITE_OBSERVATION = 56
-global SORT_AUTO_SOIN
+# global SORT_AUTO_SOIN
 SORT_AUTO_SOIN = 57
-global BOOST_DEGATS_FLECHES
+# global BOOST_DEGATS_FLECHES
 BOOST_DEGATS_FLECHES = 58
-global CHARGE_LOURDE
+# global CHARGE_LOURDE
 CHARGE_LOURDE = 59
-global CHARGE_ETENDUE
+# global CHARGE_ETENDUE
 CHARGE_ETENDUE = 60
-global INHUMANITE
+# global INHUMANITE
 INHUMANITE = 61
-global MAGICIEN
+# global MAGICIEN
 MAGICIEN = 62
-global BOOST_DE_PORTEE
+# global BOOST_DE_PORTEE
 BOOST_DE_PORTEE = 63
-global BOOST_SOIN
+# global BOOST_SOIN
 BOOST_SOIN = 65
-global SORT_DE_VUE
+# global SORT_DE_VUE
 SORT_DE_VUE = 66
-global VOL_PRIORITE
+# global VOL_PRIORITE
 VOL_PRIORITE = 67
-global BOOST_ATTAQUE_LANCE
+# global BOOST_ATTAQUE_LANCE
 BOOST_ATTAQUE_LANCE = 68
-global BOOST_PRIORITE_FLECHES
+# global BOOST_PRIORITE_FLECHES
 BOOST_PRIORITE_FLECHES = 69
-global ARTIFICIER
+# global ARTIFICIER
 ARTIFICIER = 70
-global FANTOME
+# global FANTOME
 FANTOME = 71
-global INSTAKILL
+# global INSTAKILL
 INSTAKILL = 72
-global JET_DE_MANA
+# global JET_DE_MANA
 JET_DE_MANA = 73
-global ENCHANTEMENT_RENFORCEMENT
+# global ENCHANTEMENT_RENFORCEMENT
 ENCHANTEMENT_RENFORCEMENT = 74
-global SORT_DE_PROTECTION
+# global SORT_DE_PROTECTION
 SORT_DE_PROTECTION = 75
-global BOOST_ATTAQUE
+# global BOOST_ATTAQUE
 BOOST_ATTAQUE = 76
-global ARCHER
+# global ARCHER
 ARCHER = 77
-global FLECHE_FANTOME
+# global FLECHE_FANTOME
 FLECHE_FANTOME = 78
-global BOOST_DEGAT
+# global BOOST_DEGAT
 BOOST_DEGAT = 79
-global NECROMANCIEN
+# global NECROMANCIEN
 NECROMANCIEN = 80
-global ENCHANTEUR
+# global ENCHANTEUR
 ENCHANTEUR = 81
-global SOUTIEN
+# global SOUTIEN
 SOUTIEN  = 82
-global BOOST_PRIORITE_DEPLACMEENT
+# global BOOST_PRIORITE_DEPLACMEENT
 BOOST_PRIORITE_DEPLACEMENT = 83
-global BOOST_PRIORITE_ANALYSE
+# global BOOST_PRIORITE_ANALYSE
 BOOST_PRIORITE_ANALYSE = 84
-global BOOST_PRIORITE_EXPLOSIF
+# global BOOST_PRIORITE_EXPLOSIF
 BOOST_PRIORITE_EXPLOSIF = 85
-global BOOST_VITESSE_EXPLOSIF
+# global BOOST_VITESSE_EXPLOSIF
 BOOST_VITESSE_EXPLOSIF = 86
-global BOOST_PRIORITE_AURA
+# global BOOST_PRIORITE_AURA
 BOOST_PRIORITE_AURA = 87
-global AURA_MORTELLE
+# global AURA_MORTELLE
 AURA_MORTELLE = 88
-global ASSASSIN
+# global ASSASSIN
 ASSASSIN = 89
-global BOOST_DE_ZONE_DE_RESTAURATION
+# global BOOST_DE_ZONE_DE_RESTAURATION
 BOOST_DE_ZONE_DE_RESTAURATION = 90
-global ANGE
+# global ANGE
 ANGE = 91
-global ENCHANTEMENT_ROUILLE
+# global ENCHANTEMENT_ROUILLE
 ENCHANTEMENT_ROUILLE = 92
-global MANIPULATION_ARME
+# global MANIPULATION_ARME
 MANIPULATION_ARME = 93
-global FLECHES_LOURDE_LEGERE
+# global FLECHES_LOURDE_LEGERE
 FLECHES_LOURDE_LEGERE = 94
-global BOOST_PORTEE_EXPLOSIFS
+# global BOOST_PORTEE_EXPLOSIFS
 BOOST_PORTEE_EXPLOSIFS = 95
-global ECLAIR_NOIR
+# global ECLAIR_NOIR
 ECLAIR_NOIR = 96
-global BOOST_DEGATS_PROJECTILES
+# global BOOST_DEGATS_PROJECTILES
 BOOST_DEGATS_PROJECTILES = 97
-global BOOST_ENCHANTEMENT
+# global BOOST_ENCHANTEMENT
 BOOST_ENCHANTEMENT = 98
-global RESURECTION
+# global RESURECTION
 RESURECTION = 99
 
-global PHYSIQUE
+# global PHYSIQUE
 PHYSIQUE = 100
-global PHYSIQUE_PAR_DEFAUT
+# global PHYSIQUE_PAR_DEFAUT
 PHYSIQUE_PAR_DEFAUT = 43
-global DEFENSE_PAR_DEFAUT
+# global DEFENSE_PAR_DEFAUT
 DEFENSE_PAR_DEFAUT = 64
-global MAGIE_INFINIE_PAR_DEFAUT
+# global MAGIE_INFINIE_PAR_DEFAUT
 MAGIE_INFINIE_PAR_DEFAUT = 101
-global ENCHANTEMENT_DEFENSIF
+# global ENCHANTEMENT_DEFENSIF
 ENCHANTEMENT_DEFENSIF = 102
 # Il n'y a pas de numéro 43 et 64
 
-global TOUR
+# global TOUR
 TOUR = 0
-global TOUCHE
+# global TOUCHE
 TOUCHE = 1
-global COMPLEMENT_DIR
+# global COMPLEMENT_DIR
 COMPLEMENT_DIR = 2
-global COMPLEMENT_CIBLE
+# global COMPLEMENT_CIBLE
 COMPLEMENT_CIBLE = 3
-global COMPLEMENT_COUT
+# global COMPLEMENT_COUT
 COMPLEMENT_COUT = 4
-global COMPLEMENT_MENU
+# global COMPLEMENT_MENU
 COMPLEMENT_MENU = 5
-global COMPLEMENT_DIR_PARCHEMIN
+# global COMPLEMENT_DIR_PARCHEMIN
 COMPLEMENT_DIR_PARCHEMIN = 6
-global COMPLEMENT_CIBLE_PARCHEMIN
+# global COMPLEMENT_CIBLE_PARCHEMIN
 COMPLEMENT_CIBLE_PARCHEMIN = 7
-global COMPLEMENT_COUT_PARCHEMIN
+# global COMPLEMENT_COUT_PARCHEMIN
 COMPLEMENT_COUT_PARCHEMIN = 8
-global COMPLEMENT_ALCHIMIE
+# global COMPLEMENT_ALCHIMIE
 COMPLEMENT_ALCHIMIE = 9
-global COMPLEMENT_CUISINE
+# global COMPLEMENT_CUISINE
 COMPLEMENT_CUISINE = 10
-global EVENEMENT
+# global EVENEMENT
 EVENEMENT = 11
 
-global LEVELUP
+# global LEVELUP
 LEVELUP = 0
-global DIALOGUE
+# global DIALOGUE
 DIALOGUE = 1
-global COMPLEMENT_DIALOGUE
+# global COMPLEMENT_DIALOGUE
 COMPLEMENT_DIALOGUE = 2
 
-global LISTE_EXHAUSTIVE_DES_MAGIES_OFFENSIVES #Les magies qui créent un objet Attaque
+# global LISTE_EXHAUSTIVE_DES_MAGIES_OFFENSIVES #Les magies qui créent un objet Attaque
 LISTE_EXHAUSTIVE_DES_MAGIES_OFFENSIVES = ["magie poing magique","magie poing ardent","magie secousse","magie petite secousse","magie volcan","magie explosion de mana","magie laser","magie brasier","magie avalanche"] #Je suis sur qu'il y en a d'autres

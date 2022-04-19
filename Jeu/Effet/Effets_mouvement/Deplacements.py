@@ -13,7 +13,7 @@ class Teleport(On_through):
         # On va chercher un éventuel occupant de la case cible
         occupants = entitee.controleur.trouve_non_superposables(self.position)
         if issubclass(entitee.get_classe(),Item):
-            if entitee.get_position()[0]!=self.position[0]: #Un item passe quoi qu'il arrive
+            if entitee.position.lab!=self.position.lab: #Un item passe quoi qu'il arrive
                 entitee.controleur.move(self.position,entitee)
             else:
                 entitee.set_position(self.position)
@@ -31,25 +31,25 @@ class Teleport(On_through):
                 else:
                     passe = False
             if passe:
-                if entitee.get_position()[0]!=self.position[0]:
+                if entitee.position.lab!=self.position.lab:
                     entitee.controleur.move(self.position,entitee)
                 else:
                     entitee.set_position(self.position)
                 if self.affiche: #On a affaire à un téléporteur spécial, il faut peut-être changer la direction de l'entitee
                     dir_oppose = self.get_dir_oppose(entitee.controleur)
                     if dir_oppose!=None:
-                        entitee.dir_regard = range(4)[dir_oppose-2]
+                        entitee.dir_regard = dir_oppose+2
 
     def execute(self,entitee):
         self.action(entitee)
 
     def get_dir_oppose(self,controleur):
         dir_oppose = None
-        for i in range(4):
-            mur_potentiel = controleur.labs[self.position[0]].matrice_cases[self.position[1]][self.position[2]].murs[i]
+        for i in DIRECTIONS:
+            mur_potentiel = controleur[self.position,i]
             cible_potentielle = mur_potentiel.get_cible()
             if cible_potentielle != None :
-                for mur in controleur.labs[cible_potentielle[0]].matrice_cases[cible_potentielle[1]][cible_potentielle[2]].murs:
+                for mur in controleur[cible_potentielle].murs:
                     if self in mur.effets:
                         dir_oppose = i
         return dir_oppose

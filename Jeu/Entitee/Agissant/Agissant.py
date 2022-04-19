@@ -50,7 +50,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
 
         #la direction du regard
         self.skill_courant = None
-        self.dir_regard = 0
+        self.dir_regard = HAUT
         self.talent = 1
         self.magie_courante = None
         self.cible_magie = None
@@ -92,7 +92,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         self.controleur = None
 
     def get_etage_courant(self):
-        return int(self.position[0].split()[1])
+        return int(self.position.lab.split()[1])
 
     def get_stats_attaque(self,element):
         force = self.force
@@ -105,7 +105,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         return force,affinite,self.dir_regard,self.ID
 
     def get_impact(self):
-        return (self.position[0],self.position[1]+[0,1,0,-1][self.dir_regard],self.position[2]+[-1,0,1,0][self.dir_regard])
+        return Position(self.position.lab,self.position.x+[0,1,0,-1][self.dir_regard],self.position.y+[-1,0,1,0][self.dir_regard])
 
     def attaque(self,direction):
         self.dir_regard = direction
@@ -135,7 +135,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         if self.dir_regard != None:
             return self.dir_regard
         else:
-            return HAUT
+            return DIRECTIONS[0]
 
     def regarde(self,direction):
         if direction != None:
@@ -340,7 +340,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
     def meurt(self):
         self.pv = self.pm = 0
         self.etat = "mort"
-        self.dir_regard = HAUT
+        self.dir_regard = DIRECTIONS[0]
         self.taux_regen_pv = self.taux_regen_pm = self.taux_force = self.taux_priorite = self.taux_vitesse = self.taux_aff_o = self.taux_aff_f = self.taux_aff_t = self.taux_aff_g = self.taux_stats = {} #/!\ À corriger !
         self.effets = []
         self.inventaire.drop_all(self.position)

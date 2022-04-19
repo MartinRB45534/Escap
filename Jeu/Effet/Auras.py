@@ -20,7 +20,7 @@ class Aura_elementale(Aura):
 class Aura_permanente(Aura_elementale):
     """La classe des effets d'aura élémentales permanentes, celles qui représentent l'élément par défaut de la case."""
 
-    def execute(self,case,position):
+    def execute(self,case):
         if self.phase == "démarrage":
             self.phase = "en cours"
 
@@ -34,7 +34,7 @@ class Terre(One_shot,Aura_elementale):
         self.distance = 0
         self.affiche = False
 
-    def execute(self,case,position):
+    def execute(self,case):
         if self.phase == "démarrage":
             self.termine() #Pour l'instant elle ne fait rien. Rien qu'empêcher les autres auras de s'exprimer. Je suppose que ça peut servir quand on visite des étages non-terrestres.
         case.code += 1 #0 ou 1, selon que la case a une aura de Terre ou non
@@ -48,7 +48,7 @@ class Terre_permanente(Aura_permanente):
         self.priorite = priorite
         self.affiche = False
 
-    def execute(self,case,position):
+    def execute(self,case):
         case.code += 1 #0 ou 1, selon que la case a une aura de Terre ou non
 
 class Feu(Evenement,Aura_elementale):
@@ -62,9 +62,9 @@ class Feu(Evenement,Aura_elementale):
         self.distance = 0
         self.affiche = False
 
-    def action(self,case,position):
+    def action(self,case):
         contr = case.controleur
-        occupants = contr.trouve_agissants_courants(position)
+        occupants = contr.trouve_agissants_courants(case.position)
         lanceur = contr.get_entitee(self.responsable)
         for occupant in occupants :
             agissant = contr.get_entitee(occupant)
@@ -72,7 +72,7 @@ class Feu(Evenement,Aura_elementale):
                 agissant.subit(self.temps_restant,"proximité",FEU,self.responsable)
         case.code += 2 #0 ou 2, selon que la case a une aura de Feu ou non
 
-    def execute(self,case,position):
+    def execute(self,case):
         self.temps_restant -= 1
         self.priorite -= 0.3 #La priorite diminue progressivement, donc une aura de feu descend rarement jusqu'à 0 dégats.
         if self.phase == "démarrage" :
@@ -80,7 +80,7 @@ class Feu(Evenement,Aura_elementale):
         elif self.temps_restant <= 0 :
             self.termine()
         else :
-            self.action(case,position)
+            self.action(case)
 
 class Feu_permanent(Aura_permanente):
     """L'effet qui applique l'aura de feu à une case. Il a toujours été là, et il n'en bougera pas."""
@@ -92,9 +92,9 @@ class Feu_permanent(Aura_permanente):
         self.degats = degats
         self.affiche = False
 
-    def action(self,case,position):
+    def action(self,case):
         contr = case.controleur
-        occupants = contr.trouve_agissants_courants(position)
+        occupants = contr.trouve_agissants_courants(case.position)
         for occupant in occupants :
             agissant = contr.get_entitee(occupant)
             agissant.subit(self.degats,"distance",FEU)
@@ -111,9 +111,9 @@ class Glace(One_shot,Aura_elementale):
         self.distance = 0
         self.affiche = False
 
-    def action(self,case,position):
+    def action(self,case):
         contr = case.controleur
-        occupants = contr.trouve_mobiles_courants(position)
+        occupants = contr.trouve_mobiles_courants(case.position)
         lanceur = contr.get_entitee(self.responsable)
         for occupant in occupants :
             agissant = contr.get_entitee(occupant)
@@ -121,9 +121,9 @@ class Glace(One_shot,Aura_elementale):
                 agissant.latence += self.gain_latence
         case.code += 4 #0 ou 4, selon que la case a une aura de Glace ou non
 
-    def execute(self,case,position):
+    def execute(self,case):
         if self.phase == "démarrage":
-            self.action(case,position)
+            self.action(case)
             self.termine()
 
 class Glace_permanente(Aura_permanente):
@@ -136,9 +136,9 @@ class Glace_permanente(Aura_permanente):
         self.gain_latence = gain_latence
         self.affiche = False
 
-    def action(self,case,position):
+    def action(self,case):
         contr = case.controleur
-        occupants = contr.trouve_mobiles_courants(position)
+        occupants = contr.trouve_mobiles_courants(case.position)
         for occupant in occupants :
             agissant = contr.get_entitee(occupant)
             if GLACE not in agissant.immunites :
@@ -156,13 +156,13 @@ class Ombre(One_shot,Aura_elementale):
         self.distance = 0
         self.affiche = False
 
-    def action(self,case,position):
+    def action(self,case):
         case.opacite_bonus = self.gain_opacite
         case.code += 8 #0 ou 8, selon que la case a une aura d'Ombre ou non. Comme l'ombre et le reste sont incompatibles, les codes 9 à 15 sont libres. Le code maximum pour la partie élémentaire est 8
 
-    def execute(self,case,position):
+    def execute(self,case):
         if self.phase == "démarrage":
-            self.action(case,position)
+            self.action(case)
             self.termine()
 
 class Ombre_permanente(Aura_permanente):
@@ -175,7 +175,7 @@ class Ombre_permanente(Aura_permanente):
         self.gain_opacite = gain_opacite
         self.affiche = False
 
-    def action(self,case,position):
+    def action(self,case):
         case.opacite_bonus = self.gain_opacite
         case.code += 8 #0 ou 8, selon que la case a une aura d'Ombre ou non. Comme l'ombre et le reste sont incompatibles, les codes 9 à 15 sont libres. Le code maximum pour la partie élémentaire est 8
 

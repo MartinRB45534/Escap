@@ -56,20 +56,20 @@ class Blizzard(Evenement,On_post_action):
         self.phase = "démarrage"
         self.gain_latence = gain_latence_blizzard[niveau]
 
-    def action(self,case,position):
+    def action(self,case):
         if self.phase == "en cours":
-            occupants = case.controleur.trouve_mobiles_courants(position)
+            occupants = case.controleur.trouve_mobiles_courants(case.position)
             for occupant in occupants :
                 case.controleur.get_entitee(occupant).latence.add_latence(self.gain_latence)
 
-    def execute(self,case,position):
+    def execute(self,case):
         self.temps_restant -= 1
         if self.phase == "démarrage" :
             self.phase = "en cours"
         elif self.temps_restant <= 0 :
             self.termine()
         else :
-            self.action(case,position)
+            self.action(case)
 
 class Teleportation(One_shot,On_post_action):
     """Effet qui déplace une entitée."""

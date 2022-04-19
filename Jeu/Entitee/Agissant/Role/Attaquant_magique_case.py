@@ -6,11 +6,10 @@ class Attaquant_magique_case(Mage):
     def agit_en_vue(self,esprit,defaut = ""):
         cibles = []
         #On cherche l'ennemi le plus puissant en vue
-        for colonne in self.vue:
-            for case in colonne:
-                for ID in case[6]:
-                    if ID in esprit.ennemis.keys() and not self.controleur.est_item(ID):
-                        cibles.append([esprit.ennemis[ID][0],case[0]])
+        for case in self.vue:
+            for ID in case[6]:
+                if ID in esprit.ennemis.keys() and not self.controleur.est_item(ID):
+                    cibles.append([esprit.ennemis[ID][0],case[0]])
         skill = trouve_skill(self.classe_principale,Skill_magie)
         if cibles != [] and self.peut_caster(skill.niveau):
             new_cibles = sorted(cibles, key=lambda ennemi: ennemi[0])

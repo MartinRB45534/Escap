@@ -1,11 +1,12 @@
 from Jeu.Entitee.Agissant.Agissants import *
+from Jeu.Labyrinthe.Vue import *
 import operator
 
 class Esprit :
     """La classe des esprits, qui manipulent les agisants."""
     def __init__(self,nom): #On identifie les esprits par des noms (en fait on s'en fout, vu qu'on ne fait pas d'opérations dessus on pourrait avoir des labs, des entitees et des esprits nommés avec des str, des int, des float, des bool, etc.)
         self.corps = {}
-        self.vue = {}
+        self.vue = Vues()
         self.ennemis = {}
         self.dispersion_spatiale = 0.9 #La décroissance de l'importance dans l'espace. Tester plusieurs options pour l'optimiser
         self.prejuges = []
@@ -40,8 +41,8 @@ class Esprit :
 
     def get_importance(self,position):
         importance = 0
-        if (position[0] in self.vue.keys()) and (position[1] >= 0 and position[1] < len(self.vue[position[0]])) and (position[2] >= 0 and position[2] < len(self.vue[position[0]][position[1]])):
-            case = self.vue[position[0]][position[1]][position[2]]
+        if position in self.vue:
+            case = self.vue[position]
             for ID in case[6]:
                 if self.controleur.get_entitee(ID).etat == "vivant":
                     if ID in self.ennemis:
@@ -54,26 +55,26 @@ class Esprit :
         self.vue[niveau] = vue
 
     def maj_vue(self,vue,niveau):
-        for i in range(len(vue)):
-            for j in range(len(vue[0])):
-                case = vue[i][j]
+        for i in range(vue.decalage.x):
+            for j in range(vue.decalage.y):
+                case = vue[Decalage(i,j)]
                 if case[1] > 0: #Si la clarté est positive
                     case[2] = self.oubli
-                    self.vue[niveau][i][j] = case #On remplace par la dernière version de la vision
+                    self.vue[case[0]] = case #On remplace par la dernière version de la vision
 
     def trouve_agissants(self,vue):
         agissants = []
-        for i in range(len(vue)):
-            for j in range(len(vue[0])):
-                case = vue[i][j]
+        for i in range(vue.decalage.x):
+            for j in range(vue.decalage.y):
+                case = vue[Decalage(i,j)]
                 agissants += case[6]
         return agissants
 
     def oublie_agissants(self,agissants):
         for vue in self.vue.values():
-            for i in range(len(vue)):
-                for j in range(len(vue[0])):
-                    case = vue[i][j]
+            for i in range(vue.decalage.x):
+                for j in range(vue.decalage.y):
+                    case = vue[Decalage(i,j)]
                     for ID in agissants:
                         if ID in case[6]:
                             case[6].remove(ID)
@@ -93,7 +94,7 @@ class Esprit :
                     if espece in self.prejuges:
                         self.ennemis[ID_agissant] = [0.01,0]
         for vue in vues :
-            niveau = vue[0][0][0][0] #La première coordonée de la position (première information) de la première case de la première colonne
+            niveau = vue.id #La première coordonée de la position (première information) de la première case de la première colonne
             if niveau in self.vue.keys(): 
                 self.maj_vue(vue,niveau)
             else:
@@ -142,14 +143,12 @@ class Esprit :
     def calcule_trajets(self):
         # On détermine la dangerosité de chaque case en fonction des dégats qui vont y avoir lieu
         coef=7 #/!\ Expérimenter avec ce coef à l'occasion
-        for etage in self.vue.values():
-            for colonne in etage:
-                for case in colonne:
-                    for effet in case[7]:
-                        dangerosite = coef*effet[2]/(effet[1]+coef)
-                        case[3][2] += dangerosite
-                        case[3][3] += dangerosite
-        
+        for case in self.vue:
+            for effet in case[7]:
+                dangerosite = coef*effet[2]/(effet[1]+coef)
+                case[3][2] += dangerosite
+                case[3][3] += dangerosite
+
         # On modifie légèrement pour pouvoir sortir des zones concernées
         coef_croissant = 1.1
         # On commence par trouver les seuils, vers lesquels on va vouloir aller
@@ -166,19 +165,19 @@ class Esprit :
             ennemi = self.controleur.get_entitee(ID_ennemi)
             if ennemi.etat == "vivant":
                 position = ennemi.get_position()
-                if position[0] in self.vue.keys():
+                if position.lab in self.vue.keys():
                     importance = self.ennemis[ID_ennemi][0]
                     dangerosite = self.ennemis[ID_ennemi][1]
-                    if importance > self.vue[position[0]][position[1]][position[2]][3][0]:
-                        self.vue[position[0]][position[1]][position[2]][3][0]=importance
-                        self.vue[position[0]][position[1]][position[2]][3][1]=importance
+                    if importance > self.vue[position][3][0]:
+                        self.vue[position][3][0]=importance
+                        self.vue[position][3][1]=importance
                         importances.append(position)
-                    if dangerosite > self.vue[position[0]][position[1]][position[2]][3][2]:
-                        self.vue[position[0]][position[1]][position[2]][3][2]=dangerosite
+                    if dangerosite > self.vue[position][3][2]:
+                        self.vue[position][3][2]=dangerosite
                         if not position in dangerosites: # On peut avoir des doublons (ennemis sur les seuils par exemple)
                             dangerosites.append(position)
-                    if dangerosite > self.vue[position[0]][position[1]][position[2]][3][3]:
-                        self.vue[position[0]][position[1]][position[2]][3][3]=dangerosite
+                    if dangerosite > self.vue[position][3][3]:
+                        self.vue[position][3][3]=dangerosite
                         if not position in dangerosites:
                             dangerosites.append(position)
         # On propage l'importance de façon décroissante à partir des ennemis
@@ -194,17 +193,15 @@ class Esprit :
         """'Résoud' un labyrinthe à partir d'une case donnée."""
 
         if indice == 4:
-            for vue in self.vue.values():
-                for colonne in vue:
-                    for case in colonne:
-                        case[3][4] = 0
+            for case in self.vue:
+                case[3][4] = 0
 
         #la queue est une liste de positions
         queue=[position]
 
-        if position[0] in self.vue.keys():
+        if position.lab in self.vue.keys():
 
-            self.vue[position[0]][position[1]][position[2]][3][indice] = portee
+            self.vue[position][3][indice] = portee
 
             arret_obstacle = False
 
@@ -212,7 +209,7 @@ class Esprit :
 
                 position = queue[0]
 
-                clarte = self.vue[position[0]][position[1]][position[2]][3][indice]*self.dispersion_spatiale
+                clarte = self.vue[position][3][indice]*self.dispersion_spatiale
                 #enlever position dans queue
                 queue.pop(0)
 
@@ -223,9 +220,9 @@ class Esprit :
                 arret_obstacle = dead_ends
 
                 for pos in pos_explorables:
-                    if clarte > self.vue[pos[0]][pos[1]][pos[2]][3][indice]:
+                    if clarte > self.vue[pos][3][indice]:
                         #on marque la case comme visitée
-                        self.vue[pos[0]][pos[1]][pos[2]][3][indice] = clarte
+                        self.vue[pos][3][indice] = clarte
                         
                         #on ajoute toutes les directions explorables
                         queue.append(pos)
@@ -234,10 +231,8 @@ class Esprit :
         """'Résoud' un labyrinthe à partir de plusieurs points"""
 
         if indice == 4:
-            for vue in self.vue.values():
-                for colonne in vue:
-                    for case in colonne:
-                        case[3][4] = 0
+            for case in self.vue:
+                case[3][4] = 0
 
         #la queue est une liste de positions
         queue = [position for position in positions]
@@ -250,7 +245,7 @@ class Esprit :
 
             position = queue[0]
 
-            valeur = self.vue[position[0]][position[1]][position[2]][3][indice]*coef
+            valeur = self.vue[position][3][indice]*coef
             #enlever position dans queue
             queue.pop(0)
 
@@ -264,9 +259,9 @@ class Esprit :
             pos_explorables = self.positions_utilisables(position,arret_obstacle)
 
             for pos in pos_explorables:
-                if valeur*comparateur > self.vue[pos[0]][pos[1]][pos[2]][3][indice]*comparateur:
+                if valeur*comparateur > self.vue[pos][3][indice]*comparateur:
                     #on marque la case comme visitée
-                    self.vue[pos[0]][pos[1]][pos[2]][3][indice] = valeur
+                    self.vue[pos][3][indice] = valeur
 
                     #on ajoute toutes les directions explorables
                     queue.append(pos)
@@ -274,10 +269,8 @@ class Esprit :
     def trouve_seuils(self,positions,indice=2,dead_ends=False):
         """Fonction qui trouve les 'seuils', c'est à  dire les cases qui ont un valeur plus grande que leurs voisines"""
 
-        for vue in self.vue.values():
-            for colonne in vue:
-                for case in colonne:
-                    case[3][5] = False
+        for case in self.vue:
+            case[3][5] = False
 
         seuils = []
 
@@ -304,13 +297,13 @@ class Esprit :
             pos_explorables = self.positions_utilisables(position,arret_obstacle)
 
             for pos in pos_explorables:
-                if self.vue[position[0]][position[1]][position[2]][3][indice] > self.vue[pos[0]][pos[1]][pos[2]][3][indice] and not position in seuils:
+                if self.vue[position][3][indice] > self.vue[pos][3][indice] and not position in seuils:
                     seuils.append(position)
-                elif self.vue[position[0]][position[1]][position[2]][3][indice] < self.vue[pos[0]][pos[1]][pos[2]][3][indice] and not pos in seuils:
+                elif self.vue[position][3][indice] < self.vue[pos][3][indice] and not pos in seuils:
                     seuils.append(pos)
-                if not self.vue[pos[0]][pos[1]][pos[2]][3][5]:
+                if not self.vue[pos][3][5]:
                     #on marque la case comme visitée
-                    self.vue[pos[0]][pos[1]][pos[2]][3][5] = True
+                    self.vue[pos][3][5] = True
                         
                     #on ajoute toutes les directions explorables
                     queue.append(pos)
@@ -377,15 +370,11 @@ class Esprit :
     def positions_utilisables(self,position,dead_ends):
         pos_utilisables=[]
 
-        case = self.vue[position[0]][position[1]][position[2]]
+        case = self.vue[position]
 
-        for direction in range(4):
-            try:
-                if any(case[5][direction]) and not(dead_ends and case[6]!=[]) and case[5][direction][4][0] in self.vue.keys():
-                    pos_utilisables.append(case[5][direction][4])
-            except:
-                print(case[5])
-                print(case[5][direction], any(case[5][direction]))
+        for direction in DIRECTIONS:
+            if any(case[5][direction]) and not(dead_ends and case[6]!=[]) and case[5][direction][4].lab in self.vue.keys():
+                pos_utilisables.append(case[5][direction][4])
 
         return pos_utilisables
 
@@ -408,8 +397,8 @@ class Esprit :
     def deplace(self,ID):
         corp = self.controleur.get_entitee(ID)
         position = corp.get_position()
-        case = corp.vue[position[1]][position[2]]
-        tcase = self.vue[position[0]][position[1]][position[2]]
+        case = corp.vue[position]
+        tcase = self.vue[position]
         repoussante = tcase[8]
         cases = [[-1,tcase[0],tcase[3][0],tcase[3][1],-tcase[3][2],tcase[3][2],-tcase[3][3],tcase[3][3]]]
         dirs = []
@@ -417,11 +406,11 @@ class Esprit :
         fuite = corp.veut_fuir(tcase[3][2])
         attaque = corp.veut_attaquer(tcase[3][2])
         res = "attente"
-        for i in range(4): #On commence par se renseigner sur les possibilités :
+        for i in DIRECTIONS: #On commence par se renseigner sur les possibilités :
             mur = case[5][i][self.resolution]
             if mur:
-                if mur[0] == position[0] and corp.vue[mur[1]][mur[2]][1]>0:
-                    case_pot = self.vue[mur[0]][mur[1]][mur[2]]
+                if mur in position and corp.vue[mur][1]>0:
+                    case_pot = self.vue[mur]
                     entitees = case_pot[6]
                     libre = True #On n'y va pas pour s'en enfuir après
                     for ID_entitee in entitees:
@@ -459,11 +448,11 @@ class Esprit :
                 res = "bloqué"
                 corp.skill_courant = None
                 importance = 0
-                for i in range(4):
+                for i in DIRECTIONS:
                     mur = case[5][i][self.resolution]
                     if mur:
-                        if mur[0] in self.vue.keys():
-                            case_pot = self.vue[mur[0]][mur[1]][mur[2]]
+                        if mur.lab in self.vue.keys():
+                            case_pot = self.vue[mur]
                             entitees = case_pot[6]
                             for ID_entitee in entitees:
                                 entitee = corp.controleur.get_entitee(ID_entitee)
@@ -479,7 +468,7 @@ class Esprit :
                     res = "exploration"
                     if len(dirs)>1: #On peut se permettre de choisir
                         if corp.dir_regard != None: #L'agissant regarde quelque part
-                            dir_back = [HAUT,DROITE,BAS,GAUCHE][corp.dir_regard-2]
+                            dir_back = corp.dir_regard+2
                             if dir_back in dirs: #On ne veut pas y retourner
                                 dirs.remove(dir_back)
                     corp.va(dirs[random.randint(0,len(dirs)-1)]) #/!\ Ne pas retourner sur ses pas, c'est bien ! Aller vers les endroits inconnus, ce serait mieux. /!\
@@ -508,19 +497,17 @@ class Esprit :
         corp.statut = res
 
     def oublie(self):
-        for lab in self.vue.values():
-            for colonne in lab:
-                for case in colonne:
-                    if case[2] > 0:
-                        case[2] -= 1
-                    if case[2] <= 0:
-                        case[1] = 0
-                        case[4] = 0
-                        case[5] = [[False,False,False,False,False],[False,False,False,False,False],[False,False,False,False,False],[False,False,False,False,False]]
-                        case[6] = []
-                    case[3] = [0,0,0,0,0,False]
-                    case[7] = []
-                    case[8] = False
+        for case in self.vue:
+            if case[2] > 0:
+                case[2] -= 1
+            if case[2] <= 0:
+                case[1] = 0
+                case[4] = 0
+                case[5] = [[False,False,False,False,False],[False,False,False,False,False],[False,False,False,False,False],[False,False,False,False,False]]
+                case[6] = []
+            case[3] = [0,0,0,0,0,False]
+            case[7] = []
+            case[8] = False
 
     #Découvront le déroulé d'un tour avec esprit-sensei :
     def debut_tour(self):
