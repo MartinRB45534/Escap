@@ -8,6 +8,7 @@ class Patern(Espace):
         self.position = position
         self.decalage = decalage
         self.matrice_cases = [[Case(self.position+j*DROITE+i*BAS) for i in range(decalage.y)]for j in range(decalage.x)]
+        self.bord = Bord(self.decalage)
         self.entrees = entrees
         self.codes = codes
         self.vide = vide
@@ -22,6 +23,8 @@ class Patern(Espace):
             return self.matrice_cases[key.x][key.y]
         elif isinstance(key,Position):
             return self[key-self.position]
+        if isinstance(key,Cote):
+            return self[key.emplacement][key.direction]
         else:
             return NotImplemented
 
@@ -32,6 +35,8 @@ class Patern(Espace):
             return self.converti(item) in self
         elif isinstance(item,Decalage):
             return 0<=item.x<self.decalage.x and 0<=item.y<self.decalage.y
+        elif isinstance(item,Cote):
+            return item.emplacement in self
         return NotImplemented
 
     def converti(self,position):

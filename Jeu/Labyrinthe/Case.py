@@ -6,7 +6,7 @@ class Case:
     def __init__(self,position,niveau = 1,element = TERRE,effets = [],opacite = 1):
         # Par défaut, pas de murs.
         self.position = position
-        self.murs = [Mur([Teleport(position+direction)]) for direction in DIRECTIONS]
+        self.murs = [Mur([Teleport(position+direction),Mur_plein(niveau)]) for direction in DIRECTIONS]
         self.opacite = opacite
         self.opacite_bonus = 0
         self.niveau = niveau

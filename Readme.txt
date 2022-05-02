@@ -58,6 +58,42 @@ Troisi�me �tape : mains[0][2].boucle() et le jeu reprend imm�diatement, at
 
 /!\ TODO: revoir la génération du labyrinthe
 
+Processus actuel :
+lab.__init__(patterns)
+	lab.generation()
+ x		création murs fermés
+		generateur.__init__(patterns)
+		generateur.generation()
+			generateur.pre_gene_paterns()
+				pattern.pre_generation()
+ ~					interdictions murs non-entrées
+ ->			generateur.generation_en_profondeur()
+			generateur.post_gene_paterns()
+				pattern.post_generation()
+ ~					retrait des interdictions
+ ~					construction des murs de bord non-entrées
+ ->					vidage si la salle est vide
+					pattern.post_gen_entrees()
+ ~>						ouverture des entrées/création des portes
+La génération avec les murs fermés peut être faite directement dans l'__init__
+En utilisant un parcours adapté pendant la génération, on n'a pas besoin d'interdire, de retirer l'interdiction, de construire les bords non-entrées
+Ce qui laisse la génération, le vidage, les portes
+C'est probablement très superflu d'utiliser deux classes pour ça (générateur et patern)
+
+Idée :
+Retirer le générateur (le labyrinthe gère sa génération)
+Retirer l 'interdiction (le labyrinthe gère ses passages autorisés)
+Réduire le pattern à une structure spatiale (pas de matrice, de murs, juste des positions/décalages) qui fournit les itérateurs sur lesquels le labyrinthe agira.
+
+lab.__init__(patterns)
+	création avec murs fermés
+	générations en profondeur (en appliquant les contraintes liées aux patterns)
+	vidage
+	portes
+
+
+
+
 /!\ Modifier les rôles qui se réfèrent directement au fichier de constantes de leur magie. Remplacer par caste() comme les attaquants magiques
 
 Idée : rework de la regen (augmentation progressive/mode réduit)

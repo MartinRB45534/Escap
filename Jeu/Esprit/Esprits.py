@@ -355,7 +355,7 @@ class Esprit_humain(Esprit_type):
 
     def get_cases_vues(self,humain):
         cases = []
-        for case in self.vue[humain.position]:
+        for case in self.vue[humain.position.lab]:
             if case[2] > 0:
                 cases.append(case[0])
         return cases

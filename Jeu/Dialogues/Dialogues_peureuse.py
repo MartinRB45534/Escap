@@ -111,7 +111,7 @@ REPLIQUES_PEUREUSE = {
     "dialogue5reponse1.1.1.1.1":"Merci. J'y vais alors.",
     "dialogue6phrase1":"Il y a deux portes maintenant.",
     "dialogue6reponse1.1":"Mais elles sont toutes les deux fermées !",
-    "dialogue6reponse1.2":"Heureusement, je sais comment les ouvrir.",
+    "dialogue6reponse1.2":"Heureusement, je sais comment ramasser la clé par terre.",
     "dialogue6reponse1.3":"Je sais, je ne suis pas idiot...",
     "dialogue6phrase1.1":"Regarde, il y a une clé par terre.",
     "dialogue6reponse1.1.1":"Je vois ça ! Comment je la ramasse ?",

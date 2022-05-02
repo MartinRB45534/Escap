@@ -1,5 +1,5 @@
-from turtle import pos
 from Jeu.Constantes import *
+from Jeu.Entitee.Item.Items import *
 from Jeu.Affichage.Affichage import *
 from Jeu.Skins.Skins import *
 from math import ceil
@@ -2754,22 +2754,11 @@ class Old_affichage:
             SKIN_BROUILLARD.dessine_toi(self.screen,position,taille)
         elif vue[1]==-1: #On a affaire à un case accessible mais pas vue
             SKIN_BROUILLARD.dessine_toi(self.screen,position,taille)
-            if vue[0].y > 0:
-                if vue[5][HAUT][0]:
-                    if joueur.vue[vue[0].x][vue[0].y-1][1]>0:
-                        SKIN_MUR_BROUILLARD.dessine_toi(self.screen,position,taille,1,1,HAUT)
-            if vue[0].x < len(joueur.vue) - 1:
-                if vue[5][DROITE][0]:
-                    if joueur.vue[vue[0].x+1][vue[0].y][1]>0:
-                        SKIN_MUR_BROUILLARD.dessine_toi(self.screen,position,taille,1,1,DROITE)
-            if vue[0].y < len(joueur.vue[0]) -1:
-                if vue[5][BAS][0]:
-                    if joueur.vue[vue[0].x][vue[0].y+1][1]>0:
-                        SKIN_MUR_BROUILLARD.dessine_toi(self.screen,position,taille,1,1,BAS)
-            if vue[0].x > 0:
-                if vue[5][GAUCHE][0]:
-                    if joueur.vue[vue[0].x-1][vue[0].y][1]>0:
-                        SKIN_MUR_BROUILLARD.dessine_toi(self.screen,position,taille,1,1,GAUCHE)
+            for i in DIRECTIONS:
+                if vue[5][i][0]:
+                    pos_voisin = vue[0]+i
+                    if pos_voisin in joueur.vue and joueur.vue[pos_voisin][1]>0:
+                        SKIN_MUR_BROUILLARD.dessine_toi(self.screen,position,taille,1,1,i)
         else:
             if vue[4]==0: #On teste le code de la case pour déterminer son image
                 SKIN_CASE.dessine_toi(self.screen,position,taille) #La case en premier, donc en bas
@@ -2839,7 +2828,7 @@ class Old_affichage:
                     fichier = "Jeu/Skins/barre_de_vie_allies.png"
                 else:
                     fichier = "Jeu/Skins/barre_de_vie_neutres.png"
-                self.screen.blit(pygame.transform.scale(pygame.image.load(fichier).convert_alpha(),(int(taille*((15*agissant.pv)/(19*agissant.pv_max))),int(taille*(15/19)))),(position[0]+int(taille*(2/19)),position[1]+int(taille*(2/19))))
+                self.screen.blit(pygame.transform.scale(pygame.image.load(fichier).convert_alpha(),(ceil(taille*((15*agissant.pv)/(19*agissant.pv_max))),ceil(taille*(15/19)))),(position[0]+ceil(taille*(2/19)),position[1]+ceil(taille*(2/19))))
                 if isinstance(agissant,Humain) and agissant.dialogue > 0: #Est-ce qu'on veut vraiment avoir cet indicatif au-dessus des effets ?
                     SKIN_DIALOGUE.dessine_toi(self.screen,position,taille)
             if vue[7] != []:
@@ -2909,7 +2898,7 @@ class Faux_affichage(Conteneur,Old_affichage):
         visible_y = [vue.decalage.y-1,0]
         for i in range(vue.decalage.x):
             for j in range(vue.decalage.y):
-                if vue[i][j][1] > 0:
+                if vue[Decalage(i,j)][1] > 0:
                     if i < visible_x[0]:
                         visible_x[0] = i
                     if i > visible_x[1]:
@@ -2929,13 +2918,14 @@ class Faux_affichage(Conteneur,Old_affichage):
         for j in range(nb_cases):
             marge_gauche = marge + self.position_debut_x_carre
             for i in range(nb_cases):
-                if (position[0],vue_x+i,vue_y+j) in joueur.cibles:
-                    Old_affichage.affiche(self,joueur,vue[vue_x + i][vue_y + j],(marge_gauche,marge_haut),taille_case)
+                pos_case = Position(position.lab,vue_x+i,vue_y+j)
+                if pos_case in joueur.cibles:
+                    Old_affichage.affiche(self,joueur,vue[pos_case],(marge_gauche,marge_haut),taille_case)
                 else:
                     SKIN_BROUILLARD.dessine_toi(self.screen,(marge_gauche,marge_haut),taille_case)
-                if (position[0],vue_x+i,vue_y+j) == joueur.element_courant:
+                if pos_case == joueur.element_courant:
                     pygame.draw.rect(self.screen,(255,64,0),(marge_gauche,marge_haut,taille_case,taille_case),2)
-                elif (position[0],vue_x+i,vue_y+j) in joueur.cible:
+                elif pos_case in joueur.cible:
                     pygame.draw.rect(self.screen,(170,170,170),(marge_gauche,marge_haut,taille_case,taille_case),2)
                 marge_gauche += taille_case
             marge_haut += taille_case

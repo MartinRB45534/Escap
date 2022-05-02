@@ -16,14 +16,10 @@ class Labyrinthe(Vue):
         self.depart = depart
 
         self.matrice_cases = [[Case(Position(self.id,j,i),niveau,element) for i in range(decalage.y)]for j in range(decalage.x)]
+        self.bord = Bord(self.decalage)
 
-        for i in range(decalage.x):
-            self.matrice_cases[i][0][HAUT].effets = [Mur_impassable()]
-            self.matrice_cases[i][decalage.y-1][BAS].effets = [Mur_impassable()]
-
-        for j in range(decalage.y):
-            self.matrice_cases[0][j][GAUCHE].effets = [Mur_impassable()]
-            self.matrice_cases[decalage.x-1][j][DROITE].effets = [Mur_impassable()]
+        for cote in self.bord:
+            self[cote].effets = [Mur_impassable()]
 
         self.patterns=patterns
         self.cases_visitees = None
@@ -39,6 +35,8 @@ class Labyrinthe(Vue):
             return self.matrice_cases[key[0].x][key[0].y][key[1]]
         elif isinstance(key,(Decalage,Position)):
             return self.matrice_cases[key.x][key.y]
+        if isinstance(key,Cote):
+            return self[key.emplacement][key.direction]
         return NotImplemented
 
     def __setitem__(self,key,value):
@@ -46,6 +44,8 @@ class Labyrinthe(Vue):
             self.matrice_cases[key[0].x][key[0].y][key[1]] = value
         elif isinstance(key,(Decalage,Position)):
             self.matrice_cases[key.x][key.y] = value
+        if isinstance(key,Cote):
+            self[key.emplacement][key.direction] = value
         else:
             return NotImplemented
 
@@ -56,6 +56,8 @@ class Labyrinthe(Vue):
             return item.lab == self.id and 0<=item.x<self.decalage.x and 0<=item.y<self.decalage.y
         elif isinstance(item,Decalage):
             return 0<=item.x<self.decalage.x and 0<=item.y<self.decalage.y
+        elif isinstance(item,Cote):
+            return item.emplacement in self
         return NotImplemented
 
     def generation(self,proba=None,nbMurs=None,pourcentage=None):
@@ -68,13 +70,7 @@ class Labyrinthe(Vue):
                 -L'éventuelle pourcentage de murs a casser
             Sorties:
                 rien
-        """
-        #ini du tableau de case (4 murs pleins)
-        for colone in self.matrice_cases:
-            for case in colone:
-                for mur in case.murs:
-                    mur.effets.append(Mur_plein(self.durete))
-        
+        """        
         #génération en profondeur via l'objet generateur
         #print("Génération du labyrinthe")
         gene=Generateur(self.matrice_cases,self.depart,self.decalage.x,self.decalage.y,self.patterns)

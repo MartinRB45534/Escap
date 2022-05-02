@@ -12,6 +12,8 @@ class Vue(Espace):
             return self.matrice_cases[key[0]][key[1]]
         elif isinstance(key,(Decalage,Position)):
             return self.matrice_cases[key.x][key.y]
+        if isinstance(key,Cote):
+            return self[key.emplacement][key.direction]
         return NotImplemented
 
     def __setitem__(self,key,value):
@@ -19,6 +21,8 @@ class Vue(Espace):
             self[key[0]][key[1]] = value
         elif isinstance(key,(Decalage,Position)):
             self.matrice_cases[key.x][key.y] = value
+        if isinstance(key,Cote):
+            self[key.emplacement][key.direction] = value
         else:
             return NotImplemented
 
@@ -29,6 +33,8 @@ class Vue(Espace):
             return item.lab == self.id and 0<=item.x<self.decalage.x and 0<=item.y<self.decalage.y
         elif isinstance(item,Decalage):
             return 0<=item.x<self.decalage.x and 0<=item.y<self.decalage.y
+        elif isinstance(item,Cote):
+            return item.emplacement in self
         return NotImplemented
 
 class Vues(dict):
@@ -40,6 +46,8 @@ class Vues(dict):
             return dict.__getitem__(self,key)
         elif isinstance(key,Position):
             return self[key.lab][key]
+        if isinstance(key,Cote):
+            return self[key.emplacement][key.direction]
         return NotImplemented
 
     def __setitem__(self,key,value):
@@ -49,6 +57,8 @@ class Vues(dict):
             return dict.__setitem__(self,key,value)
         elif isinstance(key,Position):
             self[key.lab][key] = value
+        if isinstance(key,Cote):
+            self[key.emplacement][key.direction] = value
         else:
             return NotImplemented
 
@@ -56,7 +66,9 @@ class Vues(dict):
         if item is None:
             return False
         elif isinstance(item,Position):
-            return item.lab in self and item in self[item]
+            return item.lab in self and item in self[item.lab]
+        elif isinstance(item,Cote):
+            return item.emplacement in self
         else:
             return dict.__contains__(self,item)
 
