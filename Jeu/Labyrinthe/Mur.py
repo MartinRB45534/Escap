@@ -3,8 +3,9 @@ from Jeu.Entitee.Item.Item import *
 from Jeu.Effet.Effets import *
 
 class Mur:
-    def __init__(self,effets):
-        self.effets = effets
+    def __init__(self,cible,niveau):
+        self.effets = [Teleport(cible),Mur_plein(niveau)]
+        self.niveau = niveau
         self.peut_passer = False
         self.controleur = None
 
@@ -65,29 +66,27 @@ class Mur:
     def interdit(self):
         self.effets.append(Mur_impassable())
 
-    def construit(self,durete):
-        self.effets.append(Mur_plein(durete))
+    def construit(self):
+        self.effets.append(Mur_plein(self.niveau))
 
     def detruit(self):
         for i in range(len(self.effets)-1,-1,-1) :
             effet = self.effets[i]
             if isinstance(effet,On_try_through):
                 self.effets.remove(effet)
-                del(effet)
 
     def brise(self):
         for i in range(len(self.effets)-1,-1,-1) :
             effet = self.effets[i]
             if isinstance(effet,On_try_through) and not isinstance(effet,Mur_impassable) :
                 self.effets.remove(effet)
-                del(effet)
 
-    def cree_porte(self,durete,code,porte=None):
+    def cree_porte(self,code,porte=None):
         self.brise()
         if porte == None:
-            self.effets.append(Porte(durete,code))
+            self.effets.append(Porte(self.niveau,code))
         else:
-            self.effets.append(porte(durete,code))
+            self.effets.append(porte(self.niveau,code))
 
     def get_trajet(self):
         trajet = None

@@ -226,6 +226,10 @@ class Classe_principale(Classe):
             course = Skill_course() #On crée un skill de course
             course.evo() #On le passe au niveau 1
             skills.append(course)
+            #Pour pouvoir tester et parcourir les labyrinthes même quand la génération est cassée :
+            # ecrasement = Skill_ecrasement()
+            # ecrasement.evo()
+            # skills.append(ecrasement)
 
 ##            #!!! Attention : ce qui se passe ici est extérieur au système !
 ##            if malchance_forcee : #Après la chance, la malchance...

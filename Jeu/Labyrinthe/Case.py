@@ -6,7 +6,7 @@ class Case:
     def __init__(self,position,niveau = 1,element = TERRE,effets = [],opacite = 1):
         # Par défaut, pas de murs.
         self.position = position
-        self.murs = [Mur([Teleport(position+direction),Mur_plein(niveau)]) for direction in DIRECTIONS]
+        self.murs = [Mur(position+direction,niveau) for direction in DIRECTIONS]
         self.opacite = opacite
         self.opacite_bonus = 0
         self.niveau = niveau
@@ -173,11 +173,11 @@ class Case:
         """
         self[direction].brise()
 
-    def construire_mur(self,direction,durete):
+    def construire_mur(self,direction):
         """
         Fonction qui construit le mur dans la direction indiquée
         """
-        self[direction].construit(durete)
+        self[direction].construit()
 
     def interdire_mur(self,direction):
         """

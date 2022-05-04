@@ -1,3 +1,4 @@
+from operator import itemgetter
 from Jeu.Entitee.Agissant.Role.Mage import *
 
 class Attaquant_magique_agissant(Mage):
@@ -10,9 +11,8 @@ class Attaquant_magique_agissant(Mage):
             for ID in case[6]:
                 if ID in esprit.ennemis.keys() and not self.controleur.est_item(ID):
                     cibles.append([esprit.ennemis[ID][0],ID])
-        skill = trouve_skill(self.classe_principale,Skill_magie)
-        if cibles != [] and self.peut_caster(skill.niveau):
-            new_cibles = sorted(cibles, key=lambda ennemi: ennemi[0])
+        if cibles != [] and self.peut_caster():
+            new_cibles = sorted(cibles, key=itemgetter(0))
             self.skill_courant = Skill_magie
             self.magie_courante = self.caste()
             self.cible_magie = new_cibles[-1][-1]

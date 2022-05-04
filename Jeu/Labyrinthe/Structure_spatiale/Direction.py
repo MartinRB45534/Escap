@@ -78,7 +78,7 @@ class Direction:
             return NotImplemented
 
     def oppose(self):
-        return self - self.directions/2
+        return self - self.directions//2
 
     def __str__(self):
         return f"Direction : {self.direction}"

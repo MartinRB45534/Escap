@@ -1,3 +1,4 @@
+from operator import itemgetter
 from Jeu.Entitee.Agissant.Agissant import *
 from Jeu.Systeme.Constantes_magies.Magies import *
 
@@ -9,32 +10,26 @@ class Multi_soigneur(Agissant):
         for ID in esprit.corps.keys():
             corp = self.controleur.get_entitee(ID)
             if corp.etat == "vivant" and corp.pv < corp.pv_max:
-                cibles.append(ID)
-        skill = trouve_skill(self.classe_principale,Skill_magie)
+                cibles.append([corp.pv,ID])
         if len(cibles) == 1:
-            if self.peut_payer(cout_pm_soin[skill.niveau-1]):#/!\ J'utilise le fait que le soin et l'auto soin aient le même coût !
+            if self.peut_caster():
                 self.skill_courant = Skill_magie
+                self.magie_courante = self.caste()
                 self.cible_magie = cibles[0]
                 defaut = "soin"
                 self.statut = "soin"
-                if cibles[0] == self.ID:
-                    self.magie_courante = "magie auto soin"
-                else:
-                    self.magie_courante = "magie soin"
         elif cibles != []:
-            if self.peut_payer(cout_pm_multi_soin[skill.niveau-1]):
+            if self.peut_multi_caster():
                 self.skill_courant = Skill_magie
-                self.magie_courante = "magie multi soin"
+                self.magie_courante = self.multi_caste()
                 self.cible_magie = cibles
                 defaut = "soin"
                 self.statut = "soin"
-            elif self.peut_payer(cout_pm_soin[skill.niveau-1]):#/!\ J'utilise le fait que le soin et l'auto soin aient le même coût !
+            elif self.peut_caster():
+                new_cibles = sorted(cibles, key=itemgetter(0))
                 self.skill_courant = Skill_magie
-                self.cible_magie = cibles[0]
+                self.magie_courante = self.caste()
+                self.cible_magie = new_cibles[0][-1]
                 defaut = "soin"
                 self.statut = "soin"
-                if cibles[0] == self.ID:
-                    self.magie_courante = "magie auto soin"
-                else:
-                    self.magie_courante = "magie soin"
         return defaut

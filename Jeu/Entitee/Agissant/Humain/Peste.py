@@ -32,10 +32,21 @@ class Peste(Multi_soigneur,Support_lointain,Humain): #La huitième humaine du je
 
     # /!\ Pour améliorer ça : ne pas fuir s'il n'y a nulle part où fuir et ne pas fuir si on n'est pas à portée de monstre
 
+    def peut_caster(self):
+        return self.peut_payer(cout_pm_soin[trouve_skill(self.classe_principale,Skill_magie).niveau-1])
+
+    def caste(self):
+        return "magie soin"
+
+    def peut_multi_caster(self):
+        return self.peut_payer(cout_pm_multi_soin[trouve_skill(self.classe_principale,Skill_magie).niveau-1])
+
+    def multi_caste(self):
+        return "magie multi soin"
+
     def attaque(self,direction):
         #Quelle est sa magie de prédilection ? Pour l'instant on va prendre l'avalanche
-        skill = trouve_skill(self.classe_principale,Skill_magie) #Est-ce qu'il a le même Skill_magie que le joueur ?
-        if self.peut_payer(cout_pm_avalanche[skill.niveau-1]):
+        if self.peut_payer(cout_pm_purification[trouve_skill(self.classe_principale,Skill_magie).niveau-1]):
             self.skill_courant = Skill_magie
             self.magie_courante = "magie purification" #/!\
             self.dir_magie = direction

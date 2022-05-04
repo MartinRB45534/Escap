@@ -237,6 +237,8 @@ class Controleur():
                 return self.labs[key[0]][Position(key[0],key[1],key[2])][key[3]]
             elif len(key)==3:
                 return self.labs[key[0]][Position(key[0],key[1],key[2])]
+        elif isinstance(key,Cote):
+            return self[key.emplacement][key.direction]
         elif isinstance(key,Position):
             return self.labs[key.lab][key]
         elif isinstance(key,int):
@@ -267,7 +269,7 @@ class Controleur():
 
         self.ajoute_entitee(Parchemin_vierge(Position("Étage 1 : test",1,5)))
 
-        paterns1 = [Patern(Position("Étage 1 : test",0,0),Decalage(20,20),[])]
+        paterns1 = [Pattern(Position("Étage 1 : test",0,0),Decalage(20,20),[])]
         self.labs["Étage 1 : test"]=Labyrinthe("Étage 1 : test",Decalage(20,20),Position("Étage 1 : test",0,0),paterns1,1,1,TERRE,1)
 
         self.entitees[2].position = Position("Étage 1 : test",0,0)
@@ -358,17 +360,17 @@ class Controleur():
         receptionniste = Receptionniste(self,Position("Étage 1 : couloir",14,0))
         self.ajoute_entitee(receptionniste)
         self.esprits["receptionniste"] = Esprit_humain(receptionniste.ID,self)
-        paterns1 = [Patern(Position("Étage 1 : couloir",9,0),Decalage(10,3),[Decalage(0,1)],["clé_couloir"])]
+        paterns1 = [Pattern(Position("Étage 1 : couloir",9,0),Decalage(0,3),[Cote(Decalage(0,1),GAUCHE)],["clé_couloir"])]
         self.labs["Étage 1 : couloir"]=Labyrinthe("Étage 1 : couloir",Decalage(19,3),Position("Étage 1 : couloir",0,0),paterns1,1,1,TERRE,1)
 
         #On crée le deuxième étage et son occupant :
         paume = Paume(self,Position("Étage 2 : labyrinthe",1,0))
         self.ajoute_entitee(paume)
         self.esprits["paume"] = Esprit_humain(paume.ID,self)
-        paterns2 = [Patern(Position("Étage 2 : labyrinthe",0,0),Decalage(5,5),[Decalage(4,1),Decalage(4,2),Decalage(4,3)]),
-                    Patern(Position("Étage 2 : labyrinthe",5,5),Decalage(5,5),[Decalage(0,1)],["Porte_centre_2"])]
-        self.labs["Étage 2 : labyrinthe"]=Labyrinthe("Étage 2 : labyrinthe",Decalage(15,15),Position("Étage 2 : labyrinthe",0,0),paterns2,1,1,TERRE,0.5)
-        self.construit_escalier(Position("Étage 1 : couloir",18,1),Position("Étage 2 : labyrinthe",0,0),DROITE,GAUCHE)
+        paterns2 = [Pattern(Position("Étage 2 : labyrinthe",0,5),Decalage(5,0)),
+                    Pattern(Position("Étage 2 : labyrinthe",5,5),Decalage(5,5),[Cote(Decalage(0,0),GAUCHE)],["Porte_centre_2"])]
+        self.labs["Étage 2 : labyrinthe"]=Labyrinthe("Étage 2 : labyrinthe",Decalage(15,15),Position("Étage 2 : labyrinthe",0,0),paterns2,1,1,TERRE,0.2)
+        self.construit_escalier(Cote(Position("Étage 1 : couloir",18,1),DROITE),Cote(Position("Étage 2 : labyrinthe",0,0),GAUCHE))
 
         #On crée le troisième étage et son occupante :
         peureuse = Peureuse(self,Position("Étage 3 : combat",8,8))
@@ -380,15 +382,16 @@ class Controleur():
         gobel1 = Premier_monstre(self,Position("Étage 3 : combat",3,8),1)
         self.ajoute_entitee(gobel1)
         self.esprits["gobelins_combat"]=Esprit_simple("gobelins_combat",[gobel1.ID],["humain"],self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
-        paterns3 = [Patern(Position("Étage 3 : combat",4,4),Decalage(7,7),[Decalage(0,4),Decalage(4,0),Decalage(0,0)]),
-                    Patern(Position("Étage 3 : combat",3,3),Decalage(3,3),[Decalage(0,0),Decalage(2,2)]),
-                    Patern(Position("Étage 3 : combat",7,2),Decalage(3,3),[Decalage(1,0),Decalage(1,2)]),
-                    Patern(Position("Étage 3 : combat",8,8),Decalage(3,3),[Decalage(0,0)]),
-                    Patern(Position("Étage 3 : combat",0,3),Decalage(1,8),[]),
-                    Patern(Position("Étage 3 : combat",1,6),Decalage(2,5),[Decalage(0,1),Decalage(0,2),Decalage(0,3),Decalage(1,1),Decalage(1,2),Decalage(1,3)],[],False),
-                    Patern(Position("Étage 3 : combat",2,7),Decalage(3,3),[Decalage(2,1),Decalage(0,1)])]
-        self.labs["Étage 3 : combat"]=Labyrinthe("Étage 3 : combat",Decalage(11,11),Position("Étage 3 : combat",0,0),paterns3,1,1,TERRE,0.4)
-        self.construit_escalier(Position("Étage 2 : labyrinthe",1,5),Position("Étage 3 : combat",10,10),HAUT,BAS)
+        paterns3 = [Pattern(Position("Étage 3 : combat",4,4),Decalage(7,7),[Cote(Decalage(0,3),GAUCHE),Cote(Decalage(0,4),GAUCHE),Cote(Decalage(0,5),GAUCHE),Cote(Decalage(3,0),HAUT),Cote(Decalage(4,0),HAUT),Cote(Decalage(5,0),HAUT),Cote(Decalage(0,0),HAUT),Cote(Decalage(1,0),HAUT),Cote(Decalage(0,0),GAUCHE),Cote(Decalage(0,1),GAUCHE)]),
+                    Pattern(Position("Étage 3 : combat",3,3),Decalage(3,3),[Cote(Decalage(0,0),HAUT),Cote(Decalage(2,2),BAS),Cote(Decalage(0,0),GAUCHE),Cote(Decalage(2,2),DROITE)]),
+                    Pattern(Position("Étage 3 : combat",7,2),Decalage(3,3),[Cote(Decalage(1,0),HAUT),Cote(Decalage(1,2),BAS)]),
+                    Pattern(Position("Étage 3 : combat",8,8),Decalage(3,3),[Cote(Decalage(0,0),HAUT),Cote(Decalage(0,0),GAUCHE)]),
+                    Pattern(Position("Étage 3 : combat",0,3),Decalage(1,0)),
+                    Pattern(Position("Étage 3 : combat",1,3),Decalage(0,3)),
+                    Pattern(Position("Étage 3 : combat",1,6),Decalage(2,0)),
+                    Pattern(Position("Étage 3 : combat",2,7),Decalage(3,3),[Cote(Decalage(0,1),GAUCHE),Cote(Decalage(2,1),DROITE)])]
+        self.labs["Étage 3 : combat"]=Labyrinthe("Étage 3 : combat",Decalage(11,11),Position("Étage 3 : combat",0,0),paterns3,1,1,TERRE,0.2)
+        self.construit_escalier(Cote(Position("Étage 2 : labyrinthe",1,5),HAUT),Cote(Position("Étage 3 : combat",10,10),BAS))
 
         #On crée le quatrième étage et ses occupants :
         codeur = Codeur(self,Position("Étage 4 : monstres",15,1))
@@ -399,12 +402,12 @@ class Controleur():
         gobel2 = Deuxieme_monstre(self,Position("Étage 4 : monstres",10,4),1) #Ainsi qu'un mage,
         self.ajoute_entitee(gobel2)
         self.esprits["gobelins_monstres"]=Esprit_simple("gobelins_monstres",[gobel1.ID,gobel2.ID],["humain"],self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
-        paterns4 = [Patern(Position("Étage 4 : monstres",4,0),Decalage(10,2),[Decalage(0,1)],[],False),
-                    Patern(Position("Étage 4 : monstres",7,2),Decalage(10,4),[Decalage(0,2)],[],False),
-                    Patern(Position("Étage 4 : monstres",14,0),Decalage(3,3),[Decalage(0,1)]),
-                    Patern(Position("Étage 4 : monstres",0,7),Decalage(4,3),[Decalage(3,1)],["Porte_coin_4"])]
-        self.labs["Étage 4 : monstres"]=Labyrinthe("Étage 4 : monstres",Decalage(17,10),Position("Étage 4 : monstres",0,0),paterns4,1,1,TERRE,0.35)
-        self.construit_escalier(Position("Étage 3 : combat",0,3),Position("Étage 4 : monstres",16,5),GAUCHE,DROITE)
+        paterns4 = [Pattern(Position("Étage 4 : monstres",4,0),Decalage(10,2),[Cote(Decalage(0,1),GAUCHE),Cote(Decalage(9,1),DROITE)],[],False),
+                    Pattern(Position("Étage 4 : monstres",7,6),Decalage(10,0),[Cote(Decalage(0,1),GAUCHE)]),
+                    Pattern(Position("Étage 4 : monstres",14,0),Decalage(3,3),[Cote(Decalage(0,1),GAUCHE)]),
+                    Pattern(Position("Étage 4 : monstres",0,7),Decalage(4,3),[Cote(Decalage(3,1),DROITE)],["Porte_coin_4"])]
+        self.labs["Étage 4 : monstres"]=Labyrinthe("Étage 4 : monstres",Decalage(17,10),Position("Étage 4 : monstres",0,0),paterns4,1,1,TERRE,0.1,[1,5,1,5]) #/!\ Vérifier ce que ça donne
+        self.construit_escalier(Cote(Position("Étage 3 : combat",0,3),GAUCHE),Cote(Position("Étage 4 : monstres",16,5),DROITE))
 
         #On crée le cinquième étage et ses occupants :
         encombrant = Encombrant(self,Position("Étage 5 : portes",2,3))
@@ -445,27 +448,26 @@ class Controleur():
         self.esprits["ombriul_captif"]=Esprit_simple("ombriul_captif",[ombriul.ID],["humain"],self)
         esprit_slime = Esprit_slime(slime.ID,self)
         self.esprits[esprit_slime.nom]=esprit_slime #Les esprits des slimes sont presque aussi compliqués que ceux des humains, les ruptures en moins.
-        paterns5 = [Patern(Position("Étage 5 : portes",0,0),Decalage(10,14),[]),
-                    Patern(Position("Étage 5 : portes",7,11),Decalage(3,3),[]),
-                    Patern(Position("Étage 5 : portes",0,5),Decalage(5,3),[]),
-                    Patern(Position("Étage 5 : portes",0,1),Decalage(5,4),[Decalage(1,0),Decalage(4,2)],["Porte_sortie_encombrant_5","Porte_entree_encombrant_5"]),
-                    Patern(Position("Étage 5 : portes",0,8),Decalage(3,3),[Decalage(1,0),Decalage(2,1)],["Porte_première_cellule_5","Porte_couloir_5"]),
-                    Patern(Position("Étage 5 : portes",0,11),Decalage(4,3),[Decalage(2,0)],["Porte_avant_prison_5"]),
-                    Patern(Position("Étage 5 : portes",4,11),Decalage(3,3),[Decalage(1,0),Decalage(2,1)],["Porte_double_cellule_première_5","Porte_double_cellule_deuxième_5"]),
-                    Patern(Position("Étage 5 : portes",6,0),Decalage(4,5),[Decalage(2,4)],["Porte_grande_cellule_5"]),
-                    Patern(Position("Étage 5 : portes",5,6),Decalage(4,4),[Decalage(3,2)],["Porte_cellule_biscornue_5"]),
-                    Patern(Position("Étage 5 : portes",3,7),Decalage(2,2),[]),
-                    Patern(Position("Étage 5 : portes",4,8),Decalage(2,2),[Decalage(0,0)]),
-                    Patern(Position("Étage 5 : portes",5,6),Decalage(2,2),[Decalage(0,1)])]
-        self.labs["Étage 5 : portes"]=Labyrinthe("Étage 5 : portes",Decalage(10,14),Position("Étage 5 : portes",0,0),paterns5)
-        self[Position("Étage 5 : portes",6,5),BAS].cree_porte(1,"Porte_cellule_plus_biscornue_5")
-        self[Position("Étage 5 : portes",6,6),HAUT].cree_porte(1,"Porte_cellule_plus_biscornue_5")
-        self[Position("Étage 5 : portes",4,0),DROITE].cree_porte(1,"Porte_fin_couloir_5")
-        self[Position("Étage 5 : portes",5,0),GAUCHE].cree_porte(1,"Porte_fin_couloir_5")
-        self[Position("Étage 5 : portes",2,11),HAUT].cree_porte(1,"Porte_avant_prison_5",Premiere_porte)
-        self[Position("Étage 5 : portes",4,3),DROITE].effets[1].auto = True
-        self[Position("Étage 5 : portes",5,3),GAUCHE].effets[1].auto = True
-        self.construit_escalier(Position("Étage 4 : monstres",16,7),Position("Étage 5 : portes",0,13),DROITE,GAUCHE,Premiere_marche)
+        paterns5 = [Pattern(Position("Étage 5 : portes",7,11),Decalage(3,3),[Cote(Decalage(0,1),GAUCHE)]),
+                    Pattern(Position("Étage 5 : portes",0,5),Decalage(5,3),[Cote(Decalage(1,2),BAS)]),
+                    Pattern(Position("Étage 5 : portes",0,1),Decalage(5,4),[Cote(Decalage(0,0),HAUT),Cote(Decalage(4,2),DROITE)],["Porte_sortie_encombrant_5","Porte_entree_encombrant_5"]),
+                    Pattern(Position("Étage 5 : portes",0,8),Decalage(3,3),[Cote(Decalage(1,0),HAUT),Cote(Decalage(2,1),DROITE),Cote(Decalage(2,2),BAS)],["Porte_première_cellule_5","Porte_couloir_5"]),
+                    Pattern(Position("Étage 5 : portes",0,11),Decalage(4,3),[Cote(Decalage(2,0),HAUT)],["Porte_avant_prison_5"]),
+                    Pattern(Position("Étage 5 : portes",4,11),Decalage(3,3),[Cote(Decalage(1,0),HAUT),Cote(Decalage(2,1),DROITE)],["Porte_double_cellule_première_5","Porte_double_cellule_deuxième_5"]),
+                    Pattern(Position("Étage 5 : portes",6,0),Decalage(4,5),[Cote(Decalage(2,4),BAS)],["Porte_grande_cellule_5"]),
+                    Pattern(Position("Étage 5 : portes",5,6),Decalage(4,4),[Cote(Decalage(3,2),DROITE)],["Porte_cellule_biscornue_5"]), #/!\ À corriger /!\
+                    Pattern(Position("Étage 5 : portes",3,7),Decalage(2,2),[Cote(Decalage(1,1),BAS),Cote(Decalage(1,1),DROITE)]),
+                    Pattern(Position("Étage 5 : portes",4,8),Decalage(2,2),[Cote(Decalage(0,0),HAUT),Cote(Decalage(0,0),GAUCHE)]),
+                    Pattern(Position("Étage 5 : portes",5,6),Decalage(2,2),[Cote(Decalage(0,1),GAUCHE)])]
+        self.labs["Étage 5 : portes"]=Labyrinthe("Étage 5 : portes",Decalage(10,14),Position("Étage 5 : portes",0,0),paterns5,1,1,TERRE,1)
+        self[Cote(Position("Étage 5 : portes",6,5),BAS)].cree_porte("Porte_cellule_plus_biscornue_5")
+        self[Cote(Position("Étage 5 : portes",6,6),HAUT)].cree_porte("Porte_cellule_plus_biscornue_5")
+        self[Cote(Position("Étage 5 : portes",4,0),DROITE)].cree_porte("Porte_fin_couloir_5")
+        self[Cote(Position("Étage 5 : portes",5,0),GAUCHE)].cree_porte("Porte_fin_couloir_5")
+        self[Cote(Position("Étage 5 : portes",2,11),HAUT)].cree_porte("Porte_avant_prison_5",Premiere_porte)
+        self[Cote(Position("Étage 5 : portes",4,3),DROITE)].effets[1].auto = True
+        self[Cote(Position("Étage 5 : portes",5,3),GAUCHE)].effets[1].auto = True
+        self.construit_escalier(Cote(Position("Étage 4 : monstres",16,7),DROITE),Cote(Position("Étage 5 : portes",0,13),GAUCHE),Premiere_marche)
 
         #On crée le sixième étage et son occupant :
         #Nouvelle version :
@@ -518,36 +520,36 @@ class Controleur():
         self.ajoute_entitee(gobel9)
         self.esprits["gobelins_potions"]=Esprit_simple("gobelins_potions",[gobel1.ID,gobel2.ID,gobel3.ID,gobel4.ID,gobel5.ID,gobel6.ID,gobel7.ID,gobel8.ID,gobel9.ID],["humain"],self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
 
-        paterns6 = [Patern(Position("Étage 6 : potions",9,3),Decalage(6,8),[Decalage(0,7)]), #La cuisine, avec le shaman et les derniers gobelins (0)
-                    Patern(Position("Étage 6 : potions",6,0),Decalage(3,2),[]), #(5)
-                    Patern(Position("Étage 6 : potions",3,0),Decalage(3,2),[]), #(12)
-                    Patern(Position("Étage 6 : potions",0,3),Decalage(2,3),[]), #(10)
-                    Patern(Position("Étage 6 : potions",0,0),Decalage(3,3),[Decalage(1,2),Decalage(2,1)],["Deuxième_porte_potions","Troisième_porte_potions"]), #(11)
-                    Patern(Position("Étage 6 : potions",3,7),Decalage(3,2),[]), #(4)
-                    Patern(Position("Étage 6 : potions",0,6),Decalage(3,3),[Decalage(2,1)],["Première_porte_potions"]), #(3)
-                    Patern(Position("Étage 6 : potions",0,9),Decalage(3,3),[]), #(8)
-                    Patern(Position("Étage 6 : potions",3,9),Decalage(3,3),[Decalage(0,1)],["Porte_inutile_potion"]), #(9)
-                    Patern(Position("Étage 6 : potions",2,2),Decalage(5,5),[]), #(7)
-                    Patern(Position("Étage 6 : potions",12,9),Decalage(3,3),[]), #(6)
-                    Patern(Position("Étage 6 : potions",11,0),Decalage(4,4),[Decalage(2,3)],["Porte_cuisine"]), #(1)
-                    Patern(Position("Étage 6 : potions",8,3),Decalage(4,4),[]), #(2)
-                    Patern(Position("Étage 6 : potions",0,12),Decalage(5,3),[Decalage(4,1)],["Porte_armurerie_6"])]
+        paterns6 = [Pattern(Position("Étage 6 : potions",9,3),Decalage(6,8),[Cote(Decalage(0,0),GAUCHE),Cote(Decalage(0,1),GAUCHE),Cote(Decalage(0,2),GAUCHE),Cote(Decalage(0,3),GAUCHE),Cote(Decalage(3,0),HAUT),Cote(Decalage(4,0),HAUT),Cote(Decalage(5,0),HAUT),Cote(Decalage(0,7),GAUCHE),Cote(Decalage(0,7),BAS),Cote(Decalage(3,7),BAS),Cote(Decalage(4,7),BAS),Cote(Decalage(5,7),BAS)]), #La cuisine, avec le shaman et les derniers gobelins (0)
+                    Pattern(Position("Étage 6 : potions",6,0),Decalage(3,2),[]), #(5)
+                    Pattern(Position("Étage 6 : potions",3,0),Decalage(3,2),[Cote(Decalage(0,1),GAUCHE)]), #(12)
+                    Pattern(Position("Étage 6 : potions",0,3),Decalage(2,3),[Cote(Decalage(1,0),HAUT)]), #(10)
+                    Pattern(Position("Étage 6 : potions",0,0),Decalage(3,3),[Cote(Decalage(1,2),BAS),Cote(Decalage(2,1),DROITE)],["Deuxième_porte_potions","Troisième_porte_potions"]), #(11)
+                    Pattern(Position("Étage 6 : potions",3,7),Decalage(3,2),[Cote(Decalage(0,1),GAUCHE)]), #(4) /!\ QUOI ?!?
+                    Pattern(Position("Étage 6 : potions",0,6),Decalage(3,3),[Cote(Decalage(2,1),DROITE)],["Première_porte_potions"]), #(3)
+                    Pattern(Position("Étage 6 : potions",0,9),Decalage(3,3),[Cote(Decalage(2,1),DROITE)]), #(8)
+                    Pattern(Position("Étage 6 : potions",3,9),Decalage(3,3),[Cote(Decalage(0,1),GAUCHE)],["Porte_inutile_potion"]), #(9)
+                    Pattern(Position("Étage 6 : potions",2,2),Decalage(5,5),[]), #(7)
+                    Pattern(Position("Étage 6 : potions",12,9),Decalage(3,3),[]), #(6)
+                    Pattern(Position("Étage 6 : potions",11,0),Decalage(4,4),[Cote(Decalage(0,3),GAUCHE),Cote(Decalage(0,3),BAS),Cote(Decalage(2,3),BAS)],["Porte_cuisine"]), #(1)
+                    Pattern(Position("Étage 6 : potions",8,3),Decalage(4,4),[]), #(2)
+                    Pattern(Position("Étage 6 : potions",0,12),Decalage(5,3),[Cote(Decalage(4,1),DROITE)],["Porte_armurerie_6"])]
         self.labs["Étage 6 : potions"]=Labyrinthe("Étage 6 : potions",Decalage(15,15),Position("Étage 6 : potions",14,14),paterns6,1,1,TERRE,0.2)
 
-        self.set_teleport(Position("Étage 6 : potions",11,2),Position("Étage 6 : potions",8,3),GAUCHE,HAUT,Premier_portail) # 1,2
-        self.set_teleport(Position("Étage 6 : potions",13,0),Position("Étage 6 : potions",1,6),HAUT,DROITE,Premier_portail) # 1,3
-        self.set_teleport(Position("Étage 6 : potions",3,8),Position("Étage 6 : potions",6,0),BAS,GAUCHE) # 4,5
-        self.set_teleport(Position("Étage 6 : potions",4,8),Position("Étage 6 : potions",13,9),BAS,HAUT) # 4,6
-        self.set_teleport(Position("Étage 6 : potions",5,8),Position("Étage 6 : potions",4,11),BAS,BAS) # 4,9
-        self.set_teleport(Position("Étage 6 : potions",12,10),Position("Étage 6 : potions",7,0),GAUCHE,HAUT) # 6,5
-        self.set_teleport(Position("Étage 6 : potions",13,11),Position("Étage 6 : potions",4,2),BAS,HAUT) # 6,7
-        self.set_teleport(Position("Étage 6 : potions",2,2),Position("Étage 6 : potions",6,1),GAUCHE,BAS) # 7,5
-        self.set_teleport(Position("Étage 6 : potions",6,5),Position("Étage 6 : potions",0,11),DROITE,BAS) # 7,8
-        self.set_teleport(Position("Étage 6 : potions",2,9),Position("Étage 6 : potions",8,1),DROITE,BAS) # 8,5
-        self.set_teleport(Position("Étage 6 : potions",5,11),Position("Étage 6 : potions",8,0),BAS,DROITE) # 9,5
-        self.set_teleport(Position("Étage 6 : potions",5,10),Position("Étage 6 : potions",0,4),DROITE,GAUCHE) # 9,10
+        self.set_teleport(Cote(Position("Étage 6 : potions",11,2),GAUCHE),Cote(Position("Étage 6 : potions",8,3),HAUT),Premier_portail) # 1,2
+        self.set_teleport(Cote(Position("Étage 6 : potions",13,0),HAUT),Cote(Position("Étage 6 : potions",1,6),DROITE),Premier_portail) # 1,3
+        self.set_teleport(Cote(Position("Étage 6 : potions",3,8),BAS),Cote(Position("Étage 6 : potions",6,0),GAUCHE)) # 4,5
+        self.set_teleport(Cote(Position("Étage 6 : potions",4,8),BAS),Cote(Position("Étage 6 : potions",13,9),HAUT)) # 4,6
+        self.set_teleport(Cote(Position("Étage 6 : potions",5,8),BAS),Cote(Position("Étage 6 : potions",4,11),BAS)) # 4,9
+        self.set_teleport(Cote(Position("Étage 6 : potions",12,10),GAUCHE),Cote(Position("Étage 6 : potions",7,0),HAUT)) # 6,5
+        self.set_teleport(Cote(Position("Étage 6 : potions",13,11),BAS),Cote(Position("Étage 6 : potions",4,2),HAUT)) # 6,7
+        self.set_teleport(Cote(Position("Étage 6 : potions",2,2),GAUCHE),Cote(Position("Étage 6 : potions",6,1),BAS)) # 7,5
+        self.set_teleport(Cote(Position("Étage 6 : potions",6,5),DROITE),Cote(Position("Étage 6 : potions",0,11),BAS)) # 7,8
+        self.set_teleport(Cote(Position("Étage 6 : potions",2,9),DROITE),Cote(Position("Étage 6 : potions",8,1),BAS)) # 8,5
+        self.set_teleport(Cote(Position("Étage 6 : potions",5,11),BAS),Cote(Position("Étage 6 : potions",8,0),DROITE)) # 9,5
+        self.set_teleport(Cote(Position("Étage 6 : potions",5,10),DROITE),Cote(Position("Étage 6 : potions",0,4),GAUCHE)) # 9,10
 
-        self.construit_escalier(Position("Étage 5 : portes",0,0),Position("Étage 6 : potions",14,0),GAUCHE,DROITE)
+        self.construit_escalier(Cote(Position("Étage 5 : portes",0,0),GAUCHE),Cote(Position("Étage 6 : potions",14,0),DROITE))
 
         #On crée le septième étage et son occupante :
         peste = Peste(self,Position("Étage 7 : meutes",2,0))
@@ -576,12 +578,12 @@ class Controleur():
         gobel10 = Shaman_gobelin(self,Position("Étage 7 : meutes",10,5),1)
         self.ajoute_entitee(gobel10)
         self.esprits["gobelins_meutes"]=Esprit_simple("gobelins_meutes",[gobel1.ID,gobel2.ID,gobel3.ID,gobel4.ID,gobel5.ID,gobel6.ID,gobel7.ID,gobel8.ID,gobel9.ID,gobel10.ID],["humain"],self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
-        paterns7 = [Patern(Position("Étage 7 : meutes",0,0),Decalage(15,2),[]),
-                    Patern(Position("Étage 7 : meutes",0,2),Decalage(4,3),[Decalage(1,0),Decalage(2,2)],["Porte_annexe_gauche_7"]),
-                    Patern(Position("Étage 7 : meutes",4,2),Decalage(7,4),[Decalage(3,0)],["Porte_salle_commune_7"]),
-                    Patern(Position("Étage 7 : meutes",11,2),Decalage(4,3),[Decalage(2,0),Decalage(1,2)],["Porte_annexe_droite_7"])]
-        self.labs["Étage 7 : meutes"]=Labyrinthe("Étage 7 : meutes",Decalage(15,10),Position("Étage 7 : meutes",0,9),paterns7,1,1,TERRE,0.3)
-        self.construit_escalier(Position("Étage 6 : potions",12,14),Position("Étage 7 : meutes",7,0),BAS,HAUT)
+        paterns7 = [Pattern(Position("Étage 7 : meutes",0,0),Decalage(15,2),[Cote(Decalage(1,1),BAS),Cote(Decalage(13,1),BAS)]),
+                    Pattern(Position("Étage 7 : meutes",0,2),Decalage(4,3),[Cote(Decalage(1,0),HAUT),Cote(Decalage(2,2),BAS)],["Porte_annexe_gauche_7"]),
+                    Pattern(Position("Étage 7 : meutes",4,2),Decalage(7,4),[Cote(Decalage(3,0),HAUT)],["Porte_salle_commune_7"]),
+                    Pattern(Position("Étage 7 : meutes",11,2),Decalage(4,3),[Cote(Decalage(2,0),HAUT),Cote(Decalage(1,2),BAS)],["Porte_annexe_droite_7"])]
+        self.labs["Étage 7 : meutes"]=Labyrinthe("Étage 7 : meutes",Decalage(15,10),Position("Étage 7 : meutes",0,9),paterns7,1,1,TERRE,0.3,[1,3,1,3])
+        self.construit_escalier(Cote(Position("Étage 6 : potions",12,14),BAS),Cote(Position("Étage 7 : meutes",7,0),HAUT))
 
         #On crée le huitième étage et son occupante :
         bombe_atomique = Bombe_atomique(self,Position("Étage 8 : magie",8,7))
@@ -614,11 +616,11 @@ class Controleur():
         gobel10 = Mage_gobelin(self,Position("Étage 8 : magie",10,9),1)
         self.ajoute_entitee(gobel10)
         self.esprits["gobelins_magie"]=Esprit_simple("gobelins_magie",[gobel1.ID,gobel2.ID,gobel3.ID,gobel4.ID,gobel5.ID,gobel6.ID,gobel7.ID,gobel8.ID,gobel9.ID,gobel10.ID],["humain"],self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
-        paterns8 = [Patern(Position("Étage 8 : magie",10,0),Decalage(5,4),[Decalage(0,1)]),
-                    Patern(Position("Étage 8 : magie",7,6),Decalage(4,3),[Decalage(0,1)],["Porte_anti_chambre_8"]),
-                    Patern(Position("Étage 8 : magie",11,4),Decalage(4,6),[Decalage(2,0),Decalage(0,4)],["Porte_sas_8","Porte_anti_anti_chambre_8"])]
+        paterns8 = [Pattern(Position("Étage 8 : magie",10,0),Decalage(5,4),[Cote(Decalage(0,1),GAUCHE),Cote(Decalage(3,3),BAS)]),
+                    Pattern(Position("Étage 8 : magie",7,6),Decalage(4,3),[Cote(Decalage(0,1),GAUCHE),Cote(Decalage(3,1),DROITE)],["Porte_anti_chambre_8"]),
+                    Pattern(Position("Étage 8 : magie",11,4),Decalage(4,6),[Cote(Decalage(2,0),HAUT),Cote(Decalage(0,4),GAUCHE)],["Porte_sas_8","Porte_anti_anti_chambre_8"])]
         self.labs["Étage 8 : magie"]=Labyrinthe("Étage 8 : magie",Decalage(15,10),Position("Étage 8 : magie",0,0),paterns8,1,1,TERRE,0.4)
-        self.construit_escalier(Position("Étage 7 : meutes",0,9),Position("Étage 8 : magie",14,7),GAUCHE,DROITE) #/!\ Rajouter un parchemin
+        self.construit_escalier(Cote(Position("Étage 7 : meutes",0,9),GAUCHE),Cote(Position("Étage 8 : magie",14,7),DROITE)) #/!\ Rajouter un parchemin
 
         #On crée le neuvième étage et son occupant :
         marchand = Marchand(self,Position("Étage 9 : équippement",6,2))
@@ -684,18 +686,18 @@ class Controleur():
         gobel10 = Shaman_gobelin(self,Position("Étage 9 : équippement",26,9),1)
         self.ajoute_entitee(gobel10)
         self.esprits["gobelins_equippement"]=Esprit_simple("gobelins_equippement",[gobel1.ID,gobel2.ID,gobel3.ID,gobel4.ID,gobel5.ID,gobel6.ID,gobel7.ID,gobel8.ID,gobel9.ID,gobel10.ID],["humain"],self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
-        paterns9 = [Patern(Position("Étage 9 : équippement",0,0),Decalage(7,4),[Decalage(5,3)],["Porte_première_armurerie_9"]),
-                    Patern(Position("Étage 9 : équippement",3,5),Decalage(4,5),[Decalage(2,0)],["Porte_deuxième_armurerie_9"]),
-                    Patern(Position("Étage 9 : équippement",11,2),Decalage(6,4),[Decalage(0,2)],["Porte_troisième_armurerie_9"]),
-                    Patern(Position("Étage 9 : équippement",15,7),Decalage(10,3),[Decalage(8,0)],["Porte_quatrième_armurerie_9"]),
-                    Patern(Position("Étage 9 : équippement",28,0),Decalage(12,10),[Decalage(0,0)],[],False),
-                    Patern(Position("Étage 9 : équippement",23,1),Decalage(8,4),[Decalage(3,0)],["Porte_cinquième_armurerie_9"]),
-                    Patern(Position("Étage 9 : équippement",36,0),Decalage(4,4),[Decalage(1,3)],["Porte_sixième_armurerie_9"]),
+        paterns9 = [Pattern(Position("Étage 9 : équippement",0,0),Decalage(7,4),[Cote(Decalage(5,3),BAS)],["Porte_première_armurerie_9"]),
+                    Pattern(Position("Étage 9 : équippement",3,5),Decalage(4,5),[Cote(Decalage(2,0),HAUT)],["Porte_deuxième_armurerie_9"]),
+                    Pattern(Position("Étage 9 : équippement",11,2),Decalage(6,4),[Cote(Decalage(0,2),GAUCHE)],["Porte_troisième_armurerie_9"]),
+                    Pattern(Position("Étage 9 : équippement",15,7),Decalage(10,3),[Cote(Decalage(8,0),HAUT)],["Porte_quatrième_armurerie_9"]),
+                    Pattern(Position("Étage 9 : équippement",28,0),Decalage(0,10),[Cote(Decalage(0,0),GAUCHE),Cote(Decalage(0,1),GAUCHE),Cote(Decalage(0,2),GAUCHE),Cote(Decalage(0,3),GAUCHE),Cote(Decalage(0,4),GAUCHE)],[],False),
+                    Pattern(Position("Étage 9 : équippement",23,1),Decalage(8,4),[Cote(Decalage(3,0),HAUT)],["Porte_cinquième_armurerie_9"]),
+                    Pattern(Position("Étage 9 : équippement",36,0),Decalage(4,4),[Cote(Decalage(1,3),BAS)],["Porte_sixième_armurerie_9"]),
                     ]
-        self.labs["Étage 9 : équippement"]=Labyrinthe("Étage 9 : équippement",Decalage(40,10),Position("Étage 9 : équippement",0,0),paterns9,1,1,TERRE,0.3)
+        self.labs["Étage 9 : équippement"]=Labyrinthe("Étage 9 : équippement",Decalage(40,10),Position("Étage 9 : équippement",0,0),paterns9,1,1,TERRE,0.1)
         self[Position("Étage 9 : équippement",5,4),HAUT].effets[1].ferme = False
         self[Position("Étage 9 : équippement",5,3),BAS].effets[1].ferme = False
-        self.construit_escalier(Position("Étage 8 : magie",13,0),Position("Étage 9 : équippement",1,9),HAUT,BAS) #/!\ Rajouter les ennemis !
+        self.construit_escalier(Cote(Position("Étage 8 : magie",13,0),HAUT),Cote(Position("Étage 9 : équippement",1,9),BAS)) #/!\ Rajouter les ennemis !
 
         #On crée le dixième étage
         gobel1 = Sentinelle_gobelin(self,Position("Étage 10 : Boss",5,5),1)
@@ -719,11 +721,10 @@ class Controleur():
         boss = Chef_gobelin(self,Position("Étage 10 : Boss",9,9),1)
         self.ajoute_entitee(boss)
         self.esprits["gobelins_boss"]=Esprit_simple("gobelins_boss",[gobel1.ID,gobel2.ID,gobel3.ID,gobel4.ID,gobel5.ID,gobel6.ID,gobel7.ID,gobel8.ID,gobel9.ID,boss.ID],["humain"],self) #/!\ Remplacer à l'occasion par un esprit + adéquat (niveau mémoire, etc.)
-        paterns10 = [Patern(Position("Étage 10 : Boss",0,0),Decalage(25,19),[],[]),
-                     Patern(Position("Étage 10 : Boss",10,0),Decalage(10,19),[Decalage(0,9)],["Porte_boss_10"],1,1,FEU),
-                     Patern(Position("Étage 10 : Boss",20,7),Decalage(3,5),[Decalage(0,2)],["Porte_dérobée_10"])]
-        self.labs["Étage 10 : Boss"]=Labyrinthe("Étage 10 : Boss",Decalage(25,19),Position("Étage 10 : Boss",0,0),paterns10,1,1,TERRE,0.1)
-        self.construit_escalier(Position("Étage 9 : équippement",39,4),Position("Étage 10 : Boss",0,9),DROITE,GAUCHE) #/!\ Rajouter les ennemis !
+        paterns10 = [Pattern(Position("Étage 10 : Boss",10,0),Decalage(0,19),[Cote(Decalage(0,9),GAUCHE)],["Porte_boss_10"]),
+                     Pattern(Position("Étage 10 : Boss",20,0),Decalage(3,19),[Cote(Decalage(0,9),GAUCHE)],["Porte_dérobée_10"])]
+        self.labs["Étage 10 : Boss"]=Labyrinthe("Étage 10 : Boss",Decalage(23,19),Position("Étage 10 : Boss",0,0),paterns10,1,1,TERRE,1)
+        self.construit_escalier(Cote(Position("Étage 9 : équippement",39,4),DROITE),Cote(Position("Étage 10 : Boss",0,9),GAUCHE)) #/!\ Rajouter les ennemis !
 
         #On lance la cinématique :
         #À rajouter
@@ -737,7 +738,7 @@ class Controleur():
         if vue : # On peut avoir des spectateurs, mais pas forcément
             self.ajoute_entitee(Joueur(("arène",tailles_lab[0]//2,tailles_lab[1]//2),screen))
         # Première étape : créer l'arène
-        self.labs["arène"]=Labyrinthe("arène",Decalage(tailles_lab[0],tailles_lab[1]),("arène",0,0),[Patern(("arène",0,0),tailles_lab[0],tailles_lab[1],[],[],vide)])
+        self.labs["arène"]=Labyrinthe("arène",Decalage(tailles_lab[0],tailles_lab[1]),("arène",0,0),[Pattern(("arène",0,0),tailles_lab[0],tailles_lab[1],[],[],vide)])
         # Deuxième étape : créer les opposants
         self.esprits["1"] = esprit1("1",niveau_1,self,("arène",0,0))
         self.esprits["2"] = esprit2("2",niveau_2,self,("arène",tailles_lab[0]-1,0))
@@ -858,29 +859,21 @@ class Controleur():
     def get_lab(self,num_lab):
         return self.labs[num_lab]
 
-    def set_teleport(self,pos_dep,pos_arr,dir_dep,dir_arr,portail=None):
-        case_dep = self.get_case(pos_dep)
-        case_arr = self.get_case(pos_arr)
-        case_dep.repoussante = True
-        case_arr.repoussante = True
-        mur_dep = case_dep.get_mur_dir(dir_dep)
-        mur_arr = case_arr.get_mur_dir(dir_arr)
-        mur_dep.detruit()
-        mur_arr.detruit()
-        mur_dep.set_cible(pos_arr,True,portail)
-        mur_arr.set_cible(pos_dep,True,portail)
+    def set_teleport(self,cote_dep,cote_arr,portail=None):
+        self[cote_dep.emplacement].repoussante = True
+        self[cote_arr.emplacement].repoussante = True
+        self[cote_dep].detruit()
+        self[cote_arr].detruit()
+        self[cote_dep].set_cible(cote_arr.emplacement,True,portail)
+        self[cote_arr].set_cible(cote_dep.emplacement,True,portail)
 
-    def construit_escalier(self,pos_dep,pos_arr,dir_dep,dir_arr,escalier=None):
-        case_dep = self.get_case(pos_dep)
-        case_arr = self.get_case(pos_arr)
-        case_dep.repoussante = True
-        case_arr.repoussante = True
-        mur_dep = case_dep.get_mur_dir(dir_dep)
-        mur_arr = case_arr.get_mur_dir(dir_arr)
-        mur_dep.detruit()
-        mur_arr.detruit()
-        mur_dep.set_escalier(pos_arr,HAUT,escalier) #Par convention, la première case est en bas
-        mur_arr.set_escalier(pos_dep,BAS,escalier)
+    def construit_escalier(self,cote_dep,cote_arr,escalier=None):
+        self[cote_dep.emplacement].repoussante = True
+        self[cote_arr.emplacement].repoussante = True
+        self[cote_dep].detruit()
+        self[cote_arr].detruit()
+        self[cote_dep].set_escalier(cote_arr.emplacement,HAUT,escalier) #Par convention, la première case est en bas
+        self[cote_arr].set_escalier(cote_dep.emplacement,BAS,escalier)
 
     def get_case(self,position):
         return self.get_lab(position.lab).get_case(position)

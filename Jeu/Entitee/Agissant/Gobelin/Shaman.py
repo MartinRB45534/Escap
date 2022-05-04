@@ -6,8 +6,13 @@ class Shaman_gobelin(Renforceur,Support_lointain,Gobelin):
     def __init__(self,controleur,position,niveau):
         Agissant.__init__(self,controleur,position,"shaman_gobelin",niveau)
 
+    def peut_caster(self,niveau):
+        return self.peut_payer(cout_pm_boost[niveau-1])
+
+    def caste(self):
+        return "magie boost"
+
     def boost(self,cible):
-        skill = trouve_skill(self.classe_principale,Skill_magie)
         self.skill_courant = Skill_magie
         self.magie_courante = "magie boost"
         self.cible_magie = cible

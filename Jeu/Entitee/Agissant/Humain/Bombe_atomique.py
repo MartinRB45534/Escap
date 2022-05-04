@@ -33,16 +33,15 @@ class Bombe_atomique(Attaquant_magique_case,Support,Humain): #La neuvième humai
         taux_limite = 0.5 + 0.01*self.appreciations[8] #Quand on se hait, on devient plus suicidaire
         return (self.pv-degats) / self.pv_max <= taux_limite
 
-    def peut_caster(self,niveau):
-        return self.peut_payer(cout_pm_volcan[niveau-1])
+    def peut_caster(self):
+        return self.peut_payer(cout_pm_volcan[trouve_skill(self.classe_principale,Skill_magie).niveau-1])
 
     def caste(self):
         return "magie volcan"
 
     def attaque(self,direction):
         #Quelle est sa magie de prédilection ? Pour l'instant on va prendre l'avalanche
-        skill = trouve_skill(self.classe_principale,Skill_magie) #Est-ce qu'il a le même Skill_magie que le joueur ?
-        if self.peut_payer(cout_pm_poing_ardent[skill.niveau-1]):
+        if self.peut_payer(cout_pm_poing_ardent[trouve_skill(self.classe_principale,Skill_magie).niveau-1]):
             self.skill_courant = Skill_magie
             self.magie_courante = "magie poing ardent"
         else:

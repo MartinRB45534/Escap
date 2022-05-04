@@ -1,3 +1,4 @@
+from operator import itemgetter
 from Jeu.Entitee.Agissant.Role.Mage import *
 from Jeu.Systeme.Constantes_magies.Magies import *
 
@@ -5,22 +6,17 @@ class Renforceur(Mage):
     """Les agissants qui boostent les attaques de leurs alliés."""
 
     def agit_en_vue(self,esprit,defaut = ""):
-        cible = None
-        importance = 0
-        #On cherche des alliés à booster
+        cibles = []
         for ID in esprit.corps.keys():
-            agissant = self.controleur.get_entitee(ID)
-            if agissant.statut == "attaque":
-                new_importance = esprit.get_importance(agissant.get_impact())
-                if new_importance > importance:
-                    cible = ID
-                    importance = new_importance
-        skill = trouve_skill(self.classe_principale,Skill_magie)
-        if cible != None and self.peut_payer(cout_pm_boost[skill.niveau-1]):
+            corp = self.controleur.get_entitee(ID)
+            if corp.statut == "attaque":
+                cibles.append([esprit.get_importance(corp.get_impact()),ID])
+        if cibles != [] and self.peut_caster():
+            new_cibles = sorted(cibles, key=itemgetter(0))
             self.skill_courant = Skill_magie
-            self.magie_courante = "magie boost"
-            self.cible_magie = cible
-            agissant = self.controleur.get_entitee(cible)
+            self.magie_courante = self.caste()
+            self.cible_magie = new_cibles[0][-1]
+            agissant = self.controleur.get_entitee(new_cibles[0][-1])
             agissant.statut = "attaque boostée"
             defaut = "soutien"
             self.statut = "soutien"

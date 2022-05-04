@@ -35,6 +35,18 @@ class Peureuse(Multi_renforceur,Support_lointain,Stratege,Humain): #La quatrièm
     # /!\ Pour améliorer ça : fuire dès qu'il y a un monstre en vue et accessible
     # et ne pas fuir s'il n'y a nulle part où fuir ou si le joueur a donné ordre de ne pas fuir et qu'on a suffisamment d'appréciation pour lui (rajouter un modificateur au taux_limite ?)
 
+    def peut_multi_caster(self):
+        return self.peut_payer(cout_pm_multi_boost[trouve_skill(self.classe_principale,Skill_magie).niveau-1])
+
+    def multi_caste(self):
+        return "magie multi boost"
+
+    def peut_caster(self):
+        return self.peut_payer(cout_pm_boost[trouve_skill(self.classe_principale,Skill_magie).niveau-1])
+
+    def caste(self):
+        return "magie boost"
+
     def start_dialogue(self): #On commence un nouveau dialogue !
         #On initialise nos attributs
         self.replique_courante = 0

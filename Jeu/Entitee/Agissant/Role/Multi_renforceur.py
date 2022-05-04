@@ -1,3 +1,4 @@
+from operator import itemgetter
 from Jeu.Entitee.Agissant.Role.Renforceur import *
 
 class Multi_renforceur(Renforceur):
@@ -5,42 +6,35 @@ class Multi_renforceur(Renforceur):
 
     def agit_en_vue(self,esprit,defaut = ""):
         cibles = []
-        importance = 0
-        #On cherche des alliés à booster
         for ID in esprit.corps.keys():
-            agissant = self.controleur.get_entitee(ID)
-            if agissant.statut == "attaque":
-                new_importance = esprit.get_importance(agissant.get_impact())
-                if new_importance > importance:
-                    cibles.insert(0,ID)
-                    importance = new_importance
-                else:
-                    cibles.append(ID)
-        skill = trouve_skill(self.classe_principale,Skill_magie)
+            corp = self.controleur.get_entitee(ID)
+            if corp.statut == "attaque":
+                cibles.append([esprit.get_importance(corp.get_impact()),ID])
         if len(cibles) == 1:
-            if self.peut_payer(cout_pm_boost[skill.niveau-1]):
+            if self.peut_caster():
                 self.skill_courant = Skill_magie
-                self.magie_courante = "magie boost"
-                self.cible_magie = cibles[0]
-                agissant = self.controleur.get_entitee(cibles[0])
+                self.magie_courante = self.caste()
+                self.cible_magie = cibles[0][-1]
+                agissant = self.controleur.get_entitee(cibles[0][-1])
                 agissant.statut = "attaque boostée"
                 defaut = "soutien"
                 self.statut = "soutien"
         elif cibles != []:
-            if self.peut_payer(cout_pm_multi_boost[skill.niveau-1]):
+            if self.peut_multi_caster():
                 self.skill_courant = Skill_magie
-                self.magie_courante = "magie multi boost"
+                self.magie_courante = self.multi_caste()
                 self.cible_magie = cibles
-                for ID in cibles:
-                    agissant = self.controleur.get_entitee(ID)
+                for cible in cibles:
+                    agissant = self.controleur.get_entitee(cible[-1])
                     agissant.statut = "attaque boostée"
                 defaut = "soutien"
                 self.statut = "soutien"
-            elif self.peut_payer(cout_pm_boost[skill.niveau-1]):
+            elif self.peut_caster():
+                new_cibles = sorted(cibles, key=itemgetter(0))
                 self.skill_courant = Skill_magie
-                self.magie_courante = "magie boost"
-                self.cible_magie = cibles[0]
-                agissant = self.controleur.get_entitee(cibles[0])
+                self.magie_courante = self.caste()
+                self.cible_magie = new_cibles[0][-1]
+                agissant = self.controleur.get_entitee(new_cibles[0][-1])
                 agissant.statut = "attaque boostée"
                 defaut = "soutien"
                 self.statut = "soutien"

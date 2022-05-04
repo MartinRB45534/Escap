@@ -5,7 +5,7 @@ from Jeu.Labyrinthe.Pattern import *
 from Jeu.Labyrinthe.Vue import *
 
 class Labyrinthe(Vue):
-    def __init__(self,ID,decalage,depart,patterns=None,durete = 1,niveau = 1,element = TERRE,proba=0.1):
+    def __init__(self,ID,decalage,depart,patterns=[],durete = 1,niveau = 1,element = TERRE,proba=0.1,poids=[1]*NB_DIRECTIONS):
         #print("Initialisation du labyrinthe")
         self.id = ID #Correspond à la clé du labyrinthe. Créer un init différend pour chaque lab ?
         self.decalage = decalage
@@ -16,9 +16,9 @@ class Labyrinthe(Vue):
         self.depart = depart
 
         self.matrice_cases = [[Case(Position(self.id,j,i),niveau,element) for i in range(decalage.y)]for j in range(decalage.x)]
-        self.bord = Bord(self.decalage)
+        self.bord = Bord_lab(self.decalage,[pattern.bord for pattern in patterns])
 
-        for cote in self.bord:
+        for cote in Bord(self.decalage):
             self[cote].effets = [Mur_impassable()]
 
         self.patterns=patterns
@@ -27,7 +27,7 @@ class Labyrinthe(Vue):
         self.temps_restant = -1 #Devient positif quand le labyrinthe est actif sans entitée supérieure
         self.controleur = None #Tant qu'il n'est pas actif, il n'a pas de controleur à qui se référer
 
-        self.generation(proba,None,None)
+        self.generation(proba,poids)
         #print("Génération : check")
 
     def __getitem__(self,key):
@@ -60,7 +60,11 @@ class Labyrinthe(Vue):
             return item.emplacement in self
         return NotImplemented
 
-    def generation(self,proba=None,nbMurs=None,pourcentage=None):
+    def __iter__(self):
+        for decalage in self.decalage:
+            yield Position(self.id,0,0) + decalage
+
+    def generation(self,proba,poids):
         """
         Fonction qui génère la matrice du labyrinthe
             Entrées:
@@ -73,9 +77,90 @@ class Labyrinthe(Vue):
         """        
         #génération en profondeur via l'objet generateur
         #print("Génération du labyrinthe")
-        gene=Generateur(self.matrice_cases,self.depart,self.decalage.x,self.decalage.y,self.patterns)
-        #print("Générateur : check")
-        gene.generation(proba,nbMurs,pourcentage)
+        self.generation_en_profondeur(poids)
+
+
+        for pos in self:
+            for mur in self.murs_utilisables(pos,0):
+                if random.random() <= proba:
+                    self[mur].brise()
+                    self[mur.oppose()].brise()
+
+        for pattern in self.patterns:
+            if pattern.vide:
+                for pos in pattern:
+                    for cote in Bord_dec(pos):
+                        if not cote in self.bord:
+                            self[cote].brise()
+                            self[cote.oppose()].brise()
+
+            for i in range(len(pattern.entrees)):
+                if i < len(pattern.codes):
+                    self[pattern.entrees[i]+pattern.position].cree_porte(pattern.codes[i])
+                    self[pattern.entrees[i].oppose()+pattern.position].cree_porte(pattern.codes[i])
+                else:
+                    self[pattern.entrees[i]].brise()
+                    self[pattern.entrees[i].oppose()].brise()
+
+    def generation_en_profondeur(self,poids):
+        """
+        Fonction qui génère la matrice avec la méthode du parcours en profondeur
+        Entrées:Rien
+        Sorties:une matrice de cases générée avec le parcours en profondeur
+        """
+        rdm=random.randrange (1,10**18,1)
+
+        #on définit la seed de notre générateur
+        #cela permet d'avoir le meme résultat
+        #rdm=851353618387733257
+        #print("seed ",rdm)
+        random.seed(rdm)
+
+        #print("Début de la génération")
+        #position dans la matrice
+        position = self.depart
+        #le stack est une liste de positions
+        stack=[position]
+
+        while len(stack)!=0 :
+
+            #on récupère les coords de là où l'on est cad la dernière case dans le stack
+            position = stack[len(stack)-1]
+
+            murs_generables = self.murs_utilisables(position)
+
+            if len(murs_generables) > 0 : 
+
+                mur=random.choices(murs_generables,[poids[mur.direction] for mur in murs_generables])[0]
+                mur_opp = mur.oppose()
+
+                self[mur].brise()
+                self[mur_opp].brise()
+
+                new_pos = mur_opp.emplacement
+                self[new_pos].clarte=1
+                #on ajoute les nouvelles coordonnées de la case au stack
+                stack.append(new_pos)
+            else:
+                #on revient encore en arrière
+                stack.pop()
+
+        #print("Fini")
+
+    def murs_utilisables(self,position,nb_murs=NB_DIRECTIONS):
+        """
+        Fonction qui prend en entrées:
+            les voisins de la case
+        et qui renvoie les directions ou les murs sont cassables
+        """
+        murs_utilisables=[]
+
+        for cote in Bord_dec(position):
+            opp = cote.oppose()
+            if not cote in self.bord :
+                if self[opp.emplacement].nb_murs_pleins() >= nb_murs:
+                    murs_utilisables.append(cote)
+        return murs_utilisables
 
     def veut_passer(self,intrus,direction):
         """Fonction qui tente de faire passer une entitée.

@@ -5,6 +5,7 @@ class Entitee:
     """La classe des entitées"""
     def __init__(self,position,ID=None):
         self.position = position
+        self.priorite = 0
         self.latence = 0
         self.effets = []
         self.controleur = None
@@ -21,6 +22,9 @@ class Entitee:
 
     def get_position(self):
         return self.position
+    
+    def get_priorite(self):
+        return self.priorite
 
     def get_direction(self):
         return DIRECTIONS[0]
