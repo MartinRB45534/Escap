@@ -34,10 +34,7 @@ class Codeur(Humain): #Le cinquième humain du jeu, à l'étage 4 (répond au no
             self.replique = "dialogue-5phrase1"
             self.repliques = ["dialogue-5reponse1.1","dialogue-5reponse1.2"]
 
-    def interprete(self,nb_replique):
-        #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
-        replique = self.repliques[nb_replique] #Donc la réplique est la phrase que le joueur à choisi
-        #Il suffit de savoir quelle phrase le joueur a choisi pour réagir en conséquence
+    def interprete(self,replique):
 
         #Premier dialogue
         #Le joueur arrive vers Dev

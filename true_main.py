@@ -21,57 +21,90 @@ class True_joueur:
         self.clock = pygame.time.Clock()
         self.parametres = {
             "meta-touches":{ #Quelques touches spéciales, à part
-                pygame.K_SPACE:"courant", #La barre espace sélectionne, valide, etc. l'objet courant. Elle ne peut pas être modifiée
-                pygame.K_BACKSPACE:"pause", #La touche d'effacement active/désactive la pause. Elle ne peut pas être modifiée
-                pygame.K_RETURN:"touches",
+                pygame.K_m:"courant", #La barre espace sélectionne, valide, etc. l'objet courant. Elle ne peut pas être modifiée
+                pygame.K_SPACE:"pause", #La touche d'effacement active/désactive la pause. Elle ne peut pas être modifiée
             },
             "touches":{
+                #Les nouveaux contrôles :
+                # "effets":{
+                #     ():{
+                #         pygame.K_SPACE:"pause",
+                #         pygame.K_UP:"navigation",
+                #         pygame.K_RIGHT:"navigation",
+                #         pygame.K_DOWN:"navigation",
+                #         pygame.K_LEFT:"navigation",
+                #         pygame.K_RETURN:"navigation",
+                #         pygame.K_BACKSPACE:"navigation",
+                #         pygame.K_TAB:"navigation",
+                #         pygame.K_e:"interraction",
+                #     },
+                #     (pygame.KMOD_LSHIFT):{
+                #         pygame.K_TAB:"navigation",
+                #         pygame.K_SPACE:"touches",
+                #         pygame.K_RETURN:"touches",
+                #     },
+                # },
+                # "directions":{
+                #     ():{
+                #         pygame.K_UP:HAUT,
+                #         pygame.K_RIGHT:DROITE,
+                #         pygame.K_DOWN:BAS,
+                #         pygame.K_LEFT:GAUCHE,
+                #         pygame.K_RETURN:IN,
+                #         pygame.K_BACKSPACE:OUT,
+                #         pygame.K_TAB:NEXT,
+                #     },
+                #     (pygame.KMOD_SHIFT):{
+                #         pygame.K_TAB:PREVIOUS,
+                #     },
+                # },
+                #Les anciens contrôles (encore actifs pour l'instant)
                 ():{ #Les touches qui n'ont pas de modificateur
                     "direction":{
-                        pygame.K_UP:HAUT,
-                        pygame.K_DOWN:BAS,
-                        pygame.K_LEFT:GAUCHE,
-                        pygame.K_RIGHT:DROITE,
-                    },
-                    "dir_zone":{
-                        pygame.K_q:GAUCHE,
                         pygame.K_z:HAUT,
                         pygame.K_d:DROITE,
                         pygame.K_s:BAS,
-                        pygame.K_a:IN,
-                        pygame.K_e:OUT,
+                        pygame.K_q:GAUCHE,
+                    },
+                    "dir_zone":{
+                        pygame.K_UP:HAUT,
+                        pygame.K_RIGHT:DROITE,
+                        pygame.K_DOWN:BAS,
+                        pygame.K_LEFT:GAUCHE,
+                        pygame.K_RETURN:IN,
+                        pygame.K_BACKSPACE:OUT,
                     },
                     "skill":{
-                        pygame.K_UP:Skill_deplacement,
-                        pygame.K_DOWN:Skill_deplacement,
-                        pygame.K_LEFT:Skill_deplacement,
-                        pygame.K_RIGHT:Skill_deplacement,
+                        pygame.K_z:Skill_deplacement,
+                        pygame.K_d:Skill_deplacement,
+                        pygame.K_s:Skill_deplacement,
+                        pygame.K_q:Skill_deplacement,
                         pygame.K_x:Skill_stomp, 
                         pygame.K_c:Skill_ramasse,
                     },
                 },
                 (pygame.KMOD_LSHIFT,):{ #L'ordre des modificateurs est très important ! (Et la virgule aussi, ne me demandez pas pourquoi...)
                     "direction":{
-                        pygame.K_UP:HAUT,
-                        pygame.K_DOWN:BAS,
-                        pygame.K_LEFT:GAUCHE,
-                        pygame.K_RIGHT:DROITE,
+                        pygame.K_z:HAUT,
+                        pygame.K_d:DROITE,
+                        pygame.K_s:BAS,
+                        pygame.K_q:GAUCHE,
                     },
                     "dir_zone":{},
                     "skill":{
-                        pygame.K_UP:Skill_course,
-                        pygame.K_DOWN:Skill_course,
-                        pygame.K_LEFT:Skill_course,
-                        pygame.K_RIGHT:Skill_course,
+                        pygame.K_z:Skill_course,
+                        pygame.K_d:Skill_course,
+                        pygame.K_s:Skill_course,
+                        pygame.K_q:Skill_course,
                         pygame.K_x:Skill_attaque,
                     },
                 },
                 (pygame.KMOD_LCTRL,):{ #L'ordre des modificateurs est très important ! (Et la virgule aussi, ne me demandez pas pourquoi...)
                     "direction":{
-                        pygame.K_UP:HAUT,
-                        pygame.K_DOWN:BAS,
-                        pygame.K_LEFT:GAUCHE,
-                        pygame.K_RIGHT:DROITE,
+                        pygame.K_z:HAUT,
+                        pygame.K_d:DROITE,
+                        pygame.K_s:BAS,
+                        pygame.K_q:GAUCHE,
                     },
                     "dir_zone":{},
                     "skill":{},
@@ -104,6 +137,15 @@ class True_joueur:
         duree = new_courant - constantes_temps['courant']
         constantes_temps['agissants.debut_tour'] += duree
         constantes_temps['courant'] = new_courant
+        # new_courant = pygame.time.get_ticks()
+        # duree = new_courant - constantes_temps['courant']
+        # constantes_temps['reste'] += duree
+        # constantes_temps['courant'] = new_courant
+        self.affichage.update()
+        new_courant = pygame.time.get_ticks()
+        duree = new_courant - constantes_temps['courant']
+        constantes_temps['update'] += duree
+        constantes_temps['courant'] = new_courant
         for item in self.items_courants :
             item.debut_tour()
         for lab in self.labs_courants:
@@ -127,6 +169,15 @@ class True_joueur:
 
         for agissant in self.agissants_courants :
             self.controleur.make_vue(agissant)
+        new_courant = pygame.time.get_ticks()
+        duree = new_courant - constantes_temps['courant']
+        constantes_temps['reste'] += duree
+        constantes_temps['courant'] = new_courant
+        self.affichage.update()
+        new_courant = pygame.time.get_ticks()
+        duree = new_courant - constantes_temps['courant']
+        constantes_temps['update'] += duree
+        constantes_temps['courant'] = new_courant
         for lab in self.labs_courants:
             lab.pseudo_debut_tour()
 
@@ -173,60 +224,20 @@ class True_joueur:
     def pseudo_fin_tour(self):
         """La fonction qui fait la deuxième moitiée de chaque tour"""
 
-        joueur = self.controleur.entitees[2]
+        joueur = self.controleur[2]
         joueur.inventaire.nettoie_item()
         joueur.affichage.dessine(joueur)
 
     def complement(self):
-        #On doit complémenter une magie
-
-        #Il y a plein de types de magies différentes
-
-        #Il y a aussi une limite de temps
-
-        #Un affichage à gérer
-
-        #On va laisser tout ça au joueur...
-
-        self.controleur.entitees[2].complement() #Ça, c'est pour vérifier que le temps n'est pas écoulé
+        self.controleur[2].complement() #Ça, c'est pour vérifier que le temps n'est pas écoulé
 
     def complement_parchemin(self):
-        #On doit complémenter une magie lancée depuis un parchemin
-
-        #Il y a plein de types de magies différentes
-
-        #Il y a aussi une limite de temps
-
-        #Un affichage à gérer
-
-        #On va laisser tout ça au joueur...
-
-        self.controleur.entitees[2].complement_parchemin() #Ça, c'est pour vérifier que le temps n'est pas écoulé
-
-    def complement_menu(self):
-        #On doit choisir un élément d'un menu
-
-        #Sans limite de temps
-
-        #On va aussi laisser ça au joueur
-
-        pass #Rien à faire ici ?
-
-    def touches(self):
-        #On doit changer les touches du joueur
-
-        #On va aussi laisser ça au joueur
-
-        #self.controleur.entitees[2].change_touches()
-
-        pass #Rien à faire ici ?
+        self.controleur[2].complement_parchemin() #Ça, c'est pour vérifier que le temps n'est pas écoulé
 
     def evenement(self):
-        #On va encore laisser ça au joueur
+        self.controleur[2].evenement()
 
-        self.controleur.entitees[2].evenement()
-
-    def affichage(self,frame,frame_par_tour):
+    def affiche(self,frame,frame_par_tour):
         pygame.display.flip()
         self.patiente(frame_par_tour)
 
@@ -239,16 +250,115 @@ class True_joueur:
         #On récupère les évènements :
         events = pygame.event.get()
         for event in events :
-            if event.type == pygame.QUIT :
+            if event.type == pygame.QUIT : #On a fermé la fenêtre
                 self.quitte() #Sauvegarde la partie en cours et ferme la fenêtre
             elif (event.type == pygame.ACTIVEEVENT and event.state == 1) and (event.gain == 0 and not self.controleur.pause):
                 self.controleur.toogle_pause()
             elif event.type == pygame.VIDEORESIZE :
-                self.controleur.entitees[2].affichage.recalcule_zones()
+                self.controleur[2].affichage.recalcule_zones()
             elif event.type == pygame.KEYDOWN :
-                self.controleur.entitees[2].controle(event.key,get_modifiers(event.mod))
+                self.controleur[2].controle(event.key,get_modifiers(event.mod))
             elif event.type == pygame.KEYUP :
-                self.controleur.entitees[2].decontrole(event.key)
+                self.controleur[2].decontrole(event.key)
+            elif event.type in [pygame.MOUSEBUTTONDOWN,pygame.MOUSEBUTTONUP,pygame.MOUSEWHEEL]:
+                self.affichage.bouge_souris(event)
+
+    def new_input(self): #À appeler régulièrement !
+        """Fonction qui traite tous les inputs"""
+        #On récupère les évènements :
+        events = pygame.event.get()
+        for event in events :
+            if event.type == pygame.QUIT : #On a fermé la fenêtre
+                self.quitte() #Sauvegarde la partie en cours et ferme la fenêtre /!\ Modifier ça /!\
+            elif (event.type == pygame.ACTIVEEVENT and event.state == 1) and (event.gain == 0 and not self.controleur.pause): #On est passé sur une autre fenêtre. Je vais mettre le jeu en pause pour toi, de rien.
+                self.controleur.toogle_pause() #/!\ Rajouter une option pour désactiver la pause auto (afk farm)
+            elif event.type == pygame.VIDEORESIZE :
+                self.cree_affichage() # À implémenter /!\
+            elif event.type == pygame.KEYDOWN :
+                self.controle(event.key,get_modifiers(event.mod))
+            elif event.type == pygame.KEYUP : #Les touches de skill peuvent être maintenues
+                self.decontrole(event.key)
+            elif event.type in [pygame.MOUSEBUTTONDOWN,pygame.MOUSEBUTTONUP,pygame.MOUSEWHEEL]:
+                self.affichage.bouge_souris(event)
+        self.recontrole()
+
+    def controle(self,touche,mods=()):
+        # Les effets d'une touche dépendent de la situation
+
+        #Certaines touches sont gérées directement ici (actions spécifiques au personnage controllé par le joueur)
+        effet = self.parametres["touches"]["effets"].get(mods,{}).get(touche)
+        if effet == "pause": # La touche de pause (Espace ?)
+            self.controleur.toogle_pause()
+        elif effet == "touches" : # On veut changer les touches (Maj + Espace ? Ou Maj + Entrée ?)
+            self.start_change_touches() #Peut-être à faire faire par l'affichage ?
+        #Rajouter mute etc.
+
+        #Les éléments de navigation
+        elif effet == "navigation" : # Les déplacements dans l'affichage (Flèches directionnelles & Return & Backspace & Tabs ?)
+            self.affichage.navigue(self.parametres["touches"]["directions"].get(mods,{}).get(touche)) #Fait aussi l'exécution d'actions (équivalent de l'ancien 'courant') par moment
+
+        if self.controleur.phase == TOUR:
+            #Les interractions avec l'environnement
+            if effet == "interraction" : # Utiliser/sélectionner l'élément courant (E ?) /!\ Gérer ça directement chez le joueur ?
+                self.controleur.joueur.interragit()
+
+            #Sinon, c'est qu'on veut controler les actions du perso (comme l'esprit le ferait pour les autres)
+            #Vu qu'on a fait les interractions ainsi que tous les choix depuis l'affichage au-dessus, il ne reste plus que les skills et leurs éventuelles précisions
+            self.controle_joueur(touche,mods)
+            self.controleur.joueur.nouvel_ordre = True
+
+        elif self.controleur.phase == TOUCHE:
+            #On veut modifier les touches
+            self.continue_change_touche(touche)
+
+    def controle_joueur(self,touche,mods):
+        touches = self.controleur.joueur.touches
+        effets = touches["effets"].get(mods,{}).get(touche,[]) #Regardons les effets que la touche a
+        if "direction" in effets: #La touche a un effet sur la direction du joueur (entre autres)
+            self.controleur.joueur.regarde(touches["directions"].get(mods,{}).get(touche))
+        if "skill" in effets: #La touche est liée à un skill (entre autres)
+            skill = touches["skills"].get(mods,{}).get(touche)
+            if skill != None:
+                self.controleur.joueur.skill_courant = skill
+                if issubclass(skill,Skills_offensifs): # Les skills qui correspondent à un statut d'attaque
+                    self.statut = "attaque"
+                elif issubclass(skill,Skills_projectiles) : # Les skills qui lancent un projectile
+                    self.projectile_courant = touches["projectiles"].get(touche)
+                    self.statut = "lancer"
+                elif issubclass(skill,Skills_magiques) : # Les skills qui utilisent de la magie
+                    self.magie_courante = touches["magies"].get(touche) #self.magie_courante n'est que le nom de la magie
+                    skill = trouve_skill(self.classe_principale,skill)
+                    self.magie = skill.magies[self.magie_courante](skill.niveau) #Ici on a une magie similaire (juste pour l'initialisation du choix, oubliée après parce que le skill fournira la vrai magie avec utilise())
+                    if isinstance(self.magie,Magies_offensives):
+                        self.statut = "attaque"
+                    #On a éventuellement besoin d'informations supplémentaires sur cette magie
+                    if self.controleur.joueur.nouvel_ordre:
+                        if isinstance(self.magie,Magie_cible):
+                            self.controleur.set_phase(COMPLEMENT_CIBLE)
+                        if isinstance(self.magie,Magie_cout):
+                            self.controleur.set_phase(COMPLEMENT_COUT)
+                        if isinstance(self.magie,Magie_dirigee):
+                            self.controleur.set_phase(COMPLEMENT_DIR)
+
+    def decontrole(self,touche):
+        """Fonction qui désélectionne le skill courant si on en relache la touche"""
+        if self.controleur.phase == TOUR:
+            if not self.nouvel_ordre: #On ne veut pas désélectionner un skill qui n'a pas encore été utilisé au moins une fois
+                for touches_skills in self.controleur.joueur.touches["skill"].values(): #On ne sait pas quels modificateurs étaient actifs lorsque la touche a été pressée
+                    if touches_skills.get(touche) == self.skill_courant: #La touche relachée est celle du skill courant
+                        self.statut = "joueur" #/!\ Vraiment ?
+                        self.skill_courant = None
+
+    def recontrole(self):
+        """La fonction qui réagit aux touches maintenues."""
+        # On ne veut pas interférer avec les touches nouvellement descendues :
+        if not self.controleur.joueur.nouvel_ordre :
+            # On commence par trouver à quelle catégorie appartient la touche :
+            mods = get_modifiers(pygame.key.get_mods())
+            pressees = pygame.key.get_pressed()
+            for key in range(len(pressees)):
+                if pressees[key]:
+                    self.controle_joueur(key,mods)
 
     def quitte(self):
         """Fonction qui quitte le jeu, en sauvegardant le controleur"""
@@ -259,6 +369,7 @@ class True_joueur:
         """Fonction qui gère tout, agrège les autres"""
 
         self.run = True
+        self.affichage = Affichage_principal(self.controleur,[self.screen.get_width(),self.screen.get_height()])
         constantes_temps['courant'] = pygame.time.get_ticks()
         while self.run : #Devient faux quand on quitte
             constantes_temps['tours']+=1
@@ -286,7 +397,17 @@ class True_joueur:
                     self.evenement()
                 joueur = self.controleur.get_entitee(2)
                 joueur.inventaire.nettoie_item()
-            self.affichage(1,1)
+            new_courant = pygame.time.get_ticks()
+            duree = new_courant - constantes_temps['courant']
+            constantes_temps['reste'] += duree
+            constantes_temps['courant'] = new_courant
+            self.affichage.affiche(self.screen,1,1)
+            new_courant = pygame.time.get_ticks()
+            duree = new_courant - constantes_temps['courant']
+            constantes_temps['affichage'] += duree
+            constantes_temps['courant'] = new_courant
+            pygame.display.flip()
+            self.patiente(1)
             new_courant = pygame.time.get_ticks()
             duree = new_courant - constantes_temps['courant']
             constantes_temps['reste'] += duree
@@ -312,7 +433,7 @@ class True_joueur:
                 if event.type == pygame.QUIT :
                     self.quitte() #Sauvegarde la partie en cours et ferme la fenêtre
                 elif event.type == pygame.VIDEORESIZE :
-                    self.controleur.entitees[2].affichage.recalcule_zones()
+                    self.controleur[2].affichage.recalcule_zones()
                 elif event.type == pygame.KEYDOWN :
                     screen.fill((0,0,0))
                     largeur,hauteur = screen.get_size()
@@ -688,7 +809,7 @@ class True_joueur:
         self.screen = None
         self.clock = None
         for controleur in self.controleurs:
-            controleur.entitees[2].affichage.clear()
+            controleur[2].affichage.clear()
         self.controleur = None
         self.agissants_courants = []
         self.items_courants = []
@@ -699,7 +820,7 @@ class True_joueur:
         self.screen = screen
         self.clock = pygame.time.Clock()
         for controleur in self.controleurs:
-            controleur.entitees[2].affichage.unclear(screen)
+            controleur[2].affichage.unclear(screen)
 
     def ouvre(self):
         run = True
@@ -707,7 +828,7 @@ class True_joueur:
         # global ID_MAX
 
         while run:
-            boutons = [[f"Partie n°{i}",[f"Le joueur est au niveau {self.controleurs[i].entitees[2].niveau},",f"et a atteint l'étage {self.controleurs[i][2].position.lab}"],self.controleurs[i]] for i in range(len(self.controleurs))] + [
+            boutons = [[f"Partie n°{i}",[f"Le joueur est au niveau {self.controleurs[i][2].niveau},",f"et a atteint l'étage {self.controleurs[i][2].position.lab}"],self.controleurs[i]] for i in range(len(self.controleurs))] + [
              ["Nouveau",["Lancer une nouvelle partie"],"ctrln"],
              ["Coller",["Ajouter à ce joueur un 'controleur'","Pour transférer une partie d'un joueur à l'autre","Ou pour conserver une sauvegarde"],"ctrlv"],
              ["Contrôles",["Modifier les touches par défaut","Pour modifier les touches d'une partie déjà commencée, appuyer sur Entrée dans la partie (ne fonctionne pas pendant les cinématiques, les dialogues, et les divers menus de sélection."],"ctrl"],
@@ -751,13 +872,13 @@ class True_joueur:
                 elif nres == "ctrlo":
                     self.controleur = res
                     ID_MAX.set_id_max(max(self.controleur.entitees.keys()))
-                    self.controleur.entitees[2].affichage.unclear(screen)
-                    self.controleur.entitees[2].affichage.recalcule_zones()
+                    self.controleur[2].affichage.unclear(screen)
+                    self.controleur[2].affichage.recalcule_zones()
                     self.controleur.pause = True
                     self.boucle()
                     run = False
                 elif nres == "ctrlc":
-                    res.entitees[2].affichage.clear()
+                    res[2].affichage.clear()
                     GLOBALS["controleur"] = res
                 elif nres == "supr":
                     self.controleurs.remove(res)

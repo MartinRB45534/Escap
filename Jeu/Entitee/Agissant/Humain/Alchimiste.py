@@ -54,7 +54,7 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
         if self.dialogue == -1: #Le joueur est venu nous voir de son propre chef
             self.replique = "dialogue-1phrase1"
             self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.4"]
-            if self.controleur.entitees[2].a_parchemin_vierge():
+            if self.controleur[2].a_parchemin_vierge():
                 self.repliques.append("dialogue-1reponse1.3")
         elif self.dialogue == -2: #Le joueur nous a traité de vieillard
             self.replique = "dialogue-2phrase1"
@@ -66,10 +66,7 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
             self.replique = "dialogue2phrase1"
             self.repliques = ["dialogue2reponse1.1","dialogue2reponse1.2","dialogue2reponse1.3"]
 
-    def interprete(self,nb_replique):
-        #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
-        replique = self.repliques[nb_replique] #Donc la réplique est la phrase que le joueur à choisi
-        #Il suffit de savoir quelle phrase le joueur a choisi pour réagir en conséquence
+    def interprete(self,replique):
 
         #Premier dialogue
         #Le joueur arrive par la porte
@@ -245,7 +242,7 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
         elif replique == "dialogue-1reponse1.1.1.1":
             self.replique = "dialogue-1phrase1.1.3"
             self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.4"]
-            if self.controleur.entitees[2].a_parchemin_vierge():
+            if self.controleur[2].a_parchemin_vierge():
                 self.repliques.append("dialogue-1reponse1.3")
             self.repliques.append("dialogue-1reponse1.5")
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
@@ -258,7 +255,7 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
         elif replique == "dialogue-1reponse1.1.3":
             self.replique="dialogue-1phrase1.1.3"
             self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.4"]
-            if self.controleur.entitees[2].a_parchemin_vierge():
+            if self.controleur[2].a_parchemin_vierge():
                 self.repliques.append("dialogue-1reponse1.3")
             self.repliques.append("dialogue-1reponse1.5")
             self.mouvement = 1
@@ -287,7 +284,7 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
         elif replique == "dialogue-1reponse1.2.1":
             self.end_dialogue(-1)
         elif replique == "dialogue-1reponse1.3":
-            if self.controleur.entitees[2].consomme_parchemin_vierge():
+            if self.controleur[2].consomme_parchemin_vierge():
                 self.replique = "dialogue-1phrase1.3"
                 self.repliques = ["dialogue-1reponse1.3.1"]
             else:
@@ -310,7 +307,7 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
         self.cible_deplacement = cible
         self.replique = "dialogue-1phrase1.1.1.2"
         self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.4"]
-        if self.controleur.entitees[2].a_parchemin_vierge():
+        if self.controleur[2].a_parchemin_vierge():
             self.repliques.append("dialogue-1reponse1.3")
         self.repliques.append("dialogue-1reponse1.5")
 
@@ -332,7 +329,7 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
             self.controleur.get_entitee(2).inventaire.ajoute(parch)
             self.replique = "dialogue-1phrase1.3.1"
             self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.4"]
-            if self.controleur.entitees[2].a_parchemin_vierge():
+            if self.controleur[2].a_parchemin_vierge():
                 self.repliques.append("dialogue-1reponse1.3")
             self.repliques.append("dialogue-1reponse1.5")
         else:

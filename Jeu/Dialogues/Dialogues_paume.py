@@ -62,7 +62,7 @@ REPLIQUES_PAUME = {
     "dialogue5reponse1.1.1":"J'espère que je ne tomberai pas dans un tel piège.",
     "dialogue5reponse1.1.2":"Il y en a qui ne passent que dans un sens ?",
     "dialogue5reponse1.1.3":"Bah, je n'ai qu'à tuer tout ce qu'il y a au-delà. Pourquoi revenir en arrière ?",
-    "dialogue5reponse1.2.1":"",
+    "dialogue5reponse1.2.1":"...",
     "dialogue5phrase1.1.1":"Ici, tu risques plutôt d'avoir des problèmes à cause du manque de place.",
     "dialogue5phrase1.1.2":"Il y en a aussi qui sont invisibles...",
     "dialogue5phrase1.1.3":"Si tu tombes dans un cul-de-sac, ça peut vite devenir compliqué... même sans portail à sens unique en fait, dans des petits espaces comme ici.",

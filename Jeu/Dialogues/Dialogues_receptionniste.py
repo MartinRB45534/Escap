@@ -1,7 +1,7 @@
 # global REPLIQUES_RECEPTIONNISTE
 REPLIQUES_RECEPTIONNISTE ={
-    "dialogue1phrase1":"Quelle chute ! Tu vas bien ? Appuie sur Espace si tu peux m'entendre.",
-    "dialogue1reponse1.1":"",
+    "dialogue1phrase1":"Quelle chute ! Tu vas bien ? Tu peux m'entendre.",
+    "dialogue1reponse1.1":"Oui...",
     "dialogue1phrase1.1":"Tu peux te lever ? Utilise les flèches directionnelles pour te diriger, et W pour marcher. Appuie sur Espace à côté de moi pour revenir me parler.",
     "dialogue1reponse1.1.1":"Merci pour ton aide.",
     "dialogue2phrase1":"Alors, ça va mieux ?",
@@ -13,7 +13,7 @@ REPLIQUES_RECEPTIONNISTE ={
     "dialogue2phrase1.1.1":"Heureusement que ton armure t'a protégé de la chute...",
     "dialogue2reponse1.1.1.1":"Et du coup, où est la sortie ?",
     "dialogue2phrase1.1.1.1":"Il y a un escalier au bout du couloir, à droite.",
-    "dialogue2reponse1.1.1.1.1":"",
+    "dialogue2reponse1.1.1.1.1":"...",
     "dialogue-2phrase1":"Qu'est-ce qu'il y a ?",
     "dialogue-2reponse1.1":"Je ne trouve pas l'escalier.",
     "dialogue-2reponse1.2":"Il n'y a pas d'autre chemin ?",
@@ -23,4 +23,4 @@ REPLIQUES_RECEPTIONNISTE ={
     "dialogue-2phrase1.3":"De rien.",
     "dialogue-2reponse1.2.1":"Tant pis. Je vais essayer l'escalier alors.",
     "dialogue-2phrase1.2.1":"Bon courage !",
-    "dialogue-2reponse1.1.1":""} #À compléter avec plus de répliques
+    "dialogue-2reponse1.1.1":"..."} #À compléter avec plus de répliques

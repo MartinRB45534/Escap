@@ -1,7 +1,7 @@
 from Jeu.Effet.Magie.Magie import *
 from Jeu.Effet.Attaque.Attaque import *
 
-class Magie_poing_magique(Magie_dirigee): #À modifier selon l'espèce qui l'utilise
+class Magie_poing_magique(Magie_dirigee,Magies_offensives): #À modifier selon l'espèce qui l'utilise
     """La magie qui crée une attaque de poing magique."""
     nom = "magie poing magique"
     def __init__(self,niveau):
@@ -26,7 +26,7 @@ class Magie_poing_magique(Magie_dirigee): #À modifier selon l'espèce qui l'uti
     def get_description(self,observation):
         return ["Une magie d'attaque","Inflige des dégats de terre aux agissants non-alliés devant le lanceur et à proximité.",f"Coût : {self.cout_pm}",f"Degats : {degats_poing_magique[self.niveau-1]}",f"Portee de l'attaque : {portee_poing_magique[self.niveau-1]}",f"Latence : {self.latence}"]
 
-class Magie_poing_ardent(Magie_dirigee): #L'attaque de mélée de la bombe atomique
+class Magie_poing_ardent(Magie_dirigee,Magies_offensives): #L'attaque de mélée de la bombe atomique
     """La magie qui crée une attaque de poing ardent."""
     nom = "magie poing ardent"
     def __init__(self,niveau):
@@ -51,7 +51,7 @@ class Magie_poing_ardent(Magie_dirigee): #L'attaque de mélée de la bombe atomi
     def get_description(self,observation):
         return ["Une magie d'attaque","Inflige des dégats de feu aux agissants non-alliés devant le lanceur et à proximité.",f"Coût : {self.cout_pm}",f"Degats : {degats_poing_ardent[self.niveau-1]}",f"Portee de l'attaque : {portee_poing_ardent[self.niveau-1]}",f"Latence : {self.latence}"]
 
-class Magie_poing_sombre(Magie_dirigee):
+class Magie_poing_sombre(Magie_dirigee,Magies_offensives):
     """La magie qui crée une attaque de poing sombre."""
     nom = "magie poing sombre"
     def __init__(self,niveau):

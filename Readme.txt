@@ -25,16 +25,16 @@ Les dossiers Constantes_items, Constantes_magies, Constantes_skills contiennent 
 D�bloquer une situation
 Premi�re �tape : Controle + C dans le shell pour interrompre l'ex�cution.
 Deuxi�me �tape : depuis le shell, mains est une variable globale qui liste tous les objets Main en cours d'utilisation (les fichiers .p dans le r�pertoire � la derni�re v�rification). s'il y a un seul Main, mains[0][2] y acc�dera. Le controleur de la partie interrompue sauvagement devrait �tre mains[0][2].controleur, et le controleur donne acc�s � tous les �l�ments du jeu. Quelques exemple :
-	- mains[0][2].controleur.entitees[2] est le joueur, donc :
-	- mains[0][2].controleur.entitees[2].pv = 100 pour remettre les pvs du joueur � 100 , ou
-	- mains[0][2].controleur.entitees[2].position = ('�tage 10 : Boss',0,0) pour d�placer le joueur � l'�tage du boss, dans le coin en haut � droite
+	- mains[0][2].controleur[2] est le joueur, donc :
+	- mains[0][2].controleur[2].pv = 100 pour remettre les pvs du joueur � 100 , ou
+	- mains[0][2].controleur[2].position = ('�tage 10 : Boss',0,0) pour d�placer le joueur � l'�tage du boss, dans le coin en haut � droite
 	les ID de 1 � 10 sont r�serv�es aux humains, donc elles sont fixes, pour les autre :
 	- mains[0][2].controleur.entitees donne le dictionnaire de toutes les entitees, (agissants et items) class�es par ID, ensuite, c'est de l'essai erreur pour trouver la bonne
 	- mains[0][2].controleur.labs donne le dictionnaire de tous les labyrinthes (~= �tages pour l'instant) class�s par nom, ce qui aide pour la premi�re coordonn�e des positions
 	- mains[0][2].controleur.esprits donne le dictionnaire des esprits, et :
-	- mains[0][2].controleur.entitees[ID].esprit donne le nom de l'esprit de l'entit�e correspondant � ID, donc :
-	- mains[0][2].controleur.esprits[mains[0][2].controleur.entitees[ID].esprit].ennemis pour le dictionnaire des ennemis de l'esprit de l'entit�e correspondant � l'identifiant ID
-	- mains[0][2].controleur[mains[0][2].controleur.entitees[ID].position,mains[0][2].controleur.entitees[ID].dir_regard].effets donnerai la liste des effets du mur juste en face de l'entit�e correspondant � l'identifiant ID (probablement un Teleport qui conduit � la case voisine et �ventuellement un Mur ou une Porte qui bloque le passage)
+	- mains[0][2].controleur[ID].esprit donne le nom de l'esprit de l'entit�e correspondant � ID, donc :
+	- mains[0][2].controleur.esprits[mains[0][2].controleur[ID].esprit].ennemis pour le dictionnaire des ennemis de l'esprit de l'entit�e correspondant � l'identifiant ID
+	- mains[0][2].controleur[mains[0][2].controleur[ID].position,mains[0][2].controleur[ID].dir_regard].effets donnerai la liste des effets du mur juste en face de l'entit�e correspondant � l'identifiant ID (probablement un Teleport qui conduit � la case voisine et �ventuellement un Mur ou une Porte qui bloque le passage)
 	- mains[0][2].controleur.entitees_courantes pour la liste des IDs des entit�es en activit�, et
 	- mains[0][2].controleur.labs_courants pour la liste des noms des labyrinthe actifs
 Honn�tement la modification de position est la seule chose utile de ce que je viens de citer, d�s qu'on commence � ramener des entitees � la vie �a s'appelle tricher... Attention quand m�me quand on se rend dans un �tage inactif, penser � l'activer ou toute interraction avec l'environnement (les monstres ou les humains, par exemple) fera planter le jeu (prendre l'escalier pour sortir de l'�tage et y revenir r�active l'�tage, sinon mains[0][2].controleur.active_lab(nom_du_lab_�_activer) en rempla�ant nom_du_lab_�_activer par le nom du labyrinthe � activer.
@@ -56,23 +56,63 @@ Troisi�me �tape : mains[0][2].boucle() et le jeu reprend imm�diatement, at
 
 À mon attention :
 
-Idée : rework de la regen (augmentation progressive/mode réduit)
+Jeter un oeil aux phases du controleur, il y a peut-être des trucs à retravailler
+
+
+
 À faire : rework affichage/menus
 Objectifs : Marchand fonctionnel, meilleure alchimie, actions à la souris, affichage mouvant
 
 
-
-
-Pour le rework des inputs :
-On veut pouvoir, à une seule touche, associer plusieurs effets (skill+direction typiquement)
-On veut aussi pouvoir changer l'effet avec un modificateur
-
-
-
-
-
-
 Pour le nouvel affichage :
+Modification importante par rapport à avant :
+L'affichage, avec ses skins etc. (objets non picklables y compris) est stocké d'un tour sur l'autre.
+Dans certains cas, il est supprimé/reconstruit :
+	Sauvegarde. Tout est supprimé.
+	Ouverture. Tout est créé.
+	Ouverture/fermeture d'un sous-menu (inventaire, etc.).
+	Lancement d'un menu (alchimie, vente, etc.).
+Est-ce que l'affichage est un attribu du joueur ?
+Arguments pour :
+Les menus/touches/etc. sont des méthodes et attributs du joueur. <- Pourquoi ? Est-ce que ça fait vraiment sens ?
+Arguments contre :
+Si on prend le contrôle de Dev, qu'est-ce qui se passe ? <- Enfin... avant d'en arriver là, on a du temps.
+Le joueur (tel qu'il est défini actuellement) n'est qu'un agissant. Il n'a pas de raison d'être traité à part.
+
+Idée :
+Séparer l'affichage et le contrôle du joueur.
+En fait, les séparer aussi du controleur...
+Sauf que les contrôles sont liés au joueur (skills et magies qu'il possède).
+Avoir un set de contrôles pour chaque perso jouable ?
+
+Conclusion :
+Affichage & controle : attributs/méthodes du True_joueur
+Liste des touches de contrôles : attribut du joueur (et d'autres persos s'ils sont jouables (garder dev à part quand même))
+Garder des touches de contrôle qui ne peuvent pas être modifiées pour chaque perso ?
+Global : pause, modification des touches, quitter la partie
+Perso : skills
+
+
+Pour les contrôles :
+Quand est-ce qu'un contrôle peut-être utilisé ?
+Différents types de contrôles :
+	Contrôle du perso (comme ce que ferait l'esprit) : modifier la direction du perso, choisir sa prochaine action (skill + infos complémentaires)
+	Actions spécifiques au joueur : interractions
+	^ restreints à la phase TOUR (jeu normal)
+	Meta-contrôles (pause, sortie, mute, etc.)
+	^ pas restreints
+	Navigation de l'affichage au clavier/à la souris
+	^ pas restreint, effets variés selon les phases
+
+Idée : menus etc. gérés completement par l'affichage -> remis à 0 si interrompus (i.e. 'recréé') -> affichage gère aussi les limites de temps
+
+
+
+
+
+
+
+
 Qu'est-ce qui compose l'affichage ?
 Certains éléments contiennent d'autres éléments qui ne se superposent pas (Pavage).
 Certains éléments sont limités en taille par leur contenant (max).
@@ -83,7 +123,7 @@ Il y a les "menus" avec des éléments jusqu'à remplir la ligne, puis d'autres 
 Une liste qui est limitée par son contenant doit permettre de circuler (molette de la souris, etc.).
 Il y a (en tous cas actuellement) des surfaces divisées de façon préétablie.
 
-Idée : rentrer une "taille" de chaque élément. Si positive, à suivre absolument, si négative, représente un proportion par rapport aux autres négatifs.
+Idée : rentrer une "taille" de chaque élément. Si positive, à suivre absolument, si négative, représente une proportion par rapport aux autres négatifs.
 
 Pour les trois zones, on veut faire en proportion de la largeur totale de la fenêtre.
 Pour la zone de gauche, on veut afficher les éléments fermés en plein et l'élément actif sur ce qu'il reste.
@@ -141,6 +181,10 @@ Choisir une recette d'alchimie (ou un objet du marchand, ou autre) (probablement
 Choisir une case pour un déplacement (encore un méthode du joueur ?)
 Donc :
 Retourne l'argument à donner à une méthode du joueur, éventuellement la méthode aussi ?
+
+
+
+
 
 
 

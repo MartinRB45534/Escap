@@ -27,6 +27,9 @@ class Magie(On_action):
     def get_description(self,observation):
         return ["Oopsie... Cette magie n'a pas de description.",f"Peut-être que son nom, {self.nom}, pourra aider."]
 
+class Magies_offensives(Magie):
+    """Les magies qui produisent un effet d'attaque"""
+
 class Magie_dirigee(Magie) :
     """La classe des magies qui nécessitent une direction."""
     def __init__(self,temps):

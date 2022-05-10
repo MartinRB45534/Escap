@@ -2,7 +2,7 @@ from Jeu.Effet.Magie.Magie import *
 from Jeu.Effet.Attaque.Attaque import *
 from Jeu.Effet.Effets_divers import *
 
-class Magie_laser(Magie_dirigee):
+class Magie_laser(Magie_dirigee,Magies_offensives):
     """La magie qui crée une attaque de laser."""
     nom = "magie laser"
     def __init__(self,niveau):
@@ -27,7 +27,7 @@ class Magie_laser(Magie_dirigee):
     def get_description(self,observation):
         return ["Une magie d'attaque","Inflige des dégats de terre aux agissants non-alliés en ligne droite et à proximité.",f"Coût : {self.cout_pm}",f"Degats : {degats_laser[self.niveau-1]}",f"Portee de l'attaque : {portee_laser[self.niveau-1]}",f"Latence : {self.latence}"]
 
-class Magie_brasier(Magie):
+class Magie_brasier(Magies_offensives):
     """La magie qui crée une attaque de brasier."""
     nom = "magie brasier"
     def __init__(self,niveau):
@@ -50,7 +50,7 @@ class Magie_brasier(Magie):
     def get_description(self,observation):
         return ["Une magie d'attaque","Inflige des dégats de feu aux agissants à proximité.",f"Coût : {self.cout_pm}",f"Degats : {degats_brasier[self.niveau-1]}",f"Portee de l'attaque : {portee_brasier[self.niveau-1]}",f"Latence : {self.latence}"]
 
-class Magie_avalanche(Magie_dirigee):
+class Magie_avalanche(Magie_dirigee,Magies_offensives):
     """La magie qui crée une attaque d'avalanche."""
     nom = "magie avalanche"
     def __init__(self,niveau):
@@ -75,7 +75,7 @@ class Magie_avalanche(Magie_dirigee):
     def get_description(self,observation):
         return ["Une magie d'attaque","Inflige des dégats de terre aux agissants devant et à proximité.",f"Coût : {self.cout_pm}",f"Degats : {degats_avalanche[self.niveau-1]}",f"Portee de l'attaque : {portee_avalanche[self.niveau-1]}",f"Latence : {self.latence}"]
 
-class Magie_purification(Magie):
+class Magie_purification(Magies_offensives):
     """La magie qui crée un effet de purification sur un agissant."""
     nom = "magie purification"
     def __init__(self,niveau):

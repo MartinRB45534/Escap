@@ -211,8 +211,6 @@ class Old_affichage:
         marge_gauche = self.position_debut_x_rectangle_1+5
         marge_haut = self.position_debut_y_rectangles_et_carre+5
 
-        police=pygame.font.SysFont(None, 20)
-
         skill = trouve_skill(joueur.classe_principale,Skill_observation)
 
         observation = 0

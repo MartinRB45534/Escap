@@ -66,7 +66,7 @@ REPLIQUES_PEUREUSE = {
     "dialogue4phrase1.3":"Ne viens pas te plaindre si tu meurs !",
     "dialogue4reponse1.1.1":"Donc, ils ne vont pas tous attendre sans bouger comme celui de l'étage précédent ?",
     "dialogue4reponse1.1.2":"Leurs capacitées ? Tu veux dire leur puissance de combat ?",
-    "dialogue4reponse1.2.1":"",
+    "dialogue4reponse1.2.1":"...",
     "dialogue4phrase1.1.1":"Exactement. Celui-là était une sentinelle, qui ne bougent que quand il aperçoit un ennemi.",
     "dialogue4phrase1.1.2":"Entre autre, mais je pensais plutôt aux capacités comme le soin, ou les attaques magiques.",
     "dialogue4reponse1.1.1.1":"Attendre qu'on vienne à eux est donc plutôt une exception ?",
@@ -126,7 +126,7 @@ REPLIQUES_PEUREUSE = {
     "dialogue7reponse1.1.1":"J'espère que je ne tomberai pas dans un tel piège.",
     "dialogue7reponse1.1.2":"Il y en a qui ne passent que dans un sens ?",
     "dialogue7reponse1.1.3":"Bah, je n'ai qu'à tuer tout ce qu'il y a au-delà. Pourquoi revenir en arrière ?",
-    "dialogue7reponse1.2.1":"",
+    "dialogue7reponse1.2.1":"...",
     "dialogue7phrase1.1.1":"Ici, tu risques plutôt d'avoir des problèmes à cause du manque de place.",
     "dialogue7phrase1.1.2":"Il y en a aussi qui sont invisibles...",
     "dialogue7phrase1.1.3":"Si tu tombes dans un cul-de-sac, ça peut vite devenir compliqué... même sans portail à sens unique en fait, dans des petits espaces comme ici.",
@@ -211,4 +211,4 @@ REPLIQUES_PEUREUSE = {
     "dialogue-1reponse1.1.1.2":"Je vais te montrer.",
     "dialogue-1phrase1.1.1.2":"C'est noté. Tu as besoin d'autre chose ?",
     "dialogue-2phrase1":"Tu as du culot de revenir me parler après ce que tu m'as dit !",
-    "dialogue-2reponse1.1":""} #À compléter avec plus de répliques
+    "dialogue-2reponse1.1":"..."} #À compléter avec plus de répliques

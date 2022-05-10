@@ -57,8 +57,7 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
             self.replique = "dialogue5phrase1"
             self.repliques = ["dialogue5reponse1.1","dialogue5reponse1.2","dialogue5reponse1.3"]
 
-    def interprete(self,nb_replique):
-        replique = self.repliques[nb_replique]
+    def interprete(self,replique):
 
         #Premier dialogue
         #Le joueur arrive par l'escalier

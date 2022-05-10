@@ -242,10 +242,6 @@ class Case:
                 self.repoussante] #Pour savoir si on peut y rester
 
     def calcule_code(self):#La fonction qui calcule le code correpondant à l'état de la case. De base, 0. Modifié d'après les effets subits par la case.
-        new_courant = pygame.time.get_ticks()
-        # duree = new_courant - constantes_temps['courant']
-        # constantes_temps['reste'] += duree
-        # constantes_temps['courant'] = new_courant
         return self.code
 
     def get_codes_effets(self):

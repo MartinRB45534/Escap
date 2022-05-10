@@ -50,10 +50,7 @@ class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyenne
             self.replique = "dialogue2phrase1"
             self.repliques = ["dialogue2reponse1.1","dialogue2reponse1.2","dialogue2reponse1.3"]
 
-    def interprete(self,nb_replique):
-        #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
-        replique = self.repliques[nb_replique] #Donc la réplique est la phrase que le joueur à choisi
-        #Il suffit de savoir quelle phrase le joueur a choisi pour réagir en conséquence
+    def interprete(self,replique):
 
         #Premier dialogue
         #Le joueur arrive par la porte
@@ -64,7 +61,7 @@ class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyenne
             self.replique="dialogue1phrase1.1.1"
             ID_clee = self.inventaire.get_clee("Porte_sortie_encombrant_5")
             self.inventaire.drop(None,ID_clee)
-            self.controleur.entitees[2].inventaire.ramasse_item(ID_clee)
+            self.controleur[2].inventaire.ramasse_item(ID_clee)
             self.repliques = ["dialogue1reponse1.1.1.1"]
             self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
         elif replique == "dialogue1reponse1.1.1.1":

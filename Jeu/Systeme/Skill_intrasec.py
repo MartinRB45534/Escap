@@ -39,10 +39,17 @@ class Skill_intrasec:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
 
+class Skills_offensifs(Skill_intrasec):
+    """La classe des skills qui produisent une attaque."""
+
+class Skills_projectiles(Skill_intrasec):
+    """La classe des skills qui lancent un objet."""
+
+class Skills_magiques(Skill_intrasec):
+    """La classe des skills qui lancent une magie"""
+
 class Skill_debut_tour(Skill_intrasec):
     """La classe des skills appelés au début de chaque tour (principalement les skills d'aura)."""
-    def __init__(self):
-        print("Ce skill ne doit pas être instancié !!! Non mais !")
 
 class Skill_deplacement(Skill_intrasec):
     """Le skill utilisé pour se déplacer. Lorsqu'il augmente de niveau, la vitesse de déplacement augmente aussi. C'est un skill intrasec à la classe principale.

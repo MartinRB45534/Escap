@@ -15,14 +15,14 @@ class Multi_soigneur(Agissant):
             if self.peut_caster():
                 self.skill_courant = Skill_magie
                 self.magie_courante = self.caste()
-                self.cible_magie = cibles[0]
+                self.cible_magie = cibles[0][-1]
                 defaut = "soin"
                 self.statut = "soin"
         elif cibles != []:
             if self.peut_multi_caster():
                 self.skill_courant = Skill_magie
                 self.magie_courante = self.multi_caste()
-                self.cible_magie = cibles
+                self.cible_magie = [cible[-1] for cible in cibles]
                 defaut = "soin"
                 self.statut = "soin"
             elif self.peut_caster():

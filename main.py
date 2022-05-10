@@ -167,7 +167,7 @@ main.alll()
 ##    controleur = Controleur() #Un objet qui permet d'accéder à tout et n'importe quoi. Il possède les dictionnaires des labyrinthes et des entitées.
 ##    #print("Controleur : check")
 ##    controleur.jeu(screen)
-##    joueur = controleur.entitees[2]
+##    joueur = controleur[2]
 ##    while run == True :
 ##        #Pour l'instant c'est un jeu rudimentaire, le joueur est le seul agissant et teste ses différents skills.
 ##        agissants,items,labs,esprits = controleur.get_agissants_items_labs_esprits()

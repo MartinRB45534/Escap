@@ -49,6 +49,10 @@ DIRECTIONS = [Direction(i) for i in range(NB_DIRECTIONS)]
 IN=4
 # global OUT
 OUT=5
+# global IN #Ne devrait, un jour, plus être nécessaire
+NEXT=6
+# global OUT
+PREVIOUS=7
 
 from Jeu.Labyrinthe.Structure_spatiale.Position import *
 

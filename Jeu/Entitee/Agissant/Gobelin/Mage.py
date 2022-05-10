@@ -6,16 +6,15 @@ class Mage_gobelin(Attaquant_magique_case,Support,Gobelin):
     def __init__(self,controleur,position,niveau):
         Agissant.__init__(self,controleur,position,"mage_gobelin",niveau)
 
-    def peut_caster(self,niveau):
-        return self.peut_payer(cout_pm_petite_secousse[niveau-1])
+    def peut_caster(self):
+        return self.peut_payer(cout_pm_petite_secousse[trouve_skill(self.classe_principale,Skill_magie).niveau-1])
 
     def caste(self):
         return "magie petite secousse"
 
     def attaque(self,direction):
-        skill = trouve_skill(self.classe_principale,Skill_magie) #Est-ce qu'il a le même Skill_magie que le joueur ?
         self.dir_regard = direction
-        if self.peut_payer(cout_pm_poing_magique[skill.niveau-1]): #Quelle est l'attaque magique des gobelins ?
+        if self.peut_payer(cout_pm_poing_magique[trouve_skill(self.classe_principale,Skill_magie).niveau-1]): #Quelle est l'attaque magique des gobelins ?
             self.skill_courant = Skill_magie
             self.magie_courante = "magie poing magique"
             self.dir_magie = direction

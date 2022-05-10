@@ -6,7 +6,7 @@ from Jeu.Effet.Effets import *
 from Jeu.Systeme.Classe import *
 from Modifiers import *
 
-class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, c'est le personnage principal !)
+class Joueur(Humain,Stratege): #Le premier humain du jeu, avant l'étage 1 (évidemment, c'est le personnage principal !)
     """La classe du joueur."""
     def __init__(self,controleur,position,parametres,screen):
 
@@ -17,6 +17,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
 
         self.apreciations = [0,0,0,0,0,0,0,0,0,0]
         self.role = "independant"
+        self.resolution = 4
         self.inventaire.__class__ = Sac_a_dos
         self.inventaire.complete()
 
@@ -74,6 +75,49 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         self.prem_glace = None
         self.prem_ombre = None
 
+        self.touches = {
+            "skills":{
+                ():{
+                    pygame.K_z:Skill_deplacement,
+                    pygame.K_d:Skill_deplacement,
+                    pygame.K_s:Skill_deplacement,
+                    pygame.K_q:Skill_deplacement,
+                    pygame.K_x:Skill_stomp, 
+                    pygame.K_c:Skill_ramasse,
+                },
+                (pygame.KMOD_LSHIFT,):{
+                    pygame.K_z:Skill_course,
+                    pygame.K_d:Skill_course,
+                    pygame.K_s:Skill_course,
+                    pygame.K_q:Skill_course,
+                    pygame.K_x:Skill_attaque,
+                },
+            },
+            "directions":{
+                ():{
+                    pygame.K_z:HAUT,
+                    pygame.K_d:DROITE,
+                    pygame.K_s:BAS,
+                    pygame.K_q:GAUCHE,
+                },
+                (pygame.KMOD_LSHIFT,):{
+                    pygame.K_z:HAUT,
+                    pygame.K_d:DROITE,
+                    pygame.K_s:BAS,
+                    pygame.K_q:GAUCHE,
+                },
+                (pygame.KMOD_LCTRL,):{
+                    pygame.K_z:HAUT,
+                    pygame.K_d:DROITE,
+                    pygame.K_s:BAS,
+                    pygame.K_q:GAUCHE,
+                },
+            },
+            "projectiles":{},
+            "magies":{},
+        }
+
+        #À retirer plus tard
         self.meta_touches = copy.deepcopy(parametres["meta-touches"])
         self.touches = copy.deepcopy(parametres["touches"])
 
@@ -92,7 +136,7 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         #Pour l'instant juste en période de navigation normale du labyrinthe
         #L'affichage est une liste verticale
         #Le premier élément, en haut, est le nom de l'étage où l'on se trouve
-        nom_etage = Texte((0,0),(0,0),self.vue[0][0][0][0]) #Les tailles (deuxième argument) ne servent à rien pour l'instant pour un texte
+        nom_etage = Texte(self.vue[0][0][0][0]) #Les tailles (deuxième argument) ne servent à rien pour l'instant pour un texte
         #Le deuxième élément, ensuite, est un pavage horizontal
             #Le premier élément, à gauche, est un pavage vertical
             #Elle contient les stats, l'inventaire et la classe
@@ -2207,3 +2251,4 @@ class Joueur(Humain): #Le premier humain du jeu, avant l'étage 1 (évidemment, 
         self.interlocuteur.parle(touche)
 
 from Jeu.Affichage.Affichages import *
+from Jeu.Affichage.Nouveaux_affichages import *

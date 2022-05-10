@@ -1,7 +1,7 @@
 from Jeu.Effet.Magie.Magie import *
 from Jeu.Effet.Attaque.Attaque import *
 
-class Magie_volcan(Cible_case):
+class Magie_volcan(Cible_case,Magies_offensives):
     """La magie qui crée une attaque de feu à un autre endroit."""
     nom = "magie volcan"
     def __init__(self,niveau):
@@ -26,7 +26,7 @@ class Magie_volcan(Cible_case):
     def get_description(self,observation):
         return ["Une magie d'attaque","Inflige des dégats de feu aux agissants à proximité d'une case en vue de lanceur.",f"Coût : {self.cout_pm}",f"Dégats : {degats_volcan[self.niveau-1]}",f"Portée : {portee_volcan[self.niveau-1]}",f"Latence : {self.latence}"]
 
-class Magie_secousse(Cible_case):
+class Magie_secousse(Cible_case,Magies_offensives):
     """La magie qui crée une attaque de terre à un autre endroit. Pas très puissant."""
     nom = "magie secousse"
     def __init__(self,niveau):
@@ -51,7 +51,7 @@ class Magie_secousse(Cible_case):
     def get_description(self,observation):
         return ["Une magie d'attaque","Inflige des dégats de terre aux agissants à proximité d'une case en vue de lanceur.",f"Coût : {self.cout_pm}",f"Dégats : {degats_secousse[self.niveau-1]}",f"Portée : {portee_secousse[self.niveau-1]}",f"Latence : {self.latence}"]
 
-class Magie_petite_secousse(Cible_case):
+class Magie_petite_secousse(Cible_case,Magies_offensives):
     """La magie qui crée une attaque de terre à un autre endroit. Pas très puissant."""
     nom = "magie petite secousse"
     def __init__(self,niveau):

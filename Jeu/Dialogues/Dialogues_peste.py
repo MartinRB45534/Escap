@@ -57,9 +57,9 @@ REPLIQUES_PESTE = {
     "dialogue-2reponse1.2":"On peut s'entraider pour tuer les monstres ?",
     "dialogue-2phrase1.1":"Comment oses-tu m'insulter !? Subit le châtiment divin !",
     "dialogue-2phrase1.2":"Tu as besoin de moi finalement ?",
-    "dialogue-2reponse1.1.1":"",
+    "dialogue-2reponse1.1.1":"...",
     "dialogue-2reponse1.2.1":"Je suppose que oui.",
     "dialogue-3phrase1":"Tu peux me laisser ? J'ai des monstres à  tuer.",
-    "dialogue-3reponse1.1":"",
+    "dialogue-3reponse1.1":"...",
     "dialogue-4phrase1":"Subit le châtiment divin !",
-    "dialogue-4reponse1.1":""} #À compléter avec plus de répliques
+    "dialogue-4reponse1.1":"..."} #À compléter avec plus de répliques

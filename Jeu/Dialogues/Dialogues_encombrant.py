@@ -26,7 +26,7 @@ REPLIQUES_ENCOMBRANT = {
     "dialogue2reponse1.1.1":"J'espère que je ne tomberai pas dans un tel piège.",
     "dialogue2reponse1.1.2":"Il y en a qui ne passent que dans un sens ?",
     "dialogue2reponse1.1.3":"Bah, je n'ai qu'à tuer tout ce qu'il y a au-delà. Pourquoi revenir en arrière ?",
-    "dialogue2reponse1.2.1":"",
+    "dialogue2reponse1.2.1":"...",
     "dialogue2phrase1.1.1":"Ici, tu risques plutôt d'avoir des problèmes à cause du manque de place.",
     "dialogue2phrase1.1.2":"Il y en a aussi qui sont invisibles...",
     "dialogue2phrase1.1.3":"Si tu tombes dans un cul-de-sac, ça peut vite devenir compliqué... même sans portail à sens unique en fait, dans des petits espaces comme ici.",
@@ -106,4 +106,4 @@ REPLIQUES_ENCOMBRANT = {
     "dialogue-1reponse1.1.1.2":"Je vais te montrer.",
     "dialogue-1phrase1.1.1.2":"C'est noté. Tu as besoin d'autre chose ?",
     "dialogue-2phrase1":"Meurs !",
-    "dialogue-2reponse1.1":""} #À compléter avec plus de répliques
+    "dialogue-2reponse1.1":"..."} #À compléter avec plus de répliques

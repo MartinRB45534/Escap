@@ -54,7 +54,7 @@ class Peureuse(Multi_renforceur,Support_lointain,Stratege,Humain): #La quatrièm
         if self.dialogue == -1: #Le joueur est venu nous voir de son propre chef
             self.replique = "dialogue-1phrase1"
             self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"] #La question personnelle est pour quand le joueur veut faire avancer les interractions.
-            if self.controleur.entitees[2].a_parchemin_vierge():
+            if self.controleur[2].a_parchemin_vierge():
                 self.repliques.append("dialogue-1reponse1.3")
         elif self.dialogue == -2: #Le joueur nous a mal traîté
             self.replique = "dialogue-2phrase1"
@@ -81,10 +81,7 @@ class Peureuse(Multi_renforceur,Support_lointain,Stratege,Humain): #La quatrièm
             self.replique = "dialogue7phrase1"
             self.repliques = ["dialogue7reponse1.1","dialogue7reponse1.2","dialogue7reponse1.3"]
 
-    def interprete(self,nb_replique):
-        #Dans une première version simple, je suppose qu'une même réplique n'apparaît pas deux fois dans tout le jeu
-        replique = self.repliques[nb_replique] #Donc la réplique est la phrase que le joueur à choisi
-        #Il suffit de savoir quelle phrase le joueur a choisi pour réagir en conséquence
+    def interprete(self,replique):
 
         #Premier dialogue
         #Le joueur arrive par l'escalier
@@ -259,7 +256,7 @@ class Peureuse(Multi_renforceur,Support_lointain,Stratege,Humain): #La quatrièm
         elif replique == "dialogue5reponse1.1.1.1":
             ID_clee = self.inventaire.get_clee("Porte_avant_prison_5")
             self.inventaire.drop(None,ID_clee)
-            self.controleur.entitees[2].inventaire.ramasse_item(ID_clee) #On refile au joueur la clé dont il a besoin
+            self.controleur[2].inventaire.ramasse_item(ID_clee) #On refile au joueur la clé dont il a besoin
             self.replique="dialogue5phrase1.1.1.1"
             self.repliques = ["dialogue5reponse1.1.1.1.1"]
         elif replique == "dialogue5reponse1.1.1.1.1":
@@ -267,13 +264,13 @@ class Peureuse(Multi_renforceur,Support_lointain,Stratege,Humain): #La quatrièm
         elif replique == "dialogue5reponse1.2":
             ID_clee = self.inventaire.get_clee("Porte_avant_prison_5")
             self.inventaire.drop(None,ID_clee)
-            self.controleur.entitees[2].inventaire.ramasse_item(ID_clee) #On refile quand même au joueur la clé dont il a besoin
+            self.controleur[2].inventaire.ramasse_item(ID_clee) #On refile quand même au joueur la clé dont il a besoin
             self.appreciations[0]+= 0.5
             self.end_dialogue()
         elif replique == "dialogue5reponse1.3":
             ID_clee = self.inventaire.get_clee("Porte_avant_prison_5")
             self.inventaire.drop(None,ID_clee)
-            self.controleur.entitees[2].inventaire.ramasse_item(ID_clee) #On refile quand même au joueur la clé dont il a besoin
+            self.controleur[2].inventaire.ramasse_item(ID_clee) #On refile quand même au joueur la clé dont il a besoin
             self.appreciations[0]-= 0.5
             self.end_dialogue()
 
@@ -423,7 +420,7 @@ class Peureuse(Multi_renforceur,Support_lointain,Stratege,Humain): #La quatrièm
         elif replique == "dialogue-1reponse1.1.1.1":
             self.replique = "dialogue-1phrase1.1.3"
             self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"] #La question personnelle est pour quand le joueur veut faire avancer les interractions.
-            if self.controleur.entitees[2].a_parchemin_vierge():
+            if self.controleur[2].a_parchemin_vierge():
                 self.repliques.append("dialogue-1reponse1.3")
             self.repliques.append("dialogue-1reponse1.4")
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
@@ -436,7 +433,7 @@ class Peureuse(Multi_renforceur,Support_lointain,Stratege,Humain): #La quatrièm
         elif replique == "dialogue-1reponse1.1.3":
             self.replique = "dialogue-1phrase1.1.3"
             self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"] #La question personnelle est pour quand le joueur veut faire avancer les interractions.
-            if self.controleur.entitees[2].a_parchemin_vierge():
+            if self.controleur[2].a_parchemin_vierge():
                 self.repliques.append("dialogue-1reponse1.3")
             self.repliques.append("dialogue-1reponse1.4")
             self.mouvement = 1
@@ -448,7 +445,7 @@ class Peureuse(Multi_renforceur,Support_lointain,Stratege,Humain): #La quatrièm
         elif replique == "dialogue-1reponse1.2.1":
             self.end_dialogue(-1)
         elif replique == "dialogue-1reponse1.3":
-            if self.controleur.entitees[2].consomme_parchemin_vierge():
+            if self.controleur[2].consomme_parchemin_vierge():
                 self.replique = "dialogue-1phrase1.3"
                 self.repliques = ["dialogue-1reponse1.3.1"]
             else:
@@ -471,7 +468,7 @@ class Peureuse(Multi_renforceur,Support_lointain,Stratege,Humain): #La quatrièm
         self.cible_deplacement = cible
         self.replique = "dialogue-1phrase1.1.1.2"
         self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"]
-        if self.controleur.entitees[2].a_parchemin_vierge():
+        if self.controleur[2].a_parchemin_vierge():
             self.repliques.append("dialogue-1reponse1.3")
         self.repliques.append("dialogue-1reponse1.4")
 
@@ -493,7 +490,7 @@ class Peureuse(Multi_renforceur,Support_lointain,Stratege,Humain): #La quatrièm
             self.controleur.get_entitee(2).inventaire.ajoute(parch)
             self.replique = "dialogue-1phrase1.3.1"
             self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"] #La question personnelle est pour quand le joueur veut faire avancer les interractions.
-            if self.controleur.entitees[2].a_parchemin_vierge():
+            if self.controleur[2].a_parchemin_vierge():
                 self.repliques.append("dialogue-1reponse1.3")
         else:
             parch = Parchemin_vierge(None)
@@ -501,7 +498,7 @@ class Peureuse(Multi_renforceur,Support_lointain,Stratege,Humain): #La quatrièm
             self.controleur.get_entitee(2).inventaire.ajoute(parch)
             self.replique = "dialogue-1phrase1.3.1echec"
             self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"] #La question personnelle est pour quand le joueur veut faire avancer les interractions.
-            if self.controleur.entitees[2].a_parchemin_vierge():
+            if self.controleur[2].a_parchemin_vierge():
                 self.repliques.append("dialogue-1reponse1.3")
             self.repliques.append("dialogue-1reponse1.4")
 

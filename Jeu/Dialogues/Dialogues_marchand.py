@@ -7,7 +7,7 @@ REPLIQUES_MARCHAND = {
     "dialogue1reponse1.1.2":"Je n'ai pas d'argent...",
     "dialogue1phrase1.1.1":"Volontiers. Il n'y a pas beaucoup d'autres clients ici.",
     "dialogue1phrase1.1.2":"Tu n'as qu'à me vendre ce dont tu ne te sers pas. Même les cadavres de monstres ont de la valeur.",
-    "dialogue1reponse1.1.1.1":"",
+    "dialogue1reponse1.1.1.1":"...",
     "dialogue1reponse1.1.2.1":"Ce serait embêtant de revenir ici à chaque fois que j'ai tué un monstre...",
     "dialogue1phrase1.1.2.1":"Je peux t'accompagner.",
     "dialogue1reponse1.1.2.1.1":"Je veux bien.",

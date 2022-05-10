@@ -5,12 +5,15 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
     def __init__(self,controleur,position,identite,niveau,ID=None):
         Entitee.__init__(self,position,ID)
         stats=CONSTANTES_STATS[identite]
-        self.pv=stats['pv'][niveau]
-        self.pv_max=self.pv
-        self.regen_pv=stats['regen_pv'][niveau]
+        self.pv_max=stats['pv'][niveau]
+        self.pv=self.pv_max
+        self.regen_pv_max=stats['regen_pv_max'][niveau]
+        self.regen_pv_min=stats['regen_pv_min'][niveau]
+        self.restauration_regen_pv=stats['restauration_regen_pv'][niveau]
+        self.regen_pv=self.regen_pv_max
         self.taux_regen_pv = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à la régénération des pv. Correspond aux effets passager sur la régénération des pv.
-        self.pm=stats['pm'][niveau]
-        self.pm_max=self.pm
+        self.pm_max=stats['pm'][niveau]
+        self.pm=self.pm_max
         self.regen_pm=stats['regen_pm'][niveau]
         self.taux_regen_pm = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à la régénération des pm. Correspond aux effets passager sur la régénération des pm.
         self.force=stats['force'][niveau]
@@ -314,6 +317,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
             gravite += 0.3
         if element not in self.immunites :
             self.pv -= degats/self.get_aff(element)
+            self.regen_pv = self.regen_pv_min
         if self.pv <= 0: #Alors tuer les gens, je ne vous en parle pas !!!
             gravite += 0.5
         self.insurge(ID,gravite,dangerosite)
@@ -433,15 +437,18 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
             #Un nouveau tour commence, qui s'annonce remplit de bonnes surprises et de nouvelles rencontres ! Pour partir du bon pied, on a quelques trucs à faire :
             #La régénération ! Plein de nouveaux pm et pv à gaspiller ! C'est pas beau la vie ?
             self.pv += self.get_total_regen_pv()
+            self.regen_pv += self.restauration_regen_pv
             self.pm += self.get_total_regen_pm() #Et oui, les pm après, désolé...
             if self.pv > self.pv_max:
                 self.pv = self.pv_max
+            if self.regen_pv > self.regen_pv_max:
+                self.regen_pv = self.regen_pv_max
             if self.pm > self.pm_max:
                 self.pm = self.pm_max
             self.inventaire.debut_tour()
             if self.latence >= 0:
                 self.latence -= self.get_vitesse()
-            # Partie auras à retravailler
+            # Partie auras à retravailler         /!\ Qu'est-ce que je voulais retravailler là ?
             skills = self.classe_principale.debut_tour()
             for skill in skills :
                 if isinstance(skill,Skill_aura):

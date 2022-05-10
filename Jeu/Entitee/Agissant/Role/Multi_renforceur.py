@@ -23,7 +23,7 @@ class Multi_renforceur(Renforceur):
             if self.peut_multi_caster():
                 self.skill_courant = Skill_magie
                 self.magie_courante = self.multi_caste()
-                self.cible_magie = cibles
+                self.cible_magie = [cible[-1] for cible in cibles]
                 for cible in cibles:
                     agissant = self.controleur.get_entitee(cible[-1])
                     agissant.statut = "attaque boostée"

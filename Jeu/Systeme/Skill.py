@@ -44,7 +44,7 @@ class Skill(Skill_intrasec): #Les skills ne sont pas des skills intrasecs, mais 
                 self.evo()
                 self.prep_next_evo()
 
-class Skill_magie(Skill):
+class Skill_magie(Skill,Skills_magiques):
     """Le skill utilisé pour faire de la magie. Le seul autorisé à consommer du mana (?).
        On le sélectionne en passant en argument la magie souhaitée, puis on précise éventuellement les cibles.
        C'est un skill actif, qui s'actionne quand on le réclame."""
@@ -80,7 +80,7 @@ class Skill_magie(Skill):
                 if isinstance(cadeau,int): #comment faire pour les autres types de cadeaux ?
                     self.xp.append(cadeau)
                 elif isinstance(cadeau,magie): #On peut gagner une magie avec la montée de niveau du skill !
-                    self.ajoute(magie)
+                    self.ajoute(cadeau)
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -369,7 +369,7 @@ class Skill_defense(Skill):
         self.xp_new += self.gain_xp #Faire dépendre des dégats bloqués ?
         return self.taux
 
-class Skill_attaque(Skill):
+class Skill_attaque(Skill,Skills_offensifs):
     """Permet d'attaquer avec une arme.
        C'est un skill actif."""
     def __init__(self):
@@ -387,7 +387,7 @@ class Skill_attaque(Skill):
         self.xp_new += gain_xp_attaque[self.niveau-1]
         return latence_attaque[self.niveau-1],taux_utilisation_attaque[self.niveau-1]
 
-class Skill_stomp(Skill_attaque):
+class Skill_stomp(Skill,Skills_offensifs):
     """Permet d'attaquer la zone avoisinnante sans arme.
        C'est un skill actif."""
     def __init__(self):
@@ -450,7 +450,7 @@ class Skill_course(Skill):
         self.xp_new+=gain_xp_course[self.niveau-1] #On gagne de l'xp !
         return latence_course[self.niveau-1], self.niveau #On renvoie le temps que prendra l'action, pour savoir combien de temps l'agissant attendra, et le niveau, pour les calculs du controleur, des collisions, du labyrinthe, etc.
 
-class Skill_lancer(Skill):
+class Skill_lancer(Skill,Skills_projectiles):
     """Permet de lancer un item. Le temps du lancer dépend du poid de l'item et du niveau du skill. La portée du lancer dépend de la portée de l'item, du niveau du skill et des capacités de l'agissant. L'item peut être dans l'inventaire ou créé au moment du lancer.
        C'est un skill actif."""
     def __init__(self):
@@ -501,7 +501,7 @@ class Skill_creation_de_fleches(Skill):
                 if isinstance(cadeau,int): #comment faire pour les autres types de cadeaux ?
                     self.xp.append(cadeau)
                 elif isinstance(cadeau,Fleche): #On peut gagner un type de flèche avec la montée de niveau du skill ? /!\ Un skill ne connait pas les autres objets du jeu /!\
-                    self.ajoute(fleche)
+                    self.ajoute(cadeau)
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -538,7 +538,7 @@ class Skill_creation_d_explosifs(Skill):
                 if isinstance(cadeau,int): #Comment faire pour les autres types de cadeaux ?
                     self.xp.append(cadeau)
                 elif isinstance(cadeau,Explosif): #On peut gagner un type d'explosif avec la montée de niveau du skill ?
-                    self.ajoute(explosif)
+                    self.ajoute(cadeau)
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -590,7 +590,7 @@ class Skill_echange(Skill):
                 if isinstance(cadeau,int): #Comment faire pour les autres types de cadeaux ?
                     self.xp.append(cadeau)
                 elif isinstance(cadeau,Explosif): #On peut gagner un type d'explosif avec la montée de niveau du skill ?
-                    self.ajoute(explosif)
+                    self.ajoute(cadeau)
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -691,5 +691,5 @@ class Invite_de_commande(Skill):
         elif touche == pygame.K_ENTER:
             eval(self.chaine) #/!\ Rajouter les variables globales pour que ça serve à quelque-chose !
             self.chaine = ""
-        elif self.chaine.append(pygame.key.name(touche)): #On se limite aux trucs simples pour l'instant !
+        else: #On se limite aux trucs simples pour l'instant !
             self.chaine.append(pygame.key.name(touche))

@@ -6,6 +6,12 @@ SKIN_VIDE = Skin("vide.png")
 ILLUSTRATION_VIDE = Illustration("vide.png")
 # global IMAGE_VIDE
 IMAGE_VIDE = Image("vide.png")
+# global IMAGE_PV_ALLIE
+IMAGE_PV_ALLIE = Image("barre_de_vie_allies.png")
+# global IMAGE_PV_ENNEMI
+IMAGE_PV_ENNEMI = Image("barre_de_vie_ennemis.png")
+# global IMAGE_PV_NEUTRE
+IMAGE_PV_NEUTRE = Image("barre_de_vie_neutres.png")
 # global SKIN_DIRECTION
 SKIN_DIRECTION = Skin("direction.png")
 # global SKIN_BROUILLARD

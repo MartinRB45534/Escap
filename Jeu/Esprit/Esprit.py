@@ -137,7 +137,7 @@ class Esprit :
         self.resolution = 0
         for ID_corp in self.corps.keys():
             corp = self.controleur.get_entitee(ID_corp)
-            if isinstance(corp,Stratege): # Comment faire quand on a plusieurs stratèges
+            if isinstance(corp,Stratege): # Comment faire quand on a plusieurs stratèges ? /!\
                 self.resolution = corp.resolution
 
     def calcule_trajets(self):

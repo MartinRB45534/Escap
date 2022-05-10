@@ -60,47 +60,65 @@ try:
     CONSTANTES_STATS["joueur"]["pv"][1] = PV_JOUEUR
     CONSTANTES_STATS["joueur"]["vitesse"][1] = VITESSE_JOUEUR
     CONSTANTES_STATS["joueur"]["force"][1] = FORCE_JOUEUR
-    CONSTANTES_STATS["joueur"]["regen_pv"][1] = REGEN_JOUEUR
+    CONSTANTES_STATS["joueur"]["regen_pv_max"][1] = REGEN_MAX_JOUEUR
+    CONSTANTES_STATS["joueur"]["regen_pv_min"][1] = REGEN_MIN_JOUEUR
+    CONSTANTES_STATS["joueur"]["restauration_regen_pv"][1] = RESTAURATION_REGEN_JOUEUR
     CONSTANTES_STATS["receptionniste"]["pv"][1] = PV_RECEPTIONNISTE
     CONSTANTES_STATS["receptionniste"]["vitesse"][1] = VITESSE_RECEPTIONNISTE
     CONSTANTES_STATS["receptionniste"]["force"][1] = FORCE_RECEPTIONNISTE
-    CONSTANTES_STATS["receptionniste"]["regen_pv"][1] = REGEN_RECEPTIONNISTE
+    CONSTANTES_STATS["receptionniste"]["regen_pv_max"][1] = REGEN_MAX_RECEPTIONNISTE
+    CONSTANTES_STATS["receptionniste"]["regen_pv_min"][1] = REGEN_MIN_RECEPTIONNISTE
+    CONSTANTES_STATS["receptionniste"]["restauration_regen_pv"][1] = RESTAURATION_REGEN_RECEPTIONNISTE
     CONSTANTES_STATS["paume"]["pv"][1] = PV_PAUME
     CONSTANTES_STATS["paume"]["vitesse"][1] = VITESSE_PAUME
     CONSTANTES_STATS["paume"]["force"][1] = FORCE_PAUME
-    CONSTANTES_STATS["paume"]["regen_pv"][1] = REGEN_PAUME
+    CONSTANTES_STATS["paume"]["regen_pv_max"][1] = REGEN_MAX_PAUME
+    CONSTANTES_STATS["paume"]["regen_pv_min"][1] = REGEN_MIN_PAUME
+    CONSTANTES_STATS["paume"]["restauration_regen_pv"][1] = RESTAURATION_REGEN_PAUME
     CONSTANTES_STATS["peureuse"]["pv"][1] = PV_PEUREUSE
     CONSTANTES_STATS["peureuse"]["vitesse"][1] = VITESSE_PEUREUSE
     CONSTANTES_STATS["peureuse"]["force"][1] = FORCE_PEUREUSE
-    CONSTANTES_STATS["peureuse"]["regen_pv"][1] = REGEN_PEUREUSE
+    CONSTANTES_STATS["peureuse"]["regen_pv_max"][1] = REGEN_MAX_PEUREUSE
+    CONSTANTES_STATS["peureuse"]["regen_pv_min"][1] = REGEN_MIN_PEUREUSE
+    CONSTANTES_STATS["peureuse"]["restauration_regen_pv"][1] = RESTAURATION_REGEN_PEUREUSE
     CONSTANTES_STATS["peureuse"]["pm"][1] = PM_PEUREUSE
     CONSTANTES_STATS["peureuse"]["regen_pm"][1] = REGEN_PM_PEUREUSE
     CONSTANTES_STATS["encombrant"]["pv"][1] = PV_ENCOMBRANT
     CONSTANTES_STATS["encombrant"]["vitesse"][1] = VITESSE_ENCOMBRANT
     CONSTANTES_STATS["encombrant"]["force"][1] = FORCE_ENCOMBRANT
-    CONSTANTES_STATS["encombrant"]["regen_pv"][1] = REGEN_ENCOMBRANT
+    CONSTANTES_STATS["encombrant"]["regen_pv_max"][1] = REGEN_MAX_ENCOMBRANT
+    CONSTANTES_STATS["encombrant"]["regen_pv_min"][1] = REGEN_MIN_ENCOMBRANT
+    CONSTANTES_STATS["encombrant"]["restauration_regen_pv"][1] = RESTAURATION_REGEN_ENCOMBRANT
     CONSTANTES_STATS["alchimiste"]["pv"][1] = PV_ALCHIMISTE
     CONSTANTES_STATS["alchimiste"]["vitesse"][1] = VITESSE_ALCHIMISTE
     CONSTANTES_STATS["alchimiste"]["force"][1] = FORCE_ALCHIMISTE
-    CONSTANTES_STATS["alchimiste"]["regen_pv"][1] = REGEN_ALCHIMISTE
+    CONSTANTES_STATS["alchimiste"]["regen_pv_max"][1] = REGEN_MAX_ALCHIMISTE
+    CONSTANTES_STATS["alchimiste"]["regen_pv_min"][1] = REGEN_MIN_ALCHIMISTE
+    CONSTANTES_STATS["alchimiste"]["restauration_regen_pv"][1] = RESTAURATION_REGEN_ALCHIMISTE
     CONSTANTES_STATS["alchimiste"]["pm"][1] = PM_ALCHIMISTE
     CONSTANTES_STATS["alchimiste"]["regen_pm"][1] = REGEN_PM_ALCHIMISTE
     CONSTANTES_STATS["peste"]["pv"][1] = PV_PESTE
     CONSTANTES_STATS["peste"]["vitesse"][1] = VITESSE_PESTE
     CONSTANTES_STATS["peste"]["force"][1] = FORCE_PESTE
-    CONSTANTES_STATS["peste"]["regen_pv"][1] = REGEN_PESTE
+    CONSTANTES_STATS["peste"]["regen_pv_max"][1] = REGEN_MAX_PESTE
+    CONSTANTES_STATS["peste"]["regen_pv_min"][1] = REGEN_MIN_PESTE
+    CONSTANTES_STATS["peste"]["restauration_regen_pv"][1] = RESTAURATION_REGEN_PESTE
     CONSTANTES_STATS["peste"]["pm"][1] = PM_PESTE
     CONSTANTES_STATS["peste"]["regen_pm"][1] = REGEN_PM_PESTE
     CONSTANTES_STATS["bombe_atomique"]["pv"][1] = PV_BOMBE
     CONSTANTES_STATS["bombe_atomique"]["vitesse"][1] = VITESSE_BOMBE
     CONSTANTES_STATS["bombe_atomique"]["force"][1] = FORCE_BOMBE
-    CONSTANTES_STATS["bombe_atomique"]["regen_pv"][1] = REGEN_BOMBE
+    CONSTANTES_STATS["bombe_atomique"]["regen_pv_max"][1] = REGEN_MAX_BOMBE
+    CONSTANTES_STATS["bombe_atomique"]["regen_pv_min"][1] = REGEN_MIN_BOMBE
+    CONSTANTES_STATS["bombe_atomique"]["restauration_regen_pv"][1] = RESTAURATION_REGEN_BOMBE
     CONSTANTES_STATS["bombe_atomique"]["pm"][1] = PM_BOMBE
     CONSTANTES_STATS["bombe_atomique"]["regen_pm"][1] = REGEN_PM_BOMBE
     CONSTANTES_STATS["marchand"]["pv"][1] = PV_MARCHAND
     CONSTANTES_STATS["marchand"]["vitesse"][1] = VITESSE_MARCHAND
     CONSTANTES_STATS["marchand"]["force"][1] = FORCE_MARCHAND
-    CONSTANTES_STATS["marchand"]["regen_pv"][1] = REGEN_MARCHAND
+    CONSTANTES_STATS["marchand"]["regen_pv_max"][1] = REGEN_MAX_MARCHAND
+    CONSTANTES_STATS["marchand"]["regen_pv_min"][1] = REGEN_MIN_MARCHAND
+    CONSTANTES_STATS["marchand"]["restauration_regen_pv"][1] = RESTAURATION_REGEN_MARCHAND
     CONSTANTES_STATS["premier_monstre"]["pv"][1] = PV_PREMIER
     CONSTANTES_STATS["premier_monstre"]["vitesse"][1] = VITESSE_PREMIER
     CONSTANTES_STATS["premier_monstre"]["force"][1] = FORCE_PREMIER
@@ -131,7 +149,9 @@ try:
     CONSTANTES_STATS["chef_gobelin"]["pv"][1] = PV_CHEF
     CONSTANTES_STATS["chef_gobelin"]["vitesse"][1] = VITESSE_CHEF
     CONSTANTES_STATS["chef_gobelin"]["force"][1] = FORCE_CHEF
-    CONSTANTES_STATS["chef_gobelin"]["regen_pv"][1] = REGEN_CHEF
+    CONSTANTES_STATS["chef_gobelin"]["regen_pv_max"][1] = REGEN_MAX_CHEF
+    CONSTANTES_STATS["chef_gobelin"]["regen_pv_min"][1] = REGEN_MIN_CHEF
+    CONSTANTES_STATS["chef_gobelin"]["restauration_regen_pv"][1] = RESTAURATION_REGEN_CHEF
 
     dpt_joueur = FORCE_JOUEUR*TAUX_STOMP*VITESSE_JOUEUR/LATENCE_STOMP
     dpt_boost_joueur = dpt_joueur * TAUX_BOOST
@@ -219,6 +239,7 @@ class Controleur():
         self.labs_courants:List[Labyrinthe] = []
         self.entitees_courantes:List[Entitee] = []
         self.esprits_courants:List[Esprit] = []
+        self.joueur:Agissant = None
         self.pause = False
         self.nb_tours = 0
         self.phase = TOUR
@@ -228,6 +249,7 @@ class Controleur():
         else:
             self.tour_par_seconde = parametres["tours_par_seconde"]
             self.ajoute_entitee(Joueur(self,None,parametres,screen))
+            self.joueur = self.entitees[2]
 
     def __getitem__(self,key):
         if isinstance(key,tuple):
@@ -243,7 +265,23 @@ class Controleur():
             return self.labs[key.lab][key]
         elif isinstance(key,int):
             return self.entitees[key]
+        print(f"n'a pas pu trouver {key}")
         return NotImplemented
+
+    def __setitem__(self,key,value):
+        if isinstance(key,tuple):
+            if len(key)==2: #Position et direction
+                self.labs[key[0].lab][key[0]][key[1]] = value
+            elif len(key)==4:
+                self.labs[key[0]][Position(key[0],key[1],key[2])][key[3]] = value
+            elif len(key)==3:
+                self.labs[key[0]][Position(key[0],key[1],key[2])] = value
+        elif isinstance(key,Cote):
+            self[key.emplacement][key.direction] = value
+        elif isinstance(key,Position):
+            self.labs[key.lab][key] = value
+        elif isinstance(key,int):
+            self.entitees[key] = value
 
     def jeu(self,screen):
 
@@ -272,7 +310,7 @@ class Controleur():
         paterns1 = [Pattern(Position("Étage 1 : test",0,0),Decalage(20,20),[])]
         self.labs["Étage 1 : test"]=Labyrinthe("Étage 1 : test",Decalage(20,20),Position("Étage 1 : test",0,0),paterns1,1,1,TERRE,1)
 
-        self.entitees[2].position = Position("Étage 1 : test",0,0)
+        self[2].position = Position("Étage 1 : test",0,0)
         self.active_lab("Étage 1 : test")
 
     def experience5(self):
@@ -367,7 +405,7 @@ class Controleur():
         paume = Paume(self,Position("Étage 2 : labyrinthe",1,0))
         self.ajoute_entitee(paume)
         self.esprits["paume"] = Esprit_humain(paume.ID,self)
-        paterns2 = [Pattern(Position("Étage 2 : labyrinthe",0,5),Decalage(5,0)),
+        paterns2 = [Pattern(Position("Étage 2 : labyrinthe",0,0),Decalage(5,5),[Cote(Decalage(4,0),DROITE),Cote(Decalage(4,1),DROITE),Cote(Decalage(4,2),DROITE),Cote(Decalage(4,3),DROITE),Cote(Decalage(4,4),DROITE)]),
                     Pattern(Position("Étage 2 : labyrinthe",5,5),Decalage(5,5),[Cote(Decalage(0,0),GAUCHE)],["Porte_centre_2"])]
         self.labs["Étage 2 : labyrinthe"]=Labyrinthe("Étage 2 : labyrinthe",Decalage(15,15),Position("Étage 2 : labyrinthe",0,0),paterns2,1,1,TERRE,0.2)
         self.construit_escalier(Cote(Position("Étage 1 : couloir",18,1),DROITE),Cote(Position("Étage 2 : labyrinthe",0,0),GAUCHE))
@@ -522,16 +560,16 @@ class Controleur():
 
         paterns6 = [Pattern(Position("Étage 6 : potions",9,3),Decalage(6,8),[Cote(Decalage(0,0),GAUCHE),Cote(Decalage(0,1),GAUCHE),Cote(Decalage(0,2),GAUCHE),Cote(Decalage(0,3),GAUCHE),Cote(Decalage(3,0),HAUT),Cote(Decalage(4,0),HAUT),Cote(Decalage(5,0),HAUT),Cote(Decalage(0,7),GAUCHE),Cote(Decalage(0,7),BAS),Cote(Decalage(3,7),BAS),Cote(Decalage(4,7),BAS),Cote(Decalage(5,7),BAS)]), #La cuisine, avec le shaman et les derniers gobelins (0)
                     Pattern(Position("Étage 6 : potions",6,0),Decalage(3,2),[]), #(5)
-                    Pattern(Position("Étage 6 : potions",3,0),Decalage(3,2),[Cote(Decalage(0,1),GAUCHE)]), #(12)
+                    Pattern(Position("Étage 6 : potions",3,0),Decalage(3,2),[Cote(Decalage(0,1),GAUCHE)]), #(12) /!\ Il y a un problème ici ?
                     Pattern(Position("Étage 6 : potions",0,3),Decalage(2,3),[Cote(Decalage(1,0),HAUT)]), #(10)
-                    Pattern(Position("Étage 6 : potions",0,0),Decalage(3,3),[Cote(Decalage(1,2),BAS),Cote(Decalage(2,1),DROITE)],["Deuxième_porte_potions","Troisième_porte_potions"]), #(11)
+                    Pattern(Position("Étage 6 : potions",0,0),Decalage(3,3),[Cote(Decalage(1,2),BAS),Cote(Decalage(2,1),DROITE),Cote(Decalage(2,2),DROITE),Cote(Decalage(2,2),BAS)],["Deuxième_porte_potions","Troisième_porte_potions"]), #(11)
                     Pattern(Position("Étage 6 : potions",3,7),Decalage(3,2),[Cote(Decalage(0,1),GAUCHE)]), #(4) /!\ QUOI ?!?
-                    Pattern(Position("Étage 6 : potions",0,6),Decalage(3,3),[Cote(Decalage(2,1),DROITE)],["Première_porte_potions"]), #(3)
+                    Pattern(Position("Étage 6 : potions",0,6),Decalage(3,3),[Cote(Decalage(2,1),DROITE),Cote(Decalage(2,0),DROITE),Cote(Decalage(2,0),HAUT)],["Première_porte_potions"]), #(3)
                     Pattern(Position("Étage 6 : potions",0,9),Decalage(3,3),[Cote(Decalage(2,1),DROITE)]), #(8)
                     Pattern(Position("Étage 6 : potions",3,9),Decalage(3,3),[Cote(Decalage(0,1),GAUCHE)],["Porte_inutile_potion"]), #(9)
                     Pattern(Position("Étage 6 : potions",2,2),Decalage(5,5),[]), #(7)
                     Pattern(Position("Étage 6 : potions",12,9),Decalage(3,3),[]), #(6)
-                    Pattern(Position("Étage 6 : potions",11,0),Decalage(4,4),[Cote(Decalage(0,3),GAUCHE),Cote(Decalage(0,3),BAS),Cote(Decalage(2,3),BAS)],["Porte_cuisine"]), #(1)
+                    Pattern(Position("Étage 6 : potions",11,0),Decalage(4,4),[Cote(Decalage(2,3),BAS),Cote(Decalage(0,3),GAUCHE),Cote(Decalage(0,3),BAS)],["Porte_cuisine"]), #(1)
                     Pattern(Position("Étage 6 : potions",8,3),Decalage(4,4),[]), #(2)
                     Pattern(Position("Étage 6 : potions",0,12),Decalage(5,3),[Cote(Decalage(4,1),DROITE)],["Porte_armurerie_6"])]
         self.labs["Étage 6 : potions"]=Labyrinthe("Étage 6 : potions",Decalage(15,15),Position("Étage 6 : potions",14,14),paterns6,1,1,TERRE,0.2)
@@ -729,7 +767,7 @@ class Controleur():
         #On lance la cinématique :
         #À rajouter
         #Et on active le lab du joueur
-        self.entitees[2].position = Position("Étage 1 : couloir",13,0)
+        self[2].position = Position("Étage 1 : couloir",13,0)
         self.active_lab(self[2].position.lab)
 
     def duel(self,esprit1,esprit2,niveau_1=1,niveau_2=1,tailles_lab=(20,20),vide=True,vue=False,screen=None):
@@ -849,9 +887,9 @@ class Controleur():
         #On cherche une éventuelle entitée supérieure dans l'ancien labyrinthe :
         sup = False
         for key_entitee in self.entitees_courantes :
-            position = self.entitees[key_entitee].get_position()
+            position = self[key_entitee].get_position()
             if position != None:
-                if (position.lab == ancien_lab) and isinstance(self.entitees[key_entitee],Entitee_superieure):
+                if (position.lab == ancien_lab) and isinstance(self[key_entitee],Entitee_superieure):
                     sup = True
         if not(sup): #On n'a pas d'entitee supérieure dans le labyrinthe
             self.labs[ancien_lab].quitte() #On lance le décompte de 5 tours (faire + de 5 tours ?)
@@ -1115,7 +1153,7 @@ class Controleur():
 
 
 
-            elif type_skill == Skill_lancer :
+            elif issubclass(type_skill,Skills_projectiles) :
                 projectile = agissant.get_item_lancer()
 
                 if projectile != None :
@@ -1175,7 +1213,7 @@ class Controleur():
                     cadavre.effets.append(Reanimation(taux,self.get_esprit(cadavre)))
 
 
-            elif type_skill in [Skill_magie,Height_of_Occultism,Lesser_Height_of_Occultism] :
+            elif issubclass(type_skill,Skills_magiques) :
                 nom_magie = agissant.magie_courante
                 latence,magie = skill.utilise(nom_magie)
                 if magie != None:
@@ -1258,7 +1296,7 @@ class Controleur():
                 if agissant.peut_payer(20): #Insérer le cout ici d'une façon ou d'une autre /!\
                     new_slime = type(agissant)(agissant.position,agissant.niveau,True)
                     agissant.paye(20)
-                    agissant.subit(20) #Il perd la moitié de ses pv max et de ses pm max
+                    agissant.subit(20) # /!\ Ne pas utiliser subit() !
                 agissant.add_latence(latence)
 
 
@@ -1355,7 +1393,7 @@ class Controleur():
         return self.get_entitee(corp).get_esprit()
 
     def get_entitee(self,ID):
-        return self.entitees[ID]
+        return self[ID]
 
     def get_especes(self,ID):
         entitee = self.get_entitee(ID)
@@ -1369,7 +1407,7 @@ class Controleur():
             self.ajoute_entitee(entitee)
 
     def ajoute_entitee(self,entitee):
-        self.entitees[entitee.ID]=entitee
+        self[entitee.ID]=entitee
         if entitee.position != None:
             if entitee.position.lab in self.labs_courants:
                 entitee.active(self)
@@ -1550,4 +1588,4 @@ class Controleur():
 
     def clear(self):
         for ID_entitee in self.entitees.keys():
-            self.entitees[ID_entitee].clear()
+            self[ID_entitee].clear()
