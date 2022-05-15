@@ -26,7 +26,7 @@ class Id_max:
         self.valeur+=1
         return self.valeur
 
-    def set_id_max(self,n):
+    def set_id_max(self,n: int):
         self.valeur = n
 
 # global POLICE20
@@ -361,37 +361,25 @@ MAGIE_INFINIE_PAR_DEFAUT = 101
 ENCHANTEMENT_DEFENSIF = 102
 # Il n'y a pas de numéro 43 et 64
 
-# global TOUR
-TOUR = 0
-# global TOUCHE
-TOUCHE = 1
-# global COMPLEMENT_DIR
-COMPLEMENT_DIR = 2
-# global COMPLEMENT_CIBLE
-COMPLEMENT_CIBLE = 3
-# global COMPLEMENT_COUT
-COMPLEMENT_COUT = 4
-# global COMPLEMENT_MENU
-COMPLEMENT_MENU = 5
-# global COMPLEMENT_DIR_PARCHEMIN
-COMPLEMENT_DIR_PARCHEMIN = 6
-# global COMPLEMENT_CIBLE_PARCHEMIN
-COMPLEMENT_CIBLE_PARCHEMIN = 7
-# global COMPLEMENT_COUT_PARCHEMIN
-COMPLEMENT_COUT_PARCHEMIN = 8
-# global COMPLEMENT_ALCHIMIE
-COMPLEMENT_ALCHIMIE = 9
-# global COMPLEMENT_CUISINE
-COMPLEMENT_CUISINE = 10
-# global EVENEMENT
-EVENEMENT = 11
-
-# global LEVELUP
-LEVELUP = 0
-# global DIALOGUE
-DIALOGUE = 1
-# global COMPLEMENT_DIALOGUE
-COMPLEMENT_DIALOGUE = 2
+TOUR = 1
+DIALOGUE = 2
+TOUCHE = 3
+LEVEL_UP = 4
+RECETTE = 5
+MARCHAND = 6
+IMPREGNATION = 7
+AUTO_IMPREGNATION = 8
+AGISSANT_DIALOGUE = 9
+CASE_DIALOGUE = 10
+AGISSANT_MAGIE = 11
+CASE_MAGIE = 12
+DIRECTION_MAGIE = 13
+COUT_MAGIE = 14
+AGISSANT_PARCHEMIN = 15
+CASE_PARCHEMIN = 16
+DIRECTION_PARCHEMIN = 17
+COUT_PARCHEMIN = 18
+CINEMATIQUE = 19
 
 # global LISTE_EXHAUSTIVE_DES_MAGIES_OFFENSIVES #Les magies qui créent un objet Attaque
 LISTE_EXHAUSTIVE_DES_MAGIES_OFFENSIVES = ["magie poing magique","magie poing ardent","magie secousse","magie petite secousse","magie volcan","magie explosion de mana","magie laser","magie brasier","magie avalanche"] #Je suis sur qu'il y en a d'autres

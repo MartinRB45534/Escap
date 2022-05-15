@@ -1,4 +1,5 @@
 import random
+from typing import List, Type
 from Jeu.Constantes import *
 from Jeu.Systeme.Kumo_desu_ga_nanika import *
 
@@ -8,9 +9,9 @@ class Classe:
         """conditions_evo : les conditions d'évolution de la classe au niveau supérieur ; si c'est un nombre, indique l'xp nécessaire à l'évolution, si c'est une chaine de caractère, indique la fonction capable d'évaluer la condition
            skills_intrasecs : les skills obtenus automatiquement avec la classe
            cadeux_evo : les récompenses d'évolution ; peuvent être des skills, des classes ou de l'xp""" #Plus vraiment, en fait... À rafraichir
-        self.skills=skills
-        self.skills_intrasecs=skills_intrasecs
-        self.sous_classes=[] #Une classe peut posséder des sous-classes, qui contribueront à son évolution moins qu'à celle de la classe principale
+        self.skills:List[Skill]=skills
+        self.skills_intrasecs:List[Skill_intrasec]=skills_intrasecs
+        self.sous_classes:List[Classe]=[] #Une classe peut posséder des sous-classes, qui contribueront à son évolution moins qu'à celle de la classe principale
         self.niveau=0 #Le niveau devrais passer à 1 lorsqu'on acquiert la classe
         self.cond_evo=conditions_evo
         self.cad_evo=cadeaux_evo
@@ -19,9 +20,9 @@ class Classe:
         self.propagation=0.1 #Certaines classes ont un taux de propagation plus important
         self.prep_next_evo() #On prépare déjà la prochaine évolution
         self.curseur = "skills"
-        self.skill_courant = 0
-        self.skill_intrasec_courant = 0
-        self.classe_courante = 0
+        # self.skill_courant = 0
+        # self.skill_intrasec_courant = 0
+        # self.classe_courante = 0
         self.nom = "classe anonyme"
         
     def gagne_xp(self):
@@ -92,82 +93,82 @@ class Classe:
             for skill in self.skills_intrasecs:
                 skill.evo()
 
-    def utilise_courant(self):
-        if self.curseur == "in_skills":
-            return type(self.skills[self.skill_courant])
-        elif self.curseur == "in_skills_intrasecs":
-            return type(self.skills_intrasecs[self.skill_intrasec_courant])
-        if self.curseur == "in_classes":
-            return self.classes[self.classe_courante].utilise_courant()
+    # def utilise_courant(self):
+    #     if self.curseur == "in_skills":
+    #         return type(self.skills[self.skill_courant])
+    #     elif self.curseur == "in_skills_intrasecs":
+    #         return type(self.skills_intrasecs[self.skill_intrasec_courant])
+    #     if self.curseur == "in_classes":
+    #         return self.classes[self.classe_courante].utilise_courant()
 
-    def deplace(self,direction):
-        res = False
-        if self.curseur == "skills":
-            if direction == HAUT:
-                self.curseur = "skills_intrasecs"
-            elif direction == BAS:
-                self.curseur = "classes"
-            elif direction == IN:
-                self.curseur = "in_skills"
-            elif direction == OUT:
-                res = True
-        elif self.curseur == "skills_intrasecs":
-            if direction == HAUT:
-                self.curseur = "classes"
-            elif direction == BAS:
-                self.curseur = "skills"
-            elif direction == IN:
-                self.curseur = "in_skills_intrasecs"
-            elif direction == OUT:
-                res = True
-        elif self.curseur == "classes":
-            if direction == HAUT:
-                self.curseur = "skills"
-            elif direction == BAS:
-                self.curseur = "skills_intrasecs"
-            elif direction == IN:
-                self.curseur = "in_classes"
-            elif direction == OUT:
-                res = True
-        elif self.curseur == "in_skills":
-            if direction == OUT:
-                self.curseur = "skills"
-            elif direction == BAS:
-                self.skill_courant += 1
-                if self.skill_courant >= len(self.skills):
-                    self.skill_courant = 0
-            elif direction == HAUT:
-                self.skill_courant -= 1
-                if self.skill_courant < 0:
-                    self.skill_courant = len(self.skills)-1
-        elif self.curseur == "in_skills_intrasecs":
-            if direction == OUT:
-                self.curseur = "skills_intrasecs"
-            elif direction == BAS:
-                self.skill_intrasec_courant += 1
-                if self.skill_intrasec_courant >= len(self.skills_intrasecs):
-                    self.skill_intrasec_courant = 0
-            elif direction == HAUT:
-                self.skill_intrasec_courant -= 1
-                if self.skill_intrasec_courant < 0:
-                    self.skill_intrasec_courant = len(self.skills_intrasecs)-1
-        elif self.curseur == "in_classes":
-            if direction == OUT:
-                self.curseur = "classes"
-            elif direction == IN:
-                self.curseur = "in_classe"
-            elif direction == BAS:
-                self.classe_courante += 1
-                if self.classe_courante >= len(self.sous_classes):
-                    self.classe_courante = 0
-            elif direction == HAUT:
-                self.classe_courante -= 1
-                if self.classe_courante < 0:
-                    self.classe_courante = len(self.sous_classes)-1
-        elif self.curseur == "in_classe":
-            if self.sous_classes[self.classe_courante].deplace(direction):
-                self.curseur = "in_classes"
-        return res
+    # def deplace(self,direction):
+    #     res = False
+    #     if self.curseur == "skills":
+    #         if direction == HAUT:
+    #             self.curseur = "skills_intrasecs"
+    #         elif direction == BAS:
+    #             self.curseur = "classes"
+    #         elif direction == IN:
+    #             self.curseur = "in_skills"
+    #         elif direction == OUT:
+    #             res = True
+    #     elif self.curseur == "skills_intrasecs":
+    #         if direction == HAUT:
+    #             self.curseur = "classes"
+    #         elif direction == BAS:
+    #             self.curseur = "skills"
+    #         elif direction == IN:
+    #             self.curseur = "in_skills_intrasecs"
+    #         elif direction == OUT:
+    #             res = True
+    #     elif self.curseur == "classes":
+    #         if direction == HAUT:
+    #             self.curseur = "skills"
+    #         elif direction == BAS:
+    #             self.curseur = "skills_intrasecs"
+    #         elif direction == IN:
+    #             self.curseur = "in_classes"
+    #         elif direction == OUT:
+    #             res = True
+    #     elif self.curseur == "in_skills":
+    #         if direction == OUT:
+    #             self.curseur = "skills"
+    #         elif direction == BAS:
+    #             self.skill_courant += 1
+    #             if self.skill_courant >= len(self.skills):
+    #                 self.skill_courant = 0
+    #         elif direction == HAUT:
+    #             self.skill_courant -= 1
+    #             if self.skill_courant < 0:
+    #                 self.skill_courant = len(self.skills)-1
+    #     elif self.curseur == "in_skills_intrasecs":
+    #         if direction == OUT:
+    #             self.curseur = "skills_intrasecs"
+    #         elif direction == BAS:
+    #             self.skill_intrasec_courant += 1
+    #             if self.skill_intrasec_courant >= len(self.skills_intrasecs):
+    #                 self.skill_intrasec_courant = 0
+    #         elif direction == HAUT:
+    #             self.skill_intrasec_courant -= 1
+    #             if self.skill_intrasec_courant < 0:
+    #                 self.skill_intrasec_courant = len(self.skills_intrasecs)-1
+    #     elif self.curseur == "in_classes":
+    #         if direction == OUT:
+    #             self.curseur = "classes"
+    #         elif direction == IN:
+    #             self.curseur = "in_classe"
+    #         elif direction == BAS:
+    #             self.classe_courante += 1
+    #             if self.classe_courante >= len(self.sous_classes):
+    #                 self.classe_courante = 0
+    #         elif direction == HAUT:
+    #             self.classe_courante -= 1
+    #             if self.classe_courante < 0:
+    #                 self.classe_courante = len(self.sous_classes)-1
+    #     elif self.curseur == "in_classe":
+    #         if self.sous_classes[self.classe_courante].deplace(direction):
+    #             self.curseur = "in_classes"
+    #     return res
 
     def get_skills_actifs(self):
         skills = []
@@ -197,7 +198,7 @@ class Classe:
 class Classe_principale(Classe):
     """La classe principale de l'agissant. Le niveau d'un agissant est égal au niveau de sa classe principale. Pour les agissants capables de s'améliorer, l'utilisation de la procédure gagne_xp de la classe principale provoque récursivement l'utilisation de cette procédure sur tous les sous-classe est skills de l'agissant. L'amélioration de la classe principale provoque une amélioration des statistiques de l'agissant.
        Pour le joueur, une amélioration de la classe principale permet de choisir une récompense dans l'arbre de compétence ou dans l'arbre élémental (ou deux dans l'arbre élémental avec la classe élémentaliste)."""
-    def __init__(self,identite,niveau):
+    def __init__(self,identite,niveau:int):
         skills_intrasecs = []
         skills = []
         cond_evo = [0,10,20,30,40,50,60,70,80,90]
@@ -882,7 +883,7 @@ class Voleur(Classe):
 
         self.nom = "Voleur"
 
-def trouve_skill(classe,type_skill):
+def trouve_skill(classe:Classe,type_skill:Type):
     trouve = None
     for skill in classe.skills:
         if isinstance(skill,type_skill) and skill.niveau > 0: #On ne devrait pas avoir de skill a 0 mais on ne sait jamais.

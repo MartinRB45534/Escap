@@ -1,10 +1,16 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from Jeu.Esprit.Esprit import Esprit
+
 from operator import itemgetter
 from Jeu.Entitee.Agissant.Role.Mage import *
 
 class Attaquant_magique_case(Mage):
     """Les agissants qui combattent en lançant des attaques magiques de loin sur des cases."""
 
-    def agit_en_vue(self,esprit,defaut = ""):
+    def agit_en_vue(self,esprit:Esprit,defaut = ""):
         cibles = []
         #On cherche l'ennemi le plus puissant en vue
         for case in self.vue:

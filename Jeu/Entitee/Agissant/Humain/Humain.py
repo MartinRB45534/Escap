@@ -1,3 +1,9 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from Jeu.Controleur import Controleur
+
 from Jeu.Skins.Skins import *
 from Jeu.Entitee.Agissant.Agissant import *
 from Jeu.Entitee.Agissant.Role.Roles import *
@@ -5,13 +11,14 @@ from Jeu.Dialogues.Dialogues import *
 
 class Humain(Agissant,Interactif,Entitee_superieure):
     """La classe des pnjs et du joueur. A un comportement un peu plus complexe, et une personnalité."""
-    def __init__(self,controleur,position,identite,niveau,ID):
+    def __init__(self,controleur:Controleur,position:Position,identite:str,niveau:int,ID:int):
         Agissant.__init__(self,controleur,position,identite,niveau,ID)
         self.statut_humain = "attente"
         self.dialogue = -1 #Le dialogue par défaut, celui des ordres
         self.replique = None #La réplique en cours de l'agissant vaut None lorsqu'il n'y a pas de dialogue en cours
         self.repliques = [] #Les réponses possibles de l'interlocuteur
         self.replique_courante = 0 #La réponse sélectionnée
+        self.interlocuteur:Humain = None #Seul le personnage controlé par le joueur peut avoir un interlocuteur
 
         self.mouvement = 0 #0 pour un déplacement ciblé, 1 pour chercher, 2 pour un déplacement ciblé prioritaire et précis
         self.cible_deplacement = self.ID #Une ID pour suivre quelqu'un, ou une position pour s'y diriger
@@ -20,43 +27,56 @@ class Humain(Agissant,Interactif,Entitee_superieure):
         self.antagonise_neutres = False #Si True, sera offensé par la simple vision d'un neutre (utile pour fuir les ennemis avant qu'ils n'attaquent)
         self.antagonise_offensifs = False #Si True, sera offensé par les neutres qui veulent l'attaquer (utile pour fuir les ennemis avant qu'ils n'attaquent sans déclencher de combats pour rien, mais nécessite une certaine intelligence...)
 
+        self.place=1
+        self.appreciations=[0,0,0,0,0,0,0,0,0,0]
+
         self.attente = True #Les humains attendent le joueur au début du jeu
 
-    def comporte_distance(self,degats):
+    def fuite(self):
+        return False
+
+    def comporte_distance(self,degats:float):
         if self.fuite(degats):
             return 3
         else:
             return self.comportement_corps_a_corps
 
-    def veut_attaquer(self,degats):
+    def veut_attaquer(self,degats:float):
         return self.comportement_corps_a_corps == 0 and not self.fuite(degats)
 
-    def veut_fuir(self,degats):
+    def veut_fuir(self,degats:float):
         return self.comportement_corps_a_corps == 2 or self.fuite(degats)
 
-    def parle(self,touche):
-        if touche == pygame.K_UP:
-            if self.replique_courante == 0:
-                self.replique_courante = len(self.repliques)
-            self.replique_courante -= 1
-        elif touche == pygame.K_DOWN:
-            self.replique_courante += 1
-            if self.replique_courante == len(self.repliques):
-                self.replique_courante = 0
-        elif touche == pygame.K_SPACE:
-            self.interprete(self.replique_courante)
+    # def parle(self,touche):
+    #     if touche == pygame.K_UP:
+    #         if self.replique_courante == 0:
+    #             self.replique_courante = len(self.repliques)
+    #         self.replique_courante -= 1
+    #     elif touche == pygame.K_DOWN:
+    #         self.replique_courante += 1
+    #         if self.replique_courante == len(self.repliques):
+    #             self.replique_courante = 0
+    #     elif touche == pygame.K_SPACE:
+    #         self.interprete(self.replique_courante)
+
+    def set_case_dialogue(self,position):
+        self.mouvement = 0
+        self.cible_deplacement = position
+
+    def set_agissant_dialogue(self,ID):
+        self.mouvement = 0
+        self.cible_deplacement = ID
 
     def end_dialogue(self,dialogue=-1):
-        self.controleur.get_entitee(2).interlocuteur = None
-        self.controleur.get_entitee(2).event = None
-        self.controleur.unset_phase(EVENEMENT)
+        self.controleur.joueur.interlocuteur = None
+        self.controleur.unset_phase(DIALOGUE)
         self.dialogue = dialogue
         if self.mouvement == 2:
             self.mouvement = 0
 
     def get_offenses(self):
         for offense in self.offenses:
-            if offense[0] == 2:
+            if offense[0] == 2: #/!\ Comment gérer des dialogues différents avec chaque autre humain ? Pour l'instant, on ne va pas y toucher
                 self.dialogue = 0
         offenses = self.offenses
         self.offenses = []
@@ -71,7 +91,7 @@ class Humain(Agissant,Interactif,Entitee_superieure):
         return offenses, etat
 
     def level_up(self):
-        niveau = self.classe_principale.niveau # /!\ Peut donner des résultats non-voulus si la montée de niveau a lieu pendant qu'on est sous le coup d'un enchantement
+        niveau = self.classe_principale.niveau # /!\ Peut donner des résultats non-voulus si la montée de niveau a lieu pendant qu'on est sous le coup d'un enchantement (ça ne devrait plus être vrai avec les taux)
         stats=CONSTANTES_STATS[self.identite]
         self.pv_max=stats['pv'][niveau]
         self.regen_pv=stats['regen_pv'][niveau]
@@ -97,7 +117,7 @@ class Humain(Agissant,Interactif,Entitee_superieure):
         elif self.antagonise_offensifs:
             for case in self.vue:
                 for ID_entitee in case[6]:
-                    entitee = self.controleur.get_entitee(ID_entitee)
+                    entitee = self.controleur[ID_entitee]
                     if issubclass(entitee.get_classe(),Agissant):
                         if self.ID in self.controleur.get_esprit(entitee.esprit).ennemis.keys():
                             self.insurge(ID_entitee,0.01,0)
@@ -122,7 +142,7 @@ class Humain(Agissant,Interactif,Entitee_superieure):
             skins.append(SKIN_STATUT_PAUME)
         return skins
 
-    def subit(self,degats,distance="contact",element=TERRE,ID=0): #L'ID 0 ne correspond à personne
+    def subit(self,degats:float,distance="contact",element=TERRE,ID=0): #L'ID 0 ne correspond à personne
         gravite = degats/self.pv_max
         dangerosite = 0
         if distance == "contact":
@@ -144,8 +164,8 @@ class Humain(Agissant,Interactif,Entitee_superieure):
             print(f"{self.identite} a été tué par :")
             print(degats,element)
             print(ID)
-            print(self.controleur.get_entitee(ID))
+            print(self.controleur[ID])
             self.effets_mortuaires = self.effets
-            self.effets_mortuaires_tueur = self.controleur.get_entitee(ID).effets
+            self.effets_mortuaires_tueur = self.controleur[ID].effets
             self.controleur.pause = True
         self.insurge(ID,gravite,dangerosite)

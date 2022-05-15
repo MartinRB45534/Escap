@@ -3,7 +3,7 @@ from Jeu.Entitee.Agissant.Gobelin.Gobelin import *
 class Guerrier_gobelin(Gobelin):
     """Un gobelin agressif est avide de sang.
        Il a une meilleure attaque que les gobelins de base."""
-    def __init__(self,controleur,position,niveau):
+    def __init__(self,controleur,position,niveau:int):
         Agissant.__init__(self,controleur,position,"guerrier_gobelin",niveau)
 
     def get_offenses(self):

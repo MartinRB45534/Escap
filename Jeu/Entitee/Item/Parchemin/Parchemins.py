@@ -8,28 +8,28 @@ from Jeu.Systeme.Constantes_items.Items import *
 
 class Parchemin_purification(Parchemin):
     """Un parchemin qui soigne poisons et maladies."""
-    def __init__(self,position):
+    def __init__(self,position:Position):
         Parchemin.__init__(self,position,Purification(),50)
 
-    def get_description(self,observation):
+    def get_description(self,observation=0):
         return ["Un parchemin","Soignera poisons et maladies."]
 
 class Parchemin_vierge(Parchemin):
     """Un parchemin qui peut être imprégné d'une magie."""
-    def __init__(self,position):
+    def __init__(self,position:Position):
         Parchemin.__init__(self,position,Impregnation(),10)
 
-    def get_description(self,observation):
+    def get_description(self,observation=0):
         return ["Un parchemin vierge","On peut y appliquer une magie."]
 
 class Parchemin_impregne(Parchemin):
     """Un parchemin imprégné d'une magie."""
-    def __init__(self,position,magie,cout): #Le cout dépend du niveau du parchemin d'imprégnation
+    def __init__(self,position:Position,magie:Magie,cout:float): #Le cout dépend du niveau du parchemin d'imprégnation
         Parchemin.__init__(self,position,magie,cout)
 
-    def utilise(self,agissant):
+    def utilise(self,agissant:Agissant):
         if self.etat == "suspens": #On l'a suspendu précédemment, ça devrait être bon maintenant
-            if agissant.peut_payer(self.cout) :
+            if agissant.peut_payer(self.cout):
                 agissant.paye(self.cout)
                 self.etat = "brisé"
                 magie = self.effet
@@ -43,21 +43,24 @@ class Parchemin_impregne(Parchemin):
                     agissant.controleur.select_cout_parchemin(magie,agissant)
                 if not reussite :
                     magie.miss_fire(agissant)
-            elif agissant.ID==2:
-                agissant.affichage.message("Tu n'as pas assez de mana pour utiliser ce parchemin.")
         else:
-            if agissant.ID == 2 and isinstance(self.effet,Magie_cible):
-                agissant.magie_parchemin = self.effet
-                agissant.controleur.set_phase(COMPLEMENT_CIBLE_PARCHEMIN)
-                self.etat = "suspens"
-            if agissant.ID == 2 and isinstance(self.effet,Magie_cout):
-                agissant.magie_parchemin = self.effet
-                agissant.controleur.set_phase(COMPLEMENT_COUT_PARCHEMIN)
-                self.etat = "suspens"
-            if agissant.ID == 2 and isinstance(self.effet,Magie_dirigee):
-                agissant.magie_parchemin = self.effet
-                agissant.controleur.set_phase(COMPLEMENT_DIR_PARCHEMIN)
-                self.etat = "suspens"
+            if agissant is agissant.controleur.joueur:
+                if isinstance(self.effet,Cible_agissant):
+                    agissant.magie_parchemin = self.effet
+                    agissant.controleur.set_phase(AGISSANT_PARCHEMIN)
+                    self.etat = "suspens"
+                if isinstance(self.effet,Cible_case):
+                    agissant.magie_parchemin = self.effet
+                    agissant.controleur.set_phase(CASE_PARCHEMIN)
+                    self.etat = "suspens"
+                if isinstance(self.effet,Magie_cout):
+                    agissant.magie_parchemin = self.effet
+                    agissant.controleur.set_phase(COUT_PARCHEMIN)
+                    self.etat = "suspens"
+                if isinstance(self.effet,Magie_dirigee):
+                    agissant.magie_parchemin = self.effet
+                    agissant.controleur.set_phase(DIRECTION_PARCHEMIN)
+                    self.etat = "suspens"
             if self.etat != "suspens": #On n'a pas eu besoin de le suspendre, on peut directement le lancer
                 if agissant.peut_payer(self.cout) :
                     agissant.paye(self.cout)
@@ -73,15 +76,13 @@ class Parchemin_impregne(Parchemin):
                         agissant.controleur.select_cout_parchemin(magie,agissant)
                     if not reussite :
                         magie.miss_fire(agissant)
-                elif agissant.ID==2:
-                    agissant.affichage.message("Tu n'as pas assez de mana pour utiliser ce parchemin.")
 
-    def get_description(self,observation):
+    def get_description(self,observation=0):
         return["Un parchemin",f"Imprégné d'une magie ({self.effet.nom})"]
 
 class Parchemin_protection(Parchemin):
-    def __init__(self,position):
+    def __init__(self,position:Position):
         Parchemin.__init__(self,position,Protection_groupe(500,200),75)
 
-    def get_description(self,observation):
+    def get_description(self,observation=0):
         return["Un parchemin","Permet de protéger tous ses alliés"]

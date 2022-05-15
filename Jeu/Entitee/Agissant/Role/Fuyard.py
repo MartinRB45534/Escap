@@ -9,5 +9,5 @@ class Fuyard(Agissant):
     def veut_attaquer(self):
         return False
 
-    def veut_fuir(self,degats=0):
+    def veut_fuir(self,degats:float=0):
         return True

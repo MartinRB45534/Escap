@@ -1,11 +1,17 @@
-from Jeu.Constantes import *
-from Jeu.Effet.Effets import *
-from Jeu.Labyrinthe.Generateur import *
+from __future__ import annotations
+from typing import List, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from Jeu.Entitee.Entitees import *
+
+# from Jeu.Constantes import *
+# from Jeu.Effet.Effets import *
+# from Jeu.Labyrinthe.Generateur import *
 from Jeu.Labyrinthe.Pattern import *
 from Jeu.Labyrinthe.Vue import *
 
 class Labyrinthe(Vue):
-    def __init__(self,ID,decalage,depart,patterns=[],durete = 1,niveau = 1,element = TERRE,proba=0.1,poids=[1]*NB_DIRECTIONS):
+    def __init__(self,ID:str,decalage:Decalage,depart:Position,patterns:List[Pattern]=[],durete = 1,niveau = 1,element = TERRE,proba=0.1,poids:List[int]=[1]*NB_DIRECTIONS):
         #print("Initialisation du labyrinthe")
         self.id = ID #Correspond à la clé du labyrinthe. Créer un init différend pour chaque lab ?
         self.decalage = decalage
@@ -64,7 +70,7 @@ class Labyrinthe(Vue):
         for decalage in self.decalage:
             yield Position(self.id,0,0) + decalage
 
-    def generation(self,proba,poids):
+    def generation(self,proba:float,poids:List[int]):
         """
         Fonction qui génère la matrice du labyrinthe
             Entrées:
@@ -102,7 +108,7 @@ class Labyrinthe(Vue):
                     self[pattern.entrees[i]].brise()
                     self[pattern.entrees[i].oppose()].brise()
 
-    def generation_en_profondeur(self,poids):
+    def generation_en_profondeur(self,poids:List[int]):
         """
         Fonction qui génère la matrice avec la méthode du parcours en profondeur
         Entrées:Rien
@@ -147,7 +153,7 @@ class Labyrinthe(Vue):
 
         #print("Fini")
 
-    def murs_utilisables(self,position,nb_murs=NB_DIRECTIONS):
+    def murs_utilisables(self,position:Position,nb_murs=NB_DIRECTIONS):
         """
         Fonction qui prend en entrées:
             les voisins de la case
@@ -162,15 +168,15 @@ class Labyrinthe(Vue):
                     murs_utilisables.append(cote)
         return murs_utilisables
 
-    def veut_passer(self,intrus,direction):
+    def veut_passer(self,intrus:Mobile,direction:Direction):
         """Fonction qui tente de faire passer une entitée.
            Se réfère à la case compétente, qui gère tout."""
         self[intrus.get_position(),direction].veut_passer(intrus)
 
-    def step(self,coord,entitee):
+    def step(self,coord:Position,entitee:Entitee):
         self[coord].step(entitee)
 
-    def get_vue(self,agissant):
+    def get_vue(self,agissant:Agissant):
         return Vue(self.id,self.resoud(agissant.get_position(),agissant.get_portee_vue()),self.decalage)
             
     def getMatrice_cases(self):
@@ -178,7 +184,7 @@ class Labyrinthe(Vue):
         new_mat = [[self.matrice_cases[j][i].get_copie() for i in range(self.decalage.y)]for j in range(self.decalage.x)]
         return new_mat
 
-    def get_case(self,position):
+    def get_case(self,position:Position):
         return self[position]
 
     #Découvrons le déroulé d'un tour, avec Labyrinthe-ni :
@@ -214,17 +220,17 @@ class Labyrinthe(Vue):
     def quitte(self):
         self.temps_restant = 5
 
-    def active(self,controleur):
+    def active(self,controleur:Controleur):
         self.controleur = controleur
         self.temps_restant = -1 #Au cas où
         for i in range(self.decalage.x):
             for j in range(self.decalage.y):
                 self.matrice_cases[i][j].active(controleur)
 
-    def attaque(self,position,portee,propagation,direction,obstacles):
+    def attaque(self,position:Position,portee:int,propagation:str,direction:Direction,obstacles:List):
         return self.resoud(position,portee,"attaque",propagation,direction,obstacles)
 
-    def resoud(self,position,portee,action="vue",propagation="C__S_Pb",direction=None,dead_ends=[],reset=True,clees=[]):
+    def resoud(self,position:Position,portee:int,action="vue",propagation="C__S_Pb",direction:Direction=None,dead_ends:List=[],reset=True,clees:List[str]=[]):
         #Les possibilités de propagation sont :
         #                           Circulaire, le mode de propagation de la vision
         #                           Rectiligne, dans une unique direction
@@ -303,15 +309,15 @@ class Labyrinthe(Vue):
 
         return matrice_cases
 
-    def voisins_case(self,data):
+    def voisins_case(self,data:List):
         """
         Fonction qui prend en entrée:
             les coordonnées de la case
         et qui renvoie les voisins de la case
         ainsi que leurs coordonnées
         """
-        position = data[0]
-        propagation = data[2]
+        position:Position = data[0]
+        propagation:str = data[2]
         deplacement = propagation[3]
         positions_voisins=[]
         #on élimine les voisins aux extrémitées
@@ -328,7 +334,7 @@ class Labyrinthe(Vue):
 
         return positions_voisins
 
-    def positions_utilisables(self,positions_voisins,data,clees):
+    def positions_utilisables(self,positions_voisins:List[Position],data:List,clees:str):
         """
         Fonction qui prend en entrées:
             les voisins de la case
@@ -337,9 +343,9 @@ class Labyrinthe(Vue):
             le chemin deja exploré
         et qui renvoie les directions ou l'on peut passer
         """
-        position = data[0]
-        directions = data[1]
-        propagation = data[2]
+        position:Position = data[0]
+        directions:List[Direction] = data[1]
+        propagation:str = data[2]
         forme = propagation[0]
         degenerescence = propagation[1]
         deplacement = propagation[3]

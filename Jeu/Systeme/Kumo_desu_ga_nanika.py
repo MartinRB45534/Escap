@@ -56,8 +56,8 @@ class Height_of_Occultism(Skill):
                 el"""
                 if isinstance(cadeau,int):
                     self.xp.append(cadeau)
-                elif isinstance(cadeau,magie):
-                    self.ajoute(magie)
+                # elif isinstance(cadeau,magie):
+                #     self.ajoute(cadeau)
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -78,7 +78,7 @@ class Divine_Thread_Weaving(Skill):
     def __init__(self):
         Skill.__init__(self)
         self.degats = 100 #Les dégats qu'une rencontre avec la toile de kumoko infligent. Commencer à plus ?
-        self.element = Terre #L'élément conféré à la toile de kumoko, qui servira pour les attaques. Kumoko peut en changer.
+        self.element = TERRE #L'élément conféré à la toile de kumoko, qui servira pour les attaques. Kumoko peut en changer.
         self.colle = 10 #La priorité que l'action de mouvement doit dépasser pour échapper aux toiles collantes de kumoko.
         self.vitesse = 5 #Le nombre de cases qu'une toile éjectée par kumoko parcours en un tour.
         self.latence = 1 #Kumoko peut utiliser ce skill une fois par tour.
@@ -97,8 +97,8 @@ class Divine_Thread_Weaving(Skill):
                 el"""
                 if isinstance(cadeau,int):
                     self.xp.append(cadeau)
-                elif isinstance(cadeau,magie):
-                    self.ajoute(magie)
+                # elif isinstance(cadeau,magie):
+                #     self.ajoute(cadeau)
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -111,14 +111,14 @@ class Divine_Thread_Weaving(Skill):
 
     def utilise(self,action):
         self.xp_new+=self.gain_xp
-        if action == "attaque" :
-            return latence, Morning_spider(self.degats,self.vitesse,self.element)
-        elif action == "pose piege" :
-            return latence, Thread_trap(self.colle)
-        elif action == "lance piege" :
-            return latence, Thread_bounds(self.colle,self.vitesse)
-        else :
-            print(action + " ? Qu'est-ce que c'est, ça se mange ?")
+        # if action == "attaque" :
+        #     return latence, Morning_spider(self.degats,self.vitesse,self.element)
+        # elif action == "pose piege" :
+        #     return latence, Thread_trap(self.colle)
+        # elif action == "lance piege" :
+        #     return latence, Thread_bounds(self.colle,self.vitesse)
+        # else :
+        #     print(action + " ? Qu'est-ce que c'est, ça se mange ?")
 
 class Jinx_Evil_Eye(Skill):
     """Le skill de malédiction de kumoko."""
@@ -140,8 +140,8 @@ class Jinx_Evil_Eye(Skill):
                 el"""
                 if isinstance(cadeau,int):
                     self.xp.append(cadeau)
-                elif isinstance(cadeau,magie):
-                    self.ajoute(magie)
+                # elif isinstance(cadeau,magie):
+                #     self.ajoute(cadeau)
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -171,8 +171,8 @@ class Inert_Evil_Eye(Skill):
                 el"""
                 if isinstance(cadeau,int):
                     self.xp.append(cadeau)
-                elif isinstance(cadeau,magie):
-                    self.ajoute(magie)
+                # elif isinstance(cadeau,magie):
+                #     self.ajoute(cadeau)
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -204,8 +204,8 @@ class Repellent_Evil_Eye(Skill):
                 el"""
                 if isinstance(cadeau,int):
                     self.xp.append(cadeau)
-                elif isinstance(cadeau,magie):
-                    self.ajoute(magie)
+                # elif isinstance(cadeau,magie):
+                #     self.ajoute(cadeau)
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -238,8 +238,8 @@ class Annihilating_Evil_Eye(Skill):
                 el"""
                 if isinstance(cadeau,int):
                     self.xp.append(cadeau)
-                elif isinstance(cadeau,magie):
-                    self.ajoute(magie)
+                # elif isinstance(cadeau,magie):
+                #     self.ajoute(cadeau)
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -375,7 +375,7 @@ class Immortality(Skill):
         self.xp_new+=self.gain_xp
         return self.coef
 
-def Egg_Laying(Skill):
+class Egg_Laying(Skill):
     """Le skill de ponte de kumoko."""
     def __init__(self):
         Skill.__init__(self)
@@ -407,10 +407,10 @@ def Egg_Laying(Skill):
                     return self.latence, None
         else :
             libre = True
-        if libre :
-            oeuf = Nightmare_vestige(self.position)
-            oeuf.evo(self.niveau)
-            return self.latence, oeuf #Les enfant de kumoko n'évoluent pas, mais ils ont le niveau qu'avait le skill Egg_Laying à leur naissance.
+        # if libre :
+        #     oeuf = Nightmare_vestige(self.position)
+        #     oeuf.evo(self.niveau)
+        #     return self.latence, oeuf #Les enfant de kumoko n'évoluent pas, mais ils ont le niveau qu'avait le skill Egg_Laying à leur naissance.
 
 #Les skills des nightmare vestiges sont des version inférieures de ceux de kumoko :
 class Hatching(Skill):
@@ -481,8 +481,8 @@ class Lesser_Height_of_Occultism(Height_of_Occultism,Skill_intrasec):
                 el"""
                 if isinstance(cadeau,int):
                     self.xp.append(cadeau)
-                elif isinstance(cadeau,magie):
-                    self.ajoute(magie)
+                # elif isinstance(cadeau,magie):
+                #     self.ajoute(cadeau)
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -503,7 +503,7 @@ class Lesser_Divine_Thread_Weaving(Divine_Thread_Weaving,Skill_intrasec):
     def __init__(self):
         Skill.__init__(self)
         self.degats = 40 #Les dégats qu'une rencontre avec les toiles des nightmare vestiges infligent. Commencer à plus ?
-        self.element = Terre #L'élément conféré à la toile des nightmare vestiges, qui servira pour les attaques. Terre ou ombre.
+        self.element = TERRE #L'élément conféré à la toile des nightmare vestiges, qui servira pour les attaques. Terre ou ombre.
         self.colle = 6 #La priorité que l'action de mouvement doit dépasser pour échapper aux toiles collantes des nightmare vestiges.
         self.vitesse = 2 #Le nombre de cases qu'une toile éjectée par les nightmare vestiges parcours en un tour.
         self.latence = 2
@@ -522,8 +522,8 @@ class Lesser_Divine_Thread_Weaving(Divine_Thread_Weaving,Skill_intrasec):
                 el"""
                 if isinstance(cadeau,int):
                     self.xp.append(cadeau)
-                elif isinstance(cadeau,magie):
-                    self.ajoute(magie)
+                # elif isinstance(cadeau,magie):
+                #     self.ajoute(cadeau)
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -536,14 +536,14 @@ class Lesser_Divine_Thread_Weaving(Divine_Thread_Weaving,Skill_intrasec):
 
     def utilise(self,action):
         self.xp_new+=self.gain_xp
-        if action == "attaque" :
-            return latence, Morning_spider(self.degats,self.vitesse,self.element)
-        elif action == "pose piege" :
-            return latence, Thread_trap(self.colle)
-        elif action == "lance piege" :
-            return latence, Thread_bounds(self.colle,self.vitesse)
-        else :
-            print(action + " ? Qu'est-ce que c'est, ça se mange ?")
+        # if action == "attaque" :
+        #     return latence, Morning_spider(self.degats,self.vitesse,self.element)
+        # elif action == "pose piege" :
+        #     return latence, Thread_trap(self.colle)
+        # elif action == "lance piege" :
+        #     return latence, Thread_bounds(self.colle,self.vitesse)
+        # else :
+        #     print(action + " ? Qu'est-ce que c'est, ça se mange ?")
 
 class Lesser_Scythe(Scythe,Skill_intrasec):
     """Le skill d'attaque physique des nightmare vestiges."""

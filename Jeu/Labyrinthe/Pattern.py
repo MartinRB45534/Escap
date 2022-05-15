@@ -1,10 +1,10 @@
-from Jeu.Constantes import *
-from Jeu.Effet.Effets import *
+# from Jeu.Constantes import *
+# from Jeu.Effet.Effets import *
 from Jeu.Labyrinthe.Case import *
 from Jeu.Labyrinthe.Structure_spatiale.Espace import *
 
 class Pattern(Espace):
-    def __init__(self,position,decalage,entrees=[],codes=[],vide=True):
+    def __init__(self,position:Position,decalage:Decalage,entrees:List[Cote]=[],codes:List[str]=[],vide=True):
         self.position = position
         self.decalage = decalage
         self.matrice_cases = [[Decalage(i,j) for j in range(decalage.y)] for i in range(decalage.x)]
@@ -41,7 +41,7 @@ class Pattern(Espace):
             yield self.position + decalage
 
 # class Patern(Espace):
-#     def __init__(self,position,decalage,entrees=[Decalage(1,0)],codes=[],vide = True,durete = 1,niveau = 1,element = TERRE):
+#     def __init__(self,position:Position,decalage,entrees=[Decalage(1,0)],codes=[],vide = True,durete = 1,niveau = 1,element = TERRE):
 #         self.position = position
 #         self.decalage = decalage
 #         self.matrice_cases = [[Case(self.position+j*DROITE+i*BAS) for i in range(decalage.y)]for j in range(decalage.x)]

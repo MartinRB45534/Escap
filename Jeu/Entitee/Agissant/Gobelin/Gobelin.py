@@ -4,7 +4,7 @@ from Jeu.Entitee.Agissant.Role.Roles import *
 
 class Gobelin(Dps):
     """Le monstre de base. Faible, souvent en groupe."""
-    def __init__(self,controleur,position,niveau):
+    def __init__(self,controleur,position,niveau:int):
         Agissant.__init__(self,controleur,position,"gobelin",niveau)
 
     def get_offenses(self):

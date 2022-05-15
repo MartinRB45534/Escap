@@ -49,15 +49,15 @@ class Soin_case(On_post_action):
         cibles_potentielles = case.controleur.trouve_agissants_courants(case.position)
         for cible_potentielle in cibles_potentielles:
             if self.responsable == 0: #Pas de responsable. Sérieusement ?
-                case.controleur.get_entitee(cible_potentielle).effets.append(Soin(self.responsable,self.gain_pv))
+                case.controleur[cible_potentielle].effets.append(Soin(self.responsable,self.gain_pv))
             else:
-                esprit = case.controleur.get_esprit(case.controleur.get_entitee(self.responsable).esprit)
+                esprit = case.controleur.get_esprit(case.controleur[self.responsable].esprit)
                 if esprit == None: #Pas d'esprit ? Sérieusement ?
-                    case.controleur.get_entitee(cible_potentielle).effets.append(Soin(self.responsable,self.gain_pv))
-                elif self.cible == "alliés" and cible_potentielle in case.controleur.get_esprit(case.controleur.get_entitee(self.responsable).esprit).get_corps():
-                    case.controleur.get_entitee(cible_potentielle).effets.append(Soin(self.responsable,self.gain_pv))
-                elif self.cible == "neutres" and not cible_potentielle in case.controleur.get_esprit(case.controleur.get_entitee(self.responsable).esprit).get_ennemis():
-                    case.controleur.get_entitee(cible_potentielle).effets.append(Soin(self.responsable,self.gain_pv))
+                    case.controleur[cible_potentielle].effets.append(Soin(self.responsable,self.gain_pv))
+                elif self.cible == "alliés" and cible_potentielle in case.controleur.get_esprit(case.controleur[self.responsable].esprit).get_corps():
+                    case.controleur[cible_potentielle].effets.append(Soin(self.responsable,self.gain_pv))
+                elif self.cible == "neutres" and not cible_potentielle in case.controleur.get_esprit(case.controleur[self.responsable].esprit).get_ennemis():
+                    case.controleur[cible_potentielle].effets.append(Soin(self.responsable,self.gain_pv))
 
     def execute(self,case):
         if self.phase == "démarrage" :

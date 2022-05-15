@@ -2,6 +2,7 @@
 
 # global recettes_alchimie
 recettes_alchimie = [
+    [],
     [{"produit":"Parchemin_vierge",
       "ingredients":{"Peau_gobelin":1},
       "xp":1},

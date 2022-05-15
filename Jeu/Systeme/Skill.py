@@ -79,8 +79,8 @@ class Skill_magie(Skill,Skills_magiques):
                 el"""
                 if isinstance(cadeau,int): #comment faire pour les autres types de cadeaux ?
                     self.xp.append(cadeau)
-                elif isinstance(cadeau,magie): #On peut gagner une magie avec la montée de niveau du skill !
-                    self.ajoute(cadeau)
+                # elif isinstance(cadeau,Magie): #On peut gagner une magie avec la montée de niveau du skill !
+                #     self.ajoute(cadeau)
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -500,8 +500,8 @@ class Skill_creation_de_fleches(Skill):
                 el"""
                 if isinstance(cadeau,int): #comment faire pour les autres types de cadeaux ?
                     self.xp.append(cadeau)
-                elif isinstance(cadeau,Fleche): #On peut gagner un type de flèche avec la montée de niveau du skill ? /!\ Un skill ne connait pas les autres objets du jeu /!\
-                    self.ajoute(cadeau)
+                # elif isinstance(cadeau,Fleche): #On peut gagner un type de flèche avec la montée de niveau du skill ? /!\ Un skill ne connait pas les autres objets du jeu /!\
+                #     self.ajoute(cadeau)
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -537,8 +537,8 @@ class Skill_creation_d_explosifs(Skill):
                 el"""
                 if isinstance(cadeau,int): #Comment faire pour les autres types de cadeaux ?
                     self.xp.append(cadeau)
-                elif isinstance(cadeau,Explosif): #On peut gagner un type d'explosif avec la montée de niveau du skill ?
-                    self.ajoute(cadeau)
+                # elif isinstance(cadeau,Explosif): #On peut gagner un type d'explosif avec la montée de niveau du skill ?
+                #     self.ajoute(cadeau)
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -564,9 +564,9 @@ class Skill_alchimie(Skill):
             self.recettes = recettes_alchimie[self.niveau]
             self.niveau+=1
 
-    def utilise(self,item):
-        self.gain_xp = self.recettes[item]["xp"]
-        self.xp_new+=self.gain_xp #On gagne de l'xp, mais combien ? 0.1, est-ce assez ? trop ?
+    def utilise(self,xp):
+        self.gain_xp = xp
+        self.xp_new+=self.gain_xp
 
 class Skill_echange(Skill):
     """Un skill d'échange d'objet. Permet au marchand (dans le labyrinthe) d'échanger des objets avec son patron (à l'extérieur) pour les vendre."""
@@ -589,8 +589,8 @@ class Skill_echange(Skill):
                 el"""
                 if isinstance(cadeau,int): #Comment faire pour les autres types de cadeaux ?
                     self.xp.append(cadeau)
-                elif isinstance(cadeau,Explosif): #On peut gagner un type d'explosif avec la montée de niveau du skill ?
-                    self.ajoute(cadeau)
+                # elif isinstance(cadeau,Explosif): #On peut gagner un type d'explosif avec la montée de niveau du skill ?
+                #     self.ajoute(cadeau)
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1

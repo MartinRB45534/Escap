@@ -1,5 +1,4 @@
 from Jeu.Entitee.Item.Equippement.Equippement import *
-from Jeu.Entitee.Item.Equippement.Role.Roles import *
 
 class Degainable(Equipement):
     """La classe des items qui doivent être dégainés. Sont utilisés en complément d'un skill, n'ont pas d'effet le reste du temps."""
@@ -8,7 +7,7 @@ class Degainable(Equipement):
 
 class Arme(Degainable):
     """La classe des équipements qui augmentent la force d'attaque."""
-    def __init__(self,position,element,tranchant,portee):
+    def __init__(self,position:Position,element:int,tranchant:float,portee:int):
         Equipement.__init__(self,position)
         self.element = element
         self.tranchant = tranchant

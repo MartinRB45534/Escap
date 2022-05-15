@@ -3,7 +3,7 @@ from Jeu.Entitee.Agissant.Gobelin.Gobelin import *
 class Sentinelle_gobelin(Tank,Gobelin,Sentinelle):
     """Un gobelin qui reste sur place tant qu'il ne voit pas d'ennemi. Créé spécifiquement pour les premiers étages et le tutoriel.
        Il a une meilleure défense que les gobelins de base."""
-    def __init__(self,controleur,position,niveau):
+    def __init__(self,controleur,position,niveau:int):
         Agissant.__init__(self,controleur,position,"sentinelle_gobelin",niveau)
 
     def get_offenses(self):
@@ -24,18 +24,18 @@ class Sentinelle_gobelin(Tank,Gobelin,Sentinelle):
 # Deux sentinelles un peu spéciales
 class Premier_monstre(Sentinelle_gobelin):
     """La première sentinelle gobelin. Réduire ses stats pour en faire un 1/2 shot ?"""
-    def __init__(self,controleur,position,niveau):
+    def __init__(self,controleur,position,niveau:int):
         Agissant.__init__(self,controleur,position,"premier_monstre",niveau)
 
     def meurt(self):
-        self.controleur.get_entitee(2).first_kill(self.position)
+        self.controleur.joueur.first_kill(self.position)
         Agissant.meurt(self)
 
 class Troisieme_monstre(Sentinelle_gobelin):
     """La deuxième sentinelle gobelin. Réduire ses stats pour en faire un 3/4 shot ?"""
-    def __init__(self,controleur,position,niveau):
+    def __init__(self,controleur,position,niveau:int):
         Agissant.__init__(self,controleur,position,"troisieme_monstre",niveau)
 
     def meurt(self):
-        self.controleur.get_entitee(2).third_kill()
+        self.controleur.joueur.third_kill()
         Agissant.meurt(self)

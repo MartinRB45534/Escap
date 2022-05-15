@@ -1,8 +1,14 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from Jeu.Controleur import Controleur
+
 from Jeu.Entitee.Agissant.Humain.Humain import *
 
 class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyennement apprèciable, surtout si on essaye de draguer sa copine)
     """La classe de l'encombrant."""
-    def __init__(self,controleur,position):
+    def __init__(self,controleur:Controleur,position:Position):
 
         self.identite = 'encombrant'
         self.place = 5
@@ -50,7 +56,7 @@ class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyenne
             self.replique = "dialogue2phrase1"
             self.repliques = ["dialogue2reponse1.1","dialogue2reponse1.2","dialogue2reponse1.3"]
 
-    def interprete(self,replique):
+    def interprete(self,replique:str):
 
         #Premier dialogue
         #Le joueur arrive par la porte
@@ -61,9 +67,9 @@ class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyenne
             self.replique="dialogue1phrase1.1.1"
             ID_clee = self.inventaire.get_clee("Porte_sortie_encombrant_5")
             self.inventaire.drop(None,ID_clee)
-            self.controleur[2].inventaire.ramasse_item(ID_clee)
+            self.controleur.joueur.inventaire.ramasse_item(ID_clee)
             self.repliques = ["dialogue1reponse1.1.1.1"]
-            self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
+            self.controleur.get_esprit(self.controleur.joueur.esprit).merge(self.esprit)
         elif replique == "dialogue1reponse1.1.1.1":
             self.replique="dialogue1phrase1.1.1.1"
             self.repliques = ["dialogue1reponse1.1.1.1.1"]
@@ -229,11 +235,9 @@ class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyenne
             self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.3"]
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
         elif replique == "dialogue-1reponse1.1.1.2":
-            self.controleur.get_entitee(2).start_select_agissant_dialogue()
-            self.controleur.get_entitee(2).event = COMPLEMENT_DIALOGUE
+            self.controleur.set_phase(AGISSANT_DIALOGUE)
         elif replique == "dialogue-1reponse1.1.2":
-            self.controleur.get_entitee(2).start_select_case_dialogue()
-            self.controleur.get_entitee(2).event = COMPLEMENT_DIALOGUE
+            self.controleur.set_phase(CASE_DIALOGUE)
         elif replique == "dialogue-1reponse1.1.3":
             self.replique = "dialogue-1phrase1.1.3"
             self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.3"]
@@ -252,12 +256,12 @@ class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyenne
 
         self.replique_courante = 0
 
-    def set_cible(self,cible):
+    def set_cible(self,cible:Union[int,Position]):
         self.cible_deplacement = cible
         self.replique = "dialogue-1phrase1.1.1.2"
         self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.3"]
 
-    def get_replique(self,code):
+    def get_replique(self,code:str):
         return REPLIQUES_ENCOMBRANT[code]
 
     def get_skin_tete(self):

@@ -1,10 +1,16 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from Jeu.Controleur import Controleur
+
 from Jeu.Skins.Skins import *
 from Jeu.Entitee.Agissant.Agissant import *
 from Jeu.Entitee.Agissant.Role.Roles import *
 
 class Slime(Dps):
     """Un tas de gelée. Faible, tant qu'il est tout seul et de bas niveau..."""
-    def __init__(self,controleur,position,niveau):
+    def __init__(self,controleur:Controleur,position:Position,niveau:int):
         Agissant.__init__(self,controleur,position,"slime",niveau)
 
     def get_offenses(self):

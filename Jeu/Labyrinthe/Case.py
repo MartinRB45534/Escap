@@ -1,9 +1,15 @@
-from Jeu.Constantes import *
-from Jeu.Effet.Effets import *
+from __future__ import annotations
+from typing import List, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from Jeu.Entitee.Entitees import *
+
+# from Jeu.Constantes import *
 from Jeu.Labyrinthe.Mur import *
+from Jeu.Effet.Auras import *
 
 class Case:
-    def __init__(self,position,niveau = 1,element = TERRE,effets = [],opacite = 1):
+    def __init__(self,position:Position,niveau = 1,element = TERRE,effets:List[Effet] = [],opacite = 1):
         # Par défaut, pas de murs.
         self.position = position
         self.murs = [Mur(position+direction,niveau) for direction in DIRECTIONS]
@@ -74,8 +80,8 @@ class Case:
             elif isinstance(aura,(Ombre,Ombre_permanente)):
                 self.code += 8
 
-    #Certains agissants particulièrement tapageurs font un concours de celui qui aura la plus grosse aura (comment ça, cette phrase particulièrement compliquée aura juste servi à faire un jeu de mot sur aura
-    def ajoute_aura(self,aura):
+    #Certains agissants particulièrement tapageurs font un concours de celui qui aura la plus grosse aura (comment ça, cette phrase particulièrement compliquée aura juste servi à faire un jeu de mot sur aura ?)
+    def ajoute_aura(self,aura:Aura):
         """Fonction qui ajoute un effet d'aura. On décidera de ceux qui s'exécutent plus tard."""
         self.effets.append(aura)
         if isinstance(aura,Aura_elementale): #On a besoin de savoir quelle aura prévaudra
@@ -87,17 +93,17 @@ class Case:
                         aura_bis.phase = "terminé"
 
     #Les agissants prennent des décisions, agissent, se déplacent, les items se déplacent aussi.
-    def veut_passer(self,intrus,direction):
+    def veut_passer(self,intrus:Mobile,direction:Direction):
         """Fonction qui tente de faire passer une entitée.
            Se réfère au mur compétent, qui gère tout."""
         self[direction].veut_passer(intrus)
 
-    def step_out(self,entitee):
+    def step_out(self,entitee:Entitee):
         for effet in self.effets:
             if isinstance(effet,On_step_out):
                 effet.execute(entitee)
 
-    def step_in(self,entitee):
+    def step_in(self,entitee:Entitee):
         for effet in self.effets:
             if isinstance(effet,On_step_in):
                 effet.execute(entitee) #On agit sur les agissants qui arrivent (pièges, téléportation, etc.)
@@ -167,31 +173,31 @@ class Case:
         
         return pleins
                 
-    def casser_mur(self,direction):
+    def casser_mur(self,direction:Direction):
         """
         Fonction qui casse le mur dans la direction indiquée
         """
         self[direction].brise()
 
-    def construire_mur(self,direction):
+    def construire_mur(self,direction:Direction):
         """
         Fonction qui construit le mur dans la direction indiquée
         """
         self[direction].construit()
 
-    def interdire_mur(self,direction):
+    def interdire_mur(self,direction:Direction):
         """
         Fonction qui construit le mur impassable dans la direction indiquée
         """
         self[direction].interdit()
 
-    def mur_plein(self,direction):
+    def mur_plein(self,direction:Direction):
         """
         Fonction qui indique si le mur indiquée par la direction est plein ou non
         """
         return self[direction].is_ferme()
 
-    def acces(self,direction,clees=[]):
+    def acces(self,direction:Direction,clees:List[str]=[]):
         return not(self[direction].is_ferme(clees)) and self[direction].get_cible()
 
     def murs_pleins(self):
@@ -201,7 +207,7 @@ class Case:
                 directions.append(direction)
         return directions
 
-    def get_mur_dir(self,direction):
+    def get_mur_dir(self,direction:Direction):
         return self[direction]
 
     def get_murs(self):
@@ -225,7 +231,7 @@ class Case:
     def get_opacite(self):
         return self.opacite + self.opacite_bonus
 
-    def get_infos(self,clees): #Est-ce que ce serait plus clair sous forme de dictionnaire ? Ou d'objet ?
+    def get_infos(self,clees:List[str]): #Est-ce que ce serait plus clair sous forme de dictionnaire ? Ou d'objet ?
         return [self.position, #La position de la case, sous forme de tuple
                 self.clarte, #La clarté, qui vient d'être calculée pour l'agissant
                 0, #Pour le décompte de l'oubli
@@ -256,7 +262,7 @@ class Case:
         copie.murs = self.murs
         return copie
 
-    def active(self,controleur):
+    def active(self,controleur:Controleur):
         self.controleur = controleur
         for mur in self.murs :
             mur.active(controleur)

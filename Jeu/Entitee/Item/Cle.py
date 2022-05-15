@@ -2,7 +2,7 @@ from Jeu.Entitee.Item.Item import *
 
 class Cle(Item):
     """La classe des items qui ouvrent les portes (et les coffres ?)."""
-    def __init__(self,position,codes):
+    def __init__(self,position:Position,codes:List[str]):
         Item.__init__(self,position)
         self.codes = codes
 
@@ -12,10 +12,10 @@ class Cle(Item):
     def get_classe(self):
         return Cle
 
-    def get_titre(self,observation):
+    def get_titre(self,observation=0):
         return "Clé"
 
-    def get_description(self,observation):
+    def get_description(self,observation=0):
         return ["Une clé","Je suppose qu'elle ouvre une porte."]
 
     def get_skin(self):

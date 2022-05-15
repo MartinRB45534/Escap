@@ -1,10 +1,16 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from Jeu.Controleur import Controleur
+
 from Jeu.Skins.Skins import *
 from Jeu.Entitee.Agissant.Agissant import *
 from Jeu.Entitee.Agissant.Role.Roles import *
 
-class Ombriul(Dps):
+class Ombriul(Dps): #/!\ Retravailler l'ombriul pour utiliser les rôles
     """Une créature des ténèbres, non-endémique du labyrinthe."""
-    def __init__(self,controleur,position,niveau):
+    def __init__(self,controleur:Controleur,position:Position,niveau:int):
         Agissant.__init__(self,controleur,position,"ombriul",niveau)
 
     def get_offenses(self):
@@ -18,10 +24,10 @@ class Ombriul(Dps):
             etat = "attaque"
         return offenses, etat
 
-    def attaque(self,direction):
-        skill = trouve_skill(self.classe_principale,Skill_magie) #Est-ce qu'il a le même Skill_magie que le joueur ?
+    def attaque(self,direction:Direction):
+        skill:Skills_magiques = trouve_skill(self.classe_principale,Skills_magiques) #Est-ce qu'il a le même Skill_magie que le joueur ?
         self.dir_regard = direction
-        if self.peut_payer(cout_pm_poing_magique[skill.niveau-1]): #Quelle est l'attaque magique des gobelins ?
+        if self.peut_payer(cout_pm_poing_sombre[skill.niveau-1]): #Quelle est l'attaque magique des gobelins ?
             self.skill_courant = Skill_magie
             self.magie_courante = "magie poing sombre"
             self.dir_magie = direction

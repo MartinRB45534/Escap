@@ -2,7 +2,7 @@ from Jeu.Labyrinthe.Structure_spatiale.Bord import *
 
 class Espace:
     """La classe qui représente un élément de l'espace (un étage de labyrinthe, une salle d'un étage, etc.)"""
-    def __init__(self,decalage):
+    def __init__(self,decalage: Decalage):
         self.decalage = decalage
         self.matrice_cases = [[Decalage(i,j) for j in range(decalage.y)] for i in range(decalage.x)]
         self.bord = Bord(self.decalage)

@@ -1,23 +1,30 @@
+from __future__ import annotations
+from typing import List, TYPE_CHECKING
+
 from Jeu.Constantes import *
 from Jeu.Skins.Skins import *
 
+if TYPE_CHECKING:
+    from Jeu.Effet.Effets import Effet
+    from Jeu.Controleur import Controleur
+
 class Entitee:
     """La classe des entitées"""
-    def __init__(self,position,ID=None):
+    def __init__(self,position: Position,ID: int=None):
         self.position = position
         self.priorite = 0
         self.latence = 0
-        self.effets = []
+        self.effets:List[Effet] = []
         self.controleur = None
         if ID==None:
             self.ID = ID_MAX.incremente()
         else:
             self.ID = ID
 
-    def set_position(self,position):
+    def set_position(self,position: Position):
         self.position = position
 
-    def ajoute_effet(self,effet):
+    def ajoute_effet(self,effet: Effet):
         self.effets.append(effet)
 
     def get_position(self):
@@ -29,14 +36,17 @@ class Entitee:
     def get_direction(self):
         return DIRECTIONS[0]
 
-    def get_description(self,observation):
+    def get_description(self,observation=0):
         return ["Une entitee","N'aurait pas dû être instanciée.","Probablement une erreur..."]
 
     def get_skin(self):
         return SKIN_MYSTERE
 
-    def active(self,controleur):
+    def active(self,controleur:Controleur):
         self.controleur = controleur
+
+    def get_classe(self):
+        return Entitee
 
     def desactive(self):
         self.controleur = None
@@ -60,8 +70,8 @@ class Non_superposable(Entitee):
 class Mobile(Entitee):
     """La classe des entitées qui peuvent se déplacer (par elles-mêmes pour les agissants, en étant lancées pour les items)."""
 
-    def add_latence(self,latence):
+    def add_latence(self,latence: float):
         self.latence += latence
 
-    def set_latence(self,latence):
+    def set_latence(self,latence: float):
         self.latence = latence

@@ -2,7 +2,7 @@ from Jeu.Entitee.Item.Item import *
 
 class Potion(Consommable):
     """La classe des consommables qui peuvent se boire (ne requièrent pas de magie pour être activés)."""
-    def __init__(self,position,effet):
+    def __init__(self,position:Position,effet:Effet):
         Item.__init__(self,position)
         self.effet = effet
 
@@ -10,7 +10,7 @@ class Potion(Consommable):
         agissant.ajoute_effet(self.effet)
         self.etat = "brisé"
 
-    def get_description(self,observation):
+    def get_description(self,observation=0):
         return ["Une potion","Tu veux la boire ?"]
 
     def get_classe(self):

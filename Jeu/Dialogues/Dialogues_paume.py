@@ -10,7 +10,7 @@ REPLIQUES_PAUME = {
     "dialogue1reponse1.1.1.2":"Tu connais un autre chemin ?",
     "dialogue1phrase1.1.1.1":"Ton courage est impressionnant ! Moi, je suis ici depuis plusieurs jours.",
     "dialogue1phrase1.1.1.2":"Non...",
-    "dialogue1reponse1.1.1.2.1":"Alors je n'ai pas d'autre choix que d'y aller",
+    "dialogue1reponse1.1.1.2.1":"Alors je n'ai pas d'autre choix que d'y aller !",
     "dialogue1reponse1.1.1.1.1":"Tu peux venir avec moi, si ça te rassure.",
     "dialogue1reponse1.1.1.1.2":"Tu es vraiment pathétique.",
     "dialogue1phrase1.1.1.1.1":"Merci beaucoup ! N'hésite pas à me demander si tu as besoin de quelque-chose.",

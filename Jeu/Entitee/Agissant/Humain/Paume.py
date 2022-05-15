@@ -1,8 +1,14 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from Jeu.Controleur import Controleur
+
 from Jeu.Entitee.Agissant.Humain.Humain import *
 
 class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2 (complêtement paumé, rejoint le joueur sauf rares exceptions)
     """La classe du mec paumé."""
-    def __init__(self,controleur,position):
+    def __init__(self,controleur:Controleur,position:Position):
 
         self.identite = 'paume'
         self.place = 2
@@ -57,7 +63,7 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
             self.replique = "dialogue5phrase1"
             self.repliques = ["dialogue5reponse1.1","dialogue5reponse1.2","dialogue5reponse1.3"]
 
-    def interprete(self,replique):
+    def interprete(self,replique:str):
 
         #Premier dialogue
         #Le joueur arrive par l'escalier
@@ -77,7 +83,7 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
             self.replique="dialogue1phrase1.1.1.1.1"
             self.repliques = ["dialogue1reponse1.1.1.1.1.1"]
             self.appreciations[0]+= 0.5
-            self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
+            self.controleur.get_esprit(self.controleur.joueur.esprit).merge(self.esprit)
         elif replique == "dialogue1reponse1.1.1.1.1.1":
             self.replique="dialogue1phrase1.1.1.1.1.1"
             self.repliques=["dialogue1reponse1.1.1.1.1.1.1"]
@@ -112,7 +118,7 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
         elif replique == "dialogue-2reponse1.3.1":
             self.replique="dialogue-2phrase1.3.1"
             self.repliques = ["dialogue-2reponse1.3.1.1","dialogue-2reponse1.3.1.2"]
-            self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
+            self.controleur.get_esprit(self.controleur.joueur.esprit).merge(self.esprit)
         elif replique == "dialogue-2reponse1.3.1.1":
             self.appreciations[0]-= 0.5
             self.end_dialogue()
@@ -140,7 +146,7 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
             self.repliques = ["dialogue2reponse1.3.1.1","dialogue2reponse1.3.1.2"]
         elif replique == "dialogue2reponse1.3.2":
             self.replique = "dialogue2phrase1.3.2" #/!\ Modifier pour mentionner l'attaque avec une arme quand les skins auront été créés
-            if self.controleur.get_entitee(5).esprit == "joueur":
+            if self.controleur[5].esprit == "joueur":
                 self.replique = "dialogue2phrase1.3.2/peureuse"
             self.repliques = ["dialogue2reponse1.3.1.1","dialogue2reponse1.3.1.2"]
         elif replique == "dialogue2reponse1.3.3":
@@ -309,11 +315,9 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
             self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.3"]
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
         elif replique == "dialogue-1reponse1.1.1.2":
-            self.controleur.get_entitee(2).start_select_agissant_dialogue()
-            self.controleur.get_entitee(2).event = COMPLEMENT_DIALOGUE
+            self.controleur.set_phase(AGISSANT_DIALOGUE)
         elif replique == "dialogue-1reponse1.1.2":
-            self.controleur.get_entitee(2).start_select_case_dialogue()
-            self.controleur.get_entitee(2).event = COMPLEMENT_DIALOGUE
+            self.controleur.set_phase(CASE_DIALOGUE)
         elif replique == "dialogue-1reponse1.1.3":
             self.replique = "dialogue-1phrase1.1.3"
             self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.3"]
@@ -331,12 +335,12 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
 
         self.replique_courante = 0
 
-    def set_cible(self,cible):
+    def set_cible(self,cible:Union[int,Position]):
         self.cible_deplacement = cible
         self.replique = "dialogue-1phrase1.1.1.2"
         self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.3"]
 
-    def get_replique(self,code):
+    def get_replique(self,code:str):
         return REPLIQUES_PAUME[code]
 
     def get_skin(self):

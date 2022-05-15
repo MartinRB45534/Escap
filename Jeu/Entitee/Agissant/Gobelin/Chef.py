@@ -3,7 +3,7 @@ from Jeu.Entitee.Agissant.Gobelin.Gobelin import *
 class Chef_gobelin(Gobelin):
     """Un gobelin qui dirige un groupe.
        Bonnes stats, augmente l'efficacité de l'esprit."""
-    def __init__(self,controleur,position,niveau):
+    def __init__(self,controleur,position,niveau:int):
         Agissant.__init__(self,controleur,position,"chef_gobelin",niveau)
 
     def get_offenses(self):

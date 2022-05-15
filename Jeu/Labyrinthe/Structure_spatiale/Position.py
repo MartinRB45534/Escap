@@ -1,7 +1,7 @@
 from Jeu.Labyrinthe.Structure_spatiale.Decalage import *
 
 class Position:
-    def __init__(self,lab,x,y):
+    def __init__(self,lab:str,x:int,y:int):
         self.lab=lab #Doit être un chaine de caractères
         self.x=x
         self.y=y

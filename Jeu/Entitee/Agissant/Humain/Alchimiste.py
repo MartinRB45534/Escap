@@ -1,3 +1,9 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from Jeu.Controleur import Controleur
+
 from Jeu.Entitee.Agissant.Humain.Humain import *
 
 class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du jeu, à l'étage 6 (un faiseur de potions aux magies diverses)
@@ -54,7 +60,7 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
         if self.dialogue == -1: #Le joueur est venu nous voir de son propre chef
             self.replique = "dialogue-1phrase1"
             self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.4"]
-            if self.controleur[2].a_parchemin_vierge():
+            if self.controleur.joueur.inventaire.a_parchemin_vierge():
                 self.repliques.append("dialogue-1reponse1.3")
         elif self.dialogue == -2: #Le joueur nous a traité de vieillard
             self.replique = "dialogue-2phrase1"
@@ -66,14 +72,14 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
             self.replique = "dialogue2phrase1"
             self.repliques = ["dialogue2reponse1.1","dialogue2reponse1.2","dialogue2reponse1.3"]
 
-    def interprete(self,replique):
+    def interprete(self,replique:str):
 
         #Premier dialogue
         #Le joueur arrive par la porte
         if replique == "dialogue1reponse1.1":
             self.replique="dialogue1phrase1.1"
             self.repliques = ["dialogue1reponse1.1.1","dialogue1reponse1.1.2"]
-            self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
+            self.controleur.get_esprit(self.controleur.joueur.esprit).merge(self.esprit)
         elif replique == "dialogue1reponse1.1.1":
             self.replique="dialogue1phrase1.1.1"
             self.repliques = ["dialogue1reponse1.1.2"]
@@ -224,7 +230,7 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
         elif replique == "dialogue-2reponse1.2.1":
             self.replique="dialogue-2phrase1.2.1"
             self.repliques = ["dialogue-2reponse1.2.1.1"]
-            self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
+            self.controleur.get_esprit(self.controleur.joueur.esprit).merge(self.esprit)
         elif replique == "dialogue-2reponse1.2.1.1":
             self.end_dialogue()
             self.mouvement = 0 #Légèrement redondant ici
@@ -242,41 +248,34 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
         elif replique == "dialogue-1reponse1.1.1.1":
             self.replique = "dialogue-1phrase1.1.3"
             self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.4"]
-            if self.controleur[2].a_parchemin_vierge():
+            if self.controleur.joueur.a_parchemin_vierge():
                 self.repliques.append("dialogue-1reponse1.3")
             self.repliques.append("dialogue-1reponse1.5")
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
         elif replique == "dialogue-1reponse1.1.1.2":
-            self.controleur.get_entitee(2).start_select_agissant_dialogue()
-            self.controleur.get_entitee(2).event = COMPLEMENT_DIALOGUE
+            self.controleur.set_phase(AGISSANT_DIALOGUE)
         elif replique == "dialogue-1reponse1.1.2":
-            self.controleur.get_entitee(2).start_select_case_dialogue()
-            self.controleur.get_entitee(2).event = COMPLEMENT_DIALOGUE
+            self.controleur.set_phase(CASE_DIALOGUE)
         elif replique == "dialogue-1reponse1.1.3":
             self.replique="dialogue-1phrase1.1.3"
             self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.4"]
-            if self.controleur[2].a_parchemin_vierge():
+            if self.controleur.joueur.a_parchemin_vierge():
                 self.repliques.append("dialogue-1reponse1.3")
             self.repliques.append("dialogue-1reponse1.5")
             self.mouvement = 1
         elif replique == "dialogue-1reponse1.5":
             self.end_dialogue(-1)
         elif replique == "dialogue-1reponse1.4":
-            self.controleur.get_entitee(2).start_menu_alchimie()
-            self.controleur.get_entitee(2).event = COMPLEMENT_DIALOGUE
+            self.controleur.set_phase(RECETTE)
         elif replique == "dialogue-1reponse1.4.1":
+            parch = Parchemin_vierge(None)
+            self.controleur.ajoute_entitee(parch)
+            self.controleur.joueur.inventaire.ajoute(parch)
             self.replique = "dialogue-1phrase1.4.1"
             self.repliques = ["dialogue-1reponse1.4.1.1","dialogue-1reponse1.4.1.2"]
         elif replique == "dialogue-1reponse1.4.1.1":
-            joueur = self.controleur.get_entitee(2)
-            joueur.methode_fin = joueur.fin_menu_impregnation
-            skill = trouve_skill(self.classe_principale,Skill_magie)
-            joueur.options_menu = skill.menu_magie()
-            joueur.start_menu()
+            self.controleur.set_phase(IMPREGNATION)
         elif replique == "dialogue-1reponse1.4.1.2":
-            parch = Parchemin_vierge(None)
-            self.controleur.ajoute_entitee(parch)
-            self.controleur.get_entitee(2).inventaire.ajoute(parch)
             self.end_dialogue(-1)
         elif replique == "dialogue-1reponse1.2":
             self.replique = "dialogue-1phrase1.2"
@@ -284,18 +283,14 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
         elif replique == "dialogue-1reponse1.2.1":
             self.end_dialogue(-1)
         elif replique == "dialogue-1reponse1.3":
-            if self.controleur[2].consomme_parchemin_vierge():
+            if self.controleur.joueur.inventaire.a_parchemin_vierge():
                 self.replique = "dialogue-1phrase1.3"
                 self.repliques = ["dialogue-1reponse1.3.1"]
             else:
                 self.replique = "dialogue-1phrase1.3refus"
                 self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.4","dialogue-1reponse1.5"]
         elif replique == "dialogue-1reponse1.3.1":
-            joueur = self.controleur.get_entitee(2)
-            joueur.methode_fin = joueur.fin_menu_impregnation
-            skill = trouve_skill(self.classe_principale,Skill_magie)
-            joueur.options_menu = skill.menu_magie()
-            joueur.start_menu()
+            self.controleur.set_phase(IMPREGNATION)
 
         else:
             self.end_dialogue(self.dialogue)
@@ -307,7 +302,7 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
         self.cible_deplacement = cible
         self.replique = "dialogue-1phrase1.1.1.2"
         self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.4"]
-        if self.controleur[2].a_parchemin_vierge():
+        if self.controleur.joueur.inventaire.a_parchemin_vierge():
             self.repliques.append("dialogue-1reponse1.3")
         self.repliques.append("dialogue-1reponse1.5")
 
@@ -315,29 +310,34 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
         return REPLIQUES_ALCHIMISTE[code]
 
     def impregne(self,nom):
-        skill = trouve_skill(self.classe_principale,Skill_magie)
+        skill = self.get_skill_magique()
         latence,magie = skill.utilise(nom)
         self.latence += latence
         cout = magie.cout_pm
         if self.peut_payer(cout):
-            self.controleur.unset_phase(COMPLEMENT_MENU)
-            self.methode_courante = None
-            self.methode_fin = None
+            self.controleur.joueur.inventaire.consomme_parchemin_vierge()
             self.paye(cout)
             parch = Parchemin_impregne(None,magie,cout//2)
             self.controleur.ajoute_entitee(parch)
-            self.controleur.get_entitee(2).inventaire.ajoute(parch)
+            self.controleur.joueur.inventaire.ajoute(parch)
             self.replique = "dialogue-1phrase1.3.1"
-            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.4"]
-            if self.controleur[2].a_parchemin_vierge():
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"]
+            if self.controleur.joueur.inventaire.a_parchemin_vierge():
                 self.repliques.append("dialogue-1reponse1.3")
+            self.repliques.append("dialogue-1reponse1.4")
             self.repliques.append("dialogue-1reponse1.5")
         else:
-            parch = Parchemin_vierge(None)
-            self.controleur.ajoute_entitee(parch)
-            self.controleur.get_entitee(2).inventaire.ajoute(parch)
             self.replique = "dialogue-1phrase1.3.1echec"
-            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.4","dialogue-1reponse1.5"]
+            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.3","dialogue-1reponse1.4","dialogue-1reponse1.5"]
+
+    def get_recettes(self):
+        alchimie = trouve_skill(self.classe_principale,Skill_alchimie)
+        return(recettes_alchimie[alchimie.niveau])
+
+    def cuisine(self,recette):
+        alchimie = trouve_skill(self.classe_principale,Skill_alchimie)
+        alchimie.utilise(recette["xp"])
+        return eval(recette["produit"])(None)
 
     def get_skin_tete(self):
         return SKIN_TETE_ALCHIMISTE

@@ -17,7 +17,7 @@ class Attaque(One_shot):
         self.distance = distance
 
     def action(self,controleur):
-        position = controleur.get_entitee(self.responsable).get_position()
+        position = controleur[self.responsable].get_position()
         positions_touches = controleur.get_pos_touches(position,self.portee,self.propagation,self.direction,"alliés",self.responsable)
         for position_touche in positions_touches:
             controleur[position_touche].effets.append(Attaque_case(self.responsable,self.degats,self.element,self.distance,self.direction,self.autre,self.taux_autre))
@@ -28,14 +28,14 @@ class Attaque_magique(Attaque):
         Attaque.__init__(self,responsable,degats,element,distance,portee,propagation,direction,autre,taux_autre)
 
     def action(self,controleur):
-        position = controleur.get_entitee(self.responsable).get_position()
+        position = controleur[self.responsable].get_position()
         positions_touches = controleur.get_pos_touches(position,self.portee,self.propagation,self.direction,"tout",self.responsable)
         for position_touche in positions_touches:
             controleur[position_touche].effets.append(Attaque_case(self.responsable,self.degats,self.element,self.distance,self.direction,self.autre,self.taux_autre))
 
 class Attaque_decentree(Attaque_magique):
     """Une attaque magique qui affecte une zone plus ou moins éloignée."""
-    def __init__(self,position,responsable=0,degats=0,element=TERRE,distance="distance",portee=1,propagation="C__S___",direction=None,autre=None,taux_autre=None):
+    def __init__(self,position:Position,responsable=0,degats=0,element=TERRE,distance="distance",portee=1,propagation="C__S___",direction=None,autre=None,taux_autre=None):
         Attaque_magique.__init__(self,responsable,degats,element,distance,portee,propagation,direction,autre,taux_autre)
         self.position = position
 
@@ -52,7 +52,7 @@ class Attaque_delayee(Attaque_magique):
 
 class Attaque_decentree_delayee(Attaque_decentree,Attaque_delayee):
     """Une attaque magique typique : affecte une zone éloignée après un temps de retard."""
-    def __init__(self,position,delai,responsable=0,degats=0,element=TERRE,portee=1,distance="distance",propagation="C__S___",direction=None,autre=None,taux_autre=None):
+    def __init__(self,position:Position,delai,responsable=0,degats=0,element=TERRE,portee=1,distance="distance",propagation="C__S___",direction=None,autre=None,taux_autre=None):
         Attaque_magique.__init__(self,responsable,degats,element,portee,distance,propagation,direction,autre,taux_autre)
         self.position = position
         self.delai = delai
@@ -78,11 +78,11 @@ class Attaque_case(One_shot):
     def action(self,case):
         victimes_potentielles = case.controleur.trouve_agissants_courants(case.position)
         for victime_potentielle in victimes_potentielles:
-            if not victime_potentielle in case.controleur.get_esprit(case.controleur.get_entitee(self.responsable).esprit).get_corps():
+            if not victime_potentielle in case.controleur.get_esprit(case.controleur[self.responsable].esprit).get_corps():
                 if self.autre == None :
-                    case.controleur.get_entitee(victime_potentielle).effets.append(Attaque_particulier(self.responsable,self.degats,self.element,self.distance,self.direction))
+                    case.controleur[victime_potentielle].effets.append(Attaque_particulier(self.responsable,self.degats,self.element,self.distance,self.direction))
                 elif self.autre == "piercing":
-                    case.controleur.get_entitee(victime_potentielle).effets.append(Attaque_percante(self.responsable,self.degats,self.element,self.distance,self.direction,self.taux_autre))
+                    case.controleur[victime_potentielle].effets.append(Attaque_percante(self.responsable,self.degats,self.element,self.distance,self.direction,self.taux_autre))
 
     def execute(self,case):
         if self.phase == "démarrage":
@@ -164,11 +164,11 @@ class Purification_lumineuse(Attaque):
         self.portee = portee
 
     def action(self,controleur):
-        position = controleur.get_entitee(self.responsable).get_position()
+        position = controleur[self.responsable].get_position()
         positions_touches = controleur.get_pos_touches(position,self.portee,"C__S___",None,"tout")
         for position_touche in positions_touches:
             for victime_potentielle in controleur.trouve_agissants_courants(position_touche):
                 if not "humain" in controleur.get_especes(victime_potentielle):
-                    victime = controleur.get_entitee(victime_potentielle)
+                    victime = controleur[victime_potentielle]
                     victime.pv -= self.degats * victime.get_aff(OMBRE)
   

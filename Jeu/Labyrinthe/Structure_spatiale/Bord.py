@@ -1,8 +1,9 @@
+from typing import List
 from Jeu.Labyrinthe.Structure_spatiale.Cote import *
 
 class Bord:
     """Représente les limites d'un espace"""
-    def __init__(self,emplacement):
+    def __init__(self,emplacement: Union[Position,Decalage]):
         self.emplacement = emplacement
 
     def __contains__(self,item):
@@ -23,7 +24,7 @@ class Bord:
 
 class Bord_dec(Bord):
     """Un bord, décalé dans l'espace"""
-    def __init__(self,position,emplacement=Decalage(1,1),entrees=[]):
+    def __init__(self,position:Position,emplacement:Decalage=Decalage(1,1),entrees:List[Cote]=[]):
         self.position = position
         self.emplacement = emplacement
         self.entrees = entrees
@@ -64,7 +65,7 @@ class Bord_pat(Bord_dec):
 
 class Bord_lab(Bord):
     """Représente les différents bords (bords réels, bords de patterns) d'un labyrinthe"""
-    def __init__(self, emplacement,bords_interieurs):
+    def __init__(self,emplacement:Union[Position,Decalage],bords_interieurs:List[Bord_pat]):
         self.emplacement = emplacement
         self.bords_interieurs = bords_interieurs
 

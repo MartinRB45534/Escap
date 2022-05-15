@@ -36,7 +36,7 @@ class Reserve_mana(On_need):
 
 class Obscurite(Evenement,On_debut_tour):
     """Evenement d'obscurité."""
-    def __init__(self,niveau):
+    def __init__(self,niveau:int):
         self.affiche = False
         self.temps_restant = duree_obscurite[niveau-1]
         self.phase = "démarrage"
@@ -50,7 +50,7 @@ class Obscurite(Evenement,On_debut_tour):
 
 class Blizzard(Evenement,On_post_action):
     """Evenement de blizzard."""
-    def __init__(self,niveau):
+    def __init__(self,niveau:int):
         self.affiche = False
         self.temps_restant = duree_blizzard[niveau]
         self.phase = "démarrage"
@@ -60,7 +60,7 @@ class Blizzard(Evenement,On_post_action):
         if self.phase == "en cours":
             occupants = case.controleur.trouve_mobiles_courants(case.position)
             for occupant in occupants :
-                case.controleur.get_entitee(occupant).latence.add_latence(self.gain_latence)
+                case.controleur[occupant].latence.add_latence(self.gain_latence)
 
     def execute(self,case):
         self.temps_restant -= 1
@@ -73,7 +73,7 @@ class Blizzard(Evenement,On_post_action):
 
 class Teleportation(One_shot,On_post_action):
     """Effet qui déplace une entitée."""
-    def __init__(self,position):
+    def __init__(self,position:Position):
         self.affiche = True
         self.phase = "démarrage"
         self.position = position

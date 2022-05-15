@@ -1,10 +1,11 @@
-from typing import Dict, List
 from Jeu.Constantes import *
 from Jeu.Entitee.Entitees import *
 from Jeu.Labyrinthe.Labyrinthe import *
-from Jeu.Effet.Magie.Magies import *
+from Jeu.Effet.Effets import *
 from Jeu.Esprit.Esprits import *
 from Modifiers import *
+
+from typing import Dict, List, Any
 import random
 
 try:
@@ -229,7 +230,7 @@ except ModuleNotFoundError:
     print("Il n'y a pas de fichier Equilibrage.py, on va garder l'équilibrage par défaut.")
 
 class Controleur():
-    def __init__(self,parametres=None,screen=None):
+    def __init__(self,parametres:List=None,screen=None):
         #print("Initialisation du controleur")
         self.labs:Dict[str,Labyrinthe] = {} #Un dictionnaire avec tous les labyrinthes, indéxés par leur identifiant dans les positions.
         #print("Labyrinthe : check")
@@ -237,8 +238,8 @@ class Controleur():
         #print("Entitées : check")
         self.esprits:Dict[str,Esprit] = {}
         self.labs_courants:List[Labyrinthe] = []
-        self.entitees_courantes:List[Entitee] = []
-        self.esprits_courants:List[Esprit] = []
+        self.entitees_courantes:List[int] = []
+        self.esprits_courants:List[str] = []
         self.joueur:Agissant = None
         self.pause = False
         self.nb_tours = 0
@@ -251,7 +252,7 @@ class Controleur():
             self.ajoute_entitee(Joueur(self,None,parametres,screen))
             self.joueur = self.entitees[2]
 
-    def __getitem__(self,key):
+    def __getitem__(self,key) -> Union[Labyrinthe,Case,Mur,Entitee,Item,Agissant,Any]:
         if isinstance(key,tuple):
             if len(key)==2: #Position et direction
                 return self.labs[key[0].lab][key[0]][key[1]]
@@ -265,6 +266,8 @@ class Controleur():
             return self.labs[key.lab][key]
         elif isinstance(key,int):
             return self.entitees[key]
+        elif isinstance(key,str):
+            return self.labs[key]
         print(f"n'a pas pu trouver {key}")
         return NotImplemented
 
@@ -283,7 +286,7 @@ class Controleur():
         elif isinstance(key,int):
             self.entitees[key] = value
 
-    def jeu(self,screen):
+    def jeu(self):
 
         self.esprits["joueur"] = Esprit_humain(2,self)
 
@@ -310,7 +313,7 @@ class Controleur():
         paterns1 = [Pattern(Position("Étage 1 : test",0,0),Decalage(20,20),[])]
         self.labs["Étage 1 : test"]=Labyrinthe("Étage 1 : test",Decalage(20,20),Position("Étage 1 : test",0,0),paterns1,1,1,TERRE,1)
 
-        self[2].position = Position("Étage 1 : test",0,0)
+        self.joueur.position = Position("Étage 1 : test",0,0)
         self.active_lab("Étage 1 : test")
 
     def experience5(self):
@@ -374,12 +377,12 @@ class Controleur():
     def check_exp5(self):
         mort1 = 0
         for ID in self.esprits["Equipe 1"].corps.keys():
-            if self.get_entitee(ID).etat == "mort":
+            if self[ID].etat == "mort":
                 mort1 += 1
 
         mort2 = 0
         for ID in self.esprits["Equipe 2"].corps.keys():
-            if self.get_entitee(ID).etat == "mort":
+            if self[ID].etat == "mort":
                 mort2 += 1
 
         if (mort1 == 10 and mort2 == 10) or self.nb_tours >= 200:
@@ -390,7 +393,7 @@ class Controleur():
             return [mort1,mort2,self.nb_tours]
         return False
 
-    def tuto(self,screen):
+    def tuto(self):
 
         self.esprits["joueur"] = Esprit_humain(2,self)
 
@@ -767,10 +770,10 @@ class Controleur():
         #On lance la cinématique :
         #À rajouter
         #Et on active le lab du joueur
-        self[2].position = Position("Étage 1 : couloir",13,0)
-        self.active_lab(self[2].position.lab)
+        self.joueur.position = Position("Étage 1 : couloir",13,0)
+        self.active_lab(self.joueur.position.lab)
 
-    def duel(self,esprit1,esprit2,niveau_1=1,niveau_2=1,tailles_lab=(20,20),vide=True,vue=False,screen=None):
+    def duel(self,esprit1: Esprit,esprit2: Esprit,niveau_1=1,niveau_2=1,tailles_lab=(20,20),vide=True,vue=False,screen=None):
         """Fonction qui crée les conditions d'un duel."""
 
         if vue : # On peut avoir des spectateurs, mais pas forcément
@@ -786,7 +789,7 @@ class Controleur():
         # Quatrième étape : admirer
         self.active_lab("arène")
 
-    def cree_agissants(self,classe,niveau,position,largeur,hauteur,nombre):
+    def cree_agissants(self,classe,niveau: int,position: Position,largeur: int,hauteur: int,nombre: int):
         poss = [position+i*DROITE+j*BAS for i in range(largeur) for j in range(hauteur)] #Les positions possibles
         #Rajouter une  vérification pour ne prendre que les cases vides ?
         agissants = []
@@ -802,7 +805,7 @@ class Controleur():
     def toogle_pause(self):
         self.pause = not(self.pause)
 
-    def set_phase(self,phase):
+    def set_phase(self,phase: int):
         if phase not in self.phases : #On ne veut pas avoir deux fois la même phase !
             self.phases.append(phase) #La dernière phase est toujours la phase active !
         self.phase = phase # /!\ Rajouter des conditions ici ! Certaines phases ne peuvent pas être interrompues par d'autres
@@ -811,7 +814,7 @@ class Controleur():
         else:
             pygame.key.set_repeat(400,200)
 
-    def unset_phase(self,phase):
+    def unset_phase(self,phase: int):
         if phase in self.phases :
             self.phases.remove(phase)
         self.phase = self.phases[-1]
@@ -820,7 +823,7 @@ class Controleur():
         else:
             pygame.key.set_repeat(400,200)
 
-    def set_barriere_classe(self,position,direction,classe):
+    def set_barriere_classe(self,position: Position,direction: Direction,classe):
         self.active_lab(position.lab) #Pourquoi est-ce qu'on a besoin de ça déjà ? (Je ne discute pas le fait que ça soit nécessaire, j'aimerais juste avoir commenté la raison à l'époque.)
         mur = [position,direction]
         mur.brise()
@@ -831,7 +834,7 @@ class Controleur():
             mur_opp.effets.append(Barriere_classe(classe))
         self.desactive_lab(position.lab)
 
-    def active_lab(self,key): #Non utilisé dans la version de mi-juillet
+    def active_lab(self,key: str): #Non utilisé dans la version de mi-juillet
         """Fonction appelée pour activer un nouveau labyrinthe. En entrée, la clé du labyrinthe à activer.
            Un étage, en règle générale, est "inactif", c'est à dire que ses occupants ne bougent pas. Il devient "actif" quand une entitée y entre, pour 5 tours si c'est une entitée basique, et jusqu'à 5 tours après son départ si c'est une entitée supérieure (joueur, dev, kumoko, etc.).
            Lorsque le labyrinthe est "activé", sa clé (qui l'indexe dans le dictionnaire des labs et se retrouve dans la coordonées de position verticale de ses occupants) est ajoutée aux labs_courants. On cherche parmis les entitées celles qui se trouvent dans ce lab et on rajoute leur identifiant aux entitées courantes.
@@ -840,7 +843,7 @@ class Controleur():
         self.labs[key].active(self) #On lui donne le controleur pour qu'il puisse l'appeler au besoin.
         #On cherche ses occupants :
         for ke in self.entitees.keys() :
-            entitee = self.get_entitee(ke)
+            entitee = self[ke]
             position = entitee.get_position()
             if position != None: #Il y a des entitees dans les inventaires
                 if position.lab == key : #La position commence par la coordonnée verticale.
@@ -850,13 +853,13 @@ class Controleur():
         if not key in self.labs_courants:
             self.labs_courants.append(key)
 
-    def desactive_lab(self,key): #Non utilisé dans la version de mi-juillet
+    def desactive_lab(self,key: str): #Non utilisé dans la version de mi-juillet
         """Fonction appelée pour désactiver un labyrinthe actif. En entrée, la clé du labyrinthe à désactiver.
            Tout labyrinthe se désactive après 5 tours d'absence d'entitée supérieure (joueur, dev, kumoko, etc.).
            Le lab actif possédant le controleur en attribut, il appelle cette fonction lui-même quand son compteur interne tombe à 0."""
         #On desactive les occupants du lab :
         for ke in self.entitees.keys() : #Normalement on a déjà vérifié qu'il n'y a pas d'entitée supérieure...
-            entitee = self.get_entitee(ke)
+            entitee = self[ke]
             position = entitee.get_position()
             if position != None: #Il y a des entitees dans les inventaires
                 if position.lab == key : #La position commence par la coordonnée verticale.
@@ -866,7 +869,7 @@ class Controleur():
         if key in self.labs_courants:
             self.labs_courants.remove(key)
 
-    def move(self,position,entitee): #Non utilisé dans la version de mi-juillet
+    def move(self,position: Position,entitee: Entitee): #Non utilisé dans la version de mi-juillet
         """Fonction appelée quand une entitée change de labyrinthe. En entrée, la position cible et l'entitée avant son déplacement.
            Si le labyrinthe de départ n'a plus d'entitée supérieure, on va devoir préparer sa désactivation. Si le labyrinthe d'arrivée n'avait pas d'entitée supérieure, il va falloir l'activer."""
         ancien_lab = entitee.position.lab
@@ -894,10 +897,7 @@ class Controleur():
         if not(sup): #On n'a pas d'entitee supérieure dans le labyrinthe
             self.labs[ancien_lab].quitte() #On lance le décompte de 5 tours (faire + de 5 tours ?)
 
-    def get_lab(self,num_lab):
-        return self.labs[num_lab]
-
-    def set_teleport(self,cote_dep,cote_arr,portail=None):
+    def set_teleport(self,cote_dep: Cote,cote_arr: Cote,portail: Teleport=None):
         self[cote_dep.emplacement].repoussante = True
         self[cote_arr.emplacement].repoussante = True
         self[cote_dep].detruit()
@@ -905,7 +905,7 @@ class Controleur():
         self[cote_dep].set_cible(cote_arr.emplacement,True,portail)
         self[cote_arr].set_cible(cote_dep.emplacement,True,portail)
 
-    def construit_escalier(self,cote_dep,cote_arr,escalier=None):
+    def construit_escalier(self,cote_dep: Cote,cote_arr: Cote,escalier: Escalier=None):
         self[cote_dep.emplacement].repoussante = True
         self[cote_arr.emplacement].repoussante = True
         self[cote_dep].detruit()
@@ -913,19 +913,14 @@ class Controleur():
         self[cote_dep].set_escalier(cote_arr.emplacement,HAUT,escalier) #Par convention, la première case est en bas
         self[cote_arr].set_escalier(cote_dep.emplacement,BAS,escalier)
 
-    def get_case(self,position):
-        return self.get_lab(position.lab).get_case(position)
-
-    def get_trajet(self,pos,direction):
+    def get_trajet(self,pos:Position,direction:Direction):
         return self[pos,direction].get_trajet()
 
-    def make_vue(self,agissant):
-        position = agissant.get_position()
-        num_lab = position.lab
-        labyrinthe = self.get_lab(num_lab)
+    def make_vue(self,agissant: Agissant):
+        labyrinthe = self[agissant.position.lab]
         vue = labyrinthe.get_vue(agissant)
         for occupant in self.entitees_courantes:
-            pos = self.get_entitee(occupant).position
+            pos = self[occupant].position
             try:
                 if pos in vue:
                     if vue[pos][1] > 0:
@@ -950,69 +945,72 @@ class Controleur():
     # Pour les interactions, les interactifs (à créer)
     # Pour les effets divers, le plus souvent les agissants, parfois les movibles (à créer)
 
-    def est_item(self,entitee):
-        return issubclass(self.get_entitee(entitee).get_classe(),Item)
+    def est_item(self,ID_entitee:int):
+        return issubclass(self[ID_entitee].get_classe(),Item)
 
-    def trouve_classe(self,position,classe):
-        entitees = []
+    def est_agissant(self,ID_entitee:int):
+        return issubclass(self[ID_entitee].get_classe(),Agissant)
+
+    def trouve_classe(self,position:Position,classe):
+        entitees:List[int] = []
         for entitee in self.entitees.values():
             if entitee.position == position and issubclass(entitee.get_classe(),classe):
                 entitees.append(entitee.ID)
         return entitees
 
-    def trouve_items(self,position):
+    def trouve_items(self,position:Position):
         return self.trouve_classe(position,Item)
 
-    def trouve_non_superposables(self,position):
+    def trouve_non_superposables(self,position:Position):
         return self.trouve_classe(position,Non_superposable)
 
-    def trouve_interactifs(self,position):
+    def trouve_interactifs(self,position:Position):
         return self.trouve_classe(position,Interactif)
 
-    def trouve_mobiles(self,position):
+    def trouve_mobiles(self,position:Position):
         return self.trouve_classe(position,Mobile)
 
-    def trouve_agissants(self,position):
+    def trouve_agissants(self,position:Position):
         return self.trouve_classe(position,Agissant)
 
-    def trouve_occupants(self,position):
+    def trouve_occupants(self,position:Position):
         occupants = []
         for ID_entitee in self.entitees.keys():
             if self[ID_entitee].position == position:
                 occupants.append(ID_entitee)
         return occupants
 
-    def trouve_classe_courants(self,position,classe):
-        entitees = []
+    def trouve_classe_courants(self,position:Position,classe):
+        entitees:List[int] = []
         for ID_entitee in self.entitees_courantes:
             entitee = self[ID_entitee]
             if entitee.position == position and issubclass(entitee.get_classe(),classe):
                 entitees.append(ID_entitee)
         return entitees
 
-    def trouve_items_courants(self,position):
+    def trouve_items_courants(self,position:Position):
         return self.trouve_classe_courants(position,Item)
 
-    def trouve_non_superposables_courants(self,position):
+    def trouve_non_superposables_courants(self,position:Position):
         return self.trouve_classe_courants(position,Non_superposable)
 
-    def trouve_interactifs_courants(self,position):
+    def trouve_interactifs_courants(self,position:Position):
         return self.trouve_classe_courants(position,Interactif)
 
-    def trouve_mobiles_courants(self,position):
+    def trouve_mobiles_courants(self,position:Position):
         return self.trouve_classe_courants(position,Mobile)
 
-    def trouve_agissants_courants(self,position):
+    def trouve_agissants_courants(self,position:Position):
         return self.trouve_classe_courants(position,Agissant)
 
-    def trouve_occupants_courants(self,position):
-        occupants = []
+    def trouve_occupants_courants(self,position:Position):
+        occupants:List[int] = []
         for entitee in self.entitees_courantes:
             if self[entitee].position == position:
                 occupants.append(entitee)
         return occupants
 
-    def fait_agir(self,agissant):
+    def fait_agir(self,agissant:Agissant):
         agissant.statut = ""
         if agissant.ID == 2:
             agissant.nouvel_ordre = False
@@ -1050,7 +1048,7 @@ class Controleur():
                 items = self.trouve_items_courants(agissant.get_position())
                 latence = 1
                 for ID_item in items:
-                    item = self.get_entitee(ID_item)
+                    item = self[ID_item]
                     latence_item,reussite = skill.utilise(item.priorite-agissant.get_priorite())
                     latence += latence_item
                     if reussite:
@@ -1081,7 +1079,7 @@ class Controleur():
                         affichage.message("Tu n'as pas d'arme ?") #Sans arme, on devrait utiliser le stomp.
                         affichage.message("Essaye le stomp !") # !! À modifier pour indiquer la touche courante du stomp, si elle existe !!!
                 else:
-                    arme = self.get_entitee(arme)
+                    arme = self[arme]
                     element,tranchant,portee = arme.get_stats_attaque()
                     force,affinite,direction,ID = agissant.get_stats_attaque(element)
                     latence,taux = skill.utilise()
@@ -1158,7 +1156,7 @@ class Controleur():
 
                 if projectile != None :
                     if isinstance(projectile,int): #Un agissant bien élevé manipule le moins d'objets possible, et leur préfère leurs ID
-                        projectile = self.get_entitee(projectile)
+                        projectile = self[projectile]
                     latence,hauteur,vitesse = skill.utilise()
                     agissant.add_latence(latence*projectile.poids)
                     projectile.position = agissant.get_position()
@@ -1183,7 +1181,7 @@ class Controleur():
                 position = agissant.get_position()
                 agissant.add_latence(latence)
 
-                lab = self.get_lab(position.lab)
+                lab = self[position.lab]
                 lab.veut_passer(agissant,direction)
 
 
@@ -1203,7 +1201,7 @@ class Controleur():
 
 
             elif type_skill in [Skill_reanimation,Skill_reanimation_renforcee] :
-                cadavre = self.get_entitee(agissant.cible)
+                cadavre = self[agissant.cible]
                 latence,taux,sup = skill.utilise()
                 agissant.add_latence(latence)
                 if cadavre.priorite + sup < agissant.priorite :
@@ -1270,7 +1268,7 @@ class Controleur():
                 ID_cible = agissant.cible_merge
                 latence = skill.utilise()
                 if ID_cible != None:
-                    esprit = self.get_entitee(ID_cible).esprit
+                    esprit = self[ID_cible].esprit
                     self.get_esprit(agissant.esprit).merge(esprit) #/!\ Syntaxe probablement fausse et foireuse, à vérifier
                 agissant.add_latence(latence)
 
@@ -1280,7 +1278,7 @@ class Controleur():
                 items = self.trouve_items_courants(agissant.get_position())
                 latence = 1
                 for ID_item in items:
-                    item = self.get_entitee(ID_item)
+                    item = self[ID_item]
                     latence_item,reussite = skill.utilise(item.priorite-agissant.get_priorite())
                     latence += latence_item
                     if reussite:
@@ -1301,39 +1299,39 @@ class Controleur():
 
 
 
-    def fait_voler(self,item):
+    def fait_voler(self,item:Item):
         direction = item.get_direction()
         position = item.get_position()
-        lab = self.get_lab(position.lab)
+        lab = self[position.lab]
         lab.veut_passer(item,direction)
 
-    def select_cible(self,magie,agissant):
+    def select_cible(self,magie:Magie_cible,agissant:Agissant):
         if random.random() < agissant.talent :
             magie.cible = agissant.cible_magie
         
-    def select_direction(self,magie,agissant):
+    def select_direction(self,magie:Magie_dirigee,agissant:Agissant):
         if random.random() < agissant.talent :
             magie.direction = agissant.dir_magie
 
-    def select_cout(self,magie,agissant):
+    def select_cout(self,magie:Magie_cout,agissant:Agissant):
         magie.cout_pm = agissant.cout_magie
 
-    def select_cible_parchemin(self,magie,agissant):
+    def select_cible_parchemin(self,magie:Magie_cible,agissant:Agissant):
         if random.random() < agissant.talent :
             magie.cible = agissant.cible_magie_parchemin
         
-    def select_direction_parchemin(self,magie,agissant):
+    def select_direction_parchemin(self,magie:Magie_dirigee,agissant:Agissant):
         if random.random() < agissant.talent :
             magie.direction = agissant.dir_magie_parchemin
 
-    def select_cout_parchemin(self,magie,agissant):
+    def select_cout_parchemin(self,magie:Magie_cout,agissant:Agissant):
         magie.cout_pm = agissant.cout_magie_parchemin
 
-    def get_cibles_potentielles_agissants(self,magie,joueur):
+    def get_cibles_potentielles_agissants(self,magie:Magie_cible,joueur:Agissant):
         cibles_potentielles = []
         for case in self.esprits["joueur"].vue:
             for ID_entitee in case[5]:
-                entitee = self.get_entitee(ID_entitee)
+                entitee = self[ID_entitee]
                 if issubclass(entitee.get_classe(),Agissant):
                     cibles_potentielles.append(entitee)
         if isinstance(magie,Portee_limitee):
@@ -1348,11 +1346,11 @@ class Controleur():
                 cibles.append(agissant.ID)
         return cibles
 
-    def get_cibles_potentielles_items(self,magie,joueur):
+    def get_cibles_potentielles_items(self,magie:Magie_cible,joueur:Agissant):
         cibles_potentielles = []
         for case in self.esprits["joueur"].vue:
             for ID_entitee in case[5]:
-                entitee = self.get_entitee(ID_entitee)
+                entitee = self[ID_entitee]
                 if issubclass(entitee.get_classe(),Item):
                     cibles_potentielles.append(entitee)
                 else:
@@ -1369,7 +1367,7 @@ class Controleur():
                 cibles.append(item.ID)
         return cibles
 
-    def get_cibles_potentielles_cases(self,magie,joueur):
+    def get_cibles_potentielles_cases(self,magie:Magie_cible,joueur:Agissant):
         cibles_potentielles = []
         for case in self.esprits["joueur"].vue:
             cibles_potentielles.append(case[0])
@@ -1383,55 +1381,55 @@ class Controleur():
             cibles = cibles_potentielles
         return cibles
 
-    def get_esprit(self,nom):
+    def get_esprit(self,nom:str):
         if nom != None:
             return self.esprits[nom]
         else:
             return None
 
-    def get_nom_esprit(self,corp):
-        return self.get_entitee(corp).get_esprit()
+    def get_nom_esprit(self,corp:Agissant):
+        return self[corp].get_esprit()
 
     def get_entitee(self,ID):
-        return self[ID]
+        return self.entitees[ID]
 
-    def get_especes(self,ID):
-        entitee = self.get_entitee(ID)
+    def get_especes(self,ID:int) -> List[str]:
+        entitee = self[ID]
         if issubclass(entitee.get_classe(),Agissant):
             return entitee.especes
         else:
             return []
 
-    def ajoute_entitees(self,entitees):
+    def ajoute_entitees(self,entitees:List[Entitee]):
         for entitee in entitees:
             self.ajoute_entitee(entitee)
 
-    def ajoute_entitee(self,entitee):
+    def ajoute_entitee(self,entitee:Entitee):
         self[entitee.ID]=entitee
         if entitee.position != None:
             if entitee.position.lab in self.labs_courants:
                 entitee.active(self)
                 self.entitees_courantes.append(entitee.ID)
 
-    def get_entitees_etage(self,num_lab):
-        entitees = []
+    def get_entitees_etage(self,num_lab:str):
+        entitees:List[Entitee] = []
         for ID_entitee in self.entitees_courantes:
-            entitee = self.get_entitee(ID_entitee)
+            entitee = self[ID_entitee]
             if entitee.position != None:
-                if self.get_entitee(ID_entitee).position.lab==num_lab:
+                if entitee.position.lab==num_lab:
                     entitees.append(ID_entitee)
         return entitees
 
     def get_agissants_items_labs_esprits(self):
         self.nb_tours+=1
-        agissants = []
-        items = []
-        labs = []
-        esprits = []
+        agissants:List[Agissant] = []
+        items:List[Item] = []
+        labs:List[Labyrinthe] = []
+        esprits:List[Esprit] = []
         noms_esprits = []
         for i in range(len(self.entitees_courantes)-1,-1,-1) :
             ID_entitee = self.entitees_courantes[i]
-            entitee = self.get_entitee(ID_entitee)
+            entitee = self[ID_entitee]
             if isinstance(entitee,Agissant):
                 if isinstance(entitee,Joueur):
                     agissants.insert(0,entitee)
@@ -1462,8 +1460,8 @@ class Controleur():
             esprits.append(self.get_esprit(nom))
         return agissants, items, labs, esprits
 
-    def get_touches(self,responsable,position,portee=1,propagation="CD_S___",direction=None,bloquable = True): #Trouve les agissants affectés par une attaque
-        attaquant = self.get_entitee(responsable)
+    def get_touches(self,responsable:int,position:Position,portee=1,propagation="CD_S___",direction:Direction=None,bloquable = True): #Trouve les agissants affectés par une attaque
+        attaquant:Agissant = self[responsable]
         nom_esprit = attaquant.esprit
         intouchables = []
         if nom_esprit != None:
@@ -1479,22 +1477,22 @@ class Controleur():
             if victime_possible in intouchables :
                 victimes_possibles.remove(victime_possible)
             elif bloquable:
-                victime = self.get_entitee(victime_possible)
+                victime = self[victime_possible]
                 if issubclass(victime.get_classe(),Agissant):
                     position_v = victime.get_position()
                     obstacles.append(position_v)
         labyrinthe.attaque(position,portee,propagation,direction,obstacles)
-        victimes = []
+        victimes:List[Agissant] = []
         for victime_possible in victimes_possibles :
-            victime = self.get_entitee(victime_possible)
+            victime = self[victime_possible]
             if issubclass(victime.get_classe(),Agissant):
                 position_v = victime.get_position()
                 if labyrinthe[position_v].clarte > 0 :
                     victimes.append(victime)
         return victimes
 
-    def get_touches_pos(self,responsable,position,portee=1,propagation = "C__S___",direction=None): #La même, mais pour les effets positifs comme les soins
-        bienfaiteur = self.get_entitee(responsable)
+    def get_touches_pos(self,responsable:int,position:Position,portee=1,propagation = "C__S___",direction=None): #La même, mais pour les effets positifs comme les soins
+        bienfaiteur:Agissant = self[responsable]
         nom_esprit = bienfaiteur.esprit
         intouchables = []
         if nom_esprit != None:
@@ -1505,56 +1503,57 @@ class Controleur():
         labyrinthe = self.labs[position.lab]
         labyrinthe.attaque(position,portee,propagation,direction,[])
         beneficiaires_possibles = self.get_entitees_etage(position.lab)
-        beneficiaires = []
+        beneficiaires:List[Agissant] = []
         for i in range(len(beneficiaires_possibles)-1,-1,-1) :
             beneficiaire_possible = beneficiaires_possibles[i]
             if beneficiaire_possible in intouchables :
                 beneficiaires_possibles.remove(beneficiaires_possibles)
             else:
-                beneficiaire = self.get_entitee(beneficiaire_possible)
-                if not issubclass(beneficiaire.get_classe(),Item):
+                beneficiaire = self[beneficiaire_possible]
+                if issubclass(beneficiaire.get_classe(),Agissant):
                     position_b = beneficiaire.get_position()
                     if labyrinthe[position_b].clarte > 0 :
                         beneficiaires.append(beneficiaire)
         return beneficiaires
 
-    def get_cadavres_touches(self,position,portee=1,propagation = "C__S___",direction = None): #La même, mais pour les effets sur les cadavres comme la réanimation
-        cadavres = []
+    def get_cadavres_touches(self,position:Position,portee=1,propagation = "C__S___",direction = None): #La même, mais pour les effets sur les cadavres comme la réanimation
+        cadavres:List[Agissant] = []
         labyrinthe = self.labs[position.lab]
         labyrinthe.attaque(position,portee,propagation,direction,[])
         cadavres_possibles = self.get_entitees_etage(position.lab)
         for i in range(len(cadavres_possibles)-1,-1,-1) :
-            cadavre_possible = self.get_entitee(cadavres_possibles[i])
+            cadavre_possible = self[cadavres_possibles[i]]
             if cadavre_possible.get_classe() == Cadavre:
                 position_c = cadavre_possible.get_position()
                 if labyrinthe[position_c].clarte > 0 :
                     cadavres.append(cadavre_possible)
         return cadavres
 
-    def get_cases_touches(self,position,portee=1,propagation = "C__S___",direction = None,traverse="tout",responsable=0): #La même, mais pour les effets sur les cases
+    def get_cases_touches(self,position:Position,portee=1,propagation = "C__S___",direction = None,traverse="tout",responsable=0): #La même, mais pour les effets sur les cases
         cases = []
         labyrinthe = self.labs[position.lab]
         labyrinthe.attaque(position,portee,propagation,direction,[])
-        for case in labyrinthe.matrice_cases :
+        for pos in labyrinthe :
+            case = labyrinthe[pos]
             if case.clarte > 0 :
                 cases.append(case)
         return cases
 
-    def get_pos_touches(self,position,portee,propagation = "C__S___",direction = None,traverse="tout",responsable=0): #La même, mais pour les positions
+    def get_pos_touches(self,position:Position,portee:int,propagation = "C__S___",direction = None,traverse="tout",responsable=0): #La même, mais pour les positions
         #On décide des obstacles:
         pos_obstacles = []
         if traverse == "rien":
             obstacles = self.get_entitees_etage(position.lab)
             for ID_obstacle in obstacles:
-                obstacle = self.get_entitee(ID_obstacle)
+                obstacle = self[ID_obstacle]
                 if issubclass(obstacle.get_classe(),Non_superposable):
                     pos_obstacles.append(obstacle.get_position())
         elif traverse == "alliés":
             obstacles_possibles = self.get_entitees_etage(position.lab)
-            nom_esprit = self.get_entitee(responsable).esprit
+            nom_esprit = self[responsable].esprit
             if nom_esprit != None:
                 for ID_obstacle in obstacles_possibles:
-                    obstacle = self.get_entitee(ID_obstacle)
+                    obstacle = self[ID_obstacle]
                     if issubclass(obstacle.get_classe(),Non_superposable):
                         if issubclass(obstacle.get_classe(),Agissant):
                             if obstacle.esprit != nom_esprit:
@@ -1563,10 +1562,10 @@ class Controleur():
                             pos_obstacles.append(obstacle.get_position())
         elif traverse == "ennemis":
             obstacles_possibles = self.get_entitees_etage(position.lab)
-            nom_esprit = self.get_entitee(responsable).esprit
+            nom_esprit = self[responsable].esprit
             if nom_esprit != None:
                 for ID_obstacle in obstacles_possibles:
-                    obstacle = self.get_entitee(ID_obstacle)
+                    obstacle = self[ID_obstacle]
                     if issubclass(obstacle.get_classe(),Non_superposable):
                         if issubclass(obstacle.get_classe(),Agissant):
                             if obstacle.esprit == nom_esprit:
@@ -1577,15 +1576,14 @@ class Controleur():
             pass
         else:
             print("Quelle est cette traversée ?")
-        poss = []
+        poss:List[Position] = []
         labyrinthe = self.labs[position.lab]
         labyrinthe.attaque(position,portee,propagation,direction,pos_obstacles)
-        for i in range(len(labyrinthe.matrice_cases)):
-            for j in range(len(labyrinthe.matrice_cases[0])):
-                if labyrinthe.matrice_cases[i][j].clarte > 0:
-                    poss.append(Position(position.lab,i,j))
+        for position in labyrinthe:
+            if labyrinthe[position].clarte > 0:
+                poss.append(position)
         return poss
 
-    def clear(self):
-        for ID_entitee in self.entitees.keys():
-            self[ID_entitee].clear()
+    # def clear(self):
+    #     for ID_entitee in self.entitees.keys():
+    #         self[ID_entitee].clear()

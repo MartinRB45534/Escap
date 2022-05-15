@@ -474,7 +474,7 @@ class Old_affichage:
                             pygame.draw.rect(self.screen,(170,170,170),(marge_gauche-1,marge_haut-1,42,42))
                         else:
                             pygame.draw.rect(self.screen,(200,200,200),(marge_gauche-1,marge_haut-1,42,42))
-                    item = joueur.controleur.get_entitee(ID_item)
+                    item = joueur.controleur[ID_item]
                     item.get_skin().dessine_toi(self.screen,(marge_gauche,marge_haut),40)
                     marge_haut += 44
 
@@ -740,13 +740,13 @@ class Old_affichage:
                         pygame.draw.rect(self.screen,(200,200,200),(marge_gauche+1,marge_haut+1,38,38))
                 else:
                     pygame.draw.rect(self.screen,(200,200,200),(marge_gauche-1,marge_haut-1,42,42))
-                agissant = joueur.controleur.get_entitee(corps[i])
+                agissant = joueur.controleur[corps[i]]
                 taille = 40
                 position = (marge_gauche,marge_haut)
                 direction = agissant.get_direction()
                 arme = agissant.inventaire.arme
                 if arme != None:
-                    joueur.controleur.get_entitee(arme).get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
+                    joueur.controleur[arme].get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
                 agissant.get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
                 armure = agissant.inventaire.armure
                 if armure != None:
@@ -800,7 +800,7 @@ class Old_affichage:
                     direction = agissant.get_direction()
                     arme = agissant.inventaire.arme
                     if arme != None:
-                        joueur.controleur.get_entitee(arme).get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
+                        joueur.controleur[arme].get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
                     agissant.get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
                     armure = agissant.inventaire.armure
                     if armure != None:
@@ -823,7 +823,7 @@ class Old_affichage:
         if curseur == "in_esprit" and ID_courant != 0:
             marge_gauche += 53
             marge_haut = self.position_debut_y_rectangles_et_carre+10
-            for texte in joueur.controleur.get_entitee(ID_courant).get_texte_descriptif():
+            for texte in joueur.controleur[ID_courant].get_texte_descriptif():
                 for tex in self.scinde_texte(texte,self.largeur_rectangles-58):
                     self.screen.blit(tex,(marge_gauche,marge_haut))
                     marge_haut += 20
@@ -885,7 +885,7 @@ class Old_affichage:
             direction = agissant.get_direction()
             arme = agissant.inventaire.arme
             if arme != None:
-                joueur.controleur.get_entitee(arme).get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
+                joueur.controleur[arme].get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
             agissant.get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
             armure = agissant.inventaire.armure
             if armure != None:
@@ -2740,7 +2740,7 @@ class Old_affichage:
 
             for ID in joueur.vue[position][6]:
                 if ID < 11:
-                    entitee = joueur.controleur.get_entitee(ID)
+                    entitee = joueur.controleur[ID]
                     if issubclass(entitee.get_classe(),Agissant):
                         for skin in entitee.get_skins_vue():
                             skin.dessine_toi(self.screen,(x,y),(largeur,hauteur))
@@ -2793,7 +2793,7 @@ class Old_affichage:
             entitees = vue[6]
             agissant = None
             for ID_entitee in entitees : #Puis les items au sol
-                entitee = joueur.controleur.get_entitee(ID_entitee)
+                entitee = joueur.controleur[ID_entitee]
                 if issubclass(entitee.get_classe(),Item):
                     entitee.get_skin().dessine_toi(self.screen,position,taille,1,1,entitee.get_direction()) #La direction est surtout utile pour les projectiles, sinon ils devraient tous être dans le même sens.
                 elif issubclass(entitee.get_classe(),Decors):
@@ -2804,7 +2804,7 @@ class Old_affichage:
                 direction = agissant.get_direction()
                 arme = agissant.inventaire.arme
                 if arme != None:
-                    joueur.controleur.get_entitee(arme).get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
+                    joueur.controleur[arme].get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
                 agissant.get_skin().dessine_toi(self.screen,position,taille,1,1,direction)
                 armure = agissant.inventaire.armure
                 if armure != None:
@@ -3001,7 +3001,7 @@ class Faux_lab(Affichable):
             entitees = vue[6]
             agissant = None
             for ID_entitee in entitees : #Puis les items au sol
-                entitee = joueur.controleur.get_entitee(ID_entitee)
+                entitee = joueur.controleur[ID_entitee]
                 if issubclass(entitee.get_classe(),Item):
                     entitee.get_skin().dessine_toi(screen,position,taille,1,1,entitee.get_direction()) #La direction est surtout utile pour les projectiles, sinon ils devraient tous être dans le même sens.
                 elif issubclass(entitee.get_classe(),Decors):
@@ -3012,7 +3012,7 @@ class Faux_lab(Affichable):
                 direction = agissant.get_direction()
                 arme = agissant.inventaire.arme
                 if arme != None:
-                    joueur.controleur.get_entitee(arme).get_skin().dessine_toi(screen,position,taille,1,1,direction)
+                    joueur.controleur[arme].get_skin().dessine_toi(screen,position,taille,1,1,direction)
                 agissant.get_skin().dessine_toi(screen,position,taille,1,1,direction)
                 armure = agissant.inventaire.armure
                 if armure != None:

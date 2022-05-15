@@ -65,9 +65,9 @@ class Feu(Evenement,Aura_elementale):
     def action(self,case):
         contr = case.controleur
         occupants = contr.trouve_agissants_courants(case.position)
-        lanceur = contr.get_entitee(self.responsable)
+        lanceur = contr[self.responsable]
         for occupant in occupants :
-            agissant = contr.get_entitee(occupant)
+            agissant = contr[occupant]
             if agissant.esprit != lanceur.esprit :
                 agissant.subit(self.temps_restant,"proximité",FEU,self.responsable)
         case.code += 2 #0 ou 2, selon que la case a une aura de Feu ou non
@@ -96,7 +96,7 @@ class Feu_permanent(Aura_permanente):
         contr = case.controleur
         occupants = contr.trouve_agissants_courants(case.position)
         for occupant in occupants :
-            agissant = contr.get_entitee(occupant)
+            agissant = contr[occupant]
             agissant.subit(self.degats,"distance",FEU)
         case.code += 2 #0 ou 2, selon que la case a une aura de Feu ou non
 
@@ -114,9 +114,9 @@ class Glace(One_shot,Aura_elementale):
     def action(self,case):
         contr = case.controleur
         occupants = contr.trouve_mobiles_courants(case.position)
-        lanceur = contr.get_entitee(self.responsable)
+        lanceur = contr[self.responsable]
         for occupant in occupants :
-            agissant = contr.get_entitee(occupant)
+            agissant = contr[occupant]
             if agissant.esprit != lanceur.esprit and GLACE not in agissant.immunites :
                 agissant.latence += self.gain_latence
         case.code += 4 #0 ou 4, selon que la case a une aura de Glace ou non
@@ -140,7 +140,7 @@ class Glace_permanente(Aura_permanente):
         contr = case.controleur
         occupants = contr.trouve_mobiles_courants(case.position)
         for occupant in occupants :
-            agissant = contr.get_entitee(occupant)
+            agissant = contr[occupant]
             if GLACE not in agissant.immunites :
                 agissant.latence += self.gain_latence
         case.code += 4 #0 ou 4, selon que la case a une aura de Glace ou non
@@ -184,7 +184,7 @@ class Ombre_permanente(Aura_permanente):
 class Aura_terre(One_shot,On_debut_tour):
     """Le centre de l'aura de terre d'un agissant. Attaché à l'agissant, placera les effets voulus sur les cases voisines."""
 
-    def __init__(self,niveau):
+    def __init__(self,niveau:int):
         self.phase = "démarrage"
         self.niveau = niveau
         self.portee = portee_aura_terre[self.niveau-1]
@@ -201,7 +201,7 @@ class Aura_terre(One_shot,On_debut_tour):
 class Aura_feu(One_shot,On_debut_tour):
     """Le centre de l'aura de feu d'un agissant. Attaché à l'agissant, placera les effets voulus sur les cases voisines."""
 
-    def __init__(self,niveau):
+    def __init__(self,niveau:int):
         self.phase = "démarrage"
         self.niveau = niveau
         self.portee = portee_aura_feu[self.niveau-1]
@@ -219,7 +219,7 @@ class Aura_feu(One_shot,On_debut_tour):
 class Aura_glace(One_shot,On_debut_tour):
     """Le centre de l'aura de glace d'un agissant. Attaché à l'agissant, placera les effets voulus sur les cases voisines."""
 
-    def __init__(self,niveau):
+    def __init__(self,niveau:int):
         self.phase = "démarrage"
         self.niveau = niveau
         self.portee = portee_aura_glace[self.niveau-1]
@@ -237,7 +237,7 @@ class Aura_glace(One_shot,On_debut_tour):
 class Aura_ombre(One_shot,On_debut_tour):
     """Le centre de l'aura d'ombre d'un agissant. Attaché à l'agissant, placera les effets voulus sur les cases voisines."""
 
-    def __init__(self,niveau):
+    def __init__(self,niveau:int):
         self.phase = "démarrage"
         self.niveau = niveau
         self.portee = portee_aura_ombre[self.niveau-1]

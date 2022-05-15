@@ -3,7 +3,7 @@ from Jeu.Entitee.Agissant.Gobelin.Gobelin import *
 class Shaman_gobelin(Renforceur,Support_lointain,Gobelin):
     """Un gobelin avec un potentiel magique.
        Il peut utiliser un sort de boost."""
-    def __init__(self,controleur,position,niveau):
+    def __init__(self,controleur,position,niveau:int):
         Agissant.__init__(self,controleur,position,"shaman_gobelin",niveau)
 
     def peut_caster(self):

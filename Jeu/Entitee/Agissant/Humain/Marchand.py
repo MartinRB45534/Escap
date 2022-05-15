@@ -1,8 +1,14 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from Jeu.Controleur import Controleur
+
 from Jeu.Entitee.Agissant.Humain.Humain import *
 
 class Marchand(Dps,Humain): #Le dixième humain du jeu, à l'étage 9 (le seul lien avec l'extérieur)
     """La classe du marchand."""
-    def __init__(self,controleur,position):
+    def __init__(self,controleur:Controleur,position:Position):
 
         self.identite = 'marchand'
         self.place = 9
@@ -45,7 +51,7 @@ class Marchand(Dps,Humain): #Le dixième humain du jeu, à l'étage 9 (le seul l
             self.replique = "dialogue1phrase1"
             self.repliques = ["dialogue1reponse1.1"]
 
-    def interprete(self,replique):
+    def interprete(self,replique:str):
 
         #Premier dialogue
         #Le joueur arrive par la porte
@@ -60,7 +66,7 @@ class Marchand(Dps,Humain): #Le dixième humain du jeu, à l'étage 9 (le seul l
             self.repliques = ["dialogue1reponse1.1.2.1.1","dialogue1reponse1.1.2.1.2"]
         elif replique == "dialogue1reponse1.1.2.1.1":
             self.end_dialogue()
-            self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
+            self.controleur.get_esprit(self.controleur.joueur.esprit).merge(self.esprit)
             self.mouvement = 0 #Légèrement redondant ici
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
             self.attente = False
@@ -69,7 +75,7 @@ class Marchand(Dps,Humain): #Le dixième humain du jeu, à l'étage 9 (le seul l
         elif replique == "dialogue1reponse1.1.1":
             self.replique="dialogue1phrase1.1.1"
             self.repliques = ["dialogue1reponse1.1.1.1"]
-            self.controleur.get_esprit(self.controleur.get_entitee(2).esprit).merge(self.esprit)
+            self.controleur.get_esprit(self.controleur.joueur.esprit).merge(self.esprit)
         elif replique == "dialogue1reponse1.1.1.1":
             self.end_dialogue()
             self.mouvement = 0 #Légèrement redondant ici
@@ -92,11 +98,9 @@ class Marchand(Dps,Humain): #Le dixième humain du jeu, à l'étage 9 (le seul l
             self.repliques = ["dialogue-1reponse1.1.1","dialogue-1reponse1.1.2","dialogue-1reponse1.1.3"]
             self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
         elif replique == "dialogue-1reponse1.1.1.1.2":
-            self.controleur.get_entitee(2).start_select_agissant_dialogue()
-            self.controleur.get_entitee(2).event = COMPLEMENT_DIALOGUE
+            self.controleur.set_phase(AGISSANT_DIALOGUE)
         elif replique == "dialogue-1reponse1.1.1.2":
-            self.controleur.get_entitee(2).start_select_case_dialogue()
-            self.controleur.get_entitee(2).event = COMPLEMENT_DIALOGUE
+            self.controleur.set_phase(CASE_DIALOGUE)
         elif replique == "dialogue-1reponse1.1.1.3":
             self.replique = "dialogue-1phrase1.1.1.1.2"
             self.repliques = ["dialogue-1reponse1.1.1","dialogue-1reponse1.1.2","dialogue-1reponse1.1.3"]
@@ -129,7 +133,7 @@ class Marchand(Dps,Humain): #Le dixième humain du jeu, à l'étage 9 (le seul l
         self.replique = "dialogue-1phrase1.1.1.1.2"
         self.repliques = ["dialogue-1reponse1.1.1","dialogue-1reponse1.1.2","dialogue-1reponse1.1.3"]
 
-    def get_replique(self,code):
+    def get_replique(self,code:str):
         return REPLIQUES_MARCHAND[code]
 
     def get_skin_tete(self):

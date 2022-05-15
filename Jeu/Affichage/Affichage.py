@@ -1,3 +1,4 @@
+from typing import List
 import pygame
 from Jeu.Constantes import *
 
@@ -133,7 +134,7 @@ class Marge_horizontale(Marge):
 
 class Vignette(Affichable):
     """Un élément qui est juste une image."""
-    def __init__(self,position,taille,skin,direction=0):
+    def __init__(self,position:Position,taille,skin,direction=0):
         self.tailles = [taille,taille]
         self.position = position
         self.skin = skin
@@ -147,7 +148,7 @@ class Vignette(Affichable):
         self.skin.dessine_toi(screen,self.position,self.tailles[0],frame,frame_par_tour,self.direction)
 
 class Vignette_image(Vignette):
-    def __init__(self,position,tailles,skin,direction=0):
+    def __init__(self,position:Position,tailles,skin,direction=0):
         self.tailles = tailles
         self.position = position
         self.skin = skin
@@ -160,7 +161,7 @@ class Conteneur(Affichable):
     """Un élément qui peut en 'contenir' d'autres, c'est-à-dire qu'il va les afficher 'à l'interieur' et ils ne pourront pas déborder."""
     def __init__(self):
         self.objets = [] #Il peut quand même avoir des objets 'normaux'
-        self.contenu = [] #Les objets qu'il 'contient'
+        self.contenu:List[Affichable] = [] #Les objets qu'il 'contient'
         self.fond = (0,0,0,0)
         self.tailles = [0,0] #La largeur et la hauteur (ou l'inverse ?)
         self.position = [0,0]
@@ -198,6 +199,7 @@ class Conteneur(Affichable):
             res_objet = objet.clique(position)
             if res_objet:
                 res = res_objet
+        self.courant = res
         return res
 
     def scroll(self,position,x,y):
@@ -222,7 +224,7 @@ class Wrapper(Conteneur):
     """Un conteneur avec un unique élément"""
     def __init__(self):
         self.objets = [] #Il peut quand même avoir des objets 'normaux'
-        self.contenu = None #Les objets qu'il 'contient'
+        self.contenu:Affichable = None #Les objets qu'il 'contient'
         self.courant = False
         self.fond = (0,0,0,0)
         self.tailles = [0,0] #La largeur et la hauteur (ou l'inverse ?)
@@ -248,6 +250,9 @@ class Wrapper(Conteneur):
     def get_tailles(self,tailles):
         # print("Get_taille")
         # print(self)
+        if self.contenu == None:
+            print(f"{self} n'a pas de contenu !")
+            return [0,0]
         return self.contenu.get_tailles(tailles)
 
     def affiche(self,screen,frame=1,frame_par_tour=1):
@@ -318,7 +323,7 @@ class Pavage(Conteneur):
     """Contient des objets, qui s'adaptent au pavage"""
     def __init__(self):
         self.objets = [] #Il peut quand même avoir des objets 'normaux'
-        self.contenu = [] #Les objets qu'il 'contient'
+        self.contenu:List[Affichable] = [] #Les objets qu'il 'contient'
         self.repartition = [] #La répartition des objets contenus
         self.fond = (0,0,0,0)
         self.tailles = [0,0] #La largeur et la hauteur (ou l'inverse ?)
@@ -442,8 +447,8 @@ class Pavage_vertical(Pavage):
 class Liste(Conteneur):
     """Contient des objets, et les affiche à la suite."""
     def __init__(self):
-        self.objets = [] #Il peut quand même avoir des objets 'normaux'
-        self.contenu = [] #Les objets qu'il 'contient'
+        self.objets:List[Affichable] = [] #Il peut quand même avoir des objets 'normaux'
+        self.contenu:List[Affichable] = [] #Les objets qu'il 'contient'
         self.repartition = []
         self.courant = 0 #L'élément 'courant' de la liste
         self.decalage = 0
@@ -451,9 +456,25 @@ class Liste(Conteneur):
         self.tailles = [0,0] #La largeur et la hauteur (ou l'inverse ?)
         self.position = [0,0]
 
-    def set_contenu(self,contenu,repartition,courant=0):
+    def set_contenu(self,contenu:List[Affichable],repartition:List[float],courant=0):
         self.contenu = contenu
         self.repartition = repartition
+
+    def clique(self,position):
+        #Trouve l'élément survolé par la souris et le renvoie
+        res = False
+        if self.touche(position):
+            pos_rel = [position[0]-self.position[0],position[1]-self.position[1]]
+            for contenu in self.contenu:
+                res_contenu = contenu.clique(pos_rel)
+                if res_contenu:
+                    res = res_contenu
+                    self.ajuste(res)
+        for objet in self.objets:
+            res_objet = objet.clique(position)
+            if res_objet:
+                res = res_objet
+        return res
 
     def scroll_liste(self,position,x,y):
         res = False
@@ -504,6 +525,17 @@ class Liste_verticale(Liste):
                 return True
         return False
 
+    def ajuste(self,element:Affichable):
+        decalage = 0
+        if element.position[1] < 0:
+            decalage = -element.position[1]
+        elif element.position[1]+element.tailles[1] > self.tailles[1]:
+            decalage = self.tailles[1]-element.position[1]-element.tailles[1]
+        if decalage != 0:
+            for contenu in self.contenu:
+                contenu.decale([0,decalage])
+            self.decalage += decalage
+
 class Liste_horizontale(Liste):
     def set_tailles(self,tailles):
         self.tailles = tailles
@@ -540,44 +572,126 @@ class Liste_horizontale(Liste):
                 return True
         return False
 
-class Liste_menu(Liste):
-    """Une liste en plusieurs lignes"""
+    def ajuste(self,element:Affichable):
+        decalage = 0
+        if element.position[0] < 0:
+            decalage = -element.position[0]
+        elif element.position[0]+element.tailles[0] > self.tailles[0]:
+            decalage = self.tailles[0]-element.position[0]-element.tailles[0]
+        if decalage != 0:
+            for contenu in self.contenu:
+                contenu.decale([decalage,0])
+            self.decalage += decalage
+
+class Liste_menu(Wrapper):
+    """Une liste sur plusieurs lignes"""
+    def __init__(self):
+        self.objets = [] #Il peut quand même avoir des objets 'normaux'
+        self.contenu:List[Affichable] = []
+        self.liste = None
+        self.courant = False
+        self.fond = (0,0,0,0)
+        self.tailles = [0,0] #La largeur et la hauteur (ou l'inverse ?)
+        self.position = [0,0]
+
+    def set_fond(self,fond):
+        self.fond = fond
+
+    def set_contenu(self,contenu):
+        self.contenu = contenu
+        self.courant = contenu[0]
+
     def set_tailles(self,tailles):
         self.tailles = tailles
-        i=0
-        lignes=[]
+        listes=[]
         ligne=[]
-        longueur_ligne=0
-        hauteurs_ligne=[]
-        ligne_courant=0
+        longueur_ligne=5
         for i in range(len(self.contenu)):
-            if self.contenu[i].tailles[0]>tailles[0]:
+            if self.contenu[i].get_tailles(self.tailles)[0] + 10 >tailles[0]:
                 print(f"Je n'ai même pas la place d'afficher {self.contenu[i]} !")
                 break
-            elif longueur_ligne + self.contenu[i].tailles[0] > tailles[0]:
-                lignes.append(ligne)
+            elif longueur_ligne + self.contenu[i].get_tailles(self.tailles)[0] + 5 > tailles[0]:
+                liste = Liste_horizontale()
+                liste.set_contenu([ligne[j//2] if j//2 == 0 else Marge_verticale() for j in range(-1,2*len(ligne))],[0 if j//2 == 0 else 5 for j in range(-1,2*len(ligne))])
+                listes.append(liste)
+                if ligne == ligne_courante:
+                    liste_courante = liste
                 ligne=[self.contenu[i]]
-                longueur_ligne = self.contenu[i].tailles[0]
-                hauteurs_ligne.append(self.contenu[i].tailles[1])
+                if self.contenu[i] == self.courant:
+                    ligne_courante = ligne
+                longueur_ligne = self.contenu[i].tailles[0] + 10
             else:
                 ligne.append(self.contenu[i])
-                longueur_ligne+=self.contenu[i].tailles[0]
-                if hauteurs_ligne[-1]<self.contenu[i].tailles[1]:
-                    hauteurs_ligne[-1]=self.contenu[i].tailles[1]
-            if i==self.courant:
-                ligne_courant=len(hauteurs_ligne)-1
-        occupe = sum(hauteurs_ligne)
-        if occupe < tailles[1]:
-            somme = 0
-        else:
-            somme = tailles[1]//2 - sum(hauteurs_ligne[:ligne_courant]) + hauteurs_ligne[ligne_courant]//2
-        for i in len(lignes):
-            ligne = lignes[i]
-            somme_horizontale = 0
-            for contenu in ligne:
-                contenu.set_position([somme_horizontale,somme])
-                somme_horizontale += contenu.tailles[0]
-            somme += hauteurs_ligne[i]
+                longueur_ligne += self.contenu[i].tailles[0] + 5
+                if self.contenu[i] == self.courant:
+                    ligne_courante = ligne
+        liste = Liste_horizontale()
+        liste.set_contenu([ligne[j//2] if j//2 == 0 else Marge_verticale() for j in range(-1,2*len(ligne))],[0 if j//2 == 0 else 5 for j in range(-1,2*len(ligne))])
+        listes.append(liste)
+        if ligne == ligne_courante:
+            liste_courante = liste
+        self.liste = Liste_verticale()
+        self.liste.set_contenu([listes[j//2] if j//2 == 0 else Marge_horizontale() for j in range(-1,2*len(listes))],[0 if j//2 == 0 else 5 for j in range(-1,2*len(listes))])
+        self.liste.set_tailles(self.tailles)
+        self.liste.ajuste(liste_courante)
+
+    def get_tailles(self,tailles):
+        return tailles
+
+    def affiche(self,screen,frame=1,frame_par_tour=1):
+        surf = pygame.Surface(self.tailles,pygame.SRCALPHA)
+        surf.fill(self.fond)
+        self.liste.affiche(surf,frame,frame_par_tour)
+        screen.blit(surf,self.position)
+        for objet in self.objets:
+            objet.affiche(screen,frame,frame_par_tour)
+
+    def clique(self,position):
+        #Trouve l'élément survolé par la souris et le renvoie
+        res = False
+        if self.touche(position):
+            pos_rel = [position[0]-self.position[0],position[1]-self.position[1]]
+            for contenu in self.contenu:
+                res_contenu = contenu.clique(pos_rel)
+                if res_contenu:
+                    res = res_contenu
+        for objet in self.objets:
+            res_objet = objet.clique(position)
+            if res_objet:
+                res = res_objet
+        self.courant = res
+        return res
+
+    def clique_wrapper(self,position):
+        #Trouve l'élément survolé par la souris et le renvoie
+        res = False
+        if self.touche(position):
+            res = self #La plupart des trucs qu'on veut pouvoir cliquer sont les Wrapper, pas les listes et pavages intermédiaires
+            pos_rel = [position[0]-self.position[0],position[1]-self.position[1]]
+            res_contenu = self.liste.clique(pos_rel)
+            if res_contenu:
+                res = res_contenu
+        for objet in self.objets:
+            res_objet = objet.clique(position)
+            if res_objet:
+                res = res_objet
+        return res
+
+    def scroll(self,position,x,y):
+        res = False
+        if self.touche(position):
+            pos_rel = [position[0]-self.position[0],position[1]-self.position[1]]
+            if self.liste.scroll(pos_rel,x,y):
+                res = True
+        for objet in self.objets:
+            if objet.scroll(position,x,y):
+                res = True
+        return res
+
+    def update(self):
+        self.liste.update()
+        for objet in self.objets:
+            objet.update()
 
 class Survolable(Affichable):
     """Un élément qui réagit au survol"""
@@ -596,7 +710,7 @@ class Survolable(Affichable):
         #Change l'apparence pour indiquer que la souris était là.
         pass
 
-    def get_description(self,observation):
+    def get_description(self,observation=0):
         return ["Hey, je réagis au passage de la souris !","C'est cool, non ?","",f"P.S. Si tu croises Martin, dit lui qu'il y a un problème avec la description de {self} !"]
 
 class Cliquable(Survolable): #Il faut être survolable pour être cliquable
@@ -725,3 +839,22 @@ class Final(Affichable):
         if self.touche(position):
             res = self
         return res
+
+class Bouton(Final,Wrapper):
+    def __init__(self,skin,texte,fond=(0,0,0)):
+        self.objets = [] #Il peut quand même avoir des objets 'normaux'
+        self.contenu:Affichable = None #Les objets qu'il 'contient'
+        self.courant = False
+        self.fond = fond
+        self.skin = skin
+        self.texte = texte
+        self.tailles = [0,0] #La largeur et la hauteur (ou l'inverse ?)
+        self.position = [0,0]
+        self.init()
+
+    def init(self):
+        contenu = Pavage_vertical()
+        triptique = Pavage_horizontal()
+        triptique.set_contenu([Marge_verticale(),Vignette([0,0],20,self.skin),Marge_verticale(),Texte(self.texte),Marge_verticale()],[5,0,5,0,5])
+        contenu.set_contenu([Marge_horizontale(),triptique,Marge_horizontale()],[5,0,5])
+        self.contenu = contenu

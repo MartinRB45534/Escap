@@ -6,15 +6,15 @@ from Jeu.Labyrinthe.Structure_spatiale.Position import *
 
 class Direction:
     directions = NB_DIRECTIONS
-    def __init__(self,direction):
+    def __init__(self,direction: int):
         self.direction = direction
 
     def __index__(self):
         return self.direction
 
     def __add__(self,other):
-        if isinstance(other,Direction): #Ne devrait théoriquement pas être utilisé
-            return Direction((self.direction+other.direction)%self.directions)
+        if isinstance(other,Direction):
+            return self.to_decalage()+other
         elif isinstance(other,int):
             return Direction((self.direction+other)%self.directions)
         elif isinstance(other,(Decalage,Position)):
@@ -24,7 +24,7 @@ class Direction:
 
     def __radd__(self,other):
         if isinstance(other,Direction): #Ne devrait pas pouvoir arriver
-            return Direction((other.direction+self.direction)%self.directions)
+            return other+self.to_decalage()
         elif isinstance(other,int):
             return Direction((other+self.direction)%self.directions)
         elif isinstance(other,(Decalage,Position)):

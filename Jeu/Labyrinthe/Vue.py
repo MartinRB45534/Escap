@@ -1,8 +1,9 @@
+# from typing import Any
 from Jeu.Labyrinthe.Structure_spatiale.Espace import *
 
 class Vue(Espace):
     """Une représentation simplifiée d'un labyrinthe"""
-    def __init__(self,ID,matrice,decalage):
+    def __init__(self,ID:str,matrice:List[List],decalage:Decalage):
         self.id = ID
         self.matrice_cases = matrice
         self.decalage = decalage

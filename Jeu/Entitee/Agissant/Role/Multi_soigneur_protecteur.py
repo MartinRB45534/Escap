@@ -9,7 +9,7 @@ class Multi_soigneur_protecteur(Agissant):
     def agit_en_vue(self,esprit,defaut = ""):
         cibles = []
         for ID in esprit.corps.keys():
-            corp = self.controleur.get_entitee(ID)
+            corp = self.controleur[ID]
             if corp.etat == "vivant" and corp.pv < corp.pv_max:
                 cibles.append([corp.pv,ID])
         if len(cibles) == 1:
@@ -35,7 +35,7 @@ class Multi_soigneur_protecteur(Agissant):
                 self.statut = "soin"
         elif self.pm == self.pm_max: #On ne l'utilise que rarement... parce qu'il est cher
             for ID in esprit.corps.keys():
-                corp = self.controleur.get_entitee(ID)
+                corp = self.controleur[ID]
                 if corp.etat == "vivant":
                     libre = True
                     for effet in corp.effets:

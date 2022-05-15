@@ -58,6 +58,35 @@ Troisi�me �tape : mains[0][2].boucle() et le jeu reprend imm�diatement, at
 
 Jeter un oeil aux phases du controleur, il y a peut-être des trucs à retravailler
 
+Phases :
+TOUR - la phase ou le joueur joue 'normalement' (je me comprends)
+DIALOGUE - lors des discussions (acutellement pas une phase)
+TOUCHE - modification des touches (inclure dans un menu, genre paramètres, avec les réglages de son, vitesse, etc. ?)
+LEVEL_UP - sélection du bonus de montée de niveau
+RECETTE - sélection d'une recette d'alchimie (alchimiste ou chaudron)
+MARCHAND - achat-vente auprès d'un marchand
+IMPREGNATION - imprégnation d'un parchemin vierge
+AGISSANT_DIALOGUE
+CASE_DIALOGUE
+AGISSANT_MAGIE
+CASE_MAGIE
+DIRECTION_MAGIE
+COUT_MAGIE
+AGISSANT_PARCHEMIN
+CASE_PARCHEMIN
+DIRECTION_PARCHEMIN
+COUT_PARCHEMIN
+CINEMATIQUE - pour plus tard
+
+
+
+COMPLEMENTS - les différents compléments (sélection de cible/direction/cout etc.)
+actuellement :
+compléments aux dialogues (sélection de la cible de déplacement (agissant ou case), sélection magie à impregner, sélection recette, etc.)
+compléments aux magies
+compléments aux parchemins
+
+
 
 
 À faire : rework affichage/menus
@@ -292,6 +321,65 @@ Et pour qu'un agissant sorte du passage si quelqu'un veut aller là où il est (
 
 
 
+Imports : qu'est-ce qui a besoin de quoi ?
+True_joueur :
+	Controleur
+	Affichage
+
+Affichage :
+	Rien ?
+
+Controleur :
+	Entitee
+	Agissant
+	Item
+	Labyrinthe (et assimilés)
+	Vue
+	Esprit
+	Effet
+
+Labyrinthe (et assimilés) :
+	Agissant
+	Item
+	Effet
+
+Vue :
+	Rien
+
+Esprit :
+	Agissant
+	Vue
+
+Agissants :
+	Vue
+	Inventaire
+	Effet
+
+Inventaire :
+	Item
+	Effet
+
+Item :
+	Agissant ?
+	Effet
+
+Effet :
+	Item
+	Agissant
+
+De quoi ont-ils besoin exactement ?
+
+Inventaire :
+	Potion, Parchemin, Cle, etc.
+
+Item :
+	
+
+
+
+
+
+
 Travail à faire :
 - Layout (prison, dialogues)
   Prison :
@@ -350,6 +438,10 @@ Parchemins d'attaque � distance puissante, pour �liminer les shamans (ingr�
 Modifier les consignes de fuite (les PNJs prennent bien trop de risques actuellement)
 2 shaman + 1 mage = une attaque � 40 d�gats. Pour des humains qui ont 50 � 150 PVs et bless�s par d'autres gobelin, c'est la mort instantann�e.
 
+
+Idée pour plus tard :
+Dans la branche de l'essence magique, proposer une magie que le joueur n'a pas assez de pm pour lancer.
+Par contre, il a assez de pm pour en imprégner un parchemin, puis (après les avoir régénérés) assez de pm pour utiliser le parchemin.
 
 
 Messages d'entr�e pour certains �tages ?

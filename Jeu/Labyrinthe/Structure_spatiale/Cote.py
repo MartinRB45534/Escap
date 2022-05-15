@@ -1,7 +1,8 @@
+from typing import Union
 from Jeu.Labyrinthe.Structure_spatiale.Direction import *
 
 class Cote:
-    def __init__(self,emplacement,direction):
+    def __init__(self,emplacement: Union[Position,Decalage],direction:Direction):
         self.emplacement = emplacement
         self.direction=direction
 

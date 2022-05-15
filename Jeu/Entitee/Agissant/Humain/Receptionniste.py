@@ -1,3 +1,9 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from Jeu.Controleur import Controleur
+
 from Jeu.Entitee.Agissant.Humain.Humain import *
 
 class Receptionniste(Dps,Humain): #Le deuxième humain du jeu, à l'étage 1 (engage la conversation après la chute, indique les commandes de base)
@@ -46,7 +52,7 @@ class Receptionniste(Dps,Humain): #Le deuxième humain du jeu, à l'étage 1 (en
             self.replique = "dialogue2phrase1"
             self.repliques = ["dialogue2reponse1.1","dialogue2reponse1.2"]
 
-    def interprete(self,replique):
+    def interprete(self,replique:str):
 
         #Premier dialogue
         #Le receptionniste accueil le joueur

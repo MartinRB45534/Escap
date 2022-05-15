@@ -18,6 +18,7 @@ SKIN_DIRECTION = Skin("direction.png")
 SKIN_BROUILLARD = Skin("brouillard.png")
 # global SKIN_MUR_BROUILLARD
 SKIN_MUR_BROUILLARD = Skin("brouillard_mur_transparent.png")
+SKIN_SHADE = Skin("shade.png")
 # global SKIN_CASE
 SKIN_CASE = Skin("case.png")
 # global SKIN_CASE_1
@@ -37,7 +38,7 @@ SKIN_CASE_7 = Skin("case_7.png")
 # global SKIN_CASE_8
 SKIN_CASE_8 = Skin("case_8.png")
 # global SKIN_CHAUDRON_GOBELIN
-SKIN_CHAUDRON_GOBELIN = Skin("chaudron_gobelin.png") #/!\ Créer le skin
+SKIN_CHAUDRON_GOBELIN = Skin("chaudron_gobelin.png")
 # global SKIN_CHAUDRON_GOBELIN_BRISE
 SKIN_CHAUDRON_GOBELIN_BRISE = Skin("vide.png") #/!\ Créer le skin
 # global SKIN_AGISSANT
@@ -254,6 +255,9 @@ SKIN_IN = Skin("in.png")
 SKIN_OUT = Skin("out.png")
 # global SKIN_QUITTER
 SKIN_QUITTER = Skin("quitter.png")
+SKIN_VALIDER = Skin("valider.png")
+SKIN_VENTE = Skin("argent.png")
+SKIN_ACHAT = Skin("argent.png")
 # global SKIN_ZONES
 SKIN_ZONES = Skin("zones.png")
 # global SKIN_ATTAQUE_TERRE

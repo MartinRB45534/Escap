@@ -1,22 +1,29 @@
-from Jeu.Constantes import *
-from Jeu.Entitee.Item.Item import *
-from Jeu.Effet.Effets import *
+from __future__ import annotations
+from typing import List, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from Jeu.Entitee.Entitees import *
+
+# from Jeu.Constantes import *
+# from Jeu.Entitee.Item.Item import *
+from Jeu.Effet.Effets_mouvement.Blocages import *
+from Jeu.Effet.Effets_mouvement.Deplacements import *
 
 class Mur:
-    def __init__(self,cible,niveau):
-        self.effets = [Teleport(cible),Mur_plein(niveau)]
+    def __init__(self,cible:Position,niveau:int):
+        self.effets:List[Effet] = [Teleport(cible),Mur_plein(niveau)]
         self.niveau = niveau
         self.peut_passer = False
         self.controleur = None
 
-    def is_ferme(self,clees=[]):
+    def is_ferme(self,clees:List[str]=[]):
         ferme = False
         for effet in self.effets :
             if isinstance(effet,Mur_impassable) or (isinstance(effet,Mur_plein) and not(effet.casse)) or (isinstance(effet,Porte) and (effet.ferme and not(effet.code in clees))):
                 ferme = True
         return ferme
 
-    def get_blocage(self,clees):
+    def get_blocage(self,clees:List[str]):
         blocage = None
         for effet in self.effets :
             if isinstance(effet,Mur_impassable):
@@ -42,7 +49,7 @@ class Mur:
                 touchable = False
         return touchable
 
-    def veut_passer(self,intrus):
+    def veut_passer(self,intrus:Entitee):
         self.peut_passer = True
         for effet in self.effets :
             if isinstance(effet,On_try_through):
@@ -81,7 +88,7 @@ class Mur:
             if isinstance(effet,On_try_through) and not isinstance(effet,Mur_impassable) :
                 self.effets.remove(effet)
 
-    def cree_porte(self,code,porte=None):
+    def cree_porte(self,code:str,porte:Porte=None):
         self.brise()
         if porte == None:
             self.effets.append(Porte(self.niveau,code))
@@ -111,7 +118,7 @@ class Mur:
             i += 1
         return cible
 
-    def get_cible_ferme(self,clees):
+    def get_cible_ferme(self,clees:List[str]):
         return [self.get_cible_ferme_simple(),self.get_cible_ferme_portes(clees),self.get_cible_ferme_portails(),self.get_cible_ferme_portes_portails(clees),self.get_cible_ferme_escaliers(clees)]
 
     def get_cible_ferme_simple(self):
@@ -126,7 +133,7 @@ class Mur:
             return False
         return cible
 
-    def get_cible_ferme_portes(self,clees):
+    def get_cible_ferme_portes(self,clees:List[str]):
         """Renvoie aussi la position si le mur est une porte dont l'agissant a la clé"""
         cible = True
         for effet in self.effets :
@@ -150,7 +157,7 @@ class Mur:
             return False
         return cible
 
-    def get_cible_ferme_portes_portails(self,clees):
+    def get_cible_ferme_portes_portails(self,clees:List[str]):
         """Renvoie aussi la position si le mur est un téléporteur ou une porte dont l'agissant a la clé"""
         cible = True
         for effet in self.effets :
@@ -162,7 +169,7 @@ class Mur:
             return False
         return cible
 
-    def get_cible_ferme_escaliers(self,clees):
+    def get_cible_ferme_escaliers(self,clees:List[str]):
         """Renvoie aussi la position si le mur est un téléporteur ou une porte dont l'agissant a la clé"""
         cible = True
         for effet in self.effets :
@@ -174,7 +181,7 @@ class Mur:
             return False
         return cible
 
-    def set_cible(self,position,surnaturel=False,portail=None):
+    def set_cible(self,position:Position,surnaturel=False,portail=None):
         for effet in self.effets:
             if isinstance(effet,Teleport):
                 self.effets.remove(effet)
@@ -182,7 +189,7 @@ class Mur:
             portail = Teleport
         self.effets.append(portail(position,surnaturel))
 
-    def set_escalier(self,position,sens,escalier=None):
+    def set_escalier(self,position:Position,sens:Direction,escalier=None):
         for effet in self.effets:
             if isinstance(effet,Teleport):
                 self.effets.remove(effet)
@@ -194,17 +201,17 @@ class Mur:
         mur_oppose = None
         cible = self.get_cible()
         if cible != None:
-            case_cible = self.controleur.get_case(cible)
+            case_cible = self.controleur[cible]
             for mur in case_cible.murs :
                 cible_potentielle = mur.get_cible()
                 if cible_potentielle != None:
-                    case_cible_potentielle = self.controleur.get_case(cible_potentielle)
+                    case_cible_potentielle = self.controleur[cible_potentielle]
                     if self in case_cible_potentielle.murs:
                         mur_oppose = mur
         return mur_oppose
         
 
-    def active(self,controleur):
+    def active(self,controleur: Controleur):
         self.controleur = controleur
 
     def desactive(self):

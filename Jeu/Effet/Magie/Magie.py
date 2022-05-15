@@ -18,13 +18,13 @@ class Magie(On_action):
     def miss_fire(self,lanceur):
         lanceur.subit(20)
 
-    def get_titre(self,observation):
+    def get_titre(self,observation=0):
         return f"Magie ({type(self)})"
 
     def get_skin(self):
         return SKIN_MAGIE
 
-    def get_description(self,observation):
+    def get_description(self,observation=0):
         return ["Oopsie... Cette magie n'a pas de description.",f"Peut-être que son nom, {self.nom}, pourra aider."]
 
 class Magies_offensives(Magie):

@@ -1,8 +1,14 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from Jeu.Controleur import Controleur
+
 from Jeu.Entitee.Agissant.Humain.Humain import *
 
 class Codeur(Humain): #Le cinquième humain du jeu, à l'étage 4 (répond au nom de Dev, quand Il n'est pas occupé à programmer un autre jeu)
     """Ma classe."""
-    def __init__(self,controleur,position):
+    def __init__(self,controleur:Controleur,position:Position):
 
         self.identite = 'codeur'
         self.place = 4
@@ -34,7 +40,7 @@ class Codeur(Humain): #Le cinquième humain du jeu, à l'étage 4 (répond au no
             self.replique = "dialogue-5phrase1"
             self.repliques = ["dialogue-5reponse1.1","dialogue-5reponse1.2"]
 
-    def interprete(self,replique):
+    def interprete(self,replique:str):
 
         #Premier dialogue
         #Le joueur arrive vers Dev
@@ -102,7 +108,7 @@ class Codeur(Humain): #Le cinquième humain du jeu, à l'étage 4 (répond au no
 
         self.replique_courante = 0
 
-    def get_replique(self,code):
+    def get_replique(self,code:str):
         return REPLIQUES_CODEUR[code]
 
     def get_skin(self):

@@ -1,9 +1,14 @@
+from __future__ import annotations
+from typing import List, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from Jeu.Entitee.Entitees import *
+
 from Jeu.Esprit.Esprit import *
 
 class Esprit_type(Esprit):
     """Un esprit caricatural, pour les besoins de mes expériences."""
-    def __init__(self,nom,niveau,controleur,position):
-        # Tout le monde spawn au même endroit, changer ça !
+    def __init__(self,nom:str,niveau:int,controleur:Controleur,position:Position):
         self.nom = nom
         self.controleur = controleur
         self.oubli = niveau
@@ -14,6 +19,7 @@ class Esprit_type(Esprit):
         self.resolution = 0
         self.vue = Vues()
         self.corps = {}
+        corps:List[Agissant] = []
         if niveau == 1:
             corps = [Tank(position,1),Dps(position,1),Dps(position,1)]
         if niveau == 2:
@@ -31,7 +37,7 @@ class Esprit_sans_scrupule(Esprit_type):
     """Un esprit qui s'en prend principalement aux soigneurs et aux soutiens."""
 
     def antagonise_supports(self,offense):
-        offenseur = self.controleur.get_entitee(offense[0])
+        offenseur = self.controleur[offense[0]]
         for effet in offenseur.effets:
             if isinstance(effet,Dopage):
                 ID = effet.responsable
@@ -52,7 +58,7 @@ class Esprit_sans_scrupule(Esprit_type):
 
 class Esprit_bourrin(Esprit_type): #À supprimer, plus nécessaire
     """Un esprit sans soigneurs ni soutiens."""
-    def __init__(self,nom,niveau,controleur,position):
+    def __init__(self,nom:str,niveau:int,controleur:Controleur,position:Position):
         # Tout le monde spawn au même endroit, changer ça !
         self.nom = nom
         self.controleur = controleur
@@ -64,6 +70,7 @@ class Esprit_bourrin(Esprit_type): #À supprimer, plus nécessaire
         self.resolution = 0
         self.vue = Vues()
         self.corps = {}
+        corps:List[Agissant] = []
         if niveau == 1:
             corps = [Dps(position,1),Dps(position,1),Dps(position,1)]
         if niveau == 2:
@@ -79,7 +86,7 @@ class Esprit_bourrin(Esprit_type): #À supprimer, plus nécessaire
 
 class Esprit_defensif(Esprit_type): #À supprimer, plus nécessaire
     """Un esprit sans soigneurs ni soutiens."""
-    def __init__(self,nom,niveau,controleur,position):
+    def __init__(self,nom:str,niveau:int,controleur:Controleur,position,Position):
         # Tout le monde spawn au même endroit, changer ça !
         self.nom = nom
         self.controleur = controleur
@@ -91,6 +98,7 @@ class Esprit_defensif(Esprit_type): #À supprimer, plus nécessaire
         self.resolution = 0
         self.vue = Vues()
         self.corps = {}
+        corps:List[Agissant] = []
         if niveau == 1:
             corps = [Tank(position,1),Tank(position,1),Dps(position,1)]
         if niveau == 2:
@@ -106,7 +114,7 @@ class Esprit_defensif(Esprit_type): #À supprimer, plus nécessaire
 
 class Esprit_solitaire(Esprit_type):
     """Un esprit avec un unique corp."""
-    def __init__(self,nom,corp,controleur):
+    def __init__(self,nom:str,corp:int,controleur:Controleur):
         self.nom = nom
         self.controleur = controleur
         self.oubli = 5
@@ -121,7 +129,7 @@ class Esprit_solitaire(Esprit_type):
 
 class Esprit_simple(Esprit_type):
     """Un esprit avec les corps qu'on lui donne."""
-    def __init__(self,nom,corps,prejuges,controleur):
+    def __init__(self,nom:str,corps:List[int],prejuges:List[str],controleur:Controleur):
         self.nom = nom
         self.controleur = controleur
         self.oubli = 5
@@ -136,8 +144,8 @@ class Esprit_simple(Esprit_type):
 
 class Esprit_humain(Esprit_type):
     """Un esprit qui dirige un ou plusieurs humains. Peut interragir avec d'autres esprits humains."""
-    def __init__(self,corp,controleur): #Les humains commencent tous séparément, donc ils ont leur propre esprit au début
-        self.nom = controleur.get_entitee(corp).identite
+    def __init__(self,corp:int,controleur:Controleur): #Les humains commencent tous séparément, donc ils ont leur propre esprit au début
+        self.nom:str = controleur[corp].identite
         self.controleur = controleur
         self.oubli = 5 #Faire dépendre de l'humain
         self.ennemis = {}
@@ -149,126 +157,121 @@ class Esprit_humain(Esprit_type):
         self.corps = {}
         Esprit_type.ajoute_corp(self,corp)
         self.chef = corp #Les humains ne peuvent pas s'empêcher d'avoir des chefs
-        self.curseur = "corps"
-        self.allies_vivants = 0
-        self.allie_courant = 0
-        self.ennemis_vus = []
-        self.ennemi_courant = 0
+        # self.ennemis_vus = []
 
-    def deplace(self,direction):
-        if self.curseur == "corps":
-            if direction == BAS:
-                self.curseur = "ennemis"
-            elif direction == HAUT:
-                self.curseur = "ennemis"
-            elif direction == IN:
-                self.curseur = "in_corps"
-            elif direction == OUT:
-                return True
-        elif self.curseur == "in_corps":
-            if direction == BAS:
-                self.allie_courant += 1
-                if self.allie_courant >= self.allies_vivants:
-                    self.allie_courant = 0
-            elif direction == HAUT:
-                if self.allie_courant == 0:
-                    self.allie_courant = self.allies_vivants
-                self.allie_courant -= 1
-            elif direction == OUT:
-                self.curseur = "corps"
-        elif self.curseur == "ennemis":
-            if direction == BAS:
-                self.curseur = "corps"
-            elif direction == HAUT:
-                self.curseur = "corps"
-            elif direction == IN:
-                self.curseur = "in_ennemis"
-            elif direction == OUT:
-                return True
-        elif self.curseur == "in_ennemis":
-            if direction == BAS:
-                self.ennemi_courant += 1
-                if self.ennemi_courant == len(self.ennemis_vus):
-                    self.ennemi_courant = 0
-            elif direction == HAUT:
-                if self.ennemi_courant == 0:
-                    self.ennemi_courant = len(self.ennemis_vus)
-                self.ennemi_courant -= 1
-            elif direction == OUT:
-                self.curseur = "ennemis"
+    # def deplace(self,direction):
+    #     if self.curseur == "corps":
+    #         if direction == BAS:
+    #             self.curseur = "ennemis"
+    #         elif direction == HAUT:
+    #             self.curseur = "ennemis"
+    #         elif direction == IN:
+    #             self.curseur = "in_corps"
+    #         elif direction == OUT:
+    #             return True
+    #     elif self.curseur == "in_corps":
+    #         if direction == BAS:
+    #             self.allie_courant += 1
+    #             if self.allie_courant >= self.allies_vivants:
+    #                 self.allie_courant = 0
+    #         elif direction == HAUT:
+    #             if self.allie_courant == 0:
+    #                 self.allie_courant = self.allies_vivants
+    #             self.allie_courant -= 1
+    #         elif direction == OUT:
+    #             self.curseur = "corps"
+    #     elif self.curseur == "ennemis":
+    #         if direction == BAS:
+    #             self.curseur = "corps"
+    #         elif direction == HAUT:
+    #             self.curseur = "corps"
+    #         elif direction == IN:
+    #             self.curseur = "in_ennemis"
+    #         elif direction == OUT:
+    #             return True
+    #     elif self.curseur == "in_ennemis":
+    #         if direction == BAS:
+    #             self.ennemi_courant += 1
+    #             if self.ennemi_courant == len(self.ennemis_vus):
+    #                 self.ennemi_courant = 0
+    #         elif direction == HAUT:
+    #             if self.ennemi_courant == 0:
+    #                 self.ennemi_courant = len(self.ennemis_vus)
+    #             self.ennemi_courant -= 1
+    #         elif direction == OUT:
+    #             self.curseur = "ennemis"
 
-    def utilise_courant(self):
-        """Lorsque le joueur veut interagir avec les PNJs."""
-        if self.curseur == "corps" or self.curseur == "in_corps":
-            ID = sorted(self.corps)[self.allie_courant]
-            if ID == 2: #Le joueur est sélectionné. Il rappelle tous les PNJs.
-                for ID_corp in self.corps.keys():
-                    if ID_corp != 2 and ID_corp <= 10:
-                        corp = self.controleur.get_entitee(ID_corp)
-                        corp.mouvement = 2
-                        corp.cible_deplacement = 2
-                        corp.dialogue_courant = -1
-            else: #Un PNJs est sélectionné, le joueur le rappelle
-                corp = self.controleur.get_entitee(ID)
-                corp.mouvement = 2
-                corp.cible_deplacement = 2
-                corp.dialogue_courant = -1
-        elif len(self.ennemis_vus) > 0:
-            ID = self.ennemis_vus[self.ennemi_courant] #Un ennemi est sélectionné. Il faut en faire une priorité !
-            self.ennemis[ID] += 1 #/!\ On a peut-être plus subtil pour augmenter la priorité
+    # def utilise_courant(self):
+    #     """Lorsque le joueur veut interagir avec les PNJs."""
+    #     if self.curseur == "corps" or self.curseur == "in_corps":
+    #         ID = sorted(self.corps)[self.allie_courant]
+    #         if ID == 2: #Le joueur est sélectionné. Il rappelle tous les PNJs.
+    #             for ID_corp in self.corps.keys():
+    #                 if ID_corp != 2 and ID_corp <= 10:
+    #                     corp = self.controleur[ID_corp]
+    #                     corp.mouvement = 2
+    #                     corp.cible_deplacement = 2
+    #                     corp.dialogue_courant = -1
+    #         else: #Un PNJs est sélectionné, le joueur le rappelle
+    #             corp = self.controleur[ID]
+    #             corp.mouvement = 2
+    #             corp.cible_deplacement = 2
+    #             corp.dialogue_courant = -1
+    #     elif len(self.ennemis_vus) > 0:
+    #         ID = self.ennemis_vus[self.ennemi_courant] #Un ennemi est sélectionné. Il faut en faire une priorité !
+    #         self.ennemis[ID] += 1 #/!\ On a peut-être plus subtil pour augmenter la priorité
 
     def retire_corp(self,corp):
         if corp in self.corps:
-            if self.corps[corp] != "incapacite":
-                if corp <= sorted(self.corps)[self.allie_courant] and self.allie_courant != 0: #Notre corp perdu est avant le courant, ou est le courant.
-                    self.item_courant -= 1 #On décale pour rester sur le même/passer au précédent
+            # if self.corps[corp] != "incapacite":
+            #     if corp <= sorted(self.corps)[self.allie_courant] and self.allie_courant != 0: #Notre corp perdu est avant le courant, ou est le courant.
+            #         self.item_courant -= 1 #On décale pour rester sur le même/passer au précédent
             self.corps.pop(corp)
 
     def refait_vue(self):
-        vues = []
-        agissants_vus = []
+        vues:List[Vue] = []
+        agissants_vus:List[int] = []
         for corp in self.corps.keys(): #On récupère les vues
             if self.corps[corp] != "incapacite":
-                agissant = self.controleur.get_entitee(corp)
+                agissant:Agissant = self.controleur[corp]
                 vues.append(agissant.vue)
-                agissants_vus += self.trouve_agissants(agissant.vue)
+                agissants_vus += self.trouve_agissants_vue(agissant.vue)
         self.oublie_agissants(agissants_vus) #Puisqu'on les a vus, on n'a plus besoin de garder en mémoire leur position précédente
-        if self.ennemis_vus != []:
-            ennemi_courant = self.ennemis_vus[self.ennemi_courant]
-            self.ennemi_courant = 0
-            attr = False
-        else:
-            self.ennemi_courant = 0
-            attr = True
-        self.ennemis_vus = []
+        # if self.ennemis_vus != []:
+        #     ennemi_courant = self.ennemis_vus[self.ennemi_courant]
+        #     self.ennemi_courant = 0
+        #     attr = False
+        # else:
+        #     self.ennemi_courant = 0
+        #     attr = True
+        # self.ennemis_vus = []
         for ID_agissant in agissants_vus:
             if not(ID_agissant in self.ennemis.keys() or ID_agissant in self.corps.keys()):
                 for espece in self.controleur.get_especes(ID_agissant):
                     if espece in self.prejuges:
                         self.ennemis[ID_agissant] = [0.01,0]
-            if ID_agissant in self.ennemis.keys() and not(ID_agissant in self.ennemis_vus or self.controleur.est_item(ID_agissant)):
-                self.ennemis_vus.append(ID_agissant)
-                if not attr:
-                    if ID_agissant <= ennemi_courant:
-                        self.ennemi_courant = len(self.ennemis_vus)-1
+            # if ID_agissant in self.ennemis.keys() and not(ID_agissant in self.ennemis_vus or self.controleur.est_item(ID_agissant)):
+            #     self.ennemis_vus.append(ID_agissant)
+            #     if not attr:
+            #         if ID_agissant <= ennemi_courant:
+            #            self.ennemi_courant = len(self.ennemis_vus)-1
         for vue in vues :
-            niveau = vue.id #La première coordonée de la position (première information) de la première case de la première colonne
-            if niveau in self.vue.keys(): 
-                self.maj_vue(vue,niveau)
+            if vue.id in self.vue.keys(): 
+                self.maj_vue(vue)
             else:
-                self.ajoute_vue(vue,niveau)
+                self.ajoute_vue(vue)
 
     def get_offenses(self):
         self.allies_vivants=0
         for corp in self.corps.keys(): #On vérifie si quelqu'un nous a offensé
-            agissant = self.controleur.get_entitee(corp)
+            agissant:Agissant = self.controleur[corp]
             offenses,etat = agissant.get_offenses()
-            if self.corps[corp] == "incapacite" and etat != "incapacite":
-                if corp < sorted(self.corps)[self.allie_courant]: #On rajoute un corps vivant à la liste
-                    self.allie_courant += 1 #On décale pour rester sur le même
-            elif self.corps[corp] != "incapacite" and etat == "incapacite":
-                if corp <= sorted(self.corps)[self.allie_courant] and self.allie_courant != 0: #On retire un corps vivant de la liste
-                    self.allie_courant -= 1 #On décale pour rester sur le même/passer au précédent
+            # if self.corps[corp] == "incapacite" and etat != "incapacite":
+            #     if corp < sorted(self.corps)[self.allie_courant]: #On rajoute un corps vivant à la liste
+            #         self.allie_courant += 1 #On décale pour rester sur le même
+            # elif self.corps[corp] != "incapacite" and etat == "incapacite":
+            #     if corp <= sorted(self.corps)[self.allie_courant] and self.allie_courant != 0: #On retire un corps vivant de la liste
+            #         self.allie_courant -= 1 #On décale pour rester sur le même/passer au précédent
             if etat != "incapacite":
                 self.allies_vivants += 1
             self.corps[corp] = etat
@@ -276,11 +279,11 @@ class Esprit_humain(Esprit_type):
                 self.antagonise_attaquant(offense)
                 self.antagonise_supports(offense)
                 if self.peureuse():
-                    for coennemi in self.controleur.get_esprit(self.controleur.get_entitee(offense[0]).esprit).corps.keys():
+                    for coennemi in self.controleur.get_esprit(self.controleur[offense[0]].esprit).corps.keys():
                         if not coennemi in self.ennemis:
                             self.ennemis[coennemi] = [0.01,0]
 
-    def merge(self,nom): #Regroupe deux esprits, lorsque des humains forment un groupe
+    def merge(self,nom:str): #Regroupe deux esprits, lorsque des humains forment un groupe
         if self.nom != nom:
             esprit = self.controleur.get_esprit(nom)
             for corp in esprit.corps.keys():
@@ -295,11 +298,10 @@ class Esprit_humain(Esprit_type):
                 else:
                     self.ennemis[ennemi] = esprit.ennemis[ennemi]
             for vue in esprit.vue.values():
-                niveau = vue.id #La première coordonée de la position (première information) de la première case de la première colonne
-                if niveau in self.vue.keys(): 
-                    self.maj_vue(vue,niveau)
+                if vue.id in self.vue:
+                    self.maj_vue(vue)
                 else:
-                    self.ajoute_vue(vue,niveau)
+                    self.ajoute_vue(vue)
             self.controleur.esprits.pop(nom)
             self.chef = self.elit()
 
@@ -308,16 +310,17 @@ class Esprit_humain(Esprit_type):
             self.chef = 2 #Le joueur est le chef par défaut ! Ah mais non mais !
         else:
             self.chef = None
-            candidats = []
+            candidats:List[Humain] = []
             for corp in self.corps.keys():
-                if "humain" in self.controleur.get_entitee(corp).get_especes():
-                    candidats.append(self.controleur.get_entitee(corp)) #Les humains sont les seuls à pouvoir diriger un esprit d'humain. Et les seuls à voter, aussi.
+                agissant:Agissant = self.controleur[corp]
+                if "humain" in agissant.get_especes():
+                    candidats.append(agissant) #Les humains sont les seuls à pouvoir diriger un esprit d'humain. Et les seuls à voter, aussi.
             votes_max = 0
             for candidat in candidats:
                 votes = 0
-                place = candidat.get_place()
+                place = candidat.place
                 for votant in candidats:
-                    votes += votant.appreciation(place)
+                    votes += votant.appreciations(place)
                 if votes > votes_max:
                     self.chef = candidat.ID #/!\ Éviter les chefs morts, à l'occasion /!\
                     votes_max = votes
@@ -326,39 +329,14 @@ class Esprit_humain(Esprit_type):
         #Il va falloir créer un nouvel esprit pour l'humain exclus
         #Et il va falloir donner un nom à ce nouvel esprit
         #Les esprits humains sont nommés d'après leur porteur originel
-        if self.controleur.get_entitee(corp).identite != self.nom: #Tout va bien
-            self.controleur.esprits[self.controleur.get_entitee(corp).identite]=Esprit_humain(corp,self.controleur)
+        humain:Humain = self.controleur[corp]
+        if humain.identite != self.nom: #Tout va bien
+            self.controleur.esprits[humain.identite]=Esprit_humain(corp,self.controleur)
         else:
-            self.controleur.esprits[self.controleur.get_entitee(corp).identite]=Esprit_humain(corp,self.controleur)
+            self.controleur.esprits[humain.identite]=Esprit_humain(corp,self.controleur)
             self.elit() #Autant changer tous les rapports de force d'un coup
-            self.nom = self.controleur.get_entitee(self.chef).identite
-
-    def get_agissants_vus(self,humain):
-        agissants = []
-        for case in self.vue:
-            if case[2] > 0:
-                for ID in case[6]:
-                    if not(self.controleur.est_item(ID)):
-                        agissants.append(ID)
-        agissants.sort()
-        return agissants
-
-    def get_corps_vus(self):
-        corps = []
-        for corp in self.corps.keys():
-            if self.corps[corp] != "incapacite":
-                corps.append(corp)
-        return corps
-
-    def get_ennemis_vus(self):
-        return self.ennemis_vus
-
-    def get_cases_vues(self,humain):
-        cases = []
-        for case in self.vue[humain.position.lab]:
-            if case[2] > 0:
-                cases.append(case[0])
-        return cases
+            self.nom = self.controleur[self.chef].identite
+            self.controleur.esprits[self.nom] = self
 
     def oublie(self):
         for case in self.vue:
@@ -382,8 +360,8 @@ class Esprit_humain(Esprit_type):
     def decide(self):
         for corp in self.corps.keys():
             if corp == 2:
-                joueur = self.controleur.get_entitee(2)
-                joueur.recontrole()
+                joueur = self.controleur.joueur
+                # joueur.recontrole()
                 if joueur.skill_courant != None and issubclass(joueur.skill_courant,(Skill_course,Skill_deplacement)) and joueur.position.lab in self.vue.keys():
                     cible = self.vue[joueur.position][5][joueur.dir_regard][4]
                     if cible and cible.lab in self.vue.keys():
@@ -397,17 +375,17 @@ class Esprit_humain(Esprit_type):
                     Esprit.deplace(self,corp)
 
     def deplace_humain(self,ID_humain):
-        humain:Humain = self.controleur.get_entitee(ID_humain)
+        humain:Humain = self.controleur[ID_humain]
         humain.skill_courant = None
         if humain.identite == "joueur":
-            humain.recontrole()
+            # humain.recontrole() #Encore ?
             humain.statut_humain = "joueur"
         else:
             humain.statut_humain = "proximite"
             if humain.mouvement == 0: #0 pour aller vers, et 1 pour chercher
                 if isinstance(humain.cible_deplacement,int):
                     if not(self.controleur.est_item(humain.cible_deplacement)):
-                        cible = self.controleur.get_entitee(humain.cible_deplacement).get_position()
+                        cible = self.controleur[humain.cible_deplacement].get_position()
                         portee = 7
                     else:
                         cible = humain.get_position()
@@ -422,7 +400,7 @@ class Esprit_humain(Esprit_type):
             else:
                 if isinstance(humain.cible_deplacement,int):
                     if not(self.controleur.est_item(humain.cible_deplacement)):
-                        cible = self.controleur.get_entitee(humain.cible_deplacement).get_position()
+                        cible = self.controleur[humain.cible_deplacement].get_position()
                         portee = 1
                     else:
                         cible = humain.get_position()
@@ -457,7 +435,7 @@ class Esprit_humain(Esprit_type):
                             entitees = case_pot[6]
                             libre = True
                             for ID_entitee in entitees:
-                                entitee = humain.controleur.get_entitee(ID_entitee)
+                                entitee = humain.controleur[ID_entitee]
                                 if issubclass(entitee.get_classe(),Non_superposable): #On ne peut pas aller sur cette case
                                     libre = False
                                     if issubclass(entitee.get_classe(),Agissant): #Elle est occupée par un agissant
@@ -470,12 +448,11 @@ class Esprit_humain(Esprit_type):
                                             elif fuite : #Et un ordre de fuite !
                                                 res = "fuite"
                                         elif humain.mouvement == 2 and ((ID_entitee == humain.cible_deplacement and ID_entitee == 2) and humain.peut_voir(i)): #Le PNJs peut enfin parler au joueur
-                                            self.controleur.get_entitee(2).interlocuteur = humain
-                                            self.controleur.set_phase(EVENEMENT)
-                                            self.controleur.get_entitee(2).event = DIALOGUE
+                                            self.controleur.joueur.interlocuteur = humain
+                                            self.controleur.set_phase(DIALOGUE)
                                             humain.start_dialogue()
                                             humain.dir_regard = i
-                                            self.controleur.get_entitee(2).dir_regard = i+2
+                                            self.controleur.joueur.dir_regard = i+2
                             if libre:
                                 cases.append([i,case_pot[0],case_pot[3][0],case_pot[3][1],-case_pot[3][2],case_pot[3][2],-case_pot[3][3],case_pot[3][3],case_pot[3][4]])
                                 dirs.append(i)
@@ -504,7 +481,7 @@ class Esprit_humain(Esprit_type):
                                     entitees = case_pot[6]
                                     libre = True
                                     for ID_entitee in entitees:
-                                        entitee = humain.controleur.get_entitee(ID_entitee)
+                                        entitee = humain.controleur[ID_entitee]
                                         if issubclass(entitee.get_classe(),Agissant): #Cette case est occupée par un agissant
                                             if humain.peut_voir(i) and ID_entitee in self.ennemis.keys(): #Et c'est un ennemi !
                                                 if self.ennemis[ID_entitee][0] > importance:
@@ -557,8 +534,8 @@ class Esprit_humain(Esprit_type):
 
 class Esprit_slime(Esprit_type):
     """Un esprit qui dirige un ou plusieurs slimes. Peut interragir avec d'autres esprits slimes."""
-    def __init__(self,corp,controleur): #Les slimes commencent tous séparément, donc ils ont leur propre esprit au début
-        self.nom = "esprit_slime"+str(corp)
+    def __init__(self,corp:int,controleur:Controleur): #Les slimes commencent tous séparément, donc ils ont leur propre esprit au début
+        self.nom = "esprit_slime_"+str(corp)
         self.controleur = controleur
         self.oubli = 5 #Faire dépendre des skills
         self.ennemis = {}
@@ -568,11 +545,11 @@ class Esprit_slime(Esprit_type):
         self.resolution = 0
         self.vue = Vues()
         self.corps = {}
-        self.classe = controleur.get_entitee(corp).classe_principale
+        self.classe:Classe_principale = controleur[corp].classe_principale
         self.ajoute_corp(corp)
 
-    def merge(self,nom): #Regroupe deux esprits, lorsque des slimes se regroupent
-        esprit = self.controleur.get_esprit(nom)
+    def merge(self,nom:str): #Regroupe deux esprits, lorsque des slimes se regroupent
+        esprit:Esprit_slime = self.controleur.get_esprit(nom)
         for corp in esprit.corps.keys():
             self.ajoute_corp(corp)
         for ennemi in esprit.ennemis.keys():
@@ -581,51 +558,55 @@ class Esprit_slime(Esprit_type):
             else:
                 self.ennemis[ennemi] = esprit.ennemis[ennemi]
         for vue in esprit.vue.values():
-            niveau = vue.id
-            if niveau in self.vue.keys(): 
-                self.maj_vue(vue,niveau)
+            if vue.id in self.vue.keys(): 
+                self.maj_vue(vue)
             else:
-                self.ajoute_vue(vue,niveau)
+                self.ajoute_vue(vue)
         self.controleur.esprits.pop(nom)
         self.merge_classe(esprit.classe)
 
-    def merge_classe(self,classe):
+    def merge_classe(self,classe:Classe):
         #On va comparer tous les skills de chaque classe
         #Les slimes ont trois skills intrasecs : la fusion, pour unir deux groupes de slimes en un seul, la division, pour créer un nouveau slime, et l'absorption, pour ramasser un cadavre et voler ses skills
         #Ils peuvent avoir beaucoup de skills non-intrasecs, et n'utilisent souvent que les passifs
         #Ils ne peuvent pas avoir de sous-classes
 
-        for skill_intrasec in classe.skills_intrasecs:
-            autre_skill_intrasec = trouve_skill(self.classe_principale,type(skill_intrasec))
-            if autre_skill_intrasec != None:
-                if skill_intrasec.niveau > autre_skill_intrasec.niveau:
-                    self.classe_principale.skill_intrasecs.remove(autre_skill_intrasec)
-                    self.classe_principale.skill_intrasecs.append(skill_intrasec)
-                elif skill_intrasec.xp > autre_skill_intrasec.xp:
-                    self.classe_principale.skill_intrasecs.remove(autre_skill_intrasec)
-                    self.classe_principale.skill_intrasecs.append(skill_intrasec)
-            else: #Ça ne devrait pas arriver dans les intrasecs, mais sait-on jamais...
-                print("Le slime receveur n'avait de skill intrasec correspondant à celui-ci :")
-                print(skill_intrasec)
-                self.classe_principale.skill_intrasecs.append(skill_intrasec)
+        if classe.niveau > self.classe.niveau:
+            self.classe.skills_intrasecs = classe.skills_intrasecs
+            self.classe.niveau = classe.niveau
+            self.classe.xp = classe.xp
+        # for skill_intrasec in classe.skills_intrasecs:
+        #     autre_skill_intrasec:Skill_intrasec = trouve_skill(self.classe,type(skill_intrasec))
+        #     if autre_skill_intrasec != None:
+        #         if skill_intrasec.niveau > autre_skill_intrasec.niveau:
+        #             self.classe.skills_intrasecs.remove(autre_skill_intrasec)
+        #             self.classe.skills_intrasecs.append(skill_intrasec)
+        #         elif skill_intrasec.xp > autre_skill_intrasec.xp:
+        #             self.classe.skills_intrasecs.remove(autre_skill_intrasec)
+        #             self.classe.skills_intrasecs.append(skill_intrasec)
+        #     else: #Ça ne devrait pas arriver dans les intrasecs, mais sait-on jamais...
+        #         print("Le slime receveur n'avait de skill intrasec correspondant à celui-ci :")
+        #         print(skill_intrasec)
+        #         self.classe.skills_intrasecs.append(skill_intrasec)
 
         for skill in classe.skills:
-            autre_skill = trouve_skill(self.classe_principale,type(skill))
+            autre_skill:Skill = trouve_skill(self.classe,type(skill))
             if autre_skill != None:
-                if skill.niveau > autre_skill.niveau:
-                    self.classe_principale.skill_intrasecs.remove(autre_skill)
-                    self.classe_principale.skill_intrasecs.append(skill)
-                elif skill.xp > autre_skill.xp:
-                    self.classe_principale.skill_intrasecs.remove(autre_skill)
-                    self.classe_principale.skill_intrasecs.append(skill)
+                if skill.niveau > autre_skill.niveau or (skill.niveau == autre_skill.niveau and skill.xp > autre_skill.xp):
+                    self.classe.skills.remove(autre_skill)
+                    self.classe.skills.append(skill)
+                elif skill.niveau == autre_skill.niveau and skill.xp > autre_skill.xp:
+                    self.classe.skills.remove(autre_skill)
+                    self.classe.skills.append(skill)
             else:
-                self.classe_principale.skill_intrasecs.append(skill)
+                self.classe.skills.append(skill)
 
-    def ajoute_corp(self,corp):
+    def ajoute_corp(self,corp:int):
         if not corp in self.corps:
             self.corps[corp] = "incapacite"
-            self.controleur.get_entitee(corp).rejoint(self.nom)
-            self.controleur.get_entitee(corp).classe_principale = self.classe #C'est la plus grande force des slimes : progresser ensemble !
+            slime:Slime=self.controleur[corp]
+            slime.rejoint(self.nom)
+            slime.classe_principale = self.classe #C'est la plus grande force des slimes : progresser ensemble !
 
     #/!\ Faire un processus de décision propre aux slimes, qui prend en compte les capacités (communes heureusement) et la situation de chacun
 

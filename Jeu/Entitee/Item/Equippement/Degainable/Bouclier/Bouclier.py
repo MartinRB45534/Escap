@@ -2,7 +2,7 @@ from Jeu.Entitee.Item.Equippement.Degainable.Degainable import *
 
 class Bouclier(Degainable):
     """La classe des boucliers. Permettent de se protéger des attaques lorsqu'ils sont utilisés."""
-    def __init__(self,position,degats_bloques,taux_degats):
+    def __init__(self,position:Position,degats_bloques:float,taux_degats:float):
         Equipement.__init__(self,position)
         self.degats_bloques = degats_bloques
         self.taux_degats = taux_degats
@@ -10,7 +10,7 @@ class Bouclier(Degainable):
         self.poids = 5
         self.frottements = 1 #En mode frisbee ça volle très bien !
 
-    def intercepte(self,attaque):
+    def intercepte(self,attaque:Attaque):
         attaque.degats -= self.degats_bloques
         if attaque.degats < 0:
             attaque.degats = 0
@@ -22,10 +22,10 @@ class Bouclier(Degainable):
     def get_classe(self):
         return Bouclier
 
-    def get_titre(self,observation):
+    def get_titre(self,observation=0):
         return "Bouclier"
 
-    def get_description(self,observation):
+    def get_description(self,observation=0):
         return ["Un frisbee","Ah non, c'est un bouclier !"]
 
     def get_image():

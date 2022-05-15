@@ -3,7 +3,7 @@ from Jeu.Entitee.Agissant.Gobelin.Gobelin import *
 class Mage_gobelin(Attaquant_magique_case,Support,Gobelin):
     """Un gobelin avec un potentiel magique.
        Il peut utiliser une attaque magique."""
-    def __init__(self,controleur,position,niveau):
+    def __init__(self,controleur,position,niveau:int):
         Agissant.__init__(self,controleur,position,"mage_gobelin",niveau)
 
     def peut_caster(self):
@@ -39,9 +39,9 @@ class Mage_gobelin(Attaquant_magique_case,Support,Gobelin):
 # Un mage un peu spécial
 class Deuxieme_monstre(Mage_gobelin):
     """Le premier mage gobelin."""
-    def __init__(self,controleur,position,niveau):
+    def __init__(self,controleur,position,niveau:int):
         Agissant.__init__(self,controleur,position,"deuxieme_monstre",niveau)
 
     def meurt(self):
-        self.controleur.get_entitee(2).magic_kill(self.position)
+        self.controleur.joueur.magic_kill(self.position)
         Agissant.meurt(self)

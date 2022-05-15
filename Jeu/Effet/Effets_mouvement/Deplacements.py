@@ -5,11 +5,11 @@ from Jeu.Constantes import *
 
 class Teleport(On_through):
     """L'effet de téléportation, qui modifie la position de l'agissant (il peut aussi s'agir d'un déplacement normal)."""
-    def __init__(self,position,surnaturel = False):
+    def __init__(self,position: Position,surnaturel: bool = False):
         self.affiche = surnaturel
         self.position = position
 
-    def action(self,entitee):
+    def action(self,entitee: Entitee):
         # On va chercher un éventuel occupant de la case cible
         occupants = entitee.controleur.trouve_non_superposables(self.position)
         if issubclass(entitee.get_classe(),Item):
@@ -25,7 +25,7 @@ class Teleport(On_through):
                 ecrasement = trouve_skill(entitee.classe_principale,Skill_ecrasement) #On peut peut-être écraser l'occupant de l'autre case
                 if ecrasement != None:
                     for occupant in occupants:
-                        agissant = entitee.controleur.get_entitee(occupant)
+                        agissant = entitee.controleur[occupant]
                         if not ecrasement.utilise(agissant.get_priorite(),entitee.get_priorite()):
                             passe = False
                 else:
@@ -65,7 +65,7 @@ class Premier_portail(Teleport):
         Teleport.execute(self,entitee)
 
 class Escalier(Teleport):
-    def __init__(self,position,sens):
+    def __init__(self,position:Position,sens):
         self.affiche = True
         self.sens = sens
         self.position = position

@@ -1,11 +1,11 @@
-from Jeu.Constantes import *
 from Jeu.Skins.Skins import *
 from Jeu.Entitee.Entitee import *
+from Jeu.Entitee.Agissant.Agissant import Agissant
 #from Jeu.Général import *
 
 class Item(Mobile):
     """La classe des entitées inanimées. Peuvent se situer dans un inventaire. Peuvent être lancés (déconseillé pour les non-projectiles)."""
-    def __init__(self,position):
+    def __init__(self,position:Position):
         Entitee.__init__(self,position)
         self.etat = "intact" #Le niveau l'évacuera s'il n'est plus intact.
         self.priorite = 0 #Pour avoir le droit de la ramasser.
@@ -104,10 +104,10 @@ class Item(Mobile):
     def get_skin(self):
         return SKIN_VIDE
 
-    def get_titre(self,observation):
+    def get_titre(self,observation=0):
         return "Item"
 
-    def get_description(self,observation):
+    def get_description(self,observation=0):
         return ["Un item",f"Oopsie, on dirait que je n'ai pas codé la description pour {self}.","Désolé, et bonne chance."]
 
     def get_image():
@@ -115,10 +115,10 @@ class Item(Mobile):
 
 class Cadavre(Item):
 
-    def get_titre(self,observation):
+    def get_titre(self,observation=0):
         return "Cadavre"
 
-    def get_description(self,observation):
+    def get_description(self,observation=0):
         return ["Un cadavre","Où as-tu trouvé ça ?"]
 
     def get_image():
@@ -126,10 +126,10 @@ class Cadavre(Item):
 
 class Oeuf(Item):
 
-    def get_titre(self,observation):
+    def get_titre(self,observation=0):
         return "Oeuf"
 
-    def get_description(self,observation):
+    def get_description(self,observation=0):
         return ["Un oeuf","Je n'ai rien pour le cuire..."]
 
     def get_image():
@@ -137,6 +137,8 @@ class Oeuf(Item):
 
 class Consommable(Item):
     """La classe des items qui peuvent être consommés. Ajoute à l'agissant un effet. Disparait après usage."""
+    def utilise(self,porteur:Agissant):
+        pass
 
 class Ingredient(Item):
     """La classe des ingrédients d'alchimie."""
@@ -146,6 +148,5 @@ class Ingredient(Item):
     def get_image():
         return SKIN_INGREDIENT
 
-from Jeu.Entitee.Agissant.Agissant import Agissant
 from Jeu.Entitee.Item.Projectile.Projectiles import Percant,Evanescent,Fragile
 from Jeu.Effet.Effets_items import *
