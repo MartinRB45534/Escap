@@ -15,7 +15,7 @@ REPLIQUES_PAUME = {
     "dialogue1reponse1.1.1.1.2":"Tu es vraiment pathétique.",
     "dialogue1phrase1.1.1.1.1":"Merci beaucoup ! N'hésite pas à me demander si tu as besoin de quelque-chose.",
     "dialogue1reponse1.1.1.1.1.1":"Je ferais appel à toi.",
-    "dialogue1phrase1.1.1.1.1.1":"Au fait, tu peux courir avec R, mais évite de me perdre de vue s'il te plaît !",
+    "dialogue1phrase1.1.1.1.1.1":"Au fait, tu peux courir avec Maj+ZQSD, mais évite de me perdre de vue s'il te plaît !",
     "dialogue1reponse1.1.1.1.1.1.1":"Merci du conseil",
     "dialogue2phrase1":"Le gobelin est mort !",
     "dialogue2reponse1.1":"Oui ! Mais il nous a blessés...",

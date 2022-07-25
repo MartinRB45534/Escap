@@ -56,6 +56,78 @@ Troisi�me �tape : mains[0][2].boucle() et le jeu reprend imm�diatement, at
 
 À mon attention :
 
+
+TODO (pour ne pas oublier les problèmes que je découvre) :
+ - Enlever l'introduction (fait, à vérifier)
+ - Corriger le recentrage de la liste (catégories d'items)
+ - Infos d'agissant pas mises à jour
+ - Labyrinthe de sélection de la case pour "Tu vois là-bas ?" a le labyrinthe de jeu habituel en fond
+ - Validation de la sélection de la case pour "Tu vois là-bas ?" ne passe pas à la suite du dialogue
+
+
+
+
+
+Comment insérer des variables dans les dialogues (touches, noms, etc.) ? Tant que j'y suis, comment gérer plusieurs langues ?
+
+
+
+
+Concernant les PNJs, les monstres, le rôle du joueur :
+
+L'objectif final est de sortir, il y a plusieurs chemins pour ça. Combattre n'est pas la seule option.
+Options (je crois qu'elle sont détaillées autre part dans ce fichier) :
+ - chemins dérobés (portes cachées et portails inter-étages qui mènent à la sortie du tutoriel, le joueur a besoin de scruter minutieusement chaque détail, d'un skill d'observation, de voir au travers des murs, d'items cachés, il peut accéder à des parties du labyrinthe qui sont d'ordinaire innaccessibles, récupérer des items dans des étages supérieurs pour vaincre des monstres dans des étages inférieurs)
+ - fin cinématique (livre secret qui débloque la "vraie" fin (un peu trop semblable à l'option précédente, à retravailler))
+ - destruction des murs (skill d'écrasement pour contourner le boss final et accéder à la sortie)
+ - vol (skill de vol et skills associés pour dérober la clé de la dernière porte au boss final)
+ - combat (différentes façon de combattre pour tuer le boss final et récupérer la clé de la dernière porte)
+
+Deux sorties (dans le tutoriel, et à l'étage 100) en plus du livre secret.
+La sortie du tutoriel et le livre sont cachés et difficiles d'accès.
+La sortie de l'étage 100 est protégée par une porte.
+La porte peut être détruite par le skill d'écrasement au niveau max, avec l'augmentation de priorité au niveau max.
+Le boss final détient la clé le porte.
+La clé peut lui être volée avec le skill de vol au niveau max, avec l'augmentation de priorité au niveau max.
+Le boss final peut être tué pour récupérer la clé.
+Les PNJs au niveau max sans le joueur ne peuvent en aucun cas vaincre le boss final (et l'atteindraient de toute façon difficilement tous en vie).
+Comment s'assurer que chaque option est exclusive (i.e. le joueur ne peut pas partir sur un build écrasement et tuer le boss final) ? À voir.
+
+Pour l'option combat :
+Le joueur peut difficilement se passer des PNJs. Les PNJs peuvent à peu près se passer du joueur (en tout cas dans les étages inférieurs, la méchanique s'inverse ensuite).
+Les PNJs consistuent un groupe où chaque rôle est utile.
+Ces rôles sont :
+ - DPS (tue les ennemis en leur infligeant des dégats), CàC et distance
+ - tank (protège ses alliés en bloquant/recevant les attaques)
+ - soutien (aide ses alliés de diverses façons)
+ - soigneur (empêche ses alliés de mourir)
+Il faut que chaque rôle soit important, c'est à dire qu'à nombre de membres égal, un groupe auquel il manque un rôle soit plus faible.
+Mais il ne faut pas que la mort d'un seul PNJ dans les étages inférieurs guarantisse la défaite. Il y a déjà une certaine redondance dans le groupe :
+ - 4 DPS avec le réceptionniste, l'encombrant, l'alchimiste (moins DPS que les autres mais quand même), la bombe atomique, mais le paumé et le marchand peuvent infliger quelques dégats aussi
+ - 1 tank avec le paumé, mais le réceptionniste, l'encombrant et le marchand peuvent tanker un peu aussi
+ - 1 soutien avec la peureuse, mais l'alchimiste et la peste peuvent au besoin soutenir un peu aussi, une fois qu'ils ont gagné quelques niveaux
+ - 1 soigneur avec la peste, mais la peureuse et l'alchimiste peuvent au besoin soigner un peu aussi, une fois qu'ils ont gagné quelques niveaux
+ - le marchand est particulièrement versatile avec son équipement changeant et peut s'adapter à la situation
+ - le joueur, selon le build qu'il choisit, peut facilement tenir deux rôles à la fois (soutien + soin avec l'ange, soutien + DPS avec l'épéiste enchanteur, DPS + tank avec l'épéiste classique) ou un rôle avec une grande efficacité (pur DPS avec le lancier, l'archer ou la mage offensif).
+
+Le joueur peut aussi se débrouiller seul (build nécromancien par exemple) mais c'est bien plus difficile dans les étages inférieurs.
+
+Comment s'assurer que chaque rôle est nécessaire :
+ - DPS : diminuer les dégats des autres rôles (déjà fait)
+ - tank : bonne défense + bonne concentration des attaques ennemies (comment exactement ?)
+ - soutien et soigneur : aide efficace là ou c'est nécessaire (plus ou moins déjà fait)
+
+Pour le tank, idées de skills :
+ - provocation (augmentation de l'importance aux yeux des ennemis) pour s'attirer les attaques
+ - protection de zone (avec un bouclier ? ou laisser le bouclier uniquement pour le build correspondant du joueur ? peut-être un peu difficile de faire controler le bouclier intelligement par une IA de toute façon)
+ - transmission de dégats (peut-être plus une magie qu'un skill, les dégats sont infligés au tank plutôt qu'aux autres, ce qui est avantageux si le tank a une plus grande affinité élémentaire)
+ - transmission d'attaque (là aussi, peut-être plus une magie qu'un skill, les attaques sur les agissants protégés sont déplacées sur le tank, qui a une meilleure défense du fait de ses skills/équippements)
+ - peut-être aussi un peu de CC (déplacement forcé, stun, immobilisation)
+
+
+
+
+
 Jeter un oeil aux phases du controleur, il y a peut-être des trucs à retravailler
 
 Phases :
@@ -273,6 +345,8 @@ Cristal transparent -> Potion d'invisibilité
 
 
 
+
+
 À propos des déplacements
 Différents objectifs :
 - Attaquer
@@ -314,6 +388,25 @@ Parfois, un agissant est bloqué par un autre, pourrait le contourner pour se ra
 Comment faire ?
 
 Et pour qu'un agissant sorte du passage si quelqu'un veut aller là où il est (le joueur par exemple)
+
+
+
+Déplacements actuels :
+
+Tout en tour par tour, i.e. à chaque tour chaque agissant détermine selon sa santé et ses ennemis ce qu'il veut faire.
+C'est simple et rapide, mais pas forcément efficace sur le long terme.
+Par exemple, la fuite est décidée en fonction de la dangerosité de la case, et les gobelins dans le couloir de la prison par exemple restent bloqué à distance du joueur.
+Deux PNJs qui vont dans un sens contraire peuvent aussi se bloquer.
+
+La "compréhension de l'espace" des IAs laisse à désirer.
+
+Idées :
+
+Décisions à long terme. Par exemple, un tank qui passe sous 20% de PVs se met en fuite, et y reste jusqu'à revenir au-dessus de 50%.
+
+Espace simplifié sous forme de graphe. Un point du graphe est un couloir (sans intersection) ou une salle (ensemble de cases à définir) et ces points sont connectés par leurs intersections.
+Les couloirs sont des espaces où l'on ne peut pas se croiser, les salles sont des espaces où l'on peut se croiser. En connaissant aussi la distance entre les différents accès de chaque salle/couloir, on peut plannifier assez simplement les trajets.
+
 
 
 

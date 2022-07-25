@@ -839,13 +839,13 @@ class True_joueur:
                     self.controleur = Controleur(self.parametres,self.screen)
                     self.controleurs.append(self.controleur)
                     self.controleur.jeu()
-                    self.start()
+                    self.boucle()
                 elif res == "tuto":
                     ID_MAX.set_id_max(10)
                     self.controleur = Controleur(self.parametres,self.screen)
                     self.controleurs.append(self.controleur)
                     self.controleur.tuto()
-                    self.start()
+                    self.boucle()
             elif res == "ctrlv":
                 if GLOBALS["controleur"] != None:
                     self.controleurs.append(copy.deepcopy(GLOBALS["controleur"]))

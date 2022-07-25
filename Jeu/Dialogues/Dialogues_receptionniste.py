@@ -1,8 +1,8 @@
 # global REPLIQUES_RECEPTIONNISTE
 REPLIQUES_RECEPTIONNISTE ={
     "dialogue1phrase1":"Quelle chute ! Tu vas bien ? Tu peux m'entendre ?",
-    "dialogue1reponse1.1":"Oui...",
-    "dialogue1phrase1.1":"Tu peux te lever ? Utilise les flèches directionnelles pour te diriger, et W pour marcher. Appuie sur Espace à côté de moi pour revenir me parler.",
+    "dialogue1reponse1.1":"Oui... (Clique pour répondre.)",
+    "dialogue1phrase1.1":"Tu peux te lever ? Utilise ZQSD pour marcher. Appuie sur E à côté de moi pour revenir me parler.",
     "dialogue1reponse1.1.1":"Merci pour ton aide.",
     "dialogue2phrase1":"Alors, ça va mieux ?",
     "dialogue2reponse1.1":"Oui, un peu. Où est-on ?",
