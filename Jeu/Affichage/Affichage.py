@@ -38,6 +38,9 @@ class Affichable:
 
     def update(self):
         pass
+
+    def remove_unpickables(self):
+        pass
 class Affichage(Affichable):
     """Un élément de l'affichage. Peut contenir des sous-éléments."""
     def __init__(self):
@@ -82,6 +85,10 @@ class Affichage(Affichable):
     def update(self):
         for objet in self.objets:
             objet.update()
+
+    def remove_unpickables(self):
+        for objet in self.objets:
+            objet.remove_unpickables()
 
 class Taille_variable(Affichable):
     """Les éléments dont la taille réelle dépend de la taille qu'on leur attribut, de façon compliquée."""
@@ -220,11 +227,17 @@ class Conteneur(Affichable):
         for objet in self.objets:
             objet.update()
 
+    def remove_unpickables(self):
+        for contenu in self.contenu:
+            contenu.remove_unpickables()
+        for objet in self.objets:
+            objet.remove_unpickables()
+
 class Wrapper(Conteneur):
     """Un conteneur avec un unique élément"""
     def __init__(self):
         self.objets = [] #Il peut quand même avoir des objets 'normaux'
-        self.contenu:Affichable = None #Les objets qu'il 'contient'
+        self.contenu:Affichable = None #L'objet qu'il 'contient'
         self.courant = False
         self.fond = (0,0,0,0)
         self.tailles = [0,0] #La largeur et la hauteur (ou l'inverse ?)
@@ -318,6 +331,11 @@ class Wrapper(Conteneur):
         self.contenu.update()
         for objet in self.objets:
             objet.update()
+
+    def remove_unpickables(self):
+        self.contenu.remove_unpickables()
+        for objet in self.objets:
+            objet.remove_unpickables()
 
 class Pavage(Conteneur):
     """Contient des objets, qui s'adaptent au pavage"""
@@ -465,10 +483,11 @@ class Liste(Conteneur):
         res = False
         if self.touche(position):
             pos_rel = [position[0]-self.position[0],position[1]-self.position[1]]
-            for contenu in self.contenu:
-                res_contenu = contenu.clique(pos_rel)
+            for i in range(len(self.contenu)):
+                res_contenu = self.contenu[i].clique(pos_rel)
                 if res_contenu:
                     res = res_contenu
+                    self.courant = i
                     self.ajuste(res)
         for objet in self.objets:
             res_objet = objet.clique(position)
@@ -492,7 +511,7 @@ class Liste_verticale(Liste):
     def set_tailles(self,tailles):
         self.tailles = tailles
         #occupe = sum(self.repartition[i] if self.repartition[i] else self.contenu[i].get_tailles(tailles)[1] for i in range(len(self.repartition)))
-        somme = 0
+        somme = self.decalage
         for i in range(len(self.repartition)):
             contenu = self.contenu[i]
             contenu.set_position([0,somme])
@@ -536,11 +555,36 @@ class Liste_verticale(Liste):
                 contenu.decale([0,decalage])
             self.decalage += decalage
 
+    def pop(self,i):
+        contenu = self.contenu.pop(i)
+        rep = self.repartition.pop(i)
+        if i < self.courant:
+            self.courant -= 1
+            self.decalage += rep if rep else contenu.tailles[1]
+        self.set_tailles(self.tailles)
+
+    def insert(self,i,contenu:Affichable,rep:int):
+        self.contenu.insert(i,contenu)
+        self.repartition.insert(i,rep)
+        if i < self.courant:
+            self.courant += 1
+            self.decalage -= rep if rep else contenu.get_tailles(self.tailles)[1]
+        self.set_tailles(self.tailles)
+
+    def replace(self,i,contenu:Affichable,rep:int):
+        ancien_contenu = self.contenu[i]
+        ancienne_rep = self.repartition[i]
+        self.contenu[i] = contenu
+        self.repartition[i] = rep
+        if i < self.courant:
+            self.decalage += ancienne_rep if ancienne_rep else ancien_contenu.get_tailles(self.tailles)[1] - rep if rep else contenu.get_tailles(self.tailles)[1]
+        self.set_tailles(self.tailles)
+
 class Liste_horizontale(Liste):
     def set_tailles(self,tailles):
         self.tailles = tailles
         #occupe = sum(self.repartition[i] if self.repartition[i] else self.contenu[i].get_tailles(tailles)[0] for i in range(len(self.repartition)))
-        somme = 0
+        somme = self.decalage
         for i in range(len(self.repartition)):
             contenu = self.contenu[i]
             contenu.set_position([somme,0])
@@ -582,6 +626,31 @@ class Liste_horizontale(Liste):
             for contenu in self.contenu:
                 contenu.decale([decalage,0])
             self.decalage += decalage
+
+    def pop(self,i):
+        contenu = self.contenu.pop(i)
+        rep = self.repartition.pop(i)
+        if i < self.courant:
+            self.courant -= 1
+            self.decalage += rep if rep else contenu.tailles[0]
+        self.set_tailles(self.tailles)
+
+    def insert(self,i,contenu:Affichable,rep:int):
+        self.contenu.insert(i,contenu)
+        self.repartition.insert(i,rep)
+        if i < self.courant:
+            self.courant += 1
+            self.decalage -= rep if rep else contenu.get_tailles(self.tailles)[0]
+        self.set_tailles(self.tailles)
+
+    def replace(self,i,contenu:Affichable,rep:int):
+        ancien_contenu = self.contenu[i]
+        ancienne_rep = self.repartition[i]
+        self.contenu[i] = contenu
+        self.repartition[i] = rep
+        if i < self.courant:
+            self.decalage += ancienne_rep if ancienne_rep else ancien_contenu.get_tailles(self.tailles)[0] - rep if rep else contenu.get_tailles(self.tailles)[0]
+        self.set_tailles(self.tailles)
 
 class Liste_menu(Wrapper):
     """Une liste sur plusieurs lignes"""
@@ -692,6 +761,11 @@ class Liste_menu(Wrapper):
         self.liste.update()
         for objet in self.objets:
             objet.update()
+
+    def remove_unpickables(self):
+        self.liste.remove_unpickables()
+        for objet in self.objets:
+            objet.remove_unpickables()
 
 class Survolable(Affichable):
     """Un élément qui réagit au survol"""

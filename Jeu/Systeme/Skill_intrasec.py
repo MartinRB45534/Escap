@@ -39,6 +39,9 @@ class Skill_intrasec:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
 
+    def get_skin(self):
+        return SKIN_MYSTERE
+
 class Skills_offensifs(Skill_intrasec):
     """La classe des skills qui produisent une attaque."""
 

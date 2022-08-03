@@ -10,13 +10,19 @@ class Affichage_principal(Wrapper):
     
     def __init__(self,controleur:Controleur,tailles):
         self.controleur = controleur
-        self.objets = []
+        self.objets:List[Affichable] = []
         self.contenu:Affichable = None
         self.courant = True
         self.fond = (0,0,0)
         self.tailles = tailles
         self.position = [0,0]
         self.phase = controleur.phase
+        
+        self.gauche = Affichage_gauche(self.controleur.joueur)
+        self.centre = Affichage_centre(self.controleur.joueur)
+        self.droite = Affichage_droite(self.controleur)
+        # Le reste peut être régénéré à chaque fois ?
+
         self.inits[self.phase](self)
 
     def init_tour(self):
@@ -24,7 +30,7 @@ class Affichage_principal(Wrapper):
         contenu = Pavage_horizontal()
         diptique = Pavage_vertical()
         triptique = Pavage_horizontal()
-        triptique.set_contenu([Affichage_gauche(self.controleur.joueur),Marge_verticale(),Affichage_centre(self.controleur.joueur),Marge_verticale(),Affichage_droite(self.controleur)],[-1,5,-2,5,-1])
+        triptique.set_contenu([self.gauche,Marge_verticale(),self.centre,Marge_verticale(),self.droite],[-1,5,-2,5,-1])
         diptique.set_contenu([Marge_horizontale(),Titre(self.controleur),Marge_horizontale(),triptique,Marge_horizontale()],[5,0,5,-1,5])
         contenu.set_contenu([Marge_verticale(),diptique,Marge_verticale()],[5,-1,5])
         contenu.set_tailles(self.tailles)
@@ -36,7 +42,7 @@ class Affichage_principal(Wrapper):
         contenu = Pavage_horizontal()
         diptique = Pavage_vertical()
         triptique = Pavage_horizontal()
-        triptique.set_contenu([Affichage_gauche(self.controleur.joueur),Marge_verticale(),Affichage_centre(self.controleur.joueur),Marge_verticale(),Affichage_droite_dialogue(self.controleur.joueur.interlocuteur)],[-1,5,-2,5,-1])
+        triptique.set_contenu([self.gauche,Marge_verticale(),self.centre,Marge_verticale(),Affichage_droite_dialogue(self.controleur.joueur.interlocuteur)],[-1,5,-2,5,-1])
         diptique.set_contenu([Marge_horizontale(),Titre(self.controleur),Marge_horizontale(),triptique,Marge_horizontale()],[5,0,5,-1,5])
         contenu.set_contenu([Marge_verticale(),diptique,Marge_verticale()],[5,-1,5])
         contenu.set_tailles(self.tailles)
@@ -47,7 +53,7 @@ class Affichage_principal(Wrapper):
         contenu = Pavage_horizontal()
         diptique = Pavage_vertical()
         triptique = Pavage_horizontal()
-        triptique.set_contenu([Affichage_gauche(self.controleur.joueur),Marge_verticale(),Affichage_centre_case_dialogue(self.controleur.joueur),Marge_verticale(),Affichage_droite_dialogue(self.controleur.joueur.interlocuteur)],[-1,5,-2,5,-1])
+        triptique.set_contenu([self.gauche,Marge_verticale(),Affichage_centre_case_dialogue(self.controleur.joueur),Marge_verticale(),Affichage_droite_dialogue(self.controleur.joueur.interlocuteur)],[-1,5,-2,5,-1])
         diptique.set_contenu([Marge_horizontale(),Titre(self.controleur),Marge_horizontale(),triptique,Marge_horizontale()],[5,0,5,-1,5])
         contenu.set_contenu([Marge_verticale(),diptique,Marge_verticale()],[5,-1,5])
         contenu.set_tailles(self.tailles)
@@ -58,7 +64,7 @@ class Affichage_principal(Wrapper):
         contenu = Pavage_horizontal()
         diptique = Pavage_vertical()
         triptique = Pavage_horizontal()
-        triptique.set_contenu([Affichage_gauche(self.controleur.joueur),Marge_verticale(),Affichage_centre_case_magie(self.controleur.joueur),Marge_verticale(),Affichage_droite(self.controleur.joueur.interlocuteur)],[-1,5,-2,5,-1])
+        triptique.set_contenu([self.gauche,Marge_verticale(),Affichage_centre_case_magie(self.controleur.joueur),Marge_verticale(),Affichage_droite(self.controleur.joueur.interlocuteur)],[-1,5,-2,5,-1])
         diptique.set_contenu([Marge_horizontale(),Titre(self.controleur),Marge_horizontale(),triptique,Marge_horizontale()],[5,0,5,-1,5])
         contenu.set_contenu([Marge_verticale(),diptique,Marge_verticale()],[5,-1,5])
         contenu.set_tailles(self.tailles)
@@ -69,7 +75,7 @@ class Affichage_principal(Wrapper):
         contenu = Pavage_horizontal()
         diptique = Pavage_vertical()
         triptique = Pavage_horizontal()
-        triptique.set_contenu([Affichage_gauche(self.controleur.joueur),Marge_verticale(),Affichage_centre_case_parchemin(self.controleur.joueur),Marge_verticale(),Affichage_droite(self.controleur.joueur.interlocuteur)],[-1,5,-2,5,-1])
+        triptique.set_contenu([self.gauche,Marge_verticale(),Affichage_centre_case_parchemin(self.controleur.joueur),Marge_verticale(),Affichage_droite(self.controleur.joueur.interlocuteur)],[-1,5,-2,5,-1])
         diptique.set_contenu([Marge_horizontale(),Titre(self.controleur),Marge_horizontale(),triptique,Marge_horizontale()],[5,0,5,-1,5])
         contenu.set_contenu([Marge_verticale(),diptique,Marge_verticale()],[5,-1,5])
         contenu.set_tailles(self.tailles)
@@ -80,7 +86,7 @@ class Affichage_principal(Wrapper):
         contenu = Pavage_horizontal()
         diptique = Pavage_vertical()
         triptique = Pavage_horizontal()
-        triptique.set_contenu([Affichage_droite_dialogue(self.controleur.joueur.interlocuteur),Marge_verticale(),Affichage_centre(self.controleur.joueur),Marge_verticale(),Affichage_droite_agissant_dialogue(self.controleur)],[-1,5,-2,5,-1])
+        triptique.set_contenu([Affichage_droite_dialogue(self.controleur.joueur.interlocuteur),Marge_verticale(),self.centre,Marge_verticale(),Affichage_droite_agissant_dialogue(self.controleur)],[-1,5,-2,5,-1])
         diptique.set_contenu([Marge_horizontale(),Titre(self.controleur),Marge_horizontale(),triptique,Marge_horizontale()],[5,0,5,-1,5])
         contenu.set_contenu([Marge_verticale(),diptique,Marge_verticale()],[5,-1,5])
         contenu.set_tailles(self.tailles)
@@ -91,7 +97,7 @@ class Affichage_principal(Wrapper):
         contenu = Pavage_horizontal()
         diptique = Pavage_vertical()
         triptique = Pavage_horizontal()
-        triptique.set_contenu([Affichage_gauche(self.controleur.joueur),Marge_verticale(),Affichage_centre(self.controleur.joueur),Marge_verticale(),Affichage_droite_agissant_magie(self.controleur)],[-1,5,-2,5,-1])
+        triptique.set_contenu([self.gauche,Marge_verticale(),self.centre,Marge_verticale(),Affichage_droite_agissant_magie(self.controleur)],[-1,5,-2,5,-1])
         diptique.set_contenu([Marge_horizontale(),Titre(self.controleur),Marge_horizontale(),triptique,Marge_horizontale()],[5,0,5,-1,5])
         contenu.set_contenu([Marge_verticale(),diptique,Marge_verticale()],[5,-1,5])
         contenu.set_tailles(self.tailles)
@@ -102,7 +108,7 @@ class Affichage_principal(Wrapper):
         contenu = Pavage_horizontal()
         diptique = Pavage_vertical()
         triptique = Pavage_horizontal()
-        triptique.set_contenu([Affichage_gauche(self.controleur.joueur),Marge_verticale(),Affichage_centre(self.controleur.joueur),Marge_verticale(),Affichage_droite_agissant_parchemin(self.controleur)],[-1,5,-2,5,-1])
+        triptique.set_contenu([self.gauche,Marge_verticale(),self.centre,Marge_verticale(),Affichage_droite_agissant_parchemin(self.controleur)],[-1,5,-2,5,-1])
         diptique.set_contenu([Marge_horizontale(),Titre(self.controleur),Marge_horizontale(),triptique,Marge_horizontale()],[5,0,5,-1,5])
         contenu.set_contenu([Marge_verticale(),diptique,Marge_verticale()],[5,-1,5])
         contenu.set_tailles(self.tailles)
@@ -113,7 +119,7 @@ class Affichage_principal(Wrapper):
         contenu = Pavage_horizontal()
         diptique = Pavage_vertical()
         triptique = Pavage_horizontal()
-        triptique.set_contenu([Affichage_gauche(self.controleur.joueur),Marge_verticale(),Affichage_centre_direction_magie(self.controleur.joueur),Marge_verticale(),Affichage_droite(self.controleur)],[-1,5,-2,5,-1])
+        triptique.set_contenu([self.gauche,Marge_verticale(),Affichage_centre_direction_magie(self.controleur.joueur),Marge_verticale(),self.droite],[-1,5,-2,5,-1])
         diptique.set_contenu([Marge_horizontale(),Titre(self.controleur),Marge_horizontale(),triptique,Marge_horizontale()],[5,0,5,-1,5])
         contenu.set_contenu([Marge_verticale(),diptique,Marge_verticale()],[5,-1,5])
         contenu.set_tailles(self.tailles)
@@ -124,7 +130,7 @@ class Affichage_principal(Wrapper):
         contenu = Pavage_horizontal()
         diptique = Pavage_vertical()
         triptique = Pavage_horizontal()
-        triptique.set_contenu([Affichage_gauche(self.controleur.joueur),Marge_verticale(),Affichage_centre_direction_parchemin(self.controleur.joueur),Marge_verticale(),Affichage_droite(self.controleur)],[-1,5,-2,5,-1])
+        triptique.set_contenu([self.gauche,Marge_verticale(),Affichage_centre_direction_parchemin(self.controleur.joueur),Marge_verticale(),self.droite],[-1,5,-2,5,-1])
         diptique.set_contenu([Marge_horizontale(),Titre(self.controleur),Marge_horizontale(),triptique,Marge_horizontale()],[5,0,5,-1,5])
         contenu.set_contenu([Marge_verticale(),diptique,Marge_verticale()],[5,-1,5])
         contenu.set_tailles(self.tailles)
@@ -135,7 +141,7 @@ class Affichage_principal(Wrapper):
         contenu = Pavage_horizontal()
         diptique = Pavage_vertical()
         triptique = Pavage_horizontal()
-        triptique.set_contenu([Affichage_gauche_cout_magie(self.controleur.joueur),Marge_verticale(),Affichage_centre(self.controleur.joueur),Marge_verticale(),Affichage_droite(self.controleur)],[-1,5,-2,5,-1])
+        triptique.set_contenu([Affichage_gauche_cout_magie(self.controleur.joueur),Marge_verticale(),self.centre,Marge_verticale(),self.droite],[-1,5,-2,5,-1])
         diptique.set_contenu([Marge_horizontale(),Titre(self.controleur),Marge_horizontale(),triptique,Marge_horizontale()],[5,0,5,-1,5])
         contenu.set_contenu([Marge_verticale(),diptique,Marge_verticale()],[5,-1,5])
         contenu.set_tailles(self.tailles)
@@ -146,7 +152,7 @@ class Affichage_principal(Wrapper):
         contenu = Pavage_horizontal()
         diptique = Pavage_vertical()
         triptique = Pavage_horizontal()
-        triptique.set_contenu([Affichage_gauche_cout_parchemin(self.controleur.joueur),Marge_verticale(),Affichage_centre(self.controleur.joueur),Marge_verticale(),Affichage_droite(self.controleur)],[-1,5,-2,5,-1])
+        triptique.set_contenu([Affichage_gauche_cout_parchemin(self.controleur.joueur),Marge_verticale(),self.centre,Marge_verticale(),self.droite],[-1,5,-2,5,-1])
         diptique.set_contenu([Marge_horizontale(),Titre(self.controleur),Marge_horizontale(),triptique,Marge_horizontale()],[5,0,5,-1,5])
         contenu.set_contenu([Marge_verticale(),diptique,Marge_verticale()],[5,-1,5])
         contenu.set_tailles(self.tailles)
@@ -352,11 +358,16 @@ class Affichage_principal(Wrapper):
 class Affichage_gauche(Wrapper):
     def __init__(self,joueur:Agissant):
         self.joueur = joueur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.fond = (255,255,255)
         self.tailles = [0,0]
         self.position = [0,0]
+
+        self.stats = Affichage_stats(self.joueur)
+        self.inventaire = Affichage_inventaire(self.joueur)
+        self.classe = Affichage_sous_classe(self.joueur.classe_principale)
+
         self.init_gauche()
 
     def init_gauche(self):
@@ -369,7 +380,7 @@ class Affichage_gauche(Wrapper):
         self.fond = (255,255,255)
 
     def init_stats(self):
-        self.courant = Affichage_stats(self.joueur)
+        self.courant = self.stats
         contenu = Pavage_horizontal()
         triptique = Pavage_vertical()
         triptique.set_contenu([Marge_horizontale(),self.courant,Marge_horizontale(),Affichage_inventaire_ferme(self.joueur),Marge_horizontale(),Affichage_classe_ferme(self.joueur.classe_principale),Marge_horizontale()],[5,-1,5,0,5,0,5]) # /!\ Remplacer par Affichage_classe_principale_ferme
@@ -378,7 +389,7 @@ class Affichage_gauche(Wrapper):
         self.fond = (255,255,255)
 
     def init_inventaire(self):
-        self.courant = Affichage_inventaire(self.joueur)
+        self.courant = self.inventaire
         contenu = Pavage_horizontal()
         triptique = Pavage_vertical()
         triptique.set_contenu([Marge_horizontale(),Affichage_stats_ferme(self.joueur),Marge_horizontale(),self.courant,Marge_horizontale(),Affichage_classe_ferme(self.joueur.classe_principale),Marge_horizontale()],[5,0,5,-1,5,0,5]) # /!\ Remplacer par Affichage_classe_principale_ferme
@@ -387,7 +398,7 @@ class Affichage_gauche(Wrapper):
         self.fond = (255,255,255)
 
     def init_classe(self):
-        self.courant = Affichage_classe(self.joueur.classe_principale)
+        self.courant = self.classe
         contenu = Pavage_horizontal()
         triptique = Pavage_vertical()
         triptique.set_contenu([Marge_horizontale(),Affichage_stats_ferme(self.joueur),Marge_horizontale(),Affichage_inventaire_ferme(self.joueur),Marge_horizontale(),self.courant,Marge_horizontale()],[5,0,5,0,5,-1,5]) # /!\ Remplacer par Affichage_classe_principale
@@ -419,18 +430,21 @@ class Affichage_gauche(Wrapper):
 class Affichage_centre(Wrapper):
     def __init__(self,joueur:Agissant):
         self.joueur = joueur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (0,0,0)
         self.tailles = [0,0]
         self.position = [0,0]
+
+        self.labyrinthe = Affichage_labyrinthe(self.joueur)
+
         self.init_centre()
 
     def init_centre(self):
         contenu = Pavage_horizontal()
         monoptique = Pavage_vertical()
-        monoptique.set_contenu([Marge_horizontale(),Affichage_labyrinthe(self.joueur),Marge_horizontale()],[5,-1,5])
+        monoptique.set_contenu([Marge_horizontale(),self.labyrinthe,Marge_horizontale()],[5,-1,5])
         contenu.set_contenu([Marge_verticale(),monoptique,Marge_verticale()],[5,-1,5])
         self.contenu = contenu
         self.fond = (0,0,0)
@@ -438,18 +452,22 @@ class Affichage_centre(Wrapper):
 class Affichage_droite(Wrapper):
     def __init__(self,controleur:Controleur):
         self.controleur = controleur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (255,255,255)
         self.tailles = [0,0]
         self.position = [0,0]
+
+        self.allies = Affichage_allies(self.controleur)
+        self.ennemis = Affichage_ennemis(self.controleur)
+        self.neutres = Affichage_neutres(self.controleur)
         self.init_droite()
 
     def init_droite(self):
         contenu = Pavage_vertical()
         triptique = Pavage_horizontal()
-        triptique.set_contenu([Marge_verticale(),Affichage_allies(self.controleur),Marge_verticale(),Affichage_ennemis(self.controleur),Marge_verticale(),Affichage_neutres(self.controleur),Marge_verticale()],[5,-1,5,-1,5,-1,5])
+        triptique.set_contenu([Marge_verticale(),self.allies,Marge_verticale(),self.ennemis,Marge_verticale(),self.neutres,Marge_verticale()],[5,-1,5,-1,5,-1,5])
         contenu.set_contenu([Marge_horizontale(),triptique,Marge_horizontale()],[5,-1,5])
         self.contenu = contenu
         self.fond = (255,255,255)
@@ -459,7 +477,7 @@ class Affichage_droite(Wrapper):
         contenu = Pavage_vertical()
         triptique = Pavage_horizontal()
         monoptique = Pavage_horizontal()
-        triptique.set_contenu([Marge_verticale(),self.courant,Marge_verticale(),Affichage_ennemis(self.controleur),Marge_verticale(),Affichage_neutres(self.controleur),Marge_verticale()],[5,-1,5,-1,5,-1,5])
+        triptique.set_contenu([Marge_verticale(),self.allies,Marge_verticale(),self.ennemis,Marge_verticale(),self.neutres,Marge_verticale()],[5,-1,5,-1,5,-1,5])
         monoptique.set_contenu([Marge_verticale(),Paves(allie.get_texte_descriptif()),Marge_verticale()],[5,-1,5])
         contenu.set_contenu([Marge_horizontale(),triptique,Marge_horizontale(),monoptique,Marge_horizontale()],[5,-1,5,0,5])
         self.contenu = contenu
@@ -470,7 +488,7 @@ class Affichage_droite(Wrapper):
         contenu = Pavage_vertical()
         triptique = Pavage_horizontal()
         monoptique = Pavage_horizontal()
-        triptique.set_contenu([Marge_verticale(),Affichage_allies(self.controleur),Marge_verticale(),self.courant,Marge_verticale(),Affichage_neutres(self.controleur),Marge_verticale()],[5,-1,5,-1,5,-1,5])
+        triptique.set_contenu([Marge_verticale(),self.allies,Marge_verticale(),self.ennemis,Marge_verticale(),self.neutres,Marge_verticale()],[5,-1,5,-1,5,-1,5])
         monoptique.set_contenu([Marge_verticale(),Paves(ennemi.get_texte_descriptif()),Marge_verticale()],[5,-1,5])
         contenu.set_contenu([Marge_horizontale(),triptique,Marge_horizontale(),monoptique,Marge_horizontale()],[5,-1,5,0,5])
         self.contenu = contenu
@@ -481,7 +499,7 @@ class Affichage_droite(Wrapper):
         contenu = Pavage_vertical()
         triptique = Pavage_horizontal()
         monoptique = Pavage_horizontal()
-        triptique.set_contenu([Marge_verticale(),Affichage_allies(self.controleur),Marge_verticale(),Affichage_ennemis(self.controleur),Marge_verticale(),self.courant,Marge_verticale()],[5,-1,5,-1,5,-1,5])
+        triptique.set_contenu([Marge_verticale(),self.allies,Marge_verticale(),self.ennemis,Marge_verticale(),self.neutres,Marge_verticale()],[5,-1,5,-1,5,-1,5])
         monoptique.set_contenu([Marge_verticale(),Paves(neutre.get_texte_descriptif()),Marge_verticale()],[5,-1,5])
         contenu.set_contenu([Marge_horizontale(),triptique,Marge_horizontale(),monoptique,Marge_horizontale()],[5,-1,5,0,5])
         self.contenu = contenu
@@ -515,8 +533,8 @@ class Affichage_droite(Wrapper):
 class Affichage_gauche_cout_magie(Wrapper):
     def __init__(self,joueur:Agissant):
         self.joueur = joueur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.fond = (255,255,255)
         self.tailles = [0,0]
         self.position = [0,0]
@@ -534,8 +552,8 @@ class Affichage_gauche_cout_magie(Wrapper):
 class Affichage_gauche_cout_parchemin(Wrapper):
     def __init__(self,joueur:Agissant):
         self.joueur = joueur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.fond = (255,255,255)
         self.tailles = [0,0]
         self.position = [0,0]
@@ -553,8 +571,8 @@ class Affichage_gauche_cout_parchemin(Wrapper):
 class Affichage_gauche_inventaire(Wrapper):
     def __init__(self,joueur:Agissant):
         self.joueur = joueur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.fond = (255,255,255)
         self.tailles = [0,0]
         self.position = [0,0]
@@ -585,8 +603,8 @@ class Affichage_gauche_inventaire(Wrapper):
 class Affichage_centre_case_dialogue(Wrapper):
     def __init__(self,joueur:Agissant):
         self.joueur = joueur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.cible = None
         self.fond = (0,0,0)
@@ -628,8 +646,8 @@ class Affichage_centre_case_dialogue(Wrapper):
 class Affichage_centre_case_magie(Wrapper):
     def __init__(self,joueur:Agissant):
         self.joueur = joueur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (0,0,0)
         self.tailles = [0,0]
@@ -669,8 +687,8 @@ class Affichage_centre_case_magie(Wrapper):
 class Affichage_centre_case_parchemin(Wrapper):
     def __init__(self,joueur:Agissant):
         self.joueur = joueur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (0,0,0)
         self.tailles = [0,0]
@@ -710,8 +728,8 @@ class Affichage_centre_case_parchemin(Wrapper):
 class Affichage_centre_direction_magie(Wrapper):
     def __init__(self,joueur:Agissant):
         self.joueur = joueur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (0,0,0)
         self.tailles = [0,0]
@@ -750,8 +768,8 @@ class Affichage_centre_direction_magie(Wrapper):
 class Affichage_centre_direction_parchemin(Wrapper):
     def __init__(self,joueur:Agissant):
         self.joueur = joueur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (0,0,0)
         self.tailles = [0,0]
@@ -790,8 +808,8 @@ class Affichage_centre_direction_parchemin(Wrapper):
 class Affichage_centre_recettes(Wrapper):
     def __init__(self,joueur:Agissant):
         self.joueur = joueur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (0,0,0)
         self.tailles = [0,0]
@@ -827,8 +845,8 @@ class Affichage_centre_recettes(Wrapper):
 class Affichage_centre_ventes(Wrapper):
     def __init__(self,joueur:Agissant):
         self.joueur = joueur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (0,0,0)
         self.tailles = [0,0]
@@ -856,15 +874,15 @@ class Affichage_centre_ventes(Wrapper):
                 self.init_centre()
             return self
         else:
-            self.init()
+            # self.init()
             self.set_tailles(self.tailles)
         return False
 
 class Affichage_centre_achats(Wrapper):
     def __init__(self,joueur:Agissant):
         self.joueur = joueur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (0,0,0)
         self.tailles = [0,0]
@@ -892,15 +910,15 @@ class Affichage_centre_achats(Wrapper):
                 self.init_centre()
             return self
         else:
-            self.init()
+            # self.init()
             self.set_tailles(self.tailles)
         return False
 
 class Affichage_centre_impregnations(Wrapper):
     def __init__(self,joueur:Agissant):
         self.joueur = joueur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (0,0,0)
         self.tailles = [0,0]
@@ -928,15 +946,15 @@ class Affichage_centre_impregnations(Wrapper):
                 self.init_centre()
             return self
         else:
-            self.init()
+            # self.init()
             self.set_tailles(self.tailles)
         return False
 
 class Affichage_centre_auto_impregnations(Wrapper):
     def __init__(self,joueur:Agissant):
         self.joueur = joueur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (0,0,0)
         self.tailles = [0,0]
@@ -964,30 +982,33 @@ class Affichage_centre_auto_impregnations(Wrapper):
                 self.init_centre()
             return self
         else:
-            self.init()
+            # self.init()
             self.set_tailles(self.tailles)
         return False
 
 class Affichage_droite_dialogue(Wrapper):
     def __init__(self,interlocuteur):
         self.interlocuteur = interlocuteur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.courant = False
         self.fond = (255,255,255)
         self.tailles = [0,0]
         self.position = [0,0]
         self.replique = interlocuteur.replique
+
+        self.repliques = Liste_verticale()
+        self.phrase = Pave(self.interlocuteur.get_replique(self.interlocuteur.replique))
+        repliques = [Affichage_replique(self.interlocuteur.get_replique(replique),replique) for replique in self.interlocuteur.repliques]
+        self.repliques.set_contenu([repliques[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1,len(repliques)*2)],[0 if i%2==0 else 5 for i  in range(-1,len(repliques)*2)])
+
         self.init_droite()
 
     def init_droite(self):
         contenu = Pavage_horizontal()
         triptique = Pavage_vertical()
-        liste = Liste_verticale()
-        repliques = [Affichage_replique(self.interlocuteur.get_replique(replique),replique) for replique in self.interlocuteur.repliques]
-        liste.set_contenu([repliques[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1,len(repliques)*2)],[0 if i%2==0 else 5 for i  in range(-1,len(repliques)*2)])
-        triptique.set_contenu([Marge_horizontale(),Affichage_perso(self.interlocuteur),Marge_horizontale(),Pave(self.interlocuteur.get_replique(self.interlocuteur.replique)),Marge_horizontale(),liste,Marge_horizontale()],[5,0,5,0,5,-1,5])
+        triptique.set_contenu([Marge_horizontale(),Affichage_perso(self.interlocuteur),Marge_horizontale(),self.phrase,Marge_horizontale(),self.repliques,Marge_horizontale()],[5,0,5,0,5,-1,5])
         contenu.set_contenu([Marge_verticale(),triptique,Marge_verticale()],[5,-1,5])
         self.contenu = contenu
         self.fond = (255,255,255)
@@ -995,6 +1016,9 @@ class Affichage_droite_dialogue(Wrapper):
     def update(self):
         if self.replique != self.interlocuteur.replique:
             self.replique = self.interlocuteur.replique
+            self.phrase = Pave(self.interlocuteur.get_replique(self.interlocuteur.replique))
+            repliques = [Affichage_replique(self.interlocuteur.get_replique(replique),replique) for replique in self.interlocuteur.repliques]
+            self.repliques.set_contenu([repliques[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1,len(repliques)*2)],[0 if i%2==0 else 5 for i  in range(-1,len(repliques)*2)])
             self.init_droite()
             self.set_tailles(self.tailles)
         else:
@@ -1022,8 +1046,8 @@ class Affichage_droite_dialogue(Wrapper):
 class Affichage_droite_agissant_dialogue(Wrapper):
     def __init__(self,controleur:Controleur):
         self.controleur = controleur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.cible = None
         self.fond = (255,255,255)
@@ -1116,8 +1140,8 @@ class Affichage_droite_agissant_dialogue(Wrapper):
 class Affichage_droite_agissant_magie(Wrapper):
     def __init__(self,controleur:Controleur):
         self.controleur = controleur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         if isinstance(self.controleur.joueur.magie,Multi_cible):
             self.cible = {"alliés":[],"ennemis":[],"neutres":[]}
@@ -1227,8 +1251,8 @@ class Affichage_droite_agissant_magie(Wrapper):
 class Affichage_droite_agissant_parchemin(Wrapper):
     def __init__(self,controleur:Controleur):
         self.controleur = controleur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         if isinstance(self.controleur.joueur.magie_parchemin,Multi_cible):
             self.cible = {"alliés":[],"ennemis":[],"neutres":[]}
@@ -1338,8 +1362,8 @@ class Affichage_droite_agissant_parchemin(Wrapper):
 class Affichage_droite_recettes(Wrapper):
     def __init__(self,controleur:Controleur):
         self.controleur = controleur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (255,255,255)
         self.tailles = [0,0]
@@ -1358,8 +1382,8 @@ class Affichage_droite_recette(Wrapper):
     def __init__(self,controleur:Controleur,recette):
         self.controleur = controleur
         self.recette = recette
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (255,255,255)
         self.tailles = [0,0]
@@ -1431,8 +1455,8 @@ class Affichage_droite_recette(Wrapper):
 class Affichage_droite_ventes(Wrapper):
     def __init__(self,controleur:Controleur):
         self.controleur = controleur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (255,255,255)
         self.tailles = [0,0]
@@ -1454,8 +1478,8 @@ class Affichage_droite_vente(Wrapper):
         self.prix = vignette.prix
         self.description = vignette.description
         self.invalide = vignette.invalide
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (255,255,255)
         self.tailles = [0,0]
@@ -1496,8 +1520,8 @@ class Affichage_droite_vente(Wrapper):
 class Affichage_droite_achats(Wrapper):
     def __init__(self,controleur:Controleur):
         self.controleur = controleur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (255,255,255)
         self.tailles = [0,0]
@@ -1519,8 +1543,8 @@ class Affichage_droite_achat(Wrapper):
         self.prix = vignette.prix
         self.description = vignette.description
         self.invalide = vignette.invalide
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (255,255,255)
         self.tailles = [0,0]
@@ -1563,8 +1587,8 @@ class Affichage_droite_achat(Wrapper):
 class Affichage_droite_impregnations(Wrapper):
     def __init__(self,controleur:Controleur):
         self.controleur = controleur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (255,255,255)
         self.tailles = [0,0]
@@ -1601,8 +1625,8 @@ class Affichage_droite_impregnation(Wrapper):
         self.controleur = controleur
         self.magie = vignette.magie
         self.invalide = vignette.invalide
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (255,255,255)
         self.tailles = [0,0]
@@ -1646,8 +1670,8 @@ class Affichage_droite_impregnation(Wrapper):
 class Affichage_droite_auto_impregnations(Wrapper):
     def __init__(self,controleur:Controleur):
         self.controleur = controleur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (255,255,255)
         self.tailles = [0,0]
@@ -1684,8 +1708,8 @@ class Affichage_droite_auto_impregnation(Wrapper):
         self.controleur = controleur
         self.magie = vignette.magie
         self.invalide = vignette.invalide
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (255,255,255)
         self.tailles = [0,0]
@@ -1729,8 +1753,8 @@ class Affichage_droite_auto_impregnation(Wrapper):
 class Affichage_stats_ferme(Wrapper):
     def __init__(self,joueur:Agissant):
         self.joueur = joueur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (200,200,200)
         self.tailles = [0,0]
@@ -1750,8 +1774,8 @@ class Affichage_stats_ferme(Wrapper):
 class Affichage_stats(Wrapper):
     def __init__(self,joueur:Agissant):
         self.joueur = joueur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (200,200,200)
         self.tailles = [0,0]
@@ -1769,8 +1793,8 @@ class Affichage_stats(Wrapper):
 class Affichage_stats_cout_magie(Wrapper):
     def __init__(self,joueur:Agissant):
         self.joueur = joueur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.cout = 0
         self.fond = (200,200,200)
@@ -1810,8 +1834,8 @@ class Affichage_stats_cout_magie(Wrapper):
 class Affichage_stats_cout_parchemin(Wrapper):
     def __init__(self,joueur:Agissant):
         self.joueur = joueur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.cout = 0
         self.fond = (200,200,200)
@@ -1851,8 +1875,8 @@ class Affichage_stats_cout_parchemin(Wrapper):
 class Affichage_inventaire_ferme(Wrapper):
     def __init__(self,joueur:Agissant):
         self.joueur = joueur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (200,200,200)
         self.tailles = [0,0]
@@ -1873,21 +1897,27 @@ class Affichage_inventaire_ferme(Wrapper):
 class Affichage_inventaire(Wrapper):
     def __init__(self,joueur:Agissant):
         self.joueur = joueur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (200,200,200)
         self.tailles = [0,0]
         self.position = [0,0]
+
+        classes = self.joueur.inventaire.items.keys()
+
+        self.liste_v = Liste_verticale()
+        #pas joli : vignettes = [Vignette_categorie(classe,40,False,not self.joueur.inventaire.items[classe]) for classe in self.joueur.inventaire.items.keys()]
+        vignettes = [Vignette_categorie(classe,40) for classe in classes]
+        self.liste_v.set_contenu([vignettes[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1,len(vignettes)*2)],[0 if i%2==0 else 5 for i  in range(-1,len(vignettes)*2)])
+        self.categories = {classe:Affichage_categorie(self.joueur,classe) for classe in classes}
+
         self.init()
 
     def init(self):
         contenu = Pavage_vertical()
         monoptique = Liste_horizontale()
-        liste_v = Liste_verticale()
-        vignettes = [Vignette([0,0],40,classe.get_image()) for classe in self.joueur.inventaire.items.keys()]
-        liste_v.set_contenu([vignettes[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1,len(vignettes)*2)],[0 if i%2==0 else 5 for i  in range(-1,len(vignettes)*2)])
-        monoptique.set_contenu([Marge_verticale(),liste_v,Marge_verticale()],[5,0,5])
+        monoptique.set_contenu([Marge_verticale(),self.liste_v,Marge_verticale()],[5,0,5])
         contenu.set_contenu([Marge_horizontale(),monoptique,Marge_horizontale()],[5,-1,5])
         self.contenu = contenu
         self.fond = (200,200,200)
@@ -1895,27 +1925,56 @@ class Affichage_inventaire(Wrapper):
     def init_classe(self):
         contenu = Pavage_vertical()
         diptique = Pavage_horizontal()
-        liste_v = Liste_verticale()
-        liste_i = Liste_verticale()
-        vignettes = [Vignette([0,0],40,classe.get_image()) for classe in self.joueur.inventaire.items.keys()]
-        items = [Vignette_item([0,0],self.joueur.controleur[ID],40) for ID in self.joueur.inventaire.items[[classe for classe in self.joueur.inventaire.items.keys() if classe.get_image() == self.courant.skin][0]]]
-        liste_v.set_contenu([vignettes[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1,len(vignettes)*2)],[0 if i%2==0 else 5 for i  in range(-1,len(vignettes)*2)])
-        liste_i.set_contenu([items[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1,len(items)*2)],[0 if i%2==0 else 5 for i  in range(-1,len(items)*2)])
-        diptique.set_contenu([Marge_verticale(),liste_v,Marge_verticale(),liste_i,Marge_verticale()],[5,0,5,0,5])
+        diptique.set_contenu([Marge_verticale(),self.liste_v,Marge_verticale(),self.categories[self.courant.categorie],Marge_verticale()],[5,0,5,-1,5])
         contenu.set_contenu([Marge_horizontale(),diptique,Marge_horizontale()],[5,-1,5])
+        self.contenu = contenu
+        self.fond = (200,200,200)
+
+    def clique(self,position):
+        clique = self.clique_wrapper(position)
+        if clique is self:
+            self.courant = True
+        elif clique:
+            if isinstance(clique,Vignette_categorie): #On veut ouvrir une catégorie
+                self.courant = clique
+                self.init_classe()
+                self.set_tailles(self.tailles)
+        else:
+            # self.init()
+            self.set_tailles(self.tailles)
+        if clique:
+            return self
+        return False
+
+class Affichage_categorie(Wrapper):
+    def __init__(self,joueur:Agissant,categorie:Union[Type[Potion],Type[Parchemin],Type[Cle],Type[Arme],Type[Bouclier],Type[Armure],Type[Haume],Type[Anneau],Type[Projectile],Type[Ingredient],Type[Cadavre],Type[Oeuf]]):
+        self.joueur = joueur
+        self.categorie = categorie
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
+        self.courant = False
+        self.fond = (200,200,200)
+        self.tailles = [0,0]
+        self.position = [0,0]
+
+        self.liste_i = Liste_verticale()
+        self.items = [Vignette_item([0,0],self.joueur.controleur[ID],40) for ID in self.joueur.inventaire.items[self.categorie]]
+        self.liste_i.set_contenu([self.items[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1,len(self.items)*2)],[0 if i%2==0 else 5 for i  in range(-1,len(self.items)*2)])
+
+        self.init()
+
+    def init(self):
+        contenu = Pavage_vertical()
+        monoptique = Liste_horizontale()
+        monoptique.set_contenu([Marge_verticale(),self.liste_i,Marge_verticale()],[5,0,5])
+        contenu.set_contenu([Marge_horizontale(),monoptique,Marge_horizontale()],[5,-1,5])
         self.contenu = contenu
         self.fond = (200,200,200)
 
     def init_item(self):
         contenu = Pavage_vertical()
         triptique = Pavage_horizontal()
-        liste_v = Liste_verticale()
-        liste_i = Liste_verticale()
-        vignettes = [Vignette([0,0],40,classe.get_image()) for classe in self.joueur.inventaire.items.keys()]
-        items = [Vignette_item([0,0],self.joueur.controleur[ID],40) for ID in self.joueur.inventaire.items[[classe for classe in self.joueur.inventaire.items.keys() if issubclass(self.courant.item.get_classe(),classe)][0]]]
-        liste_v.set_contenu([vignettes[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1,len(vignettes)*2)],[0 if i%2==0 else 5 for i  in range(-1,len(vignettes)*2)])
-        liste_i.set_contenu([items[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1,len(items)*2)],[0 if i%2==0 else 5 for i  in range(-1,len(items)*2)])
-        triptique.set_contenu([Marge_verticale(),liste_v,Marge_verticale(),liste_i,Marge_verticale(),Paves(self.courant.item.get_description(0)),Marge_verticale()],[5,0,5,0,5,-1,5])
+        triptique.set_contenu([Marge_verticale(),self.liste_i,Marge_verticale(),Paves(self.courant.item.get_description(0)),Marge_verticale()],[5,0,5,-1,5])
         contenu.set_contenu([Marge_horizontale(),triptique,Marge_horizontale()],[5,-1,5])
         self.contenu = contenu
         self.fond = (200,200,200)
@@ -1925,11 +1984,7 @@ class Affichage_inventaire(Wrapper):
         if clique is self:
             self.courant = True
         elif clique:
-            if isinstance(clique,Vignette): #On veut ouvrir l'affichage des stats
-                self.courant = clique
-                self.init_classe()
-                self.set_tailles(self.tailles)
-            if isinstance(clique,Vignette_item): #On veut ouvrir l'affichage des stats
+            if isinstance(clique,Vignette_item): #On veut afficher un item
                 if clique == self.courant:
                     self.joueur.inventaire.utilise_item(clique.item.ID)
                 else:
@@ -1937,17 +1992,39 @@ class Affichage_inventaire(Wrapper):
                     self.init_item()
                 self.set_tailles(self.tailles)
         else:
-            self.init()
+            # self.init()
             self.set_tailles(self.tailles)
         if clique:
             return self
         return False
 
+    def update(self):
+        i=0
+        items = self.joueur.inventaire.items[self.categorie]
+        while i < len(items) or i < len(self.items):
+            if i == len(items) or i == len(self.items) or items[i] != self.items[i].item.ID: #Les deux ne correspondent pas
+                if i == len(self.items) or self.items[i].item.ID in items: #Donc l'item n'a pas été retiré, mais d'autres ont été ajoutés avant
+                    item = Vignette_item([0,0],self.joueur.controleur[items[i]],40)
+                    self.items.insert(i,item)
+                    self.liste_i.insert(2*i,item,0)
+                    self.liste_i.insert(2*i,Marge_horizontale(),5)
+                    i+=1
+                else: #l'item qui était à l'emplacement i a été retiré
+                    self.items.pop(i)
+                    self.liste_i.pop(2*i) # La marge avant l'item
+                    self.liste_i.pop(2*i) # L'item
+                    # On n'incrémente pas i puisqu'il peut y avoir d'autres items à retirer/ajouter
+            else:
+                i+=1
+        self.contenu.update()
+        for objet in self.objets:
+            objet.update()
+
 class Affichage_classe_ferme(Wrapper):
     def __init__(self,classe):
         self.joueur = classe
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (200,200,200)
         self.tailles = [0,0]
@@ -1962,15 +2039,20 @@ class Affichage_classe_ferme(Wrapper):
         self.contenu = contenu
         self.fond = (200,200,200)
 
-class Affichage_classe(Wrapper):
+class Affichage_sous_classe(Wrapper):
     def __init__(self,classe):
         self.classe = classe
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (200,200,200)
         self.tailles = [0,0]
         self.position = [0,0]
+
+        self.intrasecs = Affichage_intrasecs(self.classe)
+        self.skills = Affichage_skills(self.classe)
+        self.classes = Affichage_classes(self.classe)
+
         self.init()
 
     def init(self):
@@ -1984,7 +2066,7 @@ class Affichage_classe(Wrapper):
     def init_intrasecs(self):
         contenu = Pavage_horizontal()
         liste = Pavage_vertical()
-        liste.set_contenu([Marge_horizontale(),Affichage_intrasecs(self.classe),Marge_horizontale(),Affichage_skills_ferme(self.classe),Marge_horizontale(),Affichage_classes_ferme(self.classe),Marge_horizontale()],[5,-1,5,0,5,0,5])
+        liste.set_contenu([Marge_horizontale(),self.intrasecs,Marge_horizontale(),Affichage_skills_ferme(self.classe),Marge_horizontale(),Affichage_classes_ferme(self.classe),Marge_horizontale()],[5,-1,5,0,5,0,5])
         contenu.set_contenu([Marge_verticale(),liste,Marge_verticale()],[5,-1,5])
         self.contenu = contenu
         self.fond = (200,200,200)
@@ -1992,7 +2074,7 @@ class Affichage_classe(Wrapper):
     def init_skills(self):
         contenu = Pavage_horizontal()
         liste = Pavage_vertical()
-        liste.set_contenu([Marge_horizontale(),Affichage_intrasecs_ferme(self.classe),Marge_horizontale(),Affichage_skills(self.classe),Marge_horizontale(),Affichage_classes_ferme(self.classe),Marge_horizontale()],[5,0,5,-1,5,0,5])
+        liste.set_contenu([Marge_horizontale(),Affichage_intrasecs_ferme(self.classe),Marge_horizontale(),self.skills,Marge_horizontale(),Affichage_classes_ferme(self.classe),Marge_horizontale()],[5,0,5,-1,5,0,5])
         contenu.set_contenu([Marge_verticale(),liste,Marge_verticale()],[5,-1,5])
         self.contenu = contenu
         self.fond = (200,200,200)
@@ -2000,7 +2082,7 @@ class Affichage_classe(Wrapper):
     def init_classes(self):
         contenu = Pavage_horizontal()
         liste = Pavage_vertical()
-        liste.set_contenu([Marge_horizontale(),Affichage_intrasecs_ferme(self.classe),Marge_horizontale(),Affichage_skills_ferme(self.classe),Marge_horizontale(),Affichage_classes(self.classe),Marge_horizontale()],[5,0,5,0,5,-1,5])
+        liste.set_contenu([Marge_horizontale(),Affichage_intrasecs_ferme(self.classe),Marge_horizontale(),Affichage_skills_ferme(self.classe),Marge_horizontale(),self.classes,Marge_horizontale()],[5,0,5,0,5,-1,5])
         contenu.set_contenu([Marge_verticale(),liste,Marge_verticale()],[5,-1,5])
         self.contenu = contenu
         self.fond = (200,200,200)
@@ -2018,7 +2100,7 @@ class Affichage_classe(Wrapper):
                 self.init_classes()
             self.set_tailles(self.tailles)
         else:
-            self.init()
+            # self.init()
             self.set_tailles(self.tailles)
         if clique:
             return self
@@ -2027,8 +2109,8 @@ class Affichage_classe(Wrapper):
 class Affichage_intrasecs_ferme(Wrapper):
     def __init__(self,classe):
         self.joueur = classe
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (200,200,200)
         self.tailles = [0,0]
@@ -2044,30 +2126,54 @@ class Affichage_intrasecs_ferme(Wrapper):
         self.fond = (200,200,200)
 
 class Affichage_intrasecs(Wrapper):
-    def __init__(self,classe):
+    def __init__(self,classe:Classe):
         self.classe = classe
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (200,200,200)
         self.tailles = [0,0]
         self.position = [0,0]
+        
+        self.liste_skills = Liste_verticale()
+        self.skills = [Affichage_skill(skill) for skill in self.classe.skills_intrasecs]
+        self.liste_skills.set_contenu([self.skills[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1,len(self.skills)*2)],[0 if i%2==0 else 5 for i  in range(-1,len(self.skills)*2)])
+
         self.init()
 
     def init(self):
         contenu = Pavage_horizontal()
-        liste = Liste_verticale()
-        skills = [Texte(skill.nom) for skill in self.classe.skills_intrasecs]
-        liste.set_contenu([skills[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1,len(skills)*2)],[0 if i%2==0 else 5 for i  in range(-1,len(skills)*2)])
-        contenu.set_contenu([Marge_verticale(),liste,Marge_verticale()],[5,-1,5])
+        contenu.set_contenu([Marge_verticale(),self.liste_skills,Marge_verticale()],[5,-1,5])
         self.contenu = contenu
         self.fond = (200,200,200)
+
+    def update(self):
+        i=0
+        skills = self.classe.skills_intrasecs
+        while i < len(skills) or i < len(self.skills):
+            if i == len(skills) or i == len(self.skills) or skills[i] != self.skills[i].skill: #Les deux ne correspondent pas
+                if i == len(self.skills) or self.skills[i].skill in skills: #Donc le skill n'a pas été retiré, mais d'autres ont été ajoutés avant
+                    skill = Affichage_skill(skills[i])
+                    self.skills.insert(i,skill)
+                    self.liste_skills.insert(2*i,skill,0)
+                    self.liste_skills.insert(2*i,Marge_horizontale(),5)
+                    i+=1
+                else: #le skill qui était à l'emplacement i a été retiré (rare mais je suppose que ça peut arriver)
+                    self.skills.pop(i)
+                    self.liste_skills.pop(2*i) # La marge avant l'item
+                    self.liste_skills.pop(2*i) # L'item
+                    # On n'incrémente pas i puisqu'il peut y avoir d'autres skills à retirer/ajouter
+            else:
+                i+=1
+        self.contenu.update()
+        for objet in self.objets:
+            objet.update()
 
 class Affichage_skills_ferme(Wrapper):
     def __init__(self,classe):
         self.joueur = classe
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (200,200,200)
         self.tailles = [0,0]
@@ -2083,30 +2189,54 @@ class Affichage_skills_ferme(Wrapper):
         self.fond = (200,200,200)
 
 class Affichage_skills(Wrapper):
-    def __init__(self,classe):
+    def __init__(self,classe:Classe):
         self.classe = classe
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (200,200,200)
         self.tailles = [0,0]
         self.position = [0,0]
+        
+        self.liste_skills = Liste_verticale()
+        self.skills = [Affichage_skill(skill) for skill in self.classe.skills]
+        self.liste_skills.set_contenu([self.skills[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1,len(self.skills)*2)],[0 if i%2==0 else 5 for i  in range(-1,len(self.skills)*2)])
+        
         self.init()
 
     def init(self):
         contenu = Pavage_horizontal()
-        liste = Liste_verticale()
-        skills = [Texte(skill.nom) for skill in self.classe.skills]
-        liste.set_contenu([skills[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1,len(skills)*2)],[0 if i%2==0 else 5 for i  in range(-1,len(skills)*2)])
-        contenu.set_contenu([Marge_verticale(),liste,Marge_verticale()],[5,-1,5])
+        contenu.set_contenu([Marge_verticale(),self.liste_skills,Marge_verticale()],[5,-1,5])
         self.contenu = contenu
         self.fond = (200,200,200)
+
+    def update(self):
+        i=0
+        skills = self.classe.skills
+        while i < len(skills) or i < len(self.skills):
+            if i == len(skills) or i == len(self.skills) or skills[i] != self.skills[i].skill: #Les deux ne correspondent pas
+                if i == len(self.skills) or self.skills[i].skill in skills: #Donc le skill n'a pas été retiré, mais d'autres ont été ajoutés avant
+                    skill = Affichage_skill(skills[i])
+                    self.skills.insert(i,skill)
+                    self.liste_skills.insert(2*i,skill,0)
+                    self.liste_skills.insert(2*i,Marge_horizontale(),5)
+                    i+=1
+                else: #le skill qui était à l'emplacement i a été retiré (rare mais je suppose que ça peut arriver)
+                    self.skills.pop(i)
+                    self.liste_skills.pop(2*i) # La marge avant l'item
+                    self.liste_skills.pop(2*i) # L'item
+                    # On n'incrémente pas i puisqu'il peut y avoir d'autres skills à retirer/ajouter
+            else:
+                i+=1
+        self.contenu.update()
+        for objet in self.objets:
+            objet.update()
 
 class Affichage_classes_ferme(Wrapper):
     def __init__(self,classe):
         self.joueur = classe
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (200,200,200)
         self.tailles = [0,0]
@@ -2122,33 +2252,41 @@ class Affichage_classes_ferme(Wrapper):
         self.fond = (200,200,200)
 
 class Affichage_classes(Wrapper):
-    def __init__(self,classe):
+    def __init__(self,classe:Classe):
         self.classe = classe
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (200,200,200)
         self.tailles = [0,0]
         self.position = [0,0]
+        
+        self.liste_classes = Liste_verticale()
+        self.classes = [Affichage_classe(classe) for classe in self.classe.sous_classes]
+        self.liste_classes.set_contenu([self.classes[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1,len(self.classes)*2)],[0 if i%2==0 else 5 for i  in range(-1,len(self.classes)*2)])
+        
         self.init()
 
     def init(self):
         self.courant = True
         contenu = Pavage_horizontal()
-        liste = Liste_verticale()
-        classes = [Texte(classe.nom) for classe in self.classe.sous_classes]
-        liste.set_contenu([classes[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1,len(classes)*2)],[0 if i%2==0 else 5 for i  in range(-1,len(classes)*2)])
-        contenu.set_contenu([Marge_verticale(),liste,Marge_verticale()],[5,-1,5])
+        contenu.set_contenu([Marge_verticale(),self.liste_classes,Marge_verticale()],[5,-1,5])
         self.contenu = contenu
         self.fond = (200,200,200)
 
     def init_sous_classe(self):
-        self.courant = Affichage_classe([classe for classe in self.classe.sous_classes if classe.nom == self.courant.texte][0])
+        for i in range(len(self.classes)):
+            if self.classes[i] != self.courant:
+                if isinstance(self.classes[i],Affichage_sous_classe):
+                    self.classe[i] = Affichage_classe(self.classes[i].classe)
+                    self.liste_classes.replace(2*i+1,self.classes[i],0)
+            else:
+                self.classe[i] = Affichage_sous_classe(self.classes[i].classe)
+                self.liste_classes.replace(2*i+1,self.classes[i],0)
+                self.courant = self.classe[i]
+
         contenu = Pavage_horizontal()
-        liste = Liste_verticale()
-        classes = [Texte(classe.nom) for classe in self.classe.sous_classes]
-        liste.set_contenu([self.courant if self.classe.sous_classes[i//2] == self.courant.classe else classes[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1,len(classes)*2)],[0 if i%2==0 else 5 for i  in range(-1,len(classes)*2)])
-        contenu.set_contenu([Marge_verticale(),liste,Marge_verticale()],[5,-1,5])
+        contenu.set_contenu([Marge_verticale(),self.liste_classes,Marge_verticale()],[5,-1,5])
         self.contenu = contenu
         self.fond = (200,200,200)
 
@@ -2157,42 +2295,82 @@ class Affichage_classes(Wrapper):
         if clique is self:
             self.courant = True
         elif clique:
-            if isinstance(clique,Texte):
+            if isinstance(clique,Affichage_classe):
                 self.courant = clique
                 self.init_sous_classe()
             self.set_tailles(self.tailles)
         else:
-            self.init()
+            # self.init()
             self.set_tailles(self.tailles)
         if clique:
             return self
         return False
 
+    def update(self):
+        i=0
+        classes = self.classe.sous_classes
+        while i < len(classes) or i < len(self.classes):
+            if i == len(classes) or i == len(self.classes) or classes[i] != self.classes[i].classe: #Les deux ne correspondent pas
+                if i == len(self.classes) or self.classes[i].classe in classes: #Donc la classe n'a pas été retiré, mais d'autres ont été ajoutés avant
+                    classe = Affichage_classe(classes[i])
+                    self.classes.insert(i,classe)
+                    self.liste_classes.insert(2*i,classe,0)
+                    self.liste_classes.insert(2*i,Marge_horizontale(),5)
+                    i+=1
+                else: #la classe qui était à l'emplacement i a été retiré (rare mais je suppose que ça peut arriver)
+                    self.classes.pop(i)
+                    self.liste_classes.pop(2*i) # La marge avant l'item
+                    self.liste_classes.pop(2*i) # L'item
+                    # On n'incrémente pas i puisqu'il peut y avoir d'autres classes à retirer/ajouter
+            else:
+                i+=1
+        self.contenu.update()
+        for objet in self.objets:
+            objet.update()
+
 class Affichage_allies(Wrapper):
     def __init__(self,controleur:Controleur):
         self.controleur = controleur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (200,200,200)
         self.tailles = [0,0]
         self.position = [0,0]
+        
+        self.liste_allies = Liste_verticale()
+        self.allies = [Vignette_allie([0,0],self.controleur[ID],self.controleur.joueur.esprit,40) for ID in self.controleur.get_esprit(self.controleur.joueur.esprit).get_corps_vus()]
+        self.liste_allies.set_contenu([self.allies[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1,len(self.allies)*2)],[0 if i%2==0 else 5 for i  in range(-1,len(self.allies)*2)])
+        
         self.init()
 
     def init(self):
         contenu = Pavage_horizontal()
-        liste = Liste_verticale()
-        allies = [Vignette_allie([0,0],self.controleur[ID],self.controleur.joueur.esprit,40) for ID in self.controleur.get_esprit(self.controleur.joueur.esprit).get_corps_vus()]
-        liste.set_contenu([allies[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1,len(allies)*2)],[0 if i%2==0 else 5 for i  in range(-1,len(allies)*2)])
-        contenu.set_contenu([Marge_verticale(),liste,Marge_verticale()],[5,-1,5])
+        contenu.set_contenu([Marge_verticale(),self.liste_allies,Marge_verticale()],[5,-1,5])
         self.contenu = contenu
         self.fond = (200,200,200)
 
     def update(self):
-        self.init()
+        i=0
+        allies = self.controleur.get_esprit(self.controleur.joueur.esprit).get_corps_vus()
+        while i < len(allies) or i < len(self.allies):
+            if i == len(allies) or i == len(self.allies) or allies[i] != self.allies[i].agissant.ID: #Les deux ne correspondent pas
+                if i == len(self.allies) or self.allies[i].agissant.ID in allies: #Donc l'allie n'a pas été retiré, mais d'autres ont été ajoutés avant
+                    allie = Vignette_allie([0,0],self.controleur[allies[i]],self.controleur.joueur.esprit,40)
+                    self.allies.insert(i,allie)
+                    self.liste_allies.insert(2*i,allie,0)
+                    self.liste_allies.insert(2*i,Marge_horizontale(),5)
+                    i+=1
+                else: #l'allie qui était à l'emplacement i a été retiré (rare mais je suppose que ça peut arriver)
+                    self.allies.pop(i)
+                    self.liste_allies.pop(2*i) # La marge avant l'item
+                    self.liste_allies.pop(2*i) # L'item
+                    # On n'incrémente pas i puisqu'il peut y avoir d'autres allies à retirer/ajouter
+            else:
+                i+=1
+        self.contenu.update()
         for objet in self.objets:
             objet.update()
-        self.set_tailles(self.tailles)
 
     def clique(self,position):
         clique = self.clique_wrapper(position)
@@ -2203,35 +2381,53 @@ class Affichage_allies(Wrapper):
                 self.courant = clique
             return self
         else:
-            self.init()
+            # self.init()
             self.set_tailles(self.tailles)
         return False
 
 class Affichage_ennemis(Wrapper):
     def __init__(self,controleur:Controleur):
         self.controleur = controleur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (200,200,200)
         self.tailles = [0,0]
         self.position = [0,0]
+        
+        self.liste_ennemis = Liste_verticale()
+        self.ennemis = [Vignette_ennemi([0,0],self.controleur[ID],self.controleur.joueur.esprit,40) for ID in self.controleur.get_esprit(self.controleur.joueur.esprit).get_ennemis_vus()]
+        self.liste_ennemis.set_contenu([self.ennemis[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1,len(self.ennemis)*2)],[0 if i%2==0 else 5 for i  in range(-1,len(self.ennemis)*2)])
+        
         self.init()
 
     def init(self):
         contenu = Pavage_horizontal()
-        liste = Liste_verticale()
-        ennemis = [Vignette_ennemi([0,0],self.controleur[ID],self.controleur.joueur.esprit,40) for ID in self.controleur.get_esprit(self.controleur.joueur.esprit).get_ennemis_vus()]
-        liste.set_contenu([ennemis[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1,len(ennemis)*2)],[0 if i%2==0 else 5 for i  in range(-1,len(ennemis)*2)])
-        contenu.set_contenu([Marge_verticale(),liste,Marge_verticale()],[5,-1,5])
+        contenu.set_contenu([Marge_verticale(),self.liste_ennemis,Marge_verticale()],[5,-1,5])
         self.contenu = contenu
         self.fond = (200,200,200)
 
     def update(self):
-        self.init()
+        i=0
+        ennemis = self.controleur.get_esprit(self.controleur.joueur.esprit).get_ennemis_vus()
+        while i < len(ennemis) or i < len(self.ennemis):
+            if i == len(ennemis) or i == len(self.ennemis) or ennemis[i] != self.ennemis[i].agissant.ID: #Les deux ne correspondent pas
+                if i == len(self.ennemis) or self.ennemis[i].agissant.ID in ennemis: #Donc l'ennemi n'a pas été retiré, mais d'autres ont été ajoutés avant
+                    ennemi = Vignette_ennemi([0,0],self.controleur[ennemis[i]],self.controleur.joueur.esprit,40)
+                    self.ennemis.insert(i,ennemi)
+                    self.liste_ennemis.insert(2*i,ennemi,0)
+                    self.liste_ennemis.insert(2*i,Marge_horizontale(),5)
+                    i+=1
+                else: #l'ennemi qui était à l'emplacement i a été retiré (rare mais je suppose que ça peut arriver)
+                    self.ennemis.pop(i)
+                    self.liste_ennemis.pop(2*i) # La marge avant l'item
+                    self.liste_ennemis.pop(2*i) # L'item
+                    # On n'incrémente pas i puisqu'il peut y avoir d'autres ennemis à retirer/ajouter
+            else:
+                i+=1
+        self.contenu.update()
         for objet in self.objets:
             objet.update()
-        self.set_tailles(self.tailles)
 
     def clique(self,position):
         clique = self.clique_wrapper(position)
@@ -2242,35 +2438,53 @@ class Affichage_ennemis(Wrapper):
                 self.courant = clique
             return self
         else:
-            self.init()
+            # self.init()
             self.set_tailles(self.tailles)
         return False
 
 class Affichage_neutres(Wrapper):
     def __init__(self,controleur:Controleur):
         self.controleur = controleur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.fond = (200,200,200)
         self.tailles = [0,0]
         self.position = [0,0]
+        
+        self.liste_neutres = Liste_verticale()
+        self.neutres = [Vignette_neutre([0,0],self.controleur[ID],self.controleur.joueur.esprit,40) for ID in self.controleur.get_esprit(self.controleur.joueur.esprit).get_neutres_vus()]
+        self.liste_neutres.set_contenu([self.neutres[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1,len(self.neutres)*2)],[0 if i%2==0 else 5 for i  in range(-1,len(self.neutres)*2)])
+        
         self.init()
 
     def init(self):
         contenu = Pavage_horizontal()
-        liste = Liste_verticale()
-        neutres = [Vignette_neutre([0,0],self.controleur[ID],self.controleur.joueur.esprit,40) for ID in self.controleur.get_esprit(self.controleur.joueur.esprit).get_neutres_vus()]
-        liste.set_contenu([neutres[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1,len(neutres)*2)],[0 if i%2==0 else 5 for i  in range(-1,len(neutres)*2)])
-        contenu.set_contenu([Marge_verticale(),liste,Marge_verticale()],[5,-1,5])
+        contenu.set_contenu([Marge_verticale(),self.liste_neutres,Marge_verticale()],[5,-1,5])
         self.contenu = contenu
         self.fond = (200,200,200)
 
     def update(self):
-        self.init()
+        i=0
+        neutres = self.controleur.get_esprit(self.controleur.joueur.esprit).get_neutres_vus()
+        while i < len(neutres) or i < len(self.neutres):
+            if i == len(neutres) or i == len(self.neutres) or neutres[i] != self.neutres[i].agissant.ID: #Les deux ne correspondent pas
+                if i == len(self.neutres) or self.neutres[i].agissant.ID in neutres: #Donc l'neutre n'a pas été retiré, mais d'autres ont été ajoutés avant
+                    neutre = Vignette_neutre([0,0],self.controleur[neutres[i]],self.controleur.joueur.esprit,40)
+                    self.neutres.insert(i,neutre)
+                    self.liste_neutres.insert(2*i,neutre,0)
+                    self.liste_neutres.insert(2*i,Marge_horizontale(),5)
+                    i+=1
+                else: #l'neutre qui était à l'emplacement i a été retiré (rare mais je suppose que ça peut arriver)
+                    self.neutres.pop(i)
+                    self.liste_neutres.pop(2*i) # La marge avant l'item
+                    self.liste_neutres.pop(2*i) # L'item
+                    # On n'incrémente pas i puisqu'il peut y avoir d'autres neutres à retirer/ajouter
+            else:
+                i+=1
+        self.contenu.update()
         for objet in self.objets:
             objet.update()
-        self.set_tailles(self.tailles)
 
     def clique(self,position):
         clique = self.clique_wrapper(position)
@@ -2281,15 +2495,15 @@ class Affichage_neutres(Wrapper):
                 self.courant = clique
             return self
         else:
-            self.init()
+            # self.init()
             self.set_tailles(self.tailles)
         return False
 
 class Affichage_allies_agissant_dialogue(Wrapper):
     def __init__(self,controleur:Controleur):
         self.controleur = controleur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.cible = None
         self.fond = (200,200,200)
@@ -2322,15 +2536,15 @@ class Affichage_allies_agissant_dialogue(Wrapper):
                 self.cible = clique.agissant.ID
             return self
         else:
-            self.init()
+            # self.init()
             self.set_tailles(self.tailles)
         return False
 
 class Affichage_ennemis_agissant_dialogue(Wrapper):
     def __init__(self,controleur:Controleur):
         self.controleur = controleur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.cible = None
         self.fond = (200,200,200)
@@ -2363,15 +2577,15 @@ class Affichage_ennemis_agissant_dialogue(Wrapper):
                 self.cible = clique.agissant.ID
             return self
         else:
-            self.init()
+            # self.init()
             self.set_tailles(self.tailles)
         return False
 
 class Affichage_neutres_agissant_dialogue(Wrapper):
     def __init__(self,controleur:Controleur):
         self.controleur = controleur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         self.cible = None
         self.fond = (200,200,200)
@@ -2404,15 +2618,15 @@ class Affichage_neutres_agissant_dialogue(Wrapper):
                 self.cible = clique.agissant.ID
             return self
         else:
-            self.init()
+            # self.init()
             self.set_tailles(self.tailles)
         return False
 
 class Affichage_allies_agissant_magie(Wrapper):
     def __init__(self,controleur:Controleur):
         self.controleur = controleur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         if isinstance(self.controleur.joueur.magie,Multi_cible):
             self.cible = []
@@ -2457,15 +2671,15 @@ class Affichage_allies_agissant_magie(Wrapper):
                         self.cible = None
             return self
         else:
-            self.init()
+            # self.init()
             self.set_tailles(self.tailles)
         return False
 
 class Affichage_ennemis_agissant_magie(Wrapper):
     def __init__(self,controleur:Controleur):
         self.controleur = controleur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         if isinstance(self.controleur.joueur.magie,Multi_cible):
             self.cible = []
@@ -2510,15 +2724,15 @@ class Affichage_ennemis_agissant_magie(Wrapper):
                         self.cible = None
             return self
         else:
-            self.init()
+            # self.init()
             self.set_tailles(self.tailles)
         return False
 
 class Affichage_neutres_agissant_magie(Wrapper):
     def __init__(self,controleur:Controleur):
         self.controleur = controleur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         if isinstance(self.controleur.joueur.magie,Multi_cible):
             self.cible = []
@@ -2563,15 +2777,15 @@ class Affichage_neutres_agissant_magie(Wrapper):
                         self.cible = None
             return self
         else:
-            self.init()
+            # self.init()
             self.set_tailles(self.tailles)
         return False
 
 class Affichage_allies_agissant_parchemin(Wrapper):
     def __init__(self,controleur:Controleur):
         self.controleur = controleur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         if isinstance(self.controleur.joueur.magie_parchemin,Multi_cible):
             self.cible = []
@@ -2616,15 +2830,15 @@ class Affichage_allies_agissant_parchemin(Wrapper):
                         self.cible = None
             return self
         else:
-            self.init()
+            # self.init()
             self.set_tailles(self.tailles)
         return False
 
 class Affichage_ennemis_agissant_parchemin(Wrapper):
     def __init__(self,controleur:Controleur):
         self.controleur = controleur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         if isinstance(self.controleur.joueur.magie_parchemin,Multi_cible):
             self.cible = []
@@ -2669,15 +2883,15 @@ class Affichage_ennemis_agissant_parchemin(Wrapper):
                         self.cible = None
             return self
         else:
-            self.init()
+            # self.init()
             self.set_tailles(self.tailles)
         return False
 
 class Affichage_neutres_agissant_parchemin(Wrapper):
     def __init__(self,controleur:Controleur):
         self.controleur = controleur
-        self.objets = []
-        self.contenu:List[Affichable] = []
+        self.objets:List[Affichable] = []
+        self.contenu:Affichable = None
         self.courant = False
         if isinstance(self.controleur.joueur.magie_parchemin,Multi_cible):
             self.cible = []
@@ -2722,7 +2936,7 @@ class Affichage_neutres_agissant_parchemin(Wrapper):
                         self.cible = None
             return self
         else:
-            self.init()
+            # self.init()
             self.set_tailles(self.tailles)
         return False
 
@@ -2908,7 +3122,7 @@ class Affichage_perso(Proportionnel):
 
 class Affichage_labyrinthe(Final,Affichage,Proportionnel):
     def __init__(self,joueur:Agissant):
-        self.objets = []
+        self.objets:List[Affichable] = []
         self.position=[0,0]
         self.tailles=[0,0]
         self.joueur = joueur
@@ -2947,7 +3161,7 @@ class Affichage_labyrinthe(Final,Affichage,Proportionnel):
 
 class Affichage_labyrinthe_case_dialogue(Affichage,Proportionnel):
     def __init__(self,joueur:Agissant):
-        self.objets = []
+        self.objets:List[Affichable] = []
         self.position=[0,0]
         self.tailles=[0,0]
         self.cible = None
@@ -2960,7 +3174,7 @@ class Affichage_labyrinthe_case_dialogue(Affichage,Proportionnel):
     def set_tailles(self,tailles):
         self.tailles = tailles
         if self.joueur.vue != None:
-            self.objets = []
+            self.objets:List[Affichable] = []
             decs = [[dec.x,dec.y] for dec in self.joueur.vue.decalage if self.joueur.vue[dec][1] > 0]
             visible = [min(decs,key=itemgetter(0))[0],max(decs,key=itemgetter(0))[0],min(decs,key=itemgetter(1))[1],max(decs,key=itemgetter(1))[1]]
             distance = max(self.joueur.position.x-visible[0],visible[1]-self.joueur.position.x,self.joueur.position.y-visible[2],visible[3]-self.joueur.position.y) + 1 #On cherche à déterminer le carré qui comprend toutes les cases utiles de la vue
@@ -3012,7 +3226,7 @@ class Affichage_labyrinthe_case_dialogue(Affichage,Proportionnel):
 
 class Affichage_labyrinthe_case_magie(Affichage,Proportionnel):
     def __init__(self,joueur:Agissant):
-        self.objets = []
+        self.objets:List[Affichable] = []
         self.position=[0,0]
         self.tailles=[0,0]
         self.joueur = joueur
@@ -3029,7 +3243,7 @@ class Affichage_labyrinthe_case_magie(Affichage,Proportionnel):
         self.tailles = tailles
         if self.joueur.vue != None:
             cibles = self.controleur.get_cibles_potentielles_cases(self.joueur.magie,self.joueur)
-            self.objets = []
+            self.objets:List[Affichable] = []
             decs = [[dec.x,dec.y] for dec in self.joueur.vue.decalage if self.joueur.vue[dec][1] > 0]
             visible = [min(decs,key=itemgetter(0))[0],max(decs,key=itemgetter(0))[0],min(decs,key=itemgetter(1))[1],max(decs,key=itemgetter(1))[1]]
             distance = max(self.joueur.position.x-visible[0],visible[1]-self.joueur.position.x,self.joueur.position.y-visible[2],visible[3]-self.joueur.position.y) + 1 #On cherche à déterminer le carré qui comprend toutes les cases utiles de la vue
@@ -3079,7 +3293,7 @@ class Affichage_labyrinthe_case_magie(Affichage,Proportionnel):
 
 class Affichage_labyrinthe_case_parchemin(Affichage,Proportionnel):
     def __init__(self,joueur:Agissant):
-        self.objets = []
+        self.objets:List[Affichable] = []
         self.position=[0,0]
         self.tailles=[0,0]
         self.joueur = joueur
@@ -3096,7 +3310,7 @@ class Affichage_labyrinthe_case_parchemin(Affichage,Proportionnel):
         self.tailles = tailles
         if self.joueur.vue != None:
             cibles = self.controleur.get_cibles_potentielles_cases(self.joueur.magie,self.joueur)
-            self.objets = []
+            self.objets:List[Affichable] = []
             decs = [[dec.x,dec.y] for dec in self.joueur.vue.decalage if self.joueur.vue[dec][1] > 0]
             visible = [min(decs,key=itemgetter(0))[0],max(decs,key=itemgetter(0))[0],min(decs,key=itemgetter(1))[1],max(decs,key=itemgetter(1))[1]]
             distance = max(self.joueur.position.x-visible[0],visible[1]-self.joueur.position.x,self.joueur.position.y-visible[2],visible[3]-self.joueur.position.y) + 1 #On cherche à déterminer le carré qui comprend toutes les cases utiles de la vue
@@ -3146,7 +3360,7 @@ class Affichage_labyrinthe_case_parchemin(Affichage,Proportionnel):
 
 class Affichage_labyrinthe_direction_magie(Affichage,Proportionnel):
     def __init__(self,joueur:Agissant):
-        self.objets = []
+        self.objets:List[Affichable] = []
         self.position=[0,0]
         self.tailles=[0,0]
         self.joueur = joueur
@@ -3164,7 +3378,7 @@ class Affichage_labyrinthe_direction_magie(Affichage,Proportionnel):
                 pos_magie = self.joueur.cible_magie
             else:
                 pos_magie = self.joueur.position
-            self.objets = []
+            self.objets:List[Affichable] = []
             decs = [[dec.x,dec.y] for dec in self.joueur.vue.decalage if self.joueur.vue[dec][1] > 0]
             visible = [min(decs,key=itemgetter(0))[0],max(decs,key=itemgetter(0))[0],min(decs,key=itemgetter(1))[1],max(decs,key=itemgetter(1))[1]]
             distance = max(self.joueur.position.x-visible[0],visible[1]-self.joueur.position.x,self.joueur.position.y-visible[2],visible[3]-self.joueur.position.y) + 1 #On cherche à déterminer le carré qui comprend toutes les cases utiles de la vue
@@ -3222,7 +3436,7 @@ class Affichage_labyrinthe_direction_magie(Affichage,Proportionnel):
 
 class Affichage_labyrinthe_direction_parchemin(Affichage,Proportionnel):
     def __init__(self,joueur:Agissant):
-        self.objets = []
+        self.objets:List[Affichable] = []
         self.position=[0,0]
         self.tailles=[0,0]
         self.joueur = joueur
@@ -3240,7 +3454,7 @@ class Affichage_labyrinthe_direction_parchemin(Affichage,Proportionnel):
                 pos_magie = self.joueur.cible_magie_parchemin
             else:
                 pos_magie = self.joueur.position
-            self.objets = []
+            self.objets:List[Affichable] = []
             decs = [[dec.x,dec.y] for dec in self.joueur.vue.decalage if self.joueur.vue[dec][1] > 0]
             visible = [min(decs,key=itemgetter(0))[0],max(decs,key=itemgetter(0))[0],min(decs,key=itemgetter(1))[1],max(decs,key=itemgetter(1))[1]]
             distance = max(self.joueur.position.x-visible[0],visible[1]-self.joueur.position.x,self.joueur.position.y-visible[2],visible[3]-self.joueur.position.y) + 1 #On cherche à déterminer le carré qui comprend toutes les cases utiles de la vue
@@ -3296,12 +3510,24 @@ class Affichage_labyrinthe_direction_parchemin(Affichage,Proportionnel):
             return self
         return False
 
-class Vignette_recette(Final,Affichage):
-    def __init__(self,recette,taille,shade=False,invalide=False):
-        self.recette = recette
-        self.objets = [] #La liste des objets à afficher
+class Vignette_categorie(Final,Affichage):
+    def __init__(self,categorie,taille,shade=False,invalide=False):
+        self.objets:List[Affichable] = [] #La liste des objets à afficher
         self.tailles = [taille,taille]
         self.position = [0,0]
+        self.categorie = categorie
+        self.objets.append(Vignette([0,0],taille,categorie.get_image()))
+        if shade or invalide:
+            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
+        if invalide:
+            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
+
+class Vignette_recette(Final,Affichage):
+    def __init__(self,recette,taille,shade=False,invalide=False):
+        self.objets:List[Affichable] = [] #La liste des objets à afficher
+        self.tailles = [taille,taille]
+        self.position = [0,0]
+        self.recette = recette
         self.objets.append(Vignette([0,0],taille,eval(recette["produit"])(None).get_skin()))
         if shade or invalide:
             self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
@@ -3310,7 +3536,7 @@ class Vignette_recette(Final,Affichage):
 
 class Vignette_ingredient(Final,Affichage):
     def __init__(self,ingredient:Item,quantite_necessaire,quantite_disponible,taille,shade=False,invalide=False):
-        self.objets = [] #La liste des objets à afficher
+        self.objets:List[Affichable] = [] #La liste des objets à afficher
         self.tailles = [taille,taille]
         self.position = [0,0]
         self.ingredient = ingredient
@@ -3326,12 +3552,12 @@ class Vignette_ingredient(Final,Affichage):
 
 class Vignette_vente(Final,Affichage):
     def __init__(self,item:Item,taille,prix,description,shade=False,invalide=False):
+        self.objets:List[Affichable] = [] #La liste des objets à afficher
+        self.tailles = [taille,taille]
+        self.position = [0,0]
         self.item = item
         self.prix = prix
         self.description = description
-        self.objets = [] #La liste des objets à afficher
-        self.tailles = [taille,taille]
-        self.position = [0,0]
         self.objets.append(Vignette([0,0],taille,item.get_skin()))
         if shade or invalide:
             self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
@@ -3344,12 +3570,12 @@ class Vignette_vente(Final,Affichage):
 
 class Vignette_achat(Final,Affichage):
     def __init__(self,item:Item,taille,prix,description,shade=False,invalide=False):
+        self.objets:List[Affichable] = [] #La liste des objets à afficher
+        self.tailles = [taille,taille]
+        self.position = [0,0]
         self.item = item
         self.prix = prix
         self.description = description
-        self.objets = [] #La liste des objets à afficher
-        self.tailles = [taille,taille]
-        self.position = [0,0]
         self.objets.append(Vignette([0,0],taille,item.get_skin()))
         if shade or invalide:
             self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
@@ -3362,10 +3588,10 @@ class Vignette_achat(Final,Affichage):
 
 class Vignette_magie(Final,Affichage):
     def __init__(self,magie:Magie,taille,shade=False,invalide=False):
-        self.magie = magie
-        self.objets = [] #La liste des objets à afficher
+        self.objets:List[Affichable] = [] #La liste des objets à afficher
         self.tailles = [taille,taille]
         self.position = [0,0]
+        self.magie = magie
         self.objets.append(Vignette([0,0],taille,magie.get_skin()))
         if shade or invalide:
             self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
@@ -3374,12 +3600,12 @@ class Vignette_magie(Final,Affichage):
 
 class Vignette_item(Final,Affichage):
     def __init__(self,position,item:Item,taille,direction=None,shade=False,invalide=False):
+        self.objets:List[Affichable] = [] #La liste des objets à afficher
+        self.tailles = [taille,taille]
+        self.position = position
         self.item = item
         if direction == None:
             direction = item.get_direction()
-        self.objets = [] #La liste des objets à afficher
-        self.tailles = [taille,taille]
-        self.position = position
         self.objets.append(Vignette(position,taille,item.get_skin(),direction)) #Avoir éventuellement la tête dans une autre direction ?
         for effet in item.effets:
             if effet.affiche:
@@ -3391,12 +3617,12 @@ class Vignette_item(Final,Affichage):
 
 class Vignettes_agissant(Final,Affichage):
     def __init__(self,position,agissant:Agissant,taille):
-        self.agissant = agissant
-        self.objets = [] #La liste des objets à afficher
-        direction = agissant.get_direction()
-        arme = agissant.inventaire.arme
+        self.objets:List[Affichable] = [] #La liste des objets à afficher
         self.tailles = [taille,taille]
         self.position = position
+        self.agissant = agissant
+        direction = agissant.get_direction()
+        arme = agissant.inventaire.arme
         if arme != None:
             self.objets.append(Vignette_item(position,agissant.controleur[arme],taille,direction))
         self.objets.append(Vignette(position,taille,agissant.get_skin(),direction))
@@ -3428,9 +3654,9 @@ class Vignettes_agissant(Final,Affichage):
 
 class Vignettes_position(Final,Affichage):
     def __init__(self,position,joueur,vue,pos,taille,shade=False,invalide=False):
-        self.position = position
+        self.objets:List[Affichable] = []
         self.tailles = [taille,taille]
-        self.objets = []
+        self.position = position
         self.pos = pos
         self.invalide = invalide
         if pos in vue:
@@ -3463,9 +3689,9 @@ class Vignettes_position(Final,Affichage):
 
 class Vignette_case(Final,Affichage):
     def __init__(self,position,joueur,vue,pos,taille):
-        self.position = position
+        self.objets:List[Affichable] = []
         self.tailles = [taille,taille]
-        self.objets = []
+        self.position = position
         if pos in vue:
             vue_case = vue[pos]
             if vue_case[1]==0:
@@ -3515,13 +3741,12 @@ class Vignette_case(Final,Affichage):
 
 class Vignette_allie(Final,Affichage):
     def __init__(self,position,agissant,esprit,taille,shade=False,invalide=False):
+        self.objets:List[Affichable] = []
+        self.tailles = [taille,taille]
         self.position = position
         self.agissant = agissant
         self.esprit = esprit
         self.courant = False
-        self.objets = []
-        self.tailles = [taille,taille]
-        self.position = position
         self.objets.append(Vignettes_agissant(position,agissant,taille))
         for statut in agissant.get_skins_statuts():
             self.objets.append(Vignette(position,taille,statut))
@@ -3532,13 +3757,12 @@ class Vignette_allie(Final,Affichage):
 
 class Vignette_ennemi(Final,Affichage):
     def __init__(self,position,agissant,esprit,taille,shade=False,invalide=False):
+        self.objets:List[Affichable] = []
+        self.tailles = [taille,taille]
         self.position = position
         self.agissant = agissant
         self.esprit = esprit
         self.courant = False
-        self.objets = []
-        self.tailles = [taille,taille]
-        self.position = position
         self.objets.append(Vignettes_agissant(position,agissant,taille))
         if shade or invalide:
             self.objets.append(Vignette(position,taille,SKIN_SHADE))
@@ -3547,13 +3771,12 @@ class Vignette_ennemi(Final,Affichage):
 
 class Vignette_neutre(Final,Affichage):
     def __init__(self,position,agissant,esprit,taille,shade=False,invalide=False):
+        self.objets:List[Affichable] = []
+        self.tailles = [taille,taille]
         self.position = position
         self.agissant = agissant
         self.esprit = esprit
         self.courant = False
-        self.objets = []
-        self.tailles = [taille,taille]
-        self.position = position
         self.objets.append(Vignettes_agissant(position,agissant,taille))
         if shade or invalide:
             self.objets.append(Vignette(position,taille,SKIN_SHADE))
@@ -3625,6 +3848,32 @@ class Affichage_replique(Pave):
         else:
             self.courant = False
         return res
+
+class Affichage_skill(Final,Pavage_horizontal):
+    def __init__(self,skill:Skill_intrasec,fond=(0,0,0)):
+        self.objets:List[Affichable] = [] #Il peut quand même avoir des objets 'normaux'
+        self.tailles = [0,0] #La largeur et la hauteur (ou l'inverse ?)
+        self.position = [0,0]
+        self.fond = (0,0,0,0)
+        self.contenu:List[Affichable] = [None] #Les objets qu'il 'contient'
+        self.skill = skill
+        self.init()
+
+    def init(self):
+        self.set_contenu([Vignette([0,0],20,self.skill.get_skin()),Marge_verticale(),Texte(self.skill.nom)],[0,5,0])
+
+class Affichage_classe(Final,Pavage_horizontal):
+    def __init__(self,classe:Classe,fond=(0,0,0)):
+        self.objets:List[Affichable] = [] #Il peut quand même avoir des objets 'normaux'
+        self.tailles = [0,0] #La largeur et la hauteur (ou l'inverse ?)
+        self.position = [0,0]
+        self.fond = (0,0,0,0)
+        self.contenu:List[Affichable] = [None] #Les objets qu'il 'contient'
+        self.classe = classe
+        self.init()
+
+    def init(self):
+        self.set_contenu([Vignette([0,0],20,self.classe.get_skin()),Marge_verticale(),Texte(self.classe.nom)],[0,5,0])
 
 
 
