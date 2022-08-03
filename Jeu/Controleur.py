@@ -1011,7 +1011,7 @@ class Controleur():
         return occupants
 
     def fait_agir(self,agissant:Agissant):
-        agissant.statut = ""
+        agissant.statut = "passif"
         if agissant.ID == 2:
             agissant.nouvel_ordre = False
         type_skill = agissant.skill_courant

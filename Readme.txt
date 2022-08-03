@@ -58,11 +58,8 @@ Troisi�me �tape : mains[0][2].boucle() et le jeu reprend imm�diatement, at
 
 
 TODO (pour ne pas oublier les problèmes que je découvre) :
- - Corriger le recentrage de la liste (catégories d'items) (réglé, je crois, mais peut-être améliorable)
- - Infos d'agissant pas mises à jour
- - Labyrinthe de sélection de la case pour "Tu vois là-bas ?" a le labyrinthe de jeu habituel en fond
+ - Labyrinthe de sélection de la case pour "Tu vois là-bas ?" a le labyrinthe de jeu habituel en fond (mais pourquoi !?)
  - Validation de la sélection de la case pour "Tu vois là-bas ?" ne passe pas à la suite du dialogue
- - Ajouter une insertion aux listes (et un retrait ?) avec les modifications du décalage nécessaires
 
 
 

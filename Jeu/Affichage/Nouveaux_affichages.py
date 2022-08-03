@@ -473,7 +473,7 @@ class Affichage_droite(Wrapper):
         self.fond = (255,255,255)
 
     def init_allie(self):
-        allie = self.courant.courant.agissant
+        allie = self.courant.agissant
         contenu = Pavage_vertical()
         triptique = Pavage_horizontal()
         monoptique = Pavage_horizontal()
@@ -484,7 +484,7 @@ class Affichage_droite(Wrapper):
         self.fond = (255,255,255)
 
     def init_ennemi(self):
-        ennemi = self.courant.courant.agissant
+        ennemi = self.courant.agissant
         contenu = Pavage_vertical()
         triptique = Pavage_horizontal()
         monoptique = Pavage_horizontal()
@@ -495,7 +495,7 @@ class Affichage_droite(Wrapper):
         self.fond = (255,255,255)
 
     def init_neutre(self):
-        neutre = self.courant.courant.agissant
+        neutre = self.courant.agissant
         contenu = Pavage_vertical()
         triptique = Pavage_horizontal()
         monoptique = Pavage_horizontal()
@@ -510,17 +510,17 @@ class Affichage_droite(Wrapper):
         if clique is self:
             self.courant = True
         elif clique:
-            if isinstance(clique,Affichage_allies):
+            if isinstance(clique,Vignette_allie):
                 self.courant = clique
                 self.init_allie() #Donner des informations spécifiques pour les alliés ?
-            if isinstance(clique,Affichage_ennemis):
+            if isinstance(clique,Vignette_ennemi):
                 self.courant = clique
                 self.init_ennemi() #Donner des informations spécifiques pour les ennemis ?
-            if isinstance(clique,Affichage_neutres):
+            if isinstance(clique,Vignette_neutre):
                 self.courant = clique
                 self.init_neutre() #Donner des informations spécifiques pour les neutres ?
             if isinstance(clique,Paves):
-                self.controleur.get_esprit(self.controleur.joueur.esprit).utilise(self.courant.courant.agissant)
+                self.controleur.get_esprit(self.controleur.joueur.esprit).utilise(self.courant.agissant)
             self.set_tailles(self.tailles)
         else:
             self.courant = False
@@ -529,6 +529,21 @@ class Affichage_droite(Wrapper):
         if clique:
             return self
         return False
+
+    def update(self):
+        if not self.courant in self.allies.allies + self.ennemis.ennemis + self.neutres.neutres :
+            self.init_droite()
+        else:
+            if isinstance(self.courant,Vignette_allie):
+                self.init_allie() #Donner des informations spécifiques pour les alliés ?
+            if isinstance(self.courant,Vignette_ennemi):
+                self.init_ennemi() #Donner des informations spécifiques pour les ennemis ?
+            if isinstance(self.courant,Vignette_neutre):
+                self.init_neutre() #Donner des informations spécifiques pour les neutres ?
+        self.set_tailles(self.tailles)
+        self.contenu.update()
+        for objet in self.objets:
+            objet.update()
 
 class Affichage_gauche_cout_magie(Wrapper):
     def __init__(self,joueur:Agissant):
@@ -2379,6 +2394,7 @@ class Affichage_allies(Wrapper):
         elif clique:
             if isinstance(clique,Vignette_allie):
                 self.courant = clique
+                return clique
             return self
         else:
             # self.init()
@@ -2436,6 +2452,7 @@ class Affichage_ennemis(Wrapper):
         elif clique:
             if isinstance(clique,Vignette_ennemi):
                 self.courant = clique
+                return clique
             return self
         else:
             # self.init()
@@ -2493,6 +2510,7 @@ class Affichage_neutres(Wrapper):
         elif clique:
             if isinstance(clique,Vignette_neutre):
                 self.courant = clique
+                return clique
             return self
         else:
             # self.init()
