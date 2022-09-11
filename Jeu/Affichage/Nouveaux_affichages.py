@@ -616,7 +616,7 @@ class Affichage_gauche_inventaire(Wrapper):
         return False
 
 class Affichage_centre_case_dialogue(Wrapper):
-    def __init__(self,joueur:Agissant):
+    def __init__(self,joueur:Joueur):
         self.joueur = joueur
         self.objets:List[Affichable] = []
         self.contenu:Affichable = None
@@ -646,7 +646,7 @@ class Affichage_centre_case_dialogue(Wrapper):
                 self.courant = clique
                 self.cible = self.courant.cible
             if isinstance(clique,Bouton) and clique.texte == "Confirmer":
-                self.joueur.interlocuteur.set_case_dialogue(self.cible)
+                self.joueur.interlocuteur.set_cible(self.cible)
                 self.joueur.controleur.unset_phase(CASE_DIALOGUE)
                 print(self.joueur.controleur.phases)
             self.set_tailles(self.tailles)
@@ -1002,7 +1002,7 @@ class Affichage_centre_auto_impregnations(Wrapper):
         return False
 
 class Affichage_droite_dialogue(Wrapper):
-    def __init__(self,interlocuteur):
+    def __init__(self,interlocuteur:Humain):
         self.interlocuteur = interlocuteur
         self.objets:List[Affichable] = []
         self.contenu:Affichable = None
@@ -1141,7 +1141,7 @@ class Affichage_droite_agissant_dialogue(Wrapper):
                 self.cible = self.courant.cible
                 self.init_neutre()
             if isinstance(clique,Bouton) and clique.texte == "Confirmer":
-                self.controleur.joueur.interlocuteur.set_agissant_dialogue(self.cible)
+                self.controleur.joueur.interlocuteur.set_cible(self.cible)
                 self.controleur.unset_phase(AGISSANT_DIALOGUE)
             self.set_tailles(self.tailles)
         else:

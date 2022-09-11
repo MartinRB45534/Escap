@@ -301,9 +301,10 @@ class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du
     def set_cible(self,cible):
         self.cible_deplacement = cible
         self.replique = "dialogue-1phrase1.1.1.2"
-        self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.4"]
+        self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"]
         if self.controleur.joueur.inventaire.a_parchemin_vierge():
             self.repliques.append("dialogue-1reponse1.3")
+        self.repliques.append("dialogue-1reponse1.4")
         self.repliques.append("dialogue-1reponse1.5")
 
     def get_replique(self,code):
