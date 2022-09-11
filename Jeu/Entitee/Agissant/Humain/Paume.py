@@ -335,11 +335,6 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
 
         self.replique_courante = 0
 
-    def set_cible(self,cible:Union[int,Position]):
-        self.cible_deplacement = cible
-        self.replique = "dialogue-1phrase1.1.1.2"
-        self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.3"]
-
     def get_replique(self,code:str):
         return REPLIQUES_PAUME[code]
 

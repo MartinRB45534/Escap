@@ -67,6 +67,12 @@ class Humain(Agissant,Interactif,Entitee_superieure):
         self.mouvement = 0
         self.cible_deplacement = ID
 
+    def set_cible(self,cible:Union[int,Position]):
+        self.mouvement = 0
+        self.cible_deplacement = cible
+        self.replique = "dialogue-1phrase1.1.1.2"
+        self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.3"]
+
     def end_dialogue(self,dialogue=-1):
         self.controleur.joueur.interlocuteur = None
         self.controleur.unset_phase(DIALOGUE)
