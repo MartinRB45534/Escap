@@ -616,7 +616,7 @@ class Affichage_gauche_inventaire(Wrapper):
         return False
 
 class Affichage_centre_case_dialogue(Wrapper):
-    def __init__(self,joueur:Joueur):
+    def __init__(self,joueur:Heros):
         self.joueur = joueur
         self.objets:List[Affichable] = []
         self.contenu:Affichable = None

@@ -18,14 +18,14 @@ TAUX_ATTAQUE =
 
 
 #Les constantes du joueur :
-# global FORCE_JOUEUR #La force du joueur. Augmenter cette valeur pour que le joueur cause plus de dégats
-FORCE_JOUEUR =
-# global VITESSE_JOUEUR #La quantité de latence soustraite à chaque tour. Augmenter cette valeur pour accélèrer toutes les actions du joueur. /!\ Si la vitesse est supérieure à la latence de certains skills, le joueur risque d'utiliser le skill plusieurs fois dans un tour
-VITESSE_JOUEUR =
-# global PV_JOUEUR #Le nombre maximum de PVs du joueur. Augmenter cette valeur pour que le joueur soit plus difficile à tuer
-PV_JOUEUR =
-# global REGEN_JOUEUR #La quantité de PVs restaurés chaque tour. Augmenter cette valeur pour que le joueur se soigne plus vite
-REGEN_JOUEUR =
+# global FORCE_HEROS #La force du joueur. Augmenter cette valeur pour que le joueur cause plus de dégats
+FORCE_HEROS =
+# global VITESSE_HEROS #La quantité de latence soustraite à chaque tour. Augmenter cette valeur pour accélèrer toutes les actions du joueur. /!\ Si la vitesse est supérieure à la latence de certains skills, le joueur risque d'utiliser le skill plusieurs fois dans un tour
+VITESSE_HEROS =
+# global PV_HEROS #Le nombre maximum de PVs du joueur. Augmenter cette valeur pour que le joueur soit plus difficile à tuer
+PV_HEROS =
+# global REGEN_HEROS #La quantité de PVs restaurés chaque tour. Augmenter cette valeur pour que le joueur se soigne plus vite
+REGEN_HEROS =
 
 
 #Queqlues constantes qui affectent plein de gobelins

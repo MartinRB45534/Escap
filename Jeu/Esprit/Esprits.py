@@ -377,7 +377,7 @@ class Esprit_humain(Esprit_type):
     def deplace_humain(self,ID_humain):
         humain:Humain = self.controleur[ID_humain]
         humain.skill_courant = None
-        if humain.identite == "joueur":
+        if humain.identite == "heros":
             # humain.recontrole() #Encore ?
             humain.statut_humain = "joueur"
         else:

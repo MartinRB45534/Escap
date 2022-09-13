@@ -206,7 +206,7 @@ class Classe_principale(Classe):
         skills = []
         cond_evo = [0,10,20,30,40,50,60,70,80,90]
 
-        if identite == 'joueur' :
+        if identite == 'heros' :
             self.evolutif = False
 
             #Skills intrasecs (leur niveau est lié à celui de la classe principale) :
@@ -215,6 +215,8 @@ class Classe_principale(Classe):
             vision = Skill_vision() #On crée un skill de vision
             skills_intrasecs.append(vision)
             ramasse = Skill_ramasse() #On crée une skill de ramassage
+            skills_intrasecs.append(ramasse)
+            ramasse = Skill_ramasse_light() #On crée une skill de ramassage léger
             skills_intrasecs.append(ramasse)
 
             #Autres skills :

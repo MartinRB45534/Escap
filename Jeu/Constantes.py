@@ -3,7 +3,7 @@ import pygame
 # global VERSION
 VERSION = "0.0.-1"
 
-def trouve_skill(classe,type_skill): #Vraiment une méthode propre au controleur ?
+def trouve_skill(classe,type_skill):
     trouve = None
     for skill in classe.skills:
         if isinstance(skill,type_skill) and skill.niveau > 0: #On ne devrait pas avoir de skill à 0 mais on ne sait jamais.

@@ -190,7 +190,7 @@ Sauf que les contrôles sont liés au joueur (skills et magies qu'il possède).
 Avoir un set de contrôles pour chaque perso jouable ?
 
 Conclusion :
-Affichage & controle : attributs/méthodes du True_joueur
+Affichage & controle : attributs/méthodes du Joueur
 Liste des touches de contrôles : attribut du joueur (et d'autres persos s'ils sont jouables (garder dev à part quand même))
 Garder des touches de contrôle qui ne peuvent pas être modifiées pour chaque perso ?
 Global : pause, modification des touches, quitter la partie
@@ -418,7 +418,7 @@ Les couloirs sont des espaces où l'on ne peut pas se croiser, les salles sont d
 
 
 Imports : qu'est-ce qui a besoin de quoi ?
-True_joueur :
+Joueur :
 	Controleur
 	Affichage
 

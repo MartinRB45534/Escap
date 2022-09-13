@@ -11,11 +11,11 @@ from Jeu.Effet.Effets import *
 from Jeu.Systeme.Classe import *
 from Modifiers import *
 
-class Joueur(Humain,Stratege,Multi_mage): #Le premier humain du jeu, avant l'étage 1 (évidemment, c'est le personnage principal !)
+class Heros(Humain,Stratege,Multi_mage): #Le premier humain du jeu, avant l'étage 1 (évidemment, c'est le personnage principal !)
     """La classe du joueur."""
     def __init__(self,controleur:Controleur,position:Position,parametres,screen):
 
-        self.identite = 'joueur'
+        self.identite = 'heros'
         self.place = 0
 
         Humain.__init__(self,controleur,position,self.identite,1,2)
@@ -87,7 +87,7 @@ class Joueur(Humain,Stratege,Multi_mage): #Le premier humain du jeu, avant l'ét
                     pygame.K_d:["skills","directions"],
                     pygame.K_s:["skills","directions"],
                     pygame.K_q:["skills","directions"],
-                    pygame.K_x:["skills"], 
+                    pygame.K_x:["skills"],
                     pygame.K_c:["skills"],
                 },
                 (pygame.KMOD_LSHIFT,):{
@@ -96,6 +96,7 @@ class Joueur(Humain,Stratege,Multi_mage): #Le premier humain du jeu, avant l'ét
                     pygame.K_s:["skills","directions"],
                     pygame.K_q:["skills","directions"],
                     pygame.K_x:["skills"],
+                    pygame.K_c:["skills"],
                 },
                 (pygame.KMOD_LCTRL,):{
                     pygame.K_z:["directions"],
@@ -110,8 +111,8 @@ class Joueur(Humain,Stratege,Multi_mage): #Le premier humain du jeu, avant l'ét
                     pygame.K_d:Skill_deplacement,
                     pygame.K_s:Skill_deplacement,
                     pygame.K_q:Skill_deplacement,
-                    pygame.K_x:Skill_stomp, 
-                    pygame.K_c:Skill_ramasse,
+                    pygame.K_x:Skill_stomp,
+                    pygame.K_c:Skill_ramasse_light,
                 },
                 (pygame.KMOD_LSHIFT,):{
                     pygame.K_z:Skill_course,
@@ -119,6 +120,7 @@ class Joueur(Humain,Stratege,Multi_mage): #Le premier humain du jeu, avant l'ét
                     pygame.K_s:Skill_course,
                     pygame.K_q:Skill_course,
                     pygame.K_x:Skill_attaque,
+                    pygame.K_c:Skill_ramasse,
                 },
             },
             "directions":{
@@ -160,7 +162,7 @@ class Joueur(Humain,Stratege,Multi_mage): #Le premier humain du jeu, avant l'ét
         # self.projectiles = {} #Le skill lancer peut s'utiliser de plusieurs façon : en le combinant à un skill de création de projectile, les touches sont associées comme pour les magies# sur l'item courant de l'inventaire, par le biais d'une touche du skill lancer ou, si l'item est un projectile, directement depuis l'inventaire
 
     def get_skin_tete(self):
-        return SKIN_TETE_JOUEUR
+        return SKIN_TETE_HEROS
 
     def get_texte_descriptif(self):
         return [f"Un humain (niveau {self.niveau})",f"ID : {self.ID}","Nom : Arvel","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Un humain récemment arrivé dans le labyrinthe."]
@@ -188,13 +190,13 @@ class Joueur(Humain,Stratege,Multi_mage): #Le premier humain du jeu, avant l'ét
             if self.highest == 3 and (self.get_etage_courant() == 3 and self.vue[position][2] > 0):
                 #On cherche un PNJ volontaire pour aller taper la causette :
                 paume:Humain = self.controleur[4]
-                if paume.esprit == "joueur" and (paume.get_etage_courant() == 3 and paume.statut_humain in ["exploration","proximite","en chemin"]):
+                if paume.esprit == "heros" and (paume.get_etage_courant() == 3 and paume.statut_humain in ["exploration","proximite","en chemin"]):
                     paume.mouvement = 2
                     paume.cible_deplacement = 2
                     paume.dialogue = 2
                 else:
                     peureuse:Humain = self.controleur[5]
-                    if peureuse.esprit == "joueur" and (peureuse.get_etage_courant() == 3 and peureuse.statut_humain in ["exploration","proximite","en chemin"]):
+                    if peureuse.esprit == "heros" and (peureuse.get_etage_courant() == 3 and peureuse.statut_humain in ["exploration","proximite","en chemin"]):
                         peureuse.mouvement = 2
                         peureuse.cible_deplacement = 2
                         peureuse.dialogue = 2
@@ -207,13 +209,13 @@ class Joueur(Humain,Stratege,Multi_mage): #Le premier humain du jeu, avant l'ét
             if self.highest == 4 and (self.get_etage_courant() == 4 and self.vue[position][2] > 0):
                 #On cherche un PNJ volontaire pour aller taper la causette :
                 peureuse:Humain = self.controleur[5]
-                if peureuse.esprit == "joueur" and (peureuse.get_etage_courant() == 4 and peureuse.statut_humain in ["exploration","proximite","en chemin"]):
+                if peureuse.esprit == "heros" and (peureuse.get_etage_courant() == 4 and peureuse.statut_humain in ["exploration","proximite","en chemin"]):
                     peureuse.mouvement = 2
                     peureuse.cible_deplacement = 2
                     peureuse.dialogue = 3
                 else:
                     paume:Humain = self.controleur[4]
-                    if paume.esprit == "joueur" and (paume.get_etage_courant() == 4 and paume.statut_humain in ["exploration","proximite","en chemin"]):
+                    if paume.esprit == "heros" and (paume.get_etage_courant() == 4 and paume.statut_humain in ["exploration","proximite","en chemin"]):
                         paume.mouvement = 2
                         paume.cible_deplacement = 2
                         paume.dialogue = 3
@@ -226,7 +228,7 @@ class Joueur(Humain,Stratege,Multi_mage): #Le premier humain du jeu, avant l'ét
             if self.highest == 4 :
                 #On cherche un PNJ volontaire pour aller taper la causette :
                 peureuse:Humain = self.controleur[5]
-                if peureuse.esprit == "joueur" and (peureuse.get_etage_courant() == 4 and peureuse.statut_humain in ["exploration","proximite","en chemin"]):
+                if peureuse.esprit == "heros" and (peureuse.get_etage_courant() == 4 and peureuse.statut_humain in ["exploration","proximite","en chemin"]):
                     peureuse.mouvement = 2
                     peureuse.cible_deplacement = 2
                     peureuse.dialogue = 4
@@ -237,13 +239,13 @@ class Joueur(Humain,Stratege,Multi_mage): #Le premier humain du jeu, avant l'ét
             self.first_step_=False
             #On cherche un PNJ volontaire pour aller taper la causette :
             peureuse:Humain = self.controleur[5]
-            if peureuse.esprit == "joueur" and peureuse.statut_humain in ["exploration","proximite","en chemin"]:
+            if peureuse.esprit == "heros" and peureuse.statut_humain in ["exploration","proximite","en chemin"]:
                 peureuse.mouvement = 2
                 peureuse.cible_deplacement = 2
                 peureuse.dialogue = 5
             else:
                 paume:Humain = self.controleur[4]
-                if paume.esprit == "joueur" and paume.statut_humain in ["exploration","proximite","en chemin"]:
+                if paume.esprit == "heros" and paume.statut_humain in ["exploration","proximite","en chemin"]:
                     paume.mouvement = 2
                     paume.cible_deplacement = 2
                     paume.dialogue = 4
@@ -255,7 +257,7 @@ class Joueur(Humain,Stratege,Multi_mage): #Le premier humain du jeu, avant l'ét
             #La porte qui lance le dialogue certifie qu'on y passe pour la première fois
             #On cherche un PNJ volontaire pour aller taper la causette :
             peureuse:Humain = self.controleur[5]
-            if peureuse.esprit == "joueur" and peureuse.statut_humain in ["exploration","proximite","en chemin"]:
+            if peureuse.esprit == "heros" and peureuse.statut_humain in ["exploration","proximite","en chemin"]:
                 peureuse.mouvement = 2
                 peureuse.cible_deplacement = 2
                 peureuse.dialogue = 6
@@ -266,24 +268,24 @@ class Joueur(Humain,Stratege,Multi_mage): #Le premier humain du jeu, avant l'ét
             self.first_teleport_=False
             #On cherche un PNJ volontaire pour aller taper la causette :
             alchimiste:Humain = self.controleur[7]
-            if alchimiste.esprit == "joueur" and alchimiste.statut_humain in ["exploration","proximite","en chemin"]:
+            if alchimiste.esprit == "heros" and alchimiste.statut_humain in ["exploration","proximite","en chemin"]:
                 alchimiste.mouvement = 2
                 alchimiste.dialogue = 2
             else:
                 peureuse:Humain = self.controleur[5]
-                if peureuse.esprit == "joueur" and peureuse.statut_humain in ["exploration","proximite","en chemin"]:
+                if peureuse.esprit == "heros" and peureuse.statut_humain in ["exploration","proximite","en chemin"]:
                     peureuse.mouvement = 2
                     peureuse.cible_deplacement = 2
                     peureuse.dialogue = 7
                 else:
                     encombrant:Humain = self.controleur[6]
-                    if encombrant.esprit == "joueur" and encombrant.statut_humain in ["exploration","proximite","en chemin"]:
+                    if encombrant.esprit == "heros" and encombrant.statut_humain in ["exploration","proximite","en chemin"]:
                         encombrant.mouvement = 2
                         encombrant.cible_deplacement = 2
                         encombrant.dialogue = 2
                     else:
                         paume:Humain = self.controleur[4]
-                        if paume.esprit == "joueur" and paume.statut_humain in ["exploration","proximite","en chemin"]:
+                        if paume.esprit == "heros" and paume.statut_humain in ["exploration","proximite","en chemin"]:
                             paume.mouvement = 2
                             paume.cible_deplacement = 2
                             paume.dialogue = 5

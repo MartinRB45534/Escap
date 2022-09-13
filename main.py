@@ -32,11 +32,11 @@ class Main():
                     main_potentiel = pickle.load(fichier)
                 except EOFError:
                     print("Le fichier est vide. Création d'un nouvel utilisateur.")
-                    self.mains.append([len(self.mains),nom_fichier[:-2],True_joueur(screen)])
+                    self.mains.append([len(self.mains),nom_fichier[:-2],Joueur(screen)])
                 except pickle.UnpicklingError:
                     print("Le fichier ne peut pas être décodé ?")
                 else:
-                    if isinstance(main_potentiel,True_joueur):
+                    if isinstance(main_potentiel,Joueur):
                         self.mains.append([len(self.mains),nom_fichier[:-2],main_potentiel])
                         main_potentiel.charge(screen)
                         print("Chargement réussi !")
@@ -89,7 +89,7 @@ class Main():
             elif res == "new":
                 self.quitte()
                 self.observe()
-            elif isinstance(res,True_joueur):
+            elif isinstance(res,Joueur):
                 res.ouvre()
             else:
                 print("Erreur menu main, res non reconnu")

@@ -14,7 +14,7 @@ from Jeu.Affichage.Nouveaux_affichages import *
 
 SKIN_ESCAP.dessine_toi(screen,(0,0))
 
-class True_joueur:
+class Joueur:
     """Un "joueur". Correspondrait idéalement à une personne, à un compte. Pourrait nécessiter un mot de passe.
        Contient les parties, les accomplissements (et skills globaux) et les paramètres de base."""
     def __init__(self,screen):

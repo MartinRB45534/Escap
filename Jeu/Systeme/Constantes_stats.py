@@ -1,7 +1,7 @@
 # global CONSTANTES_STATS
 CONSTANTES_STATS = {
     #Le joueur n'est jamais sensé être initialisé avec d'autres statistiques que le niveau 1, mais on ne sait jamais
-    "joueur":{
+    "heros":{
         'pv':[0,100,100,100,100,100,100,100,100,100,100],
         'regen_pv_max':[0,1,1,1,1,1,1,1,1,1,1],
         'regen_pv_min':[0,0,0,0,0,0,0,0,0,0,0],
@@ -20,7 +20,7 @@ CONSTANTES_STATS = {
         'magies':False,
         'items':['Armure_dor','Lance_dor'],
         'forme':"homme",
-        'forme_tete':"joueur",
+        'forme_tete':"heros",
         'special':True},
     #L'épéiste à l'accueil (stats non définitives, à retravailler)
     "receptionniste":{

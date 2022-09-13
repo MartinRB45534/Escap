@@ -7,7 +7,7 @@ Si besoin est, des versions intermédiaires seront ajoutées (lorsque je ne fais
 L'information est stockée grâce au module pickle, qui se contente de mettre les attributs en mémoire. Je n'ai pas besoin de modifier les méthodes, ni les éléments définis globalement (les images, les constantes, etc.).
 Les changements qui peuvent poser problème sont l'ajout d'attributs à une classe et la suppression/le remplacement d'une classe, uniquement si la classe est sauvegardée.
 Les classes concernées sont:
-True_joueur
+Joueur
 Controleur
 Labyrinthe
 Case

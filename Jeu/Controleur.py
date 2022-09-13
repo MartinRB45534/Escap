@@ -58,12 +58,12 @@ try:
     degats_petite_secousse[0] = DEGATS_MAGE
     latence_petite_secousse[0] = LATENCE_MAGE
 
-    CONSTANTES_STATS["joueur"]["pv"][1] = PV_JOUEUR
-    CONSTANTES_STATS["joueur"]["vitesse"][1] = VITESSE_JOUEUR
-    CONSTANTES_STATS["joueur"]["force"][1] = FORCE_JOUEUR
-    CONSTANTES_STATS["joueur"]["regen_pv_max"][1] = REGEN_MAX_JOUEUR
-    CONSTANTES_STATS["joueur"]["regen_pv_min"][1] = REGEN_MIN_JOUEUR
-    CONSTANTES_STATS["joueur"]["restauration_regen_pv"][1] = RESTAURATION_REGEN_JOUEUR
+    CONSTANTES_STATS["heros"]["pv"][1] = PV_HEROS
+    CONSTANTES_STATS["heros"]["vitesse"][1] = VITESSE_HEROS
+    CONSTANTES_STATS["heros"]["force"][1] = FORCE_HEROS
+    CONSTANTES_STATS["heros"]["regen_pv_max"][1] = REGEN_MAX_HEROS
+    CONSTANTES_STATS["heros"]["regen_pv_min"][1] = REGEN_MIN_HEROS
+    CONSTANTES_STATS["heros"]["restauration_regen_pv"][1] = RESTAURATION_REGEN_HEROS
     CONSTANTES_STATS["receptionniste"]["pv"][1] = PV_RECEPTIONNISTE
     CONSTANTES_STATS["receptionniste"]["vitesse"][1] = VITESSE_RECEPTIONNISTE
     CONSTANTES_STATS["receptionniste"]["force"][1] = FORCE_RECEPTIONNISTE
@@ -154,9 +154,9 @@ try:
     CONSTANTES_STATS["chef_gobelin"]["regen_pv_min"][1] = REGEN_MIN_CHEF
     CONSTANTES_STATS["chef_gobelin"]["restauration_regen_pv"][1] = RESTAURATION_REGEN_CHEF
 
-    dpt_joueur = FORCE_JOUEUR*TAUX_STOMP*VITESSE_JOUEUR/LATENCE_STOMP
-    dpt_boost_joueur = dpt_joueur * TAUX_BOOST
-    dpt_multi_boost_joueur = dpt_joueur * TAUX_MULTI_BOOST
+    dpt_heros = FORCE_HEROS*TAUX_STOMP*VITESSE_HEROS/LATENCE_STOMP
+    dpt_boost_heros = dpt_heros * TAUX_BOOST
+    dpt_multi_boost_heros = dpt_heros * TAUX_MULTI_BOOST
     dpt_receptionniste = FORCE_RECEPTIONNISTE*TAUX_ATTAQUE*TAUX_EPEE_ENCOMBRANT*VITESSE_RECEPTIONNISTE/LATENCE_ATTAQUE
     dpt_boost_receptionniste = dpt_receptionniste * TAUX_BOOST
     dpt_multi_boost_receptionniste = dpt_receptionniste * TAUX_MULTI_BOOST
@@ -185,12 +185,12 @@ try:
     dpt_marchand = FORCE_MARCHAND*TAUX_ATTAQUE*TAUX_EPEE_MARCHAND*VITESSE_MARCHAND/LATENCE_ATTAQUE
     dpt_boost_marchand = dpt_marchand * TAUX_BOOST
     dpt_multi_boost_marchand = dpt_marchand * TAUX_MULTI_BOOST
-    dpt1_min_peureuse = min(FORCE_JOUEUR*TAUX_STOMP,FORCE_PAUME*TAUX_STOMP,FORCE_ENCOMBRANT*TAUX_ATTAQUE*TAUX_EPEE_ENCOMBRANT,DEGATS_SECOUSSE,DEGATS_VOLCAN,FORCE_MARCHAND*TAUX_ATTAQUE*TAUX_EPEE_MARCHAND)*(TAUX_BOOST-1)*VITESSE_PEUREUSE/LATENCE_BOOST
-    dpt1_max_peureuse = max(FORCE_JOUEUR*TAUX_STOMP,FORCE_PAUME*TAUX_STOMP,FORCE_ENCOMBRANT*TAUX_ATTAQUE*TAUX_EPEE_ENCOMBRANT,DEGATS_SECOUSSE,DEGATS_VOLCAN,FORCE_MARCHAND*TAUX_ATTAQUE*TAUX_EPEE_MARCHAND)*(TAUX_BOOST-1)*VITESSE_PEUREUSE/LATENCE_BOOST
-    dpt2_min_peureuse = min(FORCE_JOUEUR*TAUX_STOMP,FORCE_PAUME*TAUX_STOMP,FORCE_ENCOMBRANT*TAUX_ATTAQUE*TAUX_EPEE_ENCOMBRANT,DEGATS_SECOUSSE,DEGATS_VOLCAN,FORCE_MARCHAND*TAUX_ATTAQUE*TAUX_EPEE_MARCHAND)*(TAUX_BOOST-1)*(REGEN_PM_PEUREUSE+REGEN_PM_ROBE)/PM_BOOST
-    dpt2_max_peureuse = max(FORCE_JOUEUR*TAUX_STOMP,FORCE_PAUME*TAUX_STOMP,FORCE_ENCOMBRANT*TAUX_ATTAQUE*TAUX_EPEE_ENCOMBRANT,DEGATS_SECOUSSE,DEGATS_VOLCAN,FORCE_MARCHAND*TAUX_ATTAQUE*TAUX_EPEE_MARCHAND)*(TAUX_BOOST-1)*(REGEN_PM_PEUREUSE+REGEN_PM_ROBE)/PM_BOOST
-    dpt1_multi_peureuse = (FORCE_JOUEUR*TAUX_STOMP+FORCE_PAUME*TAUX_STOMP+FORCE_ENCOMBRANT*TAUX_ATTAQUE*TAUX_EPEE_ENCOMBRANT+DEGATS_SECOUSSE+DEGATS_VOLCAN+FORCE_MARCHAND*TAUX_ATTAQUE*TAUX_EPEE_MARCHAND)*(TAUX_MULTI_BOOST-1)*VITESSE_PEUREUSE/LATENCE_MULTI_BOOST
-    dpt2_multi_peureuse = (FORCE_JOUEUR*TAUX_STOMP+FORCE_PAUME*TAUX_STOMP+FORCE_ENCOMBRANT*TAUX_ATTAQUE*TAUX_EPEE_ENCOMBRANT+DEGATS_SECOUSSE+DEGATS_VOLCAN+FORCE_MARCHAND*TAUX_ATTAQUE*TAUX_EPEE_MARCHAND)*(TAUX_MULTI_BOOST-1)*(REGEN_PM_PEUREUSE+REGEN_PM_ROBE)/PM_MULTI_BOOST
+    dpt1_min_peureuse = min(FORCE_HEROS*TAUX_STOMP,FORCE_PAUME*TAUX_STOMP,FORCE_ENCOMBRANT*TAUX_ATTAQUE*TAUX_EPEE_ENCOMBRANT,DEGATS_SECOUSSE,DEGATS_VOLCAN,FORCE_MARCHAND*TAUX_ATTAQUE*TAUX_EPEE_MARCHAND)*(TAUX_BOOST-1)*VITESSE_PEUREUSE/LATENCE_BOOST
+    dpt1_max_peureuse = max(FORCE_HEROS*TAUX_STOMP,FORCE_PAUME*TAUX_STOMP,FORCE_ENCOMBRANT*TAUX_ATTAQUE*TAUX_EPEE_ENCOMBRANT,DEGATS_SECOUSSE,DEGATS_VOLCAN,FORCE_MARCHAND*TAUX_ATTAQUE*TAUX_EPEE_MARCHAND)*(TAUX_BOOST-1)*VITESSE_PEUREUSE/LATENCE_BOOST
+    dpt2_min_peureuse = min(FORCE_HEROS*TAUX_STOMP,FORCE_PAUME*TAUX_STOMP,FORCE_ENCOMBRANT*TAUX_ATTAQUE*TAUX_EPEE_ENCOMBRANT,DEGATS_SECOUSSE,DEGATS_VOLCAN,FORCE_MARCHAND*TAUX_ATTAQUE*TAUX_EPEE_MARCHAND)*(TAUX_BOOST-1)*(REGEN_PM_PEUREUSE+REGEN_PM_ROBE)/PM_BOOST
+    dpt2_max_peureuse = max(FORCE_HEROS*TAUX_STOMP,FORCE_PAUME*TAUX_STOMP,FORCE_ENCOMBRANT*TAUX_ATTAQUE*TAUX_EPEE_ENCOMBRANT,DEGATS_SECOUSSE,DEGATS_VOLCAN,FORCE_MARCHAND*TAUX_ATTAQUE*TAUX_EPEE_MARCHAND)*(TAUX_BOOST-1)*(REGEN_PM_PEUREUSE+REGEN_PM_ROBE)/PM_BOOST
+    dpt1_multi_peureuse = (FORCE_HEROS*TAUX_STOMP+FORCE_PAUME*TAUX_STOMP+FORCE_ENCOMBRANT*TAUX_ATTAQUE*TAUX_EPEE_ENCOMBRANT+DEGATS_SECOUSSE+DEGATS_VOLCAN+FORCE_MARCHAND*TAUX_ATTAQUE*TAUX_EPEE_MARCHAND)*(TAUX_MULTI_BOOST-1)*VITESSE_PEUREUSE/LATENCE_MULTI_BOOST
+    dpt2_multi_peureuse = (FORCE_HEROS*TAUX_STOMP+FORCE_PAUME*TAUX_STOMP+FORCE_ENCOMBRANT*TAUX_ATTAQUE*TAUX_EPEE_ENCOMBRANT+DEGATS_SECOUSSE+DEGATS_VOLCAN+FORCE_MARCHAND*TAUX_ATTAQUE*TAUX_EPEE_MARCHAND)*(TAUX_MULTI_BOOST-1)*(REGEN_PM_PEUREUSE+REGEN_PM_ROBE)/PM_MULTI_BOOST
     dpt_gob = FORCE_GOB*TAUX_ATTAQUE*TAUX_EPEE*VITESSE_GOB/LATENCE_ATTAQUE
     dpt_boost_gob = dpt_gob * TAUX_BOOST
     dpt_sent = FORCE_SENT*TAUX_ATTAQUE*TAUX_LANCE*VITESSE_SENT/LATENCE_ATTAQUE
@@ -208,7 +208,7 @@ try:
     dpt_chef = FORCE_CHEF*TAUX_ATTAQUE*TAUX_EPEE*VITESSE_CHEF/LATENCE_ATTAQUE
     dpt_boost_chef = dpt_chef * TAUX_BOOST
     print("Un bref aperçu des stats\n\n")
-    print(f"Joueur :         {PV_JOUEUR:>3} PV, {dpt_joueur:.2f} ({dpt_multi_boost_joueur:.2f}, {dpt_boost_joueur:.2f}) dpt, {REGEN_JOUEUR} regen")
+    print(f"Joueur :         {PV_HEROS:>3} PV, {dpt_heros:.2f} ({dpt_multi_boost_heros:.2f}, {dpt_boost_heros:.2f}) dpt, {REGEN_HEROS} regen")
     print(f"Receptionniste : {PV_RECEPTIONNISTE:>3} PV, {dpt_receptionniste:.2f} ({dpt_multi_boost_receptionniste:.2f}, {dpt_boost_receptionniste:.2f}) dpt, {REGEN_RECEPTIONNISTE} regen, {TAUX_ARMURE_ENCOMBRANT:.2%} degats bloqués")
     print(f"Paumé :          {PV_PAUME:>3} PV, {dpt_paume:.2f} ({dpt_multi_boost_paume:.2f}, {dpt_boost_paume:.2f}) dpt, {REGEN_PAUME} regen, {TAUX_TUNIQUE:.2%} degats bloqués")
     print(f"Peureuse :       {PV_PEUREUSE:>3} PV, {dpt1_min_peureuse:.2f}~{dpt1_max_peureuse:.2f} dpt1, {dpt2_min_peureuse:.2f}~{dpt2_max_peureuse:.2f} dpt2, {dpt1_multi_peureuse:.2f} multi-dpt1, {dpt2_multi_peureuse:.2f} multi-dpt2, {REGEN_PEUREUSE} regen")
@@ -249,7 +249,7 @@ class Controleur():
             self.tour_par_seconde = 0
         else:
             self.tour_par_seconde = parametres["tours_par_seconde"]
-            self.ajoute_entitee(Joueur(self,None,parametres,screen))
+            self.ajoute_entitee(Heros(self,None,parametres,screen))
             self.joueur = self.entitees[2]
 
     def __getitem__(self,key) -> Union[Labyrinthe,Case,Mur,Entitee,Item,Agissant,Any]:
@@ -288,7 +288,7 @@ class Controleur():
 
     def jeu(self):
 
-        self.esprits["joueur"] = Esprit_humain(2,self)
+        self.esprits["heros"] = Esprit_humain(2,self)
 
         autre = Alchimiste(self,Position("Étage 1 : test",1,0))
         self.ajoute_entitee(autre)
@@ -395,7 +395,7 @@ class Controleur():
 
     def tuto(self):
 
-        self.esprits["joueur"] = Esprit_humain(2,self)
+        self.esprits["heros"] = Esprit_humain(2,self)
 
         #On crée le premier étage et son occupant :
         receptionniste = Receptionniste(self,Position("Étage 1 : couloir",14,0))
@@ -777,7 +777,7 @@ class Controleur():
         """Fonction qui crée les conditions d'un duel."""
 
         if vue : # On peut avoir des spectateurs, mais pas forcément
-            self.ajoute_entitee(Joueur(("arène",tailles_lab[0]//2,tailles_lab[1]//2),screen))
+            self.ajoute_entitee(Heros(("arène",tailles_lab[0]//2,tailles_lab[1]//2),screen))
         # Première étape : créer l'arène
         self.labs["arène"]=Labyrinthe("arène",Decalage(tailles_lab[0],tailles_lab[1]),("arène",0,0),[Pattern(("arène",0,0),tailles_lab[0],tailles_lab[1],[],[],vide)])
         # Deuxième étape : créer les opposants
@@ -1015,7 +1015,7 @@ class Controleur():
         if agissant.ID == 2:
             agissant.nouvel_ordre = False
         type_skill = agissant.skill_courant
-        skill = trouve_skill(agissant.classe_principale,type_skill)
+        skill:Skill_intrasec = trouve_skill(agissant.classe_principale,type_skill)
         if skill == None :
             print("On ne peut pas utiliser un skill que l'on n'a pas... et on ne devrait pas pouvoir le choisir d'ailleurs : "+str(type_skill))
         else :
@@ -1035,7 +1035,7 @@ class Controleur():
                 if reussite :
                     possesseur.inventaire.supprime_item(item)
                     agissant.inventaire.ramasse_item(item)
-                    if isinstance(agissant,Joueur):
+                    if isinstance(agissant,Heros):
                         affichage = agissant.affichage
                         affichage.message(f"Tu as volé avec succès un {item} à {possesseur} !")
                 else :
@@ -1057,6 +1057,20 @@ class Controleur():
 
 
 
+            elif type_skill == Skill_ramasse_light:
+                items = self.trouve_items_courants(agissant.get_position())
+                latence = 1
+                for ID_item in items:
+                    item = self[ID_item]
+                    if isinstance(item,ITEMS_LIGHTS):
+                        latence_item,reussite = skill.utilise(item.priorite-agissant.get_priorite())
+                        latence += latence_item
+                        if reussite:
+                            agissant.inventaire.ramasse_item(ID_item)
+                agissant.add_latence(latence)
+
+
+
             elif type_skill == Skill_stomp:
                 #Une attaque qui se fait sans arme.
                 force,affinite,direction,ID = agissant.get_stats_attaque(TERRE)
@@ -1074,7 +1088,7 @@ class Controleur():
                 #Une attaque qui se fait avec une arme.
                 arme = agissant.get_arme()
                 if arme == None:
-                    if isinstance(agissant,Joueur):
+                    if isinstance(agissant,Heros):
                         affichage = agissant.affichage
                         affichage.message("Tu n'as pas d'arme ?") #Sans arme, on devrait utiliser le stomp.
                         affichage.message("Essaye le stomp !") # !! À modifier pour indiquer la touche courante du stomp, si elle existe !!!
@@ -1119,7 +1133,7 @@ class Controleur():
                 #Pour être protégé par le bouclier pendant les tours suivants.
                 bouclier = agissant.get_bouclier()
                 if bouclier == None:
-                    if isinstance(agissant,Joueur):
+                    if isinstance(agissant,Heros):
                         affichage = agissant.affichage
                         affichage.message("Tu n'as pas de bouclier !") #Sans bouclier, on devrait se mettre à couvert.
                         affichage.message("Tu devrais esquiver, plutôt.")
@@ -1168,7 +1182,7 @@ class Controleur():
                     if projectile.controleur == None:
                         projectile.active(self)
                 else :
-                    if isinstance(agissant,Joueur):
+                    if isinstance(agissant,Heros):
                         affichage = agissant.affichage
                         affichage.message("J'ai dû mal comprendre...")
                         affichage.message("Tu veux lancer un item que tu n'as pas ?")
@@ -1219,7 +1233,7 @@ class Controleur():
                     if agissant.peut_payer(cout) :
                         agissant.effets.append(magie)
                         reussite = True
-                        #if isinstance(agissant,Joueur):
+                        #if isinstance(agissant,Heros):
                         #    malchance = trouve_skill(agissant.classe_principale,Skill_malchanceux)
                         #else:
                         #    malchance = None
@@ -1329,7 +1343,7 @@ class Controleur():
 
     def get_cibles_potentielles_agissants(self,magie:Magie_cible,joueur:Agissant):
         cibles_potentielles = []
-        for case in self.esprits["joueur"].vue:
+        for case in self.esprits["heros"].vue:
             for ID_entitee in case[5]:
                 entitee = self[ID_entitee]
                 if issubclass(entitee.get_classe(),Agissant):
@@ -1348,7 +1362,7 @@ class Controleur():
 
     def get_cibles_potentielles_items(self,magie:Magie_cible,joueur:Agissant):
         cibles_potentielles = []
-        for case in self.esprits["joueur"].vue:
+        for case in self.esprits["heros"].vue:
             for ID_entitee in case[5]:
                 entitee = self[ID_entitee]
                 if issubclass(entitee.get_classe(),Item):
@@ -1369,7 +1383,7 @@ class Controleur():
 
     def get_cibles_potentielles_cases(self,magie:Magie_cible,joueur:Agissant):
         cibles_potentielles = []
-        for case in self.esprits["joueur"].vue:
+        for case in self.esprits["heros"].vue:
             cibles_potentielles.append(case[0])
         if isinstance(magie,Portee_limitee):
             poss = self.get_pos_touches(joueur.position,magie.portee_limite)
@@ -1431,7 +1445,7 @@ class Controleur():
             ID_entitee = self.entitees_courantes[i]
             entitee = self[ID_entitee]
             if isinstance(entitee,Agissant):
-                if isinstance(entitee,Joueur):
+                if isinstance(entitee,Heros):
                     agissants.insert(0,entitee)
                     esprit = entitee.get_esprit()
                     if esprit != None:

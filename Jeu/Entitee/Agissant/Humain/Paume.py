@@ -146,7 +146,7 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
             self.repliques = ["dialogue2reponse1.3.1.1","dialogue2reponse1.3.1.2"]
         elif replique == "dialogue2reponse1.3.2":
             self.replique = "dialogue2phrase1.3.2" #/!\ Modifier pour mentionner l'attaque avec une arme quand les skins auront été créés
-            if self.controleur[5].esprit == "joueur":
+            if self.controleur[5].esprit == "heros":
                 self.replique = "dialogue2phrase1.3.2/peureuse"
             self.repliques = ["dialogue2reponse1.3.1.1","dialogue2reponse1.3.1.2"]
         elif replique == "dialogue2reponse1.3.3":

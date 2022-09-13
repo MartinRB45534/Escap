@@ -44,7 +44,7 @@ SKINS_ESCALIERS_HAUT_VUS = [[[Image(f"Vue/Case/Escalier_haut/skin_mur_gauche_{di
 # global FORMES_CORPS
 FORMES_CORPS = ["indefini","homme","femme","gros"] #Rajouter "gobelin", "orc", "slime", "ombriul", etc.
 # global FORMES_TETES
-FORMES_TETES = ["sans_tete","joueur","receptionniste","paume","peureuse","encombrant","alchimiste","peste","bombe_atomique","marchand"] #Rajouter "gobelin", "orc"
+FORMES_TETES = ["sans_tete","heros","receptionniste","paume","peureuse","encombrant","alchimiste","peste","bombe_atomique","marchand"] #Rajouter "gobelin", "orc"
 # global FORMES_ITEMS
 FORMES_ITEMS = ["item","armure_dor","armure_dor_cassee","lance_dor","lance_dor_cassee","epee","epee_epeiste","armure_epeiste","tunique_enchantee","robe_magique","tunique_alchimiste","soutane","robe_sorciere","chapeau_sorciere","epee_marchand","armure_marchand"] #Rajouter tous les items existants
 

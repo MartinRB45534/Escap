@@ -92,7 +92,7 @@ class Skill_vision(Skill_intrasec):
         return portee_vision[self.niveau-1] #Pour l'instant la portée est la seule chose qu'on veut savoir
 
 class Skill_ramasse(Skill_intrasec):
-    """Le skill utilisé pour ramasser un item. Lorsqu'il augmente de niveau, on peut ramasser des objets plus puissants. C'est un skill intrasec à la classe principale (mais certains ne l'ont pas).
+    """Le skill utilisé pour ramasser les items d'une cases. Lorsqu'il augmente de niveau, on peut ramasser des objets plus puissants. C'est un skill intrasec à la classe principale (mais certains ne l'ont pas).
        C'est un skill actif, qui s'actionne quand on le réclame."""
     def __init__(self):
         Skill_intrasec.__init__(self)
@@ -112,8 +112,33 @@ class Skill_ramasse(Skill_intrasec):
             #Pas d'autre cadeau
 
     def utilise(self,priorite):
-        self.xp_new+=gain_xp_ramasse[self.niveau-1] #On gagne de l'xp ! Ou pas ?
+        self.xp_new+=gain_xp_ramasse[self.niveau-1]
         return latence_ramasse[self.niveau-1], priorite_ramasse[self.niveau-1]>priorite
+
+class Skill_ramasse_light(Skill_intrasec):
+    """Le skill utilisé pour ramasser certains items d'une case. Lorsqu'il augmente de niveau, on peut ramasser des objets plus puissants. C'est un skill intrasec à la classe principale (mais certains ne l'ont pas).
+       Contrairement au Skill_ramasse, il ne ramasse que les items 'simples' (clés, peut-être potions et parchemins).
+       C'est un skill actif, qui s'actionne quand on le réclame."""
+    def __init__(self):
+        Skill_intrasec.__init__(self)
+        self.priorite = 0
+        self.latence = 11
+        self.gain_xp = 0.1
+        self.nom="Ramassage light"
+
+    def get_skin(self):
+        return SKIN_SKILL_RAMASSE
+
+    def evo(self,nb_evo=1):
+        for i in range(nb_evo):
+            self.priorite+=1 #La priorite augmente à chaque niveau
+            self.latence-=1 #La latence diminue à chaque niveau
+            self.niveau+=1 #Le niveau augmente
+            #Pas d'autre cadeau
+
+    def utilise(self,priorite):
+        self.xp_new+=gain_xp_ramasse[self.niveau-1]
+        return latence_ramasse[self.niveau-1], priorite_ramasse[self.niveau-1]>priorite #Peut-être avoir une latence inférieure ?
 
 class Skill_boost_explosifs(Skill_intrasec):
     """Le skill d'amélioration des effets des explosifs (le spliter pour les trois effets ?). C'est un skill intrasec à la classe artificier.
