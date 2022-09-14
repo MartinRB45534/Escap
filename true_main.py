@@ -10,7 +10,7 @@ GLOBALS = {"controleur":None}
 from Menus import *
 from Modifiers import *
 from Jeu.Controleur import *
-from Jeu.Affichage.Nouveaux_affichages import *
+from Affichage.Nouveaux_affichages import *
 
 SKIN_ESCAP.dessine_toi(screen,(0,0))
 

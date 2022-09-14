@@ -1,6 +1,6 @@
 from Jeu.Constantes import *
 from Jeu.Entitee.Item.Items import *
-from Jeu.Affichage.Affichage import *
+from Affichage.Affichage import *
 from Jeu.Skins.Skins import *
 from math import ceil
 

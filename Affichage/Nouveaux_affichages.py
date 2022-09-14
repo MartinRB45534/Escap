@@ -1,4 +1,4 @@
-from Jeu.Affichage.Affichage import *
+from Affichage.Affichage import *
 from Jeu.Controleur import *
 from Jeu.Skins.Skins import *
 
@@ -2434,7 +2434,7 @@ class Affichage_ennemis(Wrapper):
                     self.liste_ennemis.insert(2*i,ennemi,0)
                     self.liste_ennemis.insert(2*i,Marge_horizontale(),5)
                     i+=1
-                else: #l'ennemi qui était à l'emplacement i a été retiré (rare mais je suppose que ça peut arriver)
+                else: #l'ennemi qui était à l'emplacement i a été retiré (on l'a tué par exemple, ou il est sorti de notre champs de vision)
                     self.ennemis.pop(i)
                     self.liste_ennemis.pop(2*i) # La marge avant l'item
                     self.liste_ennemis.pop(2*i) # L'item
@@ -3758,48 +3758,64 @@ class Vignette_case(Final,Affichage):
             self.objets.append(Vignette(position,taille,SKIN_BROUILLARD))
 
 class Vignette_allie(Final,Affichage):
-    def __init__(self,position,agissant,esprit,taille,shade=False,invalide=False):
+    def __init__(self,position,agissant:Agissant,esprit,taille,shade=False,invalide=False):
         self.objets:List[Affichable] = []
         self.tailles = [taille,taille]
         self.position = position
         self.agissant = agissant
         self.esprit = esprit
         self.courant = False
-        self.objets.append(Vignettes_agissant(position,agissant,taille))
-        for statut in agissant.get_skins_statuts():
-            self.objets.append(Vignette(position,taille,statut))
+        self.shades:List[Affichable] = []
         if shade or invalide:
-            self.objets.append(Vignette(position,taille,SKIN_SHADE))
+            self.shades.append(Vignette(position,taille,SKIN_SHADE))
         if invalide:
-            self.objets.append(Vignette(position,taille,SKIN_SHADE))
+            self.shades.append(Vignette(position,taille,SKIN_SHADE))
+        
+    def update(self):
+        self.objets.append(Vignettes_agissant(self.position,self.agissant,self.tailles[0]))
+        for statut in self.agissant.get_skins_statuts():
+            self.objets.append(Vignette(self.position,self.tailles[0],statut))
+        self.objets+=self.shades
 
 class Vignette_ennemi(Final,Affichage):
-    def __init__(self,position,agissant,esprit,taille,shade=False,invalide=False):
+    def __init__(self,position,agissant:Agissant,esprit,taille,shade=False,invalide=False):
         self.objets:List[Affichable] = []
         self.tailles = [taille,taille]
         self.position = position
         self.agissant = agissant
         self.esprit = esprit
         self.courant = False
-        self.objets.append(Vignettes_agissant(position,agissant,taille))
+        self.shades:List[Affichable] = []
         if shade or invalide:
-            self.objets.append(Vignette(position,taille,SKIN_SHADE))
+            self.shades.append(Vignette(position,taille,SKIN_SHADE))
         if invalide:
-            self.objets.append(Vignette(position,taille,SKIN_SHADE))
+            self.shades.append(Vignette(position,taille,SKIN_SHADE))
+        
+    def update(self):
+        self.objets.append(Vignettes_agissant(self.position,self.agissant,self.tailles[0]))
+        for statut in self.agissant.get_skins_statuts():
+            self.objets.append(Vignette(self.position,self.tailles[0],statut))
+        self.objets+=self.shades
 
 class Vignette_neutre(Final,Affichage):
-    def __init__(self,position,agissant,esprit,taille,shade=False,invalide=False):
+    def __init__(self,position,agissant:Agissant,esprit,taille,shade=False,invalide=False):
         self.objets:List[Affichable] = []
         self.tailles = [taille,taille]
         self.position = position
         self.agissant = agissant
         self.esprit = esprit
         self.courant = False
-        self.objets.append(Vignettes_agissant(position,agissant,taille))
+        self.shades:List[Affichable] = []
         if shade or invalide:
-            self.objets.append(Vignette(position,taille,SKIN_SHADE))
+            self.shades.append(Vignette(position,taille,SKIN_SHADE))
         if invalide:
-            self.objets.append(Vignette(position,taille,SKIN_SHADE))
+            self.shades.append(Vignette(position,taille,SKIN_SHADE))
+        
+    def update(self):
+        self.objets.append(Vignettes_agissant(self.position,self.agissant,self.tailles[0]))
+        for statut in self.agissant.get_skins_statuts():
+            self.objets.append(Vignette(self.position,self.tailles[0],statut))
+        self.objets+=self.shades
 
 class Affichage_replique(Pave):
     """Un élément avec beaucoup de texte. S'adapte sur plusieurs lignes si besoin"""

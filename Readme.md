@@ -58,12 +58,11 @@ Troisi�me �tape : mains[0][2].boucle() et le jeu reprend imm�diatement, at
 
 
 TODO (pour ne pas oublier les problèmes que je découvre) :
- - Les dialogues sur les consignes sont obsolètes !
- - Ajouter le ramassage "light"
- - On peut scroller une liste qui n'occupe pas toute la longueur de son contenant...
+ - Dialogues (consignes obsolètes, ingrédients et potions, ramassage complet)
+ - On peut scroller une liste qui n'occupe pas toute la longueur de son contenant... (Vraiment bizarre...)
  - Ajouter un "message" lorsqu'on reçoit un item ! (Ou quand on ramasse.)
- - La vignette d'agissant ne se met pas à jour (barre de PV, direction, statuts)
- - Lorsqu'un humain quite la liste des neutres (en rejoignant le joueur), les éventuels autres agissants de la liste des neutres ne remontent pas au sommet (à la fois c'est cohérent, puisqu'ils gardent leur position, et en même temps bizarre visuellement)
+ - La vignette d'agissant ne se met pas à jour (barre de PV, direction, statuts) (corrigé, à vérifier)
+ - Lorsqu'un humain quite la liste des neutres (en rejoignant le joueur), les éventuels autres agissants de la liste des neutres ne remontent pas au sommet (à la fois c'est cohérent, puisqu'ils gardent leur position, et en même temps bizarre visuellement) (corrigé, à vérifier)
  - Labyrinthe de sélection de la case pour "Tu vois là-bas ?" a le labyrinthe de jeu habituel en fond (mais pourquoi !?)
  - Validation de la sélection de la case pour "Tu vois là-bas ?" ne passe pas à la suite du dialogue
 
