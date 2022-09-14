@@ -521,6 +521,15 @@ class Liste_verticale(Liste):
                 tailles_contenu = contenu.get_tailles(tailles)
             contenu.set_tailles(tailles_contenu) #Certains adaptent leur taille en fonction de ce qu'on leur accorde
             somme += tailles_contenu[1]
+        decalage = 0
+        if somme < tailles[1]:
+            decalage += tailles[1]-somme
+        if self.decalage + decalage > 0:
+            decalage = -self.decalage
+        if decalage != 0:
+            for contenu in self.contenu:
+                contenu.decale([0,decalage])
+            self.decalage += decalage
 
     def get_tailles(self,tailles):
         # print("<get l v>")
@@ -594,6 +603,15 @@ class Liste_horizontale(Liste):
                 tailles_contenu = contenu.get_tailles(tailles)
             contenu.set_tailles(tailles_contenu) #Certains adaptent leur taille en fonction de ce qu'on leur accorde
             somme += tailles_contenu[0]
+        decalage = 0
+        if somme < tailles[0]:
+            decalage += tailles[0]-somme
+        if self.decalage + decalage > 0:
+            decalage = -self.decalage
+        if decalage != 0:
+            for contenu in self.contenu:
+                contenu.decale([decalage,0])
+            self.decalage += decalage
 
     def get_tailles(self,tailles):
         # print("<get l h>")
@@ -613,6 +631,7 @@ class Liste_horizontale(Liste):
             if decalage != 0:
                 for contenu in self.contenu:
                     contenu.decale([decalage,0])
+                self.decalage += decalage
                 return True
         return False
 
