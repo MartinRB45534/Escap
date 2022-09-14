@@ -59,7 +59,8 @@ Troisi�me �tape : mains[0][2].boucle() et le jeu reprend imm�diatement, at
 
 TODO (pour ne pas oublier les problèmes que je découvre) :
  - Dialogues (consignes obsolètes, ingrédients et potions, ramassage complet)
- - Le resize ne fonctionne pas (pas implémenté)
+ - Il serait probablement graphiquement plus plaisant que le lab soit centré, verticalement et horizontalement
+ - La liste (horizontale) des items (dans l'onglet de l'inventaire fermé) ne se scrolle pas (quand on réduit la taille de la fenètre et qu'ils n'entrent pas tous). (Les autres éléments scrolables à disposition (liste des catégories d'items de l'inventaire ouvert ou les répliques) fonctionnent très bien)
  - Ajouter un "message" lorsqu'on reçoit un item ! (Ou quand on ramasse.)
  - Labyrinthe de sélection de la case pour "Tu vois là-bas ?" a le labyrinthe de jeu habituel en fond (mais pourquoi !?)
  - Validation de la sélection de la case pour "Tu vois là-bas ?" ne passe pas à la suite du dialogue

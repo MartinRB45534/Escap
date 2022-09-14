@@ -274,7 +274,7 @@ class Joueur:
             elif (event.type == pygame.ACTIVEEVENT and event.state == 1) and (event.gain == 0 and not self.controleur.pause): #On est passé sur une autre fenêtre. Je vais mettre le jeu en pause pour toi, de rien.
                 self.controleur.toogle_pause() #/!\ Rajouter une option pour désactiver la pause auto (afk farm)
             elif event.type == pygame.VIDEORESIZE :
-                self.cree_affichage() # À implémenter /!\
+                self.affichage.set_tailles([event.w,event.h])
             elif event.type == pygame.KEYDOWN :
                 self.controle(event.key,get_modifiers(event.mod))
             elif event.type == pygame.KEYUP : #Les touches de skill peuvent être maintenues
