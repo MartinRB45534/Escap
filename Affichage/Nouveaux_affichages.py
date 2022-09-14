@@ -3772,6 +3772,7 @@ class Vignette_allie(Final,Affichage):
             self.shades.append(Vignette(position,taille,SKIN_SHADE))
         
     def update(self):
+        self.objets:List[Affichable] = []
         self.objets.append(Vignettes_agissant(self.position,self.agissant,self.tailles[0]))
         for statut in self.agissant.get_skins_statuts():
             self.objets.append(Vignette(self.position,self.tailles[0],statut))
@@ -3792,6 +3793,7 @@ class Vignette_ennemi(Final,Affichage):
             self.shades.append(Vignette(position,taille,SKIN_SHADE))
         
     def update(self):
+        self.objets:List[Affichable] = []
         self.objets.append(Vignettes_agissant(self.position,self.agissant,self.tailles[0]))
         for statut in self.agissant.get_skins_statuts():
             self.objets.append(Vignette(self.position,self.tailles[0],statut))
@@ -3812,6 +3814,7 @@ class Vignette_neutre(Final,Affichage):
             self.shades.append(Vignette(position,taille,SKIN_SHADE))
         
     def update(self):
+        self.objets:List[Affichable] = []
         self.objets.append(Vignettes_agissant(self.position,self.agissant,self.tailles[0]))
         for statut in self.agissant.get_skins_statuts():
             self.objets.append(Vignette(self.position,self.tailles[0],statut))

@@ -540,17 +540,17 @@ class Liste_verticale(Liste):
         if self.scroll_liste(position,x,y): #Un de nos éléments a scrollé
             return True
         elif self.touche(position) and y != 0: #Personne n'a scrollé, peut-être qu'on peut le faire
-            if y<0:
-                #On veut descendre dans la liste
-                #On ne peut pas descendre au delà du bas de la liste
-                decalage = max(y,self.tailles[1] - sum(self.repartition[i] if self.repartition[i] else self.contenu[i].get_tailles(self.tailles)[1] for i in range(len(self.repartition))) - self.decalage)
-            else:
-                decalage = min(y,-self.decalage)
-            if decalage != 0:
-                for contenu in self.contenu:
-                    contenu.decale([0,decalage])
-                self.decalage += decalage
-                return True
+            taille_contenu = sum(self.repartition[i] if self.repartition[i] else self.contenu[i].get_tailles(self.tailles)[1] for i in range(len(self.repartition)))
+            if taille_contenu > self.tailles[1]: # On ne scrolle pas si on ne peut même pas remplir tout l'espace disponible
+                if y<0:
+                    decalage = max(y,self.tailles[1] - taille_contenu - self.decalage)
+                else:
+                    decalage = min(y,-self.decalage)
+                if decalage != 0:
+                    for contenu in self.contenu:
+                        contenu.decale([0,decalage])
+                    self.decalage += decalage
+                    return True
         return False
 
     def ajuste(self,element:Affichable):
@@ -622,17 +622,17 @@ class Liste_horizontale(Liste):
         if self.scroll_liste(position,x,y): #Un de nos éléments a scrollé
             return True
         elif self.touche(position) and x != 0: #Personne n'a scrollé, peut-être qu'on peut le faire
-            if x<0:
-                #On veut descendre dans la liste
-                #On ne peut pas descendre au delà du bas de la liste
-                decalage = max(x,self.tailles[0] - sum(self.repartition[i] if self.repartition[i] else self.contenu[i].get_tailles(self.tailles)[0] for i in range(len(self.repartition))) - self.decalage)
-            else:
-                decalage = min(x,-self.decalage)
-            if decalage != 0:
-                for contenu in self.contenu:
-                    contenu.decale([decalage,0])
-                self.decalage += decalage
-                return True
+            taille_contenu = sum(self.repartition[i] if self.repartition[i] else self.contenu[i].get_tailles(self.tailles)[0] for i in range(len(self.repartition)))
+            if taille_contenu > self.tailles[0]: # On ne scrolle pas si on ne peut même pas remplir tout l'espace disponible
+                if x<0:
+                    decalage = max(x,self.tailles[0] - taille_contenu - self.decalage)
+                else:
+                    decalage = min(x,-self.decalage)
+                if decalage != 0:
+                    for contenu in self.contenu:
+                        contenu.decale([decalage,0])
+                    self.decalage += decalage
+                    return True
         return False
 
     def ajuste(self,element:Affichable):
