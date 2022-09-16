@@ -52,5 +52,8 @@ Concrétement :
         5 - Ajouter les cases restantes aux couloirs (pour chaque case restante, si elle a 2 ou 1 ouverture, créer un couloir qui contient cette case ; pour chacun des 2 ou 1 cases voisines, si la case voisine appartient à un couloir, fusionner les couloirs)
         6 - Lister les cases restantes comme carrefours
 
-    Faire la suppression avant l'ajout (calculs de connection des salles plus courts)
+    La suppression se fait pendant l'oubli, l'ajout pendant la vue.
+    (Est-ce qu'il peut y avoir eu oubli sans qu'il y ait eu vue ? )
+
+    Il peut y avoir de la suppression pendant la vue (destruction de mur, ouverture de porte, etc. = suppression de couloir)
 

@@ -9,6 +9,8 @@ class Esprit :
     def __init__(self,nom:str): #On identifie les esprits par des noms (en fait on s'en fout, vu qu'on ne fait pas d'opérations dessus on pourrait avoir des labs, des entitees et des esprits nommés avec des str, des int, des float, des bool, etc.)
         self.corps:Dict[int,str] = {}
         self.vue = Vues()
+        self.salles:List[Salle] = []
+        self.couloirs:List[Couloir] = []
         self.ennemis:Dict[int,List[float]] = {}
         self.dispersion_spatiale = 0.9 #La décroissance de l'importance dans l'espace. Tester plusieurs options pour l'optimiser
         self.prejuges = []
@@ -66,7 +68,7 @@ class Esprit :
         nouvelles_cases = []
         for decalage in vue.decalage:
             case = vue[decalage]
-            if case[1] > 0 and not self.vue[case[0]][1]: #/!\ Réduire ça proprement
+            if (case[1] > 0 and not self.vue[case[0]][1]) or case[5] != self.vue[case[0]][5]: #/!\ Réduire ça proprement
                 nouvelles_cases.append(case[0])
             if case[1] > 0: #Si la clarté est positive
                 case[2] = self.oubli
@@ -136,12 +138,57 @@ class Esprit :
         nouvelles_cases = [*set(nouvelles_cases)] #Pour retirer les doublons
         # update_representation(nouvelles_cases)
 
-    def update_representation(self,cases):
-        carres_pot = []
+    def update_representation(self,cases:List[Position]):
+        carres_pot:List[Position] = []
         for case in cases:
             for dec in Decalage(1,1):
                 carres_pot.append(case-dec)
-        pass
+        carres:List[Position] = []
+        for carre_pot in carres_pot:
+            if self.vue[carre_pot][5][DROITE][0] and self.vue[carre_pot+DROITE][5][GAUCHE][0] and self.vue[carre_pot+BAS][5][DROITE][0] and self.vue[carre_pot+DROITE+BAS][5][GAUCHE][0] and self.vue[carre_pot][5][BAS][0] and self.vue[carre_pot+BAS][5][HAUT][0] and self.vue[carre_pot+DROITE][5][BAS][0] and self.vue[carre_pot+BAS+DROITE][5][HAUT][0] :
+                carres.append(carre_pot)
+        salles_mod:List[Salle] = [] #Les salles qu'on a modifiées
+        for carre in carres:
+            salle = Salle(carre)
+            self.salles.append(salle)
+            for salle_ in self.salles:
+                if salle_ != salle: #Peut arriver si on partage plusieurs cases avec une salle existante
+                    for dir in DIRECTIONS:
+                        if carre+dir in salle_.carres: #Ces deux carrés partagent deux cases : les deux salles n'en forment qu'une seule
+                            salle = self.fusionne_salles(salle_,salle) #/!\ À coder
+            salles_mod.append(salle)
+        for salle in salles_mod:
+            if salle in self.salles: #On peut en avoir retirées
+                salle.add_cases()
+                salle.make_bord()
+                salle.entrees = [*set([bord.emplacement for bord in salle.frontiere if self.vue[bord.emplacement][5][bord.direction][4]])]
+                salle.calcule_distances()
+                for case in salle.cases:
+                    if case in cases:
+                        cases.remove(case)
+        couloirs_mod:List[Couloir] = []
+        for case in cases:
+            if sum([self.vue[case][5][dir][4] for dir in DIRECTIONS]) < 3:
+                couloir = Couloir(case)
+                self.couloirs.append(couloir)
+                for couloir_ in self.couloirs:
+                    for dir in DIRECTIONS:
+                        if case+dir in couloir_.cases and self.vue[case][5][dir][4] and self.vue[case+dir][5][dir.oppose()][4]:
+                            couloir = self.fusionne_couloirs(couloir_,couloir) #/!\ À coder
+                couloirs_mod.append(couloir)
+        for couloir in couloirs_mod:
+            pass
+        # Est-ce qu'on a vraiment besoin de lister les carrefours ? Peut-être les entrées pour savoir à qui elles mènent depuis l'extérieur ?
+
+    def fusionne_salles(self,salle1:Salle,salle2:Salle): #salle1 est probablement plus grosse que salle2
+        salle1.carres += salle2.carres # Et c'est tout ?
+        self.salles.remove(salle2)
+        return salle1
+
+    def fusionne_couloirs(self,couloir1:Couloir,couloir2:Couloir): #salle1 est probablement plus grosse que salle2
+        couloir1.cases += couloir2.cases # Et c'est tout ?
+        self.salles.remove(couloir2)
+        return couloir1
 
     def get_offenses(self):
         for corp in self.corps.keys(): #On vérifie si quelqu'un nous a offensé
