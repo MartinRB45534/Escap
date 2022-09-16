@@ -1,5 +1,5 @@
 from Jeu.Entitee.Agissant.Agissants import *
-from Jeu.Labyrinthe.Vue import *
+from Jeu.Esprit.Representation_spatiale import *
 
 from typing import Dict, Literal
 import operator
@@ -53,15 +53,25 @@ class Esprit :
                             importance = new_importance
         return importance
 
-    def ajoute_vue(self,vue:Vue):
+    def ajoute_vue(self,vue:Vue): #Indiquer les cases nouvellement vues
         self.vue[vue.id] = vue
-
-    def maj_vue(self,vue:Vue):
+        nouvelles_cases = []
         for decalage in vue.decalage:
             case = vue[decalage]
+            if case[1] > 0:
+                nouvelles_cases.append(case[0])
+        return nouvelles_cases
+
+    def maj_vue(self,vue:Vue): #Indiquer les cases nouvellement vues
+        nouvelles_cases = []
+        for decalage in vue.decalage:
+            case = vue[decalage]
+            if case[1] > 0 and not self.vue[case[0]][1]: #/!\ Réduire ça proprement
+                nouvelles_cases.append(case[0])
             if case[1] > 0: #Si la clarté est positive
                 case[2] = self.oubli
                 self.vue[case[0]] = case #On remplace par la dernière version de la vision
+        return nouvelles_cases
 
     def trouve_agissants_vue(self,vue:Vue):
         agissants = []
@@ -75,13 +85,6 @@ class Esprit :
         for case in self.vue:
             agissants += case[6]
         return sorted(agissants)
-
-    # def get_corps_vus(self):
-    #     corps = []
-    #     for corp in self.corps.keys():
-    #         if self.corps[corp] != "incapacite":
-    #             corps.append(corp)
-    #     return corps
 
     def get_corps_vus(self):
         corps = []
@@ -118,17 +121,27 @@ class Esprit :
                 agissant:Agissant = self.controleur[corp]
                 vues.append(agissant.vue)
                 agissants_vus += self.trouve_agissants_vue(agissant.vue)
-        self.oublie_agissants(agissants_vus) #Puisqu'on les a vus, on n'a plus besoin de garder en mémoire leur position précédente.
+        self.oublie_agissants(agissants_vus) #Puisqu'on les a vus, on n'a plus besoin de garder en mémoire leur position précédente. /!\ À modifier plus tard
         for ID_agissant in agissants_vus:
             if not(ID_agissant in self.ennemis.keys() or ID_agissant in self.corps.keys()):
                 for espece in self.controleur.get_especes(ID_agissant):
                     if espece in self.prejuges:
                         self.ennemis[ID_agissant] = [0.01,0]
+        nouvelles_cases = []
         for vue in vues :
             if vue.id in self.vue.keys(): 
-                self.maj_vue(vue)
+                nouvelles_cases+=self.maj_vue(vue)
             else:
-                self.ajoute_vue(vue)
+                nouvelles_cases+=self.ajoute_vue(vue)
+        nouvelles_cases = [*set(nouvelles_cases)] #Pour retirer les doublons
+        # update_representation(nouvelles_cases)
+
+    def update_representation(self,cases):
+        carres_pot = []
+        for case in cases:
+            for dec in Decalage(1,1):
+                carres_pot.append(case-dec)
+        pass
 
     def get_offenses(self):
         for corp in self.corps.keys(): #On vérifie si quelqu'un nous a offensé
@@ -526,7 +539,8 @@ class Esprit :
                         res = corp.agit_en_vue(self)
         corp.statut = res
 
-    def oublie(self):
+    def oublie(self): #/!\ Marquer les cases anciennement vues
+        anciennes_cases = []
         for case in self.vue:
             if case[2] > 0:
                 case[2] -= 1
@@ -535,9 +549,11 @@ class Esprit :
                 case[4] = 0
                 case[5] = [[False,False,False,False,False],[False,False,False,False,False],[False,False,False,False,False],[False,False,False,False,False]]
                 case[6] = []
+                anciennes_cases.append(case[0])
             case[3] = [0,0,0,0,0,False]
             case[7] = []
             case[8] = False
+        # downdate_representation(anciennes_cases)
 
     #Découvront le déroulé d'un tour avec esprit-sensei :
     def debut_tour(self):

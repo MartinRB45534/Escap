@@ -54,4 +54,3 @@ Concrétement :
 
     Faire la suppression avant l'ajout (calculs de connection des salles plus courts)
 
-    
