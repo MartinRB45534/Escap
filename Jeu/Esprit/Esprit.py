@@ -55,7 +55,7 @@ class Esprit :
                             importance = new_importance
         return importance
 
-    def ajoute_vue(self,vue:Vue): #Indiquer les cases nouvellement vues
+    def ajoute_vue(self,vue:Vue):
         self.vue[vue.id] = vue
         nouvelles_cases = []
         for decalage in vue.decalage:
@@ -64,7 +64,7 @@ class Esprit :
                 nouvelles_cases.append(case[0])
         return nouvelles_cases
 
-    def maj_vue(self,vue:Vue): #Indiquer les cases nouvellement vues
+    def maj_vue(self,vue:Vue):
         nouvelles_cases = []
         for decalage in vue.decalage:
             case = vue[decalage]
@@ -136,7 +136,7 @@ class Esprit :
             else:
                 nouvelles_cases+=self.ajoute_vue(vue)
         nouvelles_cases = [*set(nouvelles_cases)] #Pour retirer les doublons
-        # update_representation(nouvelles_cases)
+        self.update_representation(nouvelles_cases)
 
     def update_representation(self,cases:List[Position]):
         carres_pot:List[Position] = []
@@ -177,7 +177,9 @@ class Esprit :
                             couloir = self.fusionne_couloirs(couloir_,couloir) #/!\ À coder
                 couloirs_mod.append(couloir)
         for couloir in couloirs_mod:
-            pass
+            if couloir in self.couloirs:
+                couloir.sort_cases()
+                pass
         # Est-ce qu'on a vraiment besoin de lister les carrefours ? Peut-être les entrées pour savoir à qui elles mènent depuis l'extérieur ?
 
     def fusionne_salles(self,salle1:Salle,salle2:Salle): #salle1 est probablement plus grosse que salle2
@@ -186,9 +188,23 @@ class Esprit :
         return salle1
 
     def fusionne_couloirs(self,couloir1:Couloir,couloir2:Couloir): #salle1 est probablement plus grosse que salle2
-        couloir1.cases += couloir2.cases # Et c'est tout ?
-        self.salles.remove(couloir2)
-        return couloir1
+        for dir in DIRECTIONS:
+            if self.vue[couloir1.cases[0]][5][dir][4] == couloir2.cases[0] and self.vue[couloir2.cases[0]][5][dir.oppose()][4] == couloir1.cases[0]:
+                couloir1.cases = reversed(couloir1.cases) + couloir2.cases # Et c'est tout ?
+                self.salles.remove(couloir2)
+                return couloir1
+            if self.vue[couloir1.cases[-1]][5][dir][4] == couloir2.cases[0] and self.vue[couloir2.cases[0]][5][dir.oppose()][4] == couloir1.cases[-1]:
+                couloir1.cases = couloir1.cases + couloir2.cases # Et c'est tout ?
+                self.salles.remove(couloir2)
+                return couloir1
+            if self.vue[couloir1.cases[0]][5][dir][4] == couloir2.cases[-1] and self.vue[couloir2.cases[-1]][5][dir.oppose()][4] == couloir1.cases[0]:
+                couloir2.cases = couloir2.cases + couloir1.cases # Et c'est tout ?
+                self.salles.remove(couloir1)
+                return couloir2
+            if self.vue[couloir1.cases[-1]][5][dir][4] == couloir2.cases[-1] and self.vue[couloir2.cases[-1]][5][dir.oppose()][4] == couloir1.cases[-1]:
+                couloir1.cases = couloir1.cases + reversed(couloir2.cases) # Et c'est tout ?
+                self.salles.remove(couloir2)
+                return couloir1
 
     def get_offenses(self):
         for corp in self.corps.keys(): #On vérifie si quelqu'un nous a offensé
