@@ -6,6 +6,13 @@ class Espace_schematique:
         self.frontiere:List[Cote] = []
         self.cases:List[Position] = []
         self.entrees:List[Position] = []
+        self.skip = True
+
+    def get_cases(self):
+        return self.cases
+    
+    def get_all_cases(self):
+        return self.cases+self.entrees
 
 class Salle(Espace_schematique):
     def __init__(self,carre:Position):
@@ -14,6 +21,7 @@ class Salle(Espace_schematique):
         self.carres:List[Position] = [carre]
         self.entrees:List[Position] = []
         self.distances:List[List[int]] = []
+        self.skip = True
 
     def add_cases(self):
         self.cases = []
@@ -54,6 +62,7 @@ class Couloir(Espace_schematique):
         self.frontiere:List[Cote] = []
         self.cases:List[Position] = [case] if case != None else []
         self.entrees:List[Position] = []
+        self.skip = True
 
     def dist(self,entree1,entree2):
         if entree1 == entree2:

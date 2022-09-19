@@ -219,8 +219,7 @@ class Esprit :
             libre = True
             for salle in self.salles:
                 if carre in salle.carres:
-                    print("carré pas libre")
-                    libre = False
+                    libre = False #Arrive par exemple lorsqu'on ouvre une porte à côté d'une case déjà dans une salle
                     break
             if libre:
                 salle = Salle(carre)
@@ -245,6 +244,8 @@ class Esprit :
                 for case in salle.cases:
                     if case in cases:
                         cases.remove(case)
+                    if case in salle.entrees:
+                        salle.cases.remove(case)
         new_courant = pygame.time.get_ticks()
         duree = new_courant - constantes_temps['courant']
         constantes_temps['repr_salle_esprits'] += duree
@@ -434,8 +435,19 @@ class Esprit :
             if isinstance(corp,Stratege): # Comment faire quand on a plusieurs stratèges ? /!\
                 self.resolution = corp.resolution
 
+    def set_skip(self,sources,recepteurs):
+        for espace in self.salles+self.couloirs:
+            espace.skip = True
+            for source in sources:
+                if source in espace.get_cases():
+                    espace.skip = False
+            for recepteur in recepteurs:
+                if recepteur in espace.get_all_cases():
+                    espace.skip = False
+
     def calcule_trajets(self):
         # On détermine la dangerosité de chaque case en fonction des dégats qui vont y avoir lieu
+        pos_corps = [self.controleur[corp].get_position() for corp in self.corps.keys() if self.corps[corp] in ["attaque","fuite","soin","soutien"]]
         coef=7 #/!\ Expérimenter avec ce coef à l'occasion
         for case in self.vue:
             for effet in case[7]:
@@ -447,6 +459,7 @@ class Esprit :
         coef_croissant = 1.1
         # On commence par trouver les seuils, vers lesquels on va vouloir aller
         seuils = self.trouve_seuils(self.get_pos_vues()) # On part des différents endroit d'où l'on voit, qui devraient théoriquement nous donner accès à toute notre vision
+        self.set_skip(seuils,pos_corps)
         self.propage(seuils,coef_croissant,3,False,-1) # On propage de façon croissante à partir des seuils (à l'intérieur)
         self.propage(seuils,coef_croissant,2,True,-1) # On propage de façon croissante à partir des seuils (à l'intérieur), en contournant les obstacles
 
@@ -475,9 +488,11 @@ class Esprit :
                         if not position in dangerosites:
                             dangerosites.append(position)
         # On propage l'importance de façon décroissante à partir des ennemis
+        self.set_skip(importance,pos_corps)
         self.propage(importances,coef_importance) #Traversée
         self.propage(importances,coef_importance,0,True) #Contournement (<= Traversée)
         # On propage la dangerosité de façon décroissante à partir des ennemis et des seuils
+        self.set_skip(dangerosites,pos_corps)
         self.propage(dangerosites,coef_dangerosite,3) #Traversée
         self.propage(dangerosites,coef_dangerosite,2,True) #Contournement
 
@@ -485,41 +500,7 @@ class Esprit :
 
     def resoud(self,position:Position,portee:int,indice=1,dead_ends=False):
         """'Résoud' un labyrinthe à partir d'une case donnée."""
-
-        if indice == 4:
-            for case in self.vue:
-                case[3][4] = 0
-
-        #la queue est une liste de positions
-        queue=[position]
-
-        if position in self.vue:
-
-            self.vue[position][3][indice] = portee
-
-            arret_obstacle = False
-
-            while len(queue)!=0 :
-
-                position = queue[0]
-
-                clarte = self.vue[position][3][indice]*self.dispersion_spatiale
-                #enlever position dans queue
-                queue.pop(0)
-
-                #trouver les positions explorables
-
-                pos_explorables = self.positions_utilisables(position,arret_obstacle)
-
-                arret_obstacle = dead_ends
-
-                for pos in pos_explorables:
-                    if clarte > self.vue[pos][3][indice]:
-                        #on marque la case comme visitée
-                        self.vue[pos][3][indice] = clarte
-                        
-                        #on ajoute toutes les directions explorables
-                        queue.append(pos)
+        self.propage([position],self.dispersion_spatiale,indice,dead_ends)
 
     def propage(self,positions:List[Position],coef,indice=1,dead_ends=False,comparateur=1):
         """'Résoud' un labyrinthe à partir de plusieurs points"""
@@ -535,15 +516,8 @@ class Esprit :
 
         departs = len(positions)
 
-        while len(queue)!=0 :
-
-            position = queue[0]
-
-            valeur = self.vue[position][3][indice]*coef
-            #enlever position dans queue
-            queue.pop(0)
-
-            #trouver les positions explorables
+        while len(queue) :
+            position = queue.pop(0)
 
             if departs == 0:
                 arret_obstacle = dead_ends
@@ -553,15 +527,16 @@ class Esprit :
             pos_explorables = self.positions_utilisables(position,arret_obstacle)
 
             for pos in pos_explorables:
+                valeur = self.vue[position][3][indice]*coef**pos[1]
                 if valeur*comparateur > self.vue[pos][3][indice]*comparateur:
                     #on marque la case comme visitée
-                    self.vue[pos][3][indice] = valeur
+                    self.vue[pos[0]][3][indice] = valeur
 
                     #on ajoute toutes les directions explorables
-                    queue.append(pos)
+                    queue.append(pos[0])
 
     def trouve_seuils(self,positions:List[Position],indice=2,dead_ends=False):
-        """Fonction qui trouve les 'seuils', c'est à  dire les cases qui ont un valeur plus grande que leurs voisines"""
+        """Fonction qui trouve les 'seuils', c'est à  dire les cases qui ont une valeur plus grande que leurs voisines"""
 
         for case in self.vue:
             case[3][5] = False
@@ -575,11 +550,9 @@ class Esprit :
 
         departs = len(positions)
 
-        while len(queue)!=0 :
+        while len(queue) :
 
-            position = queue[0]
-            #enlever position dans queue
-            queue.pop(0)
+            position = queue.pop(0)            
 
             #trouver les positions explorables
 
@@ -662,13 +635,21 @@ class Esprit :
                 print(bas)
 
     def positions_utilisables(self,position:Position,dead_ends:bool):
-        pos_utilisables:List[Position]=[]
+        pos_utilisables:List[tuple[Position,int]]=[]
 
         case = self.vue[position]
-
-        for direction in DIRECTIONS:
-            if any(case[5][direction]) and not(dead_ends and case[6]!=[]) and case[5][direction][4].lab in self.vue.keys():
-                pos_utilisables.append(case[5][direction][4])
+        if position in self.entrees.keys():
+            for direction in DIRECTIONS:
+                if any(case[5][direction]) and not(dead_ends and case[6]!=[]) and not any([case[5][direction][4] in espace.cases and espace.skip for espace in self.entrees[position]]) and case[5][direction][4].lab in self.vue.keys():
+                    pos_utilisables.append((case[5][direction][4],1))
+            for espace in self.entrees[position]:
+                if espace.skip:
+                    for entree in espace.entrees:
+                        pos_utilisables.append((entree,espace.dist(position,entree)))
+        else:
+            for direction in DIRECTIONS:
+                if any(case[5][direction]) and not(dead_ends and case[6]!=[]) and case[5][direction][4].lab in self.vue.keys():
+                    pos_utilisables.append((case[5][direction][4],1))
 
         return pos_utilisables
 

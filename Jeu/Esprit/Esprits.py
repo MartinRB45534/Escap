@@ -309,8 +309,9 @@ class Esprit_humain(Esprit_simple):
                 Esprit.deplace(self,ID_humain)
             else:
                 res = "recherche"
-                self.resoud(cible,10,4)
                 position = humain.get_position()
+                self.set_skip([cible],[position])
+                self.resoud(cible,10,4)
                 case = self.vue[position]
                 repoussante = case[8]
                 cases = [[-1,case[0],case[3][0],case[3][1],-case[3][2],case[3][2],-case[3][3],case[3][3],case[3][4]]]

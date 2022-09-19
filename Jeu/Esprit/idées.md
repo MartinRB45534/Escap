@@ -1,59 +1,21 @@
-Conception de l'espace :
+Comment utiliser couloirs et salles pour optimiser les esprits :
 
-    couloirs (succession de cases sans embranchement)
-    carrefours (embranchement)
-    salles (espace "ouvert", i.e. il y a toujours plusieurs chemins entre deux points)
+1 - Simplification de la méthode actuelle
+    Il n'y a pas toujours besoin de propager à chaque case des salles et des couloirs. On peut alors sauter d'une entrée à l'autre (on connait la distance qui les sépare).
+    Cas où il faut propager dans les salles et les couloirs :
+        quand la source est dans la salle ou le couloir
+        quand on veut utiliser la valeur dans la salle ou le couloir (i.e. le corps qui veut se déplacer est dans la salle ou le couloir)
+        et quand un obstacle est dans la salle ou le couloir ? (Souvent l'obstacle va être lui-même une source ou quelque chose qui a besoin de mesurer la valeur donc la question ne se pose pas.)
+    Cas où il n'est pas nécessaire de propager :
+        tout le reste du temps
+    Actuellement, que propage-t-on ?
+        les seuils de dangerosité d'effets, vers l'intérieur (utilisé par les corps)
+        la dangerosité (effets et ennemis, utilisé par les corps)
+        l'importance (ennemis, utilisé par les corps)
+        la cible de déplacement d'un humain (allié, ennemi ou position)
+    En résumé, lors de la propagation, il peut être utile de marquer les salles et couloirs à parcourir et de ne pas parcourir le reste.
+    Un espace est à parcourir si la source se trouve dans l'espace (entrées exclues) ou si le recepteur se trouve dans l'espace (entrées inclues).
 
-    Chaque point de l'espace est dans un couloir, sur un carrefour ou dans une salle. Il est à une certaine distance des autres éléments du même couloir, carrefour ou salle et des entrées/sorties du couloir, carrefour ou salle. Théoriquement, tous les calculs actuels pourraient se faire avec ces informations et en ne propageant qu'au sein des couloirs, carrefours ou salles concernés.
-
-Concrétement :
-
-    Comment former les couloirs, carrefours et salles ?
-    Option simple (mais probablement coûteuse) : recalculer à chaque fois (pourrait convenir pour les esprits avec peu de vision/beaucoup de changements de vision)
-    Option compliquée : mettre à jour au fur et à mesure (sans-doute nécessaire au moins pour l'esprit du joueur qui mémorise l'intégralité du labyrinthe parcouru)
-
-    Pour les couloirs : au minimum, c'est une case avec deux ouvertures (à moins que ce soit le coin d'une salle) (techniquement, un couloir de trois cases en coin peut en fait être une salle)
-    À partir d'une première case, on ajoute les cases voisinnes si elles sont connectées et n'ont que deux ou une ouverture. Information à stocker : les extrémitées (pour tous les calculs) et les cases intermédiaires (dans l'ordre ?) pour les cas où il faut propager localement ou scinder le couloir parce qu'on en perd de vue le milieu.
-
-    Pour les carrefours : ce sont toutes les cases qui ont trois ou quatre ouvertures (sauf celles qui appartiennent à une salle). Chaque carrefour ne comprend qu'une case.
-
-    Pour les salles : tout le reste. Le plus difficile à définir et distinguer. Peut-être commencer par là ?
-
-    Pour les connexions : garder en mémoire qu'est-ce qui est connecté à quoi ? Le retrouver à partir des positions ?
-
-
-    Salles :
-        Successions de carrés (4 cases sans murs internes (mur internes ouverts au sens spatial, i.e. les téléporteurs, escaliers etc. ne sont pas ouverts)) qui partagent deux cases avec les carrés voisins. Chaque carré peut être repéré par sa case en haut à gauche.
-        Les "entrées" sont toutes les cases dont un mur ouvert (au sens du passage, i.e. les téléporteurs, escaliers etc. sont ouverts) appartient à la frontière de la salle.
-        Les entrées n'appartiennent pas à la salle. Ce seront des carrefours.
-
-    Couloirs :
-        Successions de cases à 2 ou 1 ouvertures (au sens spatial ?) qui partagent un mur avec les cases voisines. Chaque case peut être repérée par sa position.
-        Les "entrées" sont les cases voisines des extrémités (i.e. les cases cibles des murs ouverts (au sens du passage) de la frontière du couloir). Il y en a une ou deux.
-
-    Carrefours :
-        Les cases restantes sont des carrefours (y compris les entrées des salles et des couloirs).
-
-
-
-    Suppression des anciens éléments :
-        1 - Lister les anciens carrés possibles (4 pour chaque ancienne case)
-        2 - Trouver les carrés supprimés
-        3 - Retirer les carrés aux salles (si un ancien carré est connecté à plusieurs autres carrés, vérifier qu'ils sont toujours connectés)
-        4 - Lister les cases supprimées de chaque salle (potentiellement des cases non-supprimées, mais n'appartenant plus à la salle)
-        5 - Retirer les cases restantes aux couloirs (en scindant les couloirs si les cases sont au milieu)
-        6 - Retirer les carrefours supprimés
-
-    Ajout des nouveaux éléments :
-        1 - Lister les nouveaux carrés possibles (4 pour chaque nouvelle case)
-        2 - Trouver les carrés (vérifier que les murs internes sont ouverts)
-        3 - Ajouter les nouveaux carrés aux salles (pour chaque carré, créer une salle qui contient ce carré ; pour chacun des 4 carrés voisins potentiels, si le carré voisin appartient à une salle, fusionner avec la salle actuelle du carré actuel)
-        4 - Lister les nouvelles cases de chaque salle (non-entrées) (potentiellement d'anciennes cases nouvellement dans la salle)
-        5 - Ajouter les cases restantes aux couloirs (pour chaque case restante, si elle a 2 ou 1 ouverture, créer un couloir qui contient cette case ; pour chacun des 2 ou 1 cases voisines, si la case voisine appartient à un couloir, fusionner les couloirs)
-        6 - Lister les cases restantes comme carrefours
-
-    La suppression se fait pendant l'oubli, l'ajout pendant la vue.
-    (Est-ce qu'il peut y avoir eu oubli sans qu'il y ait eu vue ? )
-
-    Il peut y avoir de la suppression pendant la vue (destruction de mur, ouverture de porte, etc. = suppression de couloir)
+2 - Gérer mieux les déplacements
+    Permettre aux corps de se croiser/contourner sans se bloquer, prioriser les déplacements.
 
