@@ -57,6 +57,8 @@ Troisi�me �tape : mains[0][2].boucle() et le jeu reprend imm�diatement, at
 
 
 TODO (pour ne pas oublier les problèmes que je découvre) :
+ - La résolution ne fonctionne plus ?
+ - En tout cas pour les humains qui veulent rejoindre le joueur (dès qu'ils sortent de son champ de vision !)
  - Salle (et porte) manquante dans l'étage des téléporteurs
  - On essaye parfois d'afficher un ennemi qui n'a plus de controleur (i.e., qui est dans un étage désactivé et donc hors de notre vision) ? Pourquoi est-ce qu'on affiche les agissants hors de notre vision active ?
  - Dialogues (consignes obsolètes, ingrédients et potions, ramassage complet)

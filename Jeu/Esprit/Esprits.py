@@ -240,15 +240,7 @@ class Esprit_humain(Esprit_simple):
             case[3] = [0,0,0,0,0,False]
             case[7] = []
             case[8] = False
-        new_courant = pygame.time.get_ticks()
-        duree = new_courant - constantes_temps['courant']
-        constantes_temps['reste'] += duree
-        constantes_temps['courant'] = new_courant
         self.downdate_representation(anciennes_cases)
-        new_courant = pygame.time.get_ticks()
-        duree = new_courant - constantes_temps['courant']
-        constantes_temps['drepr_esprits'] += duree
-        constantes_temps['courant'] = new_courant
 
     def peureuse(self):
         return 5 in self.corps.keys() and self.corps[5] in ["humain","attente","fuite","deplacement","attaque","vivant"] #J'ai un doute sur la possibilité des deux derniers mais bon...
