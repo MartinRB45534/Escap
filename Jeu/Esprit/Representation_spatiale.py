@@ -6,7 +6,6 @@ class Espace_schematique:
         self.frontiere:List[Cote] = []
         self.cases:List[Position] = []
         self.entrees:List[Position] = []
-        self.distances:List[List[int]] = []
 
 class Salle(Espace_schematique):
     def __init__(self,carre:Position):
@@ -14,9 +13,11 @@ class Salle(Espace_schematique):
         self.cases:List[Position] = []
         self.carres:List[Position] = [carre]
         self.entrees:List[Position] = []
+        self.distances:List[List[int]] = []
 
     def add_cases(self):
-        for case in [carre+dec for dec in Decalage(1,1) for carre in self.carres]:
+        self.cases = []
+        for case in [carre+dec for dec in Decalage(2,2) for carre in self.carres]:
             if not case in self.cases:
                 self.cases.append(case)
 
@@ -24,11 +25,12 @@ class Salle(Espace_schematique):
         self.frontiere = [Cote(case,dir) for dir in DIRECTIONS for case in self.cases if not case + dir in self.cases]
 
     def calcule_distances(self):
+        self.distances = []
         for i in range(len(self.entrees)):
-            distances = [0]*len(self.entrees-i-1)
+            distances = [0]*(len(self.entrees)-i-1)
             queue = [(self.entrees[i],0)]
             visitees = self.entrees[:i+1]
-            while len(queue)!=0 :
+            while len(queue) :
                 position,distance = queue.pop(0)
                 for dir in DIRECTIONS:
                     voisin = position+dir
@@ -48,7 +50,13 @@ class Salle(Espace_schematique):
             return self.distances[i][j-i-1]
 
 class Couloir(Espace_schematique):
-    def __init__(self,case:Position):
+    def __init__(self,case:Position=None):
         self.frontiere:List[Cote] = []
-        self.cases:List[Position] = [case]
+        self.cases:List[Position] = [case] if case != None else []
         self.entrees:List[Position] = []
+
+    def dist(self,entree1,entree2):
+        if entree1 == entree2:
+            return 0
+        else:
+            return len(self.cases)+1

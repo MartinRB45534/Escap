@@ -138,10 +138,6 @@ class Joueur:
         duree = new_courant - constantes_temps['courant']
         constantes_temps['agissants.debut_tour'] += duree
         constantes_temps['courant'] = new_courant
-        # new_courant = pygame.time.get_ticks()
-        # duree = new_courant - constantes_temps['courant']
-        # constantes_temps['reste'] += duree
-        # constantes_temps['courant'] = new_courant
         self.affichage.update()
         new_courant = pygame.time.get_ticks()
         duree = new_courant - constantes_temps['courant']

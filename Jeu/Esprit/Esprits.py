@@ -127,35 +127,31 @@ class Esprit_solitaire(Esprit_type):
         self.corps = {}
         self.ajoute_corp(corp)
 
-class Esprit_simple(Esprit_type):
+class Esprit_simple(Esprit):
     """Un esprit avec les corps qu'on lui donne."""
     def __init__(self,nom:str,corps:List[int],prejuges:List[str],controleur:Controleur):
+        self.corps:Dict[int,str] = {}
+        self.vue = Vues()
+        self.salles:List[Salle] = []
+        self.couloirs:List[Couloir] = []
+        self.entrees:Dict[Position,List[Espace_schematique]] = {}
+        self.ennemis:Dict[int,List[float]] = {}
         self.nom = nom
         self.controleur = controleur
         self.oubli = 5
-        self.ennemis = {}
         self.dispersion_spatiale = 0.9 #La décroissance de l'importance dans l'espace. Tester plusieurs options pour l'optimiser
         self.prejuges = prejuges
         self.pardon = 0.9 #La décroissance de l'importance avec le temps. Peut être supérieure à 1 pour s'en prendre en priorité aux ennemis ancestraux.
         self.resolution = 0
-        self.vue = Vues()
-        self.corps = {}
         self.ajoute_corps(corps)
 
-class Esprit_humain(Esprit_type):
+class Esprit_humain(Esprit_simple):
     """Un esprit qui dirige un ou plusieurs humains. Peut interragir avec d'autres esprits humains."""
     def __init__(self,corp:int,controleur:Controleur): #Les humains commencent tous séparément, donc ils ont leur propre esprit au début
-        self.nom:str = controleur[corp].identite
+        Esprit.__init__(self,controleur[corp].identite)
         self.controleur = controleur
         self.oubli = 5 #Faire dépendre de l'humain
-        self.ennemis = {}
-        self.dispersion_spatiale = 0.9
-        self.prejuges = [] #Peut-être quelques boss ?
-        self.pardon = 0.9
-        self.resolution = 0
-        self.vue = Vues()
-        self.corps = {}
-        Esprit_type.ajoute_corp(self,corp)
+        self.ajoute_corp(corp)
         self.chef = corp #Les humains ne peuvent pas s'empêcher d'avoir des chefs
 
     def get_offenses(self):
@@ -227,20 +223,32 @@ class Esprit_humain(Esprit_type):
             self.controleur.esprits[self.nom] = self
 
     def oublie(self):
+        anciennes_cases = []
         for case in self.vue:
             if case[2] > 0:
                 if self.peureuse():
                     case[2] = self.oubli
-                else:
-                    case[2] -= 1
-            if case[2] <= 0:
+            if case[2] > 1:
+                case[2] -= 1
+            elif case[2] > 0:
                 case[1] = 0
+                case[2] = 0
                 case[4] = 0
                 case[5] = [[False,False,False,False,False],[False,False,False,False,False],[False,False,False,False,False],[False,False,False,False,False]]
                 case[6] = []
+                anciennes_cases.append(case[0])
             case[3] = [0,0,0,0,0,False]
             case[7] = []
             case[8] = False
+        new_courant = pygame.time.get_ticks()
+        duree = new_courant - constantes_temps['courant']
+        constantes_temps['reste'] += duree
+        constantes_temps['courant'] = new_courant
+        self.downdate_representation(anciennes_cases)
+        new_courant = pygame.time.get_ticks()
+        duree = new_courant - constantes_temps['courant']
+        constantes_temps['drepr_esprits'] += duree
+        constantes_temps['courant'] = new_courant
 
     def peureuse(self):
         return 5 in self.corps.keys() and self.corps[5] in ["humain","attente","fuite","deplacement","attaque","vivant"] #J'ai un doute sur la possibilité des deux derniers mais bon...
@@ -423,16 +431,19 @@ class Esprit_humain(Esprit_type):
 class Esprit_slime(Esprit_type):
     """Un esprit qui dirige un ou plusieurs slimes. Peut interragir avec d'autres esprits slimes."""
     def __init__(self,corp:int,controleur:Controleur): #Les slimes commencent tous séparément, donc ils ont leur propre esprit au début
+        self.corps:Dict[int,str] = {}
+        self.vue = Vues()
+        self.salles:List[Salle] = []
+        self.couloirs:List[Couloir] = []
+        self.entrees:Dict[Position,List[Espace_schematique]] = {}
+        self.ennemis:Dict[int,List[float]] = {}
         self.nom = "esprit_slime_"+str(corp)
         self.controleur = controleur
         self.oubli = 5 #Faire dépendre des skills
-        self.ennemis = {}
         self.dispersion_spatiale = 0.9 #La décroissance de l'importance dans l'espace. Tester plusieurs options pour l'optimiser
         self.prejuges = ["humain"] #Vraiment ?
         self.pardon = 0.9 #La décroissance de l'importance avec le temps. Peut être supérieure à 1 pour s'en prendre en priorité aux ennemis ancestraux.
         self.resolution = 0
-        self.vue = Vues()
-        self.corps = {}
         self.classe:Classe_principale = controleur[corp].classe_principale
         self.ajoute_corp(corp)
 

@@ -57,6 +57,8 @@ Troisi�me �tape : mains[0][2].boucle() et le jeu reprend imm�diatement, at
 
 
 TODO (pour ne pas oublier les problèmes que je découvre) :
+ - Salle (et porte) manquante dans l'étage des téléporteurs
+ - On essaye parfois d'afficher un ennemi qui n'a plus de controleur (i.e., qui est dans un étage désactivé et donc hors de notre vision) ? Pourquoi est-ce qu'on affiche les agissants hors de notre vision active ?
  - Dialogues (consignes obsolètes, ingrédients et potions, ramassage complet)
  - Il serait probablement graphiquement plus plaisant que le lab soit centré, verticalement et horizontalement
  - La liste (horizontale) des items (dans l'onglet de l'inventaire fermé) ne se scrolle pas (quand on réduit la taille de la fenètre et qu'ils n'entrent pas tous). (Les autres éléments scrolables à disposition (liste des catégories d'items de l'inventaire ouvert ou les répliques) fonctionnent très bien)

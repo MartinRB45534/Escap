@@ -11,6 +11,7 @@ class Esprit :
         self.vue = Vues()
         self.salles:List[Salle] = []
         self.couloirs:List[Couloir] = []
+        self.entrees:Dict[Position,List[Espace_schematique]] = {}
         self.ennemis:Dict[int,List[float]] = {}
         self.dispersion_spatiale = 0.9 #La décroissance de l'importance dans l'espace. Tester plusieurs options pour l'optimiser
         self.prejuges = []
@@ -62,15 +63,21 @@ class Esprit :
             case = vue[decalage]
             if case[1] > 0:
                 nouvelles_cases.append(case[0])
+            else:
+                self.vue[case[0]][1] = 0
+                self.vue[case[0]][2] = 0
+                self.vue[case[0]][4] = 0
+                self.vue[case[0]][5] = [[False,False,False,False,False],[False,False,False,False,False],[False,False,False,False,False],[False,False,False,False,False]]
+                self.vue[case[0]][6] = []
         return nouvelles_cases
 
     def maj_vue(self,vue:Vue):
         nouvelles_cases = []
         for decalage in vue.decalage:
             case = vue[decalage]
-            if (case[1] > 0 and not self.vue[case[0]][1]) or case[5] != self.vue[case[0]][5]: #/!\ Réduire ça proprement
-                nouvelles_cases.append(case[0])
             if case[1] > 0: #Si la clarté est positive
+                if case[5] != self.vue[case[0]][5]: #/!\ Réduire ça proprement
+                    nouvelles_cases.append(case[0])
                 case[2] = self.oubli
                 self.vue[case[0]] = case #On remplace par la dernière version de la vision
         return nouvelles_cases
@@ -136,27 +143,99 @@ class Esprit :
             else:
                 nouvelles_cases+=self.ajoute_vue(vue)
         nouvelles_cases = [*set(nouvelles_cases)] #Pour retirer les doublons
+        new_courant = pygame.time.get_ticks()
+        duree = new_courant - constantes_temps['courant']
+        constantes_temps['esprits'] += duree
+        constantes_temps['courant'] = new_courant
         self.update_representation(nouvelles_cases)
+        new_courant = pygame.time.get_ticks()
+        duree = new_courant - constantes_temps['courant']
+        constantes_temps['repr_esprits'] += duree
+        constantes_temps['courant'] = new_courant
 
-    def update_representation(self,cases:List[Position]):
+    def downdate_representation(self,cases):
         carres_pot:List[Position] = []
         for case in cases:
-            for dec in Decalage(1,1):
-                carres_pot.append(case-dec)
+            for dec in Decalage(2,2):
+                if case-dec in self.vue and case-dec+Decalage(1,1) in self.vue:
+                    carres_pot.append(case-dec)
+        carres_pot = [*set(carres_pot)]
+        carres_suppr:List[Position] = []
+        for carre_pot in carres_pot:
+            if not(self.vue[carre_pot][5][DROITE][0] and self.vue[carre_pot+DROITE][5][GAUCHE][0] and self.vue[carre_pot+BAS][5][DROITE][0] and self.vue[carre_pot+DROITE+BAS][5][GAUCHE][0] and self.vue[carre_pot][5][BAS][0] and self.vue[carre_pot+BAS][5][HAUT][0] and self.vue[carre_pot+DROITE][5][BAS][0] and self.vue[carre_pot+BAS+DROITE][5][HAUT][0]):
+                carres_suppr.append(carre_pot)
+        salles_mod:List[Salle] = [] #Les salles qu'on a modifiées
+        for carre in carres_suppr:
+            for salle in self.salles:
+                if carre in salle.carres:
+                    salles_mod += self.scinde_salle(salle,carre)
+        couloirs_mod:List[Couloir] = []
+        for salle in salles_mod:
+            if salle in self.salles: #On peut en avoir retirées
+                salle.add_cases()
+                salle.make_bord()
+                salle.entrees = [*set([bord.emplacement for bord in salle.frontiere if self.vue[bord.emplacement][5][bord.direction][4]])]
+                salle.calcule_distances()
+        for case in cases:
+            for couloir in self.couloirs:
+                if case in couloir.cases:
+                    couloirs_mod += self.scinde_couloir(couloir,case)
+        for couloir in couloirs_mod:
+            if couloir in self.couloirs:
+                couloir.entrees = []
+                for dir in DIRECTIONS:
+                    case = self.vue[couloir.cases[0]][5][dir][4]
+                    if case and case not in couloir.cases: #Un mur vers l'extérieur !
+                        couloir.entrees.append(case)
+                    case = self.vue[couloir.cases[-1]][5][dir][4]
+                    if case and case not in couloir.cases: #Un mur vers l'extérieur !
+                        couloir.entrees.append(case)
+        for espace in salles_mod + couloirs_mod:
+            for entree in espace.entrees:
+                self.entrees[entree] = self.entrees.get(entree,[])+[espace]
+
+    def update_representation(self,cases:List[Position]):
+        new_courant = pygame.time.get_ticks()
+        duree = new_courant - constantes_temps['courant']
+        constantes_temps['repr_esprits'] += duree
+        constantes_temps['courant'] = new_courant
+        carres_pot:List[Position] = []
+        for case in cases:
+            for dec in Decalage(2,2):
+                if case-dec in self.vue and case-dec+Decalage(1,1) in self.vue:
+                    carres_pot.append(case-dec)
+        carres_pot = [*set(carres_pot)]
         carres:List[Position] = []
         for carre_pot in carres_pot:
-            if self.vue[carre_pot][5][DROITE][0] and self.vue[carre_pot+DROITE][5][GAUCHE][0] and self.vue[carre_pot+BAS][5][DROITE][0] and self.vue[carre_pot+DROITE+BAS][5][GAUCHE][0] and self.vue[carre_pot][5][BAS][0] and self.vue[carre_pot+BAS][5][HAUT][0] and self.vue[carre_pot+DROITE][5][BAS][0] and self.vue[carre_pot+BAS+DROITE][5][HAUT][0] :
+            if self.vue[carre_pot][5][DROITE][0] and self.vue[carre_pot+DROITE][5][GAUCHE][0] and self.vue[carre_pot][5][BAS][0] and self.vue[carre_pot+BAS][5][HAUT][0] and self.vue[carre_pot+BAS][5][DROITE][0] and self.vue[carre_pot+DROITE+BAS][5][GAUCHE][0] and self.vue[carre_pot+DROITE][5][BAS][0] and self.vue[carre_pot+BAS+DROITE][5][HAUT][0] :
                 carres.append(carre_pot)
+        new_courant = pygame.time.get_ticks()
+        duree = new_courant - constantes_temps['courant']
+        constantes_temps['repr_carre_esprits'] += duree
+        constantes_temps['courant'] = new_courant
         salles_mod:List[Salle] = [] #Les salles qu'on a modifiées
+        couloirs_mod:List[Couloir] = []
         for carre in carres:
-            salle = Salle(carre)
-            self.salles.append(salle)
-            for salle_ in self.salles:
-                if salle_ != salle: #Peut arriver si on partage plusieurs cases avec une salle existante
-                    for dir in DIRECTIONS:
-                        if carre+dir in salle_.carres: #Ces deux carrés partagent deux cases : les deux salles n'en forment qu'une seule
-                            salle = self.fusionne_salles(salle_,salle) #/!\ À coder
-            salles_mod.append(salle)
+            libre = True
+            for salle in self.salles:
+                if carre in salle.carres:
+                    print("carré pas libre")
+                    libre = False
+                    break
+            if libre:
+                salle = Salle(carre)
+                self.salles.append(salle)
+                for salle_ in self.salles:
+                    if salle_ != salle: #Peut arriver si on partage plusieurs cases avec une salle existante
+                        for dir in DIRECTIONS:
+                            if carre+dir in salle_.carres: #Ces deux carrés partagent deux cases : les deux salles n'en forment qu'une seule
+                                salle = self.fusionne_salles(salle_,salle)
+                                break
+                salles_mod.append(salle)
+            for dec in Decalage(2,2):
+                for couloir in self.couloirs:
+                    if carre+dec in couloir.cases: #Cette case appartenait à un couloir. Ce n'est plus le cas car des murs ont été ouverts (portes, écrasement, etc.) et elle appartient désormais à une salle
+                        couloirs_mod += self.scinde_couloir(couloir,carre+dec)
         for salle in salles_mod:
             if salle in self.salles: #On peut en avoir retirées
                 salle.add_cases()
@@ -166,45 +245,154 @@ class Esprit :
                 for case in salle.cases:
                     if case in cases:
                         cases.remove(case)
-        couloirs_mod:List[Couloir] = []
+        new_courant = pygame.time.get_ticks()
+        duree = new_courant - constantes_temps['courant']
+        constantes_temps['repr_salle_esprits'] += duree
+        constantes_temps['courant'] = new_courant
         for case in cases:
-            if sum([self.vue[case][5][dir][4] for dir in DIRECTIONS]) < 3:
-                couloir = Couloir(case)
-                self.couloirs.append(couloir)
-                for couloir_ in self.couloirs:
-                    for dir in DIRECTIONS:
-                        if case+dir in couloir_.cases and self.vue[case][5][dir][4] and self.vue[case+dir][5][dir.oppose()][4]:
-                            couloir = self.fusionne_couloirs(couloir_,couloir) #/!\ À coder
+            if sum([int(not(not(self.vue[case][5][dir][4]))) for dir in DIRECTIONS]) < 3:
+                libre = True
+                for couloir in self.couloirs:
+                    if case in couloir.cases:
+                        libre = False
+                        break
+                if libre:
+                    couloir = Couloir(case)
+                    self.couloirs.append(couloir)
+                    for couloir_ in self.couloirs:
+                        if couloir_ != couloir:
+                            for dir in DIRECTIONS:
+                                if case+dir in couloir_.cases and self.vue[case][5][dir][4] and self.vue[case+dir][5][dir.oppose()][4]:
+                                    new_courant = pygame.time.get_ticks()
+                                    duree = new_courant - constantes_temps['courant']
+                                    constantes_temps['repr_couloir1_esprits'] += duree
+                                    constantes_temps['courant'] = new_courant
+                                    couloir = self.fusionne_couloirs(couloir_,couloir)
+                                    new_courant = pygame.time.get_ticks()
+                                    duree = new_courant - constantes_temps['courant']
+                                    constantes_temps['repr_fusion_couloir_esprits'] += duree
+                                    constantes_temps['courant'] = new_courant
+                                    break
                 couloirs_mod.append(couloir)
+                new_courant = pygame.time.get_ticks()
+                duree = new_courant - constantes_temps['courant']
+                constantes_temps['repr_couloir1_esprits'] += duree
+                constantes_temps['courant'] = new_courant
+            else:
+                for couloir in self.couloirs:
+                    if case in couloir.cases: #Cette case appartenait à un couloir. Ce n'est plus le cas car des murs ont été ouverts (portes, écrasement, etc.)
+                        couloirs_mod += self.scinde_couloir(couloir,case)
+                new_courant = pygame.time.get_ticks()
+                duree = new_courant - constantes_temps['courant']
+                constantes_temps['repr_carrefour_esprits'] += duree
+                constantes_temps['courant'] = new_courant
+        new_courant = pygame.time.get_ticks()
+        duree = new_courant - constantes_temps['courant']
+        constantes_temps['repr_couloir1_esprits'] += duree
+        constantes_temps['courant'] = new_courant
         for couloir in couloirs_mod:
             if couloir in self.couloirs:
-                couloir.sort_cases()
-                pass
-        # Est-ce qu'on a vraiment besoin de lister les carrefours ? Peut-être les entrées pour savoir à qui elles mènent depuis l'extérieur ?
+                couloir.entrees = []
+                for dir in DIRECTIONS:
+                    case = self.vue[couloir.cases[0]][5][dir][4]
+                    if case and case not in couloir.cases: #Un mur vers l'extérieur !
+                        couloir.entrees.append(case)
+                    case = self.vue[couloir.cases[-1]][5][dir][4]
+                    if case and case not in couloir.cases: #Un mur vers l'extérieur !
+                        couloir.entrees.append(case)
+        new_courant = pygame.time.get_ticks()
+        duree = new_courant - constantes_temps['courant']
+        constantes_temps['repr_couloir_esprits'] += duree
+        constantes_temps['courant'] = new_courant
+        for espace in salles_mod + couloirs_mod:
+            for entree in espace.entrees:
+                self.entrees[entree] = self.entrees.get(entree,[])+[espace]
+        new_courant = pygame.time.get_ticks()
+        duree = new_courant - constantes_temps['courant']
+        constantes_temps['repr_entree_esprits'] += duree
+        constantes_temps['courant'] = new_courant
 
     def fusionne_salles(self,salle1:Salle,salle2:Salle): #salle1 est probablement plus grosse que salle2
         salle1.carres += salle2.carres # Et c'est tout ?
-        self.salles.remove(salle2)
+        self.remove_salle(salle2)
         return salle1
 
     def fusionne_couloirs(self,couloir1:Couloir,couloir2:Couloir): #salle1 est probablement plus grosse que salle2
         for dir in DIRECTIONS:
             if self.vue[couloir1.cases[0]][5][dir][4] == couloir2.cases[0] and self.vue[couloir2.cases[0]][5][dir.oppose()][4] == couloir1.cases[0]:
-                couloir1.cases = reversed(couloir1.cases) + couloir2.cases # Et c'est tout ?
-                self.salles.remove(couloir2)
+                couloir1.cases = list(reversed(couloir1.cases)) + couloir2.cases # Et c'est tout ?
+                self.remove_couloir(couloir2)
                 return couloir1
             if self.vue[couloir1.cases[-1]][5][dir][4] == couloir2.cases[0] and self.vue[couloir2.cases[0]][5][dir.oppose()][4] == couloir1.cases[-1]:
                 couloir1.cases = couloir1.cases + couloir2.cases # Et c'est tout ?
-                self.salles.remove(couloir2)
+                self.remove_couloir(couloir2)
                 return couloir1
             if self.vue[couloir1.cases[0]][5][dir][4] == couloir2.cases[-1] and self.vue[couloir2.cases[-1]][5][dir.oppose()][4] == couloir1.cases[0]:
                 couloir2.cases = couloir2.cases + couloir1.cases # Et c'est tout ?
-                self.salles.remove(couloir1)
+                self.remove_couloir(couloir1)
                 return couloir2
             if self.vue[couloir1.cases[-1]][5][dir][4] == couloir2.cases[-1] and self.vue[couloir2.cases[-1]][5][dir.oppose()][4] == couloir1.cases[-1]:
-                couloir1.cases = couloir1.cases + reversed(couloir2.cases) # Et c'est tout ?
-                self.salles.remove(couloir2)
+                couloir1.cases = couloir1.cases + list(reversed(couloir2.cases)) # Et c'est tout ?
+                self.remove_couloir(couloir2)
                 return couloir1
+        print(couloir1.cases)
+        print(couloir2.cases)
+        print("Oops! How did I get there?")
+
+    def scinde_salle(self,salle:Salle,carre:Position):
+        salle.carres.remove(carre)
+        voisins = [carre+dir for dir in DIRECTIONS if carre+dir in salle.carres]
+        salles = []
+        while voisins != []:
+            depart = voisins.pop(0)
+            queue = [depart]
+            salle.carres.remove(depart)
+            new_salle = Salle(depart)
+            while len(queue):
+                position = queue.pop(0)
+                for dir in DIRECTIONS:
+                    voisin = position+dir
+                    if voisin in salle.carres:
+                        salle.carres.remove(voisin)
+                        queue.append(voisin)
+                        new_salle.carres.append(voisin)
+                        if voisin in voisins:
+                            voisins.remove(voisin)
+            salles.append(new_salle)
+        self.remove_salle(salle)
+        self.salles += salles
+        return salles
+
+    def scinde_couloir(self,couloir:Couloir,case:Position):
+        i = couloir.cases.index(case)
+        cases1,cases2 = couloir.cases[:i],couloir.cases[i+1:]
+        couloirs = []
+        if cases1 != []:
+            couloir1 = Couloir()
+            couloir1.cases = cases1
+            self.couloirs.append(couloir1)
+            couloirs.append(couloir1)
+        if cases2 != []:
+            couloir2 = Couloir()
+            couloir2.cases = cases2
+            self.couloirs.append(couloir2)
+            couloirs.append(couloir2)
+        self.remove_couloir(couloir)
+        return couloirs
+
+    def remove_salle(self,salle:Salle):
+        self.salles.remove(salle)
+        for entree in salle.entrees:
+            self.entrees[entree].remove(salle)
+            if self.entrees[entree] == []:
+                self.entrees.pop(entree)
+
+    def remove_couloir(self,couloir:Couloir):
+        self.couloirs.remove(couloir)
+        for entree in couloir.entrees:
+            self.entrees[entree].remove(couloir)
+            if self.entrees[entree] == []:
+                self.entrees.pop(entree)
 
     def get_offenses(self):
         for corp in self.corps.keys(): #On vérifie si quelqu'un nous a offensé
@@ -605,10 +793,11 @@ class Esprit :
     def oublie(self): #/!\ Marquer les cases anciennement vues
         anciennes_cases = []
         for case in self.vue:
-            if case[2] > 0:
+            if case[2] > 1:
                 case[2] -= 1
-            if case[2] <= 0:
+            elif case[2] > 0:
                 case[1] = 0
+                case[2] = 0
                 case[4] = 0
                 case[5] = [[False,False,False,False,False],[False,False,False,False,False],[False,False,False,False,False],[False,False,False,False,False]]
                 case[6] = []
@@ -616,7 +805,15 @@ class Esprit :
             case[3] = [0,0,0,0,0,False]
             case[7] = []
             case[8] = False
-        # downdate_representation(anciennes_cases)
+        new_courant = pygame.time.get_ticks()
+        duree = new_courant - constantes_temps['courant']
+        constantes_temps['reste'] += duree
+        constantes_temps['courant'] = new_courant
+        self.downdate_representation(anciennes_cases)
+        new_courant = pygame.time.get_ticks()
+        duree = new_courant - constantes_temps['courant']
+        constantes_temps['drepr_esprits'] += duree
+        constantes_temps['courant'] = new_courant
 
     #Découvront le déroulé d'un tour avec esprit-sensei :
     def debut_tour(self):

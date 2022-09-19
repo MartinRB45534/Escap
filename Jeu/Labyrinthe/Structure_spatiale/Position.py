@@ -41,6 +41,10 @@ class Position:
             return self.lab == other.lab and self.x == other.x and self.y == other.y
         return False
 
+    def __hash__(self):
+        return hash((self.lab, self.x, self.y))
+
+
     def __contains__(self,item): #Ce n'est pas exactement l'usage normal de in, mais en l'occurence pos1 in pos2 est vrai si les deux positions sont au même étage
         if isinstance(item,Position):
             return self.lab == item.lab
