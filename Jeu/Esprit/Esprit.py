@@ -406,6 +406,10 @@ class Esprit :
             if isinstance(corp,Stratege): # Comment faire quand on a plusieurs stratèges ? /!\
                 self.resolution = corp.resolution
 
+    def unset_skip(self):
+        for espace in self.salles+self.couloirs:
+            espace.skip = False
+
     def set_skip(self,sources,recepteurs):
         for espace in self.salles+self.couloirs:
             espace.skip = True
@@ -429,6 +433,7 @@ class Esprit :
         # On modifie légèrement pour pouvoir sortir des zones concernées
         coef_croissant = 1.1
         # On commence par trouver les seuils, vers lesquels on va vouloir aller
+        self.unset_skip()
         seuils = self.trouve_seuils(self.get_pos_vues()) # On part des différents endroit d'où l'on voit, qui devraient théoriquement nous donner accès à toute notre vision
         self.set_skip(seuils,pos_corps)
         self.propage(seuils,coef_croissant,3,False,-1) # On propage de façon croissante à partir des seuils (à l'intérieur)
@@ -471,14 +476,18 @@ class Esprit :
 
     def resoud(self,position:Position,portee:int,indice=1,dead_ends=False):
         """'Résoud' un labyrinthe à partir d'une case donnée."""
-        self.propage([position],self.dispersion_spatiale,indice,dead_ends)
+
+        if position in self.vue:
+
+            if indice == 4:
+                for case in self.vue:
+                    case[3][4] = 0
+
+            self.vue[position][3][indice] = portee
+            self.propage([position],self.dispersion_spatiale,indice,dead_ends)
 
     def propage(self,positions:List[Position],coef,indice=1,dead_ends=False,comparateur=1):
         """'Résoud' un labyrinthe à partir de plusieurs points"""
-
-        if indice == 4:
-            for case in self.vue:
-                case[3][4] = 0
 
         #la queue est une liste de positions
         queue = [position for position in positions]
@@ -490,10 +499,10 @@ class Esprit :
         while len(queue) :
             position = queue.pop(0)
 
-            if departs == 0:
-                arret_obstacle = dead_ends
-            else:
+            if departs:
                 departs -= 1
+            else:
+                arret_obstacle = dead_ends
 
             pos_explorables = self.positions_utilisables(position,arret_obstacle)
 
