@@ -209,6 +209,8 @@ class Esprit :
             for salle in self.salles:
                 if carre in salle.carres:
                     libre = False #Arrive par exemple lorsqu'on ouvre une porte à côté d'une case déjà dans une salle
+                    if salle not in salles_mod:
+                        salles_mod.append(salle) #Si on a ouvert une porte, on veut rajouter cette case aux entrées (sinon on a des problèmes de résolution)
                     break
             if libre:
                 salle = Salle(carre)
@@ -422,7 +424,7 @@ class Esprit :
 
     def calcule_trajets(self):
         # On détermine la dangerosité de chaque case en fonction des dégats qui vont y avoir lieu
-        pos_corps = [self.controleur[corp].get_position() for corp in self.corps.keys() if self.corps[corp] in ["attaque","fuite","soin","soutien"]]
+        pos_corps = [self.controleur[corp].get_position() for corp in self.corps.keys() if self.corps[corp] != "incapacite"]
         coef=7 #/!\ Expérimenter avec ce coef à l'occasion
         for case in self.vue:
             for effet in case[7]:
@@ -474,7 +476,7 @@ class Esprit :
 
         # /!\ Prendre aussi en compte les alliés, et les cases inconnues (mais on va déjà tester ça)
 
-    def resoud(self,position:Position,portee:int,indice=1,dead_ends=False):
+    def resoud(self,position:Position,valeur:int,indice=1,dead_ends=False):
         """'Résoud' un labyrinthe à partir d'une case donnée."""
 
         if position in self.vue:
@@ -483,7 +485,7 @@ class Esprit :
                 for case in self.vue:
                     case[3][4] = 0
 
-            self.vue[position][3][indice] = portee
+            self.vue[position][3][indice] = valeur
             self.propage([position],self.dispersion_spatiale,indice,dead_ends)
 
     def propage(self,positions:List[Position],coef,indice=1,dead_ends=False,comparateur=1):
@@ -620,7 +622,7 @@ class Esprit :
         case = self.vue[position]
         if position in self.entrees.keys():
             for direction in DIRECTIONS:
-                if any(case[5][direction]) and not(dead_ends and case[6]!=[]) and not any([case[5][direction][4] in espace.cases and espace.skip for espace in self.entrees[position]]) and case[5][direction][4].lab in self.vue.keys():
+                if any(case[5][direction]) and not(dead_ends and case[6]!=[]) and not any([case[5][direction][4] in espace.cases and espace.skip for espace in self.entrees[position]]) and case[5][direction][4] in self.vue:
                     pos_utilisables.append((case[5][direction][4],1))
             for espace in self.entrees[position]:
                 if espace.skip:
@@ -629,7 +631,7 @@ class Esprit :
                             pos_utilisables.append((entree,espace.dist(position,entree)))
         else:
             for direction in DIRECTIONS:
-                if any(case[5][direction]) and not(dead_ends and case[6]!=[]) and case[5][direction][4].lab in self.vue.keys():
+                if any(case[5][direction]) and not(dead_ends and case[6]!=[]) and case[5][direction][4] in self.vue:
                     pos_utilisables.append((case[5][direction][4],1))
 
         return pos_utilisables

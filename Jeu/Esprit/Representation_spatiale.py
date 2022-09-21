@@ -27,7 +27,7 @@ class Salle(Espace_schematique):
         self.carres:List[Position] = [carre]
         self.entrees:List[Position] = []
         self.distances:List[List[int]] = []
-        self.skip = True
+        self.skip = False
 
     def add_cases(self):
         self.cases = []

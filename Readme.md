@@ -57,7 +57,7 @@ Troisi�me �tape : mains[0][2].boucle() et le jeu reprend imm�diatement, at
 
 
 TODO (pour ne pas oublier les problèmes que je découvre) :
- - Les agissants se bloquent quand ils sont à l'entrée d'un couloir (du moins c'est mon interprétation), problème de skip ?
+ - Les agissants se bloquent quand ils sont à l'entrée d'un couloir (du moins c'est mon interprétation), problème d'ouverture de portes et de création d'entrées (corrigé, à vérifier)
  - Salle (et porte) manquante dans l'étage des téléporteurs
  - On essaye parfois d'afficher un ennemi qui n'a plus de controleur (i.e., qui est dans un étage désactivé et donc hors de notre vision) ? Pourquoi est-ce qu'on affiche les agissants hors de notre vision active ?
  - Dialogues (consignes obsolètes, ingrédients et potions, ramassage complet)
