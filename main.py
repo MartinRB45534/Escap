@@ -8,7 +8,7 @@ pygame.init()
 
 screen = pygame.display.set_mode((1350, 690),pygame.RESIZABLE)
 
-from true_main import *
+from Joueur import *
 
 SKIN_ESCAP.dessine_toi(screen,(0,0))
 pygame.display.flip()

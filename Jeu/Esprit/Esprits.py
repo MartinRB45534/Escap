@@ -135,6 +135,7 @@ class Esprit_simple(Esprit):
         self.salles:List[Salle] = []
         self.couloirs:List[Couloir] = []
         self.entrees:Dict[Position,List[Espace_schematique]] = {}
+        self.zones_inconnues:List[Zone_inconnue] = []
         self.ennemis:Dict[int,List[float]] = {}
         self.nom = nom
         self.controleur = controleur
@@ -429,6 +430,7 @@ class Esprit_slime(Esprit_type):
         self.salles:List[Salle] = []
         self.couloirs:List[Couloir] = []
         self.entrees:Dict[Position,List[Espace_schematique]] = {}
+        self.zones_inconnues:List[Zone_inconnue] = []
         self.ennemis:Dict[int,List[float]] = {}
         self.nom = "esprit_slime_"+str(corp)
         self.controleur = controleur

@@ -12,6 +12,7 @@ class Esprit :
         self.salles:List[Salle] = []
         self.couloirs:List[Couloir] = []
         self.entrees:Dict[Position,List[Espace_schematique]] = {}
+        self.zones_inconnues:List[Zone_inconnue] = []
         self.ennemis:Dict[int,List[float]] = {}
         self.dispersion_spatiale = 0.9 #La décroissance de l'importance dans l'espace. Tester plusieurs options pour l'optimiser
         self.prejuges = []

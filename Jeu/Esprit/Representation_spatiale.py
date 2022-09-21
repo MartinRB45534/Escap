@@ -1,6 +1,11 @@
 from Jeu.Labyrinthe.Pattern import *
 from Jeu.Labyrinthe.Vue import *
 
+class Zone_inconnue: #Est-ce vraiment un bon nom ?
+    def __init__(self):
+        self.cases:List[Position] = []
+        self.occupants:List[int] = []
+
 class Espace_schematique:
     def __init__(self):
         self.frontiere:List[Cote] = []
