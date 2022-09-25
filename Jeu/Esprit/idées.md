@@ -43,7 +43,7 @@ Comment utiliser couloirs et salles pour optimiser les esprits :
         
         Ajout de case. Une case nouvellement hors-vue est ajoutée aux zones inconnues voisines. Si il y en a plusieurs, elles sont donc connectées par la nouvelle case et donc fusionnées (la nouvelle zone contient les cases et les agissants des zones fusionnées).
         
-        Retrait de case par oubli. Une case limite ou mémorisée qui, par oubli, n'est plus limite ni mémorisée, est retirée à sa zone inconnue. 
+        Retrait de case par oubli. Une case limite ou mémorisée qui, par oubli, n'est plus limite ni mémorisée, est retirée à sa zone inconnue. Éventuellement, la zone est coupée en plusieurs zones, qui contiennent chacunes les agissants de la zone originale.
         
         Retrait de case par vue. Une case nouvellement vue est retirée à sa zone inconnue. Éventuellement, la zone est coupée en plusieurs zones, qui contiennent chacunes les agissants de la zone originale.
         

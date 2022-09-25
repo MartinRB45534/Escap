@@ -35,7 +35,7 @@ class Peureuse(Multi_renforceur,Support_lointain,Stratege,Humain): #La quatrièm
     def fuite(self,degats=0):
         #On fuit si on est en danger (pv trop bas) ou en présence d'un monstre à condition d'avoir un chemin de fuite
         #Pour l'instant on va juste vérifier les pv :
-        taux_limite = 0.7 + 0.01*self.appreciations[1] #Quand on se hait, on devient plus suicidaire
+        taux_limite = 0.7 + 0.01*self.appreciations[3] #Quand on se hait, on devient plus suicidaire
         return (self.pv-degats) / self.pv_max <= taux_limite
 
     # /!\ Pour améliorer ça : fuire dès qu'il y a un monstre en vue et accessible
