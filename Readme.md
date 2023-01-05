@@ -118,7 +118,7 @@ Le joueur peut aussi se débrouiller seul (build nécromancien par exemple) mais
 Comment s'assurer que chaque rôle est nécessaire :
  - DPS : diminuer les dégats des autres rôles (déjà fait)
  - tank : bonne défense + bonne concentration des attaques ennemies (comment exactement ?)
- - soutien et soigneur : aide efficace là ou c'est nécessaire (plus ou moins déjà fait)
+ - soutien et soigneur : aide efficace là où c'est nécessaire (plus ou moins déjà fait)
 
 Pour le tank, idées de skills :
  - provocation (augmentation de l'importance aux yeux des ennemis) pour s'attirer les attaques
@@ -517,14 +517,14 @@ Système de 'cible' pour indiquer qui les gens attaquent
 Retours exp�rience Cl�ment :
 Pour l'�quilibrage : premiers monstres one/two-shot, puis progression (cr�er des monstres sp�cialement affaiblis pour le tutoriel ? il faut que je le fasse pour le slime de toute fa�on)
 Potions : pour quoi faire ? Permanent/non permanent, affecte le joueur/les ennemis... Peut-�tre la port�e
-Archer (impossible, mais des mages qui attaquent � distance, c'est faisable. pour remplacer les mages actuels qui sont vraiment faibles ? comment rep�rer facilement qui est responsable d'une attaque ? un seul mage par �tage, par exemple ?)
+Archer (impossible, mais des mages qui attaquent � distance, c'est faisable. Pour remplacer les mages actuels qui sont vraiment faibles ? Comment rep�rer facilement qui est responsable d'une attaque ? Un seul mage par �tage, par exemple ?)
 Plus d'accompagnement du joueur, plus d'explications. Diminuer la difficult�. C'est juste un tutoriel !
 
 
 Retours exp�rience Martin + id�e potions et parchemins :
 Shaman + mage + guerrier/sentinelle = tr�s puissant (l'�tage des potions est devenu difficile)
 Shamans + mages + guerriers/sentinelles = trop puissant (l'�tage des meutes est devenu quasi-impossible (et encore, il n'y a pas d'effet de surprise pour moi))
-4 PNJs qui colent le joueur � travers tout l'�tage des potions = salles blind�es, d�placements difficiles
+4 PNJs qui collent le joueur � travers tout l'�tage des potions = salles blind�es, d�placements difficiles
 Donc :
 Explication des controles de PNJs (les ordres qu'on peut leur donner, comment v�rifier leur �tat avec le rectangle de droite, comment les rappeler)
 Explication de l'inventaire et de la pause (comment ouvrir l'inventaire, y aller, y s�lectionner une potion/un parchemin et l'utiliser, et comment mettre le jeu en pause avant de faire tout �a)
@@ -562,7 +562,7 @@ pour informer les joueurs sur les maladies, et indiquer que l'observation permet
 
 � r�flechir s�rieusement :
 - Il serait bien de ne pas faire reposer tout le d�veloppement de personnage sur les choix des mont�es de niveau (les arbres). En particulier, le joueur doit pouvoir progresser apr�s avoir atteint le niveau 10.
-- Les sous-classes obtenues � la fin vont bien-s�r ce d�velopper plus tardivement, et permettre au joueur de continuer � se d�velopper (mais sans changer d'orientation, puisqu'il ne peut plus faire de choix).
+- Les sous-classes obtenues � la fin vont bien-s�r se d�velopper plus tardivement, et permettre au joueur de continuer � se d�velopper (mais sans changer d'orientation, puisqu'il ne peut plus faire de choix).
 - Le joueur peut aussi se d�velopper gr�ce aux objets qu'il trouve (exemple : le personnage de type Tank, qui progresse en rempla�ant son armure par une nouvelle plus forte).
 - Risque : un joueur centr� sur la magie peut r�cup�rer une armure destin�e � un joueur de type d�fensif, et obtenir une tr�s bonne d�fense qui d�s�quilibre son personnage (et le rend trop fort).
 - Contre-mesure : modifier les items disponibles en fonction des choix du joueur ;
