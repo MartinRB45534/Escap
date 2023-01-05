@@ -1,13 +1,11 @@
 from Jeu.Constantes import NB_DIRECTIONS
 from Jeu.Labyrinthe.Structure_spatiale.Position import *
-
-# global NB_DIRECTIONS
-# NB_DIRECTIONS = 4
+from Jeu.Labyrinthe.Structure_spatiale.Angle import *
 
 class Direction:
     directions = NB_DIRECTIONS
     def __init__(self,direction: int):
-        self.direction = direction
+        self.direction = direction%self.directions
 
     def __index__(self):
         return self.direction
@@ -15,8 +13,10 @@ class Direction:
     def __add__(self,other):
         if isinstance(other,Direction):
             return self.to_decalage()+other
+        elif isinstance(other,Angle):
+            return Direction(self.direction+other)
         elif isinstance(other,int):
-            return Direction((self.direction+other)%self.directions)
+            return Direction(self.direction+other)
         elif isinstance(other,(Decalage,Position)):
             return self.to_decalage()+other
         else:
@@ -25,8 +25,10 @@ class Direction:
     def __radd__(self,other):
         if isinstance(other,Direction): #Ne devrait pas pouvoir arriver
             return other+self.to_decalage()
+        elif isinstance(other,Angle):
+            return Direction(other+self.direction)
         elif isinstance(other,int):
-            return Direction((other+self.direction)%self.directions)
+            return Direction(other+self.direction)
         elif isinstance(other,(Decalage,Position)):
             return other+self.to_decalage()
         else:
@@ -34,9 +36,11 @@ class Direction:
 
     def __sub__(self,other):
         if isinstance(other,Direction): #Ne devrait théoriquement pas être utilisé
-            return Direction((self.direction-other.direction)%self.directions)
+            return self.to_decalage()-other
+        elif isinstance(other,Angle):
+            return Direction(self.direction-other)
         elif isinstance(other,int):
-            return Direction((self.direction-other)%self.directions)
+            return Direction(self.direction-other)
         elif isinstance(other,(Decalage,Position)): #Encore un truc qui ne devrait jamais servir !
             return self.to_decalage()-other
         else:
@@ -44,9 +48,11 @@ class Direction:
 
     def __rsub__(self,other):
         if isinstance(other,Direction): #Ne devrait pas pouvoir arriver
-            return Direction((other.direction-self.direction)%self.directions)
+            return other-self.to_decalage()
+        elif isinstance(other,Angle):
+            return Direction(other-self.direction)
         elif isinstance(other,int):
-            return Direction((other-self.direction)%self.directions)
+            return Direction(other-self.direction)
         elif isinstance(other,(Decalage,Position)): #Ne devrait pas être utilisé non plus
             return other-self.to_decalage()
         else:
@@ -86,12 +92,7 @@ class Direction:
     def __repr__(self):
         return f"Direction : {self.direction}"
 
-#Essayer de ne plus utiliser ceux-ci ?
-# global HAUT
 HAUT=Direction(0)
-# global DROITE
 DROITE=Direction(1)
-# global BAS
 BAS=Direction(2)
-# global GAUCHE
 GAUCHE=Direction(3)

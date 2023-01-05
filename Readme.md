@@ -111,7 +111,7 @@ Mais il ne faut pas que la mort d'un seul PNJ dans les étages inférieurs guara
  - 1 soutien avec la peureuse, mais l'alchimiste et la peste peuvent au besoin soutenir un peu aussi, une fois qu'ils ont gagné quelques niveaux
  - 1 soigneur avec la peste, mais la peureuse et l'alchimiste peuvent au besoin soigner un peu aussi, une fois qu'ils ont gagné quelques niveaux
  - le marchand est particulièrement versatile avec son équipement changeant et peut s'adapter à la situation
- - le joueur, selon le build qu'il choisit, peut facilement tenir deux rôles à la fois (soutien + soin avec l'ange, soutien + DPS avec l'épéiste enchanteur, DPS + tank avec l'épéiste classique) ou un rôle avec une grande efficacité (pur DPS avec le lancier, l'archer ou la mage offensif).
+ - le joueur, selon le build qu'il choisit, peut facilement tenir deux rôles à la fois (soutien + soin avec l'ange, soutien + DPS avec l'épéiste enchanteur, DPS + tank avec l'épéiste classique) ou un rôle avec une grande efficacité (pur DPS avec le lancier, l'archer ou le mage offensif).
 
 Le joueur peut aussi se débrouiller seul (build nécromancien par exemple) mais c'est bien plus difficile dans les étages inférieurs.
 
