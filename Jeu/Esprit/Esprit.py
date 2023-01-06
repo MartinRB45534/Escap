@@ -60,28 +60,35 @@ class Esprit :
     def ajoute_vue(self,vue:Vue):
         self.vue[vue.id] = vue
         nouvelles_cases = []
+        cases_limites = []
         for decalage in vue.decalage:
             case = vue[decalage]
             if case[1] > 0:
+                self.vue[case[0]][2] = self.oubli
                 nouvelles_cases.append(case[0])
             else:
+                if case[1] == -1:
+                    cases_limites.append(case[0])
                 self.vue[case[0]][1] = 0
                 self.vue[case[0]][2] = 0
                 self.vue[case[0]][4] = 0
                 self.vue[case[0]][5] = [[False,False,False,False,False],[False,False,False,False,False],[False,False,False,False,False],[False,False,False,False,False]]
                 self.vue[case[0]][6] = []
-        return nouvelles_cases
+        return nouvelles_cases, cases_limites
 
     def maj_vue(self,vue:Vue):
         nouvelles_cases = []
+        cases_limites = []
         for decalage in vue.decalage:
             case = vue[decalage]
             if case[1] > 0: #Si la clarté est positive
                 if case[5] != self.vue[case[0]][5]: #/!\ Réduire ça proprement
                     nouvelles_cases.append(case[0])
                 case[2] = self.oubli
-                self.vue[case[0]] = case #On remplace par la dernière version de la vision
-        return nouvelles_cases
+                self.vue[case[0]] = case #On remplace par la dernière version de la vision /!\ Et si certains n'y voient pas les mêmes choses ? (Genre des agissants invisibles ?)
+            elif case[1] == -1: #On est à la limite de la vision de quelqu'un
+                cases_limites.append(case[0])
+        return nouvelles_cases, cases_limites
 
     def trouve_agissants_vue(self,vue:Vue):
         agissants = []
@@ -138,158 +145,39 @@ class Esprit :
                     if espece in self.prejuges:
                         self.ennemis[ID_agissant] = [0.01,0]
         nouvelles_cases = []
+        cases_limites = []
         for vue in vues :
-            if vue.id in self.vue.keys(): 
-                nouvelles_cases+=self.maj_vue(vue)
+            if vue.id in self.vue.keys():
+                nouvelles, limites = self.maj_vue(vue)
+                nouvelles_cases+=nouvelles
+                cases_limites+=limites
             else:
-                nouvelles_cases+=self.ajoute_vue(vue)
+                nouvelles, limites = self.ajoute_vue(vue)
+                nouvelles_cases+=nouvelles
+                cases_limites+=limites
         nouvelles_cases = [*set(nouvelles_cases)] #Pour retirer les doublons
+        self.update_zones(nouvelles_cases, cases_limites)
         self.update_representation(nouvelles_cases)
 
     def downdate_zones(self,cases:List[Position]):
-        cases_suppr:List[Position] = []
+        zones_mod:List[Zone_inconnue] = []
         for case in cases:
-            # On veut trouver les cases anciennement limites (donc voisinnes non visibles de cases actuellement supprimées)
-            # Et pas les cases nouvellement limites
-            limite = False
-            for dir in DIRECTIONS:
-                voisine = case+dir
-                if voisine in self.vue:
-                    if voisine not in cases_suppr:
-                        if self.vue[voisine][2]: #Oubli positif: on voit la case
-                            if self.vue[voisine][5][dir.oppose()][0]: #La vue ne passe pas les portes, ni les téléporteurs ou les escaliers
-                                limite = True #la case courante est une case limite
-                        elif voisine not in cases: #Oubli négatif, on ne voit pas la case, et elle n'est pas dans les cases oubliés, on ne la voyait pas avant, donc c'était peut-être une case limite
-                            limite_voisine = False
-        salles_mod:List[Salle] = [] #Les salles qu'on a modifiées
-        for carre in cases_suppr:
-            for salle in self.salles:
-                if carre in salle.carres:
-                    salles_mod += self.scinde_salle(salle,carre)
-        couloirs_mod:List[Couloir] = []
-        for salle in salles_mod:
-            if salle in self.salles: #On peut en avoir retirées
-                salle.add_cases()
-                salle.make_bord()
-                for entree in salle.entrees:
+            for zone in self.zones_inconnues:
+                if case in zone.cases:
+                    zones_mod += self.scinde_zone(zone,case)
+        for zone in zones_mod:
+            if zone in self.zones_inconnues:
+                for entree in zone.entrees:
                     if entree in self.entrees:
-                        self.entrees[entree].remove(salle)
+                        self.entrees[entree].remove(zone)
                         if self.entrees[entree] == []:
                             self.entrees.pop(entree)
-                salle.entrees = [*set([bord.emplacement for bord in salle.frontiere if self.vue[bord.emplacement][5][bord.direction][4]])]
-                salle.calcule_distances()
-        for case in cases:
-            for couloir in self.couloirs:
-                if case in couloir.cases:
-                    couloirs_mod += self.scinde_couloir(couloir,case)
-        for couloir in couloirs_mod:
-            if couloir in self.couloirs:
-                couloir.entrees = []
-                for dir in DIRECTIONS:
-                    case = self.vue[couloir.cases[0]][5][dir][4]
-                    if case and case not in couloir.cases: #Un mur vers l'extérieur !
-                        couloir.entrees.append(case)
-                    case = self.vue[couloir.cases[-1]][5][dir][4]
-                    if case and case not in couloir.cases: #Un mur vers l'extérieur !
-                        couloir.entrees.append(case)
-        for espace in salles_mod + couloirs_mod:
-            for entree in espace.entrees:
-                self.entrees[entree] = self.entrees.get(entree,[])+[espace]
+                for case in zone.cases:
+                    for dir in DIRECTIONS:
+                        if self.vue[case][5][dir][4] and self.vue[case+dir][1] > 0: #/!\ 4 ou 0 ?
+                            zone.entrees.append(case+dir)
 
-    def update_zones(self,cases:List[Position]):
-        carres_pot:List[Position] = []
-        for case in cases:
-            for dec in Decalage(2,2):
-                if case-dec in self.vue and case-dec+Decalage(1,1) in self.vue:
-                    carres_pot.append(case-dec)
-        carres_pot = [*set(carres_pot)]
-        carres:List[Position] = []
-        for carre_pot in carres_pot:
-            if self.vue[carre_pot][5][DROITE][0] and self.vue[carre_pot+DROITE][5][GAUCHE][0] and self.vue[carre_pot][5][BAS][0] and self.vue[carre_pot+BAS][5][HAUT][0] and self.vue[carre_pot+BAS][5][DROITE][0] and self.vue[carre_pot+DROITE+BAS][5][GAUCHE][0] and self.vue[carre_pot+DROITE][5][BAS][0] and self.vue[carre_pot+BAS+DROITE][5][HAUT][0] :
-                carres.append(carre_pot)
-        salles_mod:List[Salle] = [] #Les salles qu'on a modifiées
-        couloirs_mod:List[Couloir] = []
-        for carre in carres:
-            libre = True
-            for salle in self.salles:
-                if carre in salle.carres:
-                    libre = False #Arrive par exemple lorsqu'on ouvre une porte à côté d'une case déjà dans une salle
-                    if salle not in salles_mod:
-                        salles_mod.append(salle) #Si on a ouvert une porte, on veut rajouter cette case aux entrées (sinon on a des problèmes de résolution)
-                    break
-            if libre:
-                salle = Salle(carre)
-                self.salles.append(salle)
-                for salle_ in self.salles:
-                    if salle_ != salle: #Peut arriver si on partage plusieurs cases avec une salle existante
-                        for dir in DIRECTIONS:
-                            if carre+dir in salle_.carres: #Ces deux carrés partagent deux cases : les deux salles n'en forment qu'une seule
-                                salle = self.fusionne_salles(salle_,salle)
-                                break
-                if salle not in salles_mod:
-                    salles_mod.append(salle)
-            for dec in Decalage(2,2):
-                for couloir in self.couloirs:
-                    if carre+dec in couloir.cases: #Cette case appartenait à un couloir. Ce n'est plus le cas car des murs ont été ouverts (portes, écrasement, etc.) et elle appartient désormais à une salle
-                        couloirs_mod += self.scinde_couloir(couloir,carre+dec)
-        for salle in salles_mod:
-            if salle in self.salles: #On peut en avoir retirées
-                salle.add_cases()
-                salle.make_bord()
-                for entree in salle.entrees:
-                    if entree in self.entrees:
-                        self.entrees[entree].remove(salle)
-                        if self.entrees[entree] == []:
-                            self.entrees.pop(entree)
-                salle.entrees = [*set([bord.emplacement for bord in salle.frontiere if self.vue[bord.emplacement][5][bord.direction][4]])]
-                salle.calcule_distances()
-                for case in salle.cases:
-                    if case in cases:
-                        cases.remove(case)
-                for entree in salle.entrees:
-                    salle.cases.remove(entree)
-            else:
-                salles_mod.remove(salle)
-        for case in cases:
-            if sum([int(not(not(self.vue[case][5][dir][4]))) for dir in DIRECTIONS]) < 3:
-                libre = True
-                for couloir in self.couloirs:
-                    if case in couloir.cases:
-                        libre = False
-                        break
-                if libre:
-                    couloir = Couloir(case)
-                    self.couloirs.append(couloir)
-                    for couloir_ in self.couloirs:
-                        if couloir_ != couloir:
-                            for dir in DIRECTIONS:
-                                if case+dir in couloir_.cases and self.vue[case][5][dir][4] and self.vue[case+dir][5][dir.oppose()][4]:
-                                    couloir = self.fusionne_couloirs(couloir_,couloir)
-                                    break
-                if couloir not in couloirs_mod:
-                    couloirs_mod.append(couloir)
-            else:
-                for couloir in self.couloirs:
-                    if case in couloir.cases: #Cette case appartenait à un couloir. Ce n'est plus le cas car des murs ont été ouverts (portes, écrasement, etc.)
-                        couloirs_mod += self.scinde_couloir(couloir,case)
-        for couloir in couloirs_mod:
-            if couloir in self.couloirs:
-                couloir.entrees = []
-                for dir in DIRECTIONS:
-                    case1 = self.vue[couloir.cases[0]][5][dir][4]
-                    if case1 and case1 not in couloir.cases: #Un mur vers l'extérieur !
-                        couloir.entrees.append(case1)
-                    case2 = self.vue[couloir.cases[-1]][5][dir][4]
-                    if len(couloir.cases)>1 and case2 and case2 not in couloir.cases: #Un mur vers l'extérieur !
-                        couloir.entrees.append(case2)
-            else:
-                couloirs_mod.remove(couloir)
-        for espace in salles_mod + couloirs_mod:
-            for entree in espace.entrees:
-                if espace not in self.entrees.get(entree,[]) and espace in self.salles+self.couloirs:
-                    self.entrees[entree] = self.entrees.get(entree,[])+[espace]
-
-    def downdate_representation(self,cases):
+    def downdate_representation(self,cases:List[Position]):
         carres_pot:List[Position] = []
         for case in cases:
             for dec in Decalage(2,2):
@@ -334,6 +222,53 @@ class Esprit :
         for espace in salles_mod + couloirs_mod:
             for entree in espace.entrees:
                 self.entrees[entree] = self.entrees.get(entree,[])+[espace]
+
+    def update_zones(self,cases:List[Position],cases_limites:List[Position]):
+        cases_memorisees = [case[0] for case in self.vue if case[2] and not case in cases]
+        zones_mod:List[Zone_inconnue] = []
+        for case in cases:
+            for zone in self.zones_inconnues:
+                if case in zone.cases:
+                    zones_mod += self.scinde_zone(zone,case)
+        for zone in self.zones_inconnues:
+            for case in zone.cases:
+                if case in cases_memorisees:
+                    cases_memorisees.remove(case)
+                else:
+                    print("I'm useful !")
+        for case in cases_memorisees:
+            zone = Zone_inconnue(case)
+            self.zones_inconnues.append(zone)
+            for zone_ in self.zones_inconnues:
+                if zone_ != zone:
+                    for DIR in DIRECTIONS:
+                        if case + DIR in zone_.cases:
+                            zone = self.fusionne_zones(zone,zone_)
+                            break
+                if zone not in zones_mod:
+                    zones_mod.append(zone)
+        for case in cases_limites:
+            if self.vue[case][1] == 0:
+                zone = Zone_inconnue(case)
+                self.zones_inconnues.append(zone)
+                for zone_ in self.zones_inconnues:
+                    if zone_ != zone:
+                        for DIR in DIRECTIONS:
+                            if case + DIR in zone_.cases:
+                                zone = self.fusionne_zones(zone,zone_)
+                                break
+                    if zone not in zones_mod:
+                        zones_mod.append(zone)
+            elif self.vue[case][1] < 0:
+                print("Why !!?")
+        for zone in self.zones_inconnues:
+            zone.entrees = []
+            for case in cases_limites:
+                if case in zone.cases:
+                    zone.cases.remove(case)
+                    zone.entrees.append(case)
+                    cases_limites.remove(case)
+                    zones_mod.append(zone)
 
     def update_representation(self,cases:List[Position]):
         carres_pot:List[Position] = []
@@ -433,7 +368,7 @@ class Esprit :
         self.remove_salle(salle2)
         return salle1
 
-    def fusionne_couloirs(self,couloir1:Couloir,couloir2:Couloir): #salle1 est probablement plus grosse que salle2
+    def fusionne_couloirs(self,couloir1:Couloir,couloir2:Couloir): #couloir est probablement plus gros que couloir2
         for dir in DIRECTIONS:
             if self.vue[couloir1.cases[0]][5][dir][4] == couloir2.cases[0] and self.vue[couloir2.cases[0]][5][dir.oppose()][4] == couloir1.cases[0]:
                 couloir1.cases = list(reversed(couloir1.cases)) + couloir2.cases # Et c'est tout ?
@@ -454,6 +389,11 @@ class Esprit :
         print(couloir1.cases)
         print(couloir2.cases)
         print("Oops! How did I get there?")
+
+    def fusionne_zones(self,zone1:Zone_inconnue,zone2:Zone_inconnue):
+        zone1.fusionne(zone2)
+        self.remove_zone(zone2)
+        return zone1
 
     def scinde_salle(self,salle:Salle,carre:Position):
         salle.carres.remove(carre)
@@ -496,21 +436,53 @@ class Esprit :
         self.remove_couloir(couloir)
         return couloirs
 
+    def scinde_zone(self,zone:Zone_inconnue,case:Position):
+        zone.cases.remove(case)
+        voisins = [case+dir for dir in DIRECTIONS if case+dir in zone.cases]
+        zones = []
+        while voisins != []:
+            depart = voisins.pop(0)
+            queue = [depart]
+            zone.cases.remove(depart)
+            new_zone = Zone_inconnue(depart,zone)
+            while len(queue):
+                position = queue.pop(0)
+                for dir in DIRECTIONS:
+                    voisin = position+dir
+                    if voisin in zone.cases and self.vue[position][5][dir][4]: # /!\ 4 ou 0 ?
+                        zone.cases.remove(voisin)
+                        queue.append(voisin)
+                        new_zone.cases.append(voisin)
+                        if voisin in voisins:
+                            voisins.remove(voisin)
+            zones.append(new_zone)
+        self.remove_zone(zone)
+        self.zones_inconnues += zones
+        return zones
+
     def remove_salle(self,salle:Salle):
         self.salles.remove(salle)
         for entree in salle.entrees:
-            if entree in self.entrees:
+            if entree in self.entrees and salle in self.entrees[entree]:
                 self.entrees[entree].remove(salle)
-                if self.entrees[entree] == []:
-                    self.entrees.pop(entree)
+                if self.entrees[entree] == []: #Si la salle était la seule à avoir cette entrée
+                    self.entrees.pop(entree) #On la supprime
 
     def remove_couloir(self,couloir:Couloir):
         self.couloirs.remove(couloir)
         for entree in couloir.entrees:
-            if entree in self.entrees:
+            if entree in self.entrees and couloir in self.entrees[entree]:
                 self.entrees[entree].remove(couloir)
-                if self.entrees[entree] == []:
-                    self.entrees.pop(entree)
+                if self.entrees[entree] == []: #Si le couloir était le seul à avoir cette entrée
+                    self.entrees.pop(entree) #On le supprime
+
+    def remove_zone(self,zone:Zone_inconnue):
+        self.zones_inconnues.remove(zone)
+        for entree in zone.entrees:
+            if entree in self.entrees and zone in self.entrees[entree]:
+                self.entrees[entree].remove(zone)
+                if self.entrees[entree] == []: #Si la zone était la seule à avoir cette entrée
+                    self.entrees.pop(entree) #On la supprime
 
     def get_offenses(self):
         for corp in self.corps.keys(): #On vérifie si quelqu'un nous a offensé
@@ -898,7 +870,7 @@ class Esprit :
                         res = corp.agit_en_vue(self)
         corp.statut = res
 
-    def oublie(self): #/!\ Marquer les cases anciennement vues
+    def oublie(self):
         anciennes_cases = []
         for case in self.vue:
             if case[2] > 1:
@@ -913,6 +885,7 @@ class Esprit :
             case[3] = [0,0,0,0,0,False]
             case[7] = []
             case[8] = False
+            
         self.downdate_zones(anciennes_cases)
         self.downdate_representation(anciennes_cases)
 

@@ -1,11 +1,6 @@
 from Jeu.Labyrinthe.Pattern import *
 from Jeu.Labyrinthe.Vue import *
 
-class Zone_inconnue: #Est-ce vraiment un bon nom ?
-    def __init__(self):
-        self.cases:List[Position] = []
-        self.occupants:List[int] = []
-
 class Espace_schematique:
     def __init__(self):
         self.frontiere:List[Cote] = []
@@ -24,6 +19,21 @@ class Espace_schematique:
             return 0
         else:
             return len(self.cases)+1
+
+class Zone_inconnue(Espace_schematique): # Représente une zone de la carte qui n'a pas encore été explorée
+    def __init__(self,case:Position=None,zone=None):
+        self.cases:List[Position] = [case] if case != None else []
+        self.frontiere:List[Cote] = []
+        self.entrees:List[Position] = []
+        # Copier les informations de la zone précédente
+        self.skip = False
+
+    def fusionne(self,zone):
+        if isinstance(zone,Zone_inconnue):
+            self.cases += zone.cases
+            self.frontiere += zone.frontiere
+            self.entrees += zone.entrees
+            # Copier les informations de la zone fusionnée
 
 class Salle(Espace_schematique):
     def __init__(self,carre:Position):
@@ -48,7 +58,7 @@ class Salle(Espace_schematique):
         for i in range(len(self.entrees)):
             distances = [0]*(len(self.entrees)-i-1)
             queue = [(self.entrees[i],0)]
-            visitees = self.entrees[:i+1]
+            visitees = [self.entrees[i]]
             while len(queue) :
                 position,distance = queue.pop(0)
                 for dir in DIRECTIONS:
@@ -56,7 +66,7 @@ class Salle(Espace_schematique):
                     if voisin in self.cases and voisin not in visitees:
                         visitees.append(voisin)
                         queue.append((voisin,distance+1))
-                        if voisin in self.entrees:
+                        if voisin in self.entrees[i+1:]:
                             distances[self.entrees.index(voisin)-i-1] = distance+1
             self.distances.append(distances)
 
