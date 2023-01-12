@@ -25,6 +25,8 @@ class Zone_inconnue(Espace_schematique): # Représente une zone de la carte qui 
         self.cases:List[Position] = [case] if case != None else []
         self.frontiere:List[Cote] = []
         self.entrees:List[Position] = []
+        self.sorties:List[Position] = []
+        self.occupants:List[int] = zone.occupants if zone != None else []
         # Copier les informations de la zone précédente
         self.skip = False
 
@@ -33,6 +35,8 @@ class Zone_inconnue(Espace_schematique): # Représente une zone de la carte qui 
             self.cases += zone.cases
             self.frontiere += zone.frontiere
             self.entrees += zone.entrees
+            self.sorties += zone.sorties
+            self.occupants += zone.occupants
             # Copier les informations de la zone fusionnée
 
 class Salle(Espace_schematique):

@@ -1,7 +1,7 @@
 from Jeu.Entitee.Agissant.Agissants import *
 from Jeu.Esprit.Representation_spatiale import *
 
-from typing import Dict, Literal
+from typing import Dict, Literal, Tuple
 import operator
 
 class Esprit :
@@ -77,8 +77,8 @@ class Esprit :
         return nouvelles_cases, cases_limites
 
     def maj_vue(self,vue:Vue):
-        nouvelles_cases = []
-        cases_limites = []
+        nouvelles_cases:List[Position] = []
+        cases_limites:List[Position] = []
         for decalage in vue.decalage:
             case = vue[decalage]
             if case[1] > 0: #Si la clarté est positive
@@ -91,11 +91,13 @@ class Esprit :
         return nouvelles_cases, cases_limites
 
     def trouve_agissants_vue(self,vue:Vue):
-        agissants = []
+        vus:List[int] = []
+        oublies:List[Tuple[int,Position]] = []
         for decalage in vue.decalage:
             case = vue[decalage]
-            agissants += case[6]
-        return agissants
+            vus += case[6]
+            oublies += [(ID,case[0]) for ID in self.vue[case[0]][6] if not ID in case[6]]
+        return vus, oublies
 
     def trouve_agissants(self):
         agissants = []
@@ -129,15 +131,24 @@ class Esprit :
             for ID in agissants:
                 if ID in case[6]:
                     case[6].remove(ID)
+        for zone in self.zones_inconnues:
+            for ID in agissants:
+                if ID in zone.occupants:
+                    zone.occupants.remove(ID)
 
     def refait_vue(self):
         vues:List[Vue] = []
         agissants_vus:List[int] = []
+        agissants_oublies:List[Tuple[int,Position]] = []
         for corp in self.corps.keys(): #On récupère les vues
             if self.corps[corp] != "incapacite":
                 agissant:Agissant = self.controleur[corp]
                 vues.append(agissant.vue)
-                agissants_vus += self.trouve_agissants_vue(agissant.vue)
+                vus, oublies = self.trouve_agissants_vue(agissant.vue)
+                agissants_vus += vus
+                agissants_oublies += oublies
+        agissants_vus = [*set(agissants_vus)] #On enlève les doublons
+        agissants_oublies = [*set([tup for tup in agissants_oublies if not tup[0] in agissants_vus])] #On enlève les doublons et les agissants vus
         self.oublie_agissants(agissants_vus) #Puisqu'on les a vus, on n'a plus besoin de garder en mémoire leur position précédente. /!\ À modifier plus tard
         for ID_agissant in agissants_vus:
             if not(ID_agissant in self.ennemis.keys() or ID_agissant in self.corps.keys()):
@@ -156,7 +167,7 @@ class Esprit :
                 nouvelles_cases+=nouvelles
                 cases_limites+=limites
         nouvelles_cases = [*set(nouvelles_cases)] #Pour retirer les doublons
-        self.update_zones(nouvelles_cases, cases_limites)
+        self.update_zones(nouvelles_cases, cases_limites, agissants_oublies)
         self.update_representation(nouvelles_cases)
 
     def downdate_zones(self,cases:List[Position]):
@@ -223,7 +234,7 @@ class Esprit :
             for entree in espace.entrees:
                 self.entrees[entree] = self.entrees.get(entree,[])+[espace]
 
-    def update_zones(self,cases:List[Position],cases_limites:List[Position]):
+    def update_zones(self,cases:List[Position],cases_limites:List[Position],agissants_oublies:List[Tuple[int,Position]]):
         cases_memorisees = [case[0] for case in self.vue if case[2] and not case in cases]
         zones_mod:List[Zone_inconnue] = []
         for case in cases:
@@ -242,7 +253,8 @@ class Esprit :
             for zone_ in self.zones_inconnues:
                 if zone_ != zone:
                     for DIR in DIRECTIONS:
-                        if case + DIR in zone_.cases:
+                        voisin = self.vue[case][5][DIR][4]
+                        if voisin and voisin in zone_.cases:
                             zone = self.fusionne_zones(zone,zone_)
                             break
                 if zone not in zones_mod:
@@ -254,7 +266,8 @@ class Esprit :
                 for zone_ in self.zones_inconnues:
                     if zone_ != zone:
                         for DIR in DIRECTIONS:
-                            if case + DIR in zone_.cases:
+                            voisin = self.vue[case][5][DIR][4]
+                            if voisin and voisin in zone_.cases:
                                 zone = self.fusionne_zones(zone,zone_)
                                 break
                     if zone not in zones_mod:
@@ -263,6 +276,19 @@ class Esprit :
                 print("Why !!?")
         for zone in self.zones_inconnues:
             zone.entrees = []
+            for tup in agissants_oublies:
+                if tup[1] in zone.cases:
+                    zone.occupants.append(tup[0])
+                for DIR in DIRECTIONS:
+                    voisin = self.vue[tup[1]][5][DIR][4]
+                    if voisin and voisin in zone.cases:
+                        zone.occupants.append(tup[0])
+            for case in zone.cases:
+                for DIR in DIRECTIONS:
+                    voisin = self.vue[case][5][DIR][4]
+                    if voisin and not voisin in self.vue or self.vue[voisin][1] == 0:
+                        zone.sorties.append(voisin)
+                        zones_mod.append(zone)
             for case in cases_limites:
                 if case in zone.cases:
                     zone.cases.remove(case)
