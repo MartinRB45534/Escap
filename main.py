@@ -1,5 +1,6 @@
 # coding=utf-8
 
+import time
 import pygame
 import pickle
 import os
@@ -16,7 +17,7 @@ pygame.display.flip()
 class Main():
     """Parce que sans ça on a plein de problèmes avec les variables globales."""
     def __init__(self):
-        self.mains=[]
+        self.mains:List[Tuple[int, str, Joueur]] = []
     def observe(self):
         """Fonction qui observe le répertoire courant et cherche des Main à ouvrir, puis les ouvre
            En entrée : rien
@@ -32,12 +33,12 @@ class Main():
                     main_potentiel = pickle.load(fichier)
                 except EOFError:
                     print("Le fichier est vide. Création d'un nouvel utilisateur.")
-                    self.mains.append([len(self.mains),nom_fichier[:-2],Joueur(screen)])
+                    self.mains.append((len(self.mains),nom_fichier[:-2],Joueur(screen)))
                 except pickle.UnpicklingError:
                     print("Le fichier ne peut pas être décodé ?")
                 else:
                     if isinstance(main_potentiel,Joueur):
-                        self.mains.append([len(self.mains),nom_fichier[:-2],main_potentiel])
+                        self.mains.append((len(self.mains),nom_fichier[:-2],main_potentiel))
                         main_potentiel.charge(screen)
                         print("Chargement réussi !")
                     else:
@@ -98,8 +99,14 @@ class Main():
 
 main = Main()
 main.observe()
-main.alll()
-
+while True:
+    try:
+        main.alll()
+    except KeyboardInterrupt:
+        # On print les zones de l'esprit du joueur
+        main.mains[0][2].controleur.esprits["heros"].print_zones()
+        # On attends une seconde
+        time.sleep(1)
 
 
 

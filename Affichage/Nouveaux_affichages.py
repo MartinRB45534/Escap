@@ -1,9 +1,6 @@
 from Affichage.Affichage import *
-from Jeu.Controleur import *
-from Jeu.Skins.Skins import *
 
 from operator import itemgetter
-from math import ceil
 
 class Affichage_principal(Wrapper):
     """L'element principal de l'affichage. Contient tout ce qui apparait à l'écran."""
@@ -303,35 +300,68 @@ class Affichage_principal(Wrapper):
             for objet in self.objets:
                 objet.update()
 
-    def bouge_souris(self,event):
+    def bouge_souris(self,event:pygame.event.Event):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1: #On a cliqué sur quelque chose. Vérifions quoi :
             self.clique(event.pos)
-        elif event.type == pygame.MOUSEWHEEL:
+        elif event.type == pygame.MOUSEWHEEL: #On a scrollé
             self.scroll(pygame.mouse.get_pos(),10*event.x,10*event.y)
+        elif event.type == pygame.MOUSEMOTION: #On a bougé la souris
+            # On vérifie que la souris est dans la fenêtre
+            if event.pos[0] >= 0 and event.pos[0] <= self.tailles[0] and event.pos[1] >= 0 and event.pos[1] <= self.tailles[1]:
+                # print("survol")
+                self.survol(event.pos)
 
-    def clique(self,position):
+    def select(self,selection):
+        self.courant = selection
+        if isinstance(selection,Affichage_centre_recettes):
+            self.init_recette()
+        if isinstance(selection,Affichage_centre_ventes):
+            self.init_vente()
+        if isinstance(selection,Affichage_centre_achats):
+            self.init_achat()
+        if isinstance(selection,Bouton) and selection.texte == "Quitter":
+            self.controleur.unset_phase(MARCHAND)
+        if isinstance(selection,Affichage_centre_impregnations):
+            self.init_impregnation()
+        if isinstance(selection,Affichage_centre_auto_impregnations):
+            self.init_auto_impregnation()
+
+    def clique(self,position:tuple[int,int]) -> None:
         clique = self.clique_wrapper(position)
         if clique is self:
             self.courant = True
         elif clique:
-            self.courant = clique
-            if isinstance(clique,Affichage_centre_recettes):
-                self.init_recette()
-            if isinstance(clique,Affichage_centre_ventes):
-                self.init_vente()
-            if isinstance(clique,Affichage_centre_achats):
-                self.init_achat()
-            if isinstance(clique,Bouton) and clique.texte == "Quitter":
-                self.controleur.unset_phase(MARCHAND)
-            if isinstance(clique,Affichage_centre_impregnations):
-                self.init_impregnation()
-            if isinstance(clique,Affichage_centre_auto_impregnations):
-                self.init_auto_impregnation()
+            self.select(clique)
         else:
             self.courant = False
 
-    def navigue(self,direction):
-        pass
+    def navigue(self,direction:Direction|int) -> None:
+        if self.courant is True: # Ne devrait pas arriver
+            print("Erreur : on est dans l'écran entier, on ne devrait pas naviguer !")
+            if direction == IN:
+                self.courant = self.centre
+        elif self.courant:
+            nav = self.courant.navigue(direction)
+            if nav is True: # L'élément courant a tout géré
+                pass
+            elif nav: # On a quelque chose à faire
+                self.select(nav)
+            # elif direction == OUT:
+            #     self.courant = True # Est-ce qu'on autorise vraiment ça ? Revenir à l'écran entier ne fait pas beaucoup de sens...
+            elif direction == GAUCHE:
+                if self.courant == self.centre:
+                    self.courant = self.gauche
+                elif self.courant == self.droite:
+                    self.courant = self.centre
+            elif direction == DROITE:
+                if self.courant == self.gauche:
+                    self.courant = self.centre
+                elif self.courant == self.centre:
+                    self.courant = self.droite
+        else: # Comment est-ce que c'est arrivé ?
+            print("Alors là, je ne comprends vraiment pas...")
+            if direction == IN:
+                self.courant = True
 
     inits={
         TOUR:init_tour,
@@ -406,25 +436,71 @@ class Affichage_gauche(Wrapper):
         self.contenu = contenu
         self.fond = (255,255,255)
 
+    def select(self,selection:bool|Affichable):
+        if isinstance(selection,Affichage_stats_ferme): #On veut ouvrir l'affichage des stats
+            self.init_stats()
+            self.set_tailles(self.tailles)
+        if isinstance(selection,Affichage_inventaire_ferme): #On veut ouvrir l'affichage des stats
+            self.init_inventaire()
+            self.set_tailles(self.tailles)
+        if isinstance(selection,Affichage_classe_ferme): #On veut ouvrir l'affichage des stats
+            self.init_classe()
+            self.set_tailles(self.tailles)
+
     def clique(self,position):
         clique = self.clique_wrapper(position)
         if clique is self:
             self.courant = True
         elif clique:
-            if isinstance(clique,Affichage_stats_ferme): #On veut ouvrir l'affichage des stats
-                self.init_stats()
-                self.set_tailles(self.tailles)
-            if isinstance(clique,Affichage_inventaire_ferme): #On veut ouvrir l'affichage des stats
-                self.init_inventaire()
-                self.set_tailles(self.tailles)
-            if isinstance(clique,Affichage_classe_ferme): #On veut ouvrir l'affichage des stats
-                self.init_classe()
-                self.set_tailles(self.tailles)
+            self.select(clique)
         else:
             self.init_gauche()
             self.set_tailles(self.tailles)
         if clique:
             return self
+        return False
+
+    def navigue(self,direction:Direction|int) -> Affichage:
+        if self.courant is True:
+            if direction == IN:
+                self.init_stats()
+                self.set_tailles(self.tailles)
+                return self
+            # elif direction == OUT:
+            #     self.courant = False
+        elif self.courant:
+            nav = self.courant.navigue(direction)
+            if nav: #Si on a navigué dans l'affichage courant
+                self.select(nav)
+                return self
+            else:
+                if direction == OUT:
+                    self.init_gauche()
+                    self.courant = True
+                    self.set_tailles(self.tailles)
+                    return self
+                elif direction == BAS:
+                    if self.courant is self.stats:
+                        self.init_inventaire()
+                        self.set_tailles(self.tailles)
+                    elif self.courant is self.inventaire:
+                        self.init_classe()
+                        self.set_tailles(self.tailles)
+                    return self
+                elif direction == HAUT:
+                    if self.courant is self.classe:
+                        self.init_inventaire()
+                        self.set_tailles(self.tailles)
+                    elif self.courant is self.inventaire:
+                        self.init_stats()
+                        self.set_tailles(self.tailles)
+                    return self
+        else:
+            if direction == IN:
+                self.init_gauche()
+                self.courant = True
+                self.set_tailles(self.tailles)
+                return self
         return False
 
 class Affichage_centre(Wrapper):
@@ -448,6 +524,9 @@ class Affichage_centre(Wrapper):
         contenu.set_contenu([Marge_verticale(),monoptique,Marge_verticale()],[5,-1,5])
         self.contenu = contenu
         self.fond = (0,0,0)
+
+    def navigue(self, direction: Direction | int) -> Literal[False]:
+        return False # On ne veut pas naviguer ici !
 
 class Affichage_droite(Wrapper):
     def __init__(self,controleur:Controleur):
@@ -505,23 +584,26 @@ class Affichage_droite(Wrapper):
         self.contenu = contenu
         self.fond = (255,255,255)
 
+    def select(self,selection):
+        if isinstance(selection,Vignette_allie):
+            self.courant = selection
+            self.init_allie() #Donner des informations spécifiques pour les alliés ?
+        if isinstance(selection,Vignette_ennemi):
+            self.courant = selection
+            self.init_ennemi() #Donner des informations spécifiques pour les ennemis ?
+        if isinstance(selection,Vignette_neutre):
+            self.courant = selection
+            self.init_neutre() #Donner des informations spécifiques pour les neutres ?
+        if isinstance(selection,Paves):
+            self.controleur.get_esprit(self.controleur.joueur.esprit).utilise(self.courant.agissant)
+        self.set_tailles(self.tailles)
+
     def clique(self,position):
         clique = self.clique_wrapper(position)
         if clique is self:
             self.courant = True
         elif clique:
-            if isinstance(clique,Vignette_allie):
-                self.courant = clique
-                self.init_allie() #Donner des informations spécifiques pour les alliés ?
-            if isinstance(clique,Vignette_ennemi):
-                self.courant = clique
-                self.init_ennemi() #Donner des informations spécifiques pour les ennemis ?
-            if isinstance(clique,Vignette_neutre):
-                self.courant = clique
-                self.init_neutre() #Donner des informations spécifiques pour les neutres ?
-            if isinstance(clique,Paves):
-                self.controleur.get_esprit(self.controleur.joueur.esprit).utilise(self.courant.agissant)
-            self.set_tailles(self.tailles)
+            self.select(clique)
         else:
             self.courant = False
             self.init_droite()
@@ -529,6 +611,74 @@ class Affichage_droite(Wrapper):
         if clique:
             return self
         return False
+
+    def navigue(self, direction: Direction | int):
+        if self.courant is True:
+            if direction == IN:
+                self.courant = self.allies
+                self.init_allie()
+                self.set_tailles(self.tailles)
+                return self
+            # elif direction == OUT:
+            #     self.courant = False
+        elif self.courant:
+            nav = self.courant.navigue(direction)
+            if nav:
+                self.select(nav)
+                return self
+            else:
+                if direction == OUT:
+                    self.courant = True
+                    self.init_droite()
+                    self.set_tailles(self.tailles)
+                    return self
+                elif direction == GAUCHE:
+                    if isinstance(self.courant,(Vignette_neutre,Affichage_neutres)):
+                        if self.allies.allies:
+                            self.courant = self.allies[0]
+                            self.init_allie()
+                            self.set_tailles(self.tailles)
+                        else:
+                            self.courant = self.allies
+                            self.init_droite()
+                            self.set_tailles(self.tailles)
+                    elif isinstance(self.courant,(Vignette_ennemi,Affichage_ennemis)):
+                        if self.neutres.neutres:
+                            self.courant = self.neutres[0]
+                            self.init_neutre()
+                            self.set_tailles(self.tailles)
+                        else:
+                            self.courant = self.neutres
+                            self.init_droite()
+                            self.set_tailles(self.tailles)
+                elif direction == DROITE:
+                    if isinstance(self.courant,(Vignette_allie,Affichage_allies)):
+                        if self.neutres.neutres:
+                            self.courant = self.neutres[0]
+                            self.init_neutre()
+                            self.set_tailles(self.tailles)
+                        else:
+                            self.courant = self.neutres
+                            self.init_droite()
+                            self.set_tailles(self.tailles)
+                    elif isinstance(self.courant,(Vignette_neutre,Affichage_neutres)):
+                        if self.ennemis.ennemis:
+                            self.courant = self.ennemis[0]
+                            self.init_ennemi()
+                            self.set_tailles(self.tailles)
+                        else:
+                            self.courant = self.ennemis
+                            self.init_droite()
+                            self.set_tailles(self.tailles)
+                    return self
+        else:
+            if direction == IN:
+                self.courant = self.allies
+                self.init_allie()
+                self.set_tailles(self.tailles)
+                return self
+        return False
+
 
     def update(self):
         if not self.courant in self.allies.allies + self.ennemis.ennemis + self.neutres.neutres :
@@ -602,12 +752,15 @@ class Affichage_gauche_inventaire(Wrapper):
         self.contenu = contenu
         self.fond = (255,255,255)
 
+    def select(self,selection):
+        self.courant = selection
+
     def clique(self,position):
         clique = self.clique_wrapper(position)
         if clique is self:
             self.courant = True
         elif clique:
-            self.courant = clique
+            self.select(clique)
         else:
             self.init_gauche()
             self.set_tailles(self.tailles)
@@ -615,11 +768,36 @@ class Affichage_gauche_inventaire(Wrapper):
             return self
         return False
 
-class Affichage_centre_case_dialogue(Wrapper):
-    def __init__(self,joueur:Heros):
+    def navigue(self, direction: Direction | int):
+        if self.courant is True:
+            print("Oops... Ça ne devrait pas arriver !")
+            if direction == IN:
+                self.courant = self.contenu.contenu[1].contenu[3]
+                return self
+            # elif direction == OUT:
+            #     self.courant = True:
+        elif self.courant:
+            nav = self.courant.navigue(direction)
+            if nav: #Si on a navigué dans l'inventaire
+                self.select(nav)
+                return self
+            else: # Si l'inventaire n'a pas navigué
+                print("Euh... Ça ne devrait pas arriver non plus !")
+                return False
+        else:
+            print("Encore quelque chose qui ne devrait pas arriver !")
+            if direction == IN:
+                self.courant = self.contenu.contenu[1].contenu[3]
+                return self
+
+class Affichage_centre_selection_lab(Wrapper):
+    def __init__(self,joueur:Agissant,type_affichage_labyrinthe:type):
         self.joueur = joueur
+        self.type_affichage_labyrinthe = type_affichage_labyrinthe
         self.objets:List[Affichable] = []
         self.contenu:Affichable = None
+        self.affichage_labyrinthe:Affichable = None
+        self.boutons:List[Bouton] = []
         self.courant = False
         self.cible = None
         self.fond = (0,0,0)
@@ -630,67 +808,32 @@ class Affichage_centre_case_dialogue(Wrapper):
     def init_centre(self):
         contenu = Pavage_horizontal()
         diptique = Pavage_vertical()
+        self.affichage_labyrinthe = self.type_affichage_labyrinthe(self.joueur)
         boutons = Pavage_horizontal()
-        boutons.set_contenu([Bouton(SKIN_VALIDER,"Confirmer"),Marge_verticale()],[0,-1])
-        diptique.set_contenu([Marge_horizontale(),Affichage_labyrinthe_case_dialogue(self.joueur),Marge_horizontale(),boutons,Marge_horizontale()],[5,-1,5,0,5])
+        self.boutons = [Bouton(SKIN_VALIDER,"Confirmer")]
+        boutons.set_contenu([self.boutons[i//2] if i%2==0 else Marge_verticale() for i in range(len(self.boutons)*2)],[0 if i%2==0 else 5 for i in range(len(self.boutons)*2-1)]+[-1])
+        diptique.set_contenu([Marge_horizontale(),self.affichage_labyrinthe,Marge_horizontale(),boutons,Marge_horizontale()],[5,0,5,0,5])
         contenu.set_contenu([Marge_verticale(),diptique,Marge_verticale()],[5,-1,5])
         self.contenu = contenu
         self.fond = (0,0,0)
 
-    def clique(self,position):
-        clique = self.clique_wrapper(position)
-        if clique is self:
-            self.courant = True
-        elif clique:
-            if isinstance(clique,Affichage_labyrinthe_case_dialogue):
-                self.courant = clique
-                self.cible = self.courant.cible
-            if isinstance(clique,Bouton) and clique.texte == "Confirmer":
+    def select(self,selection):
+        if isinstance(selection,self.type_affichage_labyrinthe):
+            self.courant = selection
+            self.cible = self.courant.cible
+        if isinstance(selection,Bouton) and selection.texte == "Confirmer":
+            if isinstance(self.courant,self.type_affichage_labyrinthe):
                 self.joueur.interlocuteur.set_cible(self.cible)
                 self.joueur.controleur.unset_phase(CASE_DIALOGUE)
                 print(self.joueur.controleur.phases)
-            self.set_tailles(self.tailles)
-        else:
-            self.courant = False
-            self.init_centre()
-            self.set_tailles(self.tailles)
-        if clique:
-            return self
-        return False
-
-class Affichage_centre_case_magie(Wrapper):
-    def __init__(self,joueur:Agissant):
-        self.joueur = joueur
-        self.objets:List[Affichable] = []
-        self.contenu:Affichable = None
-        self.courant = False
-        self.fond = (0,0,0)
-        self.tailles = [0,0]
-        self.position = [0,0]
-        self.init_centre()
-
-    def init_centre(self):
-        contenu = Pavage_horizontal()
-        diptique = Pavage_vertical()
-        boutons = Pavage_horizontal()
-        boutons.set_contenu([Bouton(SKIN_VALIDER,"Confirmer"),Marge_verticale()],[0,-1])
-        diptique.set_contenu([Marge_horizontale(),Affichage_labyrinthe_case_magie(self.joueur),Marge_horizontale(),boutons,Marge_horizontale()],[5,-1,5,0,5])
-        contenu.set_contenu([Marge_verticale(),diptique,Marge_verticale()],[5,-1,5])
-        self.contenu = contenu
-        self.fond = (0,0,0)
+        self.set_tailles(self.tailles)
 
     def clique(self,position):
         clique = self.clique_wrapper(position)
         if clique is self:
             self.courant = True
         elif clique:
-            if isinstance(clique,Affichage_labyrinthe_case_magie):
-                self.courant = clique
-                self.cible = self.courant.cible
-            if isinstance(clique,Bouton) and clique.texte == "Confirmer":
-                self.joueur.cible_magie = self.cible
-                self.joueur.controleur.unset_phase(CASE_MAGIE)
-            self.set_tailles(self.tailles)
+            self.select(clique)
         else:
             self.courant = False
             self.init_centre()
@@ -699,11 +842,82 @@ class Affichage_centre_case_magie(Wrapper):
             return self
         return False
 
-class Affichage_centre_case_parchemin(Wrapper):
+    def navigue(self, direction: Direction | int):
+        if self.courant is True:
+            if direction == IN:
+                self.courant = self.affichage_labyrinthe
+                return self
+            # elif direction == OUT:
+            #     self.courant = False
+        elif self.courant:
+            nav = self.courant.navigue(direction)
+            if nav: # Si on a navigué dans le labyrinthe ou sur le bouton
+                self.select(nav)
+                return self
+            else: # Si le labyrinthe ou le bouton n'a pas navigué
+                if direction == OUT:
+                    self.courant = True
+                    self.set_tailles(self.tailles)
+                    return self
+                elif direction == NEXT:
+                    if isinstance(self.courant,Affichage_labyrinthe_case_dialogue):
+                        self.courant = self.boutons[0]
+                        return self
+                    elif isinstance(self.courant,Bouton): #Vraiment ? On wrap ?
+                        self.courant = self.affichage_labyrinthe
+                        return self
+                elif direction == PREVIOUS:
+                    if isinstance(self.courant,Bouton):
+                        self.courant = self.affichage_labyrinthe
+                        return self
+                    elif isinstance(self.courant,Affichage_labyrinthe_case_dialogue): #Vraiment ? On wrap ?
+                        self.courant = self.boutons[0]
+                        return self
+                elif direction == DROITE:
+                    if isinstance(self.courant,Bouton):
+                        index = self.boutons.index(self.courant)
+                        if index < len(self.boutons)-1:
+                            self.courant = self.boutons[index+1]
+                            return self
+                elif direction == GAUCHE:
+                    if isinstance(self.courant,Bouton):
+                        index = self.boutons.index(self.courant)
+                        if index > 0:
+                            self.courant = self.boutons[index-1]
+                            return self
+        else:
+            if direction == IN:
+                self.courant = self.affichage_labyrinthe
+                return self
+        return False
+
+class Affichage_centre_case_dialogue(Affichage_centre_selection_lab,Wrapper):
     def __init__(self,joueur:Agissant):
+        Affichage_centre_selection_lab.__init__(self,joueur,Affichage_labyrinthe_case_dialogue)
+
+class Affichage_centre_case_magie(Affichage_centre_selection_lab,Wrapper):
+    def __init__(self,joueur:Agissant):
+        Affichage_centre_selection_lab.__init__(self,joueur,Affichage_labyrinthe_case_magie)
+    
+class Affichage_centre_case_parchemin(Affichage_centre_selection_lab,Wrapper):
+    def __init__(self,joueur:Agissant):
+        Affichage_centre_selection_lab.__init__(self,joueur,Affichage_labyrinthe_case_parchemin)
+
+class Affichage_centre_direction_magie(Affichage_centre_selection_lab,Wrapper):
+    def __init__(self,joueur:Agissant):
+        Affichage_centre_selection_lab.__init__(self,joueur,Affichage_labyrinthe_direction_magie)
+
+class Affichage_centre_direction_parchemin(Affichage_centre_selection_lab,Wrapper):
+    def __init__(self,joueur:Agissant):
+        Affichage_centre_selection_lab.__init__(self,joueur,Affichage_labyrinthe_direction_parchemin)
+
+class Affichage_centre_selection_liste_menu(Wrapper):
+    def __init__(self,joueur:Agissant, type_liste_menu: type):
         self.joueur = joueur
+        self.type_liste_menu = type_liste_menu
         self.objets:List[Affichable] = []
         self.contenu:Affichable = None
+        self.liste_menu:Liste_menu = None
         self.courant = False
         self.fond = (0,0,0)
         self.tailles = [0,0]
@@ -712,294 +926,51 @@ class Affichage_centre_case_parchemin(Wrapper):
 
     def init_centre(self):
         contenu = Pavage_horizontal()
-        diptique = Pavage_vertical()
-        boutons = Pavage_horizontal()
-        boutons.set_contenu([Bouton(SKIN_VALIDER,"Confirmer"),Marge_verticale()],[0,-1])
-        diptique.set_contenu([Marge_horizontale(),Affichage_labyrinthe_case_parchemin(self.joueur),Marge_horizontale(),boutons,Marge_horizontale()],[5,-1,5,0,5])
-        contenu.set_contenu([Marge_verticale(),diptique,Marge_verticale()],[5,-1,5])
+        monoptique = Pavage_vertical()
+        self.liste_menu = self.type_liste_menu(self.joueur)
+        monoptique.set_contenu([Marge_horizontale(),self.liste_menu,Marge_horizontale()],[5,-1,5])
+        contenu.set_contenu([Marge_verticale(),monoptique,Marge_verticale()],[5,-1,5])
         self.contenu = contenu
         self.fond = (0,0,0)
 
-    def clique(self,position):
-        clique = self.clique_wrapper(position)
-        if clique is self:
-            self.courant = True
-        elif clique:
-            if isinstance(clique,Affichage_labyrinthe_case_parchemin):
-                self.courant = clique
-                self.cible = self.courant.cible
-            if isinstance(clique,Bouton) and clique.texte == "Confirmer":
-                self.joueur.cible_magie_parchemin = self.cible
-                self.joueur.controleur.unset_phase(CASE_PARCHEMIN)
-            self.set_tailles(self.tailles)
-        else:
-            self.courant = False
+    def select(self,selection):
+        if isinstance(selection,self.type_liste_menu.vignette):
+            self.courant = selection
             self.init_centre()
-            self.set_tailles(self.tailles)
-        if clique:
-            return self
-        return False
-
-class Affichage_centre_direction_magie(Wrapper):
-    def __init__(self,joueur:Agissant):
-        self.joueur = joueur
-        self.objets:List[Affichable] = []
-        self.contenu:Affichable = None
-        self.courant = False
-        self.fond = (0,0,0)
-        self.tailles = [0,0]
-        self.position = [0,0]
-        self.init_centre()
-
-    def init_centre(self):
-        contenu = Pavage_horizontal()
-        diptique = Pavage_vertical()
-        boutons = Pavage_horizontal()
-        boutons.set_contenu([Bouton(SKIN_VALIDER,"Confirmer"),Marge_verticale()],[0,-1])
-        diptique.set_contenu([Marge_horizontale(),Affichage_labyrinthe_direction_magie(self.joueur),Marge_horizontale(),boutons,Marge_horizontale()],[5,-1,5,0,5])
-        contenu.set_contenu([Marge_verticale(),diptique,Marge_verticale()],[5,-1,5])
-        self.contenu = contenu
-        self.fond = (0,0,0)
-
-    def clique(self,position):
-        clique = self.clique_wrapper(position)
-        if clique is self:
-            self.courant = True
-        elif clique:
-            if isinstance(clique,Affichage_labyrinthe_direction_magie):
-                self.courant = clique
-            if isinstance(clique,Bouton) and clique.texte == "Confirmer":
-                self.joueur.dir_magie = self.courant.direction
-                self.joueur.controleur.unset_phase(DIRECTION_MAGIE)
-            self.set_tailles(self.tailles)
-        else:
-            self.courant = False
-            self.init_centre()
-            self.set_tailles(self.tailles)
-        if clique:
-            return self
-        return False
-
-class Affichage_centre_direction_parchemin(Wrapper):
-    def __init__(self,joueur:Agissant):
-        self.joueur = joueur
-        self.objets:List[Affichable] = []
-        self.contenu:Affichable = None
-        self.courant = False
-        self.fond = (0,0,0)
-        self.tailles = [0,0]
-        self.position = [0,0]
-        self.init_centre()
-
-    def init_centre(self):
-        contenu = Pavage_horizontal()
-        diptique = Pavage_vertical()
-        boutons = Pavage_horizontal()
-        boutons.set_contenu([Bouton(SKIN_VALIDER,"Confirmer"),Marge_verticale()],[0,-1])
-        diptique.set_contenu([Marge_horizontale(),Affichage_labyrinthe_direction_parchemin(self.joueur),Marge_horizontale(),boutons,Marge_horizontale()],[5,-1,5,0,5])
-        contenu.set_contenu([Marge_verticale(),diptique,Marge_verticale()],[5,-1,5])
-        self.contenu = contenu
-        self.fond = (0,0,0)
-
-    def clique(self,position):
-        clique = self.clique_wrapper(position)
-        if clique is self:
-            self.courant = True
-        elif clique:
-            if isinstance(clique,Affichage_labyrinthe_direction_parchemin):
-                self.courant = clique
-            if isinstance(clique,Bouton) and clique.texte == "Confirmer":
-                self.joueur.dir_magie_parchemin = self.courant.direction
-                self.joueur.controleur.unset_phase(DIRECTION_PARCHEMIN)
-            self.set_tailles(self.tailles)
-        else:
-            self.courant = False
-            self.init_centre()
-            self.set_tailles(self.tailles)
-        if clique:
-            return self
-        return False
-
-class Affichage_centre_recettes(Wrapper):
-    def __init__(self,joueur:Agissant):
-        self.joueur = joueur
-        self.objets:List[Affichable] = []
-        self.contenu:Affichable = None
-        self.courant = False
-        self.fond = (0,0,0)
-        self.tailles = [0,0]
-        self.position = [0,0]
-        self.init_centre()
-
-    def init_centre(self):
-        recettes = self.joueur.interlocuteur.get_recettes()
-        contenu = Pavage_horizontal()
-        monoptique = Pavage_vertical()
-        menu = Liste_menu()
-        menu.set_contenu([Vignette_recette(recette,40,isinstance(self.courant,Vignette_recette) and recette != self.courant.recette,not self.joueur.inventaire.peut_fournir({eval(ingredient):recette["ingredients"][ingredient] for ingredient in recette["ingredients"]})) for recette in recettes])
-        monoptique.set_contenu([Marge_horizontale(),menu,Marge_horizontale()],[5,-1,5])
-        contenu.set_contenu([Marge_verticale(),monoptique,Marge_verticale()],[5,-1,5])
-        self.contenu = contenu
-        self.fond = (0,0,0)
 
     def clique(self,position):
         clique = self.clique_wrapper(position)
         if clique is self:
             pass
         elif clique:
-            if isinstance(clique,Vignette_recette):
-                self.courant = clique
-                self.init_centre()
-            print(clique)
+            self.select(clique)
             return self
         else:
-            self.init_centre()
             self.set_tailles(self.tailles)
         return False
 
-class Affichage_centre_ventes(Wrapper):
+    def navigue(self, direction: Direction | int):
+        pass
+
+class Affichage_centre_recettes(Affichage_centre_selection_liste_menu, Wrapper):
     def __init__(self,joueur:Agissant):
-        self.joueur = joueur
-        self.objets:List[Affichable] = []
-        self.contenu:Affichable = None
-        self.courant = False
-        self.fond = (0,0,0)
-        self.tailles = [0,0]
-        self.position = [0,0]
-        self.init_centre()
+        Affichage_centre_selection_liste_menu.__init__(self,joueur, Affichage_liste_menu_recettes)
 
-    def init_centre(self):
-        items = self.joueur.inventaire.get_items()
-        contenu = Pavage_horizontal()
-        monoptique = Pavage_vertical()
-        menu = Liste_menu()
-        menu.set_contenu([Vignette_vente(item,40,self.joueur.interlocuteur.get_prix_vente(item),self.joueur.interlocuteur.get_description(item),isinstance(self.courant,Vignette_vente) and item != self.courant.item,item in self.joueur.inventaire.get_equippement()) for item in items])
-        monoptique.set_contenu([Marge_horizontale(),menu,Marge_horizontale()],[5,-1,5])
-        contenu.set_contenu([Marge_verticale(),monoptique,Marge_verticale()],[5,-1,5])
-        self.contenu = contenu
-        self.fond = (0,0,0)
+class Affichage_centre_ventes(Affichage_centre_selection_liste_menu, Wrapper):
+    def __init__(self, joueur:Agissant):
+        Affichage_centre_selection_liste_menu.__init__(self,joueur, Affichage_liste_menu_ventes)
 
-    def clique(self,position):
-        clique = self.clique_wrapper(position)
-        if clique is self:
-            pass
-        elif clique:
-            if isinstance(clique,Vignette_vente):
-                self.courant = clique
-                self.init_centre()
-            return self
-        else:
-            # self.init()
-            self.set_tailles(self.tailles)
-        return False
+class Affichage_centre_achats(Affichage_centre_selection_liste_menu, Wrapper):
+    def __init__(self, joueur:Agissant):
+        Affichage_centre_selection_liste_menu.__init__(self,joueur, Affichage_liste_menu_achats)
 
-class Affichage_centre_achats(Wrapper):
-    def __init__(self,joueur:Agissant):
-        self.joueur = joueur
-        self.objets:List[Affichable] = []
-        self.contenu:Affichable = None
-        self.courant = False
-        self.fond = (0,0,0)
-        self.tailles = [0,0]
-        self.position = [0,0]
-        self.init_centre()
+class Affichage_centre_impregnations(Affichage_centre_selection_liste_menu, Wrapper):
+    def __init__(self, joueur:Agissant):
+        Affichage_centre_selection_liste_menu.__init__(self,joueur, Affichage_liste_menu_impregnations)
 
-    def init_centre(self):
-        items = self.joueur.interlocuteur.get_marchandise()
-        contenu = Pavage_horizontal()
-        monoptique = Pavage_vertical()
-        menu = Liste_menu()
-        menu.set_contenu([Vignette_achat(eval(item["item"])(None),40,item["prix"],item["description"],isinstance(self.courant,Vignette_achat) and item != self.courant.item,item["prix"]>self.joueur.argent) for item in items])
-        monoptique.set_contenu([Marge_horizontale(),menu,Marge_horizontale()],[5,-1,5])
-        contenu.set_contenu([Marge_verticale(),monoptique,Marge_verticale()],[5,-1,5])
-        self.contenu = contenu
-        self.fond = (0,0,0)
-
-    def clique(self,position):
-        clique = self.clique_wrapper(position)
-        if clique is self:
-            pass
-        elif clique:
-            if isinstance(clique,Vignette_achat):
-                self.courant = clique
-                self.init_centre()
-            return self
-        else:
-            # self.init()
-            self.set_tailles(self.tailles)
-        return False
-
-class Affichage_centre_impregnations(Wrapper):
-    def __init__(self,joueur:Agissant):
-        self.joueur = joueur
-        self.objets:List[Affichable] = []
-        self.contenu:Affichable = None
-        self.courant = False
-        self.fond = (0,0,0)
-        self.tailles = [0,0]
-        self.position = [0,0]
-        self.init_centre()
-
-    def init_centre(self):
-        magies = self.joueur.interlocuteur.get_magies()
-        contenu = Pavage_horizontal()
-        monoptique = Pavage_vertical()
-        menu = Liste_menu()
-        menu.set_contenu([Vignette_magie(magie,40,isinstance(self.courant,Vignette_magie) and magie != self.courant.magie,magie.cout_mp>self.joueur.interlocuteur.pm) for magie in magies])
-        monoptique.set_contenu([Marge_horizontale(),menu,Marge_horizontale()],[5,-1,5])
-        contenu.set_contenu([Marge_verticale(),monoptique,Marge_verticale()],[5,-1,5])
-        self.contenu = contenu
-        self.fond = (0,0,0)
-
-    def clique(self,position):
-        clique = self.clique_wrapper(position)
-        if clique is self:
-            pass
-        elif clique:
-            if isinstance(clique,Vignette_magie):
-                self.courant = clique
-                self.init_centre()
-            return self
-        else:
-            # self.init()
-            self.set_tailles(self.tailles)
-        return False
-
-class Affichage_centre_auto_impregnations(Wrapper):
-    def __init__(self,joueur:Agissant):
-        self.joueur = joueur
-        self.objets:List[Affichable] = []
-        self.contenu:Affichable = None
-        self.courant = False
-        self.fond = (0,0,0)
-        self.tailles = [0,0]
-        self.position = [0,0]
-        self.init_centre()
-
-    def init_centre(self):
-        magies = self.joueur.get_magies()
-        contenu = Pavage_horizontal()
-        monoptique = Pavage_vertical()
-        menu = Liste_menu()
-        menu.set_contenu([Vignette_magie(magie,40,isinstance(self.courant,Vignette_magie) and magie != self.courant.magie,magie.cout_mp>self.joueur.pm) for magie in magies])
-        monoptique.set_contenu([Marge_horizontale(),menu,Marge_horizontale()],[5,-1,5])
-        contenu.set_contenu([Marge_verticale(),monoptique,Marge_verticale()],[5,-1,5])
-        self.contenu = contenu
-        self.fond = (0,0,0)
-
-    def clique(self,position):
-        clique = self.clique_wrapper(position)
-        if clique is self:
-            pass
-        elif clique:
-            if isinstance(clique,Vignette_magie):
-                self.courant = clique
-                self.init_centre()
-            return self
-        else:
-            # self.init()
-            self.set_tailles(self.tailles)
-        return False
+class Affichage_centre_auto_impregnations(Affichage_centre_selection_liste_menu, Wrapper):
+    def __init__(self, joueur:Agissant):
+        Affichage_centre_selection_liste_menu.__init__(self,joueur, Affichage_liste_menu_auto_impregnations)
 
 class Affichage_droite_dialogue(Wrapper):
     def __init__(self,interlocuteur:Humain):
@@ -1039,22 +1010,57 @@ class Affichage_droite_dialogue(Wrapper):
         else:
             self.contenu.update()
 
+    def select(self,selection):
+        if isinstance(selection,Affichage_replique):
+            if selection != self.courant:
+                self.courant = selection
+            else:
+                self.interlocuteur.interprete(self.courant.replique)
+        self.set_tailles(self.tailles)
+
     def clique(self,position):
         clique = self.clique_wrapper(position)
         if clique is self:
             self.courant = True
         elif clique:
-            if isinstance(clique,Affichage_replique):
-                if clique != self.courant:
-                    self.courant = clique
-                else:
-                    self.interlocuteur.interprete(self.courant.replique)
-            self.set_tailles(self.tailles)
+            self.select(clique)
         else:
             self.courant = False
             self.init_droite()
             self.set_tailles(self.tailles)
         if clique:
+            return self
+        return False
+    
+    def navigue(self, direction: Direction | int):
+        if self.courant is True:
+            print("Oops... Ça ne devrait pas arriver !")
+            if direction == IN:
+                self.courant = self.repliques.contenu[0]
+        elif self.courant:
+            nav = self.courant.navigue(direction)
+            if nav: # Si on a navigué dans la réplique
+                self.select(nav)
+                return self
+            else: # Si la réplique n'a pas navigué
+                if direction == BAS:
+                    if self.courant == self.repliques.contenu[-1]:
+                        self.courant = True
+                    else:
+                        self.courant = self.repliques.contenu[self.repliques.contenu.index(self.courant)+1]
+
+    def survol(self,position):
+        survol = self.survol_wrapper(position)
+        if survol is self:
+            pass
+        elif survol:
+            if isinstance(survol,Affichage_replique):
+                if survol != self.courant:
+                    self.courant = survol
+            self.set_tailles(self.tailles)
+        else:
+            self.set_tailles(self.tailles)
+        if survol:
             return self
         return False
 
@@ -3528,299 +3534,42 @@ class Affichage_labyrinthe_direction_parchemin(Affichage,Proportionnel):
             return self
         return False
 
-class Vignette_categorie(Final,Affichage):
-    def __init__(self,categorie,taille,shade=False,invalide=False):
-        self.objets:List[Affichable] = [] #La liste des objets à afficher
-        self.tailles = [taille,taille]
-        self.position = [0,0]
-        self.categorie = categorie
-        self.objets.append(Vignette([0,0],taille,categorie.get_image()))
-        if shade or invalide:
-            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
-        if invalide:
-            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
+class Affichage_liste_menu_recettes(Liste_menu):
+    vignette = Vignette_recette
+    def __init__(self, joueur:Agissant):
+        recettes = self.joueur.interlocuteur.get_recettes()
+        Liste_menu.__init__(self)
+        self.set_contenu([Vignette_recette(recette,40,isinstance(self.courant,Vignette_recette) and recette != self.courant.recette,not self.joueur.inventaire.peut_fournir({eval(ingredient):recette["ingredients"][ingredient] for ingredient in recette["ingredients"]})) for recette in recettes])
 
-class Vignette_recette(Final,Affichage):
-    def __init__(self,recette,taille,shade=False,invalide=False):
-        self.objets:List[Affichable] = [] #La liste des objets à afficher
-        self.tailles = [taille,taille]
-        self.position = [0,0]
-        self.recette = recette
-        self.objets.append(Vignette([0,0],taille,eval(recette["produit"])(None).get_skin()))
-        if shade or invalide:
-            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
-        if invalide:
-            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
+class Affichage_liste_menu_ventes(Liste_menu):
+    vignette = Vignette_vente
+    def __init__(self, joueur:Agissant):
+        items = self.joueur.inventaire.get_items()
+        Liste_menu.__init__(self)
+        self.set_contenu([Vignette_vente(item,40,self.joueur.interlocuteur.get_prix_vente(item),self.joueur.interlocuteur.get_description(item),isinstance(self.courant,Vignette_vente) and item != self.courant.item,item in self.joueur.inventaire.get_equippement()) for item in items])
 
-class Vignette_ingredient(Final,Affichage):
-    def __init__(self,ingredient:Item,quantite_necessaire,quantite_disponible,taille,shade=False,invalide=False):
-        self.objets:List[Affichable] = [] #La liste des objets à afficher
-        self.tailles = [taille,taille]
-        self.position = [0,0]
-        self.ingredient = ingredient
-        self.objets.append(Vignette([0,0],taille,ingredient.get_skin()))
-        if shade or invalide or quantite_disponible < quantite_necessaire:
-            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
-        if invalide or quantite_disponible < quantite_necessaire:
-            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
-        texte = Texte(f"{quantite_disponible}/{quantite_necessaire}")
-        self.objets.append(texte)
-        tailles_texte = texte.get_tailles(self.tailles)
-        texte.set_position([self.position[0]+self.tailles[0]-tailles_texte[0],self.position[1]+self.tailles[1]-tailles_texte[1]])
+class Affichage_liste_menu_achats(Liste_menu):
+    vignette = Vignette_achat
+    def __init__(self, joueur:Agissant):
+        items = self.joueur.interlocuteur.get_marchandise()
+        Liste_menu.__init__(self)
+        self.set_contenu([Vignette_achat(eval(item["item"])(None),40,item["prix"],item["description"],isinstance(self.courant,Vignette_achat) and item != self.courant.item,item["prix"]>self.joueur.argent) for item in items])
 
-class Vignette_vente(Final,Affichage):
-    def __init__(self,item:Item,taille,prix,description,shade=False,invalide=False):
-        self.objets:List[Affichable] = [] #La liste des objets à afficher
-        self.tailles = [taille,taille]
-        self.position = [0,0]
-        self.item = item
-        self.prix = prix
-        self.description = description
-        self.objets.append(Vignette([0,0],taille,item.get_skin()))
-        if shade or invalide:
-            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
-        if invalide:
-            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
-        texte = Texte(f"{prix} €")
-        self.objets.append(texte)
-        tailles_texte = texte.get_tailles(self.tailles)
-        texte.set_position([self.position[0]+self.tailles[0]-tailles_texte[0],self.position[1]+self.tailles[1]-tailles_texte[1]])
+class Affichage_liste_menu_impregnations(Liste_menu):
+    vignette = Vignette_magie
+    def __init__(self, joueur:Agissant):
+        magies = self.joueur.interlocuteur.get_magies()
+        Liste_menu.__init__(self)
+        self.set_contenu([Vignette_magie(magie,40,isinstance(self.courant,Vignette_magie) and magie != self.courant.magie,magie.cout_mp>self.joueur.interlocuteur.pm) for magie in magies])
 
-class Vignette_achat(Final,Affichage):
-    def __init__(self,item:Item,taille,prix,description,shade=False,invalide=False):
-        self.objets:List[Affichable] = [] #La liste des objets à afficher
-        self.tailles = [taille,taille]
-        self.position = [0,0]
-        self.item = item
-        self.prix = prix
-        self.description = description
-        self.objets.append(Vignette([0,0],taille,item.get_skin()))
-        if shade or invalide:
-            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
-        if invalide:
-            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
-        texte = Texte(f"{prix} €")
-        self.objets.append(texte)
-        tailles_texte = texte.get_tailles(self.tailles)
-        texte.set_position([self.position[0]+self.tailles[0]-tailles_texte[0],self.position[1]+self.tailles[1]-tailles_texte[1]])
+class Affichage_liste_menu_auto_impregnations(Liste_menu):
+    vignette = Vignette_magie
+    def __init__(self, joueur:Agissant):
+        magies = self.joueur.get_magies()
+        Liste_menu.__init__(self)
+        self.set_contenu([Vignette_magie(magie,40,isinstance(self.courant,Vignette_magie) and magie != self.courant.magie,magie.cout_mp>self.joueur.pm) for magie in magies])
 
-class Vignette_magie(Final,Affichage):
-    def __init__(self,magie:Magie,taille,shade=False,invalide=False):
-        self.objets:List[Affichable] = [] #La liste des objets à afficher
-        self.tailles = [taille,taille]
-        self.position = [0,0]
-        self.magie = magie
-        self.objets.append(Vignette([0,0],taille,magie.get_skin()))
-        if shade or invalide:
-            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
-        if invalide:
-            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
-
-class Vignette_item(Final,Affichage):
-    def __init__(self,position,item:Item,taille,direction=None,shade=False,invalide=False):
-        self.objets:List[Affichable] = [] #La liste des objets à afficher
-        self.tailles = [taille,taille]
-        self.position = position
-        self.item = item
-        if direction == None:
-            direction = item.get_direction()
-        self.objets.append(Vignette(position,taille,item.get_skin(),direction)) #Avoir éventuellement la tête dans une autre direction ?
-        for effet in item.effets:
-            if effet.affiche:
-                self.objets.append(Vignette(position,taille,effet.get_skin(),direction))
-        if shade or invalide:
-            self.objets.append(Vignette(position,taille,SKIN_SHADE))
-        if invalide:
-            self.objets.append(Vignette(position,taille,SKIN_SHADE))
-
-class Vignettes_agissant(Final,Affichage):
-    def __init__(self,position,agissant:Agissant,taille):
-        self.objets:List[Affichable] = [] #La liste des objets à afficher
-        self.tailles = [taille,taille]
-        self.position = position
-        self.agissant = agissant
-        direction = agissant.get_direction()
-        arme = agissant.inventaire.arme
-        if arme != None:
-            self.objets.append(Vignette_item(position,agissant.controleur[arme],taille,direction))
-        self.objets.append(Vignette(position,taille,agissant.get_skin(),direction))
-        armure = agissant.inventaire.armure
-        if armure != None:
-            self.objets.append(Vignette_item(position,agissant.controleur[armure],taille,direction))
-        bouclier = agissant.inventaire.bouclier
-        if bouclier != None:
-            self.objets.append(Vignette_item(position,agissant.controleur[bouclier],taille,direction))
-        haume = agissant.inventaire.haume
-        self.objets.append(Vignette(position,taille,agissant.get_skin_tete(),direction)) #Avoir éventuellement la tête dans une autre direction ?
-        if haume != None:
-            self.objets.append(Vignette_item(position,agissant.controleur[haume],taille,direction))
-        for effet in agissant.effets:
-            if effet.affiche:
-                self.objets.append(Vignette(position,taille,effet.get_skin(),direction))
-        esprit = agissant.controleur.get_esprit(agissant.controleur.joueur.esprit)
-        position_pv = [position[0]+ceil(taille*(2/19)),position[1]+ceil(taille*(2/19))]
-        tailles_pv = [ceil(taille*((15*agissant.pv)/(19*agissant.pv_max))),ceil(taille*(15/19))]
-        if agissant.ID in esprit.ennemis.keys():
-            image = IMAGE_PV_ENNEMI
-        elif agissant.ID in esprit.corps.keys():
-            image = IMAGE_PV_ALLIE
-        else:
-            image = IMAGE_PV_NEUTRE
-        self.objets.append(Vignette_image(position_pv,tailles_pv,image))
-        if isinstance(agissant,Humain) and agissant.dialogue > 0: #Est-ce qu'on veut vraiment avoir cet indicatif au-dessus des effets ?
-            self.objets.append(Vignette(position,taille,SKIN_DIALOGUE))
-
-class Vignettes_position(Final,Affichage):
-    def __init__(self,position,joueur,vue,pos,taille,shade=False,invalide=False):
-        self.objets:List[Affichable] = []
-        self.tailles = [taille,taille]
-        self.position = position
-        self.pos = pos
-        self.invalide = invalide
-        if pos in vue:
-            self.objets.append(Vignette_case(position,joueur,vue,pos,taille))
-            if vue[pos][1]>0:
-                entitees = vue[pos][6]
-                agissant = None
-                for ID_entitee in entitees:
-                    entitee = joueur.controleur[ID_entitee]
-                    if issubclass(entitee.get_classe(),Item):
-                        self.objets.append(Vignette_item(position,entitee,taille)) #La direction est surtout utile pour les projectiles, sinon ils devraient tous être dans le même sens.
-                    elif issubclass(entitee.get_classe(),Decors):
-                        self.objets.append(Vignette(position,taille,entitee.get_skin()))
-                    else:
-                        agissant = entitee
-                if agissant != None: #Enfin l'agissant (s'il y en a un)
-                    self.objets.append(Vignettes_agissant(position,agissant,taille))
-                if vue[pos][7] != []:
-                    esprit = joueur.controleur.get_esprit(joueur.esprit)
-                    if any([effet[2] in esprit.corps.keys() for effet in vue[pos][7]]):
-                        self.objets.append(Vignette(position,taille,SKIN_ATTAQUE_DELAYEE_ALLIE))
-                    else:
-                        self.objets.append(Vignette(position,taille,SKIN_ATTAQUE_DELAYEE))
-        else:
-            self.objets.append(Vignette(position,taille,SKIN_BROUILLARD))
-        if shade or invalide:
-            self.objets.append(Vignette(position,taille,SKIN_SHADE))
-        if invalide:
-            self.objets.append(Vignette(position,taille,SKIN_SHADE))
-
-class Vignette_case(Final,Affichage):
-    def __init__(self,position,joueur,vue,pos,taille):
-        self.objets:List[Affichable] = []
-        self.tailles = [taille,taille]
-        self.position = position
-        if pos in vue:
-            vue_case = vue[pos]
-            if vue_case[1]==0:
-                self.objets.append(Vignette(position,taille,SKIN_BROUILLARD))
-            elif vue_case[1]==-1: #On a affaire à une case accessible mais pas vue
-                self.objets.append(Vignette(position,taille,SKIN_BROUILLARD))
-                for i in DIRECTIONS:
-                    if vue_case[5][i][0]:
-                        pos_voisin = vue_case[0]+i
-                        if pos_voisin in vue and vue[pos_voisin][1]>0:
-                            self.objets.append(Vignette(position,taille,SKIN_MUR_BROUILLARD,i))
-            else:
-                if vue_case[4]==0: #On teste le code de la case pour déterminer son image
-                    self.objets.append(Vignette(position,taille,SKIN_CASE)) #La case en premier, donc en bas
-                elif vue_case[4]==1: #On teste le code de la case pour déterminer son image
-                    self.objets.append(Vignette(position,taille,SKIN_CASE_1)) #La case en premier, donc en bas
-                elif vue_case[4]==2: #On teste le code de la case pour déterminer son image
-                    self.objets.append(Vignette(position,taille,SKIN_CASE_2)) #La case en premier, donc en bas
-                elif vue_case[4]==3: #On teste le code de la case pour déterminer son image
-                    self.objets.append(Vignette(position,taille,SKIN_CASE_3)) #La case en premier, donc en bas
-                elif vue_case[4]==4: #On teste le code de la case pour déterminer son image
-                    self.objets.append(Vignette(position,taille,SKIN_CASE_4)) #La case en premier, donc en bas
-                elif vue_case[4]==5: #On teste le code de la case pour déterminer son image
-                    self.objets.append(Vignette(position,taille,SKIN_CASE_5)) #La case en premier, donc en bas
-                elif vue_case[4]==6: #On teste le code de la case pour déterminer son image
-                    self.objets.append(Vignette(position,taille,SKIN_CASE_6)) #La case en premier, donc en bas
-                elif vue_case[4]==7: #On teste le code de la case pour déterminer son image
-                    self.objets.append(Vignette(position,taille,SKIN_CASE_7)) #La case en premier, donc en bas
-                elif vue_case[4]==8: #On teste le code de la case pour déterminer son image
-                    self.objets.append(Vignette([0,0],taille,SKIN_CASE_8)) #La case en premier, donc en bas
-                case = joueur.controleur[vue_case[0]]
-                for i in DIRECTIONS:
-                    mur = case.get_mur_dir(i)
-                    for effet in mur.effets:
-                        if effet.affiche:
-                            if isinstance(effet,Porte) :
-                                self.objets.append(Vignette(position,taille,effet.get_skin(joueur.get_clees()),i))
-                            elif isinstance(effet,(Mur_plein,Mur_impassable)) :
-                                self.objets.append(Vignette(position,taille,effet.get_skin(vue_case[4]),i))
-                            else :
-                                self.objets.append(Vignette(position,taille,effet.get_skin(),i))
-                for effet in case.effets:
-                    if effet.affiche:
-                        self.objets.append(Vignette(position,taille,effet.get_skin()))
-        else:
-            self.objets.append(Vignette(position,taille,SKIN_BROUILLARD))
-
-class Vignette_allie(Final,Affichage):
-    def __init__(self,position,agissant:Agissant,esprit,taille,shade=False,invalide=False):
-        self.objets:List[Affichable] = []
-        self.tailles = [taille,taille]
-        self.position = position
-        self.agissant = agissant
-        self.esprit = esprit
-        self.courant = False
-        self.shades:List[Affichable] = []
-        if shade or invalide:
-            self.shades.append(Vignette(position,taille,SKIN_SHADE))
-        if invalide:
-            self.shades.append(Vignette(position,taille,SKIN_SHADE))
-        
-    def update(self):
-        self.objets:List[Affichable] = []
-        self.objets.append(Vignettes_agissant(self.position,self.agissant,self.tailles[0]))
-        for statut in self.agissant.get_skins_statuts():
-            self.objets.append(Vignette(self.position,self.tailles[0],statut))
-        self.objets+=self.shades
-
-class Vignette_ennemi(Final,Affichage):
-    def __init__(self,position,agissant:Agissant,esprit,taille,shade=False,invalide=False):
-        self.objets:List[Affichable] = []
-        self.tailles = [taille,taille]
-        self.position = position
-        self.agissant = agissant
-        self.esprit = esprit
-        self.courant = False
-        self.shades:List[Affichable] = []
-        if shade or invalide:
-            self.shades.append(Vignette(position,taille,SKIN_SHADE))
-        if invalide:
-            self.shades.append(Vignette(position,taille,SKIN_SHADE))
-        
-    def update(self):
-        self.objets:List[Affichable] = []
-        self.objets.append(Vignettes_agissant(self.position,self.agissant,self.tailles[0]))
-        for statut in self.agissant.get_skins_statuts():
-            self.objets.append(Vignette(self.position,self.tailles[0],statut))
-        self.objets+=self.shades
-
-class Vignette_neutre(Final,Affichage):
-    def __init__(self,position,agissant:Agissant,esprit,taille,shade=False,invalide=False):
-        self.objets:List[Affichable] = []
-        self.tailles = [taille,taille]
-        self.position = position
-        self.agissant = agissant
-        self.esprit = esprit
-        self.courant = False
-        self.shades:List[Affichable] = []
-        if shade or invalide:
-            self.shades.append(Vignette(position,taille,SKIN_SHADE))
-        if invalide:
-            self.shades.append(Vignette(position,taille,SKIN_SHADE))
-        
-    def update(self):
-        self.objets:List[Affichable] = []
-        self.objets.append(Vignettes_agissant(self.position,self.agissant,self.tailles[0]))
-        for statut in self.agissant.get_skins_statuts():
-            self.objets.append(Vignette(self.position,self.tailles[0],statut))
-        self.objets+=self.shades
-
-class Affichage_replique(Pave):
+class Affichage_replique(Final,Pave):
     """Un élément avec beaucoup de texte. S'adapte sur plusieurs lignes si besoin"""
     def __init__(self,texte,replique):
         self.tailles = [0,0]
@@ -3829,10 +3578,11 @@ class Affichage_replique(Pave):
         self.replique = replique
         self.couleur = (0,0,0)
         self.courant = False
+        self.hightlighted = False
 
     def get_tailles(self,tailles):
         mots = self.texte.split() #On explose sur les espaces
-        if self.courant:
+        if self.courant or self.hightlighted:
             mots.insert(0,"--> ")
         i = 0
         hauteur = 0
@@ -3847,7 +3597,7 @@ class Affichage_replique(Pave):
 
     def set_tailles(self,tailles):
         mots = self.texte.split() #On explose sur les espaces
-        if self.courant:
+        if self.courant or self.hightlighted:
             mots.insert(0,"--> ")
         i = 0
         hauteur = 0
@@ -3863,7 +3613,7 @@ class Affichage_replique(Pave):
     def affiche(self,screen,frame,frame_par_tour):
         """Fonction qui prend en entrée une chaine de caractère et renvoie les surfaces des lignes successives du texte."""
         mots = self.texte.split() #On explose sur les espaces
-        if self.courant:
+        if self.courant or self.hightlighted:
             mots.insert(0,"--> ")
         i = 0
         hauteur = 0
@@ -3885,6 +3635,12 @@ class Affichage_replique(Pave):
         else:
             self.courant = False
         return res
+
+    def highlight(self):
+        self.hightlighted = True
+
+    def unhighlight(self):
+        self.hightlighted = False
 
 class Affichage_skill(Final,Pavage_horizontal):
     def __init__(self,skill:Skill_intrasec,fond=(0,0,0)):

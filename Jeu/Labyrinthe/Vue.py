@@ -1,4 +1,5 @@
 # from typing import Any
+from typing import Any, Dict
 from Jeu.Labyrinthe.Structure_spatiale.Espace import *
 
 class Vue(Espace):
@@ -40,7 +41,7 @@ class Vue(Espace):
 
 class Vues(dict):
     """Un dictionnaire qui contient des objets Vue"""
-    def __getitem__(self,key):
+    def __getitem__(self,key) -> Vue|Any:
         if isinstance(key,tuple):
             return self[key[0]][key[1]]
         elif isinstance(key,str):

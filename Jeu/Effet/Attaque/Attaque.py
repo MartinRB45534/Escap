@@ -1,5 +1,6 @@
 from Jeu.Effet.Effet import *
 from Jeu.Constantes import *
+from Jeu.Labyrinthe.Structure_spatiale.Position import *
 
 class Attaque(One_shot):
     """L'effet d'attaque dans sa version générale. Pour chaque case dans la zone, crée une attaque (version intermèdiaire). Attachée au responsable."""

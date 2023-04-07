@@ -118,7 +118,7 @@ class Peureuse(Multi_renforceur,Support_lointain,Stratege,Humain): #La quatrièm
             self.repliques = ["dialogue1reponse1.1.1.2.1","dialogue1reponse1.1.1.2.2"]
         elif replique == "dialogue1reponse1.1.1.2.1":
             self.replique="dialogue1phrase1.1.1.2.1"
-            self.repliques = "dialogue1reponse1.1.1.2.1.1","dialogue1reponse1.1.1.2.1.2"
+            self.repliques = ["dialogue1reponse1.1.1.2.1.1","dialogue1reponse1.1.1.2.1.2"]
         elif replique in ["dialogue1reponse1.1.1.1.1","dialogue1reponse1.1.1.2.1.2"]:
             self.replique="dialogue1phrase1.1.1.1.1"
             self.repliques = ["dialogue1reponse1.1.1.1.1.1","dialogue1reponse1.1.1.1.1.2"]
@@ -128,7 +128,7 @@ class Peureuse(Multi_renforceur,Support_lointain,Stratege,Humain): #La quatrièm
         elif replique == "dialogue1reponse1.1.1.1.1.2":
             self.replique="dialogue1phrase1.1.1.1.1.2"
             self.repliques = ["dialogue1reponse1.1.1.1.1.2.1","dialogue1reponse1.1.1.1.1.2.2"]
-        elif replique == "dialogue1reponse1.1.1.1.1.2.1":
+        elif replique in ["dialogue1reponse1.1.1.1.1.2.1","dialogue1reponse1.1.1.2.1.1"]:
             self.end_dialogue()
             self.controleur.get_esprit(self.controleur.joueur.esprit).merge(self.esprit)
             self.mouvement = 0 #Légèrement redondant ici

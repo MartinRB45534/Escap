@@ -169,26 +169,8 @@ class Esprit_humain(Esprit_simple):
                             self.ennemis[coennemi] = [0.01,0]
 
     def merge(self,nom:str): #Regroupe deux esprits, lorsque des humains forment un groupe
-        if self.nom != nom:
-            esprit = self.controleur.get_esprit(nom)
-            for corp in esprit.corps.keys():
-                self.ajoute_corp(corp)
-                if corp in self.ennemis.keys():
-                    self.ennemis.pop(corp)
-            for ennemi in esprit.ennemis.keys():
-                if ennemi in self.corps.keys():
-                    self.ennemis.pop(ennemi)
-                elif ennemi in self.ennemis.keys():
-                    self.ennemis[ennemi] = max(self.ennemis[ennemi],esprit.ennemis[ennemi])
-                else:
-                    self.ennemis[ennemi] = esprit.ennemis[ennemi]
-            for vue in esprit.vue.values():
-                if vue.id in self.vue:
-                    self.maj_vue(vue)
-                else:
-                    self.ajoute_vue(vue)
-            self.controleur.esprits.pop(nom)
-            self.chef = self.elit()
+        Esprit.merge(self,nom)
+        self.chef = self.elit()
 
     def elit(self):
         if 2 in self.corps.keys():
@@ -241,6 +223,7 @@ class Esprit_humain(Esprit_simple):
             case[3] = [0,0,0,0,0,False]
             case[7] = []
             case[8] = False
+        self.downdate_zones(anciennes_cases)
         self.downdate_representation(anciennes_cases)
 
     def peureuse(self):
@@ -443,23 +426,11 @@ class Esprit_slime(Esprit_type):
         self.ajoute_corp(corp)
 
     def merge(self,nom:str): #Regroupe deux esprits, lorsque des slimes se regroupent
-        esprit:Esprit_slime = self.controleur.get_esprit(nom)
-        for corp in esprit.corps.keys():
-            self.ajoute_corp(corp)
-        for ennemi in esprit.ennemis.keys():
-            if ennemi in self.ennemis.keys():
-                self.ennemis[ennemi] = [max(self.ennemis[ennemi][0],esprit.ennemis[ennemi][0]),max(self.ennemis[ennemi][0],esprit.ennemis[ennemi][0])]
-            else:
-                self.ennemis[ennemi] = esprit.ennemis[ennemi]
-        for vue in esprit.vue.values():
-            if vue.id in self.vue.keys(): 
-                self.maj_vue(vue)
-            else:
-                self.ajoute_vue(vue)
-        self.controleur.esprits.pop(nom)
+        esprit:Esprit_slime = self.controleur[nom]
         self.merge_classe(esprit.classe)
+        Esprit.merge(self,nom)
 
-    def merge_classe(self,classe:Classe):
+    def merge_classe(self,classe:Classe_principale):
         #On va comparer tous les skills de chaque classe
         #Les slimes ont trois skills intrasecs : la fusion, pour unir deux groupes de slimes en un seul, la division, pour créer un nouveau slime, et l'absorption, pour ramasser un cadavre et voler ses skills
         #Ils peuvent avoir beaucoup de skills non-intrasecs, et n'utilisent souvent que les passifs

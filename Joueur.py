@@ -7,7 +7,6 @@ screen = pygame.display.set_mode((1350, 690),pygame.RESIZABLE)
 # global GLOBALS
 GLOBALS = {"controleur":None}
 
-from Menus import *
 from Modifiers import *
 from Jeu.Controleur import *
 from Affichage.Nouveaux_affichages import *
@@ -114,7 +113,7 @@ class Joueur:
             "tours_par_seconde":6,
         }
         self.controleurs = []
-        self.controleur = None
+        self.controleur:Controleur = None
         self.agissants_courants = []
         self.items_courants = []
         self.labs_courants = []
@@ -241,24 +240,24 @@ class Joueur:
     def patiente(self,frame_par_tour):
         self.clock.tick(self.controleur.tour_par_seconde*frame_par_tour)
 
-    def old_input(self): #À appeler régulièrement !
-        """Fonction qui traite tous les inputs"""
+    # def old_input(self): #À appeler régulièrement !
+    #     """Fonction qui traite tous les inputs"""
 
-        #On récupère les évènements :
-        events = pygame.event.get()
-        for event in events :
-            if event.type == pygame.QUIT : #On a fermé la fenêtre
-                self.quitte() #Sauvegarde la partie en cours et ferme la fenêtre
-            elif (event.type == pygame.ACTIVEEVENT and event.state == 1) and (event.gain == 0 and not self.controleur.pause):
-                self.controleur.toogle_pause()
-            elif event.type == pygame.VIDEORESIZE :
-                self.controleur.joueur.affichage.recalcule_zones()
-            elif event.type == pygame.KEYDOWN :
-                self.controleur.joueur.controle(event.key,get_modifiers(event.mod))
-            elif event.type == pygame.KEYUP :
-                self.controleur.joueur.decontrole(event.key)
-            elif event.type in [pygame.MOUSEBUTTONDOWN,pygame.MOUSEBUTTONUP,pygame.MOUSEWHEEL]:
-                self.affichage.bouge_souris(event)
+    #     #On récupère les évènements :
+    #     events = pygame.event.get()
+    #     for event in events :
+    #         if event.type == pygame.QUIT : #On a fermé la fenêtre
+    #             self.quitte() #Sauvegarde la partie en cours et ferme la fenêtre
+    #         elif (event.type == pygame.ACTIVEEVENT and event.state == 1) and (event.gain == 0 and not self.controleur.pause):
+    #             self.controleur.toogle_pause()
+    #         elif event.type == pygame.VIDEORESIZE :
+    #             self.controleur.joueur.affichage.recalcule_zones()
+    #         elif event.type == pygame.KEYDOWN :
+    #             self.controleur.joueur.controle(event.key,get_modifiers(event.mod))
+    #         elif event.type == pygame.KEYUP :
+    #             self.controleur.joueur.decontrole(event.key)
+    #         elif event.type in [pygame.MOUSEBUTTONDOWN,pygame.MOUSEBUTTONUP,pygame.MOUSEWHEEL]:
+    #             self.affichage.bouge_souris(event)
 
     def input(self): #À appeler régulièrement !
         """Fonction qui traite tous les inputs"""
@@ -275,7 +274,7 @@ class Joueur:
                 self.controle(event.key,get_modifiers(event.mod))
             elif event.type == pygame.KEYUP : #Les touches de skill peuvent être maintenues
                 self.decontrole(event.key)
-            elif event.type in [pygame.MOUSEBUTTONDOWN,pygame.MOUSEBUTTONUP,pygame.MOUSEWHEEL]:
+            elif event.type in [pygame.MOUSEBUTTONDOWN,pygame.MOUSEBUTTONUP,pygame.MOUSEWHEEL,pygame.MOUSEMOTION]:
                 self.affichage.bouge_souris(event)
         self.recontrole()
 
@@ -872,3 +871,6 @@ class Joueur:
             else:
                 print("Erreur menu true_main, res non reconnu")
                 print(res)
+
+
+from Menus import menu

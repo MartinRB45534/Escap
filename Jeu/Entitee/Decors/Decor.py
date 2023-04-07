@@ -3,6 +3,7 @@ from Jeu.Skins.Skins import *
 from Jeu.Entitee.Entitee import *
 from Jeu.Systeme.Constantes_decors.Decors import *
 
+
 class Decors(Non_superposable):
     """La classe des éléments de décors qu'on ne peut pas traverser. On peut interagir avec certains ?"""
     def __init__(self,position:Position):

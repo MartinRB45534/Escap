@@ -411,7 +411,7 @@ class Controleur():
         paterns2 = [Pattern(Position("Étage 2 : labyrinthe",0,0),Decalage(5,5),[Cote(Decalage(4,0),DROITE),Cote(Decalage(4,1),DROITE),Cote(Decalage(4,2),DROITE),Cote(Decalage(4,3),DROITE),Cote(Decalage(4,4),DROITE)]),
                     Pattern(Position("Étage 2 : labyrinthe",5,5),Decalage(5,5),[Cote(Decalage(0,0),GAUCHE)],["Porte_centre_2"])]
         self.labs["Étage 2 : labyrinthe"]=Labyrinthe("Étage 2 : labyrinthe",Decalage(15,15),Position("Étage 2 : labyrinthe",0,0),paterns2,1,1,TERRE,0.2)
-        self.construit_escalier(Cote(Position("Étage 1 : couloir",18,1),DROITE),Cote(Position("Étage 2 : labyrinthe",0,0),GAUCHE))
+        # self.construit_escalier(Cote(Position("Étage 1 : couloir",18,1),DROITE),Cote(Position("Étage 2 : labyrinthe",0,0),GAUCHE))
 
         #On crée le troisième étage et son occupante :
         peureuse = Peureuse(self,Position("Étage 3 : combat",8,8))
@@ -432,7 +432,8 @@ class Controleur():
                     Pattern(Position("Étage 3 : combat",1,6),Decalage(2,0)),
                     Pattern(Position("Étage 3 : combat",2,7),Decalage(3,3),[Cote(Decalage(0,1),GAUCHE),Cote(Decalage(2,1),DROITE)])]
         self.labs["Étage 3 : combat"]=Labyrinthe("Étage 3 : combat",Decalage(11,11),Position("Étage 3 : combat",0,0),paterns3,1,1,TERRE,0.2)
-        self.construit_escalier(Cote(Position("Étage 2 : labyrinthe",1,5),HAUT),Cote(Position("Étage 3 : combat",10,10),BAS))
+        # self.construit_escalier(Cote(Position("Étage 2 : labyrinthe",1,5),HAUT),Cote(Position("Étage 3 : combat",10,10),BAS))
+        self.construit_escalier(Cote(Position("Étage 1 : couloir",18,1),DROITE),Cote(Position("Étage 3 : combat",10,10),BAS))
 
         #On crée le quatrième étage et ses occupants :
         codeur = Codeur(self,Position("Étage 4 : monstres",15,1))

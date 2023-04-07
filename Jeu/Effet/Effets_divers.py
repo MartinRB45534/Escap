@@ -2,6 +2,7 @@ from Jeu.Effet.Effet import *
 from Jeu.Systeme.Classe import *
 from Jeu.Systeme.Constantes_magies.Magies import *
 from Jeu.Constantes import *
+from Jeu.Labyrinthe.Structure_spatiale.Position import *
 
 class Investissement_mana(Evenement,On_debut_tour):
     """Le joueur met du mana de côté, et en a plus après !"""

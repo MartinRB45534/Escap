@@ -1,6 +1,11 @@
 from typing import List
 import pygame
 from Jeu.Constantes import *
+from Jeu.Labyrinthe.Structure_spatiale.Direction import *
+from Jeu.Controleur import *
+from Jeu.Skins.Skins import *
+
+from math import ceil
 
 class Affichable:
     """Un élément qui s'affiche. Apparaît à l'écran."""
@@ -33,14 +38,29 @@ class Affichable:
             res = self
         return res
 
+    def survol(self,position):
+        #Trouve l'élément survolé par la souris et le renvoie
+        res = False
+        if self.touche(position):
+            res = self
+        return res
+
     def scroll(self,position,x,y):
         return False
+
+    def navigue(self,direction:Direction|int):
+        # /!\ À implémenter dans les sous-classes
+        # Renvoie un truthy si l'élément a traité la navigation
+        # (True si il n'y a rien à faire, ou l'objet nécessaire à la navigation, de façon identique à la méthode clique)
+        # Renvoie False si l'élément n'a pas traité la navigation
+        raise NotImplementedError
 
     def update(self):
         pass
 
     def remove_unpickables(self):
         pass
+
 class Affichage(Affichable):
     """Un élément de l'affichage. Peut contenir des sous-éléments."""
     def __init__(self):
@@ -71,6 +91,17 @@ class Affichage(Affichable):
             res = self #/!\ Est-ce que je veux faire ça comme ça ?
         for objet in self.objets:
             res_objet = objet.clique(position)
+            if res_objet:
+                res = res_objet
+        return res
+
+    def survol(self,position):
+        #Trouve l'élément survolé par la souris et le renvoie
+        res = False
+        if self.touche(position):
+            res = self
+        for objet in self.objets:
+            res_objet = objet.survol(position)
             if res_objet:
                 res = res_objet
         return res
@@ -169,6 +200,7 @@ class Conteneur(Affichable):
     def __init__(self):
         self.objets = [] #Il peut quand même avoir des objets 'normaux'
         self.contenu:List[Affichable] = [] #Les objets qu'il 'contient'
+        self.courant = False #L'objet actif (sélectionné)
         self.fond = (0,0,0,0)
         self.tailles = [0,0] #La largeur et la hauteur (ou l'inverse ?)
         self.position = [0,0]
@@ -207,6 +239,21 @@ class Conteneur(Affichable):
             if res_objet:
                 res = res_objet
         self.courant = res
+        return res
+
+    def survol(self,position):
+        #Trouve l'élément survolé par la souris et le renvoie
+        res = False
+        if self.touche(position):
+            pos_rel = [position[0]-self.position[0],position[1]-self.position[1]]
+            for contenu in self.contenu:
+                res_contenu = contenu.survol(pos_rel)
+                if res_contenu:
+                    res = res_contenu
+        for objet in self.objets:
+            res_objet = objet.survol(position)
+            if res_objet:
+                res = res_objet
         return res
 
     def scroll(self,position,x,y):
@@ -276,19 +323,6 @@ class Wrapper(Conteneur):
         for objet in self.objets:
             objet.affiche(screen,frame,frame_par_tour)
 
-    def survol(self,position):
-        #Trouve l'élément survolé par la souris et le renvoie
-        res = False
-        if position[0]>=self.position[0] and position[1]>=self.position[1] and position[0]<self.position[0]+self.tailles[0] and position[1]<self.position[1]+self.tailles[1]:
-            res_contenu = self.contenu.clique(position)
-            if res_contenu:
-                res = res_contenu
-        for objet in self.objets:
-            res_objet = objet.clique(position)
-            if res_objet:
-                res = res_objet
-        return res
-
     def clique(self,position):
         clique = self.clique_wrapper(position)
         if clique is self:
@@ -298,6 +332,18 @@ class Wrapper(Conteneur):
         else:
             self.courant = False
         if clique:
+            return self
+        return False
+
+    def survol(self,position):
+        survol = self.survol_wrapper(position)
+        if survol is self:
+            self.courant = True
+        elif survol:
+            self.courant = survol
+        else:
+            self.courant = False
+        if survol:
             return self
         return False
 
@@ -312,6 +358,21 @@ class Wrapper(Conteneur):
                 res = res_contenu
         for objet in self.objets:
             res_objet = objet.clique(position)
+            if res_objet:
+                res = res_objet
+        return res
+
+    def survol_wrapper(self,position):
+        #Trouve l'élément survolé par la souris et le renvoie
+        res = False
+        if self.touche(position):
+            res = self
+            pos_rel = [position[0]-self.position[0],position[1]-self.position[1]]
+            res_contenu = self.contenu.survol(pos_rel)
+            if res_contenu:
+                res = res_contenu
+        for objet in self.objets:
+            res_objet = objet.survol(position)
             if res_objet:
                 res = res_objet
         return res
@@ -491,6 +552,23 @@ class Liste(Conteneur):
                     self.ajuste(res)
         for objet in self.objets:
             res_objet = objet.clique(position)
+            if res_objet:
+                res = res_objet
+        return res
+
+    def survol(self,position):
+        #Trouve l'élément survolé par la souris et le renvoie
+        res = False
+        if self.touche(position):
+            pos_rel = [position[0]-self.position[0],position[1]-self.position[1]]
+            for i in range(len(self.contenu)):
+                res_contenu = self.contenu[i].survol(pos_rel)
+                if res_contenu:
+                    res = res_contenu
+                    self.courant = i
+                    self.ajuste(res)
+        for objet in self.objets:
+            res_objet = objet.survol(position)
             if res_objet:
                 res = res_objet
         return res
@@ -750,6 +828,21 @@ class Liste_menu(Wrapper):
         self.courant = res
         return res
 
+    def survol(self,position):
+        #Trouve l'élément survolé par la souris et le renvoie
+        res = False
+        if self.touche(position):
+            pos_rel = [position[0]-self.position[0],position[1]-self.position[1]]
+            for contenu in self.contenu:
+                res_contenu = contenu.survol(pos_rel)
+                if res_contenu:
+                    res = res_contenu
+        for objet in self.objets:
+            res_objet = objet.survol(position)
+            if res_objet:
+                res = res_objet
+        return res
+
     def clique_wrapper(self,position):
         #Trouve l'élément survolé par la souris et le renvoie
         res = False
@@ -761,6 +854,21 @@ class Liste_menu(Wrapper):
                 res = res_contenu
         for objet in self.objets:
             res_objet = objet.clique(position)
+            if res_objet:
+                res = res_objet
+        return res
+
+    def survol_wrapper(self,position):
+        #Trouve l'élément survolé par la souris et le renvoie
+        res = False
+        if self.touche(position):
+            res = self
+            pos_rel = [position[0]-self.position[0],position[1]-self.position[1]]
+            res_contenu = self.liste.survol(pos_rel)
+            if res_contenu:
+                res = res_contenu
+        for objet in self.objets:
+            res_objet = objet.survol(position)
             if res_objet:
                 res = res_objet
         return res
@@ -790,17 +898,19 @@ class Survolable(Affichable):
     """Un élément qui réagit au survol"""
     def survol(self,position):
         #Trouve l'élément survolé par la souris et le renvoie
-        res = False
-        if position[0]>=self.position[0] and position[1]>=self.position[1] and position[0]<self.position[0]+self.tailles[0] and position[1]<self.position[1]+self.tailles[1]:
-            res=self
-        for objet in self.objets:
-            res_objet = objet.survol(position)
-            if res_objet:
-                res = res_objet
+        res = Affichable.survol(self,position)
+        if res:
+            self.highlight()
+        else:
+            self.unhighlight()
         return res
 
     def highlight(self):
         #Change l'apparence pour indiquer que la souris était là.
+        pass
+
+    def unhighlight(self):
+        #Change l'apparence pour indiquer que la souris n'était plus là.
         pass
 
     def get_description(self,observation=0):
@@ -925,7 +1035,7 @@ class Paves(Taille_variable):
                 screen.blit(POLICE20.render(ligne,True,self.couleur),[self.position[0],self.position[1]+hauteur*20])
                 hauteur += 1
 
-class Final(Affichable):
+class Final(Cliquable):
     def clique(self,position):
         #Trouve l'élément survolé par la souris et le renvoie
         res = False
@@ -933,12 +1043,23 @@ class Final(Affichable):
             res = self
         return res
 
+    def survol(self, position):
+        res = False
+        if self.touche(position):
+            res = self
+            self.highlight()
+        else:
+            self.unhighlight()
+        return res
+
 class Bouton(Final,Wrapper):
-    def __init__(self,skin,texte,fond=(0,0,0)):
+    def __init__(self,skin,texte,fond_non_highlight=(0,0,0),fond_highlight=(50,50,50)):
         self.objets = [] #Il peut quand même avoir des objets 'normaux'
         self.contenu:Affichable = None #Les objets qu'il 'contient'
         self.courant = False
-        self.fond = fond
+        self.fond = fond_non_highlight
+        self.fond_non_highlight = fond_non_highlight
+        self.fond_highlight = fond_highlight
         self.skin = skin
         self.texte = texte
         self.tailles = [0,0] #La largeur et la hauteur (ou l'inverse ?)
@@ -951,3 +1072,310 @@ class Bouton(Final,Wrapper):
         triptique.set_contenu([Marge_verticale(),Vignette([0,0],20,self.skin),Marge_verticale(),Texte(self.texte),Marge_verticale()],[5,0,5,0,5])
         contenu.set_contenu([Marge_horizontale(),triptique,Marge_horizontale()],[5,0,5])
         self.contenu = contenu
+
+    def highlight(self):
+        self.fond = self.fond_highlight
+
+    def unhighlight(self):
+        self.fond = self.fond_non_highlight
+
+    def survol(self, position):
+        res = False
+        if self.touche(position):
+            res = self
+            self.highlight()
+        else:
+            self.unhighlight()
+        return res
+
+class Vignette_categorie(Final,Affichage):
+    def __init__(self,categorie,taille,shade=False,invalide=False):
+        self.objets:List[Affichable] = [] #La liste des objets à afficher
+        self.tailles = [taille,taille]
+        self.position = [0,0]
+        self.categorie = categorie
+        self.objets.append(Vignette([0,0],taille,categorie.get_image()))
+        if shade or invalide:
+            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
+        if invalide:
+            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
+
+class Vignette_recette(Final,Affichage):
+    def __init__(self,recette,taille,shade=False,invalide=False):
+        self.objets:List[Affichable] = [] #La liste des objets à afficher
+        self.tailles = [taille,taille]
+        self.position = [0,0]
+        self.recette = recette
+        self.objets.append(Vignette([0,0],taille,eval(recette["produit"])(None).get_skin()))
+        if shade or invalide:
+            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
+        if invalide:
+            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
+
+class Vignette_ingredient(Final,Affichage):
+    def __init__(self,ingredient:Item,quantite_necessaire,quantite_disponible,taille,shade=False,invalide=False):
+        self.objets:List[Affichable] = [] #La liste des objets à afficher
+        self.tailles = [taille,taille]
+        self.position = [0,0]
+        self.ingredient = ingredient
+        self.objets.append(Vignette([0,0],taille,ingredient.get_skin()))
+        if shade or invalide or quantite_disponible < quantite_necessaire:
+            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
+        if invalide or quantite_disponible < quantite_necessaire:
+            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
+        texte = Texte(f"{quantite_disponible}/{quantite_necessaire}")
+        self.objets.append(texte)
+        tailles_texte = texte.get_tailles(self.tailles)
+        texte.set_position([self.position[0]+self.tailles[0]-tailles_texte[0],self.position[1]+self.tailles[1]-tailles_texte[1]])
+
+class Vignette_vente(Final,Affichage):
+    def __init__(self,item:Item,taille,prix,description,shade=False,invalide=False):
+        self.objets:List[Affichable] = [] #La liste des objets à afficher
+        self.tailles = [taille,taille]
+        self.position = [0,0]
+        self.item = item
+        self.prix = prix
+        self.description = description
+        self.objets.append(Vignette([0,0],taille,item.get_skin()))
+        if shade or invalide:
+            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
+        if invalide:
+            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
+        texte = Texte(f"{prix} €")
+        self.objets.append(texte)
+        tailles_texte = texte.get_tailles(self.tailles)
+        texte.set_position([self.position[0]+self.tailles[0]-tailles_texte[0],self.position[1]+self.tailles[1]-tailles_texte[1]])
+
+class Vignette_achat(Final,Affichage):
+    def __init__(self,item:Item,taille,prix,description,shade=False,invalide=False):
+        self.objets:List[Affichable] = [] #La liste des objets à afficher
+        self.tailles = [taille,taille]
+        self.position = [0,0]
+        self.item = item
+        self.prix = prix
+        self.description = description
+        self.objets.append(Vignette([0,0],taille,item.get_skin()))
+        if shade or invalide:
+            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
+        if invalide:
+            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
+        texte = Texte(f"{prix} €")
+        self.objets.append(texte)
+        tailles_texte = texte.get_tailles(self.tailles)
+        texte.set_position([self.position[0]+self.tailles[0]-tailles_texte[0],self.position[1]+self.tailles[1]-tailles_texte[1]])
+
+class Vignette_magie(Final,Affichage):
+    def __init__(self,magie:Magie,taille,shade=False,invalide=False):
+        self.objets:List[Affichable] = [] #La liste des objets à afficher
+        self.tailles = [taille,taille]
+        self.position = [0,0]
+        self.magie = magie
+        self.objets.append(Vignette([0,0],taille,magie.get_skin()))
+        if shade or invalide:
+            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
+        if invalide:
+            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
+
+class Vignette_item(Final,Affichage):
+    def __init__(self,position,item:Item,taille,direction=None,shade=False,invalide=False):
+        self.objets:List[Affichable] = [] #La liste des objets à afficher
+        self.tailles = [taille,taille]
+        self.position = position
+        self.item = item
+        if direction == None:
+            direction = item.get_direction()
+        self.objets.append(Vignette(position,taille,item.get_skin(),direction)) #Avoir éventuellement la tête dans une autre direction ?
+        for effet in item.effets:
+            if effet.affiche:
+                self.objets.append(Vignette(position,taille,effet.get_skin(),direction))
+        if shade or invalide:
+            self.objets.append(Vignette(position,taille,SKIN_SHADE))
+        if invalide:
+            self.objets.append(Vignette(position,taille,SKIN_SHADE))
+
+class Vignettes_agissant(Final,Affichage):
+    def __init__(self,position,agissant:Agissant,taille):
+        self.objets:List[Affichable] = [] #La liste des objets à afficher
+        self.tailles = [taille,taille]
+        self.position = position
+        self.agissant = agissant
+        direction = agissant.get_direction()
+        arme = agissant.inventaire.arme
+        if arme != None:
+            self.objets.append(Vignette_item(position,agissant.controleur[arme],taille,direction))
+        self.objets.append(Vignette(position,taille,agissant.get_skin(),direction))
+        armure = agissant.inventaire.armure
+        if armure != None:
+            self.objets.append(Vignette_item(position,agissant.controleur[armure],taille,direction))
+        bouclier = agissant.inventaire.bouclier
+        if bouclier != None:
+            self.objets.append(Vignette_item(position,agissant.controleur[bouclier],taille,direction))
+        haume = agissant.inventaire.haume
+        self.objets.append(Vignette(position,taille,agissant.get_skin_tete(),direction)) #Avoir éventuellement la tête dans une autre direction ?
+        if haume != None:
+            self.objets.append(Vignette_item(position,agissant.controleur[haume],taille,direction))
+        for effet in agissant.effets:
+            if effet.affiche:
+                self.objets.append(Vignette(position,taille,effet.get_skin(),direction))
+        esprit = agissant.controleur.get_esprit(agissant.controleur.joueur.esprit)
+        position_pv = [position[0]+ceil(taille*(2/19)),position[1]+ceil(taille*(2/19))]
+        tailles_pv = [ceil(taille*((15*agissant.pv)/(19*agissant.pv_max))),ceil(taille*(15/19))]
+        if agissant.ID in esprit.ennemis.keys():
+            image = IMAGE_PV_ENNEMI
+        elif agissant.ID in esprit.corps.keys():
+            image = IMAGE_PV_ALLIE
+        else:
+            image = IMAGE_PV_NEUTRE
+        self.objets.append(Vignette_image(position_pv,tailles_pv,image))
+        if isinstance(agissant,Humain) and agissant.dialogue > 0: #Est-ce qu'on veut vraiment avoir cet indicatif au-dessus des effets ?
+            self.objets.append(Vignette(position,taille,SKIN_DIALOGUE))
+
+class Vignettes_position(Final,Affichage):
+    def __init__(self,position,joueur,vue,pos,taille,shade=False,invalide=False):
+        self.objets:List[Affichable] = []
+        self.tailles = [taille,taille]
+        self.position = position
+        self.pos = pos
+        self.invalide = invalide
+        if pos in vue:
+            self.objets.append(Vignette_case(position,joueur,vue,pos,taille))
+            if vue[pos][1]>0:
+                entitees = vue[pos][6]
+                agissant = None
+                for ID_entitee in entitees:
+                    entitee = joueur.controleur[ID_entitee]
+                    if issubclass(entitee.get_classe(),Item):
+                        self.objets.append(Vignette_item(position,entitee,taille)) #La direction est surtout utile pour les projectiles, sinon ils devraient tous être dans le même sens.
+                    elif issubclass(entitee.get_classe(),Decors):
+                        self.objets.append(Vignette(position,taille,entitee.get_skin()))
+                    else:
+                        agissant = entitee
+                if agissant != None: #Enfin l'agissant (s'il y en a un)
+                    self.objets.append(Vignettes_agissant(position,agissant,taille))
+                if vue[pos][7] != []:
+                    esprit = joueur.controleur.get_esprit(joueur.esprit)
+                    if any([effet[2] in esprit.corps.keys() for effet in vue[pos][7]]):
+                        self.objets.append(Vignette(position,taille,SKIN_ATTAQUE_DELAYEE_ALLIE))
+                    else:
+                        self.objets.append(Vignette(position,taille,SKIN_ATTAQUE_DELAYEE))
+        else:
+            self.objets.append(Vignette(position,taille,SKIN_BROUILLARD))
+        if shade or invalide:
+            self.objets.append(Vignette(position,taille,SKIN_SHADE))
+        if invalide:
+            self.objets.append(Vignette(position,taille,SKIN_SHADE))
+
+class Vignette_case(Final,Affichage):
+    def __init__(self,position,joueur,vue,pos,taille):
+        self.objets:List[Affichable] = []
+        self.tailles = [taille,taille]
+        self.position = position
+        if pos in vue:
+            vue_case = vue[pos]
+            if vue_case[1]==0:
+                self.objets.append(Vignette(position,taille,SKIN_BROUILLARD))
+            elif vue_case[1]==-1: #On a affaire à une case accessible mais pas vue
+                self.objets.append(Vignette(position,taille,SKIN_BROUILLARD))
+                for i in DIRECTIONS:
+                    if vue_case[5][i][0]:
+                        pos_voisin = vue_case[0]+i
+                        if pos_voisin in vue and vue[pos_voisin][1]>0:
+                            self.objets.append(Vignette(position,taille,SKIN_MUR_BROUILLARD,i))
+            else:
+                if vue_case[4]==0: #On teste le code de la case pour déterminer son image
+                    self.objets.append(Vignette(position,taille,SKIN_CASE)) #La case en premier, donc en bas
+                elif vue_case[4]==1: #On teste le code de la case pour déterminer son image
+                    self.objets.append(Vignette(position,taille,SKIN_CASE_1)) #La case en premier, donc en bas
+                elif vue_case[4]==2: #On teste le code de la case pour déterminer son image
+                    self.objets.append(Vignette(position,taille,SKIN_CASE_2)) #La case en premier, donc en bas
+                elif vue_case[4]==3: #On teste le code de la case pour déterminer son image
+                    self.objets.append(Vignette(position,taille,SKIN_CASE_3)) #La case en premier, donc en bas
+                elif vue_case[4]==4: #On teste le code de la case pour déterminer son image
+                    self.objets.append(Vignette(position,taille,SKIN_CASE_4)) #La case en premier, donc en bas
+                elif vue_case[4]==5: #On teste le code de la case pour déterminer son image
+                    self.objets.append(Vignette(position,taille,SKIN_CASE_5)) #La case en premier, donc en bas
+                elif vue_case[4]==6: #On teste le code de la case pour déterminer son image
+                    self.objets.append(Vignette(position,taille,SKIN_CASE_6)) #La case en premier, donc en bas
+                elif vue_case[4]==7: #On teste le code de la case pour déterminer son image
+                    self.objets.append(Vignette(position,taille,SKIN_CASE_7)) #La case en premier, donc en bas
+                elif vue_case[4]==8: #On teste le code de la case pour déterminer son image
+                    self.objets.append(Vignette([0,0],taille,SKIN_CASE_8)) #La case en premier, donc en bas
+                case = joueur.controleur[vue_case[0]]
+                for i in DIRECTIONS:
+                    mur = case.get_mur_dir(i)
+                    for effet in mur.effets:
+                        if effet.affiche:
+                            if isinstance(effet,Porte) :
+                                self.objets.append(Vignette(position,taille,effet.get_skin(joueur.get_clees()),i))
+                            elif isinstance(effet,(Mur_plein,Mur_impassable)) :
+                                self.objets.append(Vignette(position,taille,effet.get_skin(vue_case[4]),i))
+                            else :
+                                self.objets.append(Vignette(position,taille,effet.get_skin(),i))
+                for effet in case.effets:
+                    if effet.affiche:
+                        self.objets.append(Vignette(position,taille,effet.get_skin()))
+        else:
+            self.objets.append(Vignette(position,taille,SKIN_BROUILLARD))
+
+class Vignette_allie(Final,Affichage):
+    def __init__(self,position,agissant:Agissant,esprit,taille,shade=False,invalide=False):
+        self.objets:List[Affichable] = []
+        self.tailles = [taille,taille]
+        self.position = position
+        self.agissant = agissant
+        self.esprit = esprit
+        self.courant = False
+        self.shades:List[Affichable] = []
+        if shade or invalide:
+            self.shades.append(Vignette(position,taille,SKIN_SHADE))
+        if invalide:
+            self.shades.append(Vignette(position,taille,SKIN_SHADE))
+        
+    def update(self):
+        self.objets:List[Affichable] = []
+        self.objets.append(Vignettes_agissant(self.position,self.agissant,self.tailles[0]))
+        for statut in self.agissant.get_skins_statuts():
+            self.objets.append(Vignette(self.position,self.tailles[0],statut))
+        self.objets+=self.shades
+
+class Vignette_ennemi(Final,Affichage):
+    def __init__(self,position,agissant:Agissant,esprit,taille,shade=False,invalide=False):
+        self.objets:List[Affichable] = []
+        self.tailles = [taille,taille]
+        self.position = position
+        self.agissant = agissant
+        self.esprit = esprit
+        self.courant = False
+        self.shades:List[Affichable] = []
+        if shade or invalide:
+            self.shades.append(Vignette(position,taille,SKIN_SHADE))
+        if invalide:
+            self.shades.append(Vignette(position,taille,SKIN_SHADE))
+        
+    def update(self):
+        self.objets:List[Affichable] = []
+        self.objets.append(Vignettes_agissant(self.position,self.agissant,self.tailles[0]))
+        for statut in self.agissant.get_skins_statuts():
+            self.objets.append(Vignette(self.position,self.tailles[0],statut))
+        self.objets+=self.shades
+
+class Vignette_neutre(Final,Affichage):
+    def __init__(self,position,agissant:Agissant,esprit,taille,shade=False,invalide=False):
+        self.objets:List[Affichable] = []
+        self.tailles = [taille,taille]
+        self.position = position
+        self.agissant = agissant
+        self.esprit = esprit
+        self.courant = False
+        self.shades:List[Affichable] = []
+        if shade or invalide:
+            self.shades.append(Vignette(position,taille,SKIN_SHADE))
+        if invalide:
+            self.shades.append(Vignette(position,taille,SKIN_SHADE))
+        
+    def update(self):
+        self.objets:List[Affichable] = []
+        self.objets.append(Vignettes_agissant(self.position,self.agissant,self.tailles[0]))
+        for statut in self.agissant.get_skins_statuts():
+            self.objets.append(Vignette(self.position,self.tailles[0],statut))
+        self.objets+=self.shades

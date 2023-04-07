@@ -1,6 +1,7 @@
 from Jeu.Entitee.Item.Projectile.Projectile import *
 from Jeu.Systeme.Constantes_projectiles.Projectiles import *
 from Jeu.Systeme.Constantes_magies.Magies import *
+from Jeu.Labyrinthe.Structure_spatiale.Direction import *
 
 class Explosif(Projectile):
     """La classe des projectiles qui explosent. Affectés différemment par certains skills."""

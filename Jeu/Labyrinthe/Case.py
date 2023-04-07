@@ -7,6 +7,7 @@ if TYPE_CHECKING:
 # from Jeu.Constantes import *
 from Jeu.Labyrinthe.Mur import *
 from Jeu.Effet.Auras import *
+from Jeu.Labyrinthe.Structure_spatiale.Direction import *
 
 class Case:
     def __init__(self,position:Position,niveau = 1,element = TERRE,effets:List[Effet] = [],opacite = 1):

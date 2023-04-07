@@ -1,7 +1,6 @@
 from Jeu.Skins.Skins import *
 from Jeu.Entitee.Entitee import *
 from Jeu.Entitee.Agissant.Agissant import Agissant
-#from Jeu.Général import *
 
 class Item(Mobile):
     """La classe des entitées inanimées. Peuvent se situer dans un inventaire. Peuvent être lancés (déconseillé pour les non-projectiles)."""

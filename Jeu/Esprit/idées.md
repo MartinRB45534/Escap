@@ -16,6 +16,11 @@ Comment utiliser couloirs et salles pour optimiser les esprits :
     En résumé, lors de la propagation, il peut être utile de marquer les salles et couloirs à parcourir et de ne pas parcourir le reste.
     Un espace est à parcourir si la source se trouve dans l'espace (entrées exclues) ou si le recepteur se trouve dans l'espace (entrées inclues).
 
+    Comment gérer les espaces lorsqu'on fusionne des esprits ?
+    À priori, les salles de chacun sont conservées. Elle peuvent s'étendre grâce aux nouvelles cases et se fusionner.
+    Les couloirs peuvent être réduits (si leurs cases sont récupérées par des salles). Ils peuvent s'étendre et se fusionner.
+    Les entrées sont probablement à refaire.
+
 2 - Gérer mieux les zones inconnues (est-ce que ça utilise vraiment les couloirs et salles ?)
     On voudrait avoir un minimum d'informations sur les zones "inconnues" (hors de la vision active, mémorisées et non mémorisées).
     Informations à rechercher :
@@ -69,6 +74,10 @@ Comment utiliser couloirs et salles pour optimiser les esprits :
     mouvement
     agissant qui n'est plus là où il était
     i.e. une case qui contenait un agissant ne le contient plus (au moment de la mise à jour)
+
+    Pendant la fusion de vues :
+    équivalent du retrait par vue
+    puis fusion si deux zones se chevauchent
 
 3 - Gérer mieux les déplacements
     Permettre aux corps de se croiser/contourner sans se bloquer, prioriser les déplacements.

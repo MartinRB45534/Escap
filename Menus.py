@@ -1,8 +1,10 @@
+from typing import List, Union
 from Jeu.Constantes import *
 from Jeu.Skins.Skins import *
+from Joueur import *
 
 class Bouton:
-    def __init__(self,texte,details=[],action=True,couleurs=[(255,255,255),(155,155,155),(0,0,0)],image=IMAGE_VIDE):
+    def __init__(self,texte:str,details:List[str]=[],action:Union[bool,str,Joueur,Controleur]=True,couleurs:List[tuple]=[(255,255,255),(155,155,155),(0,0,0)],image:Image=IMAGE_VIDE):
         self.texte = texte
         self.details = details
         self.action = action

@@ -92,7 +92,9 @@ class Direction:
     def __repr__(self):
         return f"Direction : {self.direction}"
 
-HAUT=Direction(0)
-DROITE=Direction(1)
-BAS=Direction(2)
-GAUCHE=Direction(3)
+if NB_DIRECTIONS==4:
+    HAUT=Direction(0)
+    DROITE=Direction(1)
+    BAS=Direction(2)
+    GAUCHE=Direction(3)
+DIRECTIONS = [Direction(i) for i in range(Direction.directions)]

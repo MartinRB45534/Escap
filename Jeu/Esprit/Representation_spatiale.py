@@ -22,6 +22,9 @@ class Espace_schematique:
 
 class Zone_inconnue(Espace_schematique): # Représente une zone de la carte qui n'a pas encore été explorée
     def __init__(self,case:Position=None,zone=None):
+        if zone is not None and not isinstance(zone,Zone_inconnue):
+            print("Erreur : zone doit être une Zone_inconnue")
+            zone = None
         self.cases:List[Position] = [case] if case != None else []
         self.frontiere:List[Cote] = []
         self.entrees:List[Position] = []
@@ -38,6 +41,8 @@ class Zone_inconnue(Espace_schematique): # Représente une zone de la carte qui 
             self.sorties += zone.sorties
             self.occupants += zone.occupants
             # Copier les informations de la zone fusionnée
+        else:
+            print("Erreur : zone doit être une Zone_inconnue")
 
 class Salle(Espace_schematique):
     def __init__(self,carre:Position):
