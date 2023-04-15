@@ -227,7 +227,7 @@ class Esprit_humain(Esprit_simple):
         self.downdate_representation(anciennes_cases)
 
     def peureuse(self):
-        return 5 in self.corps.keys() and self.corps[5] in ["humain","attente","fuite","deplacement","attaque","vivant"] #J'ai un doute sur la possibilité des deux derniers mais bon...
+        return 5 in self.corps.keys() and self.corps[5] in ["PNJ","attente","fuite","deplacement","attaque","vivant"] #J'ai un doute sur la possibilité des deux derniers mais bon...
 
     def decide(self):
         for corp in self.corps.keys():
@@ -240,7 +240,7 @@ class Esprit_humain(Esprit_simple):
                         self.vue[cible][8]=True
             elif self.corps[corp] in ["attaque","fuite","soin","soutien"]:
                 Esprit.deplace(self,corp)
-            elif self.corps[corp] == "humain":
+            elif self.corps[corp] == "PNJ":
                 self.deplace_humain(corp)
             elif self.corps[corp] == "attente": #Les pnjs avant de rejoindre le joueur
                 if self.ennemis != {}: #Si on a des ennemis, c'est qu'on a été attaqué !

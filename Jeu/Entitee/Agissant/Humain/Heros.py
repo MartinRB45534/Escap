@@ -11,7 +11,7 @@ from Jeu.Effet.Effets import *
 from Jeu.Systeme.Classe import *
 from Modifiers import *
 
-class Heros(Humain,Stratege,Multi_mage): #Le premier humain du jeu, avant l'étage 1 (évidemment, c'est le personnage principal !)
+class Heros(Humain,Stratege,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (évidemment, c'est le personnage principal !)
     """La classe du joueur."""
     def __init__(self,controleur:Controleur,position:Position,parametres,screen):
 
@@ -23,8 +23,8 @@ class Heros(Humain,Stratege,Multi_mage): #Le premier humain du jeu, avant l'éta
         self.apreciations = [0,0,0,0,0,0,0,0,0,0]
         self.role = "independant"
         self.resolution = 4
-        # self.inventaire.__class__ = Sac_a_dos
-        # self.inventaire.complete()
+
+        self.interlocuteur:Agissant|Humain = None
 
         self.first_kill_=True
         self.magic_kill_=True

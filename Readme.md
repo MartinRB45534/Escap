@@ -55,6 +55,8 @@ Troisi�me �tape : mains[0][2].boucle() et le jeu reprend imm�diatement, at
 
 À mon attention :
 
+Pour l'affichage, ajouter un traitement des clics droits
+
 
 TODO (pour ne pas oublier les problèmes que je découvre) :
  - Les agissants se bloquent quand ils sont à l'entrée d'un couloir (du moins c'est mon interprétation), problème d'ouverture de portes et de création d'entrées (corrigé, à vérifier)

@@ -1,3 +1,5 @@
+from typing import Tuple
+from Jeu.Effet.Magie.Magie import Magie
 from Jeu.Skins import *
 from Jeu.Skins.Skins import *
 from Jeu.Constantes import *
@@ -50,6 +52,10 @@ class Skills_projectiles(Skill_intrasec):
 
 class Skills_magiques(Skill_intrasec):
     """La classe des skills qui lancent une magie"""
+
+    def utilise(self,nom:str) -> Tuple[int,Magie]:
+        """Utilise la magie nommée nom, et renvoie la latence et la magie utilisée"""
+        raise NotImplementedError
 
 class Skill_debut_tour(Skill_intrasec):
     """La classe des skills appelés au début de chaque tour (principalement les skills d'aura)."""

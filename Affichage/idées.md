@@ -9,6 +9,29 @@ fait : pour la mise en mémoire, ne pas inclure les surfaces (pour pouvoir pickl
 si possible, textes par morceaux, pour pouvoir insérer les touches etc., cliquer sur les mots-clés et changer de langue
 
 
+
+
+
+Comment gérer les éléments courants ?
+Plusieurs problématiques :
+  - remonter à l'élément actif depuis la racine
+  - lorsqu'on change d'élément actif, conserver ses sous-éléments ouverts
+  - marquer le survol (accessoirement peut-être ouvrir les sous-éléments par survol)
+  - marquer l'élément actif
+  - dans les choix, marquer les éléments sélectionnés (déjà géré actuellement)
+
+marquage actif/survol : booléens réinitialisés à chaque frame
+arborescence : objet (ou None)
+actif : booléen
+
+On peut remonter à l'élément actif en parcourant l'arborescence depuis la racine jusqu'à l'élément actif
+
+On peut au passage marquer l'élément actif.
+Qu'est-ce qu'on veut faire pour le survol exactement ? Marquer la présence de la souris ?
+
+
+
+
 structure :
 
 affichage global

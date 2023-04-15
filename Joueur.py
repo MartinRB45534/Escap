@@ -38,7 +38,7 @@ class Joueur:
                         pygame.K_TAB:"navigation",
                         pygame.K_e:"interraction",
                     },
-                    (pygame.KMOD_LSHIFT):{
+                    (pygame.KMOD_LSHIFT,):{
                         pygame.K_TAB:"navigation",
                         pygame.K_SPACE:"touches",
                         pygame.K_RETURN:"touches",
@@ -54,7 +54,7 @@ class Joueur:
                         pygame.K_BACKSPACE:OUT,
                         pygame.K_TAB:NEXT,
                     },
-                    (pygame.KMOD_SHIFT):{
+                    (pygame.KMOD_LSHIFT,):{
                         pygame.K_TAB:PREVIOUS,
                     },
                 },
@@ -276,6 +276,7 @@ class Joueur:
                 self.decontrole(event.key)
             elif event.type in [pygame.MOUSEBUTTONDOWN,pygame.MOUSEBUTTONUP,pygame.MOUSEWHEEL,pygame.MOUSEMOTION]:
                 self.affichage.bouge_souris(event)
+        self.affichage.survol(pygame.mouse.get_pos()) #On resurvole, au cas où la souris n'a pas bougé
         self.recontrole()
 
     def controle(self,touche,mods=()):
@@ -388,6 +389,7 @@ class Joueur:
             duree = new_courant - constantes_temps['courant']
             constantes_temps['reste'] += duree
             constantes_temps['courant'] = new_courant
+            self.affichage.trouve_actif()
             self.affichage.affiche(self.screen,1,1)
             new_courant = pygame.time.get_ticks()
             duree = new_courant - constantes_temps['courant']

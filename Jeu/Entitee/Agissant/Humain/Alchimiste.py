@@ -6,7 +6,7 @@ if TYPE_CHECKING:
 
 from Jeu.Entitee.Agissant.Humain.Humain import *
 
-class Alchimiste(Attaquant_magique_case,Support,Humain): #Le septième humain du jeu, à l'étage 6 (un faiseur de potions aux magies diverses)
+class Alchimiste(PNJ_mage,Attaquant_magique_case,Support,Humain): #Le septième humain du jeu, à l'étage 6 (un faiseur de potions aux magies diverses)
     """La classe de l'alchimiste."""
     def __init__(self,controleur,position):
 

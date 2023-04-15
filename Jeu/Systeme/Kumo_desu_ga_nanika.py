@@ -68,7 +68,7 @@ class Height_of_Occultism(Skill):
 
     def utilise(self,nom):
         magie = self.magies[nom].donne_magie(self.niveau)
-        self.gain_xp = magie.gain_xp + magie.cout_mp*0.1
+        self.gain_xp = magie.gain_xp + magie.cout_pm*0.1
         self.xp_new += self.gain_xp
         self.latence = magie.latence
         return self.latence, magie

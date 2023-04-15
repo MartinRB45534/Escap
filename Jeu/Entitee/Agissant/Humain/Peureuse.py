@@ -6,7 +6,7 @@ if TYPE_CHECKING:
 
 from Jeu.Entitee.Agissant.Humain.Humain import *
 
-class Peureuse(Multi_renforceur,Support_lointain,Stratege,Humain): #La quatrième humaine du jeu, à l'étage 3 (terrorisée par les monstres)
+class Peureuse(PNJ_mage,Multi_renforceur,Support_lointain,Stratege,Humain): #La quatrième humaine du jeu, à l'étage 3 (terrorisée par les monstres)
     """La classe de la peureuse."""
     def __init__(self,controleur:Controleur,position:Position):
 

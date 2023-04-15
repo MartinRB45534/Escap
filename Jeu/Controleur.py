@@ -240,7 +240,7 @@ class Controleur():
         self.labs_courants:List[Labyrinthe] = []
         self.entitees_courantes:List[int] = []
         self.esprits_courants:List[str] = []
-        self.joueur:Agissant = None
+        self.joueur:PJ = None
         self.pause = False
         self.nb_tours = 0
         self.phase = TOUR

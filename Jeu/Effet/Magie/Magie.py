@@ -3,9 +3,10 @@ from Jeu.Systeme.Constantes_magies.Magies import *
 
 class Magie(On_action):
     """La classe des magies. Un effet qui s'attache au lanceur le temps de remplir les paramètres, puis se lance avant la phase d'attaque."""
-    def __init__(self,gain_xp,cout_mp,latence): #Toutes ces caractéristiques sont déterminées par la sous-classe au moment de l'instanciation, en fonction de la magie utilisée et du niveau.
+    nom = "magie"
+    def __init__(self,gain_xp:int,cout_pm:int,latence:int): #Toutes ces caractéristiques sont déterminées par la sous-classe au moment de l'instanciation, en fonction de la magie utilisée et du niveau.
         self.gain_xp = gain_xp
-        self.cout_mp = cout_mp
+        self.cout_pm = cout_pm
         self.latence = latence
         self.phase = "démarrage"
         self.affiche = True
@@ -121,8 +122,8 @@ class Cible_case(Magie_cible):
 
 class Invocation(Magie):
     """La classe des magies qui créent une entitée (un agissant pour se battre à vos côtés, un projectile magique pour attaquer les ennemis, un item à utiliser plus tard..."""
-    def __init__(self,gain_xp,cout_mp,latence,entitee):
-        Magie.__init__(self,gain_xp,cout_mp,latence)
+    def __init__(self,gain_xp,cout_pm,latence,entitee):
+        Magie.__init__(self,gain_xp,cout_pm,latence)
         self.entitee = entitee
 
     def invoque(self):
@@ -130,8 +131,8 @@ class Invocation(Magie):
 
 class Invocation_projectile(Invocation,Magie_dirigee):
     """La classe des magies qui créent une entitée avec un attribut direction."""
-    def __init__(self,gain_xp,cout_mp,latence,temps,entitee):
-        Magie.__init__(self,gain_xp,cout_mp,latence)
+    def __init__(self,gain_xp,cout_pm,latence,temps,entitee):
+        Magie.__init__(self,gain_xp,cout_pm,latence)
         Magie_dirigee.__init__(self,temps)
         self.entitee = entitee
 
@@ -140,8 +141,8 @@ class Invocation_projectile(Invocation,Magie_dirigee):
 
 class Creation_effet(Magie):
     """La classe des magies qui créent un effet (un effet sur le long terme, comme les enchantement, ou sur le court terme, comme un boost ou déboost passager)."""
-    def __init__(self,gain_xp,cout_mp,latence,effet):
-        Magie.__init__(self,gain_xp,cout_mp,latence)
+    def __init__(self,gain_xp,cout_pm,latence,effet):
+        Magie.__init__(self,gain_xp,cout_pm,latence)
         self.effet = effet
 
     def get_effet(self):
@@ -149,8 +150,8 @@ class Creation_effet(Magie):
 
 class Enchante(Creation_effet):
     """La classe des magies qui créent des enchantements (des effets sur le très, très long terme)."""
-    def __init__(self,gain_xp,cout_mp,latence,enchantement):
-        Magie.__init__(self,gain_xp,cout_mp,latence)
+    def __init__(self,gain_xp,cout_pm,latence,enchantement):
+        Magie.__init__(self,gain_xp,cout_pm,latence)
         self.enchantement = enchantement
 
     def get_enchantement(self):
@@ -158,18 +159,18 @@ class Enchante(Creation_effet):
 
 class Enchante_item(Enchante,Cible_item):
     """La classe des magies qui enchantent un item."""
-    def __init__(self,gain_xp,cout_mp,latence,temps,enchantement):
-        Enchante.__init__(self,gain_xp,cout_mp,latence,enchantement)
+    def __init__(self,gain_xp,cout_pm,latence,temps,enchantement):
+        Enchante.__init__(self,gain_xp,cout_pm,latence,enchantement)
         Magie_cible.__init__(self,temps)
 
 class Enchante_cases(Enchante,Cible_case,Multi_cible):
     """La classe des magies qui enchantent des cases."""
-    def __init__(self,gain_xp,cout_mp,latence,temps,enchantement):
-        Enchante.__init__(self,gain_xp,cout_mp,latence,enchantement)
+    def __init__(self,gain_xp,cout_pm,latence,temps,enchantement):
+        Enchante.__init__(self,gain_xp,cout_pm,latence,enchantement)
         Magie_cible.__init__(self,temps)
 
 class Enchante_agissant(Enchante,Cible_agissant):
     """La classe des magies qui enchantent un agissant."""
-    def __init__(self,gain_xp,cout_mp,latence,temps,enchantement):
-        Enchante.__init__(self,gain_xp,cout_mp,latence,enchantement)
+    def __init__(self,gain_xp,cout_pm,latence,temps,enchantement):
+        Enchante.__init__(self,gain_xp,cout_pm,latence,enchantement)
         Magie_cible.__init__(self,temps)

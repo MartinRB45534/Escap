@@ -6,7 +6,7 @@ if TYPE_CHECKING:
 
 from Jeu.Entitee.Agissant.Humain.Humain import *
 
-class Bombe_atomique(Attaquant_magique_case,Support,Humain): #La neuvième humaine du jeu, à l'étage 8 (une magicienne légèrement aguicheuse)
+class Bombe_atomique(PNJ_mage,Attaquant_magique_case,Support,Humain): #La neuvième humaine du jeu, à l'étage 8 (une magicienne légèrement aguicheuse)
     """La classe de la bombe atomique."""
     def __init__(self,controleur:Controleur,position:Position):
 

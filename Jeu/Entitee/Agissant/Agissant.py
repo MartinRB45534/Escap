@@ -12,6 +12,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
     """La classe des entitées animées. Capable de décision, de différentes actions, etc. Les principales caractéristiques sont l'ID, les stats, et la classe principale."""
     def __init__(self,controleur:Controleur,position:Position,identite:str,niveau:int,ID:int=None):
         Entitee.__init__(self,position,ID)
+        self.identite:str = identite
         stats=CONSTANTES_STATS[identite]
         self.pv_max:float = stats['pv'][niveau]
         self.pv:float = self.pv_max
@@ -576,14 +577,30 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
             self.inventaire.fin_tour()
             self.classe_principale.gagne_xp()
             if self.niveau != self.classe_principale.niveau : #On a gagné un niveau
-                if self.ID==2:
-                    self.level_up() #À modifier ! /!\
+                if self.classe_principale.evolutif:
+                    self.level_up()
                 else:
                     print("Quelqu'un d'autre que le joueur a une incohérence entre son niveau et le niveau de sa classe principale !")
                     print(self)
                     print(self.niveau)
                     print(self.niveau)
                     print(self.classe_principale.niveau)
+
+    def level_up(self):
+        niveau = self.classe_principale.niveau # /!\ Peut donner des résultats non-voulus si la montée de niveau a lieu pendant qu'on est sous le coup d'un enchantement (ça ne devrait plus être vrai avec les taux)
+        stats=CONSTANTES_STATS[self.identite]
+        self.pv_max=stats['pv'][niveau]
+        self.regen_pv=stats['regen_pv'][niveau]
+        self.pm_max=stats['pm'][niveau]
+        self.regen_pm=stats['regen_pm'][niveau]
+        self.force=stats['force'][niveau]
+        self.priorite=stats['priorite'][niveau]
+        self.vitesse=stats['vitesse'][niveau]
+        self.aff_o=stats['aff_o'][niveau]
+        self.aff_f=stats['aff_f'][niveau]
+        self.aff_t=stats['aff_t'][niveau]
+        self.aff_g=stats['aff_g'][niveau]
+        self.niveau = self.classe_principale.niveau
 
 from Jeu.Constantes import *
 from Jeu.Skins.Skins import *
