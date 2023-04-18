@@ -1,3 +1,6 @@
+from warnings import warn
+
+
 class Decalage:
     def __init__(self,x:int,y:int):
         self.x=x
@@ -15,15 +18,15 @@ class Decalage:
 
     def __sub__(self,other): #Probablement une mauvaise idée !
         if isinstance(other,Decalage): #Il vaudrait mieux additionner -1*other...
-            print("Euh, pourquoi tu soustrais un décalage à un décalage ?")
-            return Decalage(self.x-other.x,self.y-other.y) #/!\ Renvoyer un warning
+            warn("Euh, pourquoi tu soustrais un décalage à un décalage ?")
+            return Decalage(self.x-other.x,self.y-other.y)
         else:
             return NotImplemented
 
     def __rsub__(self,other): #Probablement une mauvaise idée !
         if isinstance(other,Decalage): #Il vaudrait mieux additionner -1*self...
-            print("Euh, pourquoi tu soustrais un décalage à un décalage ?")
-            return Decalage(self.x-other.x,self.y-other.y) #/!\ Renvoyer un warning
+            warn("Euh, pourquoi tu soustrais un décalage à un décalage ?")
+            return Decalage(self.x-other.x,self.y-other.y)
         return NotImplemented
 
     def __mul__(self,other):

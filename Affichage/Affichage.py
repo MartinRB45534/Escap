@@ -38,6 +38,9 @@ class Affichable:
         if self.touche(position):
             res = self
         return res
+    
+    def clique_placeholder(self,placeheldholder):
+        return False
 
     def survol(self,position):
         #Trouve l'élément survolé par la souris et le renvoie
@@ -82,11 +85,18 @@ class Affichage(Affichable):
         #Trouve l'élément survolé par la souris et le renvoie
         res = False
         if self.touche(position):
-            res = self #/!\ Est-ce que je veux faire ça comme ça ?
+            res = self
         for objet in self.objets:
             res_objet = objet.clique(position)
             if res_objet:
                 res = res_objet
+        return res
+    
+    def clique_placeholder(self,placeheldholder):
+        res = False
+        for objet in self.objets:
+            if objet.clique_placeholder(placeheldholder):
+                res = objet
         return res
 
     def survol(self,position):
@@ -214,7 +224,7 @@ class Cliquable(Survolable): #Il faut être survolable pour être cliquable
         self.marque_actif = False #Est-ce que c'est l'élément actif  de la hiérarchie ?
         self.marque_courant = False #Est-ce que c'est l'élément courant de l'élément actif ?
         self.est_courant = False #Est-ce que c'est l'élément courant de son élément parent ? #TODO : à renseigner par l'élément parent (comment ?)
-        self.actif = False #Est-ce que l'élément est actif ?
+        self.actif = True #Est-ce que l'élément est actif ?
 
     def trouve_actif(self):
         if self.actif:
@@ -222,12 +232,18 @@ class Cliquable(Survolable): #Il faut être survolable pour être cliquable
         else:
             warn(f"Erreur : on a atteint {self} qui n'est pas actif, mais n'est qu'un pauvre cliquable !")
 
+    def set_actif(self):
+        self.actif = True
+
+    def unset_actif(self):
+        self.actif = False
+
     def clique(self,position):
         clique = Affichable.clique(self,position)
         if clique is self:
-            self.actif = True
+            self.set_actif()
         else:
-            self.actif = False
+            self.unset_actif()
         if clique:
             return self
         return False
@@ -236,15 +252,6 @@ class Cliquable(Survolable): #Il faut être survolable pour être cliquable
         if self.actif: #On est à ce niveau
             if direction == IN:
                 return self
-            elif direction == OUT:
-                self.actif = False
-                return False
-            elif direction == PREVIOUS:
-                self.actif = False
-                return False
-            elif direction == NEXT:
-                self.actif = False
-                return False
             return False
         else:
             warn(f"Erreur : on a atteint {self} qui n'est pas actif, mais ne navigue pas !")
@@ -277,12 +284,12 @@ class Knot(Cliquable):
     def clique(self,position: List[int]):
         clique = Affichable.clique(self,position)
         if clique is self:
-            self.actif = True
+            self.set_actif()
         elif clique:
             self.select(clique)
-            self.actif = False
+            self.unset_actif()
         else:
-            self.actif = False
+            self.unset_actif()
         if clique:
             return self
         return False
@@ -313,16 +320,16 @@ class Knot(Cliquable):
     
     def set_default_courant(self):
         self.set_courant(None)
-        self.actif = False
+        self.unset_actif()
 
     def set_courant(self,element: Cliquable):
         self.courant = element
         if element is None:
-            self.actif = True
+            self.set_actif()
         elif isinstance(element, Knot):
             element.set_courant(element.courant) # Assure qu'il y aura un self.actif True quelque part
         elif isinstance(element, Cliquable):
-            element.actif = True
+            element.set_actif()
         else:
             warn(f"Knot.set_courant : {self} a reçu {element}")
 
@@ -371,13 +378,13 @@ class Knot(Cliquable):
     def in_in(self): # On veut aller plus profond
         if self.courant is None:
             self.set_default_courant()
-        self.actif = False
+        self.unset_actif()
         if self.courant is not None:
-            self.courant.actif = True
+            self.courant.set_actif()
         return self
 
     def in_out(self): # On veut ressortir
-        self.actif = False
+        self.unset_actif()
         return False
     
     def in_previous(self): # On veut aller au précédent de l'élément actuel
@@ -402,8 +409,8 @@ class Knot(Cliquable):
         return False
     
     def through_out(self): # On veut revenir ici
-        self.courant.actif = False
-        self.actif = True
+        self.courant.unset_actif()
+        self.set_actif()
         return self
     
     def through_previous(self): # On veut aller au précédent de notre élément actuel
@@ -427,31 +434,59 @@ class Knot(Cliquable):
 class Knot_vertical(Knot):
     """Un élément dont le contenu est disposé verticalement (donc next et previous correspondent à haut et bas)."""
     def through_previous(self):
-        self.courant.actif = False # Devrait être inutile
+        self.courant.unset_actif() # Devrait être inutile
         res = self.in_up()
-        self.courant.actif = True
+        self.courant.set_actif()
         return res
     
     def through_next(self):
-        self.courant.actif = False # Devrait être inutile
+        self.courant.unset_actif() # Devrait être inutile
         res = self.in_down()
-        self.courant.actif = True
+        self.courant.set_actif()
+        return res
+
+class Knot_vertical_profondeur_agnostique(Knot):
+    """Un knot_vertical qui ne fait pas de différence entre in et through (pour haut et bas)."""
+    def through_up(self):
+        self.courant.unset_actif() # Devrait être inutile
+        res = self.in_up()
+        self.courant.set_actif()
+        return res
+    
+    def through_down(self):
+        self.courant.unset_actif()
+        res = self.in_down()
+        self.courant.set_actif()
         return res
     
 class Knot_horizontal(Knot):
     """Un élément dont le contenu est disposé horizontalement (donc next et previous correspondent à gauche et droite)."""
     def through_previous(self):
-        self.courant.actif = False # Devrait être inutile
+        self.courant.unset_actif() # Devrait être inutile
         res = self.in_left()
-        self.courant.actif = True
+        self.courant.set_actif()
         return res
     
     def through_next(self):
-        self.courant.actif = False # Devrait être inutile
+        self.courant.unset_actif() # Devrait être inutile
         res = self.in_right()
-        self.courant.actif = True
+        self.courant.set_actif()
         return res
     
+class Knot_horizontal_profondeur_agnostique(Knot):
+    """Un knot_horizontal qui ne fait pas de différence entre in et through (pour gauche et droite)."""
+    def through_left(self):
+        self.courant.unset_actif() # Devrait être inutile
+        res = self.in_left()
+        self.courant.set_actif()
+        return res
+    
+    def through_right(self):
+        self.courant.unset_actif()
+        res = self.in_right()
+        self.courant.set_actif()
+        return res
+
 class Knot_hierarchique_sinistre(Knot):
     """Un élément dont le contenu est hiérarchique de gauche à droite (donc gauche et droite correspondent à out et in)."""
     def in_left(self):
@@ -508,17 +543,17 @@ class Knot_bloque(Knot):
                 if self.courant is None:
                     raise(NotImplementedError("Un Knot_bloque doit avoir un élément courant."))
                 else:
-                    self.actif = False
-                    self.courant.actif = True
+                    self.unset_actif()
+                    self.courant.set_actif()
                     return self
             elif direction == OUT:
-                self.actif = False
+                self.unset_actif()
                 return False
             elif direction == PREVIOUS:
-                self.actif = False
+                self.unset_actif()
                 return False
             elif direction == NEXT:
-                self.actif = False
+                self.unset_actif()
                 return False
         elif self.courant is None:
             raise(NotImplementedError("Un Wrapper_bloque doit avoir un élément courant."))
@@ -529,7 +564,7 @@ class Knot_bloque(Knot):
                 return self
             else:
                 if direction == OUT:
-                    self.actif = True
+                    self.set_actif()
                     return self
             return self
             
@@ -545,13 +580,25 @@ class Affichage_knot(Affichage,Knot):
     def clique(self,position):
         clique = Affichage.clique(self,position)
         if clique is self:
-            self.actif = True
+            self.set_actif()
+        elif isinstance(clique, Placeheldholder):
+            res = self.clique_placeholder(clique)
+            if not res:
+                self.unset_actif()
+                return clique
         elif clique:
             self.select(clique)
-            self.actif = False
+            self.unset_actif()
         else:
-            self.actif = False
+            self.unset_actif()
         if clique:
+            return self
+        return False
+
+    def clique_placeholder(self,placeheldholder):
+        res = Affichable.clique_placeholder(self,placeheldholder)
+        if res:
+            self.select(res)
             return self
         return False
 
@@ -609,6 +656,18 @@ class Conteneur(Affichable):
                     res = res_contenu
         for objet in self.objets:
             res_objet = objet.clique(position)
+            if res_objet:
+                res = res_objet
+        return res
+
+    def clique_placeholder(self,placeheldholder):
+        res = False
+        for contenu in self.contenu:
+            res_contenu = contenu.clique_placeholder(placeheldholder)
+            if res_contenu:
+                res = res_contenu
+        for objet in self.objets:
+            res_objet = objet.clique_placeholder(placeheldholder)
             if res_objet:
                 res = res_objet
         return res
@@ -704,6 +763,17 @@ class Wrapper(Conteneur):
             if res_objet:
                 res = res_objet
         return res
+    
+    def clique_placeholder(self,placeheldholder):
+        res = False
+        res_contenu = self.contenu.clique_placeholder(placeheldholder)
+        if res_contenu:
+            res = res_contenu
+        for objet in self.objets:
+            res_objet = objet.clique_placeholder(placeheldholder)
+            if res_objet:
+                res = res_objet
+        return res
 
     def survol(self,position):
         #Trouve l'élément survolé par la souris et le renvoie
@@ -740,6 +810,17 @@ class Wrapper(Conteneur):
         self.contenu.remove_unpickables()
         for objet in self.objets:
             objet.remove_unpickables()
+
+class Wrapper_test(Wrapper):
+    pass
+    # Same, but allows me to test some stuff
+    # def affiche(self, screen: pygame.Surface, frame: int = 1, frame_par_tour: int = 1):
+    #     self.fond = (34, 139, 34)
+    #     print(self, self.contenu)
+    #     print(self.tailles)
+    #     print(self.position)
+    #     print(screen.get_size())
+    #     return super().affiche(screen, frame, frame_par_tour)
 
 class Wrapper_cliquable(Wrapper,Cliquable):
     """Un wrapper qui peut être cliqué"""
@@ -782,9 +863,9 @@ class Wrapper_cliquable(Wrapper,Cliquable):
     def clique(self,position):
         clique = Wrapper.clique(self,position)
         if clique is self:
-            self.actif = True
+            self.set_actif()
         else:
-            self.actif = False
+            self.unset_actif()
         if clique:
             return self
         return False
@@ -811,18 +892,86 @@ class Wrapper_knot(Wrapper_cliquable,Knot):
     def clique(self,position):
         clique = Wrapper.clique(self,position)
         if clique is self:
-            self.actif = True
+            self.set_actif()
+        elif isinstance(clique, Placeheldholder):
+            res = self.clique_placeholder(clique)
+            if not res:
+                self.unset_actif()
+                return clique
         elif clique:
             self.select(clique)
-            self.actif = False
+            self.unset_actif()
         else:
-            self.actif = False
+            self.unset_actif()
         if clique:
+            return self
+        return False
+    
+    def clique_placeholder(self,placeheldholder):
+        res = Wrapper.clique_placeholder(self,placeheldholder)
+        if res:
+            self.select(res)
             return self
         return False
     
 class Wrapper_knot_bloque(Knot_bloque,Wrapper_knot):
     pass
+
+class Placeheldholder(Wrapper_knot):
+    """L'élément où le placeheld du placeholder est placé."""
+    def set_actif(self):
+        if isinstance(self.contenu,Cliquable):
+            self.contenu.set_actif()
+
+    def unset_actif(self):
+        if isinstance(self.contenu,Cliquable):
+            self.contenu.unset_actif()
+
+    def trouve_actif(self):
+        if isinstance(self.contenu,Cliquable):
+            self.contenu.trouve_actif()
+
+    # def clique(self, position: List[int]):
+
+class Placeholder(Knot):
+    """Un élément qui lie à un autre, ailleurs."""
+    def __init__(self, placeheldholder:Placeheldholder, placeheld:Knot=None):
+        Knot.__init__(self)
+        self.placeheldholder = placeheldholder
+        self.set_courant(placeheld)
+
+    def set_actif(self):
+        super().set_actif()
+        self.placeheldholder.set_contenu(self.courant)
+        self.placeheldholder.set_tailles(self.placeheldholder.tailles)
+        self.courant.set_actif()
+
+    def unset_actif(self):
+        super().unset_actif()
+        self.courant.unset_actif()
+
+    def trouve_actif(self):
+        self.marque_actif = True
+        self.courant.trouve_actif()
+
+    def clique(self, position: List[int]):
+        return Cliquable.clique(self, position) # On ne veut pas que le clique soit propagé
+
+    def clique_placeholder(self,placeheldholder:Placeheldholder):
+        if placeheldholder is self.placeheldholder and self.courant is placeheldholder.contenu:
+            return self
+
+    def survol(self, position: List[int]):
+        return Cliquable.survol(self, position)
+    
+    def navigue(self, direction: Direction | int):
+        res = self.courant.navigue(direction)
+        self.actif = self.courant.actif
+        return res
+
+    def update(self):
+        super().update()
+        self.courant.update()
 
 class Pavage(Conteneur):
     """Contient des objets, qui s'adaptent au pavage"""
@@ -830,16 +979,16 @@ class Pavage(Conteneur):
         self.objets = [] #Il peut quand même avoir des objets 'normaux'
         self.contenu:List[Affichable] = [] #Les objets qu'il 'contient'
         self.repartition = [] #La répartition des objets contenus
-        self.courant = False
+        # self.courant = False
         self.fond = (0,0,0,0)
         self.tailles = [0,0] #La largeur et la hauteur (ou l'inverse ?)
         self.position = [0,0]
 
     def set_contenu(self,contenu,repartition):
+        if all(taille >= 0 for taille in repartition):
+            warn("Il n'y a pas d'élément ajustable dans ce pavage !?")
         if len(contenu) != len(repartition):
-            print("Hey, vérifie ton contenu et ses répartitions")
-            print(contenu)
-            print(repartition)
+            warn(f"Hey, {contenu} et {repartition} ne sont pas de même taille !")
         else:
             self.contenu = contenu
             self.repartition = repartition
@@ -867,8 +1016,6 @@ class Pavage_horizontal(Pavage):
         self.tailles = tailles
 
     def get_tailles(self,tailles):
-        # print("<get p h>")
-        # print(tailles)
         somme = 0
         maxi = 0
         libre = tailles[0] - sum(self.repartition[i] if self.repartition[i]>0 else self.contenu[i].get_tailles(tailles)[0] if not(self.repartition[i]) else 0 for i in range(len(self.repartition)))
@@ -941,6 +1088,20 @@ class Pavage_vertical(Pavage):
         # print("</get p>")
         # print([maxi,somme])
         return [maxi,somme]
+    
+class Pavage_vertical_test(Pavage_vertical):
+    def get_tailles(self, tailles):
+        res = super().get_tailles(tailles)
+        print(f"get_tailles_v({tailles}) = {res}")
+        return res
+    
+class Pavage_horizontal_test(Pavage_horizontal):
+    def get_tailles(self, tailles):
+        res = super().get_tailles(tailles)
+        print(f"get_tailles_h({tailles}) = {res}")
+        print(self.contenu[1].get_tailles(tailles))
+        print(self.contenu[1])
+        return res
 
 class Liste(Conteneur):
     """Contient des objets, et les affiche à la suite."""
@@ -955,8 +1116,16 @@ class Liste(Conteneur):
         self.position = [0,0]
 
     def set_contenu(self,contenu:List[Affichable],repartition:List[float],courant=0):
-        self.contenu = contenu
-        self.repartition = repartition
+        # On vérifie qu'il n'y a pas de nombres négatifs dans la répartition
+        if any(taille<0 for taille in repartition):
+            warn("Les tailles doivent être positives dans les listes !")
+        # On vérifie qu'il y a autant d'éléments dans la répartition que dans le contenu
+        elif len(contenu) != len(repartition):
+            warn(f"Hoy, {contenu} et {repartition} ne sont pas de même taille !")
+        else:
+            self.contenu = contenu
+            self.repartition = repartition
+            self.courant = courant
 
     def clique(self,position):
         #Trouve l'élément survolé par la souris et le renvoie
@@ -974,6 +1143,19 @@ class Liste(Conteneur):
             if res_objet:
                 res = res_objet
         return res
+
+    def clique_placeholder(self,placeheldholder):
+        res = False
+        for i in range(len(self.contenu)):
+            res_contenu = self.contenu[i].clique_placeholder(placeheldholder)
+            if res_contenu:
+                res = res_contenu
+                self.courant = i
+                self.ajuste(res)
+        for objet in self.objets:
+            res_objet = objet.clique_placeholder(placeheldholder)
+            if res_objet:
+                res = res_objet
 
     def survol(self,position):
         #Trouve l'élément survolé par la souris et le renvoie
@@ -1029,8 +1211,6 @@ class Liste_verticale(Liste):
             self.decalage += decalage
 
     def get_tailles(self,tailles):
-        # print("<get l v>")
-        # print(tailles)
         return [max(contenu.get_tailles(tailles)[0] for contenu in self.contenu),tailles[1]]#[max(contenu.get_tailles(tailles)[0] for contenu in self.contenu),min(tailles[1],sum(self.repartition[i] if self.repartition[i] else self.contenu[i].get_tailles(tailles)[1] for i in range(len(self.repartition))))]
 
     def scroll(self,position,x,y):
@@ -1263,6 +1443,18 @@ class Liste_menu(Wrapper_knot):
         self.set_courant(res)
         return res
 
+    def clique_placeholder(self,placeheldholder):
+        res = False
+        for contenu in self.contenu:
+            res_contenu = contenu.clique_placeholder(placeheldholder)
+            if res_contenu:
+                res = res_contenu
+        for objet in self.objets:
+            res_objet = objet.clique_placeholder(placeheldholder)
+            if res_objet:
+                res = res_objet
+        return res
+
     def survol(self,position):
         #Trouve l'élément survolé par la souris et le renvoie
         res = False
@@ -1274,21 +1466,6 @@ class Liste_menu(Wrapper_knot):
                     res = res_contenu
         for objet in self.objets:
             res_objet = objet.survol(position)
-            if res_objet:
-                res = res_objet
-        return res
-
-    def clique_wrapper(self,position):
-        #Trouve l'élément survolé par la souris et le renvoie
-        res = False
-        if self.touche(position):
-            res = self #La plupart des trucs qu'on veut pouvoir cliquer sont les Wrapper, pas les listes et pavages intermédiaires
-            pos_rel = [position[0]-self.position[0],position[1]-self.position[1]]
-            res_contenu = self.liste.clique(pos_rel)
-            if res_contenu:
-                res = res_contenu
-        for objet in self.objets:
-            res_objet = objet.clique(position)
             if res_objet:
                 res = res_objet
         return res
@@ -1333,31 +1510,35 @@ class Texte(Cliquable):
     """Un élément qui est juste un bout de texte."""
     def __init__(self,texte:str, texte_marque_survol:str=None, texte_marque_actif:str=None, texte_marque_courant:str=None, texte_est_courant:str=None, texte_actif:str=None):
         Cliquable.__init__(self)
+        # Élément le plus important : le texte "normal"
         self.texte=texte
+        # Second élément le plus important : le texte survolé (pour montrer au joueur qu'il peut cliquer dessus et que c'est interactif, que le jeu a pas planté, etc.)
         self.texte_marque_survol=texte_marque_survol if texte_marque_survol else self.texte
+        # Troisième élément le plus important : le texte actif (pour montrer au joueur que c'est le texte qui est actuellement sélectionné)
         self.texte_marque_actif=texte_marque_actif if texte_marque_actif else self.texte_marque_survol
+        # Élément aussi non-négligeable : le texte courant (pour montrer au joueur que c'est le texte qui est actuellement presque sélectionné, mais pas encore)
         self.texte_marque_courant=texte_marque_courant if texte_marque_courant else self.texte_marque_actif
+        # Élément moins important : le texte courant (pour montrer au joueur que s'il revient dans le dialogue, c'est le texte qui sera sélectionné)
         self.texte_est_courant=texte_est_courant if texte_est_courant else self.texte
+        # Élément pas très important non plus : le texte actif (pour montrer au joueur que s'il revient dans le dialogue, le texte sera actif)
         self.texte_actif=texte_actif if texte_actif else self.texte_est_courant
-
-    def clique(self,position):
-        #Trouve l'élément survolé par la souris et le renvoie
-        res = False
-        if self.touche(position):
-            res = self
-            self.actif = True
-        else:
-            self.actif = False
-        return res
     
-    def get_texte(self) -> str:
+    def get_texte(self,reset=False) -> str:
         if self.marque_survol:
+            if reset:
+                self.marque_survol = False
             return self.texte_marque_survol
         elif self.marque_actif:
+            if reset:
+                self.marque_actif = False
             return self.texte_marque_actif
         elif self.marque_courant:
+            if reset:
+                self.marque_courant = False
             return self.texte_marque_courant
         elif self.est_courant:
+            if reset:
+                self.est_courant = False
             return self.texte_est_courant
         elif self.actif:
             return self.texte_actif
@@ -1365,7 +1546,7 @@ class Texte(Cliquable):
             return self.texte
 
     def affiche(self,screen:pygame.Surface,frame:int=1,frame_par_tour:int=1):
-        texte=POLICE20.render(self.get_texte(),True,(0,0,0))
+        texte=POLICE20.render(self.get_texte(True),True,(0,0,0))
         screen.blit(texte,self.position)
 
     def get_tailles(self,tailles):
@@ -1403,7 +1584,7 @@ class Pave(Taille_variable,Texte):
     def affiche(self,screen:pygame.Surface,frame:int,frame_par_tour:int):
         """Fonction qui prend en entrée une chaine de caractère et renvoie les surfaces des lignes successives du texte."""
         hauteur = 0
-        mots = self.get_texte().split()
+        mots = self.get_texte(True).split()
         i = 0
         while i < len(mots):
             ligne = mots[i]
@@ -1425,14 +1606,22 @@ class Paves(Pave):
         self.textes_est_courant=textes_est_courant if textes_est_courant else self.textes
         self.textes_actifs=textes_actifs if textes_actifs else self.textes_est_courant
 
-    def get_textes(self) -> str:
+    def get_textes(self,reset=False) -> str:
         if self.marque_survol:
+            if reset:
+                self.marque_survol = False
             return self.textes_marques_survol
         elif self.marque_actif:
+            if reset:
+                self.marque_actif = False
             return self.textes_marques_actifs
         elif self.marque_courant:
+            if reset:
+                self.marque_courant = False
             return self.textes_marque_courant
         elif self.est_courant:
+            if reset:
+                self.est_courant = False
             return self.textes_est_courant
         elif self.actif:
             return self.textes_actifs
@@ -1487,37 +1676,61 @@ class Paves(Pave):
 
 class Center_texte(Wrapper_knot_bloque):
     def __init__(self, texte:str):
+
         Wrapper_knot.__init__(self)
-
-        self.fond = (255, 255, 255)
         self.texte = Texte(texte)
-        self.courant = self.texte
-        self.init_droite()
+        self.set_courant(self.texte)
+        self.init()
 
-    def init_droite(self):
+    def init(self):
         contenu = Pavage_vertical()
         monotique = Pavage_horizontal()
         monotique.set_contenu([Marge_verticale(), self.texte, Marge_verticale()], [-1, 0, -1])
         contenu.set_contenu([Marge_horizontale(), monotique, Marge_horizontale()], [-1, 0, -1])
         self.contenu = contenu
-        self.fond = (255, 255, 255)
 
 class Margin_texte(Wrapper_knot_bloque):
     def __init__(self, texte:str):
         Wrapper_knot.__init__(self)
 
-        self.fond = (255, 255, 255)
         self.texte = Texte(texte)
-        self.courant = self.texte
-        self.init_droite()
+        self.set_courant(self.texte)
+        self.init()
 
-    def init_droite(self):
+    def init(self):
         contenu = Pavage_vertical()
         monotique = Pavage_horizontal()
         monotique.set_contenu([Marge_verticale(), self.texte, Marge_verticale()], [5, 0, 5])
         contenu.set_contenu([Marge_horizontale(), monotique, Marge_horizontale()], [5, 0, 5])
         self.contenu = contenu
-        self.fond = (255, 255, 255)
+
+class Center_horizontal_texte(Center_texte, Margin_texte):
+    def init(self):
+        contenu = Pavage_vertical()
+        monotique = Pavage_horizontal()
+        monotique.set_contenu([Marge_verticale(), self.texte, Marge_verticale()], [-2, 0, -1])
+        contenu.set_contenu([Marge_horizontale(), monotique, Marge_horizontale()], [5, 0, 5])
+        self.contenu = contenu
+
+class Center_horizontal_texte_test(Center_texte, Margin_texte):
+    def init(self):
+        contenu = Pavage_vertical_test()
+        monotique = Pavage_horizontal_test()
+        monotique.set_contenu([Marge_verticale(), self.texte, Marge_verticale()], [-2, 0, -1])
+        contenu.set_contenu([Marge_horizontale(), monotique, Marge_horizontale()], [5, 0, 5])
+        self.contenu = contenu
+
+    def get_tailles(self, tailles):
+        print("texte :", self.texte.get_tailles(tailles))
+        return super().get_tailles(tailles)
+
+class Center_vertical_texte(Center_texte, Margin_texte):
+    def init(self):
+        contenu = Pavage_vertical()
+        monotique = Pavage_horizontal()
+        monotique.set_contenu([Marge_verticale(), self.texte, Marge_verticale()], [5, 0, 5])
+        contenu.set_contenu([Marge_horizontale(), monotique, Marge_horizontale()], [-1, 0, -1])
+        self.contenu = contenu
 
 class Bouton(Wrapper_cliquable):
     def __init__(self, skin, texte, fond=(0,0,0), fond_marque_survol=(50,50,50), fond_marque_actif=None, fond_marque_courant=None, fond_est_courant=None, fond_actif=None):
@@ -1564,7 +1777,7 @@ class Bouton(Wrapper_cliquable):
             objet.affiche(screen,frame,frame_par_tour)
 
 class Vignette_composee(Cliquable,Affichage):
-    def __init__(self,vignettes,taille,shade=False,invalide=False):
+    def __init__(self,vignettes:List[Affichable],taille,shade=False,invalide=False):
         Cliquable.__init__(self)
         self.tailles = [taille,taille]
         self.objets = vignettes
@@ -1573,8 +1786,28 @@ class Vignette_composee(Cliquable,Affichage):
         if invalide:
             self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
 
+class Vignette_placeholder(Vignette_composee, Placeholder):
+    def __init__(self,placeheldholder:Placeheldholder,placeheld:Knot,vignettes:List[Affichable],taille,shade=False,invalide=False):
+        Placeholder.__init__(self,placeheldholder,placeheld)
+        self.tailles = [taille,taille]
+        self.objets = vignettes
+        if shade or invalide:
+            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
+        if invalide:
+            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
+
+    def affiche(self, screen: pygame.Surface, frame: int = 1, frame_par_tour: int = 1):
+        if self.marque_actif or self.marque_courant or self.marque_survol:
+            self.decale((2,2)) # /!\ Trouver un meilleur moyen de marquer l'activité
+        super().affiche(screen, frame, frame_par_tour)
+        if self.marque_actif or self.marque_courant or self.marque_survol:
+            self.decale((-2,-2))
+            self.marque_actif = False
+            self.marque_courant = False
+            self.marque_survol = False
+
 class Vignette_composee_texte(Vignette_composee):
-    def __init__(self,vignettes,texte,taille,shade=False,invalide=False):
+    def __init__(self,vignettes:List[Affichable],texte,taille,shade=False,invalide=False):
         Vignette_composee.__init__(self,vignettes,taille,shade,invalide)
         texte = Texte(texte)
         self.objets.append(texte)
@@ -1588,12 +1821,18 @@ class Vignette_composee_texte(Vignette_composee):
                 tailles_texte = objet.get_tailles(self.tailles)
                 objet.set_position([self.tailles[0]-tailles_texte[0],self.tailles[1]-tailles_texte[1]])
 
-class Vignette_composee_updatable(Vignette_composee):
-    def __init__(self,vignettes,taille,shade=False,invalide=False):
-        self.objets:List[Affichable] = [] #La liste des objets à afficher
-        self.tailles = [taille,taille]
-        self.position = [0,0]
-        self.objets = vignettes
+class Vignette_placeholder_texte(Vignette_composee_texte,Placeholder):
+    def __init__(self,placeheldholder:Placeheldholder,placeheld:Knot,vignettes:List[Affichable],texte,taille,shade=False,invalide=False):
+        Vignette_placeholder.__init__(self,placeheldholder,placeheld,vignettes,taille,shade,invalide)
+        texte = Texte(texte)
+        self.objets.append(texte)
+        tailles_texte = texte.get_tailles(self.tailles)
+        texte.set_position([self.tailles[0]-tailles_texte[0],self.tailles[1]-tailles_texte[1]])
+
+class Vignette_placeholder_updatable(Vignette_placeholder):
+    def __init__(self,placeheldholder:Placeheldholder,placeheld:Knot,vignettes:List[Affichable],taille,shade=False,invalide=False):
+        Vignette_placeholder.__init__(self,placeheldholder,placeheld,vignettes,taille,shade,invalide)
+
         self.shades:List[Affichable] = []
         if shade or invalide:
             self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
@@ -1602,44 +1841,44 @@ class Vignette_composee_updatable(Vignette_composee):
             self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
             self.shades.append(Vignette([0,0],taille,SKIN_SHADE))
 
-class Vignette_categorie(Vignette_composee):
-    def __init__(self,categorie:Type[Potion|Parchemin|Cle|Arme|Bouclier|Armure|Haume|Anneau|Projectile|Ingredient|Cadavre|Oeuf],taille,shade=False,invalide=False):
-        self.categorie = categorie
+class Vignette_categorie(Vignette_placeholder):
+    def __init__(self,placeheldholder:Placeheldholder,placeheld:Knot,categorie:Type[Potion|Parchemin|Cle|Arme|Bouclier|Armure|Haume|Anneau|Projectile|Ingredient|Cadavre|Oeuf],taille,shade=False,invalide=False):
         vignettes = [Vignette([0,0],taille,categorie.get_image())]
 
-        Vignette_composee.__init__(self,vignettes,taille,shade,invalide)        
+        Vignette_placeholder.__init__(self,placeheldholder,placeheld,vignettes,taille,shade,invalide)
 
-class Vignette_recette(Vignette_composee):
-    def __init__(self,recette,taille,shade=False,invalide=False):
+class Vignette_recette(Vignette_placeholder):
+    def __init__(self,placeheldholder:Placeheldholder,placeheld:Knot,recette,taille,shade=False,invalide=False):
         self.recette = recette
         vignettes = [Vignette([0,0],taille,eval(recette["produit"])(None).get_skin())]
 
-        Vignette_composee.__init__(self,vignettes,taille,shade,invalide)
+        Vignette_placeholder.__init__(self,placeheldholder,placeheld,vignettes,taille,shade,invalide)
 
-class Vignette_ingredient(Vignette_composee_texte):
-    def __init__(self,ingredient:Item,quantite_necessaire,quantite_disponible,taille,shade=False,invalide=False):
+class Vignette_ingredient(Vignette_placeholder_texte):
+    def __init__(self,placeheldholder:Placeheldholder,ingredient:Item,quantite_necessaire,quantite_disponible,taille,shade=False,invalide=False):
         self.ingredient = ingredient
+        placeheld = Paves(ingredient.get_description())
         vignettes = [Vignette([0,0],taille,ingredient.get_skin())]
 
-        Vignette_composee_texte.__init__(self,vignettes,f"{quantite_disponible}/{quantite_necessaire}",taille,shade,invalide or quantite_disponible < quantite_necessaire)
+        Vignette_placeholder_texte.__init__(self,placeheldholder,placeheld,vignettes,f"{quantite_disponible}/{quantite_necessaire}",taille,shade,invalide or quantite_disponible < quantite_necessaire)
 
-class Vignette_vente(Vignette_composee_texte):
-    def __init__(self,item:Item,taille,prix,description,shade=False,invalide=False):
+class Vignette_vente(Vignette_placeholder_texte):
+    def __init__(self,placeheldholder:Placeheldholder,placeheld:Knot,item:Item,taille,prix,description,shade=False,invalide=False):
         self.item = item
         self.prix = prix
         self.description = description
         vignettes = [Vignette([0,0],taille,item.get_skin())]
 
-        Vignette_composee_texte.__init__(self,vignettes,f"{prix} €",taille,shade,invalide)
+        Vignette_placeholder_texte.__init__(self,placeheldholder,placeheld,vignettes,f"{prix} €",taille,shade,invalide)
 
-class Vignette_achat(Vignette_composee_texte):
-    def __init__(self,item:Item,taille,prix,description,shade=False,invalide=False):
+class Vignette_achat(Vignette_placeholder_texte):
+    def __init__(self,placeheldholder:Placeheldholder,placeheld:Knot,item:Item,taille,prix,description,shade=False,invalide=False):
         self.item = item
         self.prix = prix
         self.description = description
         vignettes = [Vignette([0,0],taille,item.get_skin())]
 
-        Vignette_composee_texte.__init__(self,vignettes,f"{prix} €",taille,shade,invalide)
+        Vignette_placeholder_texte.__init__(self,placeheldholder,placeheld,vignettes,f"{prix} €",taille,shade,invalide)
 
 class Vignette_magie(Vignette_composee):
     def __init__(self,magie:Magie,taille,shade=False,invalide=False):
@@ -1647,6 +1886,13 @@ class Vignette_magie(Vignette_composee):
         vignettes = [Vignette([0,0],taille,magie.get_skin())]
 
         Vignette_composee.__init__(self,vignettes,taille,shade,invalide)
+
+class Vignette_magie_placeholder(Vignette_placeholder):
+    def __init__(self,placeheldholder:Placeheldholder,placeheld:Knot,magie:Magie,taille,shade=False,invalide=False):
+        self.magie = magie
+        vignettes = [Vignette([0,0],taille,magie.get_skin())]
+
+        Vignette_placeholder.__init__(self,placeheldholder,placeheld,vignettes,taille,shade,invalide)
 
 class Vignette_item(Vignette_composee):
     def __init__(self,position,item:Item,taille,direction=None,shade=False,invalide=False):
@@ -1659,6 +1905,18 @@ class Vignette_item(Vignette_composee):
                 vignettes.append(Vignette(position,taille,effet.get_skin(),direction))
 
         Vignette_composee.__init__(self,vignettes,taille,shade,invalide)
+
+class Vignette_item_placeholder(Vignette_placeholder):
+    def __init__(self,placeheldholder:Placeheldholder,placeheld:Knot,position,item:Item,taille,direction=None,shade=False,invalide=False):
+        self.item = item
+        if direction == None:
+            direction = item.get_direction()
+        vignettes = [Vignette(position,taille,item.get_skin(),direction)]
+        for effet in item.effets:
+            if effet.affiche:
+                vignettes.append(Vignette(position,taille,effet.get_skin(),direction))
+
+        Vignette_placeholder.__init__(self,placeheldholder,placeheld,vignettes,taille,shade,invalide)
 
 class Vignettes_agissant(Vignette_composee):
     def __init__(self,position,agissant:Agissant,taille):
@@ -1781,17 +2039,14 @@ class Vignette_case(Vignette_composee):
 
         Vignette_composee.__init__(self,vignettes,taille)
 
-class Vignette_allie_neutre_ennemi(Vignette_composee_updatable):
-    def __init__(self,agissant:Agissant,esprit,taille,shade=False,invalide=False):
+class Vignette_allie_neutre_ennemi(Vignette_placeholder_updatable):
+    def __init__(self,placeheldholder:Placeheldholder,agissant:Agissant,taille,shade=False,invalide=False):
         self.agissant = agissant
-        self.esprit = esprit
         vignettes = [Vignettes_agissant([0,0],agissant,taille)]
         for statut in agissant.get_skins_statuts():
             vignettes.append(Vignette([0,0],taille,statut))
 
-        Vignette_composee_updatable.__init__(self,vignettes,taille,shade,invalide)
-
-        # self.position = position
+        Vignette_placeholder_updatable.__init__(self,placeheldholder,Paves(agissant.get_texte_descriptif()),vignettes,taille,shade,invalide)
         
     def update(self):
         self.objets:List[Affichable] = []
@@ -1799,6 +2054,7 @@ class Vignette_allie_neutre_ennemi(Vignette_composee_updatable):
         for statut in self.agissant.get_skins_statuts():
             self.objets.append(Vignette(self.position,self.tailles[0],statut))
         self.objets+=self.shades
+        self.courant.update()
 
 class Vignette_allie(Vignette_allie_neutre_ennemi):
     pass

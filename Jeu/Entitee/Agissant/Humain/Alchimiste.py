@@ -86,7 +86,7 @@ class Alchimiste(PNJ_mage,Attaquant_magique_case,Support,Humain): #Le septième 
         elif replique == "dialogue1reponse1.1.2":
             self.end_dialogue()
             self.mouvement = 0 #Légèrement redondant ici
-            self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
+            self.cible_deplacement = self.controleur.joueur.ID
             self.attente = False
         elif replique == "dialogue1reponse1.2":
             self.appreciations[0] -= 0.5
@@ -234,7 +234,7 @@ class Alchimiste(PNJ_mage,Attaquant_magique_case,Support,Humain): #Le septième 
         elif replique == "dialogue-2reponse1.2.1.1":
             self.end_dialogue()
             self.mouvement = 0 #Légèrement redondant ici
-            self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
+            self.cible_deplacement = self.controleur.joueur.ID
             self.attente = False
 
         #Dialogue par défaut:
@@ -251,7 +251,7 @@ class Alchimiste(PNJ_mage,Attaquant_magique_case,Support,Humain): #Le septième 
             if self.controleur.joueur.a_parchemin_vierge():
                 self.repliques.append("dialogue-1reponse1.3")
             self.repliques.append("dialogue-1reponse1.5")
-            self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
+            self.cible_deplacement = self.controleur.joueur.ID
         elif replique == "dialogue-1reponse1.1.1.2":
             self.controleur.set_phase(AGISSANT_DIALOGUE)
         elif replique == "dialogue-1reponse1.1.2":

@@ -5,6 +5,7 @@ if TYPE_CHECKING:
     from Jeu.Entitee.Agissant.Agissant import Agissant
     from Jeu.Entitee.Entitee import Entitee
     from Jeu.Entitee.Item.Item import Item
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
 
 from Jeu.Entitee.Item.Items import Potion,Parchemin,Cle,Arme,Bouclier,Armure,Haume,Anneau,Projectile,Ingredient,Cadavre,Oeuf,Consommable,Parchemin_vierge
 from Jeu.Systeme.Classe import *
@@ -61,7 +62,7 @@ class Inventaire:
         item.position = None
         self.items[item.get_classe()].append(item.ID)
 
-    def utilise_item(self,ID_item:int): #/!\ Encore utilisé ?
+    def utilise_item(self,ID_item:int):
         """Appelé en appuyant sur la touche espace, utilise l'item actuellement sélectionné."""
         ###L'utilisation varie beaucoup selon le type d'item :
         if ID_item != None:

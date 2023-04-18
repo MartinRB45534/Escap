@@ -4,7 +4,8 @@ from Jeu.Constantes import *
 class Effet :
     """Les effets regroupent des choses qui arrivent à des éléments du système. Ils peuvent cibler une case, un mur, un agissant, un étage, etc. et sont souvent limités dans le temps ou par d'autres conditions. Ils sont évalués par le controleur dans différentes circonstances."""
     def __init__(self):
-        print("a surdéfinir")
+        self.phase = "démarrage"
+        self.affiche = False
 
     def action(self):
         """La fonction qui exécute l'action de l'effet. En général, renvoie des valeurs que le controleur traitera."""

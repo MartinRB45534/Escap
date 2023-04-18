@@ -587,7 +587,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
                     print(self.classe_principale.niveau)
 
     def level_up(self):
-        niveau = self.classe_principale.niveau # /!\ Peut donner des résultats non-voulus si la montée de niveau a lieu pendant qu'on est sous le coup d'un enchantement (ça ne devrait plus être vrai avec les taux)
+        niveau = self.classe_principale.niveau
         stats=CONSTANTES_STATS[self.identite]
         self.pv_max=stats['pv'][niveau]
         self.regen_pv=stats['regen_pv'][niveau]

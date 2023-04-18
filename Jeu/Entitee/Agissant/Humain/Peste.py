@@ -99,7 +99,7 @@ class Peste(PNJ_mage,Multi_soigneur,Support_lointain,Humain): #La huitième huma
             self.end_dialogue()
             self.controleur.get_esprit(self.controleur.joueur.esprit).merge(self.esprit)
             self.mouvement = 0 #Légèrement redondant ici
-            self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
+            self.cible_deplacement = self.controleur.joueur.ID
             self.attente = False
         elif replique == "dialogue1reponse1.1.2":
             self.appreciations[0] -= 0.5
@@ -147,7 +147,7 @@ class Peste(PNJ_mage,Multi_soigneur,Support_lointain,Humain): #La huitième huma
         elif replique == "dialogue-2reponse1.2.1":
             self.end_dialogue()
             self.mouvement = 0 #Légèrement redondant ici
-            self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
+            self.cible_deplacement = self.controleur.joueur.ID
             self.attente = False
 
         #Dialogue par défaut -3
@@ -172,7 +172,7 @@ class Peste(PNJ_mage,Multi_soigneur,Support_lointain,Humain): #La huitième huma
             if self.controleur.joueur.inventaire.a_parchemin_vierge():
                 self.repliques.append("dialogue-1reponse1.3")
             self.repliques.append("dialogue-1reponse1.4")
-            self.cible_deplacement = 2 #Le joueur a toujours l'ID 2 /!\
+            self.cible_deplacement = self.controleur.joueur.ID
         elif replique == "dialogue-1reponse1.1.1.2":
             self.controleur.set_phase(AGISSANT_DIALOGUE)
         elif replique == "dialogue-1reponse1.1.2":
