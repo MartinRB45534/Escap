@@ -994,6 +994,11 @@ class Pavage(Conteneur):
             self.repartition = repartition
 
 class Pavage_horizontal(Pavage):
+    def set_contenu(self, contenu, repartition):
+        if any(isinstance(objet,Marge_horizontale) for objet in contenu):
+            warn("Il y a une marge horizontale dans un pavage horizontal !")
+        return super().set_contenu(contenu, repartition)
+
     def set_tailles(self,tailles):
         # print("Pavage_horizontal.set_tailles")
         libre = tailles[0] - sum(self.repartition[i] if self.repartition[i]>0 else self.contenu[i].get_tailles(tailles)[0] if not(self.repartition[i]) else 0 for i in range(len(self.repartition)))
@@ -1041,11 +1046,16 @@ class Pavage_horizontal(Pavage):
         return [somme,maxi]
 
 class Pavage_vertical(Pavage):
+    def set_contenu(self, contenu, repartition):
+        if any(isinstance(objet,Marge_verticale) for objet in contenu):
+            warn("Il y a une marge verticale dans un pavage vertical !")
+        return super().set_contenu(contenu, repartition)
+
     def set_tailles(self,tailles):
         # print("Pavage_vertical.set_tailles")
         libre = tailles[1] - sum(self.repartition[i] if self.repartition[i]>0 else self.contenu[i].get_tailles(tailles)[1] if not(self.repartition[i]) else 0 for i in range(len(self.repartition)))
         if libre < 0:
-            warn(f"Je ne peux pas faire rentrer {self.contenu} en {self.repartition} dans {self} !")
+            raise RuntimeError(f"Je ne peux pas faire rentrer {self.contenu} ({[self.repartition[i] if self.repartition[i]>0 else self.contenu[i].get_tailles(tailles)[1] if not(self.repartition[i]) else 0 for i in range(len(self.contenu))]}) en {self.repartition} ({tailles[1]}) dans {self} !")
         else:
             nb_portions = sum(taille for taille in self.repartition if taille<0)
             if nb_portions != 0: #Dans le cas contraire, on n'a pas besoin de définir portion
@@ -1373,7 +1383,7 @@ class Liste_menu(Wrapper_knot):
                 break
             elif longueur_ligne + self.contenu[i].get_tailles(self.tailles)[0] + 5 > tailles[0]:
                 liste = Liste_horizontale()
-                liste.set_contenu([ligne[j//2] if j//2 == 0 else Marge_verticale() for j in range(-1,2*len(ligne))],[0 if j//2 == 0 else 5 for j in range(-1,2*len(ligne))])
+                liste.set_contenu([ligne[j//2] if j%2 == 0 else Marge_verticale() for j in range(-1,2*len(ligne))],[0 if j%2 == 0 else 5 for j in range(-1,2*len(ligne))])
                 listes.append(liste)
                 if ligne == ligne_courante:
                     liste_courante = liste
@@ -1387,12 +1397,12 @@ class Liste_menu(Wrapper_knot):
                 if self.contenu[i] == self.courant:
                     ligne_courante = ligne
         liste = Liste_horizontale()
-        liste.set_contenu([ligne[j//2] if j//2 == 0 else Marge_verticale() for j in range(-1,2*len(ligne))],[0 if j//2 == 0 else 5 for j in range(-1,2*len(ligne))])
+        liste.set_contenu([ligne[j//2] if j%2 == 0 else Marge_verticale() for j in range(-1,2*len(ligne))],[0 if j%2 == 0 else 5 for j in range(-1,2*len(ligne))])
         listes.append(liste)
         if ligne == ligne_courante:
             liste_courante = liste
         self.liste = Liste_verticale()
-        self.liste.set_contenu([listes[j//2] if j//2 == 0 else Marge_horizontale() for j in range(-1,2*len(listes))],[0 if j//2 == 0 else 5 for j in range(-1,2*len(listes))])
+        self.liste.set_contenu([listes[j//2] if j%2 == 0 else Marge_horizontale() for j in range(-1,2*len(listes))],[0 if j%2 == 0 else 5 for j in range(-1,2*len(listes))])
         self.liste.set_tailles(self.tailles)
         self.liste.ajuste(liste_courante)
 
@@ -1733,7 +1743,7 @@ class Center_vertical_texte(Center_texte, Margin_texte):
         self.contenu = contenu
 
 class Bouton(Wrapper_cliquable):
-    def __init__(self, skin, texte, fond=(0,0,0), fond_marque_survol=(50,50,50), fond_marque_actif=None, fond_marque_courant=None, fond_est_courant=None, fond_actif=None):
+    def __init__(self, skin, texte, fond=(255,255,255), fond_marque_survol=(200,200,200), fond_marque_actif=None, fond_marque_courant=None, fond_est_courant=None, fond_actif=None):
         Wrapper_cliquable.__init__(self)
 
         self.fond = fond
@@ -1775,6 +1785,11 @@ class Bouton(Wrapper_cliquable):
         screen.blit(surf,self.position)
         for objet in self.objets:
             objet.affiche(screen,frame,frame_par_tour)
+
+class Bouton_test(Bouton):
+    def get_tailles(self, tailles):
+        print(f"bouton : tailles {tailles} ; {self.contenu.get_tailles(tailles)} ({super().get_tailles(tailles)})")
+        return super().get_tailles(tailles)
 
 class Vignette_composee(Cliquable,Affichage):
     def __init__(self,vignettes:List[Affichable],taille,shade=False,invalide=False):

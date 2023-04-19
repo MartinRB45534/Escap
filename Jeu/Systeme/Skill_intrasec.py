@@ -52,6 +52,11 @@ class Skills_projectiles(Skill_intrasec):
 
 class Skills_magiques(Skill_intrasec):
     """La classe des skills qui lancent une magie"""
+    def __init__(self): #On précise les magies directement disponibles. D'autres peuvent être acquisent en cours de jeu dans le cas du joueur. magies est un dictionnaire, les clées sont les noms des magies.
+        Skill_intrasec.__init__(self) #Il faudra penser à ajouter des cadeaux magiques
+        self.magies={}
+        self.latence = 0 #La latence dépend du sort utilisé
+        self.gain_xp = 0 #L'xp dépend du sort utilisé et du mana dépensé
 
     def menu_magie(self) -> List[Magie]:
         """Renvoie la liste des magies que le skill peut lancer"""

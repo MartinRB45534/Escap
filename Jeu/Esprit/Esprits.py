@@ -36,7 +36,7 @@ class Esprit_type(Esprit):
 class Esprit_sans_scrupule(Esprit_type):
     """Un esprit qui s'en prend principalement aux soigneurs et aux soutiens."""
 
-    def antagonise_supports(self,offense):
+    def antagonise_supports(self,offense:tuple[int,float]):
         offenseur = self.controleur[offense[0]]
         for effet in offenseur.effets:
             if isinstance(effet,Dopage):
@@ -192,7 +192,7 @@ class Esprit_humain(Esprit_simple):
                     self.chef = candidat.ID #/!\ Éviter les chefs morts, à l'occasion /!\
                     votes_max = votes
 
-    def exclus(self,corp): #C'est super sympa, les relations humaines !
+    def exclus(self,corp:int): #C'est super sympa, les relations humaines !
         #Il va falloir créer un nouvel esprit pour l'humain exclus
         #Et il va falloir donner un nom à ce nouvel esprit
         #Les esprits humains sont nommés d'après leur porteur originel
@@ -231,179 +231,183 @@ class Esprit_humain(Esprit_simple):
 
     def decide(self):
         for corp in self.corps.keys():
-            if corp == 2:
+            if self.corps[corp] in ["attaque","fuite","soin","soutien"]:
+                Esprit.deplace(self,corp)
+            elif self.corps[corp] == "PNJ":
+                self.deplace_humain(corp)
+            elif self.corps[corp] == "PJ":
                 joueur = self.controleur.joueur
                 # joueur.recontrole()
                 if joueur.skill_courant != None and issubclass(joueur.skill_courant,(Skill_course,Skill_deplacement)) and joueur.position.lab in self.vue.keys():
                     cible = self.vue[joueur.position][5][joueur.dir_regard][4]
                     if cible and cible.lab in self.vue.keys():
                         self.vue[cible][8]=True
-            elif self.corps[corp] in ["attaque","fuite","soin","soutien"]:
-                Esprit.deplace(self,corp)
-            elif self.corps[corp] == "PNJ":
-                self.deplace_humain(corp)
             elif self.corps[corp] == "attente": #Les pnjs avant de rejoindre le joueur
                 if self.ennemis != {}: #Si on a des ennemis, c'est qu'on a été attaqué !
                     Esprit.deplace(self,corp)
 
-    def deplace_humain(self,ID_humain):
+    def deplace_humain(self,ID_humain:int):
         humain:Humain = self.controleur[ID_humain]
         humain.skill_courant = None
-        if humain.identite == "heros":
-            # humain.recontrole() #Encore ?
-            humain.statut_humain = "joueur"
+        humain.statut_humain = "proximite"
+        if humain.mouvement == 0: #0 pour aller vers, 1 pour chercher et 2 pour aller au contact
+            if isinstance(humain.cible_deplacement,int):
+                if not(self.controleur.est_item(humain.cible_deplacement)):
+                    cible = self.controleur[humain.cible_deplacement].get_position()
+                    portee = 7
+                else:
+                    cible = humain.get_position()
+                    portee = 2 #C'est juste pour qu'il puisse aller où il veut
+            else:
+                cible = humain.cible_deplacement
+                portee = 5
+            pos_cibles = self.controleur.get_pos_touches(cible,portee,propagation = "C__S___",direction = None,traverse="tout",responsable=0)
+        elif humain.mouvement == 1:
+            pos_cibles = [humain.get_position()]
+            humain.statut_humain = "exploration"
         else:
-            humain.statut_humain = "proximite"
-            if humain.mouvement == 0: #0 pour aller vers, et 1 pour chercher
-                if isinstance(humain.cible_deplacement,int):
-                    if not(self.controleur.est_item(humain.cible_deplacement)):
-                        cible = self.controleur[humain.cible_deplacement].get_position()
-                        portee = 7
-                    else:
-                        cible = humain.get_position()
-                        portee = 2 #C'est juste pour qu'il puisse aller où il veut
-                else:
-                    cible = humain.cible_deplacement
-                    portee = 5
-                pos_cibles = self.controleur.get_pos_touches(cible,portee,propagation = "C__S___",direction = None,traverse="tout",responsable=0)
-            elif humain.mouvement == 1:
-                pos_cibles = [humain.get_position()]
-                humain.statut_humain = "exploration"
-            else:
-                if isinstance(humain.cible_deplacement,int):
-                    if not(self.controleur.est_item(humain.cible_deplacement)):
-                        cible = self.controleur[humain.cible_deplacement].get_position()
-                        portee = 1
-                    else:
-                        cible = humain.get_position()
-                        portee = 2 #C'est juste pour qu'il puisse aller où il veut
-                else:
-                    cible = humain.cible_deplacement
+            if isinstance(humain.cible_deplacement,int):
+                if not(self.controleur.est_item(humain.cible_deplacement)):
+                    cible = self.controleur[humain.cible_deplacement].get_position()
                     portee = 1
-                pos_cibles = self.controleur.get_pos_touches(cible,portee,propagation = "C__S___",direction = None,traverse="tout",responsable=0)
-            if humain.position in pos_cibles: #Tout va bien, on y est ! On peut combattre, par exemple.
-                Esprit.deplace(self,ID_humain)
+                else:
+                    cible = humain.get_position()
+                    portee = 2 #C'est juste pour qu'il puisse aller où il veut
             else:
-                res = "recherche"
-                position = humain.get_position()
-                self.set_skip([cible],[position])
-                self.resoud(cible,10,4)
-                case = self.vue[position]
-                repoussante = case[8]
-                cases = [[-1,case[0],case[3][0],case[3][1],-case[3][2],case[3][2],-case[3][3],case[3][3],case[3][4]]]
-                dirs = []
-                importance = 0
-                fuite = humain.veut_fuir(case[3][2])
-                attaque = humain.veut_attaquer(case[3][2])
-                humain.statut_humain = "en chemin"
-                if case[3][4] == 0:
-                    humain.statut_humain = "perdu"
-                    if humain.ID == 4:
-                        humain.statut_humain = "paume"
-                for i in DIRECTIONS:
-                    mur = case[5][i][self.resolution]
-                    if mur:
-                        if mur.lab in self.vue.keys():
-                            case_pot = self.vue[mur]
-                            entitees = case_pot[6]
-                            libre = True
-                            for ID_entitee in entitees:
-                                entitee = humain.controleur[ID_entitee]
-                                if issubclass(entitee.get_classe(),Non_superposable): #On ne peut pas aller sur cette case
-                                    libre = False
-                                    if issubclass(entitee.get_classe(),Agissant): #Elle est occupée par un agissant
-                                        if humain.peut_voir(i) and ID_entitee in self.ennemis.keys(): #Et c'est un ennemi !
-                                            if attaque: #Et le feu vert pour l'attaquer
-                                                if self.ennemis[ID_entitee][0] > importance:
-                                                    importance = self.ennemis[ID_entitee][0]
-                                                    humain.attaque(i)
-                                                    res = "attaque"
-                                            elif fuite : #Et un ordre de fuite !
-                                                res = "fuite"
-                                        elif humain.mouvement == 2 and ((ID_entitee == humain.cible_deplacement and ID_entitee == 2) and humain.peut_voir(i)): #Le PNJs peut enfin parler au joueur
-                                            self.controleur.joueur.interlocuteur = humain
-                                            self.controleur.set_phase(DIALOGUE)
-                                            humain.start_dialogue()
-                                            humain.dir_regard = i
-                                            self.controleur.joueur.dir_regard = i+2
-                            if libre:
-                                cases.append([i,case_pot[0],case_pot[3][0],case_pot[3][1],-case_pot[3][2],case_pot[3][2],-case_pot[3][3],case_pot[3][3],case_pot[3][4]])
-                                dirs.append(i)
-                if res == "recherche": #On n'a pas d'ennemi à portée directe (ou on ne souhaite pas attaquer ni fuir)
-                    comportement = humain.comporte_distance(case[3][2])
-                    if comportement == 0 : #Foncer tête baissée ! Pour les combattants au corps à corps
+                cible = humain.cible_deplacement
+                portee = 1
+            pos_cibles = self.controleur.get_pos_touches(cible,portee,propagation = "C__S___",direction = None,traverse="tout",responsable=0)
+        if humain.position in pos_cibles: #Tout va bien, on y est ! On peut combattre, par exemple.
+            Esprit.deplace(self,ID_humain)
+        else:
+            res = "recherche"
+            position = humain.get_position()
+            self.set_skip([cible],[position])
+            self.resoud(cible,10,4)
+            case = self.vue[position]
+            repoussante = case[8]
+            cases = [[-1,case[0],case[3][0],case[3][1],-case[3][2],case[3][2],-case[3][3],case[3][3],case[3][4]]]
+            dirs = []
+            importance = 0
+            fuite = humain.veut_fuir(case[3][2])
+            attaque = humain.veut_attaquer(case[3][2])
+            humain.statut_humain = "en chemin"
+            if case[3][4] == 0:
+                humain.statut_humain = "perdu"
+                if humain.ID == 4:
+                    humain.statut_humain = "paume"
+            for i in DIRECTIONS:
+                mur = case[5][i][self.resolution]
+                if mur:
+                    if mur.lab in self.vue.keys():
+                        case_pot = self.vue[mur]
+                        entitees = case_pot[6]
+                        libre = True
+                        for ID_entitee in entitees:
+                            entitee = humain.controleur[ID_entitee]
+                            if issubclass(entitee.get_classe(),Non_superposable): #On ne peut pas aller sur cette case
+                                libre = False
+                                if issubclass(entitee.get_classe(),Agissant): #Elle est occupée par un agissant
+                                    if humain.peut_voir(i) and ID_entitee in self.ennemis.keys(): #Et c'est un ennemi !
+                                        if attaque: #Et le feu vert pour l'attaquer
+                                            if self.ennemis[ID_entitee][0] > importance:
+                                                importance = self.ennemis[ID_entitee][0]
+                                                humain.attaque(i)
+                                                res = "attaque"
+                                        elif fuite : #Et un ordre de fuite !
+                                            res = "fuite"
+                                    elif humain.mouvement == 2 and ID_entitee == humain.cible_deplacement and ID_entitee == self.controleur.joueur.ID and humain.peut_voir(i): #Le PNJs peut enfin parler au joueur
+                                        self.controleur.joueur.interlocuteur = humain
+                                        self.controleur.set_phase(DIALOGUE)
+                                        humain.start_dialogue()
+                                        humain.dir_regard = i
+                                        self.controleur.joueur.dir_regard = i.oppose()
+                                        humain.mouvement = 0
+                                    elif humain.mouvement == 2 and ID_entitee == humain.cible_deplacement and humain is self.controleur.joueur and humain.peut_voir(i): #Le joueur peut enfin parler au PNJ
+                                        humain.interlocuteur = self.controleur[ID_entitee]
+                                        self.controleur.set_phase(DIALOGUE)
+                                        self.controleur[ID_entitee].start_dialogue()
+                                        humain.dir_regard = i
+                                        self.controleur[ID_entitee].dir_regard = i.oppose()
+                                        humain.mouvement = 0
+                        if libre:
+                            cases.append([i,case_pot[0],case_pot[3][0],case_pot[3][1],-case_pot[3][2],case_pot[3][2],-case_pot[3][3],case_pot[3][3],case_pot[3][4]])
+                            dirs.append(i)
+            if res == "recherche": #On n'a pas d'ennemi à portée directe (ou on ne souhaite pas attaquer ni fuir)
+                comportement = humain.comporte_distance(case[3][2])
+                if comportement == 0 : #Foncer tête baissée ! Pour les combattants au corps à corps
+                    res = "deplacement"
+                elif comportement == 1: #Tenter une action, puis approcher. Pour les effets à distance qui ont besoin de ne pas être trop loin.
+                    res = humain.agit_en_vue(self,"deplacement")
+                    if repoussante:
                         res = "deplacement"
-                    elif comportement == 1: #Tenter une action, puis approcher. Pour les effets à distance qui ont besoin de ne pas être trop loin.
-                        res = humain.agit_en_vue(self,"deplacement")
-                        if repoussante:
-                            res = "deplacement"
-                    elif comportement == 2: #Tenter une action, puis fuir. Pour les effets à distance qui peuvent se permettre d'être loin.
-                        res = humain.agit_en_vue(self,"fuite")
-                        if repoussante:
-                            res = "fuite"
-                    elif comportement == 3 : #La fuite ! Quand les pvs sont bas
+                elif comportement == 2: #Tenter une action, puis fuir. Pour les effets à distance qui peuvent se permettre d'être loin.
+                    res = humain.agit_en_vue(self,"fuite")
+                    if repoussante:
                         res = "fuite"
-                    if len(cases) == 1: #Pas de cases libres à proximité, on va essayer d'attaquer pour s'en sortir
-                        humain.skill_courant = None
-                        importance = 0
-                        for i in DIRECTIONS:
-                            mur = case[5][i][self.resolution]
-                            if mur:
-                                if mur.lab in self.vue.keys():
-                                    case_pot = self.vue[mur]
-                                    entitees = case_pot[6]
-                                    libre = True
-                                    for ID_entitee in entitees:
-                                        entitee = humain.controleur[ID_entitee]
-                                        if issubclass(entitee.get_classe(),Agissant): #Cette case est occupée par un agissant
-                                            if humain.peut_voir(i) and ID_entitee in self.ennemis.keys(): #Et c'est un ennemi !
-                                                if self.ennemis[ID_entitee][0] > importance:
-                                                    importance = self.ennemis[ID_entitee][0]
-                                                    humain.attaque(i)
-                                                    res = "attaque"
-                    elif not(case[3] or case[5]) and humain.statut_humain == "perdu":
-                        res = "paix"
-                        if not isinstance(humain,Sentinelle) or repoussante:
-                            res = "exploration"
-                            if len(dirs)>1: #On peut se permettre de choisir
-                                if humain.dir_regard != None: #L'agissant regarde quelque part
-                                    dir_back = humain.dir_regard+2
-                                    if dir_back in dirs: #On ne veut pas y retourner
-                                        dirs.remove(dir_back)
-                            humain.va(dirs[random.randint(0,len(dirs)-1)]) #/!\ Ne pas retourner sur ses pas, c'est bien ! Aller vers les endroits inconnus, ce serait mieux. /!\
-                    elif humain.statut_humain == "paume":
-                        res = "paix"
-                        if repoussante:
-                            res = "exploration"
-                            if len(dirs)>1: #On peut se permettre de choisir
-                                if humain.dir_regard != None: #L'agissant regarde quelque part
-                                    dir_back = humain.dir_regard+2
-                                    if dir_back in dirs: #On ne veut pas y retourner
-                                        dirs.remove(dir_back)
-                            humain.va(dirs[random.randint(0,len(dirs)-1)]) #/!\ Ne pas retourner sur ses pas, c'est bien ! Aller vers les endroits inconnus, ce serait mieux. /!\
-                    else:
-                        if repoussante:
-                            cases.pop(0)
-                        if res == "deplacement":
-                            res = "approche"
-                            new_cases = sorted(cases,key=operator.itemgetter(8,2,3,4,6))
-                            if new_cases[-1][0] != -1: #La dernière case (i.e. les valeurs les plus élevées) n'est pas celle où l'on est
-                                humain.va(new_cases[-1][0])
-                                if ID_humain == 4:
-                                    constantes_deplacements.append([self.controleur.nb_tours,"deplacement loin",humain.dir_regard,new_cases])
-                            else:
-                                res = humain.agit_en_vue(self)
-                        elif res == "fuite":
-                            for case in cases:
-                                case[8] *= -1
-                            new_cases = sorted(cases,key=operator.itemgetter(8,5,7,2,3))
-                            if new_cases[0][0] != -1: #La première case (i.e. les valeurs les moins élevées) n'est pas celle où l'on est
-                                humain.va(new_cases[0][0])
-                                if ID_humain == 4:
-                                    constantes_deplacements.append([self.controleur.nb_tours,"fuite loin",humain.dir_regard,new_cases])
-                            else:
-                                res = humain.agit_en_vue(self)
-                humain.statut = res
+                elif comportement == 3 : #La fuite ! Quand les pvs sont bas
+                    res = "fuite"
+                if len(cases) == 1: #Pas de cases libres à proximité, on va essayer d'attaquer pour s'en sortir
+                    humain.skill_courant = None
+                    importance = 0
+                    for i in DIRECTIONS:
+                        mur = case[5][i][self.resolution]
+                        if mur:
+                            if mur.lab in self.vue.keys():
+                                case_pot = self.vue[mur]
+                                entitees = case_pot[6]
+                                libre = True
+                                for ID_entitee in entitees:
+                                    entitee = humain.controleur[ID_entitee]
+                                    if issubclass(entitee.get_classe(),Agissant): #Cette case est occupée par un agissant
+                                        if humain.peut_voir(i) and ID_entitee in self.ennemis.keys(): #Et c'est un ennemi !
+                                            if self.ennemis[ID_entitee][0] > importance:
+                                                importance = self.ennemis[ID_entitee][0]
+                                                humain.attaque(i)
+                                                res = "attaque"
+                elif not(case[3] or case[5]) and humain.statut_humain == "perdu":
+                    res = "paix"
+                    if not isinstance(humain,Sentinelle) or repoussante:
+                        res = "exploration"
+                        if len(dirs)>1: #On peut se permettre de choisir
+                            if humain.dir_regard != None: #L'agissant regarde quelque part
+                                dir_back = humain.dir_regard+2
+                                if dir_back in dirs: #On ne veut pas y retourner
+                                    dirs.remove(dir_back)
+                        humain.va(dirs[random.randint(0,len(dirs)-1)]) #/!\ Ne pas retourner sur ses pas, c'est bien ! Aller vers les endroits inconnus, ce serait mieux. /!\
+                elif humain.statut_humain == "paume":
+                    res = "paix"
+                    if repoussante:
+                        res = "exploration"
+                        if len(dirs)>1: #On peut se permettre de choisir
+                            if humain.dir_regard != None: #L'agissant regarde quelque part
+                                dir_back = humain.dir_regard+2
+                                if dir_back in dirs: #On ne veut pas y retourner
+                                    dirs.remove(dir_back)
+                        humain.va(dirs[random.randint(0,len(dirs)-1)]) #/!\ Ne pas retourner sur ses pas, c'est bien ! Aller vers les endroits inconnus, ce serait mieux. /!\
+                else:
+                    if repoussante:
+                        cases.pop(0)
+                    if res == "deplacement":
+                        res = "approche"
+                        new_cases = sorted(cases,key=operator.itemgetter(8,2,3,4,6))
+                        if new_cases[-1][0] != -1: #La dernière case (i.e. les valeurs les plus élevées) n'est pas celle où l'on est
+                            humain.va(new_cases[-1][0])
+                            if ID_humain == 4:
+                                constantes_deplacements.append([self.controleur.nb_tours,"deplacement loin",humain.dir_regard,new_cases])
+                        else:
+                            res = humain.agit_en_vue(self)
+                    elif res == "fuite":
+                        for case in cases:
+                            case[8] *= -1
+                        new_cases = sorted(cases,key=operator.itemgetter(8,5,7,2,3))
+                        if new_cases[0][0] != -1: #La première case (i.e. les valeurs les moins élevées) n'est pas celle où l'on est
+                            humain.va(new_cases[0][0])
+                            if ID_humain == 4:
+                                constantes_deplacements.append([self.controleur.nb_tours,"fuite loin",humain.dir_regard,new_cases])
+                        else:
+                            res = humain.agit_en_vue(self)
+            humain.statut = res
 
 class Esprit_slime(Esprit_type):
     """Un esprit qui dirige un ou plusieurs slimes. Peut interragir avec d'autres esprits slimes."""

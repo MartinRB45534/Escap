@@ -10,7 +10,7 @@ from Jeu.Entitee.Agissant.Role.Roles import *
 from Jeu.Entitee.Agissant.PNJ.PNJs import *
 from Jeu.Dialogues.Dialogues import *
 
-class Humain(PNJ,Interactif,Entitee_superieure):
+class Humain(PNJ,Entitee_superieure):
     """La classe des pnjs et du joueur. A un comportement un peu plus complexe, et une personnalité."""
     def __init__(self,controleur:Controleur,position:Position,identite:str,niveau:int,ID:int):
         PNJ.__init__(self,controleur,position,identite,niveau,ID)

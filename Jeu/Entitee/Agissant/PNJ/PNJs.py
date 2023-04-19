@@ -1,13 +1,15 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
+from Jeu.Entitee.Decors.Decor import Decors_interactif, Ustensile
+
 if TYPE_CHECKING:
     from Jeu.Controleur import Controleur
 
 from Jeu.Entitee.Agissant.Agissant import *
 from Jeu.Entitee.Agissant.Role.Roles import *
 
-class PNJ(Agissant):
+class PNJ(Agissant, Interactif):
     """
     Un personnage non-jouable (en vrai plutôt non-joué ici, il peut être controlable par un joueur).
     Se distingue par sa capacité à parler, obéir et le fait d'attendre le joueur jusqu'à le rencontrer.
@@ -141,5 +143,37 @@ class PJ(PNJ): #Les PJs sont des PNJs, parce que le mot PNJ est trompeur
     """
     def __init__(self, controleur: Controleur, position: Position, identite: str, niveau: int, ID: int = None):
         PNJ.__init__(controleur, position, identite, niveau, ID)
-        self.interlocuteur:PNJ|PNJ_mage|PJ = None
-        self.touches = {}
+        self.nouvel_ordre:bool = False
+        self.interlocuteur:Interactif|PNJ|PNJ_mage|PJ = None
+        self.touches:Dict[str,Dict[Tuple[int],Dict[int,List[str]|Type[Skill]|Direction|Type[Projectile]|str]]] = {
+            "effets":{
+            },
+            "skills":{
+            },
+            "directions":{
+            },
+            "projectiles":{},
+            "magies":{},
+        }
+                          
+    def interagit(self):
+        #On cherche la personne :
+        self.interlocuteur = None #Normalement c'est déjà le cas
+        for i in [0,-1,1,2]:
+            if self.peut_voir(self.dir_regard+i):
+                pos = self.position+(self.dir_regard+i)
+                interactifs = self.controleur.trouve_interactifs_courants(pos)
+                if interactifs!=[]:
+                    interactif = self.controleur[interactifs[0]] # Est-ce que je continue à appeler ça un interlocuteur ?
+                    if isinstance(interactif,PNJ):
+                        self.interlocuteur = interactif
+                        self.controleur.set_phase(DIALOGUE)
+                        interactif.start_dialogue()
+                        self.dir_regard+=i
+                        interactif.dir_regard = self.dir_regard+2
+                    elif isinstance(interactif,Decors_interactif):
+                        self.interlocuteur = interactif
+                        self.dir_regard+=i
+                        if isinstance(interactif,Ustensile):
+                            self.controleur.set_phase(RECETTE)
+                    break

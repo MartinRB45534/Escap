@@ -16,7 +16,7 @@ SKIN_ESCAP.dessine_toi(screen,(0,0))
 class Joueur:
     """Un "joueur". Correspondrait idéalement à une personne, à un compte. Pourrait nécessiter un mot de passe.
        Contient les parties, les accomplissements (et skills globaux) et les paramètres de base."""
-    def __init__(self,screen):
+    def __init__(self,screen:pygame.Surface):
         self.screen = screen
         self.clock = pygame.time.Clock()
         self.parametres = {
@@ -125,37 +125,22 @@ class Joueur:
 
         #On récupère les intervenants du tour
         self.agissants_courants,self.items_courants,self.labs_courants,self.esprits_courants = self.controleur.get_agissants_items_labs_esprits()
-        new_courant = pygame.time.get_ticks()
-        duree = new_courant - constantes_temps['courant']
-        constantes_temps['reste'] += duree
-        constantes_temps['courant'] = new_courant
+        add_constantes_temps('reste')
 
         for agissant in self.agissants_courants :
             self.controleur.make_vue(agissant)
             agissant.debut_tour()
-        new_courant = pygame.time.get_ticks()
-        duree = new_courant - constantes_temps['courant']
-        constantes_temps['agissants.debut_tour'] += duree
-        constantes_temps['courant'] = new_courant
+        add_constantes_temps('agissants.debut_tour')
         self.affichage.update()
-        new_courant = pygame.time.get_ticks()
-        duree = new_courant - constantes_temps['courant']
-        constantes_temps['update'] += duree
-        constantes_temps['courant'] = new_courant
+        add_constantes_temps('update')
         for item in self.items_courants :
             item.debut_tour()
         for lab in self.labs_courants:
             lab.debut_tour()
-        new_courant = pygame.time.get_ticks()
-        duree = new_courant - constantes_temps['courant']
-        constantes_temps['reste'] += duree
-        constantes_temps['courant'] = new_courant
+        add_constantes_temps('reste')
         for esprit in self.esprits_courants:
             esprit.debut_tour() #Des décisions sont prises ici
-        new_courant = pygame.time.get_ticks()
-        duree = new_courant - constantes_temps['courant']
-        constantes_temps['esprits'] += duree
-        constantes_temps['courant'] = new_courant
+        add_constantes_temps('esprits')
 
     def pseudo_debut_tour(self):
         """La fonction qui fait la première moitiée de chaque tour"""
@@ -165,15 +150,9 @@ class Joueur:
 
         for agissant in self.agissants_courants :
             self.controleur.make_vue(agissant)
-        new_courant = pygame.time.get_ticks()
-        duree = new_courant - constantes_temps['courant']
-        constantes_temps['reste'] += duree
-        constantes_temps['courant'] = new_courant
+        add_constantes_temps('reste')
         self.affichage.update()
-        new_courant = pygame.time.get_ticks()
-        duree = new_courant - constantes_temps['courant']
-        constantes_temps['update'] += duree
-        constantes_temps['courant'] = new_courant
+        add_constantes_temps('update')
         for lab in self.labs_courants:
             lab.pseudo_debut_tour()
 
@@ -310,11 +289,12 @@ class Joueur:
 
     def controle_joueur(self,touche,mods):
         touches = self.controleur.joueur.touches
-        effets = touches["effets"].get(mods,{}).get(touche,[]) #Regardons les effets que la touche a
+        effets:List[str] = touches["effets"].get(mods,{}).get(touche,[]) #Regardons les effets que la touche a
         if "directions" in effets: #La touche a un effet sur la direction du joueur (entre autres)
-            self.controleur.joueur.regarde(touches["directions"].get(mods,{}).get(touche))
+            direction:Direction = touches["directions"].get(mods,{}).get(touche)
+            self.controleur.joueur.regarde(direction)
         if "skills" in effets: #La touche est liée à un skill (entre autres)
-            skill = touches["skills"].get(mods,{}).get(touche)
+            skill:Type[Skill] = touches["skills"].get(mods,{}).get(touche)
             if skill != None:
                 self.controleur.joueur.skill_courant = skill
                 if issubclass(skill,Skills_offensifs): # Les skills qui correspondent à un statut d'attaque
@@ -323,20 +303,22 @@ class Joueur:
                     self.controleur.joueur.projectile_courant = touches["projectiles"].get(touche)
                     self.controleur.joueur.statut = "lancer"
                 elif issubclass(skill,Skills_magiques) : # Les skills qui utilisent de la magie
-                    self.controleur.joueur.magie_courante = touches["magies"].get(touche) #self.magie_courante n'est que le nom de la magie
-                    skill = self.controleur.joueur.get_skill_magique()
-                    self.controleur.joueur.magie = skill.magies[self.magie_courante](skill.niveau) #Ici on a une magie similaire (juste pour l'initialisation du choix, oubliée après parce que le skill fournira la vrai magie avec utilise())
-                    if isinstance(self.magie,Magies_offensives):
+                    self.controleur.joueur.magie_courante:str = touches["magies"].get(touche) #self.magie_courante n'est que le nom de la magie
+                    skill_magique = self.controleur.joueur.get_skill_magique()
+                    if not isinstance(skill_magique, skill):
+                        warn("Le skill magique du joueur n'est pas celui attendu.")
+                    magie = skill_magique.magies[self.controleur.joueur.magie_courante](skill.niveau) #Ici on a une magie similaire (juste pour l'initialisation du choix, oubliée après parce que le skill fournira la vrai magie avec utilise())
+                    if isinstance(magie,Magies_offensives):
                         self.controleur.joueur.statut = "attaque"
                     #On a éventuellement besoin d'informations supplémentaires sur cette magie
                     if self.controleur.joueur.nouvel_ordre:
-                        if isinstance(self.magie,Cible_agissant):
+                        if isinstance(magie,Cible_agissant):
                             self.controleur.set_phase(AGISSANT_MAGIE)
-                        if isinstance(self.magie,Cible_case):
+                        if isinstance(magie,Cible_case):
                             self.controleur.set_phase(CASE_MAGIE)
-                        if isinstance(self.magie,Magie_cout):
+                        if isinstance(magie,Magie_cout):
                             self.controleur.set_phase(COUT_MAGIE)
-                        if isinstance(self.magie,Magie_dirigee):
+                        if isinstance(magie,Magie_dirigee):
                             self.controleur.set_phase(DIRECTION_MAGIE)
 
     def decontrole(self,touche):
@@ -369,9 +351,9 @@ class Joueur:
 
         self.run = True
         self.affichage = Affichage_principal(self.controleur,[self.screen.get_width(),self.screen.get_height()])
-        constantes_temps['courant'] = pygame.time.get_ticks()
+        set_constantes_temps_courant()
         while self.run : #Devient faux quand on quitte
-            constantes_temps['tours']+=1
+            tourne_constantes_temps()
             if self.controleur.phase == TOUR and not self.controleur.pause:
                 self.debut_tour()
             else :
@@ -385,22 +367,13 @@ class Joueur:
                     self.fin_tour()
             else:
                 self.controleur.joueur.inventaire.nettoie_item()
-            new_courant = pygame.time.get_ticks()
-            duree = new_courant - constantes_temps['courant']
-            constantes_temps['reste'] += duree
-            constantes_temps['courant'] = new_courant
+            add_constantes_temps('reste')
             self.affichage.trouve_actif()
             self.affichage.affiche(self.screen,1,1)
-            new_courant = pygame.time.get_ticks()
-            duree = new_courant - constantes_temps['courant']
-            constantes_temps['affichage'] += duree
-            constantes_temps['courant'] = new_courant
+            add_constantes_temps('affichage')
             pygame.display.flip()
             self.patiente(1)
-            new_courant = pygame.time.get_ticks()
-            duree = new_courant - constantes_temps['courant']
-            constantes_temps['reste'] += duree
-            constantes_temps['courant'] = new_courant
+            add_constantes_temps('reste')
 
     def start(self):
         """Fonction qui commence une partie."""

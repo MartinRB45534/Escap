@@ -954,7 +954,7 @@ class Controleur():
     def est_agissant(self,ID_entitee:int):
         return issubclass(self[ID_entitee].get_classe(),Agissant)
 
-    def trouve_classe(self,position:Position,classe):
+    def trouve_classe(self,position:Position,classe:Type):
         entitees:List[int] = []
         for entitee in self.entitees.values():
             if entitee.position == position and issubclass(entitee.get_classe(),classe):
@@ -1448,7 +1448,7 @@ class Controleur():
             ID_entitee = self.entitees_courantes[i]
             entitee = self[ID_entitee]
             if isinstance(entitee,Agissant):
-                if isinstance(entitee,Heros):
+                if entitee is self.joueur:
                     agissants.insert(0,entitee)
                     esprit = entitee.get_esprit()
                     if esprit != None:

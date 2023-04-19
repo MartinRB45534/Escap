@@ -1,7 +1,7 @@
 from Jeu.Entitee.Agissant.Agissants import *
 from Jeu.Esprit.Representation_spatiale import *
 
-from typing import Dict, Literal, Tuple
+from typing import Dict, Literal, Self, Tuple
 import operator
 
 class Esprit :
@@ -451,7 +451,7 @@ class Esprit :
             for entree in espace.entrees:
                 self.entrees[entree] = self.entrees.get(entree,[])+[espace]
 
-    def merge_zones(self,esprit,cases_self:List[Position],cases_esprit:List[Position]):
+    def merge_zones(self,esprit:Self,cases_self:List[Position],cases_esprit:List[Position]):
         zones_mod:List[Zone_inconnue] = []
         entrees:List[Position] = []
         for zone in self.zones_inconnues+esprit.zones_inconnues:
@@ -491,7 +491,7 @@ class Esprit :
                         if voisin and ((not voisin in self.vue) or self.vue[voisin][1] == 0):
                             zone.sorties.append(voisin)
         
-    def merge_representation(self,esprit,cases_self:List[Position],cases_esprit:List[Position]):
+    def merge_representation(self,esprit:Self,cases_self:List[Position],cases_esprit:List[Position]):
         salles_mod:List[Salle] = []
         carres_pot_esprit:List[Position] = []
         carres_pot_self:List[Position] = []
@@ -797,10 +797,10 @@ class Esprit :
                 self.antagonise_attaquant(offense)
                 self.antagonise_supports(offense)
         
-    def antagonise_attaquant(self,offense):
-        ID_offenseur:int = offense[0]
-        gravite:float = offense[1]
-        degats:float = offense[2]
+    def antagonise_attaquant(self,offense:Tuple[int,float,float]):
+        ID_offenseur = offense[0]
+        gravite = offense[1]
+        degats = offense[2]
         if ID_offenseur in self.ennemis:
             self.ennemis[ID_offenseur][0] += gravite
             if self.ennemis[ID_offenseur][1] < degats:
@@ -808,7 +808,7 @@ class Esprit :
         else:
             self.ennemis[ID_offenseur] = [gravite,degats]
 
-    def antagonise_supports(self,offense):
+    def antagonise_supports(self,offense:Tuple[int,float]):
         pass
 
     def get_pos_vues(self):
@@ -832,7 +832,7 @@ class Esprit :
         for espace in self.salles+self.couloirs:
             espace.skip = False
 
-    def set_skip(self,sources,recepteurs):
+    def set_skip(self,sources:List[Position],recepteurs:List[Position]):
         for espace in self.salles+self.couloirs:
             espace.skip = True
             for source in sources:
@@ -908,7 +908,7 @@ class Esprit :
             self.vue[position][3][indice] = valeur
             self.propage([position],self.dispersion_spatiale,indice,dead_ends)
 
-    def propage(self,positions:List[Position],coef,indice=1,dead_ends=False,comparateur=1):
+    def propage(self,positions:List[Position],coef:float,indice=1,dead_ends=False,comparateur=1):
         """'Résoud' un labyrinthe à partir de plusieurs points"""
 
         #la queue est une liste de positions
@@ -1117,18 +1117,18 @@ class Esprit :
             self.merge_enemies(esprit)
             self.merge_vision(esprit)
 
-    def merge_corps(self,esprit):
+    def merge_corps(self,esprit:Self):
         for corps in esprit.corps.keys():
             if corps not in self.corps.keys():
                 self.corps[corps] = esprit.corps[corps]
                 self.controleur[corps].rejoint(self.nom)
 
-    def merge_enemies(self,esprit):
+    def merge_enemies(self,esprit:Self):
         for ennemi in esprit.ennemis.keys():
             if ennemi not in self.corps.keys():
                 self.ennemis[ennemi] = max(esprit.ennemis[ennemi],self.ennemis[ennemi])
 
-    def merge_vision(self,esprit):
+    def merge_vision(self,esprit:Self):
         cases_self:List[Position] = []
         cases_other:List[Position] = []
         for etage in esprit.vue.keys():
@@ -1148,7 +1148,7 @@ class Esprit :
 
     def decide(self):
         for corp in self.corps.keys():
-            if corp != self.controleur.joueur and self.corps[corp] in ["attaque","fuite","soin","soutien"]:
+            if self.corps[corp] in ["attaque","fuite","soin","soutien"]:
                 self.deplace(corp)
 
     def fuite_utile(self,ID:int):

@@ -1,4 +1,7 @@
 # global CONSTANTES_STATS
+import time
+
+
 CONSTANTES_STATS = {
     #Le joueur n'est jamais sensé être initialisé avec d'autres statistiques que le niveau 1, mais on ne sait jamais
     "heros":{
@@ -497,3 +500,18 @@ constantes_temps = {'tours':0,
 
 # global constantes_deplacements
 constantes_deplacements = []
+
+def set_constantes_temps_courant():
+    constantes_temps['courant'] = time.time()
+
+def tourne_constantes_temps():
+    constantes_temps['tours'] += 1
+
+def add_constantes_temps(nom):
+    new_courant = time.time()
+    duree = new_courant - constantes_temps['courant']
+    if nom in constantes_temps:
+        constantes_temps[nom] += duree
+    else:
+        constantes_temps[nom] = duree
+    constantes_temps['courant'] = new_courant
