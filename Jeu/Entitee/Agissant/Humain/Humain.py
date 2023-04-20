@@ -14,7 +14,6 @@ class Humain(PNJ,Entitee_superieure):
     """La classe des pnjs et du joueur. A un comportement un peu plus complexe, et une personnalité."""
     def __init__(self,controleur:Controleur,position:Position,identite:str,niveau:int,ID:int):
         PNJ.__init__(self,controleur,position,identite,niveau,ID)
-        self.statut_humain = "attente"
 
         self.appreciations=[0,0,0,0,0,0,0,0,0,0]
 
@@ -23,20 +22,6 @@ class Humain(PNJ,Entitee_superieure):
             return SKIN_CORPS_HUMAIN
         else:
             return SKIN_CADAVRE
-
-    def get_skins_statuts(self):
-        skins = Agissant.get_skins_statuts(self)
-        if self.statut_humain == "exploration":
-            skins.append(SKIN_STATUT_CHERCHE)
-        elif self.statut_humain == "proximite":
-            skins.append(SKIN_STATUT_PROXIMITE)
-        elif self.statut_humain == "en chemin":
-            skins.append(SKIN_STATUT_CHEMIN)
-        elif self.statut_humain == "perdu":
-            skins.append(SKIN_STATUT_PERDU)
-        elif self.statut_humain == "paume":
-            skins.append(SKIN_STATUT_PAUME)
-        return skins
 
     def subit(self,degats:float,distance="contact",element=TERRE,ID=0): #L'ID 0 ne correspond à personne
         gravite = degats/self.pv_max

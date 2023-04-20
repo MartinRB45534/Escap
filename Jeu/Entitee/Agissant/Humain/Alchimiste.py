@@ -87,11 +87,10 @@ class Alchimiste(PNJ_mage,Attaquant_magique_case,Support,Humain): #Le septième 
             self.end_dialogue()
             self.mouvement = 0 #Légèrement redondant ici
             self.cible_deplacement = self.controleur.joueur.ID
-            self.attente = False
         elif replique == "dialogue1reponse1.2":
             self.appreciations[0] -= 0.5
             self.end_dialogue(-2)
-            self.statut_humain = "exploration"
+            self.statut_pnj = "exploration"
 
         #Deuxième dialogue
         #Le joueur a utilisé un téléporteur
@@ -218,12 +217,11 @@ class Alchimiste(PNJ_mage,Attaquant_magique_case,Support,Humain): #Le septième 
             self.repliques = ["dialogue-2reponse1.1.1","dialogue-2reponse1.1.2"]
         elif replique == "dialogue-2reponse1.1.1":
             self.end_dialogue(-2)
-            self.statut_humain = "exploration"
+            self.statut_pnj = "exploration"
         elif replique == "dialogue-2reponse1.1.2":
             self.end_dialogue(-2)
             self.offenses.append([2,0.01,0])
-            self.statut_humain = "exploration"
-            self.attente = False
+            self.statut_pnj = "exploration"
         elif replique == "dialogue-2reponse1.2":
             self.replique="dialogue-2phrase1.2"
             self.repliques = ["dialogue-2reponse1.2.1"]
@@ -235,7 +233,6 @@ class Alchimiste(PNJ_mage,Attaquant_magique_case,Support,Humain): #Le septième 
             self.end_dialogue()
             self.mouvement = 0 #Légèrement redondant ici
             self.cible_deplacement = self.controleur.joueur.ID
-            self.attente = False
 
         #Dialogue par défaut:
         elif replique == "dialogue-1reponse1.1":

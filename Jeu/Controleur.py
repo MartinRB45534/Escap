@@ -230,7 +230,7 @@ except ModuleNotFoundError:
     print("Il n'y a pas de fichier Equilibrage.py, on va garder l'équilibrage par défaut.")
 
 class Controleur():
-    def __init__(self,parametres:List=None,screen=None):
+    def __init__(self,parametres:Dict,screen:pygame.Surface):
         #print("Initialisation du controleur")
         self.labs:Dict[str,Labyrinthe] = {} #Un dictionnaire avec tous les labyrinthes, indéxés par leur identifiant dans les positions.
         #print("Labyrinthe : check")
@@ -240,7 +240,7 @@ class Controleur():
         self.labs_courants:List[Labyrinthe] = []
         self.entitees_courantes:List[int] = []
         self.esprits_courants:List[str] = []
-        self.joueur:PJ|Mage = None
+        self.joueur:PJ|PJ_mage|None = None
         self.pause = False
         self.nb_tours = 0
         self.phase = TOUR
@@ -249,8 +249,6 @@ class Controleur():
             self.tour_par_seconde = 0
         else:
             self.tour_par_seconde = parametres["tours_par_seconde"]
-            self.ajoute_entitee(Heros(self,None,parametres,screen))
-            self.joueur = self.entitees[2]
 
     def __getitem__(self,key) -> Union[Labyrinthe,Case,Mur,Entitee,Item,Agissant,Any]:
         if isinstance(key,tuple):
@@ -261,7 +259,7 @@ class Controleur():
             elif len(key)==3:
                 return self.labs[key[0]][Position(key[0],key[1],key[2])]
         elif isinstance(key,Cote):
-            return self[key.emplacement][key.direction]
+            return self.labs[key.emplacement.lab][key.emplacement][key.direction]
         elif isinstance(key,Position):
             return self.labs[key.lab][key]
         elif isinstance(key,int):
@@ -280,7 +278,7 @@ class Controleur():
             elif len(key)==3:
                 self.labs[key[0]][Position(key[0],key[1],key[2])] = value
         elif isinstance(key,Cote):
-            self[key.emplacement][key.direction] = value
+            self.labs[key.emplacement.lab][key.emplacement][key.direction] = value
         elif isinstance(key,Position):
             self.labs[key.lab][key] = value
         elif isinstance(key,int):
@@ -395,8 +393,6 @@ class Controleur():
 
     def tuto(self):
 
-        self.esprits["heros"] = Esprit_humain(2,self)
-
         #On crée le premier étage et son occupant :
         receptionniste = Receptionniste(self,Position("Étage 1 : couloir",14,0))
         self.ajoute_entitee(receptionniste)
@@ -411,7 +407,7 @@ class Controleur():
         paterns2 = [Pattern(Position("Étage 2 : labyrinthe",0,0),Decalage(5,5),[Cote(Decalage(4,0),DROITE),Cote(Decalage(4,1),DROITE),Cote(Decalage(4,2),DROITE),Cote(Decalage(4,3),DROITE),Cote(Decalage(4,4),DROITE)]),
                     Pattern(Position("Étage 2 : labyrinthe",5,5),Decalage(5,5),[Cote(Decalage(0,0),GAUCHE)],["Porte_centre_2"])]
         self.labs["Étage 2 : labyrinthe"]=Labyrinthe("Étage 2 : labyrinthe",Decalage(15,15),Position("Étage 2 : labyrinthe",0,0),paterns2,1,1,TERRE,0.2)
-        # self.construit_escalier(Cote(Position("Étage 1 : couloir",18,1),DROITE),Cote(Position("Étage 2 : labyrinthe",0,0),GAUCHE))
+        self.construit_escalier(Cote(Position("Étage 1 : couloir",18,1),DROITE),Cote(Position("Étage 2 : labyrinthe",0,0),GAUCHE))
 
         #On crée le troisième étage et son occupante :
         peureuse = Peureuse(self,Position("Étage 3 : combat",8,8))
@@ -433,7 +429,6 @@ class Controleur():
                     Pattern(Position("Étage 3 : combat",2,7),Decalage(3,3),[Cote(Decalage(0,1),GAUCHE),Cote(Decalage(2,1),DROITE)])]
         self.labs["Étage 3 : combat"]=Labyrinthe("Étage 3 : combat",Decalage(11,11),Position("Étage 3 : combat",0,0),paterns3,1,1,TERRE,0.2)
         self.construit_escalier(Cote(Position("Étage 2 : labyrinthe",1,5),HAUT),Cote(Position("Étage 3 : combat",10,10),BAS))
-        self.construit_escalier(Cote(Position("Étage 1 : couloir",18,1),DROITE),Cote(Position("Étage 3 : combat",10,10),BAS))
 
         #On crée le quatrième étage et ses occupants :
         codeur = Codeur(self,Position("Étage 4 : monstres",15,1))
@@ -592,7 +587,6 @@ class Controleur():
         self.set_teleport(Cote(Position("Étage 6 : potions",5,10),DROITE),Cote(Position("Étage 6 : potions",0,4),GAUCHE)) # 9,10
 
         self.construit_escalier(Cote(Position("Étage 5 : portes",0,0),GAUCHE),Cote(Position("Étage 6 : potions",14,0),DROITE))
-        self.construit_escalier(Cote(Position("Étage 1 : couloir",18,1),DROITE),Cote(Position("Étage 6 : potions",14,0),DROITE))
 
         #On crée le septième étage et son occupante :
         peste = Peste(self,Position("Étage 7 : meutes",2,0))
@@ -770,10 +764,11 @@ class Controleur():
         self.construit_escalier(Cote(Position("Étage 9 : équippement",39,4),DROITE),Cote(Position("Étage 10 : Boss",0,9),GAUCHE)) #/!\ Rajouter les ennemis !
 
         #On lance la cinématique :
-        #À rajouter
+        #TODO: À rajouter
         #Et on active le lab du joueur
-        # self.joueur.position = Position("Étage 1 : couloir",13,0)
-        self.joueur.position = Position("Étage 6 : potions",13,0)
+        self.joueur = Heros(self,Position("Étage 1 : couloir",13,0))
+        self.ajoute_entitee(self.joueur)
+        self.esprits["heros"] = Esprit_humain(2,self)
         self.active_lab(self.joueur.position.lab)
 
     def duel(self,esprit1: Esprit,esprit2: Esprit,niveau_1=1,niveau_2=1,tailles_lab=(20,20),vide=True,vue=False,screen=None):

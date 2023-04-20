@@ -1150,8 +1150,12 @@ class Esprit :
         for corp in self.corps.keys():
             if self.corps[corp] in ["attaque","fuite","soin","soutien"]:
                 self.deplace(corp)
+            elif self.corps[corp] == "PNJ":
+                self.deplace_pnj(corp)
+            elif self.corps[corp] == "PJ":
+                self.deplace_pj(corp)
 
-    def fuite_utile(self,ID:int):
+    def fuite_utile(self,ID:int): #TODO inclure l'accessibilité
         for corp in self.corps.keys():
             if corp != ID and self.corps[corp] not in ["fuite","incapacite","mort"]:
                 return True
@@ -1258,6 +1262,419 @@ class Esprit :
                     else:
                         res = corp.agit_en_vue(self)
         corp.statut = res
+
+    def deplace_pnj(self,ID:int):
+        pnj:PNJ = self.controleur[ID]
+        pnj.skill_courant = None
+        pnj.statut_pnj = "proximite"
+        if pnj.mouvement == 0: #0 pour aller vers, 1 pour chercher et 2 pour aller au contact
+            if isinstance(pnj.cible_deplacement,int):
+                if not(self.controleur.est_item(pnj.cible_deplacement)):
+                    cible = self.controleur[pnj.cible_deplacement].get_position()
+                    portee = 7
+                else:
+                    cible = pnj.get_position()
+                    portee = 1 #C'est juste pour qu'il puisse aller où il veut
+            else:
+                cible = pnj.cible_deplacement
+                portee = 5
+            pos_cibles = self.controleur.get_pos_touches(cible,portee,propagation = "C__S___",direction = None,traverse="tout",responsable=0)
+        elif pnj.mouvement == 1:
+            cible = pnj.get_position()
+            portee = 1 #C'est juste pour qu'il puisse aller où il veut
+            pnj.statut_pnj = "exploration"
+        elif pnj.mouvement == 2:
+            if isinstance(pnj.cible_deplacement,int):
+                if not(self.controleur.est_item(pnj.cible_deplacement)):
+                    cible = self.controleur[pnj.cible_deplacement].get_position()
+                    portee = 0
+                else:
+                    cible = pnj.get_position()
+                    portee = 1 #C'est juste pour qu'il puisse aller où il veut
+            else:
+                cible = pnj.cible_deplacement
+                portee = 0
+        elif pnj.mouvement == 3:
+            pnj.statut_pnj = "attente"
+            return
+        pos_cibles = self.controleur.get_pos_touches(cible,portee,propagation = "C__S___",direction = None,traverse="tout",responsable=0)
+        if pnj.position in pos_cibles: #Tout va bien, on y est ! On peut combattre, par exemple.
+            Esprit.deplace(self,ID)
+        else:
+            res = "recherche"
+            position = pnj.get_position()
+            self.set_skip([cible],[position])
+            self.resoud(cible,10,4)
+            case = self.vue[position]
+            repoussante = case[8]
+            cases = [[-1,case[0],case[3][0],case[3][1],-case[3][2],case[3][2],-case[3][3],case[3][3],case[3][4]]]
+            dirs = []
+            importance = 0
+            fuite = pnj.veut_fuir(case[3][2])
+            attaque = pnj.veut_attaquer(case[3][2])
+            pnj.statut_pnj = "en chemin"
+            if case[3][4] == 0:
+                pnj.statut_pnj = "perdu"
+                if pnj.ID == 4:
+                    pnj.statut_pnj = "paume"
+            for i in DIRECTIONS:
+                mur = case[5][i][self.resolution]
+                if mur:
+                    if mur.lab in self.vue.keys():
+                        case_pot = self.vue[mur]
+                        entitees = case_pot[6]
+                        libre = True
+                        for ID_entitee in entitees:
+                            entitee = pnj.controleur[ID_entitee]
+                            if issubclass(entitee.get_classe(),Non_superposable): #On ne peut pas aller sur cette case
+                                libre = False
+                                if issubclass(entitee.get_classe(),Agissant): #Elle est occupée par un agissant
+                                    if pnj.peut_voir(i) and ID_entitee in self.ennemis.keys(): #Et c'est un ennemi !
+                                        if attaque: #Et le feu vert pour l'attaquer
+                                            if self.ennemis[ID_entitee][0] > importance:
+                                                importance = self.ennemis[ID_entitee][0]
+                                                pnj.attaque(i)
+                                                res = "attaque"
+                                        elif fuite : #Et un ordre de fuite !
+                                            res = "fuite"
+                                    elif pnj.mouvement == 2 and ID_entitee == pnj.cible_deplacement and ID_entitee == self.controleur.joueur.ID and pnj.peut_voir(i): #Le PNJs peut enfin parler au joueur
+                                        self.controleur.joueur.interlocuteur = pnj
+                                        self.controleur.set_phase(DIALOGUE)
+                                        pnj.start_dialogue()
+                                        pnj.dir_regard = i
+                                        self.controleur.joueur.dir_regard = i.oppose()
+                                        pnj.mouvement = 0
+                                    elif pnj.mouvement == 2 and ID_entitee == pnj.cible_deplacement and isinstance(self.controleur[ID_entitee], PNJ) and pnj is self.controleur.joueur and pnj.peut_voir(i): #Le joueur peut enfin parler au PNJ
+                                        pnj.interlocuteur = self.controleur[ID_entitee]
+                                        self.controleur.set_phase(DIALOGUE)
+                                        self.controleur[ID_entitee].start_dialogue()
+                                        pnj.dir_regard = i
+                                        self.controleur[ID_entitee].dir_regard = i.oppose()
+                                        pnj.mouvement = 0
+                        if libre:
+                            cases.append([i,case_pot[0],case_pot[3][0],case_pot[3][1],-case_pot[3][2],case_pot[3][2],-case_pot[3][3],case_pot[3][3],case_pot[3][4]])
+                            dirs.append(i)
+            if res == "recherche": #On n'a pas d'ennemi à portée directe (ou on ne souhaite pas attaquer ni fuir)
+                comportement = pnj.comporte_distance(case[3][2])
+                if comportement == 0 : #Foncer tête baissée ! Pour les combattants au corps à corps
+                    res = "deplacement"
+                elif comportement == 1: #Tenter une action, puis approcher. Pour les effets à distance qui ont besoin de ne pas être trop loin.
+                    res = pnj.agit_en_vue(self,"deplacement")
+                    if repoussante:
+                        res = "deplacement"
+                elif comportement == 2: #Tenter une action, puis fuir. Pour les effets à distance qui peuvent se permettre d'être loin.
+                    res = pnj.agit_en_vue(self,"fuite")
+                    if repoussante:
+                        res = "fuite"
+                elif comportement == 3 : #La fuite ! Quand les pvs sont bas
+                    res = "fuite"
+                if len(cases) == 1: #Pas de cases libres à proximité, on va essayer d'attaquer pour s'en sortir
+                    pnj.skill_courant = None
+                    importance = 0
+                    for i in DIRECTIONS:
+                        mur = case[5][i][self.resolution]
+                        if mur:
+                            if mur.lab in self.vue.keys():
+                                case_pot = self.vue[mur]
+                                entitees = case_pot[6]
+                                libre = True
+                                for ID_entitee in entitees:
+                                    entitee = pnj.controleur[ID_entitee]
+                                    if issubclass(entitee.get_classe(),Agissant): #Cette case est occupée par un agissant
+                                        if pnj.peut_voir(i) and ID_entitee in self.ennemis.keys(): #Et c'est un ennemi !
+                                            if self.ennemis[ID_entitee][0] > importance:
+                                                importance = self.ennemis[ID_entitee][0]
+                                                pnj.attaque(i)
+                                                res = "attaque"
+                elif not(case[3] or case[5]) and pnj.statut_pnj == "perdu":
+                    res = "paix"
+                    if not isinstance(pnj,Sentinelle) or repoussante:
+                        res = "exploration"
+                        if len(dirs)>1: #On peut se permettre de choisir
+                            if pnj.dir_regard != None: #L'agissant regarde quelque part
+                                dir_back = pnj.dir_regard+2
+                                if dir_back in dirs: #On ne veut pas y retourner
+                                    dirs.remove(dir_back)
+                        pnj.va(dirs[random.randint(0,len(dirs)-1)]) #/!\ Ne pas retourner sur ses pas, c'est bien ! Aller vers les endroits inconnus, ce serait mieux. /!\
+                elif pnj.statut_pnj == "paume":
+                    res = "paix"
+                    if repoussante:
+                        res = "exploration"
+                        if len(dirs)>1: #On peut se permettre de choisir
+                            if pnj.dir_regard != None: #L'agissant regarde quelque part
+                                dir_back = pnj.dir_regard+2
+                                if dir_back in dirs: #On ne veut pas y retourner
+                                    dirs.remove(dir_back)
+                        pnj.va(dirs[random.randint(0,len(dirs)-1)]) #/!\ Ne pas retourner sur ses pas, c'est bien ! Aller vers les endroits inconnus, ce serait mieux. /!\
+                else:
+                    if repoussante:
+                        cases.pop(0)
+                    if res == "deplacement":
+                        res = "approche"
+                        new_cases = sorted(cases,key=operator.itemgetter(8,2,3,4,6))
+                        if new_cases[-1][0] != -1: #La dernière case (i.e. les valeurs les plus élevées) n'est pas celle où l'on est
+                            pnj.va(new_cases[-1][0])
+                            if ID == 4:
+                                constantes_deplacements.append([self.controleur.nb_tours,"deplacement loin",pnj.dir_regard,new_cases])
+                        else:
+                            res = pnj.agit_en_vue(self)
+                    elif res == "fuite":
+                        for case in cases:
+                            case[8] *= -1
+                        new_cases = sorted(cases,key=operator.itemgetter(8,5,7,2,3))
+                        if new_cases[0][0] != -1: #La première case (i.e. les valeurs les moins élevées) n'est pas celle où l'on est
+                            pnj.va(new_cases[0][0])
+                            if ID == 4:
+                                constantes_deplacements.append([self.controleur.nb_tours,"fuite loin",pnj.dir_regard,new_cases])
+                        else:
+                            res = pnj.agit_en_vue(self)
+            pnj.statut = res
+
+    def deplace_pj(self,ID:int):
+        pj:PJ = self.controleur[ID]
+        pj.statut_pnj = "proximite"
+        if pj.mouvement == 0: #0 pour aller vers, 1 pour chercher et 2 pour aller au contact
+            if isinstance(pj.cible_deplacement,int):
+                if not(self.controleur.est_item(pj.cible_deplacement)):
+                    cible = self.controleur[pj.cible_deplacement].get_position()
+                    portee = 7
+                else:
+                    cible = pj.get_position()
+                    portee = 2 #C'est juste pour qu'il puisse aller où il veut
+            else:
+                cible = pj.cible_deplacement
+                portee = 5
+            pos_cibles = self.controleur.get_pos_touches(cible,portee,propagation = "C__S___",direction = None,traverse="tout",responsable=0)
+        elif pj.mouvement == 1:
+            cible = pj.get_position()
+            portee = 2 #C'est juste pour qu'il puisse aller où il veut
+            pj.statut_pnj = "exploration"
+        elif pj.mouvement == 2:
+            if isinstance(pj.cible_deplacement,int):
+                if not(self.controleur.est_item(pj.cible_deplacement)):
+                    cible = self.controleur[pj.cible_deplacement].get_position()
+                    portee = 1
+                else:
+                    cible = pj.get_position()
+                    portee = 2 #C'est juste pour qu'il puisse aller où il veut
+            else:
+                cible = pj.cible_deplacement
+                portee = 1
+        elif pj.mouvement == 3:
+            pj.statut_pnj = "attente"
+            return
+        pos_cibles = self.controleur.get_pos_touches(cible,portee,propagation = "C__S___",direction = None,traverse="tout",responsable=0)
+        if pj.position in pos_cibles: #Tout va bien, on y est ! On peut combattre, par exemple.
+            self.simule_deplace(ID)
+        else:
+            res = "recherche"
+            position = pj.get_position()
+            self.set_skip([cible],[position])
+            self.resoud(cible,10,4)
+            case = self.vue[position]
+            repoussante = case[8]
+            cases = [[-1,case[0],case[3][0],case[3][1],-case[3][2],case[3][2],-case[3][3],case[3][3],case[3][4]]]
+            dirs = []
+            importance = 0
+            fuite = pj.veut_fuir(case[3][2])
+            attaque = pj.veut_attaquer(case[3][2])
+            pj.statut_pnj = "en chemin"
+            if case[3][4] == 0:
+                pj.statut_pnj = "perdu"
+                if pj.ID == 4:
+                    pj.statut_pnj = "paume"
+            for i in DIRECTIONS:
+                mur = case[5][i][self.resolution]
+                if mur:
+                    if mur.lab in self.vue.keys():
+                        case_pot = self.vue[mur]
+                        entitees = case_pot[6]
+                        libre = True
+                        for ID_entitee in entitees:
+                            entitee = pj.controleur[ID_entitee]
+                            if issubclass(entitee.get_classe(),Non_superposable): #On ne peut pas aller sur cette case
+                                libre = False
+                                if issubclass(entitee.get_classe(),Agissant): #Elle est occupée par un agissant
+                                    if pj.peut_voir(i) and ID_entitee in self.ennemis.keys(): #Et c'est un ennemi !
+                                        if attaque: #Et le feu vert pour l'attaquer
+                                            if self.ennemis[ID_entitee][0] > importance:
+                                                importance = self.ennemis[ID_entitee][0]
+                                                pj.simule_attaque(i)
+                                                res = "attaque"
+                                        elif fuite : #Et un ordre de fuite !
+                                            res = "fuite"
+                        if libre:
+                            cases.append([i,case_pot[0],case_pot[3][0],case_pot[3][1],-case_pot[3][2],case_pot[3][2],-case_pot[3][3],case_pot[3][3],case_pot[3][4]])
+                            dirs.append(i)
+            if res == "recherche": #On n'a pas d'ennemi à portée directe (ou on ne souhaite pas attaquer ni fuir)
+                comportement = pj.comporte_distance(case[3][2])
+                if comportement == 0 : #Foncer tête baissée ! Pour les combattants au corps à corps
+                    res = "deplacement"
+                elif comportement == 1: #Tenter une action, puis approcher. Pour les effets à distance qui ont besoin de ne pas être trop loin.
+                    res = pj.simule_agit_en_vue(self,"deplacement")
+                    if repoussante:
+                        res = "deplacement"
+                elif comportement == 2: #Tenter une action, puis fuir. Pour les effets à distance qui peuvent se permettre d'être loin.
+                    res = pj.simule_agit_en_vue(self,"fuite")
+                    if repoussante:
+                        res = "fuite"
+                elif comportement == 3 : #La fuite ! Quand les pvs sont bas
+                    res = "fuite"
+                if len(cases) == 1: #Pas de cases libres à proximité, on va essayer d'attaquer pour s'en sortir
+                    pj.skill_courant = None
+                    importance = 0
+                    for i in DIRECTIONS:
+                        mur = case[5][i][self.resolution]
+                        if mur:
+                            if mur.lab in self.vue.keys():
+                                case_pot = self.vue[mur]
+                                entitees = case_pot[6]
+                                libre = True
+                                for ID_entitee in entitees:
+                                    entitee = pj.controleur[ID_entitee]
+                                    if issubclass(entitee.get_classe(),Agissant): #Cette case est occupée par un agissant
+                                        if pj.peut_voir(i) and ID_entitee in self.ennemis.keys(): #Et c'est un ennemi !
+                                            if self.ennemis[ID_entitee][0] > importance:
+                                                importance = self.ennemis[ID_entitee][0]
+                                                pj.simule_attaque(i)
+                                                res = "attaque"
+                elif not(case[3] or case[5]) and pj.statut_pnj == "perdu":
+                    res = "paix"
+                    if not isinstance(pj,Sentinelle) or repoussante:
+                        res = "exploration"
+                        if len(dirs)>1: #On peut se permettre de choisir
+                            if pj.dir_regard != None: #L'agissant regarde quelque part
+                                dir_back = pj.dir_regard+2
+                                if dir_back in dirs: #On ne veut pas y retourner
+                                    dirs.remove(dir_back)
+                        pj.simule_va(dirs[random.randint(0,len(dirs)-1)]) #/!\ Ne pas retourner sur ses pas, c'est bien ! Aller vers les endroits inconnus, ce serait mieux. /!\
+                elif pj.statut_pnj == "paume":
+                    res = "paix"
+                    if repoussante:
+                        res = "exploration"
+                        if len(dirs)>1: #On peut se permettre de choisir
+                            if pj.dir_regard != None: #L'agissant regarde quelque part
+                                dir_back = pj.dir_regard+2
+                                if dir_back in dirs: #On ne veut pas y retourner
+                                    dirs.remove(dir_back)
+                        pj.simule_va(dirs[random.randint(0,len(dirs)-1)]) #/!\ Ne pas retourner sur ses pas, c'est bien ! Aller vers les endroits inconnus, ce serait mieux. /!\
+                else:
+                    if repoussante:
+                        cases.pop(0)
+                    if res == "deplacement":
+                        res = "approche"
+                        new_cases = sorted(cases,key=operator.itemgetter(8,2,3,4,6))
+                        if new_cases[-1][0] != -1: #La dernière case (i.e. les valeurs les plus élevées) n'est pas celle où l'on est
+                            pj.simule_va(new_cases[-1][0])
+                        else:
+                            res = pj.simule_agit_en_vue(self)
+                    elif res == "fuite":
+                        for case in cases:
+                            case[8] *= -1
+                        new_cases = sorted(cases,key=operator.itemgetter(8,5,7,2,3))
+                        if new_cases[0][0] != -1: #La première case (i.e. les valeurs les moins élevées) n'est pas celle où l'on est
+                            pj.simule_va(new_cases[0][0])
+                        else:
+                            res = pj.simule_agit_en_vue(self)
+
+    def simule_deplace(self,ID:int):
+        pj:PJ = self.controleur[ID]
+        position = pj.position
+        case = pj.vue[position]
+        tcase = self.vue[position]
+        repoussante = tcase[8]
+        cases = [[-1,tcase[0],tcase[3][0],tcase[3][1],-tcase[3][2],tcase[3][2],-tcase[3][3],tcase[3][3]]]
+        dirs = []
+        importance = 0
+        fuite = pj.veut_fuir(tcase[3][2])
+        attaque = pj.veut_attaquer(tcase[3][2])
+        res = "attente"
+        for i in DIRECTIONS: #On commence par se renseigner sur les possibilités :
+            mur:Union[Position,Literal[False]] = case[5][i][self.resolution]
+            if mur:
+                if mur in position and pj.vue[mur][1]>0:
+                    case_pot = self.vue[mur]
+                    entitees = case_pot[6]
+                    libre = True #On n'y va pas pour s'en enfuir après
+                    for ID_entitee in entitees:
+                        entitee = self.controleur[ID_entitee]
+                        if issubclass(entitee.get_classe(),Non_superposable): #On ne peut pas aller sur cette case
+                            libre = False
+                            if issubclass(entitee.get_classe(),Agissant): #Elle est occupée par un agissant
+                                if ID_entitee in self.ennemis.keys(): #Et c'est un ennemi !
+                                    if pj.peut_voir(i) and (attaque or (fuite and not self.fuite_utile(ID))) : #On veut attaquer lorsqu'on croise un ennemi au corps à corps (et on a assez de mana pour, si on utilise la magie)
+                                        if self.ennemis[ID_entitee][0] > importance:
+                                            importance = self.ennemis[ID_entitee][0]
+                                            pj.simule_attaque(i)
+                                            res = "attaque"
+                                    elif fuite and self.fuite_utile(ID): #On veut fuire lorsqu'on croise un ennemi au corps à corps
+                                        res = "fuite"
+                    if libre:
+                        cases.append([i,case_pot[0],case_pot[3][0],case_pot[3][1],-case_pot[3][2],case_pot[3][2],-case_pot[3][3],case_pot[3][3]])
+                        dirs.append(i)
+        if res == "attente": #Quelques comportements possibles :
+            comportement = pj.comporte_distance(tcase[3][2])
+            if comportement == 0 : #Foncer tête baissée ! Pour les combattants au corps à corps
+                res = "deplacement"
+            elif comportement == 1 or (comportement > 1 and not self.fuite_utile(ID)): #Tenter une action, puis approcher. Pour les effets à distance qui ont besoin de ne pas être trop loin.
+                res = pj.simule_agit_en_vue(self,"deplacement")
+                if repoussante:
+                    res = "deplacement"
+            elif comportement == 2: #Tenter une action, puis fuir. Pour les effets à distance qui peuvent se permettre d'être loin.
+                res = pj.simule_agit_en_vue(self,"fuite")
+                if repoussante:
+                    res = "fuite"
+            elif comportement == 3 : #La fuite ! Quand les pvs sont bas
+                res = "fuite"
+        if res in ["deplacement","fuite"] and pj.latence <= 0:
+            if len(cases) == 1: #Pas de cases libres à proximité, on va essayer d'attaquer pour s'en sortir
+                res = "bloqué"
+                pj.skill_courant = None
+                importance = 0
+                for i in DIRECTIONS:
+                    mur:Union[Position,Literal[False]] = case[5][i][self.resolution]
+                    if mur:
+                        if mur.lab in self.vue.keys():
+                            case_pot = self.vue[mur]
+                            entitees = case_pot[6]
+                            for ID_entitee in entitees:
+                                entitee = pj.controleur[ID_entitee]
+                                if issubclass(entitee.get_classe(),Agissant): #Cette case est occupée par un agissant
+                                    if pj.peut_voir(i) and ID_entitee in self.ennemis.keys(): #Et c'est un ennemi !
+                                        if self.ennemis[ID_entitee][0] > importance:
+                                            importance = self.ennemis[ID_entitee][0]
+                                            pj.simule_attaque(i)
+                                            res = "attaque"
+            elif tcase[3][1] == 0: #Et tcase[3] forcément aussi par la même occasion, donc on est totalement libre de chercher
+                res = "paix"
+                if not isinstance(pj,Sentinelle) or isinstance(pj,Humain) or repoussante:
+                    res = "exploration"
+                    if len(dirs)>1: #On peut se permettre de choisir
+                        if pj.dir_regard != None: #L'agissant regarde quelque part
+                            dir_back = pj.dir_regard+2
+                            if dir_back in dirs: #On ne veut pas y retourner
+                                dirs.remove(dir_back)
+                    pj.simule_va(dirs[random.randint(0,len(dirs)-1)]) #/!\ Ne pas retourner sur ses pas, c'est bien ! Aller vers les endroits inconnus, ce serait mieux. /!\
+                    if ID == 4: # /!\ Ne pas nettoyer, c'est très utile par moment
+                        constantes_deplacements.append([self.controleur.nb_tours,"cherche",pj.dir_regard,cases])
+            else:
+                if repoussante: #On ne veut pas rester en place
+                    cases.pop(0)
+                if res == "deplacement":
+                    new_cases = sorted(cases,key=operator.itemgetter(2,3,4,6)) #2 pour le chemin d'accès indirect, 3 pour le chemin d'accès direct
+                    res = "approche"
+                    if new_cases[-1][0] != -1: #La dernière case (i.e. les valeurs les plus élevées) n'est pas celle où l'on est
+                        pj.simule_va(new_cases[-1][0])
+                    else:
+                        res = pj.simule_agit_en_vue(self)
+                elif res == "fuite":
+                    new_cases = sorted(cases,key=operator.itemgetter(5,7,2,3)) #2 pour le chemin d'accès indirect, 3 pour le chemin d'accès direct
+                    if new_cases[0][0] != -1: #La première case (i.e. les valeurs les moins élevées) n'est pas celle où l'on est
+                        pj.simule_va(new_cases[0][0])
+                        if ID == 4:
+                            constantes_deplacements.append([self.controleur.nb_tours,"fuite",pj.dir_regard,new_cases])
+                    else:
+                        res = pj.simule_agit_en_vue(self)
 
     def oublie(self):
         anciennes_cases = []

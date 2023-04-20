@@ -13,7 +13,7 @@ from Modifiers import *
 
 class Heros(Humain,Stratege,Multi_mage,PJ): #Le premier humain du jeu, avant l'√©tage 1 (√©videmment, c'est le personnage principal !)
     """La classe du joueur."""
-    def __init__(self,controleur:Controleur,position:Position,parametres,screen):
+    def __init__(self,controleur:Controleur,position:Position):
 
         self.identite = 'heros'
         self.place = 0
@@ -22,9 +22,12 @@ class Heros(Humain,Stratege,Multi_mage,PJ): #Le premier humain du jeu, avant l'√
 
         self.apreciations = [0,0,0,0,0,0,0,0,0,0]
         self.dialogue = -1
-        self.attente = False
         self.resolution = 4
 
+        self.statut_simule:str = "attente"
+        self.skill_courant_simule:Type[Skill] = None
+        self.dir_regard_simule:Direction = None
+        self.attente:int = -1
         self.nouvel_ordre:bool = False
         self.interlocuteur:Interactif|PNJ|PNJ_mage|PJ = None
 
@@ -170,13 +173,13 @@ class Heros(Humain,Stratege,Multi_mage,PJ): #Le premier humain du jeu, avant l'√
             if self.highest == 3 and (self.get_etage_courant() == 3 and self.vue[position][2] > 0):
                 #On cherche un PNJ volontaire pour aller taper la causette :
                 paume:Humain = self.controleur[4]
-                if paume.esprit == "heros" and (paume.get_etage_courant() == 3 and paume.statut_humain in ["exploration","proximite","en chemin"]):
+                if paume.esprit == "heros" and (paume.get_etage_courant() == 3 and paume.statut_pnj in ["exploration","proximite","en chemin"]):
                     paume.mouvement = 2
                     paume.cible_deplacement = 2
                     paume.dialogue = 2
                 else:
                     peureuse:Humain = self.controleur[5]
-                    if peureuse.esprit == "heros" and (peureuse.get_etage_courant() == 3 and peureuse.statut_humain in ["exploration","proximite","en chemin"]):
+                    if peureuse.esprit == "heros" and (peureuse.get_etage_courant() == 3 and peureuse.statut_pnj in ["exploration","proximite","en chemin"]):
                         peureuse.mouvement = 2
                         peureuse.cible_deplacement = 2
                         peureuse.dialogue = 2
@@ -189,13 +192,13 @@ class Heros(Humain,Stratege,Multi_mage,PJ): #Le premier humain du jeu, avant l'√
             if self.highest == 4 and (self.get_etage_courant() == 4 and self.vue[position][2] > 0):
                 #On cherche un PNJ volontaire pour aller taper la causette :
                 peureuse:Humain = self.controleur[5]
-                if peureuse.esprit == "heros" and (peureuse.get_etage_courant() == 4 and peureuse.statut_humain in ["exploration","proximite","en chemin"]):
+                if peureuse.esprit == "heros" and (peureuse.get_etage_courant() == 4 and peureuse.statut_pnj in ["exploration","proximite","en chemin"]):
                     peureuse.mouvement = 2
                     peureuse.cible_deplacement = 2
                     peureuse.dialogue = 3
                 else:
                     paume:Humain = self.controleur[4]
-                    if paume.esprit == "heros" and (paume.get_etage_courant() == 4 and paume.statut_humain in ["exploration","proximite","en chemin"]):
+                    if paume.esprit == "heros" and (paume.get_etage_courant() == 4 and paume.statut_pnj in ["exploration","proximite","en chemin"]):
                         paume.mouvement = 2
                         paume.cible_deplacement = 2
                         paume.dialogue = 3
@@ -208,7 +211,7 @@ class Heros(Humain,Stratege,Multi_mage,PJ): #Le premier humain du jeu, avant l'√
             if self.highest == 4 :
                 #On cherche un PNJ volontaire pour aller taper la causette :
                 peureuse:Humain = self.controleur[5]
-                if peureuse.esprit == "heros" and (peureuse.get_etage_courant() == 4 and peureuse.statut_humain in ["exploration","proximite","en chemin"]):
+                if peureuse.esprit == "heros" and (peureuse.get_etage_courant() == 4 and peureuse.statut_pnj in ["exploration","proximite","en chemin"]):
                     peureuse.mouvement = 2
                     peureuse.cible_deplacement = 2
                     peureuse.dialogue = 4
@@ -219,13 +222,13 @@ class Heros(Humain,Stratege,Multi_mage,PJ): #Le premier humain du jeu, avant l'√
             self.first_step_=False
             #On cherche un PNJ volontaire pour aller taper la causette :
             peureuse:Humain = self.controleur[5]
-            if peureuse.esprit == "heros" and peureuse.statut_humain in ["exploration","proximite","en chemin"]:
+            if peureuse.esprit == "heros" and peureuse.statut_pnj in ["exploration","proximite","en chemin"]:
                 peureuse.mouvement = 2
                 peureuse.cible_deplacement = 2
                 peureuse.dialogue = 5
             else:
                 paume:Humain = self.controleur[4]
-                if paume.esprit == "heros" and paume.statut_humain in ["exploration","proximite","en chemin"]:
+                if paume.esprit == "heros" and paume.statut_pnj in ["exploration","proximite","en chemin"]:
                     paume.mouvement = 2
                     paume.cible_deplacement = 2
                     paume.dialogue = 4
@@ -237,7 +240,7 @@ class Heros(Humain,Stratege,Multi_mage,PJ): #Le premier humain du jeu, avant l'√
             #La porte qui lance le dialogue certifie qu'on y passe pour la premi√®re fois
             #On cherche un PNJ volontaire pour aller taper la causette :
             peureuse:Humain = self.controleur[5]
-            if peureuse.esprit == "heros" and peureuse.statut_humain in ["exploration","proximite","en chemin"]:
+            if peureuse.esprit == "heros" and peureuse.statut_pnj in ["exploration","proximite","en chemin"]:
                 peureuse.mouvement = 2
                 peureuse.cible_deplacement = 2
                 peureuse.dialogue = 6
@@ -248,24 +251,24 @@ class Heros(Humain,Stratege,Multi_mage,PJ): #Le premier humain du jeu, avant l'√
             self.first_teleport_=False
             #On cherche un PNJ volontaire pour aller taper la causette :
             alchimiste:Humain = self.controleur[7]
-            if alchimiste.esprit == "heros" and alchimiste.statut_humain in ["exploration","proximite","en chemin"]:
+            if alchimiste.esprit == "heros" and alchimiste.statut_pnj in ["exploration","proximite","en chemin"]:
                 alchimiste.mouvement = 2
                 alchimiste.dialogue = 2
             else:
                 peureuse:Humain = self.controleur[5]
-                if peureuse.esprit == "heros" and peureuse.statut_humain in ["exploration","proximite","en chemin"]:
+                if peureuse.esprit == "heros" and peureuse.statut_pnj in ["exploration","proximite","en chemin"]:
                     peureuse.mouvement = 2
                     peureuse.cible_deplacement = 2
                     peureuse.dialogue = 7
                 else:
                     encombrant:Humain = self.controleur[6]
-                    if encombrant.esprit == "heros" and encombrant.statut_humain in ["exploration","proximite","en chemin"]:
+                    if encombrant.esprit == "heros" and encombrant.statut_pnj in ["exploration","proximite","en chemin"]:
                         encombrant.mouvement = 2
                         encombrant.cible_deplacement = 2
                         encombrant.dialogue = 2
                     else:
                         paume:Humain = self.controleur[4]
-                        if paume.esprit == "heros" and paume.statut_humain in ["exploration","proximite","en chemin"]:
+                        if paume.esprit == "heros" and paume.statut_pnj in ["exploration","proximite","en chemin"]:
                             paume.mouvement = 2
                             paume.cible_deplacement = 2
                             paume.dialogue = 5
@@ -284,6 +287,22 @@ class Heros(Humain,Stratege,Multi_mage,PJ): #Le premier humain du jeu, avant l'√
                 return self.cible_magie
             return self.position
         return self.position
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #/!\ √Ä conserver pour s'y r√©f√©rer (surtout la partie level up) /!\
 

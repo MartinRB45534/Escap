@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 class Entitee:
     """La classe des entitées"""
-    def __init__(self,position: Position,ID: int=None):
+    def __init__(self,position: Position,ID: int|None=None):
         self.position = position
         self.priorite = 0
         self.latence = 0

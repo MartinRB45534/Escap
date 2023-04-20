@@ -111,6 +111,7 @@ class Joueur:
                 # },
             },
             "tours_par_seconde":6,
+            "attente":10, #Le nombre de tours à attendre après une action avant que le pilotage automatique ne reprenne
         }
         self.controleurs = []
         self.controleur:Controleur = None
@@ -265,8 +266,6 @@ class Joueur:
         effet = self.parametres["touches"]["effets"].get(mods,{}).get(touche)
         if effet == "pause": # La touche de pause (Espace ?)
             self.controleur.toogle_pause()
-        elif effet == "touches" : # On veut changer les touches (Maj + Espace ? Ou Maj + Entrée ?)
-            self.start_change_touches() #Peut-être à faire faire par l'affichage ?
         #Rajouter mute etc.
 
         #Les éléments de navigation
@@ -275,17 +274,15 @@ class Joueur:
 
         if self.controleur.phase == TOUR:
             #Les interractions avec l'environnement
-            if effet == "interraction" : # Utiliser/sélectionner l'élément courant (E ?) /!\ Gérer ça directement chez le joueur ?
+            if effet == "interraction" : # Les interractions avec l'environnement (E ?)
                 self.controleur.joueur.interagit()
 
-            #Sinon, c'est qu'on veut controler les actions du perso (comme l'esprit le ferait pour les autres)
-            #Vu qu'on a fait les interractions ainsi que tous les choix depuis l'affichage au-dessus, il ne reste plus que les skills et leurs éventuelles précisions
-            self.controle_joueur(touche,mods)
-            self.controleur.joueur.nouvel_ordre = True
-
-        elif self.controleur.phase == TOUCHE:
-            #On veut modifier les touches
-            self.continue_change_touche(touche)
+            if self.controleur.joueur.touches["effets"].get(mods,{}).get(touche,[]):
+                #Sinon, c'est qu'on veut controler les actions du perso (comme l'esprit le ferait pour les autres)
+                #Vu qu'on a fait les interractions ainsi que tous les choix depuis l'affichage au-dessus, il ne reste plus que les skills et leurs éventuelles précisions
+                self.controle_joueur(touche,mods)
+                self.controleur.joueur.nouvel_ordre = True
+                self.controleur.joueur.attente = self.parametres["attente"]
 
     def controle_joueur(self,touche,mods):
         touches = self.controleur.joueur.touches
@@ -326,9 +323,11 @@ class Joueur:
         if self.controleur.phase == TOUR:
             if not self.controleur.joueur.nouvel_ordre: #On ne veut pas désélectionner un skill qui n'a pas encore été utilisé au moins une fois
                 for touches_skills in self.controleur.joueur.touches["skills"].values(): #On ne sait pas quels modificateurs étaient actifs lorsque la touche a été pressée
-                    if touches_skills.get(touche) == self.controleur.joueur.skill_courant: #La touche relachée est celle du skill courant
-                        self.controleur.joueur.statut = "joueur" #/!\ Vraiment ?
-                        self.controleur.joueur.skill_courant = None
+                    if touches_skills.get(touche) != None: #La touche relachée est liée à un skill
+                        if touches_skills.get(touche) == self.controleur.joueur.skill_courant: #La touche relachée est celle du skill courant
+                            self.controleur.joueur.statut = "attente"
+                            self.controleur.joueur.skill_courant = None
+                            self.controleur.joueur.attente = self.parametres["attente"]
 
     def recontrole(self):
         """La fonction qui réagit aux touches maintenues."""
@@ -339,7 +338,9 @@ class Joueur:
             pressees = pygame.key.get_pressed()
             for key in range(len(pressees)):
                 if pressees[key]:
-                    self.controle_joueur(key,mods)
+                    if self.controleur.joueur.touches["effets"].get(mods,{}).get(key,[]): #La touche est liée à un effet
+                        self.controle_joueur(key,mods)
+                        self.controleur.joueur.attente = self.parametres["attente"]
 
     def quitte(self):
         """Fonction qui quitte le jeu, en sauvegardant le controleur"""
@@ -373,6 +374,7 @@ class Joueur:
             add_constantes_temps('affichage')
             pygame.display.flip()
             self.patiente(1)
+            add_constantes_temps('patience')
             add_constantes_temps('reste')
 
     def start(self):

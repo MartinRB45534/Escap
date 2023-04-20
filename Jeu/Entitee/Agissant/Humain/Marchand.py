@@ -69,7 +69,6 @@ class Marchand(Dps,Humain): #Le dixième humain du jeu, à l'étage 9 (le seul l
             self.controleur.get_esprit(self.controleur.joueur.esprit).merge(self.esprit)
             self.mouvement = 0 #Légèrement redondant ici
             self.cible_deplacement = self.controleur.joueur.ID
-            self.attente = False
         elif replique == "dialogue1reponse1.1.2.1.2":
             self.end_dialogue(-2)
         elif replique == "dialogue1reponse1.1.1":
@@ -80,7 +79,6 @@ class Marchand(Dps,Humain): #Le dixième humain du jeu, à l'étage 9 (le seul l
             self.end_dialogue()
             self.mouvement = 0 #Légèrement redondant ici
             self.cible_deplacement = self.controleur.joueur.ID
-            self.attente = False
 
         #Dialogue par défaut:
         elif replique == "dialogue-1reponse1.1":

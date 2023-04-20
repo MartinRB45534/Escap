@@ -32,14 +32,14 @@ class Affichable:
     def touche(self,position):
         return position[0]>=self.position[0] and position[1]>=self.position[1] and position[0]<self.position[0]+self.tailles[0] and position[1]<self.position[1]+self.tailles[1]
 
-    def clique(self,position: List[int]):
+    def clique(self,position: List[int], droit: bool = False):
         #Trouve l'élément survolé par la souris et le renvoie
         res = False
         if self.touche(position):
             res = self
         return res
     
-    def clique_placeholder(self,placeheldholder):
+    def clique_placeholder(self,placeheldholder,droit: bool = False):
         return False
 
     def survol(self,position):
@@ -63,9 +63,9 @@ class Affichage(Affichable):
     def __init__(self):
         self.tailles = [0,0] #La largeur et la hauteur (ou l'inverse ?)
         self.position = [0,0]
-        self.objets = [] #La liste des objets à afficher
+        self.objets:List[Affichable] = [] #La liste des objets à afficher
 
-    def set_objets(self,objets):
+    def set_objets(self,objets:List[Affichable]):
         self.objets = objets
 
     def set_position(self,position):
@@ -81,21 +81,21 @@ class Affichage(Affichable):
         for objet in self.objets:
             objet.affiche(screen,frame,frame_par_tour)
 
-    def clique(self,position):
+    def clique(self,position: List[int], droit: bool = False):
         #Trouve l'élément survolé par la souris et le renvoie
         res = False
         if self.touche(position):
             res = self
         for objet in self.objets:
-            res_objet = objet.clique(position)
+            res_objet = objet.clique(position,droit)
             if res_objet:
                 res = res_objet
         return res
     
-    def clique_placeholder(self,placeheldholder):
+    def clique_placeholder(self,placeheldholder,droit: bool = False):
         res = False
         for objet in self.objets:
-            if objet.clique_placeholder(placeheldholder):
+            if objet.clique_placeholder(placeheldholder,droit):
                 res = objet
         return res
 
@@ -238,8 +238,8 @@ class Cliquable(Survolable): #Il faut être survolable pour être cliquable
     def unset_actif(self):
         self.actif = False
 
-    def clique(self,position):
-        clique = Affichable.clique(self,position)
+    def clique(self,position:List[int], droit:bool=False):
+        clique = Affichable.clique(self,position,droit)
         if clique is self:
             self.set_actif()
         else:
@@ -277,16 +277,16 @@ class Knot(Cliquable):
         else:
             warn(f"Erreur : on a atteint {self} qui n'est pas actif, mais n'a pas de courant dénini !")
 
-    def select(self, selection: Affichable):
-        if isinstance(selection, Cliquable):
+    def select(self, selection: Affichable, droit:bool=False):
+        if isinstance(selection, Cliquable) and not droit:
             self.set_courant(selection)
 
-    def clique(self,position: List[int]):
-        clique = Affichable.clique(self,position)
+    def clique(self,position: List[int],droit:bool=False):
+        clique = Affichable.clique(self,position,droit)
         if clique is self:
             self.set_actif()
         elif clique:
-            self.select(clique)
+            self.select(clique,droit)
             self.unset_actif()
         else:
             self.unset_actif()
@@ -568,7 +568,7 @@ class Knot_bloque(Knot):
                     return self
             return self
             
-    def select(self, selection):
+    def select(self, selection: Affichable, droit: bool = False):
         pass
 
 class Affichage_knot(Affichage,Knot):
@@ -577,17 +577,17 @@ class Affichage_knot(Affichage,Knot):
         
         self.objets:List[Affichable] = [] #La liste des objets à afficher
 
-    def clique(self,position):
-        clique = Affichage.clique(self,position)
+    def clique(self,position:List[int],droit:bool=False):
+        clique = Affichage.clique(self,position,droit)
         if clique is self:
             self.set_actif()
         elif isinstance(clique, Placeheldholder):
-            res = self.clique_placeholder(clique)
+            res = self.clique_placeholder(clique,droit)
             if not res:
                 self.unset_actif()
                 return clique
         elif clique:
-            self.select(clique)
+            self.select(clique,droit)
             self.unset_actif()
         else:
             self.unset_actif()
@@ -595,10 +595,10 @@ class Affichage_knot(Affichage,Knot):
             return self
         return False
 
-    def clique_placeholder(self,placeheldholder):
-        res = Affichable.clique_placeholder(self,placeheldholder)
+    def clique_placeholder(self,placeheldholder,droit:bool=False):
+        res = Affichable.clique_placeholder(self,placeheldholder,droit)
         if res:
-            self.select(res)
+            self.select(res,droit)
             return self
         return False
 
@@ -612,8 +612,8 @@ class Affichage_knot(Affichage,Knot):
             return self
         return False
     
-    def select(self,selection):
-        if isinstance(selection,Knot):
+    def select(self,selection:Cliquable,droit:bool=False):
+        if isinstance(selection,Knot) and not droit:
             self.set_courant(selection)
 
 class Conteneur(Affichable):
@@ -645,29 +645,29 @@ class Conteneur(Affichable):
         for objet in self.objets:
             objet.affiche(screen,frame,frame_par_tour)
 
-    def clique(self,position):
+    def clique(self,position:List[int],droit:bool=False):
         #Trouve l'élément survolé par la souris et le renvoie
         res = False
         if self.touche(position):
             pos_rel = [position[0]-self.position[0],position[1]-self.position[1]]
             for contenu in self.contenu:
-                res_contenu = contenu.clique(pos_rel)
+                res_contenu = contenu.clique(pos_rel,droit)
                 if res_contenu:
                     res = res_contenu
         for objet in self.objets:
-            res_objet = objet.clique(position)
+            res_objet = objet.clique(position,droit)
             if res_objet:
                 res = res_objet
         return res
 
-    def clique_placeholder(self,placeheldholder):
+    def clique_placeholder(self,placeheldholder,droit:bool=False):
         res = False
         for contenu in self.contenu:
-            res_contenu = contenu.clique_placeholder(placeheldholder)
+            res_contenu = contenu.clique_placeholder(placeheldholder,droit)
             if res_contenu:
                 res = res_contenu
         for objet in self.objets:
-            res_objet = objet.clique_placeholder(placeheldholder)
+            res_objet = objet.clique_placeholder(placeheldholder,droit)
             if res_objet:
                 res = res_objet
         return res
@@ -749,28 +749,28 @@ class Wrapper(Conteneur):
         for objet in self.objets:
             objet.affiche(screen,frame,frame_par_tour)
 
-    def clique(self,position):
+    def clique(self,position:List[int],droit:bool=False):
         #Trouve l'élément survolé par la souris et le renvoie
         res = False
         if self.touche(position):
             res = self #La plupart des trucs qu'on veut pouvoir cliquer sont les Wrapper, pas les listes et pavages intermédiaires
             pos_rel = [position[0]-self.position[0],position[1]-self.position[1]]
-            res_contenu = self.contenu.clique(pos_rel)
+            res_contenu = self.contenu.clique(pos_rel,droit)
             if res_contenu:
                 res = res_contenu
         for objet in self.objets:
-            res_objet = objet.clique(position)
+            res_objet = objet.clique(position,droit)
             if res_objet:
                 res = res_objet
         return res
     
-    def clique_placeholder(self,placeheldholder):
+    def clique_placeholder(self,placeheldholder,droit:bool=False):
         res = False
-        res_contenu = self.contenu.clique_placeholder(placeheldholder)
+        res_contenu = self.contenu.clique_placeholder(placeheldholder,droit)
         if res_contenu:
             res = res_contenu
         for objet in self.objets:
-            res_objet = objet.clique_placeholder(placeheldholder)
+            res_objet = objet.clique_placeholder(placeheldholder,droit)
             if res_objet:
                 res = res_objet
         return res
@@ -860,8 +860,8 @@ class Wrapper_cliquable(Wrapper,Cliquable):
         for objet in self.objets:
             objet.affiche(screen,frame,frame_par_tour)
 
-    def clique(self,position):
-        clique = Wrapper.clique(self,position)
+    def clique(self,position:List[int],droit:bool=False):
+        clique = Wrapper.clique(self,position,droit)
         if clique is self:
             self.set_actif()
         else:
@@ -889,17 +889,17 @@ class Wrapper_knot(Wrapper_cliquable,Knot):
         self.contenu:Affichable = None #L'objet qu'il 'contient'
         self.fond = (0,0,0,0)
 
-    def clique(self,position):
-        clique = Wrapper.clique(self,position)
+    def clique(self,position, droit:bool=False):
+        clique = Wrapper.clique(self,position,droit)
         if clique is self:
             self.set_actif()
         elif isinstance(clique, Placeheldholder):
-            res = self.clique_placeholder(clique)
+            res = self.clique_placeholder(clique, droit)
             if not res:
                 self.unset_actif()
                 return clique
         elif clique:
-            self.select(clique)
+            self.select(clique, droit)
             self.unset_actif()
         else:
             self.unset_actif()
@@ -907,10 +907,10 @@ class Wrapper_knot(Wrapper_cliquable,Knot):
             return self
         return False
     
-    def clique_placeholder(self,placeheldholder):
-        res = Wrapper.clique_placeholder(self,placeheldholder)
+    def clique_placeholder(self,placeheldholder, droit:bool=False):
+        res = Wrapper.clique_placeholder(self,placeheldholder, droit)
         if res:
-            self.select(res)
+            self.select(res, droit)
             return self
         return False
     
@@ -930,8 +930,6 @@ class Placeheldholder(Wrapper_knot):
     def trouve_actif(self):
         if isinstance(self.contenu,Cliquable):
             self.contenu.trouve_actif()
-
-    # def clique(self, position: List[int]):
 
 class Placeholder(Knot):
     """Un élément qui lie à un autre, ailleurs."""
@@ -954,10 +952,10 @@ class Placeholder(Knot):
         self.marque_actif = True
         self.courant.trouve_actif()
 
-    def clique(self, position: List[int]):
-        return Cliquable.clique(self, position) # On ne veut pas que le clique soit propagé
+    def clique(self, position: List[int], droit:bool=False):
+        return Cliquable.clique(self, position, droit) # On ne veut pas que le clique soit propagé
 
-    def clique_placeholder(self,placeheldholder:Placeheldholder):
+    def clique_placeholder(self,placeheldholder:Placeheldholder, droit:bool=False):
         if placeheldholder is self.placeheldholder and self.courant is placeheldholder.contenu:
             return self
 
@@ -1137,33 +1135,33 @@ class Liste(Conteneur):
             self.repartition = repartition
             self.courant = courant
 
-    def clique(self,position):
+    def clique(self,position:List[int],droit:bool=False):
         #Trouve l'élément survolé par la souris et le renvoie
         res = False
         if self.touche(position):
             pos_rel = [position[0]-self.position[0],position[1]-self.position[1]]
             for i in range(len(self.contenu)):
-                res_contenu = self.contenu[i].clique(pos_rel)
+                res_contenu = self.contenu[i].clique(pos_rel,droit)
                 if res_contenu:
                     res = res_contenu
                     self.courant = i
                     self.ajuste(res)
         for objet in self.objets:
-            res_objet = objet.clique(position)
+            res_objet = objet.clique(position,droit)
             if res_objet:
                 res = res_objet
         return res
 
-    def clique_placeholder(self,placeheldholder):
+    def clique_placeholder(self,placeheldholder,droit:bool=False):
         res = False
         for i in range(len(self.contenu)):
-            res_contenu = self.contenu[i].clique_placeholder(placeheldholder)
+            res_contenu = self.contenu[i].clique_placeholder(placeheldholder,droit)
             if res_contenu:
                 res = res_contenu
                 self.courant = i
                 self.ajuste(res)
         for objet in self.objets:
-            res_objet = objet.clique_placeholder(placeheldholder)
+            res_objet = objet.clique_placeholder(placeheldholder,droit)
             if res_objet:
                 res = res_objet
 
@@ -1362,13 +1360,14 @@ class Liste_menu(Wrapper_knot):
     """Une liste sur plusieurs lignes"""
     def __init__(self):
         Wrapper_knot.__init__(self)
+        self.contenu:List[Cliquable] = []
         
         self.liste = None
 
     def set_fond(self,fond):
         self.fond = fond
 
-    def set_contenu(self,contenu):
+    def set_contenu(self,contenu:List[Cliquable]):
         self.contenu = contenu
         self.set_courant(contenu[0])
 
@@ -1376,6 +1375,8 @@ class Liste_menu(Wrapper_knot):
         self.tailles = tailles
         listes=[]
         ligne=[]
+        ligne_courante=[]
+        liste_courante=Liste_horizontale()
         longueur_ligne=5
         for i in range(len(self.contenu)):
             if self.contenu[i].get_tailles(self.tailles)[0] + 10 >tailles[0]:
@@ -1437,30 +1438,30 @@ class Liste_menu(Wrapper_knot):
         for objet in self.objets:
             objet.affiche(screen,frame,frame_par_tour)
 
-    def clique(self,position):
+    def clique(self,position,droit:bool=False):
         #Trouve l'élément survolé par la souris et le renvoie
         res = False
         if self.touche(position):
             pos_rel = [position[0]-self.position[0],position[1]-self.position[1]]
             for contenu in self.contenu:
-                res_contenu = contenu.clique(pos_rel)
+                res_contenu = contenu.clique(pos_rel,droit)
                 if res_contenu:
                     res = res_contenu
         for objet in self.objets:
-            res_objet = objet.clique(position)
+            res_objet = objet.clique(position,droit)
             if res_objet:
                 res = res_objet
         self.set_courant(res)
         return res
 
-    def clique_placeholder(self,placeheldholder):
+    def clique_placeholder(self,placeheldholder,droit:bool=False):
         res = False
         for contenu in self.contenu:
-            res_contenu = contenu.clique_placeholder(placeheldholder)
+            res_contenu = contenu.clique_placeholder(placeheldholder,droit)
             if res_contenu:
                 res = res_contenu
         for objet in self.objets:
-            res_objet = objet.clique_placeholder(placeheldholder)
+            res_objet = objet.clique_placeholder(placeheldholder,droit)
             if res_objet:
                 res = res_objet
         return res

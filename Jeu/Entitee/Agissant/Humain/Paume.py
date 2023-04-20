@@ -91,26 +91,25 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
             self.end_dialogue()
             self.mouvement = 0 #Légèrement redondant ici
             self.cible_deplacement = self.controleur.joueur.ID
-            self.attente = False
         elif replique == "dialogue1reponse1.1.1.1.2":
             self.appreciations[0]-= 0.5
             self.end_dialogue(-2)
-            self.statut_humain = "exploration"
+            self.statut_pnj = "exploration"
         elif replique == "dialogue1reponse1.2":
             self.appreciations[0]-= 0.5
             self.end_dialogue(-2)
-            self.statut_humain = "exploration"
+            self.statut_pnj = "exploration"
 
         #Dialogue par défaut -2
         elif replique == "dialogue-2reponse1.1":
             self.end_dialogue(-2)
-            self.statut_humain = "exploration"
+            self.statut_pnj = "exploration"
         elif replique == "dialogue-2reponse1.2":
             self.replique="dialogue-2phrase1.2"
             self.repliques = ["dialogue-2reponse1.2.1"]
         elif replique == "dialogue-2reponse1.2.1":
             self.end_dialogue(-2)
-            self.statut_humain = "exploration"
+            self.statut_pnj = "exploration"
         elif replique == "dialogue-2reponse1.3":
             self.replique="dialogue-2phrase1.3"
             self.repliques = ["dialogue-2reponse1.3.1"]
@@ -124,12 +123,10 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
             self.end_dialogue()
             self.mouvement = 0 #Légèrement redondant ici
             self.cible_deplacement = self.controleur.joueur.ID
-            self.attente = False
         elif replique == "dialogue-2reponse1.3.1.2":
             self.end_dialogue()
             self.mouvement = 0 #Légèrement redondant ici
             self.cible_deplacement = self.controleur.joueur.ID
-            self.attente = False
 
         #Deuxième dialogue
         #On vient de tuer le premier gobelin

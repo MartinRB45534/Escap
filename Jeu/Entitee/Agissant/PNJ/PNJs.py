@@ -14,21 +14,35 @@ class PNJ(Agissant, Interactif):
     Un personnage non-jouable (en vrai plutôt non-joué ici, il peut être controlable par un joueur).
     Se distingue par sa capacité à parler, obéir et le fait d'attendre le joueur jusqu'à le rencontrer.
     """
-    def __init__(self, controleur: Controleur, position: Position, identite: str, niveau: int, ID: int = None):
+    def __init__(self, controleur: Controleur, position: Position, identite: str, niveau: int, ID: int|None = None):
         Agissant.__init__(self, controleur, position, identite, niveau, ID)
         self.dialogue = -1 #Le dialogue par défaut, celui des ordres
         self.replique = None #La réplique en cours de l'agissant vaut None lorsqu'il n'y a pas de dialogue en cours
         self.repliques = [] #Les réponses possibles de l'interlocuteur
         self.replique_courante = 0 #La réponse sélectionnée
 
-        self.mouvement = 0 #0 pour un déplacement ciblé, 1 pour chercher, 2 pour un déplacement ciblé prioritaire et précis
+        self.mouvement = 3 #0 pour un déplacement ciblé, 1 pour chercher, 2 pour un déplacement ciblé prioritaire et précis, 3 pour l'attente
         self.cible_deplacement = self.ID #Une ID pour suivre quelqu'un, ou une position pour s'y diriger
         self.comportement_corps_a_corps = 0 #0 pour attaquer, 1 pour ignorer, 2 pour fuir
         self.comportement_distance = 0 #0 pour foncer dans le tas, 1 pour tenter une attaque à distance puis se rapprocher, 2 pour tenter une attaque à distance puis fuir, 3 pour fuir puis tenter une attaque à distance
         self.antagonise_neutres = False #Si True, sera offensé par la simple vision d'un neutre (utile pour fuir les ennemis avant qu'ils n'attaquent)
         self.antagonise_offensifs = False #Si True, sera offensé par les neutres qui veulent l'attaquer (utile pour fuir les ennemis avant qu'ils n'attaquent sans déclencher de combats pour rien, mais nécessite une certaine intelligence...)
 
-        self.attente = True #Le PNJ attend le joueur
+        self.statut_pnj = "attente"
+
+    def get_skins_statuts(self):
+        skins = Agissant.get_skins_statuts(self)
+        if self.statut_pnj == "exploration":
+            skins.append(SKIN_STATUT_CHERCHE)
+        elif self.statut_pnj == "proximite":
+            skins.append(SKIN_STATUT_PROXIMITE)
+        elif self.statut_pnj == "en chemin":
+            skins.append(SKIN_STATUT_CHEMIN)
+        elif self.statut_pnj == "perdu":
+            skins.append(SKIN_STATUT_PERDU)
+        elif self.statut_pnj == "paume":
+            skins.append(SKIN_STATUT_PAUME)
+        return skins
 
     def fuite(self):
         return False
@@ -53,8 +67,6 @@ class PNJ(Agissant, Interactif):
         self.offenses = []
         if self.etat != "vivant" or self.controleur == None:
             etat = "incapacite"
-        elif self.attente:
-            etat = "attente"
         elif self.fuite():
             etat = "fuite"
         else:
@@ -69,7 +81,7 @@ class PNJ(Agissant, Interactif):
         self.mouvement = 0
         self.cible_deplacement = ID
 
-    def set_cible(self,cible:Union[int,Position]):
+    def set_cible(self,cible:int|Position):
         self.mouvement = 0
         self.cible_deplacement = cible
         self.replique = "dialogue-1phrase1.1.1.2"
@@ -103,9 +115,6 @@ class PNJ(Agissant, Interactif):
 
     def interprete(self,replique:str):
         raise NotImplementedError(f"Je ne peux pas interpréter {replique}. Parce que tu n'as pas surdéfini la méthode interprete pour {self}.")
-
-    def set_cible(self,cible:Union[int,Position]):
-        raise NotImplementedError(f"Je ne peux pas cibler {cible}. Parce que tu n'as pas surdéfini la méthode set_cible pour {self}.")
 
     def get_replique(self,code:str):
         raise NotImplementedError(f"Je ne peux pas trouver la réplique correspondant à {code}. Parce que tu n'as pas surdéfini la méthode get_replique pour {self}.")
@@ -141,10 +150,14 @@ class PJ(PNJ): #Les PJs sont des PNJs, parce que le mot PNJ est trompeur
     - des touches de contrôle
     - un interlocuteur
     """
-    def __init__(self, controleur: Controleur, position: Position, identite: str, niveau: int, ID: int = None):
-        PNJ.__init__(controleur, position, identite, niveau, ID)
+    def __init__(self, controleur: Controleur, position: Position, identite: str, niveau: int, ID: int|None = None):
+        PNJ.__init__(self,controleur, position, identite, niveau, ID)
+        self.statut_simule:str = "attente"
+        self.skill_courant_simule:Type[Skill]|None = None
+        self.dir_regard_simule:Direction|None = None
+        self.attente:int = -1
         self.nouvel_ordre:bool = False
-        self.interlocuteur:Interactif|PNJ|PNJ_mage|PJ = None
+        self.interlocuteur:Interactif|PNJ|PNJ_mage|None = None
         self.touches:Dict[str,Dict[Tuple[int],Dict[int,List[str]|Type[Skill]|Direction|Type[Projectile]|str]]] = {
             "effets":{
             },
@@ -155,7 +168,39 @@ class PJ(PNJ): #Les PJs sont des PNJs, parce que le mot PNJ est trompeur
             "projectiles":{},
             "magies":{},
         }
-                          
+
+    def get_offenses(self):
+        for offense in self.offenses:
+            if offense[0] == 2: #/!\ Comment gérer des dialogues différents avec chaque autre humain ? Pour l'instant, on ne va pas y toucher
+                self.dialogue = 0
+        offenses = self.offenses
+        self.offenses = []
+        if self.etat != "vivant" or self.controleur == None:
+            etat = "incapacite"
+        elif self.attente:
+            etat = "PJ" #Et les PJs on n'en parle même pas
+            self.attente -= 1
+        elif self.fuite():
+            etat = "fuite"
+        else:
+            etat = "PNJ" #Les PNJs ont des comportements inutilement alambiqués...
+        return offenses, etat
+
+    def simule_attaque(self,direction:Direction):
+        self.dir_regard_simule = direction
+        if self.get_arme() != None:
+            self.skill_courant_simule = Skill_attaque
+        else:
+            self.skill_courant_simule = Skill_stomp
+        self.statut_simule = "attaque"
+
+    def simule_va(self,direction:Direction):
+        self.dir_regard_simule = direction
+        self.skill_courant_simule = Skill_deplacement
+
+    def simule_agit_en_vue(self,esprit:Esprit,defaut = ""): #Pas d'action à distance par défaut
+        return defaut
+
     def interagit(self):
         #On cherche la personne :
         self.interlocuteur = None #Normalement c'est déjà le cas
@@ -177,3 +222,6 @@ class PJ(PNJ): #Les PJs sont des PNJs, parce que le mot PNJ est trompeur
                         if isinstance(interactif,Ustensile):
                             self.controleur.set_phase(RECETTE)
                     break
+
+class PJ_mage(PJ, PNJ_mage):
+    pass

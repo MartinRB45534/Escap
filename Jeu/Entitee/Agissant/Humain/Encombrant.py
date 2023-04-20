@@ -77,14 +77,12 @@ class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyenne
             self.end_dialogue()
             self.mouvement = 0 #Légèrement redondant ici
             self.cible_deplacement = self.controleur.joueur.ID
-            self.attente = False
         elif replique == "dialogue1reponse1.1.2":
             self.replique="dialogue1phrase1.1.2"
             self.repliques = ["dialogue1reponse1.1.2.1"]
         elif replique == "dialogue1reponse1.1.2.1":
             self.end_dialogue(-2)
-            self.statut_humain = "exploration"
-            self.attente = False
+            self.statut_pnj = "exploration"
         elif replique == "dialogue1reponse1.2":
             self.replique="dialogue1phrase1.2"
             self.repliques = ["dialogue1reponse1.2.1","dialogue1reponse1.2.2"]
@@ -94,9 +92,8 @@ class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyenne
         elif replique == "dialogue1reponse1.2.2":
             #self.controleur.get_esprit(self.esprit).antagonise(truc comme ça ou une offense ?
             #+ modifier le role, ou quelque chose, pour qu'il combatte
-            self.attente = False
             self.end_dialogue(-2)
-            self.statut_humain = "exploration"
+            self.statut_pnj = "exploration"
 
         #Septième dialogue
         #Le joueur a utilisé un téléporteur
@@ -220,7 +217,7 @@ class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyenne
         #Dialogue par défaut -2
         elif replique == "":
             self.end_dialogue(-2)
-            self.statut_humain = "exploration"
+            self.statut_pnj = "exploration"
 
         #Dialogue par défaut:
         elif replique == "dialogue-1reponse1.1":
