@@ -126,7 +126,7 @@ class Joueur:
 
         #On récupère les intervenants du tour
         self.agissants_courants,self.items_courants,self.labs_courants,self.esprits_courants = self.controleur.get_agissants_items_labs_esprits()
-        add_constantes_temps('reste')
+        add_constantes_temps('trucs courants')
 
         for agissant in self.agissants_courants :
             self.controleur.make_vue(agissant)
@@ -136,12 +136,13 @@ class Joueur:
         add_constantes_temps('update')
         for item in self.items_courants :
             item.debut_tour()
+        add_constantes_temps('items.debut_tour')
         for lab in self.labs_courants:
             lab.debut_tour()
-        add_constantes_temps('reste')
+        add_constantes_temps('labs.debut_tour')
         for esprit in self.esprits_courants:
             esprit.debut_tour() #Des décisions sont prises ici
-        add_constantes_temps('esprits')
+        add_constantes_temps('esprits.debut_tour')
 
     def pseudo_debut_tour(self):
         """La fonction qui fait la première moitiée de chaque tour"""
@@ -151,11 +152,12 @@ class Joueur:
 
         for agissant in self.agissants_courants :
             self.controleur.make_vue(agissant)
-        add_constantes_temps('reste')
+        add_constantes_temps('agissants.make_vue')
         self.affichage.update()
-        add_constantes_temps('update')
+        add_constantes_temps('affichage.update')
         for lab in self.labs_courants:
             lab.pseudo_debut_tour()
+        add_constantes_temps('labs.pseudo_debut_tour')
 
     def fin_tour(self):
         """La fonction qui fait la deuxième moitiée de chaque tour"""
@@ -375,7 +377,6 @@ class Joueur:
             pygame.display.flip()
             self.patiente(1)
             add_constantes_temps('patience')
-            add_constantes_temps('reste')
 
     def start(self):
         """Fonction qui commence une partie."""
