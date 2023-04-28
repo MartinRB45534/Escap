@@ -1,4 +1,3 @@
-# global REPLIQUES_PAUME
 REPLIQUES_PAUME = {
     "dialogue1phrase1":"Quelle chance, il y a quelqu'un ici !",
     "dialogue1reponse1.1":"Bonjour.",

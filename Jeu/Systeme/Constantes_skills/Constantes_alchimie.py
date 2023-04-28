@@ -1,6 +1,5 @@
 #Les stats du skill d'alchimie
 
-# global recettes_alchimie
 recettes_alchimie = [
     [],
     [{"produit":"Parchemin_vierge",

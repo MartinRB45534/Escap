@@ -1,4 +1,3 @@
-# global REPLIQUES_PESTE
 REPLIQUES_PESTE = {
     "dialogue1phrase1":"Hey, toi !",
     "dialogue1reponse1.1":"Qu'est-ce qu'il y a ?",

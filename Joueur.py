@@ -4,7 +4,6 @@ import copy
 pygame.init()
 screen = pygame.display.set_mode((1350, 690),pygame.RESIZABLE)
 
-# global GLOBALS
 GLOBALS = {"controleur":None}
 
 from Modifiers import *
@@ -789,8 +788,7 @@ class Joueur:
     def ouvre(self):
         run = True
 
-        # global ID_MAX
-
+        
         while run:
             boutons = [[f"Partie n°{i}",[f"Le joueur est au niveau {self.controleurs[i][2].niveau},",f"et a atteint l'étage {self.controleurs[i][2].position.lab}"],self.controleurs[i]] for i in range(len(self.controleurs))] + [
              ["Nouveau",["Lancer une nouvelle partie"],"ctrln"],

@@ -1,4 +1,3 @@
-# global REPLIQUES_ENCOMBRANT
 REPLIQUES_ENCOMBRANT = {
     "dialogue1phrase1":"Hey, salut ! Moi c'est [insérer le nom du copain ici].",
     "dialogue1reponse1.1":"Moi c'est Arvel.",

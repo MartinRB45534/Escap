@@ -1,4 +1,3 @@
-# global REPLIQUES_RECEPTIONNISTE
 REPLIQUES_RECEPTIONNISTE ={
     "dialogue1phrase1":"Quelle chute ! Tu vas bien ? Tu peux m'entendre ?",
     "dialogue1reponse1.1":"Oui... (Clique pour répondre.)",

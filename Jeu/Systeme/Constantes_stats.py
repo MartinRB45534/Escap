@@ -1,4 +1,3 @@
-# global CONSTANTES_STATS
 import time
 
 
@@ -489,11 +488,9 @@ CONSTANTES_STATS = {
         'special':False},
         }
 
-# global constantes_temps
 constantes_temps = {'tours':0,
                     'courant':0}
 
-# global constantes_deplacements
 constantes_deplacements = []
 
 def set_constantes_temps_courant():

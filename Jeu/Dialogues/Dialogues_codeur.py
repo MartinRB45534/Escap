@@ -1,4 +1,3 @@
-# global REPLIQUES_CODEUR
 REPLIQUES_CODEUR = {
     "dialogue-1phrase1":"Salut, qu'est-ce que tu viens faire ici ?",
     "dialogue-1reponse1.1":"Je me suis perdu !",
