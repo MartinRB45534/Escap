@@ -1699,11 +1699,16 @@ class Esprit :
     def debut_tour(self):
         #On va faire plein de choses pendant ce tour (est-ce vraiment nécessaire de prendre des décisions si aucun des corps ne va jouer à ce tour ?
         self.get_offenses() #On s'insurge à grands cris (s'il y a lieu)
+        add_constantes_temps("offenses")
         self.refait_vue() #On prend connaissance de son environnement
         #Il faudra éventuellement définir une stratégie
+        add_constantes_temps("vue") # 12
         self.trouve_strateges()
+        add_constantes_temps("strateges")
         self.calcule_trajets() #On dresse les plans de bataille (s'il y a lieu)
+        add_constantes_temps("trajets") # 10
         self.decide() #On donne les ordres
+        add_constantes_temps("decisions") # 7
 
     def pseudo_debut_tour(self):
         pass

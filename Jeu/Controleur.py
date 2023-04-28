@@ -1432,7 +1432,7 @@ class Controleur():
                     entitees.append(ID_entitee)
         return entitees
 
-    def get_agissants_items_labs_esprits(self):
+    def get_agissants_items_labs_esprits(self) -> Tuple[List[Agissant],List[Item],List[Labyrinthe],List[Esprit]]:
         self.nb_tours+=1
         agissants:List[Agissant] = []
         items:List[Item] = []

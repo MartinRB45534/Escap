@@ -491,11 +491,6 @@ CONSTANTES_STATS = {
 
 # global constantes_temps
 constantes_temps = {'tours':0,
-                    'agissants.debut_tour':0,
-                    'esprits':0,
-                    'affichage':0,
-                    'update':0,
-                    'reste':0,
                     'courant':0}
 
 # global constantes_deplacements
