@@ -1923,14 +1923,9 @@ class Vignette_item(Vignette_composee):
         Vignette_composee.__init__(self,vignettes,taille,shade,invalide)
 
 class Vignette_item_placeholder(Vignette_placeholder):
-    def __init__(self,placeheldholder:Placeheldholder,placeheld:Knot,position,item:Item,taille,direction=None,shade=False,invalide=False):
+    def __init__(self,placeheldholder:Placeheldholder,placeheld:Knot,position,item:Item,taille,shade=False,invalide=False):
         self.item = item
-        if direction == None:
-            direction = item.get_direction()
-        vignettes = [Vignette(position,taille,item.get_skin(),direction)]
-        for effet in item.effets:
-            if effet.affiche:
-                vignettes.append(Vignette(position,taille,effet.get_skin(),direction))
+        vignettes = [Vignette(position,taille,item.get_skin())]
 
         Vignette_placeholder.__init__(self,placeheldholder,placeheld,vignettes,taille,shade,invalide)
 
@@ -2055,15 +2050,15 @@ class Vignette_case(Vignette_composee):
 
         Vignette_composee.__init__(self,vignettes,taille)
 
-class Vignette_allie_neutre_ennemi(Vignette_placeholder_updatable):
+class Vignette_allie(Vignette_placeholder_updatable):
     def __init__(self,placeheldholder:Placeheldholder,agissant:Agissant,taille,shade=False,invalide=False):
         self.agissant = agissant
         vignettes = [Vignettes_agissant([0,0],agissant,taille)]
         for statut in agissant.get_skins_statuts():
             vignettes.append(Vignette([0,0],taille,statut))
 
-        Vignette_placeholder_updatable.__init__(self,placeheldholder,Paves(agissant.get_texte_descriptif()),vignettes,taille,shade,invalide)
-        
+        Vignette_placeholder_updatable.__init__(self,placeheldholder,Description_allie(agissant.controleur,agissant),vignettes,taille,shade,invalide)
+
     def update(self):
         self.objets:List[Affichable] = []
         self.objets.append(Vignettes_agissant(self.position,self.agissant,self.tailles[0]))
@@ -2072,11 +2067,278 @@ class Vignette_allie_neutre_ennemi(Vignette_placeholder_updatable):
         self.objets+=self.shades
         self.courant.update()
 
-class Vignette_allie(Vignette_allie_neutre_ennemi):
-    pass
+class Vignette_ennemi(Vignette_placeholder_updatable):
+    def __init__(self,placeheldholder:Placeheldholder,agissant:Agissant,taille,shade=False,invalide=False):
+        self.agissant = agissant
+        vignettes = [Vignettes_agissant([0,0],agissant,taille)]
 
-class Vignette_ennemi(Vignette_allie_neutre_ennemi):
-    pass
+        Vignette_placeholder_updatable.__init__(self,placeheldholder,Description_ennemi(agissant.controleur, agissant),vignettes,taille,shade,invalide)
+        
+    def update(self):
+        self.objets:List[Affichable] = []
+        self.objets.append(Vignettes_agissant(self.position,self.agissant,self.tailles[0]))
+        self.objets+=self.shades
+        self.courant.update()
 
-class Vignette_neutre(Vignette_allie_neutre_ennemi):
-    pass
+class Vignette_neutre(Vignette_placeholder_updatable):
+    def __init__(self,placeheldholder:Placeheldholder,agissant:Agissant,taille,shade=False,invalide=False):
+        self.agissant = agissant
+        vignettes = [Vignettes_agissant([0,0],agissant,taille)]
+
+        Vignette_placeholder_updatable.__init__(self,placeheldholder,Description_neutre(agissant.controleur, agissant),vignettes,taille,shade,invalide)
+        
+    def update(self):
+        self.objets:List[Affichable] = []
+        self.objets.append(Vignettes_agissant(self.position,self.agissant,self.tailles[0]))
+        self.objets+=self.shades
+        self.courant.update()
+
+class Description_allie(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
+    def __init__(self,controleur:Controleur,allie:Agissant):
+        Wrapper_knot.__init__(self)
+
+        self.controleur = controleur
+        self.allie = allie
+        self.fond = (0, 0, 0)
+
+        self.paves = Paves(self.allie.get_texte_descriptif())
+        self.boutons = [
+            Bouton(SKIN_REJOINDRE, "Rejoindre"),
+            Bouton(SKIN_PARLER, "Parler") if isinstance(self.allie, PNJ) else None,
+            Bouton(SKIN_AIDER, "Aider"),
+            Bouton(SKIN_EXCLURE, "Exclure"),
+        ].remove(None)
+
+        self.init()
+
+    def init(self):
+        contenu = Pavage_horizontal()
+        diptique = Pavage_vertical()
+        boutons = Pavage_horizontal()
+        boutons.set_contenu([self.boutons[i//2] if i%2==0 else Marge_verticale() for i in range(len(self.boutons)*2)], [0 if i%2==0 else 5 for i in range(len(self.boutons)*2-1)]+[-1])
+        diptique.set_contenu([Marge_horizontale(),self.paves,Marge_horizontale(),boutons,Marge_horizontale()],[5, -1, 5, 0, 5])
+        contenu.set_contenu([Marge_verticale(),diptique,Marge_verticale()],[5,-1,5])
+        self.contenu = contenu
+        self.fond = (0, 0, 0)
+
+    def select(self, selection: Cliquable, droit: bool = False):
+        if not droit:
+            if isinstance(selection, Bouton):
+                if selection.texte == "Rejoindre":
+                    self.controleur.joueur.mouvement = 0
+                    self.controleur.joueur.cible_deplacement = self.allie.ID
+                elif selection.texte == "Parler":
+                    self.controleur.joueur.mouvement = 2
+                    self.controleur.joueur.cible_deplacement = self.allie.ID
+                elif selection.texte == "Aider":
+                    pass #TODO : Définir l'action d'aide
+                elif selection.texte == "Exclure":
+                    esprit:Esprit = self.controleur[self.controleur.joueur.esprit]
+                    if isinstance(esprit, Esprit_humain):
+                        esprit.exclus(self.allie.ID)
+        # TODO : indiquer que l'action a été effectuée
+
+    def set_default_courant(self):
+        self.courant = self.boutons[0]
+
+    def in_left(self):
+        if self.courant in self.boutons and self.boutons.index(self.courant) > 0:
+            self.set_courant(self.boutons[self.boutons.index(self.courant) - 1])
+
+    def in_right(self):
+        if self.courant in self.boutons and self.boutons.index(self.courant) < len(self.boutons) - 1:
+            self.set_courant(self.boutons[self.boutons.index(self.courant) + 1])
+
+    def update(self):
+        self.paves = Paves(self.allie.get_texte_descriptif())
+        self.init()
+        self.contenu.update()
+        for objet in self.objets:
+            objet.update()
+
+class Description_neutre(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
+    def __init__(self,controleur:Controleur,neutre:Agissant):
+        Wrapper_knot.__init__(self)
+
+        self.controleur = controleur
+        self.neutre = neutre
+        self.fond = (0, 0, 0)
+
+        self.paves = Paves(self.neutre.get_texte_descriptif())
+        self.boutons = [
+            Bouton(SKIN_REJOINDRE, "Rejoindre"),
+            Bouton(SKIN_PARLER, "Parler") if isinstance(self.neutre, PNJ) else None,
+            Bouton(SKIN_ATTAQUER, "Attaquer"),
+            Bouton(SKIN_ANTAGONISER, "Antagoniser"),
+        ].remove(None)
+
+        self.init()
+
+    def init(self):
+        contenu = Pavage_horizontal()
+        diptique = Pavage_vertical()
+        boutons = Pavage_horizontal()
+        boutons.set_contenu([self.boutons[i//2] if i%2==0 else Marge_verticale() for i in range(len(self.boutons)*2)], [0 if i%2==0 else 5 for i in range(len(self.boutons)*2-1)]+[-1])
+        diptique.set_contenu([Marge_horizontale(),self.paves,Marge_horizontale(),boutons,Marge_horizontale()],[5, -1, 5, 0, 5])
+        contenu.set_contenu([Marge_verticale(),diptique,Marge_verticale()],[5,-1,5])
+        self.contenu = contenu
+        self.fond = (0, 0, 0)
+
+    def select(self, selection: Cliquable, droit: bool = False):
+        if not droit:
+            if isinstance(selection, Bouton):
+                if selection.texte == "Rejoindre":
+                    self.controleur.joueur.mouvement = 0
+                    self.controleur.joueur.cible_deplacement = self.neutre.ID
+                elif selection.texte == "Parler":
+                    self.controleur.joueur.mouvement = 2
+                    self.controleur.joueur.cible_deplacement = self.neutre.ID
+                elif selection.texte == "Attaquer":
+                    self.controleur.joueur.mouvement = 4
+                    self.controleur.joueur.cible_deplacement = self.neutre.ID
+                elif selection.texte == "Antagoniser":
+                    esprit:Esprit = self.controleur[self.controleur.joueur.esprit]
+                    esprit.ennemis[self.neutre.ID] = 0.1
+        # TODO : indiquer que l'action a été effectuée
+
+    def set_default_courant(self):
+        self.courant = self.boutons[0]
+
+    def in_left(self):
+        if self.courant in self.boutons and self.boutons.index(self.courant) > 0:
+            self.set_courant(self.boutons[self.boutons.index(self.courant) - 1])
+
+    def in_right(self):
+        if self.courant in self.boutons and self.boutons.index(self.courant) < len(self.boutons) - 1:
+            self.set_courant(self.boutons[self.boutons.index(self.courant) + 1])
+
+    def update(self):
+        self.paves = Paves(self.neutre.get_texte_descriptif())
+        self.init()
+        self.contenu.update()
+        for objet in self.objets:
+            objet.update()
+
+class Description_ennemi(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
+    def __init__(self,controleur:Controleur,ennemi:Agissant):
+        Wrapper_knot.__init__(self)
+
+        self.controleur = controleur
+        self.ennemi = ennemi
+        self.fond = (0, 0, 0)
+
+        self.paves = Paves(self.ennemi.get_texte_descriptif())
+        self.boutons = [
+            Bouton(SKIN_REJOINDRE, "Rejoindre"),
+            Bouton(SKIN_PARLER, "Parler") if isinstance(self.ennemi, PNJ) else None,
+            Bouton(SKIN_ATTAQUER, "Attaquer"),
+            Bouton(SKIN_PRIORISER, "Prioriser"),
+        ].remove(None)
+
+        self.init()
+
+    def init(self):
+        contenu = Pavage_horizontal()
+        diptique = Pavage_vertical()
+        boutons = Pavage_horizontal()
+        boutons.set_contenu([self.boutons[i//2] if i%2==0 else Marge_verticale() for i in range(len(self.boutons)*2)], [0 if i%2==0 else 5 for i in range(len(self.boutons)*2-1)]+[-1])
+        diptique.set_contenu([Marge_horizontale(),self.paves,Marge_horizontale(),boutons,Marge_horizontale()],[5, -1, 5, 0, 5])
+        contenu.set_contenu([Marge_verticale(),diptique,Marge_verticale()],[5,-1,5])
+        self.contenu = contenu
+        self.fond = (0, 0, 0)
+
+    def select(self, selection: Cliquable, droit: bool = False):
+        if not droit:
+            if isinstance(selection, Bouton):
+                if selection.texte == "Rejoindre":
+                    self.controleur.joueur.mouvement = 0
+                    self.controleur.joueur.cible_deplacement = self.ennemi.ID
+                elif selection.texte == "Parler":
+                    self.controleur.joueur.mouvement = 2
+                    self.controleur.joueur.cible_deplacement = self.ennemi.ID
+                elif selection.texte == "Attaquer":
+                    self.controleur.joueur.mouvement = 4
+                    self.controleur.joueur.cible_deplacement = self.ennemi.ID
+                elif selection.texte == "Prioriser":
+                    esprit:Esprit = self.controleur[self.controleur.joueur.esprit]
+                    esprit.ennemis[self.ennemi.ID] += 1
+        # TODO : indiquer que l'action a été effectuée
+
+    def set_default_courant(self):
+        self.courant = self.boutons[0]
+
+    def in_left(self):
+        if self.courant in self.boutons and self.boutons.index(self.courant) > 0:
+            self.set_courant(self.boutons[self.boutons.index(self.courant) - 1])
+
+    def in_right(self):
+        if self.courant in self.boutons and self.boutons.index(self.courant) < len(self.boutons) - 1:
+            self.set_courant(self.boutons[self.boutons.index(self.courant) + 1])
+
+    def update(self):
+        self.paves = Paves(self.ennemi.get_texte_descriptif())
+        self.init()
+        self.contenu.update()
+        for objet in self.objets:
+            objet.update()
+
+class Description_item(Wrapper_knot, Knot_vertical_profondeur_agnostique):
+    def __init__(self,controleur:Controleur,item:Item):
+        Wrapper_knot.__init__(self)
+
+        self.controleur = controleur
+        self.item = item
+        self.fond = (0, 0, 0)
+
+        self.paves = Paves(self.item.get_description())
+        self.boutons = [
+            None if not isinstance(Item,Equipement) else Bouton(SKIN_DESEQUIPER, "Deséquiper") if self.item.ID in self.controleur.joueur.inventaire.get_equippement() else Bouton(SKIN_EQUIPER, "Equiper"),
+            Bouton(SKIN_LANCER, "Lancer", fond=(255, 255, 255) if isinstance(self.item, Projectile) else (100, 100, 100)) if trouve_skill(self.controleur.joueur.classe_principale, Skills_projectiles) is not None else None,
+            Bouton(SKIN_BOIRE, "Boire") if isinstance(self.item, Potion) else None,
+            Bouton(SKIN_UTILISER, "Utiliser") if isinstance(self.item, Parchemin) else None,
+        ].remove(None)
+
+
+        self.init()
+
+    def init(self):
+        contenu = Pavage_horizontal()
+        multiptique = Pavage_vertical()
+        multiptique.set_contenu([Marge_horizontale(),self.paves] + [self.boutons[i//2] if i%2==0 else Marge_horizontale() for i in range(len(self.boutons)*2)], [5, 0] + [0 if i%2==0 else 5 for i in range(len(self.boutons)*2-1)]+[-1])
+        contenu.set_contenu([Marge_verticale(),multiptique,Marge_verticale()],[5,-1,5])
+        self.contenu = contenu
+        self.fond = (0, 0, 0)
+
+    def select(self, selection: Cliquable, droit: bool = False):
+        if not droit:
+            if isinstance(selection, Bouton):
+                if selection.texte == "Equiper":
+                    self.controleur.joueur.inventaire.equippe([self.item])
+                elif selection.texte == "Deséquiper":
+                    self.controleur.joueur.inventaire.desequippe([self.item])
+                elif selection.texte == "Lancer":
+                    self.controleur.joueur.skill_courant = trouve_skill(self.controleur.joueur.classe_principale, Skills_projectiles)
+                    self.controleur.joueur.projectile_courant = self.item
+                elif selection.texte == "Boire":
+                    self.controleur.joueur.inventaire.utilise_item(self.item)
+                elif selection.texte == "Utiliser":
+                    self.controleur.joueur.inventaire.utilise_item(self.item)
+        # TODO : indiquer que l'action a été effectuée
+
+    def set_default_courant(self):
+        self.courant = self.boutons[0]
+
+    def in_up(self):
+        if self.courant in self.boutons and self.boutons.index(self.courant) > 0:
+            self.set_courant(self.boutons[self.boutons.index(self.courant) - 1])
+
+    def in_down(self):
+        if self.courant in self.boutons and self.boutons.index(self.courant) < len(self.boutons) - 1:
+            self.set_courant(self.boutons[self.boutons.index(self.courant) + 1])
+
+    def update(self):
+        self.paves = Paves(self.item.get_description())
+        self.init()
+        self.contenu.update()
+        for objet in self.objets:
+            objet.update()

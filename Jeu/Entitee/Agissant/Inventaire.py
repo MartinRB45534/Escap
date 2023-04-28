@@ -203,6 +203,26 @@ class Inventaire:
                         self.anneau[i]=self.anneau[i-1]
                     self.anneau[0]=ID
 
+    def desequippe(self,equippement:List[Item]):
+        for item in equippement:
+            ID = item.ID
+            if isinstance(item,Arme):
+                if ID == self.arme:
+                    self.arme = None
+            elif isinstance(item,Bouclier):
+                if ID == self.bouclier:
+                    self.bouclier = None
+            elif isinstance(item,Armure):
+                if ID == self.armure:
+                    self.armure = None
+            elif isinstance(item,Haume):
+                if ID == self.haume:
+                    self.haume = None
+            elif isinstance(item,Anneau):
+                if ID in self.anneau:
+                    self.anneau.remove(ID)
+                    self.anneau.append(None)
+
     def get_clees(self):
         clees:List[int] = []
         for ID_cle in self.items[Cle]:
@@ -328,127 +348,6 @@ class Inventaire:
                 parch.etat = "brisé"
                 return True
         return False
-
-class Sac_a_dos(Inventaire): #L'inventaire du joueur
-
-    def __init__(self):
-        Inventaire.__init__(self,2,10)
-        # self.cat_courante = 0
-        # self.deplacement = 1
-        # self.item_courant = 0
-        # self.profondeur = 0
-
-    def complete(self):
-        """"""
-        # self.cat_courante = 0
-        # self.deplacement = 1
-        # self.item_courant = 0
-        # self.profondeur = 0
-
-    def get_skin_cats(self):
-        return [cat.get_image() for cat in self.kiiz]
-
-    # #La principale différence est la notion d'item courant, et tout ce qui tourne autour
-    # def get_item_courant(self):
-    #     cat = self.items[self.kiiz[self.cat_courante]]
-    #     if self.item_courant < len(cat):
-    #         item_courant = cat[self.item_courant]
-    #     else:
-    #         item_courant = None
-    #     return item_courant
-
-    # def deplace(self,direction):
-    #     res = False
-    #     if direction == IN and self.profondeur <= 1:
-    #         self.profondeur += 1
-    #     elif direction == OUT:
-    #         if self.profondeur == 0:
-    #             res = True
-    #         else:
-    #             self.profondeur -=1
-    #     elif direction == BAS:
-    #         if self.profondeur == 0:
-    #             self.cat_courante += 1
-    #             if self.cat_courante >= len(self.items):
-    #                 self.cat_courante = 0
-    #             self.item_courant = 0
-    #             self.deplacement = 1
-    #         elif self.profondeur == 1:
-    #             self.item_courant += 1
-    #             if self.item_courant >= len(self.items[self.kiiz[self.cat_courante]]):
-    #                 self.item_courant = 0
-    #     elif direction == HAUT:
-    #         if self.profondeur == 0:
-    #             if self.cat_courante <= 0:
-    #                 self.cat_courante = len(self.items)
-    #             self.cat_courante -= 1
-    #             self.item_courant = 0
-    #             self.deplacement = -1
-    #         elif self.profondeur == 1:
-    #             self.item_courant -= 1
-    #             if self.item_courant < 0:
-    #                 self.item_courant = len(self.items[self.kiiz[self.cat_courante]])-1
-    #     return res
-
-    # def utilise_courant(self):
-    #     """Appelé en appuyant sur la touche espace, utilise l'item actuellement sélectionné."""
-    #     ID_item = self.get_item_courant()
-    #     self.utilise_item(ID_item)
-
-    def a_parchemin_vierge(self):
-        for ID_parch in self.items[Parchemin]:
-            if isinstance(self.controleur[ID_parch],Parchemin_vierge):
-                return True
-        return False
-
-    def consomme_parchemin_vierge(self):
-        for ID_parch in self.items[Parchemin]:
-            if isinstance(self.controleur[ID_parch],Parchemin_vierge):
-                self.controleur[ID_parch].etat = "brisé"
-                return True
-        return False
-
-    # def nettoie_item(self): #Méthode appelée à chaque fin de tour pour supprimer les items retirés ou utilisés.
-    #     for cat in range(10): #On parcourt les catégories
-    #         items = self.items[self.kiiz[cat]]
-    #         for nb_item in range(len(items)-1,-1,-1): #On parcourt les items
-    #             ID_item = items[nb_item]
-    #             item = self.controleur[ID_item]
-    #             if item.position != None or item.etat == "brisé": #S'il a été lancé ou n'est plus en état
-    #                 items.remove(ID_item)
-
-    #                 if cat == self.cat_courante :
-    #                     if nb_item < self.item_courant or nb_item == len(items) == self.item_courant :
-    #                         self.item_courant -= 1 #On gère d'éventuels problèmes de selection
-
-    #                 if self.arme == ID_item :
-    #                     self.arme = None
-    #                 elif self.bouclier == ID_item :
-    #                     self.bouclier = None
-    #                 elif self.armure == ID_item :
-    #                     self.armure = None
-    #                 elif self.haume == ID_item :
-    #                     self.haume = None
-    #                 else :
-    #                     for doigt in range(len(self.anneau)):
-    #                         if self.anneau[doigt] == ID_item :
-    #                             self.anneau[doigt] = None #Quel genre d'imbécile briserait ou lancerait son équippement ? Enfin...
-
-    #     if 0 == len(self.items[Potion]) == len(self.items[Parchemin]) == len(self.items[Cle]) == len(self.items[Arme]) == len(self.items[Bouclier]) == len(self.items[Armure]) == len(self.items[Haume]) == len(self.items[Anneau]) == len(self.items[Projectile]) == len(self.items[Cadavre]) == len(self.items[Oeuf]) : #Sérieusement, l'inventaire est vide ?!
-    #         self.cat_courante = 0
-    #         self.item_courant = 0
-    #     else :
-    #         while len(self.items[self.kiiz[self.cat_courante]]) == 0: #On a au moins une catégorie non vide.
-    #             self.cat_courante = (self.cat_courante + self.deplacement) % len(self.items)
-    #         if self.item_courant == -1 : #Ce devrait être le cas si on est passé dans la boucle précédente, et ce n'est pas très souhaitable...
-    #             self.item_courant = 0
-    #             self.profondeur = 0
-
-    # def drop_courant(self,position):
-    #     cat = self.items[self.kiiz[self.cat_courante]]
-    #     if cat != []:
-    #         ID_item = cat[self.item_courant]
-    #         self.drop(position,ID_item)
 
 from Jeu.Entitee.Item.Items import Potion,Parchemin,Cle,Arme,Bouclier,Armure,Haume,Anneau,Projectile,Ingredient,Cadavre,Oeuf,Consommable,Parchemin_vierge
 from Jeu.Systeme.Classe import *

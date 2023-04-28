@@ -473,7 +473,7 @@ class Affichage_centre_selection_lab(Wrapper_knot, Knot_vertical):
         self.contenu = contenu
         self.fond = (0, 0, 0)
 
-    def select(self, selection:Cliquable, droit:bool=False):
+    def select(self, selection: Cliquable, droit: bool=False):
         if not droit:
             if isinstance(selection, self.type_affichage_labyrinthe):
                 self.set_courant(selection)
@@ -1164,7 +1164,7 @@ class Affichage_categorie(Wrapper_knot, Knot_vertical, Knot_hierarchique_sinistr
         self.item_descr = Placeheldholder()
 
         self.liste_i = Liste_verticale()
-        self.items = [Vignette_item_placeholder(self.item_descr,Paves(self.joueur.controleur[ID].get_description(0)),[0, 0], self.joueur.controleur[ID], 40) for ID in self.joueur.inventaire.items[self.categorie]]
+        self.items = [Vignette_item_placeholder(self.item_descr,Description_item(self.joueur.controleur, self.joueur.controleur[ID]),[0, 0], self.joueur.controleur[ID], 40, ID in self.joueur.inventaire.get_equippement()) for ID in self.joueur.inventaire.items[self.categorie]]
         self.liste_i.set_contenu([self.items[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1, len(self.items)*2)], [0 if i%2==0 else 5 for i  in range(-1, len(self.items)*2)])
 
         if self.items:
@@ -1213,7 +1213,7 @@ class Affichage_categorie(Wrapper_knot, Knot_vertical, Knot_hierarchique_sinistr
         while i < len(items) or i < len(self.items):
             if i == len(items) or i == len(self.items) or items[i] != self.items[i].item.ID: #Les deux ne correspondent pas
                 if i == len(self.items) or self.items[i].item.ID in items: #Donc l'item n'a pas été retiré, mais d'autres ont été ajoutés avant
-                    item = Vignette_item_placeholder(self.item_descr,Paves(self.joueur.controleur[items[i]].get_description(0)), [0, 0], self.joueur.controleur[items[i]], 40)
+                    item = Vignette_item_placeholder(self.item_descr,Description_item(self.joueur.controleur,self.joueur.controleur[items[i]]), [0, 0], self.joueur.controleur[items[i]], 40)
                     self.items.insert(i, item)
                     self.liste_i.insert(2*i, item, 0)
                     self.liste_i.insert(2*i, Marge_horizontale(), 5)
@@ -2078,26 +2078,6 @@ class Affichage_labyrinthe_jeu(Affichage_labyrinthe):
                         self.controleur.joueur.mouvement = 2
                         self.controleur.joueur.cible_deplacement = position
                 self.controleur.joueur.attente = 0
-
-            # pos_joueur = self.controleur.joueur.position
-            # if selection.pos not in pos_joueur:
-            #     warn("Le joueur et l'affichage du labyrinthe ne sont pas au même étage")
-            #     return
-            # decalage = pos_joueur-selection.pos
-            # if abs(decalage.x) > abs(decalage.y):
-            #     if decalage.x<0:
-            #         direction = DROITE
-            #     else:
-            #         direction = GAUCHE
-            # elif abs(decalage.x) < abs(decalage.y):
-            #     if decalage.y<0:
-            #         direction = BAS
-            #     else:
-            #         direction = HAUT
-            # else:
-            #     return
-            # self.controleur.joueur.va(direction)
-            # self.set_tailles(self.tailles)
 
 class Affichage_labyrinthe_case_dialogue(Affichage_labyrinthe):
     def __init__(self, controleur: Controleur):

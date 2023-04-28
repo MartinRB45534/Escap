@@ -21,7 +21,7 @@ class PNJ(Agissant, Interactif):
         self.repliques = [] #Les réponses possibles de l'interlocuteur
         self.replique_courante = 0 #La réponse sélectionnée
 
-        self.mouvement = 3 #0 pour un déplacement ciblé, 1 pour chercher, 2 pour un déplacement ciblé prioritaire et précis, 3 pour l'attente
+        self.mouvement = 3 #0 pour un déplacement vague, 1 pour chercher, 2 pour un déplacement ciblé (prioritaire et précis), 3 pour l'attente, 4 pour l'attaque (déplacement ciblé et attaque dès qu'à portée)
         self.cible_deplacement = self.ID #Une ID pour suivre quelqu'un, ou une position pour s'y diriger
         self.comportement_corps_a_corps = 0 #0 pour attaquer, 1 pour ignorer, 2 pour fuir
         self.comportement_distance = 0 #0 pour foncer dans le tas, 1 pour tenter une attaque à distance puis se rapprocher, 2 pour tenter une attaque à distance puis fuir, 3 pour fuir puis tenter une attaque à distance
