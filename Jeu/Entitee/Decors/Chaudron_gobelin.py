@@ -1,4 +1,4 @@
-from Jeu.Skins.Skins import *
+from Affichage.Skins.Skins import *
 from Jeu.Entitee.Decors.Decor import *
 from Jeu.Systeme.Constantes_decors.Decors import *
 

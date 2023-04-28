@@ -1,5 +1,5 @@
 from Jeu.Constantes import *
-from Jeu.Skins.Skins import *
+from Affichage.Skins.Skins import *
 from Jeu.Entitee.Entitee import *
 from Jeu.Systeme.Constantes_decors.Decors import *
 

@@ -1,7 +1,7 @@
 from typing import List, Tuple
 from Jeu.Effet.Magie.Magie import Magie
-from Jeu.Skins import *
-from Jeu.Skins.Skins import *
+from Affichage.Skins import *
+from Affichage.Skins.Skins import *
 from Jeu.Constantes import *
 from Jeu.Systeme.Constantes_skills.Skills import *
 

@@ -603,7 +603,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         self.niveau = self.classe_principale.niveau
 
 from Jeu.Constantes import *
-from Jeu.Skins.Skins import *
+from Affichage.Skins.Skins import *
 from Jeu.Effet.Effets_protection import *
 from Jeu.Effet.Effets_divers import *
 from Jeu.Effet.Sante.Maladies.Maladies import *

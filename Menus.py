@@ -1,6 +1,6 @@
 from typing import List, Union
 from Jeu.Constantes import *
-from Jeu.Skins.Skins import *
+from Affichage.Skins.Skins import *
 from Joueur import *
 
 class Bouton:

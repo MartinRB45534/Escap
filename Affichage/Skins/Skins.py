@@ -1,4 +1,4 @@
-from Jeu.Skins.Vue.Skins_vue import *
+from Affichage.Skins.Vue.Skins_vue import *
 
 # global SKIN_VIDE
 SKIN_VIDE = Skin("vide.png")

@@ -4,7 +4,7 @@ from Jeu.Entitee.Item.Equippement.Equippements import *
 from Jeu.Entitee.Item.Parchemin.Parchemins import *
 from Jeu.Entitee.Item.Potion.Potions import *
 from Jeu.Entitee.Item.Projectile.Projectiles import *
-from Jeu.Skins.Skins import *
+from Affichage.Skins.Skins import *
 from Jeu.Constantes import *
 
 #Quelques items pour le tutoriel :

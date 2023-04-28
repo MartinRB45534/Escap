@@ -1,4 +1,4 @@
-from Jeu.Skins.Skins import *
+from Affichage.Skins.Skins import *
 from Jeu.Entitee.Agissant.Agissant import *
 from Jeu.Entitee.Agissant.Role.Roles import *
 

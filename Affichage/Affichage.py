@@ -4,7 +4,7 @@ import pygame
 from Jeu.Constantes import *
 from Jeu.Labyrinthe.Structure_spatiale.Direction import *
 from Jeu.Controleur import *
-from Jeu.Skins.Skins import *
+from Affichage.Skins.Skins import *
 
 from math import ceil
 

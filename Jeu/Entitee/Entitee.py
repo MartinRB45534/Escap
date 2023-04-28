@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import List, TYPE_CHECKING
 
 from Jeu.Constantes import *
-from Jeu.Skins.Skins import *
+from Affichage.Skins.Skins import *
 from Jeu.Labyrinthe.Structure_spatiale.Bord import *
 
 if TYPE_CHECKING:

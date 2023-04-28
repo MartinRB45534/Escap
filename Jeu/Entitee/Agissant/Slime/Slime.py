@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from Jeu.Controleur import Controleur
 
-from Jeu.Skins.Skins import *
+from Affichage.Skins.Skins import *
 from Jeu.Entitee.Agissant.Agissant import *
 from Jeu.Entitee.Agissant.Role.Roles import *
 
