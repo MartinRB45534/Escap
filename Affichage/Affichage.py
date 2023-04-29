@@ -1999,7 +1999,7 @@ class Vignettes_position(Vignette_composee):
         self.position = position
 
 class Vignette_case(Vignette_composee):
-    def __init__(self,position,joueur,vue,pos,taille):
+    def __init__(self,position,joueur:PJ,vue,pos,taille):
         vignettes = []
         if pos in vue:
             vue_case = vue[pos]
@@ -2013,27 +2013,10 @@ class Vignette_case(Vignette_composee):
                         if pos_voisin in vue and vue[pos_voisin][1]>0:
                             vignettes.append(Vignette(position,taille,SKIN_MUR_BROUILLARD,i))
             else:
-                if vue_case[4]==0: #On teste le code de la case pour déterminer son image
-                    vignettes.append(Vignette(position,taille,SKIN_CASE)) #La case en premier, donc en bas
-                elif vue_case[4]==1: #On teste le code de la case pour déterminer son image
-                    vignettes.append(Vignette(position,taille,SKIN_CASE_1)) #La case en premier, donc en bas
-                elif vue_case[4]==2: #On teste le code de la case pour déterminer son image
-                    vignettes.append(Vignette(position,taille,SKIN_CASE_2)) #La case en premier, donc en bas
-                elif vue_case[4]==3: #On teste le code de la case pour déterminer son image
-                    vignettes.append(Vignette(position,taille,SKIN_CASE_3)) #La case en premier, donc en bas
-                elif vue_case[4]==4: #On teste le code de la case pour déterminer son image
-                    vignettes.append(Vignette(position,taille,SKIN_CASE_4)) #La case en premier, donc en bas
-                elif vue_case[4]==5: #On teste le code de la case pour déterminer son image
-                    vignettes.append(Vignette(position,taille,SKIN_CASE_5)) #La case en premier, donc en bas
-                elif vue_case[4]==6: #On teste le code de la case pour déterminer son image
-                    vignettes.append(Vignette(position,taille,SKIN_CASE_6)) #La case en premier, donc en bas
-                elif vue_case[4]==7: #On teste le code de la case pour déterminer son image
-                    vignettes.append(Vignette(position,taille,SKIN_CASE_7)) #La case en premier, donc en bas
-                elif vue_case[4]==8: #On teste le code de la case pour déterminer son image
-                    vignettes.append(Vignette([0,0],taille,SKIN_CASE_8)) #La case en premier, donc en bas
-                case = joueur.controleur[vue_case[0]]
+                vignettes.append(Vignette(position,taille,SKINS_CASES[vue_case[4]])) #La case en premier, donc en bas
+                case:Case = joueur.controleur[vue_case[0]]
                 for i in DIRECTIONS:
-                    mur = case.get_mur_dir(i)
+                    mur:Mur = case[i]
                     for effet in mur.effets:
                         if effet.affiche:
                             if isinstance(effet,Porte) :

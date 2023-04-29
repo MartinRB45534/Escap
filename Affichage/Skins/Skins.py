@@ -1,54 +1,57 @@
 from Affichage.Skins.Vue.Skins_vue import *
 
+# Divers
+
 SKIN_VIDE = Skin("vide.png")
 ILLUSTRATION_VIDE = Illustration("vide.png")
 IMAGE_VIDE = Image("vide.png")
+
+# Mystère
+SKIN_MYSTERE = Skin("mystere.png")
+
+# Barres de PV
 IMAGE_PV_ALLIE = Image("barre_de_vie_allies.png")
 IMAGE_PV_ENNEMI = Image("barre_de_vie_ennemis.png")
 IMAGE_PV_NEUTRE = Image("barre_de_vie_neutres.png")
-SKIN_DIRECTION = Skin("direction.png")
-SKIN_BROUILLARD = Skin("brouillard.png")
-SKIN_MUR_BROUILLARD = Skin("brouillard_mur_transparent.png")
-SKIN_SHADE = Skin("shade.png")
-SKIN_CASE = Skin("case.png")
-SKIN_CASE_1 = Skin("case_1.png")
-SKIN_CASE_2 = Skin("case_2.png")
-SKIN_CASE_3 = Skin("case_3.png")
-SKIN_CASE_4 = Skin("case_4.png")
-SKIN_CASE_5 = Skin("case_5.png")
-SKIN_CASE_6 = Skin("case_6.png")
-SKIN_CASE_7 = Skin("case_7.png")
-SKIN_CASE_8 = Skin("case_8.png")
-SKIN_CHAUDRON_GOBELIN = Skin("chaudron_gobelin.png")
-SKIN_CHAUDRON_GOBELIN_BRISE = Skin("vide.png") #/!\ Créer le skin
-SKIN_AGISSANT = Skin("agissant.png")
-SKIN_ROUGE = Skin("rouge.png")
-SKIN_VERT = Skin("vert.png")
-SKIN_CADAVRE = Skin("cadavre.png")
-SKIN_CRANE = Skin("crane.png")
-SKIN_OEUF = Skin("oeuf.png")
-SKIN_INGREDIENT = Skin("ingredient.png")
+
+# Blessure
 SKIN_BLESSURE = Skin("blessure.png")
-SKIN_ATTAQUE_DELAYEE = Skin("attaque_delayee.png")
-SKIN_ATTAQUE_DELAYEE_ALLIE = Skin("attaque_delayee_allie.png")
-SKIN_TETE_HEROS = Skin("heros_tete.png")
-SKIN_TETE_RECEPTIONNISTE = Skin("receptionniste_tete.png")
-SKIN_TETE_PAUME = Skin("paume_tete.png")
-SKIN_TETE_PEUREUSE = Skin("peureuse_tete.png")
-SKIN_CODEUR = Skin("codeur.png")
-SKIN_TETE_ENCOMBRANT = Skin("encombrant_tete.png")
-SKIN_TETE_ALCHIMISTE = Skin("alchimiste_tete.png")
-SKIN_TETE_PESTE = Skin("peste_tete.png")
-SKIN_TETE_BOMBE_ATOMIQUE = Skin("bombe_atomique_tete.png")
-SKIN_TETE_MARCHAND = Skin("marchand_tete.png")
-SKIN_CORPS_HUMAIN = Skin("humain_corps.png")
-SKIN_CORPS_PAUME = Skin("paume_corps.png")
-SKIN_GOBELIN = Skin("gobelin.png")
-SKIN_CORPS_GOBELIN = Skin("gobelin_corps.png")
-SKIN_TETE_GOBELIN = Skin("gobelin_tete.png")
-SKIN_SLIME = Skin("slime.png")
-SKIN_CORPS_OMBRIUL = Skin("ombriul_corps.png")
-SKIN_TETE_OMBRIUL = Skin("ombriul_tete.png")
+
+# Direction
+SKIN_DIRECTION = Skin("direction.png")
+
+# Shade
+SKIN_SHADE = Skin("shade.png")
+
+# Directions
+SKIN_HAUT = Skin("haut.png")
+SKIN_DROITE = Skin("droite.png")
+SKIN_BAS = Skin("bas.png")
+SKIN_GAUCHE = Skin("gauche.png")
+SKIN_IN = Skin("in.png")
+SKIN_OUT = Skin("out.png")
+
+# Recettes
+SKIN_PLUS = Skin("plus.png")
+SKIN_EGAL = Skin("egal.png")
+
+# Boutons
+SKIN_QUITTER = Skin("quitter.png")
+SKIN_VALIDER = Skin("valider.png")
+
+# Actions
+SKIN_LANCER = Skin("skill_lancer.png")
+SKIN_BOIRE = Skin("boire.png")
+SKIN_UTILISER = Skin("utiliser_parchemin.png")
+
+# Marchand
+SKIN_VENTE = Skin("argent.png")
+SKIN_ACHAT = Skin("argent.png")
+
+# Zones
+SKIN_ZONES = Skin("zones.png")
+
+# Statuts
 SKIN_DIALOGUE = Skin("dialogue.png")
 SKIN_STATUT_PAIX = Skin("statut_paix.png")
 SKIN_STATUT_EXPLORATION = Skin("statut_exploration.png")
@@ -63,7 +66,88 @@ SKIN_STATUT_PROXIMITE = Skin("statut_proximite.png")
 SKIN_STATUT_CHEMIN = Skin("statut_en_chemin.png")
 SKIN_STATUT_PERDU = Skin("statut_perdu.png")
 SKIN_STATUT_PAUME = Skin("statut_paume.png")
-SKIN_MYSTERE = Skin("mystere.png")
+
+# Murs et cases
+SKIN_BROUILLARD = Skin("brouillard.png")
+SKIN_MUR_BROUILLARD = Skin("brouillard_mur_transparent.png")
+SKIN_CASE = Skin("case.png")
+SKIN_CASE_1 = Skin("case_1.png")
+SKIN_CASE_2 = Skin("case_2.png")
+SKIN_CASE_3 = Skin("case_3.png")
+SKIN_CASE_4 = Skin("case_4.png")
+SKIN_CASE_5 = Skin("case_5.png")
+SKIN_CASE_6 = Skin("case_6.png")
+SKIN_CASE_7 = Skin("case_7.png")
+SKIN_CASE_8 = Skin("case_8.png")
+SKINS_CASES = [SKIN_CASE,SKIN_CASE_1,SKIN_CASE_2,SKIN_CASE_3,SKIN_CASE_4,SKIN_CASE_5,SKIN_CASE_6,SKIN_CASE_7,SKIN_CASE_8]
+SKIN_MUR = Skin("mur.png")
+SKIN_MUR_1 = Skin("mur_1.png")
+SKIN_MUR_2 = Skin("mur_2.png")
+SKIN_MUR_3 = Skin("mur_3.png")
+SKIN_MUR_4 = Skin("mur_4.png")
+SKIN_MUR_5 = Skin("mur_5.png")
+SKIN_MUR_6 = Skin("mur_6.png")
+SKIN_MUR_7 = Skin("mur_7.png")
+SKIN_MUR_8 = Skin("mur_8.png")
+SKINS_MURS = [SKIN_MUR,SKIN_MUR_1,SKIN_MUR_2,SKIN_MUR_3,SKIN_MUR_4,SKIN_MUR_5,SKIN_MUR_6,SKIN_MUR_7,SKIN_MUR_8]
+SKIN_MUR_CASSE = Skin("mur_casse.png")
+SKIN_ESCALIER = Skin("escalier.png")
+SKIN_ESCALIER_BAS = Skin("escalier_bas.png")
+SKIN_ESCALIER_HAUT = Skin("escalier_haut.png")
+SKIN_PORTE = Skin("porte.png")
+SKIN_PORTE_OUVERTE = Skin("porte_ouverte.png")
+SKIN_PORTE_OUVRABLE = Skin("porte_ouvrable.png")
+SKIN_BARRIERE = Skin("barriere.png")
+SKIN_PORTAIL = Skin("portail.png")
+
+# Entitees
+
+# Ingredients
+SKIN_INGREDIENT = Skin("ingredient.png")
+SKIN_HYPOKUTE = Skin("hypokute.png")
+SKIN_PIERRE_SOLIDE = Skin("pierre_solide.png")
+SKIN_DENT = Skin("dent.png")
+SKIN_PEAU_GOBELIN = Skin("peau_gobelin.png")
+
+# Decors
+SKIN_CHAUDRON_GOBELIN = Skin("chaudron_gobelin.png")
+SKIN_CHAUDRON_GOBELIN_BRISE = Skin("vide.png") #/!\ Créer le skin
+
+# Cadavres
+SKIN_CADAVRE = Skin("cadavre.png")
+SKIN_CRANE = Skin("crane.png")
+
+# Oeuf
+SKIN_OEUF = Skin("oeuf.png")
+
+#Agissants
+SKIN_AGISSANT = Skin("agissant.png")
+SKIN_ROUGE = Skin("rouge.png")
+SKIN_VERT = Skin("vert.png")
+
+# Humains
+SKIN_TETE_HEROS = Skin("heros_tete.png")
+SKIN_TETE_RECEPTIONNISTE = Skin("receptionniste_tete.png")
+SKIN_TETE_PAUME = Skin("paume_tete.png")
+SKIN_TETE_PEUREUSE = Skin("peureuse_tete.png")
+SKIN_CODEUR = Skin("codeur.png")
+SKIN_TETE_ENCOMBRANT = Skin("encombrant_tete.png")
+SKIN_TETE_ALCHIMISTE = Skin("alchimiste_tete.png")
+SKIN_TETE_PESTE = Skin("peste_tete.png")
+SKIN_TETE_BOMBE_ATOMIQUE = Skin("bombe_atomique_tete.png")
+SKIN_TETE_MARCHAND = Skin("marchand_tete.png")
+SKIN_CORPS_HUMAIN = Skin("humain_corps.png")
+SKIN_CORPS_PAUME = Skin("paume_corps.png")
+
+# Monstres
+SKIN_GOBELIN = Skin("gobelin.png")
+SKIN_CORPS_GOBELIN = Skin("gobelin_corps.png")
+SKIN_TETE_GOBELIN = Skin("gobelin_tete.png")
+SKIN_SLIME = Skin("slime.png")
+SKIN_CORPS_OMBRIUL = Skin("ombriul_corps.png")
+SKIN_TETE_OMBRIUL = Skin("ombriul_tete.png")
+
+# Items
 SKIN_BOUCLIER = Skin("bouclier.png")
 SKIN_BOUCLIER_BOIS = Skin("bouclier_bois.png")
 SKIN_CLE = Skin("cle.png")
@@ -101,53 +185,6 @@ SKIN_ROCHER = Skin("rocher.png")
 SKIN_BOULE_DE_FEU = Skin("boule_de_feu.png")
 SKIN_FLECHE_DE_GLACE = Skin("fleche_de_glace.png")
 SKIN_OMBRE_FURTIVE = Skin("ombre_furtive.png")
-SKIN_EFFET = Skin("effet.png")
-SKIN_MUR = Skin("mur.png")
-SKIN_MUR_1 = Skin("mur_1.png")
-SKIN_MUR_2 = Skin("mur_2.png")
-SKIN_MUR_3 = Skin("mur_3.png")
-SKIN_MUR_4 = Skin("mur_4.png")
-SKIN_MUR_5 = Skin("mur_5.png")
-SKIN_MUR_6 = Skin("mur_6.png")
-SKIN_MUR_7 = Skin("mur_7.png")
-SKIN_MUR_8 = Skin("mur_8.png")
-SKINS_MURS = [SKIN_MUR,SKIN_MUR_1,SKIN_MUR_2,SKIN_MUR_3,SKIN_MUR_4,SKIN_MUR_5,SKIN_MUR_6,SKIN_MUR_7,SKIN_MUR_8]
-SKIN_MUR_CASSE = Skin("mur_casse.png")
-SKIN_ESCALIER = Skin("escalier.png")
-SKIN_ESCALIER_BAS = Skin("escalier_bas.png")
-SKIN_ESCALIER_HAUT = Skin("escalier_haut.png")
-SKIN_PORTE = Skin("porte.png")
-SKIN_PORTE_OUVERTE = Skin("porte_ouverte.png")
-SKIN_PORTE_OUVRABLE = Skin("porte_ouvrable.png")
-SKIN_BARRIERE = Skin("barriere.png")
-SKIN_PORTAIL = Skin("portail.png")
-SKIN_HAUT = Skin("haut.png")
-SKIN_DROITE = Skin("droite.png")
-SKIN_BAS = Skin("bas.png")
-SKIN_GAUCHE = Skin("gauche.png")
-SKIN_IN = Skin("in.png")
-SKIN_OUT = Skin("out.png")
-SKIN_QUITTER = Skin("quitter.png")
-SKIN_VALIDER = Skin("valider.png")
-SKIN_VENTE = Skin("argent.png")
-SKIN_ACHAT = Skin("argent.png")
-SKIN_ZONES = Skin("zones.png")
-SKIN_ATTAQUE_TERRE = Skin("attaque_1.png")
-SKIN_ATTAQUE_FEU = Skin("attaque_2.png")
-SKIN_ATTAQUE_GLACE = Skin("attaque_4.png")
-SKIN_ATTAQUE_OMBRE = Skin("attaque_8.png")
-SKIN_DOPAGE = Skin("dopage.png")
-SKIN_PROTECTION = Skin("protection.png")
-SKIN_PROTECTION_SACREE = Skin("protection_sacree.png")
-SKIN_SOIN = Skin("soin.png")
-SKIN_TELEPORTATION = Skin("teleportation.png")
-SKIN_MAGIE = Skin("magie.png")
-SKIN_HYPOKUTE = Skin("hypokute.png")
-SKIN_PIERRE_SOLIDE = Skin("pierre_solide.png")
-SKIN_DENT = Skin("dent.png")
-SKIN_PEAU_GOBELIN = Skin("peau_gobelin.png")
-SKIN_PLUS = Skin("plus.png")
-SKIN_EGAL = Skin("egal.png")
 
 # Skills :
 
@@ -197,8 +234,33 @@ SKIN_SKILL_STOMP = Skin("skill_stomp.png")
 SKIN_SKILL_VOL = Skin("skill_vol.png")
 SKIN_SKILL_VOL_PRIORITE = Skin("skill_vol_priorite.png")
 
-# Magies :
+# Effets :
 
+SKIN_EFFET = Skin("effet.png")
+
+# Attaques :
+SKIN_ATTAQUE_DELAYEE = Skin("attaque_delayee.png")
+SKIN_ATTAQUE_DELAYEE_ALLIE = Skin("attaque_delayee_allie.png")
+SKIN_ATTAQUE_TERRE = Skin("attaque_1.png")
+SKIN_ATTAQUE_FEU = Skin("attaque_2.png")
+SKIN_ATTAQUE_GLACE = Skin("attaque_4.png")
+SKIN_ATTAQUE_OMBRE = Skin("attaque_8.png")
+
+# Dopage :
+SKIN_DOPAGE = Skin("dopage.png")
+
+# Protections :
+SKIN_PROTECTION = Skin("protection.png")
+SKIN_PROTECTION_SACREE = Skin("protection_sacree.png")
+
+# Soin
+SKIN_SOIN = Skin("soin.png")
+
+# Téléportation :
+SKIN_TELEPORTATION = Skin("teleportation.png")
+
+# Magies :
+SKIN_MAGIE = Skin("magie.png")
 SKIN_MAGIE_ACCELERATION = Skin("magie_acceleration.png")
 SKIN_MAGIE_AUTO_SOIN = Skin("magie_auto_soin.png")
 SKIN_MAGIE_AVALANCHE = Skin("magie_avalanche.png")
@@ -231,8 +293,7 @@ SKIN_MAGIE_SOIN_ZONE = Skin("magie_soin_zone.png")
 SKIN_MAGIE_TELEPORTATION = Skin("magie_teleportation.png")
 SKIN_MAGIE_VISION = Skin("magie_vision.png")
 
-# Enchantement :
-
+# Enchantements :
 SKIN_MAGIE_ENCHANTEMENT_ABSORPTION = Skin("magie_enchantement_absorption.png")
 SKIN_MAGIE_ENCHANTEMENT_BOMBE = Skin("magie_enchantement_bombe.png")
 SKIN_MAGIE_ENCHANTEMENT_CECITE = Skin("magie_enchantement_cecite.png")
@@ -425,5 +486,10 @@ SKIN_OMBRE_AURA_MAGIE = SKIN_VIDE
 SKIN_OMBRE_AFF = SKIN_VIDE
 SKIN_OMBRE_MAGIE = SKIN_VIDE
 SKIN_OMBRE_VIDE = SKIN_VIDE
+
+
+
+
+# Escap
 
 SKIN_ESCAP = Illustration("Escap.png")
