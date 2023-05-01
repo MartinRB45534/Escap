@@ -3,9 +3,9 @@ import pygame
 class Illustration:
     def __init__(self,nom_fichier):
         try:
-            self.image = pygame.image.load("Jeu/Skins/"+nom_fichier).convert_alpha()
+            self.image = pygame.image.load("Affichage/Skins/"+nom_fichier).convert_alpha()
         except FileNotFoundError:
-            self.image = pygame.image.load("Jeu/Skins/vide.png").convert_alpha()
+            self.image = pygame.image.load("Affichage/Skins/vide.png").convert_alpha()
             print(f"N'a pas pu charger {nom_fichier}, remplacé par vide.png")
 
     def dessine_toi(self,screen,position,frame=1,frame_par_tour=1):

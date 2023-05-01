@@ -40,6 +40,8 @@ SKIN_QUITTER = Skin("quitter.png")
 SKIN_VALIDER = Skin("valider.png")
 
 # Actions
+SKIN_EQUIPER = Skin("equiper.png")
+SKIN_DESEQUIPER = Skin("desequiper.png")
 SKIN_LANCER = Skin("skill_lancer.png")
 SKIN_BOIRE = Skin("boire.png")
 SKIN_UTILISER = Skin("utiliser_parchemin.png")
