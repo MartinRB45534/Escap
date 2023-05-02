@@ -2090,7 +2090,9 @@ class Description_allie(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
             Bouton(SKIN_PARLER, "Parler") if isinstance(self.allie, PNJ) else None,
             Bouton(SKIN_AIDER, "Aider"),
             Bouton(SKIN_EXCLURE, "Exclure"),
-        ].remove(None)
+        ]
+
+        self.boutons = [bouton for bouton in self.boutons if bouton is not None]
 
         self.init()
 
@@ -2153,7 +2155,9 @@ class Description_neutre(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
             Bouton(SKIN_PARLER, "Parler") if isinstance(self.neutre, PNJ) else None,
             Bouton(SKIN_ATTAQUER, "Attaquer"),
             Bouton(SKIN_ANTAGONISER, "Antagoniser"),
-        ].remove(None)
+        ]
+
+        self.boutons = [bouton for bouton in self.boutons if bouton is not None]
 
         self.init()
 
@@ -2216,7 +2220,9 @@ class Description_ennemi(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
             Bouton(SKIN_PARLER, "Parler") if isinstance(self.ennemi, PNJ) else None,
             Bouton(SKIN_ATTAQUER, "Attaquer"),
             Bouton(SKIN_PRIORISER, "Prioriser"),
-        ].remove(None)
+        ]
+
+        self.boutons = [bouton for bouton in self.boutons if bouton is not None]
 
         self.init()
 
@@ -2271,15 +2277,30 @@ class Description_item(Wrapper_knot, Knot_vertical_profondeur_agnostique):
 
         self.controleur = controleur
         self.item = item
-        self.fond = (0, 0, 0)
+        self.fond = (0, 0, 50)
 
         self.paves = Paves(self.item.get_description())
         self.boutons = [
-            None if not isinstance(Item,Equipement) else Bouton(SKIN_DESEQUIPER, "Deséquiper") if self.item.ID in self.controleur.joueur.inventaire.get_equippement() else Bouton(SKIN_EQUIPER, "Equiper"),
+            None if not isinstance(self.item,Equipement) else 
+            (Bouton(SKIN_DESEQUIPER_ANNEAU, "Desequiper") if isinstance(self.item, Anneau) else
+             Bouton(SKIN_DESEQUIPER_ARME, "Desequiper") if isinstance(self.item, Arme) else
+             Bouton(SKIN_DESEQUIPER_ARMURE, "Desequiper") if isinstance(self.item, Armure) else
+             Bouton(SKIN_DESEQUIPER_BOUCLIER, "Desequiper") if isinstance(self.item, Bouclier) else
+             Bouton(SKIN_DESEQUIPER_CASQUE, "Desequiper") if isinstance(self.item, Haume) else None
+             ) if self.item.ID in self.controleur.joueur.inventaire.get_equippement() else 
+            (Bouton(SKIN_EQUIPER_ANNEAU, "Equiper") if isinstance(self.item, Anneau) else
+             Bouton(SKIN_EQUIPER_ARMURE, "Equiper") if isinstance(self.item, Armure) else
+             Bouton(SKIN_EQUIPER_BOUCLIER, "Equiper") if isinstance(self.item, Bouclier) else
+             Bouton(SKIN_EQUIPER_CASQUE, "Equiper") if isinstance(self.item, Haume) else
+             Bouton(SKIN_EQUIPER_EPEE, "Equiper") if isinstance(self.item, Epee) else
+             Bouton(SKIN_EQUIPER_LANCE, "Equiper") if isinstance(self.item, Lance) else None
+             ),
             Bouton(SKIN_LANCER, "Lancer", fond=(255, 255, 255) if isinstance(self.item, Projectile) else (100, 100, 100)) if trouve_skill(self.controleur.joueur.classe_principale, Skills_projectiles) is not None else None,
             Bouton(SKIN_BOIRE, "Boire") if isinstance(self.item, Potion) else None,
             Bouton(SKIN_UTILISER, "Utiliser") if isinstance(self.item, Parchemin) else None,
-        ].remove(None)
+        ]
+
+        self.boutons = [bouton for bouton in self.boutons if bouton is not None]
 
 
         self.init()
@@ -2287,10 +2308,10 @@ class Description_item(Wrapper_knot, Knot_vertical_profondeur_agnostique):
     def init(self):
         contenu = Pavage_horizontal()
         multiptique = Pavage_vertical()
-        multiptique.set_contenu([Marge_horizontale(),self.paves] + [self.boutons[i//2] if i%2==0 else Marge_horizontale() for i in range(len(self.boutons)*2)], [5, 0] + [0 if i%2==0 else 5 for i in range(len(self.boutons)*2-1)]+[-1])
+        multiptique.set_contenu([Marge_horizontale(),self.paves] + [self.boutons[i//2] if i%2==1 else Marge_horizontale() for i in range(len(self.boutons)*2+1)], [5, 0] + [0 if i%2==1 else 5 for i in range(len(self.boutons)*2)]+[-1])
         contenu.set_contenu([Marge_verticale(),multiptique,Marge_verticale()],[5,-1,5])
         self.contenu = contenu
-        self.fond = (0, 0, 0)
+        self.fond = (0, 0, 50)
 
     def select(self, selection: Cliquable, droit: bool = False):
         if not droit:
