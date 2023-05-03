@@ -39,7 +39,7 @@ class Affichage_principal(Wrapper_knot, Knot_horizontal):
         diptique.set_contenu([Marge_horizontale(), Titre(self.controleur), Marge_horizontale(), triptique, Marge_horizontale()], [5, 0, 5, -1, 5])
         contenu.set_contenu([Marge_verticale(), diptique, Marge_verticale()], [5, -1, 5])
         contenu.set_tailles(self.tailles)
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.set_courant(courant)
         self.actif = actif
         self.fond = (0, 0, 0)
@@ -253,14 +253,14 @@ class Affichage_gauche(Wrapper_knot, Knot_vertical):
         triptique = Liste_verticale()
         triptique.set_contenu([Marge_horizontale(), self.stats_ferme, Marge_horizontale(), self.inventaire_ferme, Marge_horizontale(), self.classe_ferme, Marge_horizontale()], [5, 0, 5, 0, 5, 0, 5]) # /!\ Remplacer par Affichage_classe_principale_ferme
         contenu.set_contenu([Marge_verticale(), triptique, Marge_verticale()], [5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
 
     def init_stats(self):
         contenu = Pavage_horizontal()
         triptique = Pavage_vertical()
         triptique.set_contenu([Marge_horizontale(), self.stats, Marge_horizontale(), self.inventaire_ferme, Marge_horizontale(), self.classe_ferme, Marge_horizontale()], [5, -1, 5, 0, 5, 0, 5]) # /!\ Remplacer par Affichage_classe_principale_ferme
         contenu.set_contenu([Marge_verticale(), triptique, Marge_verticale()], [5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.set_courant(self.stats)
 
     def init_inventaire(self):
@@ -268,7 +268,7 @@ class Affichage_gauche(Wrapper_knot, Knot_vertical):
         triptique = Pavage_vertical()
         triptique.set_contenu([Marge_horizontale(), self.stats_ferme, Marge_horizontale(), self.inventaire, Marge_horizontale(), self.classe_ferme, Marge_horizontale()], [5, 0, 5, -1, 5, 0, 5]) # /!\ Remplacer par Affichage_classe_principale_ferme
         contenu.set_contenu([Marge_verticale(), triptique, Marge_verticale()], [5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.set_courant(self.inventaire)
 
     def init_classe(self):
@@ -276,7 +276,7 @@ class Affichage_gauche(Wrapper_knot, Knot_vertical):
         triptique = Pavage_vertical()
         triptique.set_contenu([Marge_horizontale(), self.stats_ferme, Marge_horizontale(), self.inventaire_ferme, Marge_horizontale(), self.classe, Marge_horizontale()], [5, 0, 5, 0, 5, -1, 5]) # /!\ Remplacer par Affichage_classe_principale
         contenu.set_contenu([Marge_verticale(), triptique, Marge_verticale()], [5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.set_courant(self.classe)
 
     def select(self, selection:bool|Affichable, droit:bool=False):
@@ -331,7 +331,7 @@ class Affichage_centre(Wrapper_knot_bloque):
         monoptique = Pavage_vertical()
         monoptique.set_contenu([Marge_horizontale(), self.labyrinthe, Marge_horizontale()], [5, -1, 5])
         contenu.set_contenu([Marge_verticale(), monoptique, Marge_verticale()], [5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.fond = (0, 0, 0)
 
 class Affichage_droite(Wrapper_knot, Knot_horizontal):
@@ -343,9 +343,9 @@ class Affichage_droite(Wrapper_knot, Knot_horizontal):
 
         self.agissant_descr = Placeheldholder()
 
-        self.allies = Affichage_agissants(self.agissant_descr, self.controleur, Vignette_allie, self.controleur.get_esprit(self.controleur.joueur.esprit).get_corps_vus)
-        self.neutres = Affichage_agissants(self.agissant_descr, self.controleur, Vignette_neutre, self.controleur.get_esprit(self.controleur.joueur.esprit).get_neutres_vus)
-        self.ennemis = Affichage_agissants(self.agissant_descr, self.controleur, Vignette_ennemi, self.controleur.get_esprit(self.controleur.joueur.esprit).get_ennemis_vus)
+        self.allies = Affichage_agissants(self.agissant_descr, self, self.controleur, Vignette_allie, self.controleur.get_esprit(self.controleur.joueur.esprit).get_corps_vus)
+        self.neutres = Affichage_agissants(self.agissant_descr, self, self.controleur, Vignette_neutre, self.controleur.get_esprit(self.controleur.joueur.esprit).get_neutres_vus)
+        self.ennemis = Affichage_agissants(self.agissant_descr, self, self.controleur, Vignette_ennemi, self.controleur.get_esprit(self.controleur.joueur.esprit).get_ennemis_vus)
         
         self.agissant_descr.set_contenu(Center_horizontal_texte("Aucun agissant sélectionné"))
         self.init_droite()
@@ -357,7 +357,7 @@ class Affichage_droite(Wrapper_knot, Knot_horizontal):
         triptique.set_contenu([self.allies, Marge_verticale(), self.neutres, Marge_verticale(), self.ennemis], [-1, 5, -1, 5, -1])
         diptique.set_contenu([Marge_horizontale(), triptique, Marge_horizontale(), self.agissant_descr, Marge_horizontale()], [5, -1, 5, 0, 5])
         contenu.set_contenu([Marge_verticale(), diptique, Marge_verticale()], [5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.fond = (255, 255, 255)
 
     def select(self, selection:Cliquable, droit:bool=False):
@@ -412,7 +412,7 @@ class Affichage_gauche_cout_magie(Wrapper_knot_bloque):
         triptique = Liste_verticale()
         triptique.set_contenu([Marge_horizontale(), self.courant, Marge_horizontale(), Affichage_inventaire_ferme(self.controleur.joueur), Marge_horizontale(), Margin_texte("Classes & compétences"), Marge_horizontale()], [5, 0, 5, 0, 5, 0, 5]) # /!\ Remplacer par Affichage_classe_principale_ferme
         contenu.set_contenu([Marge_verticale(), triptique, Marge_verticale()], [5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.fond = (255, 255, 255)
 
 class Affichage_gauche_cout_parchemin(Wrapper_knot_bloque):
@@ -429,7 +429,7 @@ class Affichage_gauche_cout_parchemin(Wrapper_knot_bloque):
         triptique = Liste_verticale()
         triptique.set_contenu([Marge_horizontale(), self.courant, Marge_horizontale(), Affichage_inventaire_ferme(self.controleur.joueur), Marge_horizontale(), Margin_texte("Classes & compétences"), Marge_horizontale()], [5, 0, 5, 0, 5, 0, 5]) # /!\ Remplacer par Affichage_classe_principale_ferme
         contenu.set_contenu([Marge_verticale(), triptique, Marge_verticale()], [5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.fond = (255, 255, 255)
 
 class Affichage_gauche_inventaire(Wrapper_knot_bloque):
@@ -446,7 +446,7 @@ class Affichage_gauche_inventaire(Wrapper_knot_bloque):
         triptique = Pavage_vertical()
         triptique.set_contenu([Marge_horizontale(), Affichage_stats_ferme(self.joueur), Marge_horizontale(), self.courant, Marge_horizontale(), Margin_texte("Classes & compétences"), Marge_horizontale()], [5, 0, 5, -1, 5, 0, 5]) # /!\ Remplacer par Affichage_classe_principale_ferme
         contenu.set_contenu([Marge_verticale(), triptique, Marge_verticale()], [5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.fond = (255, 255, 255)
 
 class Affichage_centre_selection_lab(Wrapper_knot, Knot_vertical):
@@ -470,7 +470,7 @@ class Affichage_centre_selection_lab(Wrapper_knot, Knot_vertical):
         boutons.set_contenu([self.boutons[i//2] if i%2==0 else Marge_verticale() for i in range(len(self.boutons)*2)], [0 if i%2==0 else 5 for i in range(len(self.boutons)*2-1)]+[-1])
         diptique.set_contenu([Marge_horizontale(), self.affichage_labyrinthe, Marge_horizontale(), boutons, Marge_horizontale()], [5, -1, 5, 0, 5])
         contenu.set_contenu([Marge_verticale(), diptique, Marge_verticale()], [5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.fond = (0, 0, 0)
 
     def select(self, selection: Cliquable, droit: bool=False):
@@ -553,7 +553,7 @@ class Affichage_centre_selection_liste_menu(Wrapper_knot_bloque):
         monoptique = Pavage_vertical()
         monoptique.set_contenu([Marge_horizontale(), self.courant, Marge_horizontale()], [5, -1, 5])
         contenu.set_contenu([Marge_verticale(), monoptique, Marge_verticale()], [5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.fond = (0, 0, 0)
 
 class Affichage_centre_recettes(Affichage_centre_selection_liste_menu):
@@ -596,7 +596,7 @@ class Affichage_droite_dialogue(Wrapper_knot, Knot_vertical_profondeur_agnostiqu
         liste_repliques.set_contenu([self.repliques[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1, len(self.repliques)*2)], [0 if i%2==0 else 5 for i  in range(-1, len(self.repliques)*2)])
         triptique.set_contenu([Marge_horizontale(), Affichage_perso(self.interlocuteur), Marge_horizontale(), self.phrase, Marge_horizontale(), liste_repliques, Marge_horizontale()], [5, 0, 5, 0, 5, -1, 5])
         contenu.set_contenu([Marge_verticale(), triptique, Marge_verticale()], [5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.fond = (255, 255, 255)
 
     def update(self):
@@ -624,7 +624,8 @@ class Affichage_droite_dialogue(Wrapper_knot, Knot_vertical_profondeur_agnostiqu
     def set_default_courant(self):
         self.set_courant(self.repliques[0])
         self.init_droite()
-        self.set_tailles(self.tailles)
+        if self.tailles != [0, 0]:
+            self.set_tailles(self.tailles)
 
     def in_up(self):
         if self.courant != self.repliques[0]:
@@ -648,17 +649,23 @@ class Affichage_droite_agissant_cible(Wrapper_knot, Knot_horizontal):
         self.phase = phase
         self.fond = (255, 255, 255)
 
-        self.allies = Affichage_agissants_cible(self.controleur, multi, Vignette_allie, self.controleur.get_esprit(self.controleur.joueur.esprit).get_corps_vus)
-        self.ennemis = Affichage_agissants_cible(self.controleur, multi, Vignette_ennemi, self.controleur.get_esprit(self.controleur.joueur.esprit).get_ennemis_vus)
-        self.neutres = Affichage_agissants_cible(self.controleur, multi, Vignette_neutre, self.controleur.get_esprit(self.controleur.joueur.esprit).get_neutres_vus)
+        self.agissant_descr = Placeheldholder()
+
+        self.allies = Affichage_agissants_cible(self.agissant_descr, self, self.controleur, multi, Vignette_allie, self.controleur.get_esprit(self.controleur.joueur.esprit).get_corps_vus)
+        self.ennemis = Affichage_agissants_cible(self.agissant_descr, self, self.controleur, multi, Vignette_ennemi, self.controleur.get_esprit(self.controleur.joueur.esprit).get_ennemis_vus)
+        self.neutres = Affichage_agissants_cible(self.agissant_descr, self, self.controleur, multi, Vignette_neutre, self.controleur.get_esprit(self.controleur.joueur.esprit).get_neutres_vus)
+        
+        self.agissant_descr.set_contenu(Center_horizontal_texte("Sélectionnez un agissant"))
         self.init_droite()
 
     def init_droite(self):
-        contenu = Pavage_vertical()
+        contenu = Pavage_horizontal()
+        diptique = Pavage_vertical()
         triptique = Pavage_horizontal()
-        triptique.set_contenu([Marge_verticale(), self.allies, Marge_verticale(), self.ennemis, Marge_verticale(), self.neutres, Marge_verticale()], [5, -1, 5, -1, 5, -1, 5])
-        contenu.set_contenu([Marge_horizontale(), triptique, Marge_horizontale()], [5, -1, 5])
-        self.contenu = contenu
+        triptique.set_contenu([self.allies, Marge_verticale(), self.neutres, Marge_verticale(), self.ennemis], [-1, 5, -1, 5, -1])
+        diptique.set_contenu([Marge_horizontale(), triptique, Marge_horizontale(), self.agissant_descr, Marge_horizontale()], [5, -1, 5, 0, 5])
+        contenu.set_contenu([Marge_verticale(), diptique, Marge_verticale()], [5, -1, 5])
+        self.set_contenu(contenu)
         self.fond = (255, 255, 255)
 
     def init_agissant(self):
@@ -671,7 +678,7 @@ class Affichage_droite_agissant_cible(Wrapper_knot, Knot_horizontal):
         triptique.set_contenu([Marge_verticale(), self.allies, Marge_verticale(), self.ennemis, Marge_verticale(), self.neutres, Marge_verticale()], [5, -1, 5, -1, 5, -1, 5])
         monoptique.set_contenu([Marge_verticale(), Paves(agissant.get_texte_descriptif()), Marge_verticale()], [5, -1, 5])
         contenu.set_contenu([Marge_horizontale(), triptique, Marge_horizontale(), monoptique, Marge_horizontale(), boutons, Marge_horizontale()], [5, -1, 5, 0, 5, 0, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.fond = (255, 255, 255)
 
     def select(self, selection:Cliquable, droit:bool=False):
@@ -762,7 +769,7 @@ class Affichage_droite_recette(Wrapper_knot, Knot_vertical):
         liste.set_contenu([self.ingredients[i//2] if i%2 == 0 else Marge_verticale() for i in range(len(self.ingredients)*2-1)], [0 if i%2 == 0 else 5 for i in range(len(self.ingredients)*2-1)])
         diptique.set_contenu([Marge_verticale(), self.vignette_recette, Marge_verticale(), liste, Marge_verticale()], [5, 0, 5, -1, 5])
         contenu.set_contenu([Marge_horizontale(), diptique, Marge_horizontale(), self.wrapper_descr, Marge_horizontale(), boutons, Marge_horizontale()], [5, 0, 5, -1, 5, 0, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.fond = (255, 255, 255)
 
     def select(self, selection:Cliquable, droit:bool=False):
@@ -853,7 +860,7 @@ class Affichage_droite_vente(Wrapper_knot_bloque):
         boutons.set_contenu([Marge_verticale(), self.bouton, Marge_verticale(), Marge_verticale()], [5, 0, -1, 5])
         triptique.set_contenu([Marge_horizontale(), Vignette_item([0, 0], self.item, 40, 0, False, self.invalide), Marge_horizontale(), Paves(self.textes), Marge_horizontale(), boutons, Marge_horizontale()], [5, 0, 5, -1, 5, 0, 5])
         contenu.set_contenu([Marge_verticale(), triptique, Marge_verticale()], [5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.fond = (255, 255, 255)
 
     def select(self, selection:Cliquable, droit:bool=False):
@@ -890,7 +897,7 @@ class Affichage_droite_achat(Wrapper_knot_bloque):
         boutons.set_contenu([Marge_verticale(), self.bouton, Marge_verticale(), Marge_verticale()], [5, 0, -1, 5])
         triptique.set_contenu([Marge_horizontale(), Vignette_item([0, 0], self.item, 40, 0, False, self.invalide), Marge_horizontale(), Paves(self.textes), Marge_horizontale(), boutons, Marge_horizontale()], [5, 0, 5, -1, 5, 0, 5])
         contenu.set_contenu([Marge_verticale(), triptique, Marge_verticale()], [5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.fond = (255, 255, 255)
 
     def select(self, selection:Cliquable, droit:bool=False):
@@ -919,7 +926,7 @@ class Affichage_droite_impregnations(Wrapper_knot_bloque):
         boutons.set_contenu([Marge_verticale(), Marge_verticale(), self.courant, Marge_verticale()], [5, -1, 0, 5])
         diptique.set_contenu([Marge_verticale(), self.texte, Marge_verticale(), Marge_verticale(), boutons, Marge_verticale()], [-1, 0, -1, 5, 0, 5])
         contenu.set_contenu([Marge_horizontale(), diptique, Marge_horizontale()], [-1, 0, -1])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.fond = (255, 255, 255)
 
     def select(self, selection:Cliquable, droit:bool=False):
@@ -963,7 +970,7 @@ class Affichage_droite_impregnation(Wrapper_knot, Knot_horizontal):
             boutons.set_contenu([Marge_verticale(), self.boutons[0], Marge_verticale(), self.boutons[1], Marge_verticale()], [5, 0, -1, 0, 5])
         triptique.set_contenu([Marge_horizontale(), Vignette_magie(self.magie, 40, False, self.invalide), Marge_horizontale(), Paves(self.textes), Marge_horizontale(), boutons, Marge_horizontale()], [5, 0, 5, -1, 5, 0, 5])
         contenu.set_contenu([Marge_verticale(), triptique, Marge_verticale()], [5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.fond = (255, 255, 255)
 
     def select(self, selection:Cliquable, droit:bool=False):
@@ -1009,7 +1016,7 @@ class Affichage_stats_ferme(Wrapper_cliquable):
         diptique_gauche.set_contenu([Marge_horizontale(), Texte("PV"), Marge_horizontale(), Affichage_PV(self.joueur), Marge_horizontale()], [5, 0, 5, 0, 5])
         diptique_droite.set_contenu([Marge_horizontale(), Texte("PM"), Marge_horizontale(), Affichage_PM(self.joueur), Marge_horizontale()], [5, 0, 5, 0, 5])
         contenu.set_contenu([Marge_verticale(), diptique_gauche, Marge_verticale(), diptique_droite, Marge_verticale()], [5, -1, 5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.fond = (200, 200, 200)
 
 class Affichage_stats(Wrapper_cliquable): # Modifier en donnant la possibilité d'afficher le détail des stats
@@ -1025,7 +1032,7 @@ class Affichage_stats(Wrapper_cliquable): # Modifier en donnant la possibilité 
         tetraptique = Pavage_vertical()
         tetraptique.set_contenu([Marge_horizontale(), Texte("PV"), Marge_horizontale(), Affichage_PV(self.joueur), Marge_horizontale(), Texte("PM"), Marge_horizontale(), Affichage_PM(self.joueur), Marge_horizontale()], [5, 0, 5, 0, 5, 0, 5, 0, 5])
         contenu.set_contenu([Marge_verticale(), tetraptique, Marge_verticale()], [5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.fond = (200, 200, 200)
 
 class Affichage_stats_cout_magie(Wrapper_knot, Knot_vertical):
@@ -1048,7 +1055,7 @@ class Affichage_stats_cout_magie(Wrapper_knot, Knot_vertical):
         boutons.set_contenu([self.bouton, Marge_verticale()], [0, -1])
         pentaptique.set_contenu([Marge_horizontale(), Texte("PV"), Marge_horizontale(), Affichage_PV(self.controleur.joueur), Marge_horizontale(), Texte("PM"), Marge_horizontale(), self.affichage_cout, Marge_horizontale(), boutons, Marge_horizontale()], [5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5])
         contenu.set_contenu([Marge_verticale(), pentaptique, Marge_verticale()], [5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.fond = (200, 200, 200)
 
     def select(self, selection:Cliquable, droit:bool=False):
@@ -1099,7 +1106,7 @@ class Affichage_inventaire_ferme(Wrapper_cliquable):
         liste.set_contenu([vignettes[i//2] if i%2==0 else Marge_verticale() for i  in range(-1, len(vignettes)*2)], [0 if i%2==0 else 5 for i  in range(-1, len(vignettes)*2)])
         monoptique.set_contenu([Marge_horizontale(), liste, Marge_horizontale()], [5, 0, 5])
         contenu.set_contenu([Marge_verticale(), monoptique, Marge_verticale()], [5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.fond = (200, 200, 200)
 
 class Affichage_inventaire(Wrapper_knot, Knot_vertical, Knot_hierarchique_sinistre_sommet):
@@ -1126,7 +1133,7 @@ class Affichage_inventaire(Wrapper_knot, Knot_vertical, Knot_hierarchique_sinist
         diptique = Pavage_horizontal()
         diptique.set_contenu([Marge_verticale(), self.liste_v, Marge_verticale(), self.wrapper_cat, Marge_verticale()], [5, 0, 5, -1, 5])
         contenu.set_contenu([Marge_horizontale(), diptique, Marge_horizontale()], [5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.fond = (200, 200, 200)
 
     def set_default_courant(self):
@@ -1181,7 +1188,7 @@ class Affichage_categorie(Wrapper_knot, Knot_vertical, Knot_hierarchique_sinistr
         diptique.set_contenu([Marge_verticale(), self.liste_i, Marge_verticale(), self.item_descr, Marge_verticale()], [5, 0, 5, -1, 5])
         titre.set_contenu([Marge_verticale(), Center_horizontal_texte(self.categorie.__name__), Marge_verticale()], [5, -1, 5])
         contenu.set_contenu([Marge_horizontale(), titre, Marge_horizontale(), diptique, Marge_horizontale()], [5, 0, 5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.fond = (200, 200, 200)
 
     def select(self, selection:Cliquable, droit:bool=False):
@@ -1193,6 +1200,11 @@ class Affichage_categorie(Wrapper_knot, Knot_vertical, Knot_hierarchique_sinistr
     def set_default_courant(self):
         if self.items:
             self.set_courant(self.items[0])
+            self.set_tailles(self.tailles)
+        else:
+            if isinstance(self.courant, Vignette_item_placeholder) and self.courant.courant == self.item_descr.courant:
+                self.item_descr.set_contenu(Center_horizontal_texte("Sélectionnez un item"))
+            self.set_courant(None)
             self.set_tailles(self.tailles)
 
     def in_down(self):
@@ -1219,18 +1231,12 @@ class Affichage_categorie(Wrapper_knot, Knot_vertical, Knot_hierarchique_sinistr
                     self.liste_i.insert(2*i, Marge_horizontale(), 5)
                     i+=1
                 else: #l'item qui était à l'emplacement i a été retiré
-                    if self.courant == self.items[i]:
-                        if self.courant == self.items[0]:
-                            if len(self.items) == 1:
-                                self.set_courant(None)
-                            else:
-                                self.set_courant(self.items[1])
-                        else:
-                            self.set_courant(self.items[i-1])
-                    self.items.pop(i)
+                    item = self.items.pop(i)
                     self.liste_i.pop(2*i) # La marge avant l'item
                     self.liste_i.pop(2*i) # L'item
                     # On n'incrémente pas i puisqu'il peut y avoir d'autres items à retirer/ajouter
+                    if item == self.courant:
+                        self.set_default_courant()
             else:
                 i+=1
         self.contenu.update()
@@ -1259,7 +1265,7 @@ class Affichage_sous_classe(Wrapper_knot, Knot_vertical):
         liste = Liste_verticale()
         liste.set_contenu([Marge_horizontale(), self.intrasecs_ferme, Marge_horizontale(), self.skills_ferme, Marge_horizontale(), self.classes_ferme, Marge_horizontale()], [5, 0, 5, 0, 5, 0, 5])
         contenu.set_contenu([Marge_verticale(), liste, Marge_verticale()], [5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.fond = (200, 200, 200)
 
     def init_intrasecs(self):
@@ -1267,7 +1273,7 @@ class Affichage_sous_classe(Wrapper_knot, Knot_vertical):
         liste = Pavage_vertical()
         liste.set_contenu([Marge_horizontale(), self.intrasecs, Marge_horizontale(), self.skills_ferme, Marge_horizontale(), self.classes_ferme, Marge_horizontale()], [5, -1, 5, 0, 5, 0, 5])
         contenu.set_contenu([Marge_verticale(), liste, Marge_verticale()], [5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.fond = (200, 200, 200)
 
     def init_skills(self):
@@ -1275,7 +1281,7 @@ class Affichage_sous_classe(Wrapper_knot, Knot_vertical):
         liste = Pavage_vertical()
         liste.set_contenu([Marge_horizontale(), self.intrasecs_ferme, Marge_horizontale(), self.skills, Marge_horizontale(), self.classes_ferme, Marge_horizontale()], [5, 0, 5, -1, 5, 0, 5])
         contenu.set_contenu([Marge_verticale(), liste, Marge_verticale()], [5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.fond = (200, 200, 200)
 
     def init_classes(self):
@@ -1283,7 +1289,7 @@ class Affichage_sous_classe(Wrapper_knot, Knot_vertical):
         liste = Pavage_vertical()
         liste.set_contenu([Marge_horizontale(), self.intrasecs_ferme, Marge_horizontale(), self.skills_ferme, Marge_horizontale(), self.classes, Marge_horizontale()], [5, 0, 5, 0, 5, -1, 5])
         contenu.set_contenu([Marge_verticale(), liste, Marge_verticale()], [5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.fond = (200, 200, 200)
 
     def init_sous(self):
@@ -1347,7 +1353,7 @@ class Affichage_intrasecs(Wrapper_knot, Knot_vertical):
     def init(self):
         contenu = Pavage_horizontal()
         contenu.set_contenu([Marge_verticale(), self.liste_skills, Marge_verticale()], [5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.fond = (200, 200, 200)
 
     def select(self, selection:Cliquable, droit:bool=False):
@@ -1429,13 +1435,13 @@ class Affichage_skills(Wrapper_knot, Knot_vertical):
     def init(self):
         contenu = Pavage_horizontal()
         contenu.set_contenu([Marge_verticale(), self.liste_skills, Marge_verticale()], [5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.fond = (200, 200, 200)
 
     def init(self):
         contenu = Pavage_horizontal()
         contenu.set_contenu([Marge_verticale(), self.liste_skills, Marge_verticale()], [5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.fond = (200, 200, 200)
 
     def select(self, selection:Cliquable, droit:bool=False):
@@ -1517,7 +1523,7 @@ class Affichage_classes(Wrapper_knot, Knot_vertical):
     def init(self):
         contenu = Pavage_horizontal()
         contenu.set_contenu([Marge_verticale(), self.liste_classes, Marge_verticale()], [5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.fond = (200, 200, 200)
 
     def init_sous_classe(self):
@@ -1533,7 +1539,7 @@ class Affichage_classes(Wrapper_knot, Knot_vertical):
 
         contenu = Pavage_horizontal()
         contenu.set_contenu([Marge_verticale(), self.liste_classes, Marge_verticale()], [5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.fond = (200, 200, 200)
 
     def select(self, selection:Cliquable, droit:bool=False):
@@ -1604,17 +1610,18 @@ class Affichage_classes(Wrapper_knot, Knot_vertical):
             objet.update()
 
 class Affichage_agissants(Wrapper_knot, Knot_vertical):
-    def __init__(self, placeheldholder:Placeheldholder, controleur:Controleur, type_vignette:Type[Vignette_allie|Vignette_ennemi|Vignette_neutre], methode:Callable[[], List[int]]):
+    def __init__(self, placeheldholder:Placeheldholder, placeheldholder_ajuster:Affichage, controleur:Controleur, type_vignette:Type[Vignette_allie|Vignette_ennemi|Vignette_neutre], methode:Callable[[], List[int]]):
         Wrapper_knot.__init__(self)
 
         self.placeheldholder = placeheldholder
+        self.placeheldholder_ajuster = placeheldholder_ajuster
         self.controleur = controleur
         self.type_vignette = type_vignette
         self.methode = methode
         self.fond = (200, 200, 200)
         
         self.liste_agissants = Liste_verticale()
-        self.agissants = [self.type_vignette(placeheldholder, self.controleur[ID], 40) for ID in self.methode()]
+        self.agissants = [self.type_vignette(placeheldholder, placeheldholder_ajuster, self.controleur[ID], 40) for ID in self.methode()]
         self.liste_agissants.set_contenu([self.agissants[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1, len(self.agissants)*2)], [0 if i%2==0 else 5 for i  in range(-1, len(self.agissants)*2)])
         
         self.init()
@@ -1622,7 +1629,7 @@ class Affichage_agissants(Wrapper_knot, Knot_vertical):
     def init(self):
         contenu = Pavage_horizontal()
         contenu.set_contenu([Marge_verticale(), self.liste_agissants, Marge_verticale()], [5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.fond = (200, 200, 200)
 
     def update(self):
@@ -1631,16 +1638,18 @@ class Affichage_agissants(Wrapper_knot, Knot_vertical):
         while i < len(agissants) or i < len(self.agissants):
             if i == len(agissants) or i == len(self.agissants) or agissants[i] != self.agissants[i].agissant.ID: #Les deux ne correspondent pas
                 if i == len(self.agissants) or self.agissants[i].agissant.ID in agissants: #Donc l'agissant n'a pas été retiré, mais d'autres ont été ajoutés avant
-                    allie = self.type_vignette(self.placeheldholder, self.controleur[agissants[i]], 40)
-                    self.agissants.insert(i, allie)
-                    self.liste_agissants.insert(2*i, allie, 0)
+                    agissant = self.type_vignette(self.placeheldholder, self.placeheldholder_ajuster, self.controleur[agissants[i]], 40)
+                    self.agissants.insert(i, agissant)
+                    self.liste_agissants.insert(2*i, agissant, 0)
                     self.liste_agissants.insert(2*i, Marge_horizontale(), 5)
                     i+=1
-                else: #l'agissant qui était à l'emplacement i a été retiré (rare mais je suppose que ça peut arriver)
-                    self.agissants.pop(i)
+                else: #l'agissant qui était à l'emplacement i a été retiré (sorti de la vue, mort, changé de statut, etc.)
+                    agissant = self.agissants.pop(i)
                     self.liste_agissants.pop(2*i) # La marge avant l'item
                     self.liste_agissants.pop(2*i) # L'item
                     # On n'incrémente pas i puisqu'il peut y avoir d'autres agissants à retirer/ajouter
+                    if agissant == self.courant:
+                        self.set_default_courant()
             else:
                 i+=1
         self.contenu.update()
@@ -1651,6 +1660,8 @@ class Affichage_agissants(Wrapper_knot, Knot_vertical):
         if len(self.agissants) > 0:
             self.set_courant(self.agissants[0])
         else:
+            if isinstance(self.courant, self.type_vignette) and self.placeheldholder.courant is self.courant.courant:
+                self.placeheldholder.set_courant(Center_horizontal_texte("Aucun agissant sélectionné"))
             self.set_courant(None)
 
     def select(self, selection:Cliquable, droit:bool=False):
@@ -1676,8 +1687,11 @@ class Affichage_agissants(Wrapper_knot, Knot_vertical):
         return self
 
 class Affichage_agissants_cible(Wrapper_knot, Knot_vertical):
-    def __init__(self, controleur:Controleur, multi:bool, type_vignette:Type[Vignette_allie|Vignette_ennemi|Vignette_neutre], methode:Callable[[], List[int]]):
+    def __init__(self, placeheldholder:Placeheldholder, placeheldholder_ajuster:Affichage, controleur:Controleur, multi:bool, type_vignette:Type[Vignette_allie|Vignette_ennemi|Vignette_neutre], methode:Callable[[], List[int]]):
         Wrapper_knot.__init__(self)
+
+        self.placeheldholder = placeheldholder
+        self.placeheldholder_ajuster = placeheldholder_ajuster
 
         self.controleur = controleur
         self.type_vignette = type_vignette
@@ -1689,7 +1703,7 @@ class Affichage_agissants_cible(Wrapper_knot, Knot_vertical):
         self.multi = multi
         self.fond = (200, 200, 200)
 
-        self.agissants = [self.type_vignette(self.controleur[ID], 40) for ID in self.methode()]
+        self.agissants = [self.type_vignette(placeheldholder, placeheldholder_ajuster, self.controleur[ID], 40) for ID in self.methode()]
         self.init()
 
     def init(self):
@@ -1697,7 +1711,7 @@ class Affichage_agissants_cible(Wrapper_knot, Knot_vertical):
         liste = Liste_verticale()
         liste.set_contenu([self.agissants[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1, len(self.agissants)*2)], [0 if i%2==0 else 5 for i  in range(-1, len(self.agissants)*2)])
         contenu.set_contenu([Marge_verticale(), liste, Marge_verticale()], [5, -1, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
         self.fond = (200, 200, 200)
 
     def update(self):
@@ -1712,27 +1726,27 @@ class Affichage_agissants_cible(Wrapper_knot, Knot_vertical):
                 if self.courant == selection:
                     if self.multi and selection.agissant.ID in self.cible:
                         self.cible.remove(selection.agissant.ID)
-                        self.set_courant(self.type_vignette([0, 0], self.controleur[selection.agissant.ID], 40, True))
+                        self.set_courant(self.type_vignette(self.placeheldholder, self.placeheldholder_ajuster, selection.agissant, 40, True))
                         self.agissants[self.agissants.index(selection)] = self.courant
                     elif self.multi:
-                        self.set_courant(self.type_vignette([0, 0], self.controleur[selection.agissant.ID], 40, True, True))
+                        self.set_courant(self.type_vignette(self.placeheldholder, self.placeheldholder_ajuster, selection.agissant, 40, True, True))
                         self.agissants[self.agissants.index(selection)] = self.courant
                         self.cible.append(selection.agissant.ID)
                     elif selection.agissant.ID == self.cible:
-                        self.set_courant(self.type_vignette([0, 0], self.controleur[selection.agissant.ID], 40, True))
+                        self.set_courant(self.type_vignette(self.placeheldholder, self.placeheldholder_ajuster, selection.agissant, 40, True))
                         self.agissants[self.agissants.index(selection)] = self.courant
                         self.cible = None
                     else:
-                        self.set_courant(self.type_vignette([0, 0], self.controleur[selection.agissant.ID], 40, True, True))
+                        self.set_courant(self.type_vignette(self.placeheldholder, self.placeheldholder_ajuster, selection.agissant, 40, True, True))
                         self.agissants[self.agissants.index(selection)] = self.courant
                         self.cible = selection.agissant.ID
-                else:
+                elif isinstance(self.courant, self.type_vignette):
                     if self.courant.agissant.ID is self.cible or self.multi and self.courant.agissant.ID in self.cible:
-                        self.agissants[self.agissants.index(self.courant)] = self.type_vignette([0, 0], self.controleur[self.courant.agissant.ID], 40, True, True)
+                        self.agissants[self.agissants.index(self.courant)] = self.type_vignette(self.placeheldholder, self.placeheldholder_ajuster, selection.agissant, 40, True, True)
                     else:
-                        self.agissants[self.agissants.index(self.courant)] = self.type_vignette([0, 0], self.controleur[self.courant.agissant.ID], 40)
+                        self.agissants[self.agissants.index(self.courant)] = self.type_vignette(self.placeheldholder, self.placeheldholder_ajuster, selection.agissant, 40)
                     self.set_courant(selection)
-                    self.agissants[self.agissants.index(self.courant)] = self.type_vignette([0, 0], self.controleur[self.courant.agissant.ID], 40, True)
+                    self.agissants[self.agissants.index(self.courant)] = self.type_vignette(self.placeheldholder, self.placeheldholder_ajuster, selection.agissant, 40, True)
 
     def in_up(self):
         self.set_courant(self.agissants[(self.agissants.index(self.courant) - 1) % len(self.agissants)])
@@ -2040,7 +2054,7 @@ class Affichage_labyrinthe(Affichage_knot, Proportionnel):
 class Affichage_labyrinthe_jeu(Affichage_labyrinthe):
     def select(self, selection:Cliquable, droit:bool=False):
         if not droit:
-            if isinstance(selection, Vignettes_position):
+            if isinstance(selection, Vignettes_position) and selection.pos in self.controleur.joueur.vue:
                 self.set_courant(selection)
                 position = selection.pos
                 agissants = self.controleur.trouve_agissants(position)
@@ -2055,7 +2069,7 @@ class Affichage_labyrinthe_jeu(Affichage_labyrinthe):
                     self.controleur.joueur.cible_deplacement = position
                 self.controleur.joueur.attente = 0
         else:
-            if isinstance(selection, Vignettes_position):
+            if isinstance(selection, Vignettes_position) and selection.pos in self.controleur.joueur.vue:
                 self.set_courant(selection)
                 position = selection.pos
                 interactifs = self.controleur.trouve_interactifs(position)

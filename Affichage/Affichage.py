@@ -720,22 +720,22 @@ class Wrapper(Conteneur):
         self.tailles = [0,0] #La largeur et la hauteur (ou l'inverse ?)
         self.position = [0,0]
     
-    def set_contenu(self,contenu):
+    def set_contenu(self,contenu:Affichable|None):
         self.contenu = contenu
 
-    def set_fond(self,fond):
+    def set_fond(self,fond:Tuple[int,int,int,int]|Tuple[int,int,int]):
         self.fond = fond
 
-    def decale(self,decalage):
+    def decale(self,decalage:Tuple[int,int]):
         self.position = [self.position[0] + decalage[0],self.position[1] + decalage[1]]
         for objet in self.objets:
             objet.decale(decalage)
 
-    def set_tailles(self,tailles):
+    def set_tailles(self,tailles:Tuple[int,int]):
         self.tailles = tailles
         self.contenu.set_tailles(tailles)
 
-    def get_tailles(self,tailles):
+    def get_tailles(self,tailles:Tuple[int,int]):
         if self.contenu == None:
             print(f"{self} n'a pas de contenu !")
             return [0,0]
@@ -919,6 +919,24 @@ class Wrapper_knot_bloque(Knot_bloque,Wrapper_knot):
 
 class Placeheldholder(Wrapper_knot):
     """L'élément où le placeheld du placeholder est placé."""
+    def clique(self,position, droit:bool=False):
+        clique = Wrapper.clique(self,position,droit)
+        if clique is self:
+            self.set_actif()
+        elif isinstance(clique, Placeheldholder):
+            res = self.clique_placeholder(clique, droit)
+            if not res:
+                self.unset_actif()
+                return clique
+        elif clique:
+            self.select(clique, droit)
+            self.unset_actif()
+        # else:
+        #     self.unset_actif()
+        if clique:
+            return self
+        return False
+
     def set_actif(self):
         if isinstance(self.contenu,Cliquable):
             self.contenu.set_actif()
@@ -933,15 +951,21 @@ class Placeheldholder(Wrapper_knot):
 
 class Placeholder(Knot):
     """Un élément qui lie à un autre, ailleurs."""
-    def __init__(self, placeheldholder:Placeheldholder, placeheld:Knot=None):
+    def __init__(self, placeheldholder:Placeheldholder, placeheld:Knot=None, placeheldholder_ajuster:Affichage=None):
         Knot.__init__(self)
         self.placeheldholder = placeheldholder
+        self.placeheldholder_ajuster = placeheldholder_ajuster if placeheldholder_ajuster else placeheldholder # L'élément le plus proche dans la parenté du placeheldholder dont la taille n'est pas affectée par la taille du placeheldholder (celui jusqu'auquel il faut remonter pour ajuster la taille du placeheldholder)
         self.set_courant(placeheld)
+
+    def set_courant(self,element: Cliquable):
+        self.courant = element
+        self.set_actif()
 
     def set_actif(self):
         super().set_actif()
         self.placeheldholder.set_contenu(self.courant)
-        self.placeheldholder.set_tailles(self.placeheldholder.tailles)
+        if self.placeheldholder_ajuster.tailles != [0,0]:
+            self.placeheldholder_ajuster.set_tailles(self.placeheldholder_ajuster.tailles)
         self.courant.set_actif()
 
     def unset_actif(self):
@@ -970,6 +994,8 @@ class Placeholder(Knot):
     def update(self):
         super().update()
         self.courant.update()
+        if self.placeheldholder.courant is self.courant and self.placeheldholder_ajuster.tailles != [0,0]:
+            self.placeheldholder_ajuster.set_tailles(self.placeheldholder_ajuster.tailles)
 
 class Pavage(Conteneur):
     """Contient des objets, qui s'adaptent au pavage"""
@@ -977,7 +1003,6 @@ class Pavage(Conteneur):
         self.objets = [] #Il peut quand même avoir des objets 'normaux'
         self.contenu:List[Affichable] = [] #Les objets qu'il 'contient'
         self.repartition = [] #La répartition des objets contenus
-        # self.courant = False
         self.fond = (0,0,0,0)
         self.tailles = [0,0] #La largeur et la hauteur (ou l'inverse ?)
         self.position = [0,0]
@@ -1001,7 +1026,7 @@ class Pavage_horizontal(Pavage):
         # print("Pavage_horizontal.set_tailles")
         libre = tailles[0] - sum(self.repartition[i] if self.repartition[i]>0 else self.contenu[i].get_tailles(tailles)[0] if not(self.repartition[i]) else 0 for i in range(len(self.repartition)))
         if libre < 0:
-            warn(f"Je ne peux pas faire rentrer {self.contenu} en {self.repartition} dans {self} !")
+            raise RuntimeError(f"Je ne peux pas faire rentrer {self.contenu} ({[self.repartition[i] if self.repartition[i]>0 else self.contenu[i].get_tailles(tailles)[0] if not(self.repartition[i]) else 0 for i in range(len(self.contenu))]}) en {self.repartition} ({tailles[0]}) dans {self} !")
         else:
             nb_portions = sum(taille for taille in self.repartition if taille<0)
             if nb_portions != 0: #Dans le cas contraire, on n'a pas besoin de définir portion
@@ -1024,7 +1049,7 @@ class Pavage_horizontal(Pavage):
         libre = tailles[0] - sum(self.repartition[i] if self.repartition[i]>0 else self.contenu[i].get_tailles(tailles)[0] if not(self.repartition[i]) else 0 for i in range(len(self.repartition)))
         # print("libre")
         if libre < 0:
-            warn(f"Je ne peux pas faire rentrer {self.contenu} en {self.repartition} dans {self} !")
+            warn(f"Je ne peux pas faire rentrer {self.contenu} ({[self.repartition[i] if self.repartition[i]>0 else self.contenu[i].get_tailles(tailles)[0] if not(self.repartition[i]) else 0 for i in range(len(self.contenu))]}) en {self.repartition} ({tailles[0]}) dans {self} !")
         else:
             nb_portions = sum(taille for taille in self.repartition if taille<0)
             if nb_portions != 0: #Dans le cas contraire, on n'a pas besoin de définir portion
@@ -1078,7 +1103,7 @@ class Pavage_vertical(Pavage):
         libre = tailles[1] - sum(self.repartition[i] if self.repartition[i]>0 else self.contenu[i].get_tailles(tailles)[1] if not(self.repartition[i]) else 0 for i in range(len(self.repartition)))
         # print("libre")
         if libre < 0:
-            warn(f"Je ne peux pas faire rentrer {self.contenu} en {self.repartition} dans {self} !")
+            warn(f"Je ne peux pas faire rentrer {self.contenu} ({[self.repartition[i] if self.repartition[i]>0 else self.contenu[i].get_tailles(tailles)[1] if not(self.repartition[i]) else 0 for i in range(len(self.contenu))]}) en {self.repartition} ({tailles[1]}) dans {self} !")
         else:
             nb_portions = sum(taille for taille in self.repartition if taille<0)
             if nb_portions != 0: #Dans le cas contraire, on n'a pas besoin de définir portion
@@ -1698,7 +1723,7 @@ class Center_texte(Wrapper_knot_bloque):
         monotique = Pavage_horizontal()
         monotique.set_contenu([Marge_verticale(), self.texte, Marge_verticale()], [-1, 0, -1])
         contenu.set_contenu([Marge_horizontale(), monotique, Marge_horizontale()], [-1, 0, -1])
-        self.contenu = contenu
+        self.set_contenu(contenu)
 
 class Margin_texte(Wrapper_knot_bloque):
     def __init__(self, texte:str):
@@ -1713,15 +1738,15 @@ class Margin_texte(Wrapper_knot_bloque):
         monotique = Pavage_horizontal()
         monotique.set_contenu([Marge_verticale(), self.texte, Marge_verticale()], [5, 0, 5])
         contenu.set_contenu([Marge_horizontale(), monotique, Marge_horizontale()], [5, 0, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
 
 class Center_horizontal_texte(Center_texte, Margin_texte):
     def init(self):
         contenu = Pavage_vertical()
         monotique = Pavage_horizontal()
-        monotique.set_contenu([Marge_verticale(), self.texte, Marge_verticale()], [-2, 0, -1])
+        monotique.set_contenu([Marge_verticale(), self.texte, Marge_verticale()], [-1, 0, -1])
         contenu.set_contenu([Marge_horizontale(), monotique, Marge_horizontale()], [5, 0, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
 
 class Center_horizontal_texte_test(Center_texte, Margin_texte):
     def init(self):
@@ -1729,7 +1754,7 @@ class Center_horizontal_texte_test(Center_texte, Margin_texte):
         monotique = Pavage_horizontal_test()
         monotique.set_contenu([Marge_verticale(), self.texte, Marge_verticale()], [-2, 0, -1])
         contenu.set_contenu([Marge_horizontale(), monotique, Marge_horizontale()], [5, 0, 5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
 
     def get_tailles(self, tailles):
         print("texte :", self.texte.get_tailles(tailles))
@@ -1741,7 +1766,7 @@ class Center_vertical_texte(Center_texte, Margin_texte):
         monotique = Pavage_horizontal()
         monotique.set_contenu([Marge_verticale(), self.texte, Marge_verticale()], [5, 0, 5])
         contenu.set_contenu([Marge_horizontale(), monotique, Marge_horizontale()], [-1, 0, -1])
-        self.contenu = contenu
+        self.set_contenu(contenu)
 
 class Bouton(Wrapper_cliquable):
     def __init__(self, skin, texte, fond=(255,255,255), fond_marque_survol=(200,200,200), fond_marque_actif=None, fond_marque_courant=None, fond_est_courant=None, fond_actif=None):
@@ -1763,7 +1788,7 @@ class Bouton(Wrapper_cliquable):
         triptique = Pavage_horizontal()
         triptique.set_contenu([Marge_verticale(),Vignette([0,0],20,self.skin),Marge_verticale(),Texte(self.texte),Marge_verticale()],[5,0,5,0,5])
         contenu.set_contenu([Marge_horizontale(),triptique,Marge_horizontale()],[5,0,5])
-        self.contenu = contenu
+        self.set_contenu(contenu)
 
     def get_fond(self):
         if self.marque_survol:
@@ -1803,8 +1828,8 @@ class Vignette_composee(Cliquable,Affichage):
             self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
 
 class Vignette_placeholder(Vignette_composee, Placeholder):
-    def __init__(self,placeheldholder:Placeheldholder,placeheld:Knot,vignettes:List[Affichable],taille,shade=False,invalide=False):
-        Placeholder.__init__(self,placeheldholder,placeheld)
+    def __init__(self,placeheldholder:Placeheldholder,placeheld:Knot,placeheldholder_ajuster:Affichage,vignettes:List[Affichable],taille,shade=False,invalide=False):
+        Placeholder.__init__(self,placeheldholder,placeheld,placeheldholder_ajuster)
         self.tailles = [taille,taille]
         self.objets = vignettes
         if shade or invalide:
@@ -1838,16 +1863,16 @@ class Vignette_composee_texte(Vignette_composee):
                 objet.set_position([self.tailles[0]-tailles_texte[0],self.tailles[1]-tailles_texte[1]])
 
 class Vignette_placeholder_texte(Vignette_composee_texte,Placeholder):
-    def __init__(self,placeheldholder:Placeheldholder,placeheld:Knot,vignettes:List[Affichable],texte,taille,shade=False,invalide=False):
-        Vignette_placeholder.__init__(self,placeheldholder,placeheld,vignettes,taille,shade,invalide)
+    def __init__(self,placeheldholder:Placeheldholder,placeheld:Knot,placeheldholder_ajuster:Affichage,vignettes:List[Affichable],texte,taille,shade=False,invalide=False):
+        Vignette_placeholder.__init__(self,placeheldholder,placeheld,placeheldholder_ajuster,vignettes,taille,shade,invalide)
         texte = Texte(texte)
         self.objets.append(texte)
         tailles_texte = texte.get_tailles(self.tailles)
         texte.set_position([self.tailles[0]-tailles_texte[0],self.tailles[1]-tailles_texte[1]])
 
 class Vignette_placeholder_updatable(Vignette_placeholder):
-    def __init__(self,placeheldholder:Placeheldholder,placeheld:Knot,vignettes:List[Affichable],taille,shade=False,invalide=False):
-        Vignette_placeholder.__init__(self,placeheldholder,placeheld,vignettes,taille,shade,invalide)
+    def __init__(self,placeheldholder:Placeheldholder,placeheld:Knot,placeheldholder_ajuster:Affichage,vignettes:List[Affichable],taille,shade=False,invalide=False):
+        Vignette_placeholder.__init__(self,placeheldholder,placeheld,placeheldholder_ajuster,vignettes,taille,shade,invalide)
 
         self.shades:List[Affichable] = []
         if shade or invalide:
@@ -1861,14 +1886,14 @@ class Vignette_categorie(Vignette_placeholder):
     def __init__(self,placeheldholder:Placeheldholder,placeheld:Knot,categorie:Type[Potion|Parchemin|Cle|Arme|Bouclier|Armure|Haume|Anneau|Projectile|Ingredient|Cadavre|Oeuf],taille,shade=False,invalide=False):
         vignettes = [Vignette([0,0],taille,categorie.get_image())]
 
-        Vignette_placeholder.__init__(self,placeheldholder,placeheld,vignettes,taille,shade,invalide)
+        Vignette_placeholder.__init__(self,placeheldholder,placeheld,None,vignettes,taille,shade,invalide)
 
 class Vignette_recette(Vignette_placeholder):
     def __init__(self,placeheldholder:Placeheldholder,placeheld:Knot,recette,taille,shade=False,invalide=False):
         self.recette = recette
         vignettes = [Vignette([0,0],taille,eval(recette["produit"])(None).get_skin())]
 
-        Vignette_placeholder.__init__(self,placeheldholder,placeheld,vignettes,taille,shade,invalide)
+        Vignette_placeholder.__init__(self,placeheldholder,placeheld,None,vignettes,taille,shade,invalide)
 
 class Vignette_ingredient(Vignette_placeholder_texte):
     def __init__(self,placeheldholder:Placeheldholder,ingredient:Item,quantite_necessaire,quantite_disponible,taille,shade=False,invalide=False):
@@ -1876,7 +1901,7 @@ class Vignette_ingredient(Vignette_placeholder_texte):
         placeheld = Paves(ingredient.get_description())
         vignettes = [Vignette([0,0],taille,ingredient.get_skin())]
 
-        Vignette_placeholder_texte.__init__(self,placeheldholder,placeheld,vignettes,f"{quantite_disponible}/{quantite_necessaire}",taille,shade,invalide or quantite_disponible < quantite_necessaire)
+        Vignette_placeholder_texte.__init__(self,placeheldholder,placeheld,None,vignettes,f"{quantite_disponible}/{quantite_necessaire}",taille,shade,invalide or quantite_disponible < quantite_necessaire)
 
 class Vignette_vente(Vignette_placeholder_texte):
     def __init__(self,placeheldholder:Placeheldholder,placeheld:Knot,item:Item,taille,prix,description,shade=False,invalide=False):
@@ -1885,7 +1910,7 @@ class Vignette_vente(Vignette_placeholder_texte):
         self.description = description
         vignettes = [Vignette([0,0],taille,item.get_skin())]
 
-        Vignette_placeholder_texte.__init__(self,placeheldholder,placeheld,vignettes,f"{prix} €",taille,shade,invalide)
+        Vignette_placeholder_texte.__init__(self,placeheldholder,placeheld,None,vignettes,f"{prix} €",taille,shade,invalide)
 
 class Vignette_achat(Vignette_placeholder_texte):
     def __init__(self,placeheldholder:Placeheldholder,placeheld:Knot,item:Item,taille,prix,description,shade=False,invalide=False):
@@ -1894,7 +1919,7 @@ class Vignette_achat(Vignette_placeholder_texte):
         self.description = description
         vignettes = [Vignette([0,0],taille,item.get_skin())]
 
-        Vignette_placeholder_texte.__init__(self,placeheldholder,placeheld,vignettes,f"{prix} €",taille,shade,invalide)
+        Vignette_placeholder_texte.__init__(self,placeheldholder,placeheld,None,vignettes,f"{prix} €",taille,shade,invalide)
 
 class Vignette_magie(Vignette_composee):
     def __init__(self,magie:Magie,taille,shade=False,invalide=False):
@@ -1908,7 +1933,7 @@ class Vignette_magie_placeholder(Vignette_placeholder):
         self.magie = magie
         vignettes = [Vignette([0,0],taille,magie.get_skin())]
 
-        Vignette_placeholder.__init__(self,placeheldholder,placeheld,vignettes,taille,shade,invalide)
+        Vignette_placeholder.__init__(self,placeheldholder,placeheld,None,vignettes,taille,shade,invalide)
 
 class Vignette_item(Vignette_composee):
     def __init__(self,position,item:Item,taille,direction=None,shade=False,invalide=False):
@@ -1927,7 +1952,7 @@ class Vignette_item_placeholder(Vignette_placeholder):
         self.item = item
         vignettes = [Vignette(position,taille,item.get_skin())]
 
-        Vignette_placeholder.__init__(self,placeheldholder,placeheld,vignettes,taille,shade,invalide)
+        Vignette_placeholder.__init__(self,placeheldholder,placeheld,None,vignettes,taille,shade,invalide)
 
 class Vignettes_agissant(Vignette_composee):
     def __init__(self,position,agissant:Agissant,taille):
@@ -2034,13 +2059,13 @@ class Vignette_case(Vignette_composee):
         Vignette_composee.__init__(self,vignettes,taille)
 
 class Vignette_allie(Vignette_placeholder_updatable):
-    def __init__(self,placeheldholder:Placeheldholder,agissant:Agissant,taille,shade=False,invalide=False):
+    def __init__(self,placeheldholder:Placeheldholder,placeheldholder_ajuster:Affichage,agissant:Agissant,taille,shade=False,invalide=False):
         self.agissant = agissant
         vignettes = [Vignettes_agissant([0,0],agissant,taille)]
         for statut in agissant.get_skins_statuts():
             vignettes.append(Vignette([0,0],taille,statut))
 
-        Vignette_placeholder_updatable.__init__(self,placeheldholder,Description_allie(agissant.controleur,agissant),vignettes,taille,shade,invalide)
+        Vignette_placeholder_updatable.__init__(self,placeheldholder,Description_allie(agissant.controleur,agissant),placeheldholder_ajuster,vignettes,taille,shade,invalide)
 
     def update(self):
         self.objets:List[Affichable] = []
@@ -2049,32 +2074,38 @@ class Vignette_allie(Vignette_placeholder_updatable):
             self.objets.append(Vignette(self.position,self.tailles[0],statut))
         self.objets+=self.shades
         self.courant.update()
+        if self.placeheldholder.courant is self.courant and self.placeheldholder_ajuster.tailles != [0,0]:
+            self.placeheldholder_ajuster.set_tailles(self.placeheldholder_ajuster.tailles)
 
 class Vignette_ennemi(Vignette_placeholder_updatable):
-    def __init__(self,placeheldholder:Placeheldholder,agissant:Agissant,taille,shade=False,invalide=False):
+    def __init__(self,placeheldholder:Placeheldholder,placeheldholder_ajuster:Affichage,agissant:Agissant,taille,shade=False,invalide=False):
         self.agissant = agissant
         vignettes = [Vignettes_agissant([0,0],agissant,taille)]
 
-        Vignette_placeholder_updatable.__init__(self,placeheldholder,Description_ennemi(agissant.controleur, agissant),vignettes,taille,shade,invalide)
+        Vignette_placeholder_updatable.__init__(self,placeheldholder,Description_ennemi(agissant.controleur, agissant),placeheldholder_ajuster,vignettes,taille,shade,invalide)
         
     def update(self):
         self.objets:List[Affichable] = []
         self.objets.append(Vignettes_agissant(self.position,self.agissant,self.tailles[0]))
         self.objets+=self.shades
         self.courant.update()
+        if self.placeheldholder.courant is self.courant and self.placeheldholder_ajuster.tailles != [0,0]:
+            self.placeheldholder_ajuster.set_tailles(self.placeheldholder_ajuster.tailles)
 
 class Vignette_neutre(Vignette_placeholder_updatable):
-    def __init__(self,placeheldholder:Placeheldholder,agissant:Agissant,taille,shade=False,invalide=False):
+    def __init__(self,placeheldholder:Placeheldholder,placeheldholder_ajuster:Affichage,agissant:Agissant,taille,shade=False,invalide=False):
         self.agissant = agissant
         vignettes = [Vignettes_agissant([0,0],agissant,taille)]
 
-        Vignette_placeholder_updatable.__init__(self,placeheldholder,Description_neutre(agissant.controleur, agissant),vignettes,taille,shade,invalide)
+        Vignette_placeholder_updatable.__init__(self,placeheldholder,Description_neutre(agissant.controleur, agissant),placeheldholder_ajuster,vignettes,taille,shade,invalide)
         
     def update(self):
         self.objets:List[Affichable] = []
         self.objets.append(Vignettes_agissant(self.position,self.agissant,self.tailles[0]))
         self.objets+=self.shades
         self.courant.update()
+        if self.placeheldholder.courant is self.courant and self.placeheldholder_ajuster.tailles != [0,0]:
+            self.placeheldholder_ajuster.set_tailles(self.placeheldholder_ajuster.tailles)
 
 class Description_allie(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
     def __init__(self,controleur:Controleur,allie:Agissant):
@@ -2082,7 +2113,7 @@ class Description_allie(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
 
         self.controleur = controleur
         self.allie = allie
-        self.fond = (0, 0, 0)
+        self.fond = (200, 200, 200)
 
         self.paves = Paves(self.allie.get_texte_descriptif())
         self.boutons = [
@@ -2098,13 +2129,11 @@ class Description_allie(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
 
     def init(self):
         contenu = Pavage_horizontal()
-        diptique = Pavage_vertical()
-        boutons = Pavage_horizontal()
-        boutons.set_contenu([self.boutons[i//2] if i%2==0 else Marge_verticale() for i in range(len(self.boutons)*2)], [0 if i%2==0 else 5 for i in range(len(self.boutons)*2-1)]+[-1])
-        diptique.set_contenu([Marge_horizontale(),self.paves,Marge_horizontale(),boutons,Marge_horizontale()],[5, -1, 5, 0, 5])
-        contenu.set_contenu([Marge_verticale(),diptique,Marge_verticale()],[5,-1,5])
-        self.contenu = contenu
-        self.fond = (0, 0, 0)
+        multiptique = Pavage_vertical()
+        multiptique.set_contenu([Marge_horizontale(),self.paves] + [self.boutons[i//2] if i%2==1 else Marge_horizontale() for i in range(len(self.boutons)*2+1)], [5, 0] + [0 if i%2==1 else 5 for i in range(len(self.boutons)*2+1)])
+        contenu.set_contenu([Marge_verticale(),multiptique,Marge_verticale()],[5,-1,5])
+        self.set_contenu(contenu)
+        self.fond = (200, 200, 200)
 
     def select(self, selection: Cliquable, droit: bool = False):
         if not droit:
@@ -2124,7 +2153,7 @@ class Description_allie(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
         # TODO : indiquer que l'action a été effectuée
 
     def set_default_courant(self):
-        self.courant = self.boutons[0]
+        self.set_courant(self.boutons[0])
 
     def in_left(self):
         if self.courant in self.boutons and self.boutons.index(self.courant) > 0:
@@ -2136,10 +2165,26 @@ class Description_allie(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
 
     def update(self):
         self.paves = Paves(self.allie.get_texte_descriptif())
+        self.boutons:List[Bouton|None] = [
+            Bouton(SKIN_REJOINDRE, "Rejoindre"),
+            Bouton(SKIN_PARLER, "Parler") if isinstance(self.allie, PNJ) else None,
+            Bouton(SKIN_AIDER, "Aider"),
+            Bouton(SKIN_EXCLURE, "Exclure"),
+        ]
+
+        self.boutons = [bouton for bouton in self.boutons if bouton is not None]
+
+        if isinstance(self.courant, Bouton):
+            if self.courant.texte in [bouton.texte for bouton in self.boutons]:
+                self.set_courant(self.boutons[[bouton.texte for bouton in self.boutons].index(self.courant.texte)])
+            else:
+                self.set_default_courant()
         self.init()
         self.contenu.update()
         for objet in self.objets:
             objet.update()
+        if self.tailles != [0, 0]:
+            self.set_tailles(self.tailles)
 
 class Description_neutre(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
     def __init__(self,controleur:Controleur,neutre:Agissant):
@@ -2147,7 +2192,7 @@ class Description_neutre(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
 
         self.controleur = controleur
         self.neutre = neutre
-        self.fond = (0, 0, 0)
+        self.fond = (200, 200, 200)
 
         self.paves = Paves(self.neutre.get_texte_descriptif())
         self.boutons = [
@@ -2163,13 +2208,11 @@ class Description_neutre(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
 
     def init(self):
         contenu = Pavage_horizontal()
-        diptique = Pavage_vertical()
-        boutons = Pavage_horizontal()
-        boutons.set_contenu([self.boutons[i//2] if i%2==0 else Marge_verticale() for i in range(len(self.boutons)*2)], [0 if i%2==0 else 5 for i in range(len(self.boutons)*2-1)]+[-1])
-        diptique.set_contenu([Marge_horizontale(),self.paves,Marge_horizontale(),boutons,Marge_horizontale()],[5, -1, 5, 0, 5])
-        contenu.set_contenu([Marge_verticale(),diptique,Marge_verticale()],[5,-1,5])
-        self.contenu = contenu
-        self.fond = (0, 0, 0)
+        multiptique = Pavage_vertical()
+        multiptique.set_contenu([Marge_horizontale(),self.paves] + [self.boutons[i//2] if i%2==1 else Marge_horizontale() for i in range(len(self.boutons)*2+1)], [5, 0] + [0 if i%2==1 else 5 for i in range(len(self.boutons)*2+1)])
+        contenu.set_contenu([Marge_verticale(),multiptique,Marge_verticale()],[5,-1,5])
+        self.set_contenu(contenu)
+        self.fond = (200, 200, 200)
 
     def select(self, selection: Cliquable, droit: bool = False):
         if not droit:
@@ -2189,7 +2232,7 @@ class Description_neutre(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
         # TODO : indiquer que l'action a été effectuée
 
     def set_default_courant(self):
-        self.courant = self.boutons[0]
+        self.set_courant(self.boutons[0])
 
     def in_left(self):
         if self.courant in self.boutons and self.boutons.index(self.courant) > 0:
@@ -2201,10 +2244,24 @@ class Description_neutre(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
 
     def update(self):
         self.paves = Paves(self.neutre.get_texte_descriptif())
+        self.boutons = [
+            Bouton(SKIN_REJOINDRE, "Rejoindre"),
+            Bouton(SKIN_PARLER, "Parler") if isinstance(self.neutre, PNJ) else None,
+            Bouton(SKIN_ATTAQUER, "Attaquer"),
+            Bouton(SKIN_ANTAGONISER, "Antagoniser"),
+        ]
+        self.boutons = [bouton for bouton in self.boutons if bouton is not None]
+        if isinstance(self.courant, Bouton):
+            if self.courant.texte in [bouton.texte for bouton in self.boutons]:
+                self.set_courant(self.boutons[[bouton.texte for bouton in self.boutons].index(self.courant.texte)])
+            else:
+                self.set_default_courant()
         self.init()
         self.contenu.update()
         for objet in self.objets:
             objet.update()
+        if self.tailles != [0, 0]:
+            self.set_tailles(self.tailles)
 
 class Description_ennemi(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
     def __init__(self,controleur:Controleur,ennemi:Agissant):
@@ -2212,7 +2269,7 @@ class Description_ennemi(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
 
         self.controleur = controleur
         self.ennemi = ennemi
-        self.fond = (0, 0, 0)
+        self.fond = (200, 200, 200)
 
         self.paves = Paves(self.ennemi.get_texte_descriptif())
         self.boutons = [
@@ -2228,13 +2285,11 @@ class Description_ennemi(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
 
     def init(self):
         contenu = Pavage_horizontal()
-        diptique = Pavage_vertical()
-        boutons = Pavage_horizontal()
-        boutons.set_contenu([self.boutons[i//2] if i%2==0 else Marge_verticale() for i in range(len(self.boutons)*2)], [0 if i%2==0 else 5 for i in range(len(self.boutons)*2-1)]+[-1])
-        diptique.set_contenu([Marge_horizontale(),self.paves,Marge_horizontale(),boutons,Marge_horizontale()],[5, -1, 5, 0, 5])
-        contenu.set_contenu([Marge_verticale(),diptique,Marge_verticale()],[5,-1,5])
-        self.contenu = contenu
-        self.fond = (0, 0, 0)
+        multiptique = Pavage_vertical()
+        multiptique.set_contenu([Marge_horizontale(),self.paves] + [self.boutons[i//2] if i%2==1 else Marge_horizontale() for i in range(len(self.boutons)*2+1)], [5, 0] + [0 if i%2==1 else 5 for i in range(len(self.boutons)*2+1)])
+        contenu.set_contenu([Marge_verticale(),multiptique,Marge_verticale()],[5,-1,5])
+        self.set_contenu(contenu)
+        self.fond = (200, 200, 200)
 
     def select(self, selection: Cliquable, droit: bool = False):
         if not droit:
@@ -2254,7 +2309,7 @@ class Description_ennemi(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
         # TODO : indiquer que l'action a été effectuée
 
     def set_default_courant(self):
-        self.courant = self.boutons[0]
+        self.set_courant(self.boutons[0])
 
     def in_left(self):
         if self.courant in self.boutons and self.boutons.index(self.courant) > 0:
@@ -2266,10 +2321,24 @@ class Description_ennemi(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
 
     def update(self):
         self.paves = Paves(self.ennemi.get_texte_descriptif())
+        self.boutons = [
+            Bouton(SKIN_REJOINDRE, "Rejoindre"),
+            Bouton(SKIN_PARLER, "Parler") if isinstance(self.ennemi, PNJ) else None,
+            Bouton(SKIN_ATTAQUER, "Attaquer"),
+            Bouton(SKIN_PRIORISER, "Prioriser"),
+        ]
+        self.boutons = [bouton for bouton in self.boutons if bouton is not None]
+        if isinstance(self.courant, Bouton):
+            if self.courant.texte in [bouton.texte for bouton in self.boutons]:
+                self.set_courant(self.boutons[[bouton.texte for bouton in self.boutons].index(self.courant.texte)])
+            else:
+                self.set_default_courant()
         self.init()
         self.contenu.update()
         for objet in self.objets:
             objet.update()
+        if self.tailles != [0, 0]:
+            self.set_tailles(self.tailles)
 
 class Description_item(Wrapper_knot, Knot_vertical_profondeur_agnostique):
     def __init__(self,controleur:Controleur,item:Item):
@@ -2277,7 +2346,7 @@ class Description_item(Wrapper_knot, Knot_vertical_profondeur_agnostique):
 
         self.controleur = controleur
         self.item = item
-        self.fond = (0, 0, 50)
+        self.fond = (200, 200, 200)
 
         self.paves = Paves(self.item.get_description())
         self.boutons = [
@@ -2298,10 +2367,11 @@ class Description_item(Wrapper_knot, Knot_vertical_profondeur_agnostique):
             Bouton(SKIN_LANCER, "Lancer", fond=(255, 255, 255) if isinstance(self.item, Projectile) else (100, 100, 100)) if trouve_skill(self.controleur.joueur.classe_principale, Skills_projectiles) is not None else None,
             Bouton(SKIN_BOIRE, "Boire") if isinstance(self.item, Potion) else None,
             Bouton(SKIN_UTILISER, "Utiliser") if isinstance(self.item, Parchemin) else None,
+            Bouton(SKIN_JETER, "Jeter"),
         ]
 
         self.boutons = [bouton for bouton in self.boutons if bouton is not None]
-
+        self.set_default_courant()
 
         self.init()
 
@@ -2310,15 +2380,19 @@ class Description_item(Wrapper_knot, Knot_vertical_profondeur_agnostique):
         multiptique = Pavage_vertical()
         multiptique.set_contenu([Marge_horizontale(),self.paves] + [self.boutons[i//2] if i%2==1 else Marge_horizontale() for i in range(len(self.boutons)*2+1)], [5, 0] + [0 if i%2==1 else 5 for i in range(len(self.boutons)*2)]+[-1])
         contenu.set_contenu([Marge_verticale(),multiptique,Marge_verticale()],[5,-1,5])
-        self.contenu = contenu
-        self.fond = (0, 0, 50)
+        self.set_contenu(contenu)
+        self.fond = (200, 200, 200)
 
     def select(self, selection: Cliquable, droit: bool = False):
+        print("selection")
+        print(selection)
         if not droit:
             if isinstance(selection, Bouton):
+                print("bouton")
+                print(selection.texte)
                 if selection.texte == "Equiper":
                     self.controleur.joueur.inventaire.equippe([self.item])
-                elif selection.texte == "Deséquiper":
+                elif selection.texte == "Desequiper":
                     self.controleur.joueur.inventaire.desequippe([self.item])
                 elif selection.texte == "Lancer":
                     self.controleur.joueur.skill_courant = trouve_skill(self.controleur.joueur.classe_principale, Skills_projectiles)
@@ -2327,10 +2401,13 @@ class Description_item(Wrapper_knot, Knot_vertical_profondeur_agnostique):
                     self.controleur.joueur.inventaire.utilise_item(self.item)
                 elif selection.texte == "Utiliser":
                     self.controleur.joueur.inventaire.utilise_item(self.item)
+                elif selection.texte == "Jeter":
+                    self.controleur.joueur.inventaire.drop(self.controleur.joueur.position, self.item.ID)
+        self.update()
         # TODO : indiquer que l'action a été effectuée
 
     def set_default_courant(self):
-        self.courant = self.boutons[0]
+        self.set_courant(self.boutons[0])
 
     def in_up(self):
         if self.courant in self.boutons and self.boutons.index(self.courant) > 0:
@@ -2342,7 +2419,33 @@ class Description_item(Wrapper_knot, Knot_vertical_profondeur_agnostique):
 
     def update(self):
         self.paves = Paves(self.item.get_description())
+        self.boutons = [
+            None if not isinstance(self.item,Equipement) else
+            (Bouton(SKIN_DESEQUIPER_ANNEAU, "Desequiper") if isinstance(self.item, Anneau) else
+                Bouton(SKIN_DESEQUIPER_ARME, "Desequiper") if isinstance(self.item, Arme) else
+                Bouton(SKIN_DESEQUIPER_ARMURE, "Desequiper") if isinstance(self.item, Armure) else
+                Bouton(SKIN_DESEQUIPER_BOUCLIER, "Desequiper") if isinstance(self.item, Bouclier) else
+                Bouton(SKIN_DESEQUIPER_CASQUE, "Desequiper") if isinstance(self.item, Haume) else None
+                ) if self.item.ID in self.controleur.joueur.inventaire.get_equippement() else
+            (Bouton(SKIN_EQUIPER_ANNEAU, "Equiper") if isinstance(self.item, Anneau) else
+                Bouton(SKIN_EQUIPER_ARMURE, "Equiper") if isinstance(self.item, Armure) else
+                Bouton(SKIN_EQUIPER_BOUCLIER, "Equiper") if isinstance(self.item, Bouclier) else
+                Bouton(SKIN_EQUIPER_CASQUE, "Equiper") if isinstance(self.item, Haume) else None
+                ),
+            Bouton(SKIN_LANCER, "Lancer", fond=(255, 255, 255) if isinstance(self.item, Projectile) else (100, 100, 100)) if trouve_skill(self.controleur.joueur.classe_principale, Skills_projectiles) is not None else None,
+            Bouton(SKIN_BOIRE, "Boire") if isinstance(self.item, Potion) else None,
+            Bouton(SKIN_UTILISER, "Utiliser") if isinstance(self.item, Parchemin) else None,
+            Bouton(SKIN_JETER, "Jeter"),
+        ]
+        self.boutons = [bouton for bouton in self.boutons if bouton is not None]
+        if isinstance(self.courant, Bouton):
+            if self.courant.texte in [bouton.texte for bouton in self.boutons]:
+                self.set_courant(self.boutons[[bouton.texte for bouton in self.boutons].index(self.courant.texte)])
+            else:
+                self.set_default_courant()
         self.init()
         self.contenu.update()
         for objet in self.objets:
             objet.update()
+        if self.tailles != [0, 0]:
+            self.set_tailles(self.tailles)

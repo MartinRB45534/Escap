@@ -63,6 +63,7 @@ SKIN_DESEQUIPER_CASQUE = Skin("desequipper_casque.png")
 SKIN_LANCER = Skin("skill_lancer.png")
 SKIN_BOIRE = Skin("boire.png")
 SKIN_UTILISER = Skin("utiliser_parchemin.png")
+SKIN_JETER = Skin("jeter.png")
 
 # Marchand
 SKIN_VENTE = Skin("argent.png")

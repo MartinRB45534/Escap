@@ -229,23 +229,6 @@ class Esprit_humain(Esprit_simple):
     def peureuse(self):
         return 5 in self.corps.keys() and self.corps[5] in ["PNJ","attente","fuite","deplacement","attaque","vivant"] #J'ai un doute sur la possibilité des deux derniers mais bon...
 
-    # def decide(self):
-    #     for corp in self.corps.keys():
-    #         if self.corps[corp] in ["attaque","fuite","soin","soutien"]:
-    #             Esprit.deplace(self,corp)
-    #         elif self.corps[corp] == "PNJ":
-    #             self.deplace_humain(corp)
-    #         elif self.corps[corp] == "PJ":
-    #             joueur = self.controleur.joueur
-    #             # joueur.recontrole()
-    #             if joueur.skill_courant != None and issubclass(joueur.skill_courant,(Skill_course,Skill_deplacement)) and joueur.position.lab in self.vue.keys():
-    #                 cible = self.vue[joueur.position][5][joueur.dir_regard][4]
-    #                 if cible and cible.lab in self.vue.keys():
-    #                     self.vue[cible][8]=True
-    #         elif self.corps[corp] == "attente": #Les pnjs avant de rejoindre le joueur
-    #             if self.ennemis != {}: #Si on a des ennemis, c'est qu'on a été attaqué !
-    #                 Esprit.deplace(self,corp)
-
 class Esprit_slime(Esprit_type):
     """Un esprit qui dirige un ou plusieurs slimes. Peut interragir avec d'autres esprits slimes."""
     def __init__(self,corp:int,controleur:Controleur): #Les slimes commencent tous séparément, donc ils ont leur propre esprit au début
