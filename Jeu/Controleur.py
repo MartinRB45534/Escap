@@ -5,7 +5,7 @@ from Jeu.Effet.Effets import *
 from Jeu.Esprit.Esprits import *
 from Modifiers import *
 
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Set
 import random
 
 try:
@@ -238,7 +238,7 @@ class Controleur():
         #print("Entitées : check")
         self.esprits:Dict[str,Esprit] = {}
         self.labs_courants:List[Labyrinthe] = []
-        self.entitees_courantes:List[int] = []
+        self.entitees_courantes:Set[int] = set()
         self.esprits_courants:List[str] = []
         self.joueur:PJ|PJ_mage|None = None
         self.pause = False
@@ -845,8 +845,7 @@ class Controleur():
             position = entitee.get_position()
             if position != None: #Il y a des entitees dans les inventaires
                 if position.lab == key : #La position commence par la coordonnée verticale.
-                    if not ke in self.entitees_courantes:
-                        self.entitees_courantes.append(ke)
+                    self.entitees_courantes.add(ke)
                     entitee.active(self)
         if not key in self.labs_courants:
             self.labs_courants.append(key)
@@ -861,8 +860,7 @@ class Controleur():
             position = entitee.get_position()
             if position != None: #Il y a des entitees dans les inventaires
                 if position.lab == key : #La position commence par la coordonnée verticale.
-                    if ke in self.entitees_courantes:
-                        self.entitees_courantes.remove(ke)
+                    self.entitees_courantes.discard(ke)
                     entitee.desactive()
         if key in self.labs_courants:
             self.labs_courants.remove(key)
@@ -1010,23 +1008,23 @@ class Controleur():
 
     def fait_agir(self,agissant:Agissant):
         agissant.statut = "passif"
-        if agissant.ID == 2:
+        if isinstance(agissant, PJ) and agissant is self.joueur:
             agissant.nouvel_ordre = False
         type_skill = agissant.skill_courant
-        skill:Skill_intrasec = trouve_skill(agissant.classe_principale,type_skill)
-        if skill == None :
+        skill:Skill_intrasec|None = trouve_skill(agissant.classe_principale,type_skill)
+        if skill is None :
             print("On ne peut pas utiliser un skill que l'on n'a pas... et on ne devrait pas pouvoir le choisir d'ailleurs : "+str(type_skill))
         else :
 
 
 
-            if type_skill == Skill_analyse: #À améliorer ! /!\
+            if isinstance(skill, Skill_analyse): #À améliorer ! /!\
                 mallus,niveau,cible = skill.utilise()
                 self.lance_analyse(mallus,niveau,cible)
 
 
 
-            elif type_skill == Skill_vol:
+            elif isinstance(skill, Skill_vol):
                 possesseur,item = self.selectionne_item_vol()
                 latence,reussite = skill.utilise(possesseur.priorite,agissant.priorite)
                 agissant.add_latence(latence)
@@ -1042,7 +1040,7 @@ class Controleur():
 
 
 
-            elif type_skill == Skill_ramasse:
+            elif isinstance(skill, Skill_ramasse):
                 items = self.trouve_items_courants(agissant.get_position())
                 latence = 1
                 for ID_item in items:
@@ -1055,7 +1053,7 @@ class Controleur():
 
 
 
-            elif type_skill == Skill_ramasse_light:
+            elif isinstance(skill, Skill_ramasse_light):
                 items = self.trouve_items_courants(agissant.get_position())
                 latence = 1
                 for ID_item in items:
@@ -1069,7 +1067,7 @@ class Controleur():
 
 
 
-            elif type_skill == Skill_stomp:
+            elif isinstance(skill, Skill_stomp):
                 #Une attaque qui se fait sans arme.
                 force,affinite,direction,ID = agissant.get_stats_attaque(TERRE)
                 latence,taux,portee = skill.utilise()
@@ -1082,7 +1080,7 @@ class Controleur():
 
 
 
-            elif type_skill == Skill_attaque:
+            elif isinstance(skill, Skill_attaque):
                 #Une attaque qui se fait avec une arme.
                 arme = agissant.get_arme()
                 if arme == None:
@@ -1176,7 +1174,7 @@ class Controleur():
                     projectile.taux_vitesse["lancementv"]=vitesse
                     projectile.direction = agissant.dir_regard
                     projectile.lanceur = agissant.ID
-                    self.entitees_courantes.append(projectile.ID)
+                    self.entitees_courantes.add(projectile.ID)
                     if projectile.controleur == None:
                         projectile.active(self)
                 else :
@@ -1268,7 +1266,7 @@ class Controleur():
 
 
 
-            elif type_skill == Egg_Laying:
+            elif isinstance(skill, Egg_Laying):
                 latence, oeuf = skill.utilise()
                 agissant.add_latence(latence)
                 if oeuf != None :
@@ -1276,7 +1274,7 @@ class Controleur():
 
 
 
-            elif type_skill == Skill_merge:
+            elif isinstance(skill, Skill_merge):
                 ID_cible = agissant.cible_merge
                 latence = skill.utilise()
                 if ID_cible != None:
@@ -1286,7 +1284,7 @@ class Controleur():
 
 
 
-            elif type_skill == Skill_absorb:
+            elif isinstance(skill, Skill_absorb):
                 items = self.trouve_items_courants(agissant.get_position())
                 latence = 1
                 for ID_item in items:
@@ -1301,7 +1299,7 @@ class Controleur():
 
 
 
-            elif type_skill == Skill_divide:
+            elif isinstance(skill, Skill_divide):
                 latence = skill.utilise()
                 if agissant.peut_payer(20): #Insérer le cout ici d'une façon ou d'une autre /!\
                     new_slime = type(agissant)(agissant.position,agissant.niveau,True)
@@ -1421,7 +1419,7 @@ class Controleur():
         if entitee.position != None:
             if entitee.position.lab in self.labs_courants:
                 entitee.active(self)
-                self.entitees_courantes.append(entitee.ID)
+                self.entitees_courantes.add(entitee.ID)
 
     def get_entitees_etage(self,num_lab:str):
         entitees:List[Entitee] = []
@@ -1439,8 +1437,7 @@ class Controleur():
         labs:List[Labyrinthe] = []
         esprits:List[Esprit] = []
         noms_esprits = []
-        for i in range(len(self.entitees_courantes)-1,-1,-1) :
-            ID_entitee = self.entitees_courantes[i]
+        for ID_entitee in self.entitees_courantes :
             entitee = self[ID_entitee]
             if isinstance(entitee,Agissant):
                 if entitee is self.joueur:

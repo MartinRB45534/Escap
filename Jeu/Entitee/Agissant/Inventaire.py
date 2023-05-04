@@ -62,23 +62,23 @@ class Inventaire:
         item.position = None
         self.items[item.get_classe()].append(item.ID)
 
-    def utilise_item(self,ID_item:int):
-        """Appelé en appuyant sur la touche espace, utilise l'item actuellement sélectionné."""
-        ###L'utilisation varie beaucoup selon le type d'item :
-        if ID_item != None:
-            item:Item = self.controleur[ID_item]
-            if isinstance(item,Consommable): #Un consommable se consomme (si c'est un parchemin, l'activation peut échouer)
-                item.utilise(self.controleur[self.possesseur])
-            elif isinstance(item,Arme): #Un équipable s'équipe. Il y a certaines conditions.
-                self.set_arme(ID_item)
-            elif isinstance(item,Bouclier):
-                self.set_bouclier(ID_item)
-            elif isinstance(item,Armure):
-                self.set_armure(ID_item)
-            elif isinstance(item,Haume):
-                self.set_haume(ID_item)
-            elif isinstance(item,Anneau):
-                self.set_anneau(ID_item)
+    # def utilise_item(self,ID_item:int):
+    #     """Appelé en appuyant sur la touche espace, utilise l'item actuellement sélectionné."""
+    #     ###L'utilisation varie beaucoup selon le type d'item :
+    #     if ID_item != None:
+    #         item:Item = self.controleur[ID_item]
+    #         if isinstance(item,Consommable): #Un consommable se consomme (si c'est un parchemin, l'activation peut échouer)
+    #             item.utilise(self.controleur[self.possesseur])
+    #         elif isinstance(item,Arme): #Un équipable s'équipe. Il y a certaines conditions.
+    #             self.set_arme(ID_item)
+    #         elif isinstance(item,Bouclier):
+    #             self.set_bouclier(ID_item)
+    #         elif isinstance(item,Armure):
+    #             self.set_armure(ID_item)
+    #         elif isinstance(item,Haume):
+    #             self.set_haume(ID_item)
+    #         elif isinstance(item,Anneau):
+    #             self.set_anneau(ID_item)
 
     def peut_fournir(self,items:List):
         for item in items:
@@ -272,7 +272,7 @@ class Inventaire:
             for ID_item in self.items[cat_item]:
                 self.drop(position,ID_item)
                 item:Item = self.controleur[ID_item]
-                self.controleur.entitees_courantes.append(ID_item)
+                self.controleur.entitees_courantes.add(ID_item)
                 item.position = position
             self.items[cat_item]=[]
         self.arme = None
@@ -285,7 +285,7 @@ class Inventaire:
         for cat_item in self.kiiz :
             if ID_item in self.items[cat_item]:
                 item:Item = self.controleur[ID_item]
-                self.controleur.entitees_courantes.append(ID_item)
+                self.controleur.entitees_courantes.add(ID_item)
                 item.position = position
                 self.items[cat_item].remove(ID_item)
                 if self.arme == ID_item :

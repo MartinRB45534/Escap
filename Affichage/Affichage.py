@@ -1026,7 +1026,10 @@ class Pavage_horizontal(Pavage):
         # print("Pavage_horizontal.set_tailles")
         libre = tailles[0] - sum(self.repartition[i] if self.repartition[i]>0 else self.contenu[i].get_tailles(tailles)[0] if not(self.repartition[i]) else 0 for i in range(len(self.repartition)))
         if libre < 0:
-            raise RuntimeError(f"Je ne peux pas faire rentrer {self.contenu} ({[self.repartition[i] if self.repartition[i]>0 else self.contenu[i].get_tailles(tailles)[0] if not(self.repartition[i]) else 0 for i in range(len(self.contenu))]}) en {self.repartition} ({tailles[0]}) dans {self} !")
+            if tailles == [0, 0]:
+                warn(f"Tailles nulles pour {self} !")
+            else:
+                raise RuntimeError(f"Je ne peux pas faire rentrer {self.contenu} ({[self.repartition[i] if self.repartition[i]>0 else self.contenu[i].get_tailles(tailles)[0] if not(self.repartition[i]) else 0 for i in range(len(self.contenu))]}) en {self.repartition} ({tailles[0]}) dans {self} !")
         else:
             nb_portions = sum(taille for taille in self.repartition if taille<0)
             if nb_portions != 0: #Dans le cas contraire, on n'a pas besoin de définir portion
@@ -1078,7 +1081,10 @@ class Pavage_vertical(Pavage):
         # print("Pavage_vertical.set_tailles")
         libre = tailles[1] - sum(self.repartition[i] if self.repartition[i]>0 else self.contenu[i].get_tailles(tailles)[1] if not(self.repartition[i]) else 0 for i in range(len(self.repartition)))
         if libre < 0:
-            raise RuntimeError(f"Je ne peux pas faire rentrer {self.contenu} ({[self.repartition[i] if self.repartition[i]>0 else self.contenu[i].get_tailles(tailles)[1] if not(self.repartition[i]) else 0 for i in range(len(self.contenu))]}) en {self.repartition} ({tailles[1]}) dans {self} !")
+            if tailles == [0, 0]:
+                warn(f"Tailles nulles pour {self} !")
+            else:
+                raise RuntimeError(f"Je ne peux pas faire rentrer {self.contenu} ({[self.repartition[i] if self.repartition[i]>0 else self.contenu[i].get_tailles(tailles)[1] if not(self.repartition[i]) else 0 for i in range(len(self.contenu))]}) en {self.repartition} ({tailles[1]}) dans {self} !")
         else:
             nb_portions = sum(taille for taille in self.repartition if taille<0)
             if nb_portions != 0: #Dans le cas contraire, on n'a pas besoin de définir portion
@@ -2397,10 +2403,9 @@ class Description_item(Wrapper_knot, Knot_vertical_profondeur_agnostique):
                 elif selection.texte == "Lancer":
                     self.controleur.joueur.skill_courant = trouve_skill(self.controleur.joueur.classe_principale, Skills_projectiles)
                     self.controleur.joueur.projectile_courant = self.item
-                elif selection.texte == "Boire":
-                    self.controleur.joueur.inventaire.utilise_item(self.item)
-                elif selection.texte == "Utiliser":
-                    self.controleur.joueur.inventaire.utilise_item(self.item)
+                elif selection.texte == "Boire" or selection.texte == "Utiliser":
+                    self.item: Consommable
+                    self.item.utilise(self.controleur.joueur)
                 elif selection.texte == "Jeter":
                     self.controleur.joueur.inventaire.drop(self.controleur.joueur.position, self.item.ID)
         self.update()
@@ -2430,7 +2435,9 @@ class Description_item(Wrapper_knot, Knot_vertical_profondeur_agnostique):
             (Bouton(SKIN_EQUIPER_ANNEAU, "Equiper") if isinstance(self.item, Anneau) else
                 Bouton(SKIN_EQUIPER_ARMURE, "Equiper") if isinstance(self.item, Armure) else
                 Bouton(SKIN_EQUIPER_BOUCLIER, "Equiper") if isinstance(self.item, Bouclier) else
-                Bouton(SKIN_EQUIPER_CASQUE, "Equiper") if isinstance(self.item, Haume) else None
+                Bouton(SKIN_EQUIPER_CASQUE, "Equiper") if isinstance(self.item, Haume) else
+                Bouton(SKIN_EQUIPER_EPEE, "Equiper") if isinstance(self.item, Epee) else
+                Bouton(SKIN_EQUIPER_LANCE, "Equiper") if isinstance(self.item, Lance) else None
                 ),
             Bouton(SKIN_LANCER, "Lancer", fond=(255, 255, 255) if isinstance(self.item, Projectile) else (100, 100, 100)) if trouve_skill(self.controleur.joueur.classe_principale, Skills_projectiles) is not None else None,
             Bouton(SKIN_BOIRE, "Boire") if isinstance(self.item, Potion) else None,

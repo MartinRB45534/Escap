@@ -1191,21 +1191,19 @@ class Affichage_categorie(Wrapper_knot, Knot_vertical, Knot_hierarchique_sinistr
         self.set_contenu(contenu)
         self.fond = (200, 200, 200)
 
-    def select(self, selection:Cliquable, droit:bool=False):
-        if not droit:
-            if isinstance(selection, Vignette_item_placeholder): #On veut afficher un item
-                if selection == self.courant:
-                    self.joueur.inventaire.utilise_item(selection.item.ID)
+    # def select(self, selection:Cliquable, droit:bool=False):
+    #     if not droit:
+    #         if isinstance(selection, Vignette_item_placeholder): #On veut afficher un item
+    #             if selection == self.courant:
+    #                 self.joueur.inventaire.utilise_item(selection.item.ID)
 
     def set_default_courant(self):
         if self.items:
             self.set_courant(self.items[0])
-            self.set_tailles(self.tailles)
         else:
-            if isinstance(self.courant, Vignette_item_placeholder) and self.courant.courant == self.item_descr.courant:
-                self.item_descr.set_contenu(Center_horizontal_texte("Sélectionnez un item"))
+            self.item_descr.set_contenu(Center_horizontal_texte("Sélectionnez un item"))
             self.set_courant(None)
-            self.set_tailles(self.tailles)
+        self.set_tailles(self.tailles)
 
     def in_down(self):
         if self.courant in self.items[:-1]:
@@ -1239,6 +1237,8 @@ class Affichage_categorie(Wrapper_knot, Knot_vertical, Knot_hierarchique_sinistr
                         self.set_default_courant()
             else:
                 i+=1
+        if not self.items:
+            self.set_default_courant()
         self.contenu.update()
         for objet in self.objets:
             objet.update()
