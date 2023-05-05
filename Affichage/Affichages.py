@@ -1862,11 +1862,11 @@ class Affichage_perso(Proportionnel):
             pos_case_centre = position + direction*distance
             if pos_case_centre in joueur.vue:
                 case = joueur.vue[pos_case_centre]
-                if case[1] == -1:
+                if case.clarte == -1:
                     skins.append(SKINS_CASES_NOIRES_VUES[distance][0])
-                elif case[1] > 0:
+                elif case.clarte > 0:
                     skins.append(SKINS_CASES_VUES[distance][0])
-                    if not case[5][direction][4]:
+                    if not case.cibles[direction][PASSE_ESCALIER]:
                         skins.append(SKINS_MURS_FACE_VUS[distance][0])
                     else:
                         traj = joueur.controleur.get_trajet(case[0], direction)
@@ -1874,7 +1874,7 @@ class Affichage_perso(Proportionnel):
                             skins.append(SKINS_ESCALIERS_BAS_FACE_VUS[distance][0])
                         elif traj == "escalier haut":
                             skins.append(SKINS_ESCALIERS_HAUT_FACE_VUS[distance][0])
-                    if not case[5][direction-1][4]:
+                    if not case.cibles[direction-1][4]:
                         skins.append(SKINS_MURS_VUS[distance][0][0])
                     else:
                         traj = joueur.controleur.get_trajet(case[0], direction-1)
@@ -1882,7 +1882,7 @@ class Affichage_perso(Proportionnel):
                             skins.append(SKINS_ESCALIERS_BAS_VUS[distance][0][0])
                         elif traj == "escalier haut":
                             skins.append(SKINS_ESCALIERS_HAUT_VUS[distance][0][0])
-                    if not case[5][direction-3][4]:
+                    if not case.cibles[direction-3][4]:
                         skins.append(SKINS_MURS_VUS[distance][0][1])
                     else:
                         traj = joueur.controleur.get_trajet(case[0], direction-3)
@@ -1895,11 +1895,11 @@ class Affichage_perso(Proportionnel):
                 pos_case_droite = pos_case_centre + (direction+1)*ecart #À droite du point de vue du joueur
                 if pos_case_droite in joueur.vue:
                     case = joueur.vue[pos_case_droite]
-                    if case[1] == -1:
+                    if case.clarte == -1:
                         skins.append(SKINS_CASES_NOIRES_VUES[distance][ecart])
-                    elif case[1] > 0:
+                    elif case.clarte > 0:
                         skins.append(SKINS_CASES_VUES[distance][ecart])#Rajouter les affinités etc. plus tard
-                        if not case[5][direction][4]:
+                        if not case.cibles[direction][PASSE_ESCALIER]:
                             skins.append(SKINS_MURS_FACE_VUS[distance][ecart])#Rajouter aussi les distinctions des téléportations
                         else:
                             traj = joueur.controleur.get_trajet(case[0], direction)
@@ -1907,7 +1907,7 @@ class Affichage_perso(Proportionnel):
                                 skins.append(SKINS_ESCALIERS_BAS_FACE_VUS[distance][ecart])
                             elif traj == "escalier haut":
                                 skins.append(SKINS_ESCALIERS_HAUT_FACE_VUS[distance][ecart])
-                        if not case[5][direction-3][4]:
+                        if not case.cibles[direction-3][4]:
                             skins.append(SKINS_MURS_VUS[distance][ecart])#Pareil
                         else:
                             traj = joueur.controleur.get_trajet(case[0], direction-3)
@@ -1919,11 +1919,11 @@ class Affichage_perso(Proportionnel):
                 if pos_case_droite in joueur.vue:
                     case = joueur.vue[pos_case_droite]
                     ecart = -ecart
-                    if case[1] == -1:
+                    if case.clarte == -1:
                         skins.append(SKINS_CASES_NOIRES_VUES[distance][ecart])
-                    elif case[1] > 0:
+                    elif case.clarte > 0:
                         skins.append(SKINS_CASES_VUES[distance][ecart])
-                        if not case[5][direction][4]:
+                        if not case.cibles[direction][PASSE_ESCALIER]:
                             skins.append(SKINS_MURS_FACE_VUS[distance][ecart])
                         else:
                             traj = joueur.controleur.get_trajet(case[0], direction)
@@ -1931,7 +1931,7 @@ class Affichage_perso(Proportionnel):
                                 skins.append(SKINS_ESCALIERS_BAS_FACE_VUS[distance][ecart])
                             elif traj == "escalier haut":
                                 skins.append(SKINS_ESCALIERS_HAUT_FACE_VUS[distance][ecart])
-                        if not case[5][direction-1][4]:
+                        if not case.cibles[direction-1][4]:
                             skins.append(SKINS_MURS_VUS[distance][ecart])
                         else:
                             traj = joueur.controleur.get_trajet(case[0], direction-1)
@@ -1943,7 +1943,7 @@ class Affichage_perso(Proportionnel):
         for skin in skins:
             skin.dessine_toi(screen, (x, y), (largeur, hauteur), frame, frame_par_tour)
 
-        for ID in joueur.vue[position][6]:
+        for ID in joueur.vue[position].entitees:
             if ID < 11:
                 entitee = joueur.controleur[ID]
                 if issubclass(entitee.get_classe(), Agissant):
@@ -1968,7 +1968,7 @@ class Affichage_labyrinthe(Affichage_knot, Proportionnel):
         courant = None
         if self.controleur.joueur.vue != None:
             self.objets:List[Affichable] = []
-            decs = [[dec.x, dec.y] for dec in self.controleur.joueur.vue.decalage if self.controleur.joueur.vue[dec][1] > 0]
+            decs = [[dec.x, dec.y] for dec in self.controleur.joueur.vue.decalage if self.controleur.joueur.vue[dec].clarte > 0]
             visible = [min(decs, key=itemgetter(0))[0], max(decs, key=itemgetter(0))[0], min(decs, key=itemgetter(1))[1], max(decs, key=itemgetter(1))[1]]
             distance = max(self.controleur.joueur.position.x-visible[0], visible[1]-self.controleur.joueur.position.x, self.controleur.joueur.position.y-visible[2], visible[3]-self.controleur.joueur.position.y) + 1 #On cherche à déterminer le carré qui comprend toutes les cases utiles de la vue
             debut_vue = self.controleur.joueur.position + distance * (HAUT + GAUCHE)

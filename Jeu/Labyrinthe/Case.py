@@ -8,6 +8,7 @@ if TYPE_CHECKING:
 from Jeu.Labyrinthe.Mur import *
 from Jeu.Effet.Auras import *
 from Jeu.Labyrinthe.Structure_spatiale.Direction import *
+from Jeu.Labyrinthe.Vue import Representation_case
 
 class Case:
     def __init__(self,position:Position,niveau = 1,element = TERRE,effets:List[Effet] = [],opacite = 1):
@@ -33,10 +34,10 @@ class Case:
             self.effets.append(Ombre_permanente(self.niveau,self.niveau/2))
         self.controleur = None
 
-    def __getitem__(self,key):
+    def __getitem__(self,key:Direction) -> Mur:
         return self.murs[key]
 
-    def __setitem__(self,key,value):
+    def __setitem__(self,key:Direction,value:Mur):
         self.murs[key] = value
 
     #Découvrons le déroulé d'un tour, avec case-chan :
@@ -214,44 +215,34 @@ class Case:
     def get_murs(self):
         return self.murs
 
-    def get_mur_haut(self):
-        return self[0]
+    # def get_mur_haut(self):
+    #     return self[0]
 
-    def get_mur_droit(self):
-        return self[1]
+    # def get_mur_droit(self):
+    #     return self[1]
 
-    def get_mur_bas(self):
-        return self[2]
+    # def get_mur_bas(self):
+    #     return self[2]
 
-    def get_mur_gauche(self):
-        return self[3]
+    # def get_mur_gauche(self):
+    #     return self[3]
 
-    def toString(self):
-        return "haut "+str(self[0].get_etat())+" droite "+str(self[1].get_etat())+" bas "+str(self[2].get_etat())+" gauche "+str(self[3].get_etat())+"  "
+    # def toString(self):
+    #     return "haut "+str(self[0].get_etat())+" droite "+str(self[1].get_etat())+" bas "+str(self[2].get_etat())+" gauche "+str(self[3].get_etat())+"  "
 
     def get_opacite(self):
         return self.opacite + self.opacite_bonus
 
     def get_infos(self,clees:List[str]): #Est-ce que ce serait plus clair sous forme de dictionnaire ? Ou d'objet ?
-        return [self.position, #La position de la case, sous forme de tuple
-                self.clarte, #La clarté, qui vient d'être calculée pour l'agissant
-                0, #Pour le décompte de l'oubli
-                [0, #Pour les trajets (importance des ennemis), en contournant les agissants
-                 0, #Pour les trajets (importance des ennemis), en traversant les agissants
-                 0, #Pour les trajets (dangerosité), en contournant les agissants
-                 0, #Pour les trajets (dangerosité), en traversant les agissants
-                 0, #Pour les autres trajets (pour calculer de façon unique, effacé avant chaque calcul)
-                 False],
-                self.calcule_code(), #Le code correspondant aux auras et autres effets
-                [self[i].get_cible_ferme(clees) for i in DIRECTIONS], #Les murs et leur traversabilité pour l'agissant
-                [], #Pour stocker les entitées
-                self.get_codes_effets(), #Pour stocker les effets (attaques delayées)
-                self.repoussante] #Pour savoir si on peut y rester
+        return Representation_case(self.position, self.clarte, self.calcule_code(), self.get_cibles_fermes(clees), self.get_codes_effets(), self.repoussante)
 
     def calcule_code(self):#La fonction qui calcule le code correpondant à l'état de la case. De base, 0. Modifié d'après les effets subits par la case.
         return self.code
 
-    def get_codes_effets(self):
+    def get_cibles_fermes(self,clees:List[str]):
+        return [self[i].get_cible_ferme(clees) for i in DIRECTIONS]
+
+    def get_codes_effets(self) -> List[List[int]]:
         effets=[]
         for effet in self.effets:
             if isinstance(effet,Attaque_case_delayee):

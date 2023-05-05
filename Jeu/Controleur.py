@@ -919,8 +919,8 @@ class Controleur():
             pos = self[occupant].position
             try:
                 if pos in vue:
-                    if vue[pos][1] > 0:
-                        vue[pos][6].append(occupant)
+                    if vue[pos].clarte > 0:
+                        vue[pos].entitees.append(occupant)
             except:
                 print(pos)
                 print(vue)
@@ -1340,7 +1340,7 @@ class Controleur():
     def get_cibles_potentielles_agissants(self,magie:Magie_cible,joueur:Agissant):
         cibles_potentielles = []
         for case in self.esprits["heros"].vue:
-            for ID_entitee in case[5]:
+            for ID_entitee in case.cibles:
                 entitee = self[ID_entitee]
                 if issubclass(entitee.get_classe(),Agissant):
                     cibles_potentielles.append(entitee)
@@ -1359,7 +1359,7 @@ class Controleur():
     def get_cibles_potentielles_items(self,magie:Magie_cible,joueur:Agissant):
         cibles_potentielles = []
         for case in self.esprits["heros"].vue:
-            for ID_entitee in case[5]:
+            for ID_entitee in case.cibles:
                 entitee = self[ID_entitee]
                 if issubclass(entitee.get_classe(),Item):
                     cibles_potentielles.append(entitee)

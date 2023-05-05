@@ -14,7 +14,7 @@ class Attaquant_magique_case(Mage):
         cibles = []
         #On cherche l'ennemi le plus puissant en vue
         for case in self.vue:
-            for ID in case[6]:
+            for ID in case.entitees:
                 if ID in esprit.ennemis.keys() and not self.controleur.est_item(ID):
                     cibles.append([esprit.ennemis[ID][0],case[0]])
         if cibles != [] and self.peut_caster():

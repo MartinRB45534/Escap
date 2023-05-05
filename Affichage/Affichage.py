@@ -2004,7 +2004,7 @@ class Vignettes_position(Vignette_composee):
         if pos in vue:
             vignettes.append(Vignette_case(position,joueur,vue,pos,taille))
             if vue[pos][1]>0:
-                entitees = vue[pos][6]
+                entitees = vue[pos].entitees
                 agissant = None
                 for ID_entitee in entitees:
                     entitee = joueur.controleur[ID_entitee]
@@ -2016,9 +2016,9 @@ class Vignettes_position(Vignette_composee):
                         agissant = entitee
                 if agissant != None: #Enfin l'agissant (s'il y en a un)
                     vignettes.append(Vignettes_agissant(position,agissant,taille))
-                if vue[pos][7] != []:
+                if vue[pos].effets != []:
                     esprit = joueur.controleur.get_esprit(joueur.esprit)
-                    if any([effet[2] in esprit.corps.keys() for effet in vue[pos][7]]):
+                    if any([effet[2] in esprit.corps.keys() for effet in vue[pos].effets]):
                         vignettes.append(Vignette(position,taille,SKIN_ATTAQUE_DELAYEE_ALLIE))
                     else:
                         vignettes.append(Vignette(position,taille,SKIN_ATTAQUE_DELAYEE))
@@ -2039,12 +2039,12 @@ class Vignette_case(Vignette_composee):
             elif vue_case[1]==-1: #On a affaire à une case accessible mais pas vue
                 vignettes.append(Vignette(position,taille,SKIN_BROUILLARD))
                 for i in DIRECTIONS:
-                    if vue_case[5][i][0]:
+                    if vue_case.cibles[i][BASIQUE]:
                         pos_voisin = vue_case[0]+i
                         if pos_voisin in vue and vue[pos_voisin][1]>0:
                             vignettes.append(Vignette(position,taille,SKIN_MUR_BROUILLARD,i))
             else:
-                vignettes.append(Vignette(position,taille,SKINS_CASES[vue_case[4]])) #La case en premier, donc en bas
+                vignettes.append(Vignette(position,taille,SKINS_CASES[vue_case.code])) #La case en premier, donc en bas
                 case:Case = joueur.controleur[vue_case[0]]
                 for i in DIRECTIONS:
                     mur:Mur = case[i]
@@ -2053,7 +2053,7 @@ class Vignette_case(Vignette_composee):
                             if isinstance(effet,Porte) :
                                 vignettes.append(Vignette(position,taille,effet.get_skin(joueur.get_clees()),i))
                             elif isinstance(effet,(Mur_plein,Mur_impassable)) :
-                                vignettes.append(Vignette(position,taille,effet.get_skin(vue_case[4]),i))
+                                vignettes.append(Vignette(position,taille,effet.get_skin(vue_case.code),i))
                             else :
                                 vignettes.append(Vignette(position,taille,effet.get_skin(),i))
                 for effet in case.effets:

@@ -98,13 +98,13 @@ class PNJ(Agissant, Interactif):
         Agissant.debut_tour(self)
         if self.antagonise_neutres:
             for case in self.vue:
-                for entitee in case[6]:
+                for entitee in case.entitees:
                     if not self.controleur.est_item(entitee):
                         if not entitee in self.controleur.get_esprit(self.esprit).ennemis.keys():
                             self.insurge(entitee,0.01,0)
         elif self.antagonise_offensifs:
             for case in self.vue:
-                for ID_entitee in case[6]:
+                for ID_entitee in case.entitees:
                     entitee = self.controleur[ID_entitee]
                     if issubclass(entitee.get_classe(),Agissant):
                         if self.ID in self.controleur.get_esprit(entitee.esprit).ennemis.keys():

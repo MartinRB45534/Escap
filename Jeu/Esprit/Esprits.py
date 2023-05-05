@@ -151,7 +151,6 @@ class Esprit_humain(Esprit_simple):
     def __init__(self,corp:int,controleur:Controleur): #Les humains commencent tous séparément, donc ils ont leur propre esprit au début
         Esprit.__init__(self,controleur[corp].identite)
         self.controleur = controleur
-        self.oubli = 5 #Faire dépendre de l'humain
         self.ajoute_corp(corp)
         self.chef = corp #Les humains ne peuvent pas s'empêcher d'avoir des chefs
 
@@ -204,30 +203,6 @@ class Esprit_humain(Esprit_simple):
             self.elit() #Autant changer tous les rapports de force d'un coup
             self.nom = self.controleur[self.chef].identite
             self.controleur.esprits[self.nom] = self
-
-    def oublie(self):
-        anciennes_cases = []
-        for case in self.vue:
-            if case[2] > 0:
-                if self.peureuse():
-                    case[2] = self.oubli
-            if case[2] > 1:
-                case[2] -= 1
-            elif case[2] > 0:
-                case[1] = 0
-                case[2] = 0
-                case[4] = 0
-                case[5] = [[False,False,False,False,False],[False,False,False,False,False],[False,False,False,False,False],[False,False,False,False,False]]
-                case[6] = []
-                anciennes_cases.append(case[0])
-            case[3] = [0,0,0,0,0,False]
-            case[7] = []
-            case[8] = False
-        self.downdate_zones(anciennes_cases)
-        self.downdate_representation(anciennes_cases)
-
-    def peureuse(self):
-        return 5 in self.corps.keys() and self.corps[5] in ["PNJ","attente","fuite","deplacement","attaque","vivant"] #J'ai un doute sur la possibilité des deux derniers mais bon...
 
 class Esprit_slime(Esprit_type):
     """Un esprit qui dirige un ou plusieurs slimes. Peut interragir avec d'autres esprits slimes."""

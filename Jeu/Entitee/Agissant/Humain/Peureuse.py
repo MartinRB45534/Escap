@@ -6,7 +6,7 @@ if TYPE_CHECKING:
 
 from Jeu.Entitee.Agissant.Humain.Humain import *
 
-class Peureuse(PNJ_mage,Multi_renforceur,Support_lointain,Stratege,Humain): #La quatrième humaine du jeu, à l'étage 3 (terrorisée par les monstres)
+class Peureuse(PNJ_mage,Multi_renforceur,Support_lointain,Humain): #La quatrième humaine du jeu, à l'étage 3 (terrorisée par les monstres)
     """La classe de la peureuse."""
     def __init__(self,controleur:Controleur,position:Position):
 
@@ -21,8 +21,6 @@ class Peureuse(PNJ_mage,Multi_renforceur,Support_lointain,Stratege,Humain): #La 
 
         self.appreciations = [1,1,0,-1,0,9,1,6,-1,-1]
         self.dialogue = 1
-
-        self.resolution = 4 #Permet aux humains de passer partout
 
         #Est-ce qu'elle a un minimum d'équippement ?
 

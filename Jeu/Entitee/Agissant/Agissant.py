@@ -4,7 +4,7 @@ from typing import Dict, Union, TYPE_CHECKING
 if TYPE_CHECKING:
     from Jeu.Controleur import Controleur
     from Jeu.Esprit.Esprit import Esprit
-    from Jeu.Labyrinthe.Vue import Vue
+    from Jeu.Labyrinthe.Vue import Representation_vue
 
 from Jeu.Entitee.Entitee import *
 
@@ -44,13 +44,15 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         self.especes:List[str] = stats['especes']
         self.classe_principale = Classe_principale(identite,niveau)
         self.niveau = self.classe_principale.niveau
+        self.oubli = stats['oubli'][niveau]
+        self.resolution = stats['resolution']
         self.forme:str = stats['forme']
         self.forme_tete:str = stats['forme_tete']
         self.statut = "attente"
         self.etat = "vivant"
 
         #vue de l'agissant
-        self.vue:Vue = None
+        self.vue:Representation_vue = None
 
         self.offenses=[]
         self.esprit=None

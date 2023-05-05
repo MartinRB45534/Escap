@@ -19,3 +19,11 @@ Plus tard, on pourrait avoir des ennemis (boss ou simples stratèges) qui augmen
 Intérêt d'utiliser skill et classe plutôt qu'une class c'est qu'on pourrait rendre le joueur stratège en cours de route. + évolution de la stratégie
 
 Particularités d'un stratège : traîtement des offenses différent ? ; décision différente ; oubli différent
+
+Retirer la classe stratège, utiliser des skills pour tout ?
+
+Tout le monde est un peu stratège.
+
+Donner une résolution et un oubli à tout le monde ? On regarde le meilleur de tous les corps disponibles pour avoir ceux de l'esprit ?
+
+On pourra rajouter des stratégies plus tard (quand l'esprit laguera un peu moins déjà).

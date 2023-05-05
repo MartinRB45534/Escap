@@ -11,7 +11,7 @@ from Jeu.Effet.Effets import *
 from Jeu.Systeme.Classe import *
 from Modifiers import *
 
-class Heros(Humain,Stratege,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (évidemment, c'est le personnage principal !)
+class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (évidemment, c'est le personnage principal !)
     """La classe du joueur."""
     def __init__(self,controleur:Controleur,position:Position):
 
@@ -22,7 +22,6 @@ class Heros(Humain,Stratege,Multi_mage,PJ): #Le premier humain du jeu, avant l'�
 
         self.apreciations = [0,0,0,0,0,0,0,0,0,0]
         self.dialogue = -1
-        self.resolution = 4
 
         self.statut_simule:str = "attente"
         self.skill_courant_simule:Type[Skill] = None
@@ -170,7 +169,7 @@ class Heros(Humain,Stratege,Multi_mage,PJ): #Le premier humain du jeu, avant l'�
         if self.first_kill_:
             self.first_kill_=False
             #On vérifie que le dialogue a lieu d'être : le joueur n'a pas rencontré d'autre monstre et il a assisté à la mort du gobelin
-            if self.highest == 3 and (self.get_etage_courant() == 3 and self.vue[position][2] > 0):
+            if self.highest == 3 and (self.get_etage_courant() == 3 and self.vue[position].oubli > 0):
                 #On cherche un PNJ volontaire pour aller taper la causette :
                 paume:Humain = self.controleur[4]
                 if paume.esprit == "heros" and (paume.get_etage_courant() == 3 and paume.statut_pnj in ["exploration","proximite","en chemin"]):
@@ -189,7 +188,7 @@ class Heros(Humain,Stratege,Multi_mage,PJ): #Le premier humain du jeu, avant l'�
         if self.magic_kill_:
             self.magic_kill_=False
             #On vérifie que le dialogue a lieu d'être : le joueur a assisté à la mort du mage gobelin (et donc probablement à ses attaques)
-            if self.highest == 4 and (self.get_etage_courant() == 4 and self.vue[position][2] > 0):
+            if self.highest == 4 and (self.get_etage_courant() == 4 and self.vue[position].oubli > 0):
                 #On cherche un PNJ volontaire pour aller taper la causette :
                 peureuse:Humain = self.controleur[5]
                 if peureuse.esprit == "heros" and (peureuse.get_etage_courant() == 4 and peureuse.statut_pnj in ["exploration","proximite","en chemin"]):

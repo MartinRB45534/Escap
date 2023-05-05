@@ -34,63 +34,26 @@ POLICE40 = pygame.font.SysFont(None, 40)
 
 ID_MAX = Id_max()
 
-#constantes
+#Directions
 NB_DIRECTIONS = 4
-# from Jeu.Labyrinthe.Structure_spatiale.Direction import *
 
-IN=4
-OUT=5
-NEXT=6
-PREVIOUS=7
+IN=NB_DIRECTIONS
+OUT=NB_DIRECTIONS+1
+NEXT=NB_DIRECTIONS+2
+PREVIOUS=NB_DIRECTIONS+3
 
-# from Jeu.Labyrinthe.Structure_spatiale.Position import *
-
+#Éléments
 TERRE = 0
 FEU = 1
 GLACE = 2
 OMBRE = 3
 
-# #Les positions possibles du curseur :
-# RECTANGLE_G = 0
-# CARRE = 1
-# RECTANGLE_D = 2
-
-# #Dans le rectangle gauche :
-# STATS = 0
-# INVENTAIRE = 1
-# SKILLS = 2
-
-# #Dans les stats du joueur :
-# VIE = 0
-# MANA = 1
-# PRIORITE = 2
-
-# #Dans les informations sur la vie du joueur :
-# TITRE = 0
-# BARRE = 1
-# MIN = 2
-# VAL = 3
-# MAX = 4
-
-#Les informations sur le mana du joueur sont indentiques aux informations sur la vie du joueur, mais si le joueur a des réserves de magies, un curseur indique la limite haute de quelle réserve est observée (0 pour la réserve naturelle) et quelle barre est observée (0 pour la réserve naturelle)
-#Les informations sur la priorité et l'identifiant du joueur sont de la forme titre et val, uniquement.
-
-
-
-#Dans le rectangle droit :
-#Le rectangle droit peut contenir les informations d'un agissant séléctionné dans la vue (visible à partir d'un certain niveau d'observation, auquel cas le curseur est comme précédemment
-#Le rectangle droit peut contenir les informations d'un item séléctionné dans un inventaire (celui du joueur ou d'un agissant observé dans la vue) :
-NOM = 0
-#Dans le cas d'une potion, on observera aussi l'effet :
-EFFET = 1
-#Dans le cas d'un parchemin, il y aura aussi une information sur le cout d'utilisation :
-COUT = 2
-#Dans le cas d'un 
-
-# ARBORESCENCE = [[RECTANGLE_G,CARRE,RECTANGLE_D],
-#                 [[STATS,INVENTAIRE,SKILLS],[],[]],
-#                 [[[VIE,MANA,PRIORITE],[],[]],[],[]],
-#                 [[[[TITRE,BARRE,MIN,VAL,MAX],[TITRE,BARRE,MIN,VAL,MAX],[TITRE,VAL]],[],[]],[],[]]]
+#Résolutions
+BASIQUE = 0
+PASSE_PORTE = 1
+PASSE_PORTAIL = 2
+PASSE_PORTE_ET_PORTAIL = 3
+PASSE_ESCALIER = 4
 
 CLASSIQUE = True
 ELEMENTAL = False
@@ -217,6 +180,8 @@ MAGIE_INFINIE_PAR_DEFAUT = 101
 ENCHANTEMENT_DEFENSIF = 102
 # Il n'y a pas de numéro 43 et 64
 
+
+# Phases de jeu
 TOUR = 1
 DIALOGUE = 2
 TOUCHE = 3

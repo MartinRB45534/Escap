@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List, TYPE_CHECKING
+from typing import List, TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
     from Jeu.Entitee.Entitees import *
@@ -118,7 +118,7 @@ class Mur:
             i += 1
         return cible
 
-    def get_cible_ferme(self,clees:List[str]):
+    def get_cible_ferme(self,clees:List[str]) -> List[Position|Literal[False]]:
         return [self.get_cible_ferme_simple(),self.get_cible_ferme_portes(clees),self.get_cible_ferme_portails(),self.get_cible_ferme_portes_portails(clees),self.get_cible_ferme_escaliers(clees)]
 
     def get_cible_ferme_simple(self):
