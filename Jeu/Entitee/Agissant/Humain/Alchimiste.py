@@ -47,11 +47,11 @@ class Alchimiste(PNJ_mage,Attaquant_magique_case,Support,Humain): #Le septième 
     def attaque(self,direction):
         #Quelle est sa magie de prédilection ? Pour l'instant on va prendre l'avalanche
         if self.peut_payer(cout_pm_avalanche[trouve_skill(self.classe_principale,Skill_magie).niveau-1]):
-            self.skill_courant = Skill_magie
-            self.magie_courante = "magie poing magique" #/!\
+            self.utilise(Skill_magie)
+            self.set_magie_courante("magie poing magique") #/!\
             self.dir_magie = direction
         else:
-            self.skill_courant = Skill_stomp
+            self.utilise(Skill_stomp)
 
     def start_dialogue(self): #On commence un nouveau dialogue !
         #On initialise nos attributs

@@ -38,7 +38,7 @@ class Teleport(On_through):
                 if self.affiche: #On a affaire à un téléporteur spécial, il faut peut-être changer la direction de l'entitee
                     dir_oppose = self.get_dir_oppose(entitee.controleur)
                     if dir_oppose!=None:
-                        entitee.dir_regard = dir_oppose+2
+                        entitee.regarde(dir_oppose.oppose())
 
     def execute(self,entitee):
         self.action(entitee)

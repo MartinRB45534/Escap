@@ -221,26 +221,7 @@ class Joueur:
     def patiente(self,frame_par_tour):
         self.clock.tick(self.controleur.tour_par_seconde*frame_par_tour)
 
-    # def old_input(self): #À appeler régulièrement !
-    #     """Fonction qui traite tous les inputs"""
-
-    #     #On récupère les évènements :
-    #     events = pygame.event.get()
-    #     for event in events :
-    #         if event.type == pygame.QUIT : #On a fermé la fenêtre
-    #             self.quitte() #Sauvegarde la partie en cours et ferme la fenêtre
-    #         elif (event.type == pygame.ACTIVEEVENT and event.state == 1) and (event.gain == 0 and not self.controleur.pause):
-    #             self.controleur.toogle_pause()
-    #         elif event.type == pygame.VIDEORESIZE :
-    #             self.controleur.joueur.affichage.recalcule_zones()
-    #         elif event.type == pygame.KEYDOWN :
-    #             self.controleur.joueur.controle(event.key,get_modifiers(event.mod))
-    #         elif event.type == pygame.KEYUP :
-    #             self.controleur.joueur.decontrole(event.key)
-    #         elif event.type in [pygame.MOUSEBUTTONDOWN,pygame.MOUSEBUTTONUP,pygame.MOUSEWHEEL]:
-    #             self.affichage.bouge_souris(event)
-
-    def input(self): #À appeler régulièrement !
+    def input(self):
         """Fonction qui traite tous les inputs"""
         #On récupère les évènements :
         events = pygame.event.get()
@@ -290,24 +271,24 @@ class Joueur:
         effets:List[str] = touches["effets"].get(mods,{}).get(touche,[]) #Regardons les effets que la touche a
         if "directions" in effets: #La touche a un effet sur la direction du joueur (entre autres)
             direction:Direction = touches["directions"].get(mods,{}).get(touche)
-            self.controleur.joueur.regarde(direction)
+            self.controleur.joueur.regarde(direction,True)
         if "skills" in effets: #La touche est liée à un skill (entre autres)
             skill:Type[Skill] = touches["skills"].get(mods,{}).get(touche)
             if skill != None:
-                self.controleur.joueur.skill_courant = skill
+                self.controleur.joueur.utilise(skill,True)
                 if issubclass(skill,Skills_offensifs): # Les skills qui correspondent à un statut d'attaque
-                    self.controleur.joueur.statut = "attaque"
+                    self.controleur.joueur.set_statut("attaque",True)
                 elif issubclass(skill,Skills_projectiles) : # Les skills qui lancent un projectile
                     self.controleur.joueur.projectile_courant = touches["projectiles"].get(touche)
-                    self.controleur.joueur.statut = "lancer"
+                    self.controleur.joueur.set_statut("lancer",True)
                 elif issubclass(skill,Skills_magiques) : # Les skills qui utilisent de la magie
-                    self.controleur.joueur.magie_courante:str = touches["magies"].get(touche) #self.magie_courante n'est que le nom de la magie
+                    self.controleur.joueur.set_magie_courante(touches["magies"].get(touche),True) #self.magie_courante n'est que le nom de la magie
                     skill_magique = self.controleur.joueur.get_skill_magique()
                     if not isinstance(skill_magique, skill):
                         warn("Le skill magique du joueur n'est pas celui attendu.")
                     magie = skill_magique.magies[self.controleur.joueur.magie_courante](skill.niveau) #Ici on a une magie similaire (juste pour l'initialisation du choix, oubliée après parce que le skill fournira la vrai magie avec utilise())
                     if isinstance(magie,Magies_offensives):
-                        self.controleur.joueur.statut = "attaque"
+                        self.controleur.joueur.set_statut("attaque",True)
                     #On a éventuellement besoin d'informations supplémentaires sur cette magie
                     if self.controleur.joueur.nouvel_ordre:
                         if isinstance(magie,Cible_agissant):
@@ -326,8 +307,8 @@ class Joueur:
                 for touches_skills in self.controleur.joueur.touches["skills"].values(): #On ne sait pas quels modificateurs étaient actifs lorsque la touche a été pressée
                     if touches_skills.get(touche) != None: #La touche relachée est liée à un skill
                         if touches_skills.get(touche) == self.controleur.joueur.skill_courant: #La touche relachée est celle du skill courant
-                            self.controleur.joueur.statut = "attente"
-                            self.controleur.joueur.skill_courant = None
+                            self.controleur.joueur.set_statut("attente",True)
+                            self.controleur.joueur.utilise(None,True)
                             self.controleur.joueur.attente = self.parametres["attente"]
 
     def recontrole(self):
@@ -482,7 +463,7 @@ class Joueur:
         return f"{self.get_touche_zone(IN)}, {self.get_touche_zone(OUT)}, {self.get_touche_zone(HAUT)}, {self.get_touche_zone(BAS)}, {self.get_touche_zone(GAUCHE)} et {self.get_touche_zone(DROITE)}"
 
     def get_touche_zone(self,direction):
-        for key in self.parametres["dir_touches"].keys():
+        for key in self.parametres["dir_touches"]:
             if self.parametres["cat_touches"][key] == "zone" and self.parametres["dir_touches"][key] == direction:
                 return pygame.key.name(key).upper()
         return 0
@@ -515,7 +496,7 @@ class Joueur:
                             run = False
                             self.parametres["cat_touches"][key] = "zone"
                             self.parametres["dir_touches"][key] = IN
-                    elif not(event.key in self.parametres["cat_touches"].keys()):
+                    elif not(event.key in self.parametres["cat_touches"]):
                         key = event.key
                 elif event.type == pygame.QUIT:
                     self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
@@ -537,7 +518,7 @@ class Joueur:
                             run = False
                             self.parametres["cat_touches"][key] = "zone"
                             self.parametres["dir_touches"][key] = OUT
-                    elif not(event.key in self.parametres["cat_touches"].keys()):
+                    elif not(event.key in self.parametres["cat_touches"]):
                         key = event.key
                 elif event.type == pygame.QUIT:
                     self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
@@ -559,7 +540,7 @@ class Joueur:
                             run = False
                             self.parametres["cat_touches"][key] = "zone"
                             self.parametres["dir_touches"][key] = HAUT
-                    elif not(event.key in self.parametres["cat_touches"].keys()):
+                    elif not(event.key in self.parametres["cat_touches"]):
                         key = event.key
                 elif event.type == pygame.QUIT:
                     self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
@@ -581,7 +562,7 @@ class Joueur:
                             run = False
                             self.parametres["cat_touches"][key] = "zone"
                             self.parametres["dir_touches"][key] = BAS
-                    elif not(event.key in self.parametres["cat_touches"].keys()):
+                    elif not(event.key in self.parametres["cat_touches"]):
                         key = event.key
                 elif event.type == pygame.QUIT:
                     self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
@@ -603,7 +584,7 @@ class Joueur:
                             run = False
                             self.parametres["cat_touches"][key] = "zone"
                             self.parametres["dir_touches"][key] = GAUCHE
-                    elif not(event.key in self.parametres["cat_touches"].keys()):
+                    elif not(event.key in self.parametres["cat_touches"]):
                         key = event.key
                 elif event.type == pygame.QUIT:
                     self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
@@ -625,7 +606,7 @@ class Joueur:
                             run = False
                             self.parametres["cat_touches"][key] = "zone"
                             self.parametres["dir_touches"][key] = DROITE
-                    elif not(event.key in self.parametres["cat_touches"].keys()):
+                    elif not(event.key in self.parametres["cat_touches"]):
                         key = event.key
                 elif event.type == pygame.QUIT:
                     self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
@@ -647,7 +628,7 @@ class Joueur:
                             run = False
                             self.parametres["cat_touches"][key] = "skill"
                             self.parametres["dir_touches"][key] = Skill_deplacement
-                    elif not(event.key in self.parametres["cat_touches"].keys()):
+                    elif not(event.key in self.parametres["cat_touches"]):
                         key = event.key
                 elif event.type == pygame.QUIT:
                     self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
@@ -669,7 +650,7 @@ class Joueur:
                             run = False
                             self.parametres["cat_touches"][key] = "skill"
                             self.parametres["dir_touches"][key] = Skill_course
-                    elif not(event.key in self.parametres["cat_touches"].keys()):
+                    elif not(event.key in self.parametres["cat_touches"]):
                         key = event.key
                 elif event.type == pygame.QUIT:
                     self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
@@ -691,7 +672,7 @@ class Joueur:
                             run = False
                             self.parametres["cat_touches"][key] = "skill"
                             self.parametres["dir_touches"][key] = Skill_ramasse
-                    elif not(event.key in self.parametres["cat_touches"].keys()):
+                    elif not(event.key in self.parametres["cat_touches"]):
                         key = event.key
                 elif event.type == pygame.QUIT:
                     self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
@@ -713,7 +694,7 @@ class Joueur:
                             run = False
                             self.parametres["cat_touches"][key] = "skill"
                             self.parametres["dir_touches"][key] = Skill_stomp
-                    elif not(event.key in self.parametres["cat_touches"].keys()):
+                    elif not(event.key in self.parametres["cat_touches"]):
                         key = event.key
                 elif event.type == pygame.QUIT:
                     self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
@@ -735,7 +716,7 @@ class Joueur:
                             run = False
                             self.parametres["cat_touches"][key] = "skill"
                             self.parametres["dir_touches"][key] = Skill_attaque
-                    elif not(event.key in self.parametres["cat_touches"].keys()):
+                    elif not(event.key in self.parametres["cat_touches"]):
                         key = event.key
                 elif event.type == pygame.QUIT:
                     self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}

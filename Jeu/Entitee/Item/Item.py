@@ -65,7 +65,7 @@ class Item(Mobile):
 
     def arret(self):
         self.latence = 0
-        if "lancementv" in self.taux_vitesse.keys():
+        if "lancementv" in self.taux_vitesse:
             self.taux_vitesse.pop("lancementv")
         self.hauteur = 0
 

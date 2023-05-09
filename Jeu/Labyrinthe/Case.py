@@ -63,7 +63,7 @@ class Case:
         for effet in self.effets:
             if isinstance(effet,Aura_elementale):
                 ID = effet.responsable
-                if ID in auras.keys() : # On a déjà une aura de ce type
+                if ID in auras : # On a déjà une aura de ce type
                     auras[ID].append(effet)
                 else:
                     auras[ID]=[effet]
@@ -129,7 +129,7 @@ class Case:
             for effet in self.effets:
                 if isinstance(effet,Aura_elementale):
                     ID = effet.responsable
-                    if ID in auras.keys() : # On a déjà une aura de ce type
+                    if ID in auras : # On a déjà une aura de ce type
                         auras[ID].append(effet)
                     else:
                         auras[ID]=[effet]

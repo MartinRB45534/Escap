@@ -238,10 +238,10 @@ class Affichage_gauche(Wrapper_knot, Knot_vertical):
 
         self.stats = Affichage_stats(self.joueur)
         self.inventaire = Affichage_inventaire(self.joueur)
-        self.classe = Affichage_sous_classe(self.joueur.classe_principale)
+        self.classe = Affichage_sous_classe(self.joueur.classe_principale) # /!\ Remplacer par Affichage_classe_principale
         self.stats_ferme = Affichage_stats_ferme(self.joueur)
         self.inventaire_ferme = Affichage_inventaire_ferme(self.joueur)
-        self.classe_ferme = Margin_texte("Classes & compétences")
+        self.classe_ferme = Margin_texte("Classes & compétences") # /!\ Remplacer par Affichage_classe_principale_ferme
         self.classe_ferme.fond = (200, 200, 200)
         self.set_courant(self.inventaire_ferme)
 
@@ -251,14 +251,14 @@ class Affichage_gauche(Wrapper_knot, Knot_vertical):
     def init_gauche(self):
         contenu = Pavage_horizontal()
         triptique = Liste_verticale()
-        triptique.set_contenu([Marge_horizontale(), self.stats_ferme, Marge_horizontale(), self.inventaire_ferme, Marge_horizontale(), self.classe_ferme, Marge_horizontale()], [5, 0, 5, 0, 5, 0, 5]) # /!\ Remplacer par Affichage_classe_principale_ferme
+        triptique.set_contenu([Marge_horizontale(), self.stats_ferme, Marge_horizontale(), self.inventaire_ferme, Marge_horizontale(), self.classe_ferme, Marge_horizontale()], [5, 0, 5, 0, 5, 0, 5])
         contenu.set_contenu([Marge_verticale(), triptique, Marge_verticale()], [5, -1, 5])
         self.set_contenu(contenu)
 
     def init_stats(self):
         contenu = Pavage_horizontal()
         triptique = Pavage_vertical()
-        triptique.set_contenu([Marge_horizontale(), self.stats, Marge_horizontale(), self.inventaire_ferme, Marge_horizontale(), self.classe_ferme, Marge_horizontale()], [5, -1, 5, 0, 5, 0, 5]) # /!\ Remplacer par Affichage_classe_principale_ferme
+        triptique.set_contenu([Marge_horizontale(), self.stats, Marge_horizontale(), self.inventaire_ferme, Marge_horizontale(), self.classe_ferme, Marge_horizontale()], [5, -1, 5, 0, 5, 0, 5])
         contenu.set_contenu([Marge_verticale(), triptique, Marge_verticale()], [5, -1, 5])
         self.set_contenu(contenu)
         self.set_courant(self.stats)
@@ -266,7 +266,7 @@ class Affichage_gauche(Wrapper_knot, Knot_vertical):
     def init_inventaire(self):
         contenu = Pavage_horizontal()
         triptique = Pavage_vertical()
-        triptique.set_contenu([Marge_horizontale(), self.stats_ferme, Marge_horizontale(), self.inventaire, Marge_horizontale(), self.classe_ferme, Marge_horizontale()], [5, 0, 5, -1, 5, 0, 5]) # /!\ Remplacer par Affichage_classe_principale_ferme
+        triptique.set_contenu([Marge_horizontale(), self.stats_ferme, Marge_horizontale(), self.inventaire, Marge_horizontale(), self.classe_ferme, Marge_horizontale()], [5, 0, 5, -1, 5, 0, 5])
         contenu.set_contenu([Marge_verticale(), triptique, Marge_verticale()], [5, -1, 5])
         self.set_contenu(contenu)
         self.set_courant(self.inventaire)
@@ -274,7 +274,7 @@ class Affichage_gauche(Wrapper_knot, Knot_vertical):
     def init_classe(self):
         contenu = Pavage_horizontal()
         triptique = Pavage_vertical()
-        triptique.set_contenu([Marge_horizontale(), self.stats_ferme, Marge_horizontale(), self.inventaire_ferme, Marge_horizontale(), self.classe, Marge_horizontale()], [5, 0, 5, 0, 5, -1, 5]) # /!\ Remplacer par Affichage_classe_principale
+        triptique.set_contenu([Marge_horizontale(), self.stats_ferme, Marge_horizontale(), self.inventaire_ferme, Marge_horizontale(), self.classe, Marge_horizontale()], [5, 0, 5, 0, 5, -1, 5])
         contenu.set_contenu([Marge_verticale(), triptique, Marge_verticale()], [5, -1, 5])
         self.set_contenu(contenu)
         self.set_courant(self.classe)
@@ -1102,7 +1102,7 @@ class Affichage_inventaire_ferme(Wrapper_cliquable):
         contenu = Pavage_horizontal()
         monoptique = Pavage_vertical()
         liste = Liste_horizontale()
-        vignettes = [Vignette([0, 0], 20, classe.get_image()) for classe in self.joueur.inventaire.items.keys()]
+        vignettes = [Vignette([0, 0], 20, classe.get_image()) for classe in self.joueur.inventaire.items]
         liste.set_contenu([vignettes[i//2] if i%2==0 else Marge_verticale() for i  in range(-1, len(vignettes)*2)], [0 if i%2==0 else 5 for i  in range(-1, len(vignettes)*2)])
         monoptique.set_contenu([Marge_horizontale(), liste, Marge_horizontale()], [5, 0, 5])
         contenu.set_contenu([Marge_verticale(), monoptique, Marge_verticale()], [5, -1, 5])
@@ -1853,7 +1853,7 @@ class Affichage_perso(Proportionnel):
         y = self.position[1]
         largeur = self.tailles[0]
         hauteur = self.tailles[1]
-        direction = self.perso.dir_regard-2
+        direction = self.perso.dir_regard.oppose()
         joueur = self.perso.controleur.joueur
 
         # Version plus jolie :

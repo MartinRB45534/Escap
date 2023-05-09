@@ -1,6 +1,8 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
+from Jeu.Systeme.Skill_intrasec import Skill_intrasec
+from Jeu.Labyrinthe.Structure_spatiale.Position import Position
 from Jeu.Entitee.Decors.Decor import Decors_interactif, Ustensile
 
 if TYPE_CHECKING:
@@ -100,14 +102,14 @@ class PNJ(Agissant, Interactif):
             for case in self.vue:
                 for entitee in case.entitees:
                     if not self.controleur.est_item(entitee):
-                        if not entitee in self.controleur.get_esprit(self.esprit).ennemis.keys():
+                        if not entitee in self.controleur.get_esprit(self.esprit).ennemis:
                             self.insurge(entitee,0.01,0)
         elif self.antagonise_offensifs:
             for case in self.vue:
                 for ID_entitee in case.entitees:
                     entitee = self.controleur[ID_entitee]
                     if issubclass(entitee.get_classe(),Agissant):
-                        if self.ID in self.controleur.get_esprit(entitee.esprit).ennemis.keys():
+                        if self.ID in self.controleur.get_esprit(entitee.esprit).ennemis:
                             self.insurge(ID_entitee,0.01,0)
 
     def start_dialogue(self):
@@ -153,12 +155,12 @@ class PJ(PNJ): #Les PJs sont des PNJs, parce que le mot PNJ est trompeur
     def __init__(self, controleur: Controleur, position: Position, identite: str, niveau: int, ID: int|None = None):
         PNJ.__init__(self,controleur, position, identite, niveau, ID)
         self.statut_simule:str = "attente"
-        self.skill_courant_simule:Type[Skill]|None = None
+        self.skill_courant_simule:Type[Skill_intrasec]|None = None
         self.dir_regard_simule:Direction|None = None
         self.attente:int = -1
         self.nouvel_ordre:bool = False
         self.interlocuteur:Interactif|PNJ|PNJ_mage|None = None
-        self.touches:Dict[str,Dict[Tuple[int],Dict[int,List[str]|Type[Skill]|Direction|Type[Projectile]|str]]] = {
+        self.touches:Dict[str,Dict[Tuple[int],Dict[int,List[str]|Type[Skill_intrasec]|Direction|Type[Projectile]|str]]] = {
             "effets":{
             },
             "skills":{
@@ -169,44 +171,31 @@ class PJ(PNJ): #Les PJs sont des PNJs, parce que le mot PNJ est trompeur
             "magies":{},
         }
 
-    def get_offenses(self):
-        for offense in self.offenses:
-            if offense[0] == 2: #/!\ Comment gérer des dialogues différents avec chaque autre humain ? Pour l'instant, on ne va pas y toucher
-                self.dialogue = 0
-        offenses = self.offenses
-        self.offenses = []
-        if self.etat != "vivant" or self.controleur == None:
-            etat = "incapacite"
-        elif self.attente:
-            etat = "PJ" #Et les PJs on n'en parle même pas
-            self.attente -= 1
-        elif self.fuite():
-            etat = "fuite"
+    def utilise(self, skill: Skill_intrasec, force: bool = False):
+        if self is self.controleur.joueur and self.attente and not force:
+            self.skill_courant_simule = skill
         else:
-            etat = "PNJ" #Les PNJs ont des comportements inutilement alambiqués...
-        return offenses, etat
+            self.skill_courant = skill
 
-    def simule_attaque(self,direction:Direction):
-        self.dir_regard_simule = direction
-        if self.get_arme() != None:
-            self.skill_courant_simule = Skill_attaque
+    def regarde(self, direction: Direction, force: bool = False):
+        if self is self.controleur.joueur and self.attente and not force:
+            self.dir_regard_simule = direction
+        elif direction != None:
+            self.dir_regard = direction
+
+    def set_statut(self, statut: str, force: bool = False):
+        if self is self.controleur.joueur and self.attente and not force:
+            self.statut_simule = statut
         else:
-            self.skill_courant_simule = Skill_stomp
-        self.statut_simule = "attaque"
-
-    def simule_va(self,direction:Direction):
-        self.dir_regard_simule = direction
-        self.skill_courant_simule = Skill_deplacement
-
-    def simule_agit_en_vue(self,esprit:Esprit,defaut = ""): #Pas d'action à distance par défaut
-        return defaut
+            self.statut = statut
 
     def interagit(self):
         #On cherche la personne :
         self.interlocuteur = None #Normalement c'est déjà le cas
         for i in [0,-1,1,2]:
-            if self.peut_voir(self.dir_regard+i):
-                pos = self.position+(self.dir_regard+i)
+            direction = self.dir_regard+i
+            if self.peut_voir(direction):
+                pos = self.position+direction
                 interactifs = self.controleur.trouve_interactifs_courants(pos)
                 if interactifs!=[]:
                     interactif = self.controleur[interactifs[0]] # Est-ce que je continue à appeler ça un interlocuteur ?
@@ -214,14 +203,18 @@ class PJ(PNJ): #Les PJs sont des PNJs, parce que le mot PNJ est trompeur
                         self.interlocuteur = interactif
                         self.controleur.set_phase(DIALOGUE)
                         interactif.start_dialogue()
-                        self.dir_regard+=i
-                        interactif.dir_regard = self.dir_regard+2
+                        self.regarde(direction,True)
+                        interactif.regarde(self.dir_regard.oppose())
                     elif isinstance(interactif,Decors_interactif):
                         self.interlocuteur = interactif
-                        self.dir_regard+=i
+                        self.regarde(direction,True)
                         if isinstance(interactif,Ustensile):
                             self.controleur.set_phase(RECETTE)
                     break
 
 class PJ_mage(PJ, PNJ_mage):
-    pass
+    def set_magie_courante(self, magie: Type[Magie], force: bool = False):
+        if self is self.controleur.joueur and self.attente and not force:
+            self.magie_courante_simule = magie
+        else:
+            self.magie_courante = magie

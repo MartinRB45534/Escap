@@ -14,15 +14,15 @@ class Soigneur(Mage):
     def agit_en_vue(self,esprit:Esprit,defaut = ""):
         cibles = []
         skill = type(self.get_skill_magique())
-        for ID in esprit.corps.keys():
+        for ID in esprit.corps:
             corp = self.controleur[ID]
             if corp.etat == "vivant" and corp.pv < corp.pv_max:
                 cibles.append([corp.pv,ID])
         if cibles != [] and self.peut_caster():
             new_cibles = sorted(cibles, key=itemgetter(0))
-            self.skill_courant = skill
-            self.magie_courante = self.caste()
+            self.utilise(skill)
+            self.set_magie_courante(self.caste())
             self.cible_magie = new_cibles[0][-1]
             defaut = "soin"
-            self.statut = "soin"
+            self.set_statut("soin")
         return defaut

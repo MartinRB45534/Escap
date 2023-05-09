@@ -9,6 +9,9 @@ class Mage(Agissant):
 
     def caste(self):
         return None
+    
+    def set_magie_courante(self,magie):
+        self.magie_courante = magie
 
     def get_magies(self):
         return self.get_skill_magique().menu_magie()

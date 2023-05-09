@@ -346,6 +346,6 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
 
     def get_texte_descriptif(self):
         if self.statut == None:
-            self.statut = ""
+            self.set_statut("")
             print("Hey, mon statut vaut None, pourquoi !?")
         return [f"Un humain (niveau {self.niveau})",f"ID : {self.ID}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Un humain terrorisé par les labyrinthes. Il espère pouvoir sortir un jour de cet enfer."]

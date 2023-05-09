@@ -13,7 +13,7 @@ class Esprit :
         self.couloirs:List[Couloir] = []
         self.entrees:Dict[Position,List[Espace_schematique]] = {}
         self.zones_inconnues:List[Zone_inconnue] = []
-        self.ennemis:Dict[int,List[float]] = {}
+        self.ennemis:Dict[int,Dict[str,float]] = {}
         self.dispersion_spatiale = 0.9 #La décroissance de l'importance dans l'espace. Tester plusieurs options pour l'optimiser
         self.prejuges = []
         self.pardon = 0.9 #La décroissance de l'importance avec le temps. Peut être supérieure à 1 pour s'en prendre en priorité aux ennemis ancestraux.
@@ -41,7 +41,7 @@ class Esprit :
 
     def get_corps(self):
         corps:List[int] = []
-        for corp in self.corps.keys():
+        for corp in self.corps:
             corps.append(corp)
         return corps
 
@@ -52,7 +52,7 @@ class Esprit :
             for ID in case.entitees:
                 if self.controleur[ID].etat == "vivant":
                     if ID in self.ennemis:
-                        new_importance = self.ennemis[ID][0]
+                        new_importance = self.ennemis[ID]["importance"]
                         if new_importance > importance:
                             importance = new_importance
         return importance
@@ -84,7 +84,7 @@ class Esprit :
             case = vue[decalage]
             if case.clarte > 0: #Si la clarté est positive
                 cases_vues.append(case.position) 
-                if case.cibles != self.vue[case.position].cibles: #/!\ Réduire ça proprement
+                if case.cibles != self.vue[case.position].cibles:
                     nouvelles_cases.append(case.position)
                 case.oubli = self.oubli
                 self.vue[case.position] = case #On remplace par la dernière version de la vision /!\ Et si certains n'y voient pas les mêmes choses ? (Genre des agissants invisibles ?)
@@ -126,21 +126,21 @@ class Esprit :
     def get_corps_vus(self) -> List[int]:
         corps = []
         for agissant in self.trouve_agissants():
-            if agissant in self.corps.keys() and self.controleur.est_agissant(agissant):
+            if agissant in self.corps and self.controleur.est_agissant(agissant):
                 corps.append(agissant)
         return corps
 
     def get_ennemis_vus(self) -> List[int]:
         ennemis = []
         for agissant in self.trouve_agissants():
-            if agissant in self.ennemis.keys() and self.controleur.est_agissant(agissant):
+            if agissant in self.ennemis and self.controleur.est_agissant(agissant):
                 ennemis.append(agissant)
         return ennemis
 
     def get_neutres_vus(self) -> List[int]:
         neutres = []
         for agissant in self.trouve_agissants():
-            if agissant not in self.corps.keys() and agissant not in self.ennemis.keys() and self.controleur.est_agissant(agissant):
+            if agissant not in self.corps and agissant not in self.ennemis and self.controleur.est_agissant(agissant):
                 neutres.append(agissant)
         return neutres
 
@@ -158,7 +158,7 @@ class Esprit :
         vues:List[Representation_vue] = []
         agissants_vus:List[int] = []
         agissants_oublies:List[Tuple[int,Position]] = []
-        for corp in self.corps.keys(): #On récupère les vues
+        for corp in self.corps: #On récupère les vues
             if self.corps[corp] != "incapacite":
                 agissant:Agissant = self.controleur[corp]
                 vues.append(agissant.vue)
@@ -169,15 +169,15 @@ class Esprit :
         agissants_oublies = [*set([tup for tup in agissants_oublies if not tup[0] in agissants_vus])] #On enlève les doublons et les agissants vus
         self.oublie_agissants(agissants_vus) #Puisqu'on les a vus, on n'a plus besoin de garder en mémoire leur position précédente. /!\ À modifier plus tard
         for ID_agissant in agissants_vus:
-            if not(ID_agissant in self.ennemis.keys() or ID_agissant in self.corps.keys()):
+            if not(ID_agissant in self.ennemis or ID_agissant in self.corps):
                 for espece in self.controleur.get_especes(ID_agissant):
                     if espece in self.prejuges:
-                        self.ennemis[ID_agissant] = [0.01,0]
+                        self.ennemis[ID_agissant] = {"importance":0,"dangerosite":0}
         cases_vues = []
         nouvelles_cases = []
         cases_limites = []
         for vue in vues :
-            if vue.id in self.vue.keys():
+            if vue.id in self.vue:
                 cases, nouvelles, limites = self.maj_vue(vue)
                 cases_vues+=cases
                 nouvelles_cases+=nouvelles
@@ -751,7 +751,7 @@ class Esprit :
                 position = queue.pop(0)
                 for dir in DIRECTIONS:
                     voisin = position+dir
-                    if voisin in zone.cases and self.vue[position].cibles[dir][PASSE_ESCALIER]: # /!\ 4 ou 0 ?
+                    if voisin in zone.cases and self.vue[position].cibles[dir][PASSE_ESCALIER]:
                         zone.cases.remove(voisin)
                         queue.append(voisin)
                         new_zone.cases.append(voisin)
@@ -789,7 +789,7 @@ class Esprit :
             # /!\ Regarder avec attention ce qui se passe pour les entrées
 
     def get_offenses(self):
-        for corp in self.corps.keys(): #On vérifie si quelqu'un nous a offensé
+        for corp in self.corps: #On vérifie si quelqu'un nous a offensé
             agissant:Agissant = self.controleur[corp]
             offenses,etat = agissant.get_offenses()
             self.corps[corp] = etat
@@ -802,18 +802,18 @@ class Esprit :
         gravite = offense[1]
         degats = offense[2]
         if ID_offenseur in self.ennemis:
-            self.ennemis[ID_offenseur][0] += gravite
-            if self.ennemis[ID_offenseur][1] < degats:
-                self.ennemis[ID_offenseur][1] = degats
+            self.ennemis[ID_offenseur]["importance"] += gravite
+            if self.ennemis[ID_offenseur]["dangerosite"] < degats:
+                self.ennemis[ID_offenseur]["dangerosite"] = degats
         else:
-            self.ennemis[ID_offenseur] = [gravite,degats]
+            self.ennemis[ID_offenseur] = {"importance":gravite,"dangerosite":degats}
 
     def antagonise_supports(self,offense:Tuple[int,float]):
         pass
 
     def get_pos_vues(self):
         positions = []
-        for corp in self.corps.keys():
+        for corp in self.corps:
             if self.corps[corp] != "incapacite":
                 agissant = self.controleur[corp]
                 positions.append(agissant.position)
@@ -823,7 +823,7 @@ class Esprit :
         # Plus exactement lié aux stratèges, renommer à l'occasion
         self.resolution = 0
         self.oubli = 0
-        for ID_corp in self.corps.keys():
+        for ID_corp in self.corps:
             corp = self.controleur[ID_corp]
             self.resolution = max(self.resolution,corp.resolution)
             self.oubli = max(self.oubli,corp.oubli)
@@ -844,7 +844,7 @@ class Esprit :
 
     def calcule_trajets(self):
         # On détermine la dangerosité de chaque case en fonction des dégats qui vont y avoir lieu
-        pos_corps:Set[Position] = {self.controleur[corp].get_position() for corp in self.corps.keys() if self.corps[corp] != "incapacite"}
+        pos_corps:Set[Position] = {self.controleur[corp].get_position() for corp in self.corps if self.corps[corp] != "incapacite"}
         coef=7 #/!\ Expérimenter avec ce coef à l'occasion
         for case in self.vue:
             for effet in case.effets:
@@ -864,13 +864,13 @@ class Esprit :
         coef_dangerosite = 0.9
         dangerosites = seuils
         importances:Set[Position] = set()
-        for ID_ennemi in self.ennemis.keys():
+        for ID_ennemi in self.ennemis:
             ennemi = self.controleur[ID_ennemi]
             if ennemi.etat == "vivant":
                 position = ennemi.get_position()
-                if position.lab in self.vue.keys():
-                    importance = self.ennemis[ID_ennemi][0]
-                    dangerosite = -self.ennemis[ID_ennemi][1]
+                if position.lab in self.vue:
+                    importance = self.ennemis[ID_ennemi]["importance"]
+                    dangerosite = -self.ennemis[ID_ennemi]["dangerosite"]
                     if importance > self.vue[position]["importance",0]:
                         self.vue[position]["importance",0]=importance
                         importances.add(position)
@@ -935,7 +935,7 @@ class Esprit :
 
                 for pos in pos_obstacle:
                     valeur = position["valeur"]*coef**pos[1]
-                    if valeur*comparateur > self.vue[pos[0]][trajet,-1]*comparateur:
+                    if all([valeur*comparateur > val*comparateur for val in self.vue[pos[0]][trajet]]):
                         self.vue[pos[0]][trajet,i+1] = valeur
                         obstacles.add(pos[0])
 
@@ -980,7 +980,7 @@ class Esprit :
         return seuils
 
     # def print_vue(self):
-    #     for etage in self.vue.keys():
+    #     for etage in self.vue:
     #         matrice = self.vue[etage]
     #         print("Vue de l'esprit :")
     #         print(self.nom)
@@ -1012,9 +1012,9 @@ class Esprit :
     #                     if case.entitees != []:
     #                         occ = " "
     #                         for occupant in case.entitees:
-    #                             if occupant in self.corps.keys():
+    #                             if occupant in self.corps:
     #                                 occ = "O"
-    #                             elif occupant in self.ennemis.keys():
+    #                             elif occupant in self.ennemis:
     #                                 occ = "X"
     #                         centre += occ
     #                     else:
@@ -1041,7 +1041,7 @@ class Esprit :
     #     print(f"Vue de l'esprit {self.nom} :")
     #     zones_visibles = self.salles + self.couloirs
     #     zones_inconnues = self.zones_inconnues
-    #     for etage in self.vue.keys():
+    #     for etage in self.vue:
     #         vue = self.vue[etage]
     #         print(f"Zones de l'étage {etage} :")
     #         for zones in [zones_visibles,zones_inconnues]:
@@ -1096,7 +1096,7 @@ class Esprit :
         pos_obstacles:List[tuple[Position,int]]=[]
 
         case = self.vue[position]
-        if position in self.entrees.keys():
+        if position in self.entrees:
             for direction in DIRECTIONS:
                 if case.cibles[direction][PASSE_ESCALIER]: # Si la case est accessible
                     if not any(case.cibles[direction][PASSE_ESCALIER] in espace.cases and espace.skip for espace in self.entrees[position]): # Si la case n'est pas skippée
@@ -1129,20 +1129,21 @@ class Esprit :
             self.merge_vision(esprit)
 
     def merge_corps(self,esprit:Self):
-        for corps in esprit.corps.keys():
-            if corps not in self.corps.keys():
+        for corps in esprit.corps:
+            if corps not in self.corps:
                 self.corps[corps] = esprit.corps[corps]
                 self.controleur[corps].rejoint(self.nom)
 
     def merge_enemies(self,esprit:Self):
-        for ennemi in esprit.ennemis.keys():
-            if ennemi not in self.corps.keys():
-                self.ennemis[ennemi] = max(esprit.ennemis[ennemi],self.ennemis[ennemi])
+        for ennemi in esprit.ennemis:
+            if ennemi not in self.corps:
+                for cle in ["importance","dangerosite"]:
+                    self.ennemis[ennemi] = max(esprit.ennemis[ennemi][cle],self.ennemis[ennemi][cle])
 
     def merge_vision(self,esprit:Self):
         cases_self:List[Position] = []
         cases_other:List[Position] = []
-        for etage in esprit.vue.keys():
+        for etage in esprit.vue:
             if etage not in self.vue:
                 self.vue[etage] = esprit.vue[etage]
             else:
@@ -1154,11 +1155,11 @@ class Esprit :
 
     def antagonise(self,nom_esprit:str):
         for corp in self.controleur.get_esprit(nom_esprit).get_corps():
-            if not corp in self.ennemis.keys():
-                self.ennemis[corp] = [0.1,0]
+            if not corp in self.ennemis:
+                self.ennemis[corp] = {"importance":0.1,"dangerosite":0}
 
     def decide(self):
-        for corp in self.corps.keys():
+        for corp in self.corps:
             if self.corps[corp] in ["attaque","fuite","soin","soutien"]:
                 self.deplace(corp)
             elif self.corps[corp] == "PNJ":
@@ -1167,7 +1168,7 @@ class Esprit :
                 self.deplace_pj(corp)
 
     def fuite_utile(self,ID:int): #TODO inclure l'accessibilité
-        for corp in self.corps.keys():
+        for corp in self.corps:
             if corp != ID and self.corps[corp] not in ["fuite","incapacite","mort"]:
                 return True
         return False
@@ -1195,10 +1196,10 @@ class Esprit :
                         if issubclass(entitee.get_classe(),Non_superposable): #On ne peut pas aller sur cette case
                             libre = False
                             if issubclass(entitee.get_classe(),Agissant): #Elle est occupée par un agissant
-                                if ID_entitee in self.ennemis.keys(): #Et c'est un ennemi !
+                                if ID_entitee in self.ennemis: #Et c'est un ennemi !
                                     if corp.peut_voir(i) and (attaque or (fuite and not self.fuite_utile(ID))) : #On veut attaquer lorsqu'on croise un ennemi au corps à corps (et on a assez de mana pour, si on utilise la magie)
-                                        if self.ennemis[ID_entitee][0] > importance:
-                                            importance = self.ennemis[ID_entitee][0]
+                                        if self.ennemis[ID_entitee]["importance"] > importance:
+                                            importance = self.ennemis[ID_entitee]["importance"]
                                             corp.attaque(i)
                                             res = "attaque"
                                     elif fuite and self.fuite_utile(ID): #On veut fuire lorsqu'on croise un ennemi au corps à corps
@@ -1223,20 +1224,20 @@ class Esprit :
         if res in ["deplacement","fuite"] and corp.latence <= 0:
             if len(cases) == 1: #Pas de cases libres à proximité, on va essayer d'attaquer pour s'en sortir
                 res = "bloqué"
-                corp.skill_courant = None
+                corp.utilise(None)
                 importance = 0
                 for i in DIRECTIONS:
                     mur:Union[Position,Literal[False]] = case.cibles[i][self.resolution]
                     if mur:
-                        if mur.lab in self.vue.keys():
+                        if mur.lab in self.vue:
                             case_pot = self.vue[mur]
                             entitees = case_pot.entitees
                             for ID_entitee in entitees:
                                 entitee = corp.controleur[ID_entitee]
                                 if issubclass(entitee.get_classe(),Agissant): #Cette case est occupée par un agissant
-                                    if corp.peut_voir(i) and ID_entitee in self.ennemis.keys(): #Et c'est un ennemi !
-                                        if self.ennemis[ID_entitee][0] > importance:
-                                            importance = self.ennemis[ID_entitee][0]
+                                    if corp.peut_voir(i) and ID_entitee in self.ennemis: #Et c'est un ennemi !
+                                        if self.ennemis[ID_entitee]["importance"] > importance:
+                                            importance = self.ennemis[ID_entitee]["importance"]
                                             corp.attaque(i)
                                             res = "attaque"
             elif (not any(case["dangerosite"])) and (not any(case["importance"])): #Il n'y a pas une seule dangerosité ou importance dans la case
@@ -1271,11 +1272,11 @@ class Esprit :
                             constantes_deplacements.append([self.controleur.nb_tours,"fuite",corp.dir_regard,new_cases])
                     else:
                         res = corp.agit_en_vue(self)
-        corp.statut = res
+        corp.set_statut(res)
 
     def deplace_pnj(self,ID:int):
         pnj:PNJ = self.controleur[ID]
-        pnj.skill_courant = None
+        pnj.utilise(None)
         pnj.statut_pnj = "proximite"
         cible = pnj.position
         if pnj.mouvement == 0: #0 pour aller vers, 1 pour chercher et 2 pour aller au contact
@@ -1315,7 +1316,6 @@ class Esprit :
             res = "recherche"
             position = pnj.get_position()
             self.set_skip({cible},{position})
-            case:Representation_case = self.vue[position]
             self.resoud(cible,1,"recherche")
             case:Representation_case = self.vue[position]
             repoussante = case.repoussante
@@ -1332,7 +1332,7 @@ class Esprit :
             for i in DIRECTIONS:
                 mur:Union[Position,Literal[False]] = case.cibles[i][self.resolution]
                 if mur:
-                    if mur.lab in self.vue.keys():
+                    if mur.lab in self.vue:
                         case_pot = self.vue[mur]
                         entitees = case_pot.entitees
                         libre = True
@@ -1341,10 +1341,10 @@ class Esprit :
                             if issubclass(entitee.get_classe(),Non_superposable): #On ne peut pas aller sur cette case
                                 libre = False
                                 if issubclass(entitee.get_classe(),Agissant): #Elle est occupée par un agissant
-                                    if pnj.peut_voir(i) and ID_entitee in self.ennemis.keys(): #Et c'est un ennemi !
+                                    if pnj.peut_voir(i) and ID_entitee in self.ennemis: #Et c'est un ennemi !
                                         if attaque: #Et le feu vert pour l'attaquer
-                                            if self.ennemis[ID_entitee][0] > importance:
-                                                importance = self.ennemis[ID_entitee][0]
+                                            if self.ennemis[ID_entitee]["importance"] > importance:
+                                                importance = self.ennemis[ID_entitee]["importance"]
                                                 pnj.attaque(i)
                                                 res = "attaque"
                                         elif fuite : #Et un ordre de fuite !
@@ -1355,15 +1355,15 @@ class Esprit :
                                             self.controleur.joueur.interlocuteur = pnj
                                             self.controleur.set_phase(DIALOGUE)
                                             pnj.start_dialogue()
-                                            pnj.dir_regard = i
-                                            self.controleur.joueur.dir_regard = i.oppose()
+                                            pnj.regarde(i)
+                                            self.controleur.joueur.regarde(i.oppose())
                                             pnj.mouvement = 0
                                         elif isinstance(entitee, PNJ) and isinstance(pnj, PJ) and pnj is self.controleur.joueur and pnj.peut_voir(i): #Le joueur peut enfin parler au PNJ
                                             pnj.interlocuteur = entitee
                                             self.controleur.set_phase(DIALOGUE)
                                             pnj.interlocuteur.start_dialogue()
-                                            pnj.dir_regard = i
-                                            pnj.interlocuteur.dir_regard = i.oppose()
+                                            pnj.regarde(i)
+                                            pnj.interlocuteur.regarde(i.oppose())
                                             pnj.mouvement = 0
                         if libre:
                             cases.append({"position":mur,"direction":i}|case_pot.trajets)
@@ -1384,21 +1384,21 @@ class Esprit :
                     res = "fuite"
                 if len(cases) == 1: #Pas de cases libres à proximité, on va essayer d'attaquer pour s'en sortir
                     res = "bloqué"
-                    pnj.skill_courant = None
+                    pnj.utilise(None)
                     importance = 0
                     for i in DIRECTIONS:
                         mur:Union[Position,Literal[False]] = case.cibles[i][self.resolution]
                         if mur:
-                            if mur.lab in self.vue.keys():
+                            if mur.lab in self.vue:
                                 case_pot = self.vue[mur]
                                 entitees = case_pot.entitees
                                 libre = True
                                 for ID_entitee in entitees:
                                     entitee = pnj.controleur[ID_entitee]
                                     if issubclass(entitee.get_classe(),Agissant): #Cette case est occupée par un agissant
-                                        if pnj.peut_voir(i) and ID_entitee in self.ennemis.keys(): #Et c'est un ennemi !
-                                            if self.ennemis[ID_entitee][0] > importance:
-                                                importance = self.ennemis[ID_entitee][0]
+                                        if pnj.peut_voir(i) and ID_entitee in self.ennemis: #Et c'est un ennemi !
+                                            if self.ennemis[ID_entitee]["importance"] > importance:
+                                                importance = self.ennemis[ID_entitee]["importance"]
                                                 pnj.attaque(i)
                                                 res = "attaque"
                 elif  (not any(case["dangerosite"])) and (not any(case["importance"])) and pnj.statut_pnj == "perdu":
@@ -1441,7 +1441,7 @@ class Esprit :
                                 constantes_deplacements.append([self.controleur.nb_tours,"fuite loin",pnj.dir_regard,new_cases])
                         else:
                             res = pnj.agit_en_vue(self)
-            pnj.statut = res
+            pnj.set_statut(res)
 
     def deplace_pj(self,ID:int):
         pj:PJ = self.controleur[ID]
@@ -1499,7 +1499,7 @@ class Esprit :
             for i in DIRECTIONS:
                 mur:Union[Position,Literal[False]] = case.cibles[i][self.resolution]
                 if mur:
-                    if mur.lab in self.vue.keys():
+                    if mur.lab in self.vue:
                         case_pot = self.vue[mur]
                         entitees = case_pot.entitees
                         libre = True
@@ -1508,10 +1508,10 @@ class Esprit :
                             if issubclass(entitee.get_classe(),Non_superposable): #On ne peut pas aller sur cette case
                                 libre = False
                                 if issubclass(entitee.get_classe(),Agissant): #Elle est occupée par un agissant
-                                    if pj.peut_voir(i) and ID_entitee in self.ennemis.keys(): #Et c'est un ennemi !
+                                    if pj.peut_voir(i) and ID_entitee in self.ennemis: #Et c'est un ennemi !
                                         if attaque: #Et le feu vert pour l'attaquer
-                                            if self.ennemis[ID_entitee][0] > importance:
-                                                importance = self.ennemis[ID_entitee][0]
+                                            if self.ennemis[ID_entitee]["importance"] > importance:
+                                                importance = self.ennemis[ID_entitee]["importance"]
                                                 pj.simule_attaque(i)
                                                 res = "attaque"
                                         elif fuite : #Et un ordre de fuite !
@@ -1535,21 +1535,21 @@ class Esprit :
                     res = "fuite"
                 if len(cases) == 1: #Pas de cases libres à proximité, on va essayer d'attaquer pour s'en sortir
                     res = "bloqué"
-                    pj.skill_courant = None
+                    pj.utilise(None)
                     importance = 0
                     for i in DIRECTIONS:
                         mur:Union[Position,Literal[False]] = case.cibles[i][self.resolution]
                         if mur:
-                            if mur.lab in self.vue.keys():
+                            if mur.lab in self.vue:
                                 case_pot = self.vue[mur]
                                 entitees = case_pot.entitees
                                 libre = True
                                 for ID_entitee in entitees:
                                     entitee = pj.controleur[ID_entitee]
                                     if issubclass(entitee.get_classe(),Agissant): #Cette case est occupée par un agissant
-                                        if pj.peut_voir(i) and ID_entitee in self.ennemis.keys(): #Et c'est un ennemi !
-                                            if self.ennemis[ID_entitee][0] > importance:
-                                                importance = self.ennemis[ID_entitee][0]
+                                        if pj.peut_voir(i) and ID_entitee in self.ennemis: #Et c'est un ennemi !
+                                            if self.ennemis[ID_entitee]["importance"] > importance:
+                                                importance = self.ennemis[ID_entitee]["importance"]
                                                 pj.simule_attaque(i)
                                                 res = "attaque"
                 elif (not any(case["dangerosite"])) and (not any(case["importance"])) == "perdu":
@@ -1612,10 +1612,10 @@ class Esprit :
                         if issubclass(entitee.get_classe(),Non_superposable): #On ne peut pas aller sur cette case
                             libre = False
                             if issubclass(entitee.get_classe(),Agissant): #Elle est occupée par un agissant
-                                if ID_entitee in self.ennemis.keys(): #Et c'est un ennemi !
+                                if ID_entitee in self.ennemis: #Et c'est un ennemi !
                                     if pj.peut_voir(i) and (attaque or (fuite and not self.fuite_utile(ID))) : #On veut attaquer lorsqu'on croise un ennemi au corps à corps (et on a assez de mana pour, si on utilise la magie)
-                                        if self.ennemis[ID_entitee][0] > importance:
-                                            importance = self.ennemis[ID_entitee][0]
+                                        if self.ennemis[ID_entitee]["importance"] > importance:
+                                            importance = self.ennemis[ID_entitee]["importance"]
                                             pj.simule_attaque(i)
                                             res = "attaque"
                                     elif fuite and self.fuite_utile(ID): #On veut fuire lorsqu'on croise un ennemi au corps à corps
@@ -1640,20 +1640,20 @@ class Esprit :
         if res in ["deplacement","fuite"] and pj.latence <= 0:
             if len(cases) == 1: #Pas de cases libres à proximité, on va essayer d'attaquer pour s'en sortir
                 res = "bloqué"
-                pj.skill_courant = None
+                pj.utilise(None)
                 importance = 0
                 for i in DIRECTIONS:
                     mur:Union[Position,Literal[False]] = case.cibles[i][self.resolution]
                     if mur:
-                        if mur.lab in self.vue.keys():
+                        if mur.lab in self.vue:
                             case_pot = self.vue[mur]
                             entitees = case_pot.entitees
                             for ID_entitee in entitees:
                                 entitee = pj.controleur[ID_entitee]
                                 if issubclass(entitee.get_classe(),Agissant): #Cette case est occupée par un agissant
-                                    if pj.peut_voir(i) and ID_entitee in self.ennemis.keys(): #Et c'est un ennemi !
-                                        if self.ennemis[ID_entitee][0] > importance:
-                                            importance = self.ennemis[ID_entitee][0]
+                                    if pj.peut_voir(i) and ID_entitee in self.ennemis: #Et c'est un ennemi !
+                                        if self.ennemis[ID_entitee]["importance"] > importance:
+                                            importance = self.ennemis[ID_entitee]["importance"]
                                             pj.simule_attaque(i)
                                             res = "attaque"
             elif (not any(case["dangerosite"])) and (not any(case["importance"])): #Et case[3] forcément aussi par la même occasion, donc on est totalement libre de chercher

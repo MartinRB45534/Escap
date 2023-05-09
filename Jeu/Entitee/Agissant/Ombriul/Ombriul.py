@@ -26,14 +26,14 @@ class Ombriul(Dps): #/!\ Retravailler l'ombriul pour utiliser les rôles
 
     def attaque(self,direction:Direction):
         skill:Skills_magiques = trouve_skill(self.classe_principale,Skills_magiques) #Est-ce qu'il a le même Skill_magie que le joueur ?
-        self.dir_regard = direction
+        self.regarde(direction)
         if self.peut_payer(cout_pm_poing_sombre[skill.niveau-1]): #Quelle est l'attaque magique des gobelins ?
-            self.skill_courant = Skill_magie
-            self.magie_courante = "magie poing sombre"
+            self.utilise(Skill_magie)
+            self.set_magie_courante("magie poing sombre")
             self.dir_magie = direction
         else:
-            self.skill_courant = Skill_stomp
-        self.statut = "attaque"
+            self.utilise(Skill_stomp)
+        self.set_statut("attaque")
 
     def get_skin(self):
         if self.etat == "vivant":

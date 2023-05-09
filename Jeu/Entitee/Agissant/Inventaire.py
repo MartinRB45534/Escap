@@ -37,12 +37,12 @@ class Inventaire:
 
     def active(self,controleur: Controleur):
         self.controleur = controleur
-        for key in self.items.keys():
+        for key in self.items:
             for item in self.items[key]:
                 self.controleur[item].active(controleur)
 
     def desactive(self):
-        for key in self.items.keys():
+        for key in self.items:
             for item in self.items[key]:
                 self.controleur[item].desactive()
         self.controleur = None

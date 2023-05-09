@@ -20,7 +20,7 @@ class Classe:
         self.propagation=0.1 #Certaines classes ont un taux de propagation plus important
         self.prep_next_evo() #On prépare déjà la prochaine évolution
         self.curseur = "skills"
-        # self.skill_courant = 0
+        # self.utilise(0)
         # self.skill_intrasec_courant = 0
         # self.classe_courante = 0
         self.nom = "classe anonyme"

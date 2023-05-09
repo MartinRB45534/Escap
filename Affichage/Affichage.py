@@ -1985,9 +1985,9 @@ class Vignettes_agissant(Vignette_composee):
         esprit = agissant.controleur.get_esprit(agissant.controleur.joueur.esprit)
         position_pv = [position[0]+ceil(taille*(2/19)),position[1]+ceil(taille*(2/19))]
         tailles_pv = [ceil(taille*((15*agissant.pv)/(19*agissant.pv_max))),ceil(taille*(15/19))]
-        if agissant.ID in esprit.ennemis.keys():
+        if agissant.ID in esprit.ennemis:
             image = IMAGE_PV_ENNEMI
-        elif agissant.ID in esprit.corps.keys():
+        elif agissant.ID in esprit.corps:
             image = IMAGE_PV_ALLIE
         else:
             image = IMAGE_PV_NEUTRE
@@ -2018,7 +2018,7 @@ class Vignettes_position(Vignette_composee):
                     vignettes.append(Vignettes_agissant(position,agissant,taille))
                 if vue[pos].effets != []:
                     esprit = joueur.controleur.get_esprit(joueur.esprit)
-                    if any([effet[2] in esprit.corps.keys() for effet in vue[pos].effets]):
+                    if any([effet[2] in esprit.corps for effet in vue[pos].effets]):
                         vignettes.append(Vignette(position,taille,SKIN_ATTAQUE_DELAYEE_ALLIE))
                     else:
                         vignettes.append(Vignette(position,taille,SKIN_ATTAQUE_DELAYEE))
@@ -2234,7 +2234,7 @@ class Description_neutre(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
                     self.controleur.joueur.cible_deplacement = self.neutre.ID
                 elif selection.texte == "Antagoniser":
                     esprit:Esprit = self.controleur[self.controleur.joueur.esprit]
-                    esprit.ennemis[self.neutre.ID] = 0.1
+                    esprit.ennemis[self.neutre.ID] = {"importance": 0.01, "dangerosite":0}
         # TODO : indiquer que l'action a été effectuée
 
     def set_default_courant(self):
@@ -2311,7 +2311,7 @@ class Description_ennemi(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
                     self.controleur.joueur.cible_deplacement = self.ennemi.ID
                 elif selection.texte == "Prioriser":
                     esprit:Esprit = self.controleur[self.controleur.joueur.esprit]
-                    esprit.ennemis[self.ennemi.ID] += 1
+                    esprit.ennemis[self.ennemi.ID]["importance"] += 1
         # TODO : indiquer que l'action a été effectuée
 
     def set_default_courant(self):
@@ -2401,7 +2401,7 @@ class Description_item(Wrapper_knot, Knot_vertical_profondeur_agnostique):
                 elif selection.texte == "Desequiper":
                     self.controleur.joueur.inventaire.desequippe([self.item])
                 elif selection.texte == "Lancer":
-                    self.controleur.joueur.skill_courant = trouve_skill(self.controleur.joueur.classe_principale, Skills_projectiles)
+                    self.controleur.joueur.utilise(trouve_skill(self.controleur.joueur.classe_principale, Skills_projectiles))
                     self.controleur.joueur.projectile_courant = self.item
                 elif selection.texte == "Boire" or selection.texte == "Utiliser":
                     self.item: Consommable

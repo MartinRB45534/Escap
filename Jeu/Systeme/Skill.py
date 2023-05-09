@@ -60,7 +60,7 @@ class Skill_magie(Skill,Skills_magiques):
 
     def menu_magie(self):
         res = []
-        for nom in self.magies.keys():
+        for nom in self.magies:
             type_magie = self.magies[nom]
             magie = type_magie(self.niveau)
             res.append(magie)
@@ -90,7 +90,7 @@ class Skill_magie(Skill,Skills_magiques):
         self.magies[magie.nom]=magie #Les magies sont répérées par leur nom
 
     def utilise(self,nom):
-        if nom in self.magies.keys():
+        if nom in self.magies:
             magie = self.magies[nom](self.niveau) #Les caractéristiques des magies s'améliorent avec le niveau du skill
             self.gain_xp = magie.gain_xp + magie.cout_pm*0.1
             self.xp_new+=self.gain_xp #On gagne de l'xp, mais combien ? 0.1, est-ce assez ? trop ?

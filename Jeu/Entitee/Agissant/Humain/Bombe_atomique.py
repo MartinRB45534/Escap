@@ -48,11 +48,11 @@ class Bombe_atomique(PNJ_mage,Attaquant_magique_case,Support,Humain): #La neuvi√
     def attaque(self,direction:Direction):
         #Quelle est sa magie de pr√©dilection ? Pour l'instant on va prendre l'avalanche
         if self.peut_payer(cout_pm_poing_ardent[trouve_skill(self.classe_principale,Skill_magie).niveau-1]):
-            self.skill_courant = Skill_magie
-            self.magie_courante = "magie poing ardent"
+            self.utilise(Skill_magie)
+            self.set_magie_courante("magie poing ardent")
         else:
-            self.skill_courant = Skill_stomp
-        self.statut = "attaque"
+            self.utilise(Skill_stomp)
+        self.set_statut("attaque")
 
     def start_dialogue(self): #On commence un nouveau dialogue !
         #On initialise nos attributs

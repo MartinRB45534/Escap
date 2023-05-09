@@ -13,8 +13,8 @@ class Shaman_gobelin(Renforceur,Support_lointain,Gobelin):
         return "magie boost"
 
     def boost(self,cible):
-        self.skill_courant = Skill_magie
-        self.magie_courante = "magie boost"
+        self.utilise(Skill_magie)
+        self.set_magie_courante("magie boost")
         self.cible_magie = cible
 
     def get_offenses(self):

@@ -51,13 +51,13 @@ class Peste(PNJ_mage,Multi_soigneur,Support_lointain,Humain): #La huitième huma
         return "magie multi soin"
 
     def attaque(self,direction:Direction):
-        #Quelle est sa magie de prédilection ? Pour l'instant on va prendre l'avalanche
+        #Quelle est sa magie de prédilection ? On lui donne la purification (magie unique qui a plus ou moins un élément de lumière)
         if self.peut_payer(cout_pm_purification[trouve_skill(self.classe_principale,Skill_magie).niveau-1]):
-            self.skill_courant = Skill_magie
-            self.magie_courante = "magie purification" #/!\
+            self.utilise(Skill_magie)
+            self.set_magie_courante("magie purification")
             self.dir_magie = direction
         else:
-            self.skill_courant = Skill_stomp
+            self.utilise(Skill_stomp)
 
     def start_dialogue(self): #On commence un nouveau dialogue !
         #On initialise nos attributs

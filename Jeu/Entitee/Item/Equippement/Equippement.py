@@ -11,6 +11,6 @@ class Equipement(Item):
         pass
 
     def desequippe(self):
-        for cause in self.taux_stats.keys():
+        for cause in self.taux_stats:
             if cause == "incompatibilité porteur":
                 self.taux_stats.pop(cause)

@@ -374,12 +374,12 @@ class Controleur():
 
     def check_exp5(self):
         mort1 = 0
-        for ID in self.esprits["Equipe 1"].corps.keys():
+        for ID in self.esprits["Equipe 1"].corps:
             if self[ID].etat == "mort":
                 mort1 += 1
 
         mort2 = 0
-        for ID in self.esprits["Equipe 2"].corps.keys():
+        for ID in self.esprits["Equipe 2"].corps:
             if self[ID].etat == "mort":
                 mort2 += 1
 
@@ -840,7 +840,7 @@ class Controleur():
         #On active le lab :
         self.labs[key].active(self) #On lui donne le controleur pour qu'il puisse l'appeler au besoin.
         #On cherche ses occupants :
-        for ke in self.entitees.keys() :
+        for ke in self.entitees :
             entitee = self[ke]
             position = entitee.get_position()
             if position != None: #Il y a des entitees dans les inventaires
@@ -855,7 +855,7 @@ class Controleur():
            Tout labyrinthe se désactive après 5 tours d'absence d'entitée supérieure (joueur, dev, kumoko, etc.).
            Le lab actif possédant le controleur en attribut, il appelle cette fonction lui-même quand son compteur interne tombe à 0."""
         #On desactive les occupants du lab :
-        for ke in self.entitees.keys() : #Normalement on a déjà vérifié qu'il n'y a pas d'entitée supérieure...
+        for ke in self.entitees : #Normalement on a déjà vérifié qu'il n'y a pas d'entitée supérieure...
             entitee = self[ke]
             position = entitee.get_position()
             if position != None: #Il y a des entitees dans les inventaires
@@ -971,7 +971,7 @@ class Controleur():
 
     def trouve_occupants(self,position:Position):
         occupants = []
-        for ID_entitee in self.entitees.keys():
+        for ID_entitee in self.entitees:
             if self[ID_entitee].position == position:
                 occupants.append(ID_entitee)
         return occupants
@@ -1007,7 +1007,7 @@ class Controleur():
         return occupants
 
     def fait_agir(self,agissant:Agissant):
-        agissant.statut = "passif"
+        agissant.set_statut("passif")
         if isinstance(agissant, PJ) and agissant is self.joueur:
             agissant.nouvel_ordre = False
         type_skill = agissant.skill_courant
@@ -1316,22 +1316,22 @@ class Controleur():
         lab.veut_passer(item,direction)
 
     def select_cible(self,magie:Magie_cible,agissant:Agissant):
-        if random.random() < agissant.talent :
+        # if random.random() < agissant.talent :
             magie.cible = agissant.cible_magie
         
     def select_direction(self,magie:Magie_dirigee,agissant:Agissant):
-        if random.random() < agissant.talent :
+        # if random.random() < agissant.talent :
             magie.direction = agissant.dir_magie
 
     def select_cout(self,magie:Magie_cout,agissant:Agissant):
         magie.cout_pm = agissant.cout_magie
 
     def select_cible_parchemin(self,magie:Magie_cible,agissant:Agissant):
-        if random.random() < agissant.talent :
+        # if random.random() < agissant.talent :
             magie.cible = agissant.cible_magie_parchemin
         
     def select_direction_parchemin(self,magie:Magie_dirigee,agissant:Agissant):
-        if random.random() < agissant.talent :
+        # if random.random() < agissant.talent :
             magie.direction = agissant.dir_magie_parchemin
 
     def select_cout_parchemin(self,magie:Magie_cout,agissant:Agissant):
@@ -1594,5 +1594,5 @@ class Controleur():
         return poss
 
     # def clear(self):
-    #     for ID_entitee in self.entitees.keys():
+    #     for ID_entitee in self.entitees:
     #         self[ID_entitee].clear()

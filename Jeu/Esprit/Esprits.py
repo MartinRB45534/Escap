@@ -44,17 +44,17 @@ class Esprit_sans_scrupule(Esprit_type):
                 if ID != offense[0] and effet.phase == "affiche":
                     responsabilite = (effet.taux_degats-1)*offense[1]
                     if ID in self.ennemis:
-                        self.ennemis[ID][0] += responsabilite
+                        self.ennemis[ID]["importance"] += responsabilite
                     else:
-                        self.ennemis[ID] = [responsabilite,0]
+                        self.ennemis[ID] = {"importance":responsabilite,"dangerosite":0}
             elif isinstance(effet,Soin):
                 ID = effet.responsable
                 if ID != offense[0] and effet.phase == "affiche":
                     responsabilite = (effet.gain_pv/offenseur.pv)*offense[1]
                     if ID in self.ennemis:
-                        self.ennemis[ID][0] += responsabilite
+                        self.ennemis[ID]["importance"] += responsabilite
                     else:
-                        self.ennemis[ID] = [responsabilite,0]
+                        self.ennemis[ID] = {"importance":responsabilite,"dangerosite":0}
 
 class Esprit_bourrin(Esprit_type): #À supprimer, plus nécessaire
     """Un esprit sans soigneurs ni soutiens."""
@@ -155,7 +155,7 @@ class Esprit_humain(Esprit_simple):
         self.chef = corp #Les humains ne peuvent pas s'empêcher d'avoir des chefs
 
     def get_offenses(self):
-        for corp in self.corps.keys(): #On vérifie si quelqu'un nous a offensé
+        for corp in self.corps: #On vérifie si quelqu'un nous a offensé
             agissant:Agissant = self.controleur[corp]
             offenses,etat = agissant.get_offenses()
             self.corps[corp] = etat
@@ -163,21 +163,21 @@ class Esprit_humain(Esprit_simple):
                 self.antagonise_attaquant(offense)
                 self.antagonise_supports(offense)
                 if True:# self.peureuse():
-                    for coennemi in self.controleur.get_esprit(self.controleur[offense[0]].esprit).corps.keys():
+                    for coennemi in self.controleur.get_esprit(self.controleur[offense[0]].esprit).corps:
                         if not coennemi in self.ennemis:
-                            self.ennemis[coennemi] = [0.01,0]
+                            self.ennemis[coennemi] = {"importance":0.01,"dangerosite":0}
 
     def merge(self,nom:str): #Regroupe deux esprits, lorsque des humains forment un groupe
         Esprit.merge(self,nom)
         self.chef = self.elit()
 
     def elit(self):
-        if 2 in self.corps.keys():
+        if 2 in self.corps:
             self.chef = 2 #Le joueur est le chef par défaut ! Ah mais non mais !
         else:
             self.chef = None
             candidats:List[Humain] = []
-            for corp in self.corps.keys():
+            for corp in self.corps:
                 agissant:Agissant = self.controleur[corp]
                 if "humain" in agissant.get_especes():
                     candidats.append(agissant) #Les humains sont les seuls à pouvoir diriger un esprit d'humain. Et les seuls à voter, aussi.

@@ -48,7 +48,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         self.resolution = stats['resolution']
         self.forme:str = stats['forme']
         self.forme_tete:str = stats['forme_tete']
-        self.statut = "attente"
+        self.set_statut("attente")
         self.etat = "vivant"
 
         #vue de l'agissant
@@ -61,7 +61,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         self.inventaire = Inventaire(self.ID,stats['doigts'])
 
         #la direction du regard
-        self.dir_regard = HAUT
+        self.regarde(HAUT)
 
         self.skill_courant:Skill = None
 
@@ -126,17 +126,19 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
     def get_impact(self):
         return Position(self.position.lab,self.position.x+[0,1,0,-1][self.dir_regard],self.position.y+[-1,0,1,0][self.dir_regard])
 
+
+    # Les actions de l'agissant
     def attaque(self,direction:Direction):
-        self.dir_regard = direction
+        self.regarde(direction)
         if self.get_arme() != None:
-            self.skill_courant = Skill_attaque
+            self.utilise(Skill_attaque)
         else:
-            self.skill_courant = Skill_stomp
-        self.statut = "attaque"
+            self.utilise(Skill_stomp)
+        self.set_statut("attaque")
 
     def va(self,direction:Direction):
-        self.dir_regard = direction
-        self.skill_courant = Skill_deplacement #La plupart des monstres n'ont pas ce skill !
+        self.regarde(direction)
+        self.utilise(Skill_deplacement) #La plupart des monstres n'ont pas ce skill !
 
     def agit_en_vue(self,esprit:Esprit,defaut = ""): #Par défaut, on n'a pas d'action à distance
         return defaut
@@ -156,9 +158,15 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         else:
             return DIRECTIONS[0]
 
-    def regarde(self,direction:Direction):
+    def utilise(self,skill:Skill,force:bool=False):
+        self.skill_courant = skill
+
+    def regarde(self,direction:Direction,force:bool=False):
         if direction != None:
             self.dir_regard = direction
+
+    def set_statut(self,statut:str,force:bool=False):
+        self.statut = statut
 
     def get_arme(self):
         return self.inventaire.get_arme()
@@ -358,7 +366,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
     def meurt(self):
         self.pv = self.pm = 0
         self.etat = "mort"
-        self.dir_regard = DIRECTIONS[0]
+        self.regarde(DIRECTIONS[0])
         self.taux_regen_pv = self.taux_regen_pm = self.taux_force = self.taux_priorite = self.taux_vitesse = self.taux_aff_o = self.taux_aff_f = self.taux_aff_t = self.taux_aff_g = self.taux_stats = {} #/!\ À corriger !
         self.effets = []
         self.inventaire.drop_all(self.position)
@@ -493,7 +501,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
 
     # Les agissants agissent, les items projetés se déplacent, éventuellement explosent.
     def on_action(self):
-        self.skill_courant = None #Si on a de la chance, on pourra jouer plusieurs fois dans le tour ! (Bientôt...)
+        self.utilise(None, True) #Si on a de la chance, on pourra jouer plusieurs fois dans le tour ! (Bientôt...)
         for effet in self.effets:
             if isinstance(effet,On_action):
                 effet.execute(self) #Principalement les lancements de magies
@@ -574,7 +582,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
             else :
                 immortel:Skill_immortel = trouve_skill(self.classe_principale,Skill_immortel)
                 if immortel != None :
-                    if "immortalité" in self.taux_stats.keys():
+                    if "immortalité" in self.taux_stats:
                         self.taux_stats.pop("immortalité")
             self.inventaire.fin_tour()
             self.classe_principale.gagne_xp()

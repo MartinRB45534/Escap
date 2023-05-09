@@ -13,14 +13,14 @@ class Mage_gobelin(Attaquant_magique_case,Support,Gobelin):
         return "magie petite secousse"
 
     def attaque(self,direction):
-        self.dir_regard = direction
+        self.regarde(direction)
         if self.peut_payer(cout_pm_poing_magique[trouve_skill(self.classe_principale,Skill_magie).niveau-1]): #Quelle est l'attaque magique des gobelins ?
-            self.skill_courant = Skill_magie
-            self.magie_courante = "magie poing magique"
+            self.utilise(Skill_magie)
+            self.set_magie_courante("magie poing magique")
             self.dir_magie = direction
         else:
-            self.skill_courant = Skill_stomp
-        self.statut = "attaque"
+            self.utilise(Skill_stomp)
+        self.set_statut("attaque")
 
     def get_offenses(self):
         offenses = self.offenses
