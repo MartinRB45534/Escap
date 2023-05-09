@@ -147,11 +147,11 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
     def get_texte_descriptif(self):
         return [f"Un humain (niveau {self.niveau})",f"ID : {self.ID}","Nom : Arvel","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Un humain récemment arrivé dans le labyrinthe."]
 
-    def fuite(self,degats=0):
+    def fuite(self,degats:float=0):
         #On fuit si on est en danger (pv trop bas) à condition d'avoir un chemin de fuite
         #Pour l'instant on va juste vérifier les pv :
         taux_limite = 0.6 + 0.01*self.appreciations[1] #Quand on se hait, on devient plus suicidaire
-        return (self.pv-degats) / self.pv_max <= taux_limite
+        return (self.pv+degats) / self.pv_max <= taux_limite
 
     def debut_tour(self):
         if self.latence <= 0:

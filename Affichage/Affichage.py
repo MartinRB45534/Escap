@@ -1998,12 +1998,12 @@ class Vignettes_agissant(Vignette_composee):
         Vignette_composee.__init__(self,vignettes,taille)
 
 class Vignettes_position(Vignette_composee):
-    def __init__(self,position: List[int], joueur: Agissant, vue: Vue, pos: Position, taille: int, shade=False, invalide=False):
+    def __init__(self,position: List[int], joueur: Agissant, vue: Representation_vue, pos: Position, taille: int, shade=False, invalide=False):
         self.pos = pos
         vignettes = []
         if pos in vue:
             vignettes.append(Vignette_case(position,joueur,vue,pos,taille))
-            if vue[pos][1]>0:
+            if vue[pos].clarte>0:
                 entitees = vue[pos].entitees
                 agissant = None
                 for ID_entitee in entitees:
@@ -2030,22 +2030,22 @@ class Vignettes_position(Vignette_composee):
         self.position = position
 
 class Vignette_case(Vignette_composee):
-    def __init__(self,position,joueur:PJ,vue,pos,taille):
+    def __init__(self,position,joueur:PJ,vue:Representation_vue,pos,taille):
         vignettes = []
         if pos in vue:
             vue_case = vue[pos]
-            if vue_case[1]==0:
+            if not(vue_case.clarte):
                 vignettes.append(Vignette(position,taille,SKIN_BROUILLARD))
-            elif vue_case[1]==-1: #On a affaire à une case accessible mais pas vue
+            elif vue_case.clarte==-1: #On a affaire à une case accessible mais pas vue
                 vignettes.append(Vignette(position,taille,SKIN_BROUILLARD))
                 for i in DIRECTIONS:
                     if vue_case.cibles[i][BASIQUE]:
-                        pos_voisin = vue_case[0]+i
-                        if pos_voisin in vue and vue[pos_voisin][1]>0:
+                        pos_voisin = vue_case.position+i
+                        if pos_voisin in vue and vue[pos_voisin].clarte>0:
                             vignettes.append(Vignette(position,taille,SKIN_MUR_BROUILLARD,i))
             else:
                 vignettes.append(Vignette(position,taille,SKINS_CASES[vue_case.code])) #La case en premier, donc en bas
-                case:Case = joueur.controleur[vue_case[0]]
+                case:Case = joueur.controleur[vue_case.position]
                 for i in DIRECTIONS:
                     mur:Mur = case[i]
                     for effet in mur.effets:

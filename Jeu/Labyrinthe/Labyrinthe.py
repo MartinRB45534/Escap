@@ -36,7 +36,7 @@ class Labyrinthe(Vue):
         self.generation(proba,poids)
         #print("Génération : check")
 
-    def __getitem__(self,key):
+    def __getitem__(self,key) -> Case|Mur:
         if isinstance(key,tuple):
             return self.matrice_cases[key[0].x][key[0].y][key[1]]
         elif isinstance(key,(Decalage,Position)):
@@ -153,13 +153,13 @@ class Labyrinthe(Vue):
 
         #print("Fini")
 
-    def murs_utilisables(self,position:Position,nb_murs=NB_DIRECTIONS):
+    def murs_utilisables(self,position:Position,nb_murs=NB_DIRECTIONS) -> List[Cote]:
         """
         Fonction qui prend en entrées:
             les voisins de la case
         et qui renvoie les directions ou les murs sont cassables
         """
-        murs_utilisables=[]
+        murs_utilisables:List[Cote]=[]
 
         for cote in Bord_dec(position):
             opp = cote.oppose()
@@ -177,7 +177,7 @@ class Labyrinthe(Vue):
         self[coord].step(entitee)
 
     def get_vue(self,agissant:Agissant):
-        return Vue(self.id,self.resoud(agissant.get_position(),agissant.get_portee_vue()),self.decalage)
+        return Representation_vue(self.id,self.resoud(agissant.get_position(),agissant.get_portee_vue()),self.decalage)
             
     def getMatrice_cases(self):
         #on obtient une copie indépendante du labyrinthe
@@ -228,9 +228,9 @@ class Labyrinthe(Vue):
                 self.matrice_cases[i][j].active(controleur)
 
     def attaque(self,position:Position,portee:int,propagation:str,direction:Direction,obstacles:List):
-        return self.resoud(position,portee,"attaque",propagation,direction,obstacles)
+        self.resoud(position,portee,"attaque",propagation,direction,obstacles)
 
-    def resoud(self,position:Position,portee:int,action="vue",propagation="C__S_Pb",direction:Direction=None,dead_ends:List=[],reset=True,clees:List[str]=[]):
+    def resoud(self,position:Position,portee:int,action="vue",propagation="C__S_Pb",direction:Direction|None=None,dead_ends:List=[],reset=True,clees:List[str]=[]) -> List[List[Representation_case]]|None:
         #Les possibilités de propagation sont :
         #                           Circulaire, le mode de propagation de la vision
         #                           Rectiligne, dans une unique direction
@@ -256,10 +256,10 @@ class Labyrinthe(Vue):
         if forme == "R":
             dirs = [direction]
         elif forme == "S":
-            dirs.remove(dirs[direction-2])
+            dirs.remove(dirs[direction.oppose()])
         elif forme == "Q":
-            dirs.remove(dirs[direction-2])
-            dirs.remove(dirs[direction-3])
+            dirs.remove(dirs[direction.oppose()])
+            dirs.remove(dirs[direction.oppose()-1])
 
         queue=[(position,dirs,propagation)]
 
@@ -298,16 +298,13 @@ class Labyrinthe(Vue):
                         queue.append(data_explorable)
 
         if action == "vue":
-            matrice_cases = []
+            matrice_cases:List[List[Representation_case]] = []
             for colonne in self.matrice_cases:
                 collone = []
                 for case in colonne:
                     collone.append(case.get_infos(clees))
                 matrice_cases.append(collone)
-        else :
-            matrice_cases = self.matrice_cases
-
-        return matrice_cases
+            return matrice_cases
 
     def voisins_case(self,data:List):
         """

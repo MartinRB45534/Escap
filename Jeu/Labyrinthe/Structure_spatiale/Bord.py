@@ -1,4 +1,4 @@
-from typing import List
+from typing import Iterator, List
 from Jeu.Labyrinthe.Structure_spatiale.Cote import *
 
 class Bord:
@@ -35,10 +35,10 @@ class Bord_dec(Bord):
         if isinstance(item,Cote):
             if NB_DIRECTIONS == 4:
                 item_pat = item-self.position
-                return (Bord.__contains__(item_pat) and not item_pat in self.entrees)
+                return (Bord.__contains__(self,item_pat) and not item_pat in self.entrees) #/!\ Jamais utilisé !?
         return NotImplemented
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Cote]:
         for cote_pat in Bord.__iter__(self):
             if not cote_pat in self.entrees:
                 cote = cote_pat + self.position

@@ -144,10 +144,10 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
     def comporte_distance(self):
         pass
 
-    def veut_attaquer(self):
+    def veut_attaquer(self,degats:float=0):
         pass
 
-    def veut_fuir(self,degats=0):
+    def veut_fuir(self,degats:float=0):
         pass
 
     def get_direction(self):

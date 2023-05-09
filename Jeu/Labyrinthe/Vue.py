@@ -58,13 +58,7 @@ class Representation_case:
         self.position = position #La position de la case
         self.clarte = clarte #La clarté, qui vient d'être calculée pour l'agissant
         self.oubli = 0 #Pour le décompte de l'oubli
-        # self.trajets = [0, #Pour les trajets (importance des ennemis), en contournant les agissants
-        #                 0, #Pour les trajets (importance des ennemis), en traversant les agissants
-        #                 0, #Pour les trajets (dangerosité), en contournant les agissants
-        #                 0, #Pour les trajets (dangerosité), en traversant les agissants
-        #                 0, #Pour les autres trajets (pour calculer de façon unique, effacé avant chaque calcul)
-        #                 False]
-        self.trajets = {}
+        self.trajets = {"dangerosite":[],"importance":[]}
         self.visitee = False #Pour savoir si la case a déjà été visitée
         self.code = code #Le code correspondant aux auras et autres effets
         self.cibles = cibles #Les murs et leur traversabilité pour l'agissant
@@ -74,7 +68,7 @@ class Representation_case:
 
     def oublie(self, oubli:int):
         """Pour oublier les cases visitées il y a trop longtemps"""
-        self.trajets = {}
+        self.trajets = {"dangerosite":[],"importance":[]}
         self.effets = []
         self.repoussante = False
         if self.oubli > 1:
@@ -94,7 +88,7 @@ class Representation_case:
         elif isinstance(key,tuple):
             if isinstance(key[0],str):
                 trajet = self.trajets.get(key[0],[])
-                if len(trajet) > key[1]:
+                if len(trajet) > key[1] and -len(trajet) <= key[1] :
                     return trajet[key[1]]
                 return 0
             elif isinstance(key[0],(int,Direction)):

@@ -10,7 +10,7 @@ class Support(Agissant):
             return 3
 
     def veut_attaquer(self,degats:float=0):
-        return (self.pv-degats)/self.pv_max < 0.7 and (self.pv-degats)/self.pv_max >= 0.4
+        return (self.pv+degats)/self.pv_max < 0.7 and (self.pv-degats)/self.pv_max >= 0.4
 
     def veut_fuir(self,degats:float=0):
-        return (self.pv-degats)/self.pv_max < 0.4
+        return (self.pv+degats)/self.pv_max < 0.4

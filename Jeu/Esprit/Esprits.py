@@ -162,7 +162,7 @@ class Esprit_humain(Esprit_simple):
             for offense in offenses:
                 self.antagonise_attaquant(offense)
                 self.antagonise_supports(offense)
-                if self.peureuse():
+                if True:# self.peureuse():
                     for coennemi in self.controleur.get_esprit(self.controleur[offense[0]].esprit).corps.keys():
                         if not coennemi in self.ennemis:
                             self.ennemis[coennemi] = [0.01,0]
@@ -184,9 +184,9 @@ class Esprit_humain(Esprit_simple):
             votes_max = 0
             for candidat in candidats:
                 votes = 0
-                place = candidat.place
+                place = candidat.ID
                 for votant in candidats:
-                    votes += votant.appreciations(place)
+                    votes += votant.appreciations[place]
                 if votes > votes_max:
                     self.chef = candidat.ID #/!\ Éviter les chefs morts, à l'occasion /!\
                     votes_max = votes

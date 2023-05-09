@@ -32,11 +32,11 @@ class Alchimiste(PNJ_mage,Attaquant_magique_case,Support,Humain): #Le septième 
         #                        d'explorer (chercher la sortie),
         #                        de suivre (se déplacer avec le joueur, combattre les monstres en chemin, aller vers la sortie lorsque quelqu'un l'a trouvée)
 
-    def fuite(self,degats=0):
+    def fuite(self,degats:float=0):
         #On fuit si on est en danger (pv trop bas) à condition d'avoir un chemin de fuite
         #Pour l'instant on va juste vérifier les pv :
         taux_limite = 0.5 + 0.01*self.appreciations[1] #Quand on se hait, on devient plus suicidaire
-        return (self.pv-degats) / self.pv_max <= taux_limite
+        return (self.pv+degats) / self.pv_max <= taux_limite
 
     def peut_caster(self):
         return self.peut_payer(cout_pm_secousse[trouve_skill(self.classe_principale,Skill_magie).niveau-1])

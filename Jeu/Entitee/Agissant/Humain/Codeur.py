@@ -17,7 +17,7 @@ class Codeur(Humain): #Le cinquième humain du jeu, à l'étage 4 (répond au no
 
         self.appreciations = [5,0,0,0,0,0,0,0,0,0]
 
-    def fuite(self,degats=0):
+    def fuite(self,degats:float=0):
         return False
 
     def start_dialogue(self): #On commence un nouveau dialogue !

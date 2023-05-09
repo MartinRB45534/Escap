@@ -44,7 +44,7 @@ class PNJ(Agissant, Interactif):
             skins.append(SKIN_STATUT_PAUME)
         return skins
 
-    def fuite(self):
+    def fuite(self,degats:float=0):
         return False
 
     def comporte_distance(self,degats:float):
@@ -56,7 +56,7 @@ class PNJ(Agissant, Interactif):
     def veut_attaquer(self,degats:float):
         return self.comportement_corps_a_corps == 0 and not self.fuite(degats)
 
-    def veut_fuir(self,degats:float):
+    def veut_fuir(self,degats:float=0):
         return self.comportement_corps_a_corps == 2 or self.fuite(degats)
 
     def get_offenses(self):

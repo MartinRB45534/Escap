@@ -28,11 +28,11 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
         #                        de fuir (se mettre à l'abri en évitant les combats),
         #                        de suivre (se déplacer avec le joueur, combattre les monstres en chemin, aller vers la sortie lorsque quelqu'un l'a trouvée)
 
-    def fuite(self,degats=0):
+    def fuite(self,degats:float=0):
         #On fuit si on est en danger (pv trop bas) à condition d'avoir un chemin de fuite
         #Pour l'instant on va juste vérifier les pv :
         taux_limite = 0.1 + 0.01*self.appreciations[2] #Quand on se hait, on devient plus suicidaire
-        return (self.pv-degats) / self.pv_max <= taux_limite
+        return (self.pv+degats) / self.pv_max <= taux_limite
 
     # /!\ Pour améliorer ça : modifier le taux limite en fonction des autres humains en danger au front et de l'appréciation qu'on a pour eux (exceptionnel, pour le cas où le paumé serait amoureux, sinon il obéit et fuit normalement)
     # et ne pas fuir s'il n'y a nulle part où fuir ou si le joueur a donné ordre de ne pas fuir et qu'on a suffisamment d'appréciation pour lui (rajouter un modificateur au taux_limite ?)

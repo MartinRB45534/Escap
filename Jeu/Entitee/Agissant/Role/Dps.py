@@ -10,4 +10,4 @@ class Dps(Bourrin):
             return 3
 
     def veut_attaquer(self,degats:float):
-        return (self.pv-degats)/self.pv_max > 0.3 #Appliquer un multiplicateur aux dégats en fonction des moyens de défense du DPS
+        return (self.pv+degats)/self.pv_max > 0.3 #Appliquer un multiplicateur aux dégats en fonction des moyens de défense du DPS

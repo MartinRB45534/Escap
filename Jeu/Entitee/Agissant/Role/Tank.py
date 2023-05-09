@@ -10,4 +10,4 @@ class Tank(Bourrin):
             return 3
 
     def veut_attaquer(self,degats:float=0):
-        return (self.pv-degats)/self.pv_max > 0.2 #Appliquer un multiplicateur aux dégats en fonction des moyens de défense du tank
+        return (self.pv+degats)/self.pv_max > 0.2 #Appliquer un multiplicateur aux dégats en fonction des moyens de défense du tank

@@ -1841,7 +1841,7 @@ class Titre(Cliquable):
         screen.blit(texte, self.position)
 
 class Affichage_perso(Proportionnel):
-    def __init__(self, perso):
+    def __init__(self, perso: PNJ):
         self.perso = perso
         self.tailles = [0, 0]
         self.position = [0, 0]
@@ -1869,7 +1869,7 @@ class Affichage_perso(Proportionnel):
                     if not case.cibles[direction][PASSE_ESCALIER]:
                         skins.append(SKINS_MURS_FACE_VUS[distance][0])
                     else:
-                        traj = joueur.controleur.get_trajet(case[0], direction)
+                        traj = joueur.controleur.get_trajet(case.position, direction)
                         if traj == "escalier bas":
                             skins.append(SKINS_ESCALIERS_BAS_FACE_VUS[distance][0])
                         elif traj == "escalier haut":
@@ -1877,7 +1877,7 @@ class Affichage_perso(Proportionnel):
                     if not case.cibles[direction-1][4]:
                         skins.append(SKINS_MURS_VUS[distance][0][0])
                     else:
-                        traj = joueur.controleur.get_trajet(case[0], direction-1)
+                        traj = joueur.controleur.get_trajet(case.position, direction-1)
                         if traj == "escalier bas":
                             skins.append(SKINS_ESCALIERS_BAS_VUS[distance][0][0])
                         elif traj == "escalier haut":
@@ -1885,7 +1885,7 @@ class Affichage_perso(Proportionnel):
                     if not case.cibles[direction-3][4]:
                         skins.append(SKINS_MURS_VUS[distance][0][1])
                     else:
-                        traj = joueur.controleur.get_trajet(case[0], direction-3)
+                        traj = joueur.controleur.get_trajet(case.position, direction-3)
                         if traj == "escalier bas":
                             skins.append(SKINS_ESCALIERS_BAS_VUS[distance][0][1])
                         elif traj == "escalier haut":
@@ -1902,7 +1902,7 @@ class Affichage_perso(Proportionnel):
                         if not case.cibles[direction][PASSE_ESCALIER]:
                             skins.append(SKINS_MURS_FACE_VUS[distance][ecart])#Rajouter aussi les distinctions des téléportations
                         else:
-                            traj = joueur.controleur.get_trajet(case[0], direction)
+                            traj = joueur.controleur.get_trajet(case.position, direction)
                             if traj == "escalier bas":
                                 skins.append(SKINS_ESCALIERS_BAS_FACE_VUS[distance][ecart])
                             elif traj == "escalier haut":
@@ -1910,7 +1910,7 @@ class Affichage_perso(Proportionnel):
                         if not case.cibles[direction-3][4]:
                             skins.append(SKINS_MURS_VUS[distance][ecart])#Pareil
                         else:
-                            traj = joueur.controleur.get_trajet(case[0], direction-3)
+                            traj = joueur.controleur.get_trajet(case.position, direction-3)
                             if traj == "escalier bas":
                                 skins.append(SKINS_ESCALIERS_BAS_VUS[distance][ecart])
                             elif traj == "escalier haut":
@@ -1926,7 +1926,7 @@ class Affichage_perso(Proportionnel):
                         if not case.cibles[direction][PASSE_ESCALIER]:
                             skins.append(SKINS_MURS_FACE_VUS[distance][ecart])
                         else:
-                            traj = joueur.controleur.get_trajet(case[0], direction)
+                            traj = joueur.controleur.get_trajet(case.position, direction)
                             if traj == "escalier bas":
                                 skins.append(SKINS_ESCALIERS_BAS_FACE_VUS[distance][ecart])
                             elif traj == "escalier haut":
@@ -1934,7 +1934,7 @@ class Affichage_perso(Proportionnel):
                         if not case.cibles[direction-1][4]:
                             skins.append(SKINS_MURS_VUS[distance][ecart])
                         else:
-                            traj = joueur.controleur.get_trajet(case[0], direction-1)
+                            traj = joueur.controleur.get_trajet(case.position, direction-1)
                             if traj == "escalier bas":
                                 skins.append(SKINS_ESCALIERS_BAS_VUS[distance][ecart])
                             elif traj == "escalier haut":

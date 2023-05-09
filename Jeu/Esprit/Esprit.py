@@ -871,10 +871,10 @@ class Esprit :
                 if position.lab in self.vue.keys():
                     importance = self.ennemis[ID_ennemi][0]
                     dangerosite = -self.ennemis[ID_ennemi][1]
-                    if importance > self.vue[position][3]["importance"]:
+                    if importance > self.vue[position]["importance",0]:
                         self.vue[position]["importance",0]=importance
                         importances.add(position)
-                    if dangerosite < self.vue[position]["dangerosite"]:
+                    if dangerosite < self.vue[position]["dangerosite",0]:
                         self.vue[position]["dangerosite",0]=dangerosite
                     if not position in dangerosites: # On peut avoir des doublons (ennemis sur les seuils par exemple)
                         dangerosites.add(position)
@@ -899,7 +899,6 @@ class Esprit :
         """'Résoud' un labyrinthe à partir de plusieurs points"""
 
         i = 0
-        trajet
             
         # On commence par 'nettoyer' les cases
         if clear:
@@ -919,10 +918,10 @@ class Esprit :
             while len(queue) :
                 position = queue.pop(0)
 
-                pos_explorables, pos_obstacle = self.positions_utilisables(position)
+                pos_explorables, pos_obstacle = self.positions_utilisables(position["position"])
 
                 for pos in pos_explorables:
-                    valeur = self.vue[position][trajet][i]*coef**pos[1]
+                    valeur = position["valeur"]*coef**pos[1]
                     if valeur*comparateur > self.vue[pos[0]][trajet,i]*comparateur:
                         self.vue[pos[0]][trajet,i] = valeur
 
@@ -935,8 +934,8 @@ class Esprit :
                             queue.insert(0,{"position":pos[0],"valeur":valeur})
 
                 for pos in pos_obstacle:
-                    valeur = self.vue[position][trajet][i]*coef**pos[1]
-                    if valeur*comparateur > self.vue[pos[0]][trajet,i+1]*comparateur:
+                    valeur = position["valeur"]*coef**pos[1]
+                    if valeur*comparateur > self.vue[pos[0]][trajet,-1]*comparateur:
                         self.vue[pos[0]][trajet,i+1] = valeur
                         obstacles.add(pos[0])
 
@@ -980,117 +979,117 @@ class Esprit :
                     queue.append(pos[0])
         return seuils
 
-    def print_vue(self):
-        for etage in self.vue.keys():
-            matrice = self.vue[etage]
-            print("Vue de l'esprit :")
-            print(self.nom)
-            for i in range(len(matrice)):
-                haut = ""
-                centre = ""
-                bas = ""
-                for j in range(len(matrice[0])):
-                    case:Representation_case = matrice[i][j]
-                    if case.clarte == 0:
-                        haut += " ~~~ "
-                        centre += ": ? :"
-                        bas += " ~~~ "
-                    else:
-                        haut+= " "
-                        if case.cibles[0]:
-                            haut += "   "
-                        else:
-                            haut += "---"
-                        haut += " "
-                        if case.cibles[3]:
-                            centre += " "
-                        else:
-                            centre += "|"
-                        if case.cibles > 0:
-                            centre += "x"
-                        else:
-                            centre += " "
-                        if case.entitees != []:
-                            occ = " "
-                            for occupant in case.entitees:
-                                if occupant in self.corps.keys():
-                                    occ = "O"
-                                elif occupant in self.ennemis.keys():
-                                    occ = "X"
-                            centre += occ
-                        else:
-                            centre += " "
-                        if case[3][1] > 0:
-                            centre += "x"
-                        else:
-                            centre += " "
-                        if case.cibles[1]:
-                            centre += " "
-                        else:
-                            centre += "|"
-                        bas += " "
-                        if case.cibles[2]:
-                            bas += "   "
-                        else:
-                            bas += "---"
-                        bas += " "
-                print(haut)
-                print(centre)
-                print(bas)
+    # def print_vue(self):
+    #     for etage in self.vue.keys():
+    #         matrice = self.vue[etage]
+    #         print("Vue de l'esprit :")
+    #         print(self.nom)
+    #         for i in range(len(matrice)):
+    #             haut = ""
+    #             centre = ""
+    #             bas = ""
+    #             for j in range(len(matrice[0])):
+    #                 case:Representation_case = matrice[i][j]
+    #                 if case.clarte == 0:
+    #                     haut += " ~~~ "
+    #                     centre += ": ? :"
+    #                     bas += " ~~~ "
+    #                 else:
+    #                     haut+= " "
+    #                     if case.cibles[0]:
+    #                         haut += "   "
+    #                     else:
+    #                         haut += "---"
+    #                     haut += " "
+    #                     if case.cibles[3]:
+    #                         centre += " "
+    #                     else:
+    #                         centre += "|"
+    #                     if case.cibles > 0:
+    #                         centre += "x"
+    #                     else:
+    #                         centre += " "
+    #                     if case.entitees != []:
+    #                         occ = " "
+    #                         for occupant in case.entitees:
+    #                             if occupant in self.corps.keys():
+    #                                 occ = "O"
+    #                             elif occupant in self.ennemis.keys():
+    #                                 occ = "X"
+    #                         centre += occ
+    #                     else:
+    #                         centre += " "
+    #                     if case[3][1] > 0:
+    #                         centre += "x"
+    #                     else:
+    #                         centre += " "
+    #                     if case.cibles[1]:
+    #                         centre += " "
+    #                     else:
+    #                         centre += "|"
+    #                     bas += " "
+    #                     if case.cibles[2]:
+    #                         bas += "   "
+    #                     else:
+    #                         bas += "---"
+    #                     bas += " "
+    #             print(haut)
+    #             print(centre)
+    #             print(bas)
 
-    def print_zones(self):
-        print(f"Vue de l'esprit {self.nom} :")
-        zones_visibles = self.salles + self.couloirs
-        zones_inconnues = self.zones_inconnues
-        for etage in self.vue.keys():
-            vue = self.vue[etage]
-            print(f"Zones de l'étage {etage} :")
-            for zones in [zones_visibles,zones_inconnues]:
-                for j in range(vue.decalage.y):
-                    haut = ""
-                    milieu = ""
-                    bas = ""
-                    for i in range(vue.decalage.x):
-                        case = vue[i,j]
-                        # Le haut
-                        haut+= " "
-                        if case.cibles[0][PASSE_ESCALIER]:
-                            haut += "   "
-                        else:
-                            haut += "---"
-                        haut += " "
-                        # La gauche
-                        if case.cibles[3][PASSE_ESCALIER]:
-                            gauche = " "
-                        else:
-                            gauche = "|"
-                        # La droite
-                        if case.cibles[1][PASSE_ESCALIER]:
-                            droite = " "
-                        else:
-                            droite = "|"
-                        # Le bas
-                        bas += " "
-                        if case.cibles[2][PASSE_ESCALIER]:
-                            bas += "   "
-                        else:
-                            bas += "---"
-                        bas += " "
-                        # Le centre
-                        for i in range(len(zones)):
-                            if case[0] in zones[i].cases or case[0] in zones[i].entrees:
-                                centre = f"{i:^{3}}"
-                                break
-                        else:
-                            if case.clarte > 0:
-                                centre = "   "
-                            else:
-                                centre = " ? "
-                        milieu += gauche + centre + droite
-                    print(haut)
-                    print(milieu)
-                    print(bas)
-                print("")
+    # def print_zones(self):
+    #     print(f"Vue de l'esprit {self.nom} :")
+    #     zones_visibles = self.salles + self.couloirs
+    #     zones_inconnues = self.zones_inconnues
+    #     for etage in self.vue.keys():
+    #         vue = self.vue[etage]
+    #         print(f"Zones de l'étage {etage} :")
+    #         for zones in [zones_visibles,zones_inconnues]:
+    #             for j in range(vue.decalage.y):
+    #                 haut = ""
+    #                 milieu = ""
+    #                 bas = ""
+    #                 for i in range(vue.decalage.x):
+    #                     case = vue[i,j]
+    #                     # Le haut
+    #                     haut+= " "
+    #                     if case.cibles[0][PASSE_ESCALIER]:
+    #                         haut += "   "
+    #                     else:
+    #                         haut += "---"
+    #                     haut += " "
+    #                     # La gauche
+    #                     if case.cibles[3][PASSE_ESCALIER]:
+    #                         gauche = " "
+    #                     else:
+    #                         gauche = "|"
+    #                     # La droite
+    #                     if case.cibles[1][PASSE_ESCALIER]:
+    #                         droite = " "
+    #                     else:
+    #                         droite = "|"
+    #                     # Le bas
+    #                     bas += " "
+    #                     if case.cibles[2][PASSE_ESCALIER]:
+    #                         bas += "   "
+    #                     else:
+    #                         bas += "---"
+    #                     bas += " "
+    #                     # Le centre
+    #                     for i in range(len(zones)):
+    #                         if case[0] in zones[i].cases or case[0] in zones[i].entrees:
+    #                             centre = f"{i:^{3}}"
+    #                             break
+    #                     else:
+    #                         if case.clarte > 0:
+    #                             centre = "   "
+    #                         else:
+    #                             centre = " ? "
+    #                     milieu += gauche + centre + droite
+    #                 print(haut)
+    #                 print(milieu)
+    #                 print(bas)
+    #             print("")
 
     def positions_utilisables(self,position:Position):
         pos_utilisables:List[tuple[Position,int]]=[]
@@ -1176,14 +1175,13 @@ class Esprit :
     def deplace(self,ID:int):
         corp:Agissant = self.controleur[ID]
         position = corp.position
-        case = corp.vue[position]
-        tcase = self.vue[position]
-        repoussante = tcase.repoussante
-        cases = [{"position":position,"direction":None}|tcase.trajets]
+        case = self.vue[position]
+        repoussante = case.repoussante
+        cases = [{"position":position,"direction":None}|case.trajets]
         dirs = []
         importance = 0
-        fuite = corp.veut_fuir(tcase[3][2])
-        attaque = corp.veut_attaquer(tcase[3][2])
+        fuite = corp.veut_fuir(case["dangerosite",0])
+        attaque = corp.veut_attaquer(case["dangerosite",0])
         res = "attente"
         for i in DIRECTIONS: #On commence par se renseigner sur les possibilités :
             mur:Union[Position,Literal[False]] = case.cibles[i][self.resolution]
@@ -1206,10 +1204,10 @@ class Esprit :
                                     elif fuite and self.fuite_utile(ID): #On veut fuire lorsqu'on croise un ennemi au corps à corps
                                         res = "fuite"
                     if libre:
-                        cases.append({"position":mur,"direction":i})
+                        cases.append({"position":mur,"direction":i}|case_pot.trajets)
                         dirs.append(i)
         if res == "attente": #Quelques comportements possibles :
-            comportement = corp.comporte_distance(tcase["dangerosite"])
+            comportement = corp.comporte_distance(case["dangerosite",0])
             if comportement == 0 : #Foncer tête baissée ! Pour les combattants au corps à corps
                 res = "deplacement"
             elif comportement == 1 or (comportement > 1 and not self.fuite_utile(ID)): #Tenter une action, puis approcher. Pour les effets à distance qui ont besoin de ne pas être trop loin.
@@ -1241,7 +1239,7 @@ class Esprit :
                                             importance = self.ennemis[ID_entitee][0]
                                             corp.attaque(i)
                                             res = "attaque"
-            elif (not any(tcase["dangerosite"])) and (not any(tcase["importance"])): #Il n'y a pas une seule dangerosité ou importance dans la case
+            elif (not any(case["dangerosite"])) and (not any(case["importance"])): #Il n'y a pas une seule dangerosité ou importance dans la case
                 res = "paix"
                 if not isinstance(corp,Sentinelle) or isinstance(corp,Humain) or repoussante:
                     res = "exploration"
@@ -1317,21 +1315,22 @@ class Esprit :
             res = "recherche"
             position = pnj.get_position()
             self.set_skip({cible},{position})
-            self.resoud(cible,1,"Recherche")
+            case:Representation_case = self.vue[position]
+            self.resoud(cible,1,"recherche")
             case:Representation_case = self.vue[position]
             repoussante = case.repoussante
             cases = [{"position":position,"direction":None}|case.trajets]
             dirs = []
             importance = 0
-            fuite = pnj.veut_fuir(case[3][2])
-            attaque = pnj.veut_attaquer(case[3][2])
+            fuite = pnj.veut_fuir(case["dangerosite",0])
+            attaque = pnj.veut_attaquer(case["dangerosite",0])
             pnj.statut_pnj = "en chemin"
-            if case[3][4] == 0:
+            if case["recherche"] == 0:
                 pnj.statut_pnj = "perdu"
-                if pnj.ID == 4:
+                if pnj.ID == 4: # /!\ Remplacer par une propriété du PNJ
                     pnj.statut_pnj = "paume"
             for i in DIRECTIONS:
-                mur = case.cibles[i][self.resolution]
+                mur:Union[Position,Literal[False]] = case.cibles[i][self.resolution]
                 if mur:
                     if mur.lab in self.vue.keys():
                         case_pot = self.vue[mur]
@@ -1350,25 +1349,27 @@ class Esprit :
                                                 res = "attaque"
                                         elif fuite : #Et un ordre de fuite !
                                             res = "fuite"
-                                    elif pnj.mouvement == 2 and ID_entitee == pnj.cible_deplacement and ID_entitee == self.controleur.joueur.ID and pnj.peut_voir(i): #Le PNJs peut enfin parler au joueur
-                                        self.controleur.joueur.interlocuteur = pnj
-                                        self.controleur.set_phase(DIALOGUE)
-                                        pnj.start_dialogue()
-                                        pnj.dir_regard = i
-                                        self.controleur.joueur.dir_regard = i.oppose()
-                                        pnj.mouvement = 0
-                                    elif pnj.mouvement == 2 and ID_entitee == pnj.cible_deplacement and isinstance(self.controleur[ID_entitee], PNJ) and pnj is self.controleur.joueur and pnj.peut_voir(i): #Le joueur peut enfin parler au PNJ
-                                        pnj.interlocuteur = self.controleur[ID_entitee]
-                                        self.controleur.set_phase(DIALOGUE)
-                                        self.controleur[ID_entitee].start_dialogue()
-                                        pnj.dir_regard = i
-                                        self.controleur[ID_entitee].dir_regard = i.oppose()
-                                        pnj.mouvement = 0
+                                    elif pnj.mouvement == 2 and ID_entitee == pnj.cible_deplacement:
+                                        entitee = self.controleur[ID_entitee]
+                                        if entitee == self.controleur.joueur and pnj.peut_voir(i): #Le PNJ peut enfin parler au joueur
+                                            self.controleur.joueur.interlocuteur = pnj
+                                            self.controleur.set_phase(DIALOGUE)
+                                            pnj.start_dialogue()
+                                            pnj.dir_regard = i
+                                            self.controleur.joueur.dir_regard = i.oppose()
+                                            pnj.mouvement = 0
+                                        elif isinstance(entitee, PNJ) and isinstance(pnj, PJ) and pnj is self.controleur.joueur and pnj.peut_voir(i): #Le joueur peut enfin parler au PNJ
+                                            pnj.interlocuteur = entitee
+                                            self.controleur.set_phase(DIALOGUE)
+                                            pnj.interlocuteur.start_dialogue()
+                                            pnj.dir_regard = i
+                                            pnj.interlocuteur.dir_regard = i.oppose()
+                                            pnj.mouvement = 0
                         if libre:
-                            cases.append([i,case_pot[0],case_pot[3][0],case_pot[3][1],-case_pot[3][2],case_pot[3][2],-case_pot[3][3],case_pot[3][3],case_pot[3][4]])
+                            cases.append({"position":mur,"direction":i}|case_pot.trajets)
                             dirs.append(i)
             if res == "recherche": #On n'a pas d'ennemi à portée directe (ou on ne souhaite pas attaquer ni fuir)
-                comportement = pnj.comporte_distance(case[3][2])
+                comportement = pnj.comporte_distance(case["dangerosite",0])
                 if comportement == 0 : #Foncer tête baissée ! Pour les combattants au corps à corps
                     res = "deplacement"
                 elif comportement == 1: #Tenter une action, puis approcher. Pour les effets à distance qui ont besoin de ne pas être trop loin.
@@ -1382,10 +1383,11 @@ class Esprit :
                 elif comportement == 3 : #La fuite ! Quand les pvs sont bas
                     res = "fuite"
                 if len(cases) == 1: #Pas de cases libres à proximité, on va essayer d'attaquer pour s'en sortir
+                    res = "bloqué"
                     pnj.skill_courant = None
                     importance = 0
                     for i in DIRECTIONS:
-                        mur = case.cibles[i][self.resolution]
+                        mur:Union[Position,Literal[False]] = case.cibles[i][self.resolution]
                         if mur:
                             if mur.lab in self.vue.keys():
                                 case_pot = self.vue[mur]
@@ -1399,13 +1401,13 @@ class Esprit :
                                                 importance = self.ennemis[ID_entitee][0]
                                                 pnj.attaque(i)
                                                 res = "attaque"
-                elif not(case[3] or case.cibles) and pnj.statut_pnj == "perdu":
+                elif  (not any(case["dangerosite"])) and (not any(case["importance"])) and pnj.statut_pnj == "perdu":
                     res = "paix"
                     if not isinstance(pnj,Sentinelle) or repoussante:
                         res = "exploration"
                         if len(dirs)>1: #On peut se permettre de choisir
                             if pnj.dir_regard != None: #L'agissant regarde quelque part
-                                dir_back = pnj.dir_regard+2
+                                dir_back = pnj.dir_regard.oppose()
                                 if dir_back in dirs: #On ne veut pas y retourner
                                     dirs.remove(dir_back)
                         pnj.va(dirs[random.randint(0,len(dirs)-1)]) #/!\ Ne pas retourner sur ses pas, c'est bien ! Aller vers les endroits inconnus, ce serait mieux. /!\
@@ -1415,7 +1417,7 @@ class Esprit :
                         res = "exploration"
                         if len(dirs)>1: #On peut se permettre de choisir
                             if pnj.dir_regard != None: #L'agissant regarde quelque part
-                                dir_back = pnj.dir_regard+2
+                                dir_back = pnj.dir_regard.oppose()
                                 if dir_back in dirs: #On ne veut pas y retourner
                                     dirs.remove(dir_back)
                         pnj.va(dirs[random.randint(0,len(dirs)-1)]) #/!\ Ne pas retourner sur ses pas, c'est bien ! Aller vers les endroits inconnus, ce serait mieux. /!\
@@ -1423,20 +1425,18 @@ class Esprit :
                     if repoussante:
                         cases.pop(0)
                     if res == "deplacement":
+                        new_cases = sorted(cases,key=operator.itemgetter("importance","dangerosite"))
                         res = "approche"
-                        new_cases = sorted(cases,key=operator.itemgetter(8,2,3,4,6))
-                        if new_cases[-1][0] != -1: #La dernière case (i.e. les valeurs les plus élevées) n'est pas celle où l'on est
-                            pnj.va(new_cases[-1][0])
+                        if new_cases[-1]["direction"]: #La dernière case (i.e. les valeurs les plus élevées) n'est pas celle où l'on est
+                            pnj.va(new_cases[-1]["direction"])
                             if ID == 4:
                                 constantes_deplacements.append([self.controleur.nb_tours,"deplacement loin",pnj.dir_regard,new_cases])
                         else:
                             res = pnj.agit_en_vue(self)
                     elif res == "fuite":
-                        for case in cases:
-                            case[8] *= -1
-                        new_cases = sorted(cases,key=operator.itemgetter(8,5,7,2,3))
-                        if new_cases[0][0] != -1: #La première case (i.e. les valeurs les moins élevées) n'est pas celle où l'on est
-                            pnj.va(new_cases[0][0])
+                        new_cases = sorted(cases,key=operator.itemgetter("dangerosite","importance")) #2 pour le chemin d'accès indirect, 3 pour le chemin d'accès direct
+                        if new_cases[-1]["direction"]: #La première case (i.e. les valeurs les moins élevées) n'est pas celle où l'on est
+                            pnj.va(new_cases[-1]["direction"])
                             if ID == 4:
                                 constantes_deplacements.append([self.controleur.nb_tours,"fuite loin",pnj.dir_regard,new_cases])
                         else:
@@ -1453,26 +1453,26 @@ class Esprit :
                     portee = 7
                 else:
                     cible = pj.get_position()
-                    portee = 2 #C'est juste pour qu'il puisse aller où il veut
+                    portee = 1 #C'est juste pour qu'il puisse aller où il veut
             elif isinstance(pj.cible_deplacement,Position):
                 cible = pj.cible_deplacement
                 portee = 5
             pos_cibles = self.controleur.get_pos_touches(cible,portee,propagation = "C__S___",direction = None,traverse="tout",responsable=0)
         elif pj.mouvement == 1:
             cible = pj.get_position()
-            portee = 2 #C'est juste pour qu'il puisse aller où il veut
+            portee = 1 #C'est juste pour qu'il puisse aller où il veut
             pj.statut_pnj = "exploration"
         elif pj.mouvement == 2:
             if isinstance(pj.cible_deplacement,int):
                 if not(self.controleur.est_item(pj.cible_deplacement)):
                     cible = self.controleur[pj.cible_deplacement].get_position()
-                    portee = 1
+                    portee = 0
                 else:
                     cible = pj.get_position()
-                    portee = 2 #C'est juste pour qu'il puisse aller où il veut
+                    portee = 1 #C'est juste pour qu'il puisse aller où il veut
             elif isinstance(pj.cible_deplacement,Position):
                 cible = pj.cible_deplacement
-                portee = 1
+                portee = 0
         elif pj.mouvement == 3:
             pj.statut_pnj = "attente"
             return
@@ -1483,21 +1483,21 @@ class Esprit :
             res = "recherche"
             position = pj.get_position()
             self.set_skip({cible},{position})
-            self.resoud(cible,10,"Recherche")
-            case = self.vue[position]
+            self.resoud(cible,1,"recherche")
+            case:Representation_case = self.vue[position]
             repoussante = case.repoussante
-            cases = [[-1,case[0],case[3][0],case[3][1],-case[3][2],case[3][2],-case[3][3],case[3][3],case[3][4]]]
+            cases = [{"position":position,"direction":None}|case.trajets]
             dirs = []
             importance = 0
-            fuite = pj.veut_fuir(case[3][2])
-            attaque = pj.veut_attaquer(case[3][2])
+            fuite = pj.veut_fuir(case["dangerosite",0])
+            attaque = pj.veut_attaquer(case["dangerosite",0])
             pj.statut_pnj = "en chemin"
-            if case[3][4] == 0:
+            if case["recherche"] == 0:
                 pj.statut_pnj = "perdu"
                 if pj.ID == 4:
                     pj.statut_pnj = "paume"
             for i in DIRECTIONS:
-                mur = case.cibles[i][self.resolution]
+                mur:Union[Position,Literal[False]] = case.cibles[i][self.resolution]
                 if mur:
                     if mur.lab in self.vue.keys():
                         case_pot = self.vue[mur]
@@ -1517,10 +1517,10 @@ class Esprit :
                                         elif fuite : #Et un ordre de fuite !
                                             res = "fuite"
                         if libre:
-                            cases.append([i,case_pot[0],case_pot[3][0],case_pot[3][1],-case_pot[3][2],case_pot[3][2],-case_pot[3][3],case_pot[3][3],case_pot[3][4]])
+                            cases.append({"position":mur,"direction":i}|case_pot.trajets)
                             dirs.append(i)
             if res == "recherche": #On n'a pas d'ennemi à portée directe (ou on ne souhaite pas attaquer ni fuir)
-                comportement = pj.comporte_distance(case[3][2])
+                comportement = pj.comporte_distance(case["dangerosite",0])
                 if comportement == 0 : #Foncer tête baissée ! Pour les combattants au corps à corps
                     res = "deplacement"
                 elif comportement == 1: #Tenter une action, puis approcher. Pour les effets à distance qui ont besoin de ne pas être trop loin.
@@ -1534,10 +1534,11 @@ class Esprit :
                 elif comportement == 3 : #La fuite ! Quand les pvs sont bas
                     res = "fuite"
                 if len(cases) == 1: #Pas de cases libres à proximité, on va essayer d'attaquer pour s'en sortir
+                    res = "bloqué"
                     pj.skill_courant = None
                     importance = 0
                     for i in DIRECTIONS:
-                        mur = case.cibles[i][self.resolution]
+                        mur:Union[Position,Literal[False]] = case.cibles[i][self.resolution]
                         if mur:
                             if mur.lab in self.vue.keys():
                                 case_pot = self.vue[mur]
@@ -1551,13 +1552,13 @@ class Esprit :
                                                 importance = self.ennemis[ID_entitee][0]
                                                 pj.simule_attaque(i)
                                                 res = "attaque"
-                elif not(case[3] or case.cibles) and pj.statut_pnj == "perdu":
+                elif (not any(case["dangerosite"])) and (not any(case["importance"])) == "perdu":
                     res = "paix"
                     if not isinstance(pj,Sentinelle) or repoussante:
                         res = "exploration"
                         if len(dirs)>1: #On peut se permettre de choisir
                             if pj.dir_regard != None: #L'agissant regarde quelque part
-                                dir_back = pj.dir_regard+2
+                                dir_back = pj.dir_regard.oppose()
                                 if dir_back in dirs: #On ne veut pas y retourner
                                     dirs.remove(dir_back)
                         pj.simule_va(dirs[random.randint(0,len(dirs)-1)]) #/!\ Ne pas retourner sur ses pas, c'est bien ! Aller vers les endroits inconnus, ce serait mieux. /!\
@@ -1567,7 +1568,7 @@ class Esprit :
                         res = "exploration"
                         if len(dirs)>1: #On peut se permettre de choisir
                             if pj.dir_regard != None: #L'agissant regarde quelque part
-                                dir_back = pj.dir_regard+2
+                                dir_back = pj.dir_regard.oppose()
                                 if dir_back in dirs: #On ne veut pas y retourner
                                     dirs.remove(dir_back)
                         pj.simule_va(dirs[random.randint(0,len(dirs)-1)]) #/!\ Ne pas retourner sur ses pas, c'est bien ! Aller vers les endroits inconnus, ce serait mieux. /!\
@@ -1575,32 +1576,29 @@ class Esprit :
                     if repoussante:
                         cases.pop(0)
                     if res == "deplacement":
+                        new_cases = sorted(cases,key=operator.itemgetter("importance","dangerosite"))
                         res = "approche"
-                        new_cases = sorted(cases,key=operator.itemgetter(8,2,3,4,6))
-                        if new_cases[-1][0] != -1: #La dernière case (i.e. les valeurs les plus élevées) n'est pas celle où l'on est
-                            pj.simule_va(new_cases[-1][0])
+                        if new_cases[-1]["direction"]: #La dernière case (i.e. les valeurs les plus élevées) n'est pas celle où l'on est
+                            pj.simule_va(new_cases[-1]["direction"])
                         else:
                             res = pj.simule_agit_en_vue(self)
                     elif res == "fuite":
-                        for case in cases:
-                            case[8] *= -1
-                        new_cases = sorted(cases,key=operator.itemgetter(8,5,7,2,3))
-                        if new_cases[0][0] != -1: #La première case (i.e. les valeurs les moins élevées) n'est pas celle où l'on est
-                            pj.simule_va(new_cases[0][0])
+                        new_cases = sorted(cases,key=operator.itemgetter("dangerosite","importance")) #2 pour le chemin d'accès indirect, 3 pour le chemin d'accès direct
+                        if new_cases[-1]["direction"]: #La première case (i.e. les valeurs les moins élevées) n'est pas celle où l'on est
+                            pj.simule_va(new_cases[-1]["direction"])
                         else:
                             res = pj.simule_agit_en_vue(self)
 
     def simule_deplace(self,ID:int):
         pj:PJ = self.controleur[ID]
         position = pj.position
-        case = pj.vue[position]
-        tcase = self.vue[position]
-        repoussante = tcase.repoussante
-        cases = [[-1,tcase[0],tcase[3][0],tcase[3][1],-tcase[3][2],tcase[3][2],-tcase[3][3],tcase[3][3]]]
+        case = self.vue[position]
+        repoussante = case.repoussante
+        cases = [{"position":position,"direction":None}|case.trajets]
         dirs = []
         importance = 0
-        fuite = pj.veut_fuir(tcase[3][2])
-        attaque = pj.veut_attaquer(tcase[3][2])
+        fuite = pj.veut_fuir(case["dangerosite",0])
+        attaque = pj.veut_attaquer(case["dangerosite",0])
         res = "attente"
         for i in DIRECTIONS: #On commence par se renseigner sur les possibilités :
             mur:Union[Position,Literal[False]] = case.cibles[i][self.resolution]
@@ -1623,10 +1621,10 @@ class Esprit :
                                     elif fuite and self.fuite_utile(ID): #On veut fuire lorsqu'on croise un ennemi au corps à corps
                                         res = "fuite"
                     if libre:
-                        cases.append([i,case_pot[0],case_pot[3][0],case_pot[3][1],-case_pot[3][2],case_pot[3][2],-case_pot[3][3],case_pot[3][3]])
+                        cases.append({"position":mur,"direction":i}|case_pot.trajets)
                         dirs.append(i)
         if res == "attente": #Quelques comportements possibles :
-            comportement = pj.comporte_distance(tcase[3][2])
+            comportement = pj.comporte_distance(case["dangerosite",0])
             if comportement == 0 : #Foncer tête baissée ! Pour les combattants au corps à corps
                 res = "deplacement"
             elif comportement == 1 or (comportement > 1 and not self.fuite_utile(ID)): #Tenter une action, puis approcher. Pour les effets à distance qui ont besoin de ne pas être trop loin.
@@ -1658,13 +1656,13 @@ class Esprit :
                                             importance = self.ennemis[ID_entitee][0]
                                             pj.simule_attaque(i)
                                             res = "attaque"
-            elif tcase[3][1] == 0: #Et tcase[3] forcément aussi par la même occasion, donc on est totalement libre de chercher
+            elif (not any(case["dangerosite"])) and (not any(case["importance"])): #Et case[3] forcément aussi par la même occasion, donc on est totalement libre de chercher
                 res = "paix"
                 if not isinstance(pj,Sentinelle) or isinstance(pj,Humain) or repoussante:
                     res = "exploration"
                     if len(dirs)>1: #On peut se permettre de choisir
                         if pj.dir_regard != None: #L'agissant regarde quelque part
-                            dir_back = pj.dir_regard+2
+                            dir_back = pj.dir_regard.oppose()
                             if dir_back in dirs: #On ne veut pas y retourner
                                 dirs.remove(dir_back)
                     pj.simule_va(dirs[random.randint(0,len(dirs)-1)]) #/!\ Ne pas retourner sur ses pas, c'est bien ! Aller vers les endroits inconnus, ce serait mieux. /!\
@@ -1674,16 +1672,16 @@ class Esprit :
                 if repoussante: #On ne veut pas rester en place
                     cases.pop(0)
                 if res == "deplacement":
-                    new_cases = sorted(cases,key=operator.itemgetter(2,3,4,6)) #2 pour le chemin d'accès indirect, 3 pour le chemin d'accès direct
+                    new_cases = sorted(cases,key=operator.itemgetter("importance","dangerosite")) #2 pour le chemin d'accès indirect, 3 pour le chemin d'accès direct
                     res = "approche"
-                    if new_cases[-1].position != -1: #La dernière case (i.e. les valeurs les plus élevées) n'est pas celle où l'on est
-                        pj.simule_va(new_cases[-1].position)
+                    if new_cases[-1]["direction"] != -1: #La dernière case (i.e. les valeurs les plus élevées) n'est pas celle où l'on est
+                        pj.simule_va(new_cases[-1]["direction"])
                     else:
                         res = pj.simule_agit_en_vue(self)
                 elif res == "fuite":
-                    new_cases = sorted(cases,key=operator.itemgetter(5,7,2,3)) #2 pour le chemin d'accès indirect, 3 pour le chemin d'accès direct
-                    if new_cases[0].position != -1: #La première case (i.e. les valeurs les moins élevées) n'est pas celle où l'on est
-                        pj.simule_va(new_cases[0].position)
+                    new_cases = sorted(cases,key=operator.itemgetter("dangerosite","importance")) #2 pour le chemin d'accès indirect, 3 pour le chemin d'accès direct
+                    if new_cases[-1]["direction"] != -1: #La première case (i.e. les valeurs les moins élevées) n'est pas celle où l'on est
+                        pj.simule_va(new_cases[-1]["direction"])
                         if ID == 4:
                             constantes_deplacements.append([self.controleur.nb_tours,"fuite",pj.dir_regard,new_cases])
                     else:
@@ -1692,7 +1690,7 @@ class Esprit :
     def oublie(self):
         anciennes_cases = []
         for case in self.vue:
-            if case.oublie():
+            if case.oublie(self.oubli):
                 anciennes_cases.append(case.position)
 
         self.downdate_zones(anciennes_cases)
