@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List, TYPE_CHECKING
+from typing import List, TYPE_CHECKING, Set
 
 if TYPE_CHECKING:
     from Jeu.Entitee.Entitees import *
@@ -19,7 +19,7 @@ class Case:
         self.opacite_bonus = 0
         self.niveau = niveau
         self.element = element
-        self.clarte = 0
+        self.clarte:float = 0
         self.code = 0
         self.repoussante = False
         self.effets = [] #Les cases ont aussi des effets ! Les auras, par exemple.
@@ -205,7 +205,7 @@ class Case:
     def murs_pleins(self):
         directions = []
         for direction in DIRECTIONS:
-            if self.mur_plein[direction]:
+            if self.mur_plein(direction):
                 directions.append(direction)
         return directions
 
@@ -233,13 +233,13 @@ class Case:
     def get_opacite(self):
         return self.opacite + self.opacite_bonus
 
-    def get_infos(self,clees:List[str]): #Est-ce que ce serait plus clair sous forme de dictionnaire ? Ou d'objet ?
+    def get_infos(self,clees:Set[str]): #Est-ce que ce serait plus clair sous forme de dictionnaire ? Ou d'objet ?
         return Representation_case(self.position, self.clarte, self.calcule_code(), self.get_cibles_fermes(clees), self.get_codes_effets(), self.repoussante)
 
     def calcule_code(self):#La fonction qui calcule le code correpondant à l'état de la case. De base, 0. Modifié d'après les effets subits par la case.
         return self.code
 
-    def get_cibles_fermes(self,clees:List[str]):
+    def get_cibles_fermes(self,clees:Set[str]):
         return [self[i].get_cible_ferme(clees) for i in DIRECTIONS]
 
     def get_codes_effets(self) -> List[List[int]]:

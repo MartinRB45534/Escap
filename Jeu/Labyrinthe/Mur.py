@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List, TYPE_CHECKING, Literal
+from typing import List, TYPE_CHECKING, Literal, Set
 
 if TYPE_CHECKING:
     from Jeu.Entitee.Entitees import *
@@ -23,7 +23,7 @@ class Mur:
                 ferme = True
         return ferme
 
-    def get_blocage(self,clees:List[str]):
+    def get_blocage(self,clees:Set[str]):
         blocage = None
         for effet in self.effets :
             if isinstance(effet,Mur_impassable):
@@ -58,9 +58,9 @@ class Mur:
             for effet in self.effets :
                 if isinstance(effet,On_through):
                     effet.execute(intrus) #Il est conseillé d'avoir un seul effet de déplacement, comme un seul effet d'autorisation de passage...
-            if issubclass(intrus.get_classe(),Item):
+            if issubclass(intrus.get_classe(),Item) and isinstance(intrus,Item):
                 intrus.vole()
-        elif issubclass(intrus.get_classe(),Item):
+        elif issubclass(intrus.get_classe(),Item) and isinstance(intrus,Item):
             intrus.heurte_mur()
 
     def peut_voir(self):
@@ -88,9 +88,9 @@ class Mur:
             if isinstance(effet,On_try_through) and not isinstance(effet,Mur_impassable) :
                 self.effets.remove(effet)
 
-    def cree_porte(self,code:str,porte:Porte=None):
+    def cree_porte(self,code:str,porte:Optional[Type[Porte]]=None):
         self.brise()
-        if porte == None:
+        if porte is None:
             self.effets.append(Porte(self.niveau,code))
         else:
             self.effets.append(porte(self.niveau,code))
@@ -118,7 +118,7 @@ class Mur:
             i += 1
         return cible
 
-    def get_cible_ferme(self,clees:List[str]) -> List[Position|Literal[False]]:
+    def get_cible_ferme(self,clees:Set[str]) -> List[Position|Literal[False]]:
         return [self.get_cible_ferme_simple(),self.get_cible_ferme_portes(clees),self.get_cible_ferme_portails(),self.get_cible_ferme_portes_portails(clees),self.get_cible_ferme_escaliers(clees)]
 
     def get_cible_ferme_simple(self):
@@ -133,7 +133,7 @@ class Mur:
             return False
         return cible
 
-    def get_cible_ferme_portes(self,clees:List[str]):
+    def get_cible_ferme_portes(self,clees:Set[str]):
         """Renvoie aussi la position si le mur est une porte dont l'agissant a la clé"""
         cible = True
         for effet in self.effets :
@@ -157,7 +157,7 @@ class Mur:
             return False
         return cible
 
-    def get_cible_ferme_portes_portails(self,clees:List[str]):
+    def get_cible_ferme_portes_portails(self,clees:Set[str]):
         """Renvoie aussi la position si le mur est un téléporteur ou une porte dont l'agissant a la clé"""
         cible = True
         for effet in self.effets :
@@ -169,7 +169,7 @@ class Mur:
             return False
         return cible
 
-    def get_cible_ferme_escaliers(self,clees:List[str]):
+    def get_cible_ferme_escaliers(self,clees:Set[str]):
         """Renvoie aussi la position si le mur est un téléporteur ou une porte dont l'agissant a la clé"""
         cible = True
         for effet in self.effets :
@@ -181,31 +181,29 @@ class Mur:
             return False
         return cible
 
-    def set_cible(self,position:Position,surnaturel=False,portail=None):
+    def set_cible(self,position:Position,surnaturel=False,portail:Type[Teleport]=Teleport):
         for effet in self.effets:
             if isinstance(effet,Teleport):
                 self.effets.remove(effet)
-        if portail == None:
-            portail = Teleport
         self.effets.append(portail(position,surnaturel))
 
-    def set_escalier(self,position:Position,sens:Direction,escalier=None):
+    def set_escalier(self,position:Position,sens:Direction,escalier:Type[Escalier]=Escalier):
         for effet in self.effets:
             if isinstance(effet,Teleport):
                 self.effets.remove(effet)
-        if escalier == None:
-            escalier = Escalier
         self.effets.append(escalier(position,sens))
 
     def get_mur_oppose(self):
+        if self.controleur is None:
+            raise Exception("Le mur n'est pas dans un controleur")
         mur_oppose = None
         cible = self.get_cible()
-        if cible != None:
-            case_cible = self.controleur[cible]
+        if cible is not None:
+            case_cible = self.controleur.case_from_position(cible)
             for mur in case_cible.murs :
                 cible_potentielle = mur.get_cible()
-                if cible_potentielle != None:
-                    case_cible_potentielle = self.controleur[cible_potentielle]
+                if cible_potentielle is not None:
+                    case_cible_potentielle = self.controleur.case_from_position(cible_potentielle)
                     if self in case_cible_potentielle.murs:
                         mur_oppose = mur
         return mur_oppose

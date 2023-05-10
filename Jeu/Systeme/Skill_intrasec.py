@@ -28,15 +28,8 @@ class Skill_intrasec:
         """fonction qui procède à l'évolution"""
         for i in range(nb_evo):
             for cadeau in self.cad_evo[self.niveau]:
-                """if issubclass(cadeau,Classe):
-                    self.sous_classes.append(cadeau)
-                    cadeau.evo() #La classe devrait encore être au niveau 0
-                elif issubclass(cadeau,Skill):
-                    self.skills.append(cadeau)
-                    cadeau.evo() #Le skill devrait encore être au niveau 0
-                el"""
                 if isinstance(cadeau,int): #comment faire pour les autres types de cadeaux ?
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -50,6 +43,10 @@ class Skills_offensifs(Skill_intrasec):
 class Skills_projectiles(Skill_intrasec):
     """La classe des skills qui lancent un objet."""
 
+    def utilise(self) -> Tuple[float, float, float]:
+        """Utilise le skill, et renvoie l'objet lancé"""
+        raise NotImplementedError
+
 class Skills_magiques(Skill_intrasec):
     """La classe des skills qui lancent une magie"""
     def __init__(self): #On précise les magies directement disponibles. D'autres peuvent être acquisent en cours de jeu dans le cas du joueur. magies est un dictionnaire, les clées sont les noms des magies.
@@ -57,6 +54,10 @@ class Skills_magiques(Skill_intrasec):
         self.magies={}
         self.latence = 0 #La latence dépend du sort utilisé
         self.gain_xp = 0 #L'xp dépend du sort utilisé et du mana dépensé
+
+    def ajoute(self,magie:Magie):
+        """Ajoute une magie au skill"""
+        self.magies[magie.nom]=magie
 
     def menu_magie(self) -> List[Magie]:
         """Renvoie la liste des magies que le skill peut lancer"""
@@ -178,7 +179,7 @@ class Skill_boost_explosifs(Skill_intrasec):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int): #comment faire pour les autres types de cadeaux ?
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -213,7 +214,7 @@ class Skill_boost_fleches(Skill_intrasec):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int): #comment faire pour les autres types de cadeaux ?
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -248,7 +249,7 @@ class Skill_boost_fleches_sniper(Skill_intrasec):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int): #comment faire pour les autres types de cadeaux ?
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -281,7 +282,7 @@ class Skill_boost_epee(Skill_intrasec):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int): #comment faire pour les autres types de cadeaux ?
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -312,7 +313,7 @@ class Skill_boost_lance(Skill_intrasec):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int): #comment faire pour les autres types de cadeaux ?
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -343,7 +344,7 @@ class Skill_boost_bouclier(Skill_intrasec):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int): #comment faire pour les autres types de cadeaux ?
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -375,7 +376,7 @@ class Skill_boost_armes(Skill_intrasec):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int): #comment faire pour les autres types de cadeaux ?
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -408,7 +409,7 @@ class Skill_boost_enchantements(Skill_intrasec):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int): #comment faire pour les autres types de cadeaux ?
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -441,7 +442,7 @@ class Skill_boost_soutien(Skill_intrasec):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int): #comment faire pour les autres types de cadeaux ?
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -474,7 +475,7 @@ class Skill_boost_ange(Skill_intrasec):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int): #comment faire pour les autres types de cadeaux ?
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -511,7 +512,7 @@ class Skill_soin(Skill_intrasec):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int): #comment faire pour les autres types de cadeaux ?
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -548,7 +549,7 @@ class Skill_regeneration_MP(Skill_intrasec):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int): #comment faire pour les autres types de cadeaux ?
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -605,7 +606,7 @@ class Skill_boost_elementaliste(Skill_intrasec):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int): #comment faire pour les autres types de cadeaux ?
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -638,7 +639,7 @@ class Skill_boost_elemental(Skill_intrasec):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int): #comment faire pour les autres types de cadeaux ?
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -699,7 +700,7 @@ class Skill_boost_magicien(Skill_intrasec):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int): #comment faire pour les autres types de cadeaux ?
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -753,7 +754,7 @@ class Skill_boost_necromancien(Skill_intrasec):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int): #comment faire pour les autres types de cadeaux ?
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -796,7 +797,7 @@ class Skill_reanimation(Skill_intrasec):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int): #comment faire pour les autres types de cadeaux ?
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -805,7 +806,7 @@ class Skill_reanimation(Skill_intrasec):
             self.latence -= 1
 
     def utilise(self):
-        self.xp_new += self.xp
+        self.xp_new += self.gain_xp
         return self.latence, self.taux_vie_rendue, self.superiorite
 
 class Skill_boost_maitre_de_la_mort(Skill_intrasec):
@@ -836,7 +837,7 @@ class Skill_boost_maitre_de_la_mort(Skill_intrasec):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int): #comment faire pour les autres types de cadeaux ?
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -858,7 +859,7 @@ class Skill_boost_maitre_de_la_mort(Skill_intrasec):
         zone += self.boost_zone_sort
         return latence, cout, portee, zone, self.boost_portee_aura, self.boost_portee_reanimation_de_masse, self.boost_priorite_reanimation, self.boost_coef_immortalite #On peut appeler le skill plusieurs fois par tour, pour déclencher un gain d'xp à chaque fois.
 
-class Skill_reanimation_renforcee(Skill_intrasec):
+class Skill_reanimation_renforcee(Skill_reanimation):
     """Un skill qui premet de ramener les morts à la vie. Ce skill une version plus faible (sur un cadavre à la fois) du sort de réanimation de zone. Contrairement au sort de résurection, la cible ne revient pas à son état d'origine : seule une partie de sa vie lui est rendue, il obtient l'espèce mort_vivant et peut être conveti à la cause du nécromancien. C'est un skill intrasec à la classe Maitre de la mort."""
     def __init__(self):
         Skill_intrasec.__init__(self)
@@ -882,7 +883,7 @@ class Skill_reanimation_renforcee(Skill_intrasec):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int): #comment faire pour les autres types de cadeaux ?
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -890,7 +891,7 @@ class Skill_reanimation_renforcee(Skill_intrasec):
             self.superiorite -= 1
 
     def utilise(self): #Ce skill remplace automatiquement (?) le skill de réanimation dans le skill clavier.
-        self.xp_new += self.xp
+        self.xp_new += self.gain_xp
         return self.taux_vie_rendue, self.superiorite
 
 class Skill_boost_instakill(Skill_intrasec):
@@ -913,7 +914,7 @@ class Skill_boost_instakill(Skill_intrasec):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int): #comment faire pour les autres types de cadeaux ?
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -943,7 +944,7 @@ class Skill_boost_vol(Skill_intrasec):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int): #comment faire pour les autres types de cadeaux ?
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -973,7 +974,7 @@ class Skill_merge(Skill_intrasec):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int): #comment faire pour les autres types de cadeaux ?
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -1005,7 +1006,7 @@ class Skill_absorb(Skill_intrasec):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int): #comment faire pour les autres types de cadeaux ?
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -1037,7 +1038,7 @@ class Skill_divide(Skill_intrasec):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int): #comment faire pour les autres types de cadeaux ?
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
