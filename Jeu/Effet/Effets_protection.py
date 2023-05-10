@@ -47,7 +47,7 @@ class Protection_groupe(One_shot,On_post_action):
     def action(self,porteur):
         nom_esprit = porteur.esprit
         cibles = []
-        if nom_esprit != None:
+        if nom_esprit is not None:
             esprit = porteur.controleur.get_esprit(nom_esprit)
             cibles = esprit.get_corps()
         else:
@@ -66,7 +66,7 @@ class Protection_bouclier(Time_limited,On_attack):
         self.directions = directions
 
     def action(self,attaque):
-        if attaque.direction == None:
+        if attaque.direction is None:
             print("ATTENTION : attaque sans direction ! Je n'intercepte pas.")
         elif attaque.oppose() in self.directions:
             self.bouclier.intercepte(attaque)

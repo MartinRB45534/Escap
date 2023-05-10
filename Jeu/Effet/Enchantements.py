@@ -71,7 +71,7 @@ class Enchantement_confusion(Enchantement,On_post_decision):
     def action(self,agissant):
         if self.phase == "en cours":
             dir_voulue = agissant.dir_regard
-            if random.random() < self.taux_erreur and dir_voulue != None and agissant.latence <= 0 :
+            if random.random() < self.taux_erreur and dir_voulue is not None and agissant.latence <= 0 :
                 dir_possibles = [Direction(i) for i in range(NB_DIRECTIONS)]
                 dir_possibles.remove(dir_voulue)
                 agissant.regarde(dir_possibles[random.randint(0,2)])

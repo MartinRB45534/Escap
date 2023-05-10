@@ -10,13 +10,13 @@ from Jeu.Entitee.Agissant.Role.Roles import *
 
 class Slime(Dps):
     """Un tas de gelée. Faible, tant qu'il est tout seul et de bas niveau..."""
-    def __init__(self,controleur:Controleur,position:Position,niveau:int):
+    def __init__(self,controleur:Controleur,position:Optional[Position]=None,niveau:int):
         Agissant.__init__(self,controleur,position,"slime",niveau)
 
     def get_offenses(self):
         offenses = self.offenses
         self.offenses = []
-        if self.etat != "vivant" or self.controleur == None:
+        if self.etat != "vivant" or self.controleur is None:
             etat = "incapacite"
         elif self.pv <= self.pv_max//9:
             etat = "fuite"

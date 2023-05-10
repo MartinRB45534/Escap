@@ -8,7 +8,7 @@ from Jeu.Entitee.Agissant.Humain.Humain import *
 
 class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2 (complêtement paumé, rejoint le joueur sauf rares exceptions)
     """La classe du mec paumé."""
-    def __init__(self,controleur:Controleur,position:Position):
+    def __init__(self,controleur:Controleur,position:Optional[Position]=None):
 
         self.identite = 'paume'
         self.place = 2
@@ -143,7 +143,7 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
             self.repliques = ["dialogue2reponse1.3.1.1","dialogue2reponse1.3.1.2"]
         elif replique == "dialogue2reponse1.3.2":
             self.replique = "dialogue2phrase1.3.2" #/!\ Modifier pour mentionner l'attaque avec une arme quand les skins auront été créés
-            if self.controleur[5].esprit == "heros":
+            if self.controleur.entitees[5].esprit == "heros":
                 self.replique = "dialogue2phrase1.3.2/peureuse"
             self.repliques = ["dialogue2reponse1.3.1.1","dialogue2reponse1.3.1.2"]
         elif replique == "dialogue2reponse1.3.3":
@@ -345,7 +345,7 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
         return SKIN_TETE_PAUME
 
     def get_texte_descriptif(self):
-        if self.statut == None:
+        if self.statut is None:
             self.set_statut("")
             print("Hey, mon statut vaut None, pourquoi !?")
         return [f"Un humain (niveau {self.niveau})",f"ID : {self.ID}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Un humain terrorisé par les labyrinthes. Il espère pouvoir sortir un jour de cet enfer."]

@@ -8,7 +8,7 @@ from Jeu.Entitee.Agissant.Humain.Humain import *
 
 class Marchand(Dps,Humain): #Le dixième humain du jeu, à l'étage 9 (le seul lien avec l'extérieur)
     """La classe du marchand."""
-    def __init__(self,controleur:Controleur,position:Position):
+    def __init__(self,controleur:Controleur,position:Optional[Position]=None):
 
         self.identite = 'marchand'
         self.place = 9

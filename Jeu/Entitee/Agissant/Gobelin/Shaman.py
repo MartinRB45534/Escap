@@ -20,7 +20,7 @@ class Shaman_gobelin(Renforceur,Support_lointain,Gobelin):
     def get_offenses(self):
         offenses = self.offenses
         self.offenses = []
-        if self.etat != "vivant" or self.controleur == None:
+        if self.etat != "vivant" or self.controleur is None:
             etat = "incapacite"
         elif self.pv <= 3*self.pv_max//4 or self.pm < 50:
             etat = "fuite"

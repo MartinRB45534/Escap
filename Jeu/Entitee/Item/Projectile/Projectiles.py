@@ -13,7 +13,7 @@ class Explosif(Projectile):
 
 class Charge_de_base(Explosif):
     """L'explosif le plus basique qui soit. Plutôt commun, accessible dès le niveau 1 du skill de création d'explosifs. À manipuler avec précaution, risque d'antagonisation involontaire."""
-    def __init__(self,niveau:int,position:Position):
+    def __init__(self,niveau:int,position:Optional[Position]=None):
         Entitee.__init__(self,position)
         self.etat = "intact" #Le niveau l'évacuera s'il n'est plus intact.
         self.priorite = 0
@@ -31,7 +31,7 @@ class Charge_de_base(Explosif):
 
 class Charge_lourde(Explosif):
     """Un explosif puissant, mais de portée réduite."""
-    def __init__(self,niveau:int,position:Position):
+    def __init__(self,niveau:int,position:Optional[Position]=None):
         Entitee.__init__(self,position)
         self.etat = "intact" #Le niveau l'évacuera s'il n'est plus intact.
         self.priorite = 0
@@ -49,7 +49,7 @@ class Charge_lourde(Explosif):
 
 class Charge_etendue(Explosif):
     """Un explosif faible, mais de portée importante."""
-    def __init__(self,niveau:int,position:Position):
+    def __init__(self,niveau:int,position:Optional[Position]=None):
         Entitee.__init__(self,position)
         self.etat = "intact" #Le niveau l'évacuera s'il n'est plus intact.
         self.priorite = 0
@@ -76,7 +76,7 @@ class Fleche(Percant):
 
 class Fleche_de_base(Fleche):
     """La flèche la plus basique qui soit. La plus commune dans le labyrinthe, accessible dès le niveau 1 du skill de création de flèches."""
-    def __init__(self,niveau:int,position:Position):
+    def __init__(self,niveau:int,position:Optional[Position]=None):
         Entitee.__init__(self,position)
         self.etat = "intact"
         self.priorite = 0 #Faire dépendre du niveau ?
@@ -94,7 +94,7 @@ class Fleche_de_base(Fleche):
 
 class Fleche_fantome(Fleche,Fantome):
     """Une flèche qui peut traverser les murs. Est-ce l'âme d'une flèche décédée ?"""
-    def __init__(self,niveau:int,position:Position):
+    def __init__(self,niveau:int,position:Optional[Position]=None):
         Entitee.__init__(self,position)
         self.etat = "intact"
         self.priorite = 0 #Faire dépendre du niveau ?
@@ -112,7 +112,7 @@ class Fleche_fantome(Fleche,Fantome):
 
 class Fleche_lourde(Fleche):
     """Une flèche lourde. Elle va moins loin et un peu moins vite, mais rien que de bonnes stats ne puissent compenser. Et elle est dévastatrice !"""
-    def __init__(self,niveau:int,position:Position):
+    def __init__(self,niveau:int,position:Optional[Position]=None):
         Entitee.__init__(self,position)
         self.etat = "intact"
         self.priorite = 0 #Faire dépendre du niveau ?
@@ -130,7 +130,7 @@ class Fleche_lourde(Fleche):
 
 class Fleche_legere(Fleche):
     """Une flèche légère. Rapidité inégalée, portée incomparable... mais pas beaucoup de dégats, évidemment."""
-    def __init__(self,niveau:int,position:Position):
+    def __init__(self,niveau:int,position:Optional[Position]=None):
         Entitee.__init__(self,position)
         self.etat = "intact"
         self.priorite = 0 #Faire dépendre du niveau ?
@@ -148,7 +148,7 @@ class Fleche_legere(Fleche):
 
 class Fleche_explosive(Fleche,Explosif):
     """Une flèche explosive. C'est une flèche ou un explosif ? Mieux vaut rester loin en tous cas..."""
-    def __init__(self,niveau:int,position:Position):
+    def __init__(self,niveau:int,position:Optional[Position]=None):
         Entitee.__init__(self,position)
         self.etat = "intact"
         self.priorite = 0 #Faire dépendre du niveau ?
@@ -197,7 +197,7 @@ class Magie_explosive_percante(Magie_explosive,Percant):
 
 class Boule_de_feu(Magie_explosive):
     """Les projectiles crées par le sort de boule de feu."""
-    def __init__(self,niveau:int,position:Position,direction:Direction,lanceur:int):
+    def __init__(self,niveau:int,position:Optional[Position]=None,direction:Direction,lanceur:int):
         Entitee.__init__(self,position)
         self.etat = "intact" #Le niveau l'évacuera s'il n'est plus intact.
         self.priorite = 0 #On s'en fout, on ne peut pas ramasser une boule de feu...
@@ -220,7 +220,7 @@ class Boule_de_feu(Magie_explosive):
 
 class Fleche_de_glace(Fleche_magique):
     """Les projectiles crées par le sort de fleche de glace."""
-    def __init__(self,niveau:int,position:Position,direction:Direction,lanceur:int):
+    def __init__(self,niveau:int,position:Optional[Position]=None,direction:Direction,lanceur:int):
         Entitee.__init__(self,position)
         self.etat = "intact" #Le niveau l'évacuera s'il n'est plus intact.
         self.priorite = 0 #Est-ce qu'on peut ramasser les fleches de glace ?
@@ -243,7 +243,7 @@ class Fleche_de_glace(Fleche_magique):
 
 class Rocher(Projectile_magique):
     """Les projectiles crées par le sort de rocher."""
-    def __init__(self,niveau:int,position:Position,direction:Direction,lanceur:int):
+    def __init__(self,niveau:int,position:Optional[Position]=None,direction:Direction,lanceur:int):
         Entitee.__init__(self,position)
         self.etat = "intact" #Le niveau l'évacuera s'il n'est plus intact.
         self.priorite = 0
@@ -266,7 +266,7 @@ class Rocher(Projectile_magique):
 
 class Ombre_furtive(Perce_armure_magique):
     """Les projectiles crées par le sort d'ombre_furtive."""
-    def __init__(self,niveau:int,position:Position,direction:Direction,lanceur:int):
+    def __init__(self,niveau:int,position:Optional[Position]=None,direction:Direction,lanceur:int):
         Entitee.__init__(self,position)
         self.etat = "intact" #Le niveau l'évacuera s'il n'est plus intact.
         self.priorite = 0 #On s'en fout, on ne peut pas ramasser une ombre...
@@ -289,7 +289,7 @@ class Ombre_furtive(Perce_armure_magique):
 
 class Jet_de_mana(Projectile_magique):
     """Les projectiles crées par le sort de jet de mana."""
-    def __init__(self,niveau:int,position:Position,direction:Direction,lanceur:int):
+    def __init__(self,niveau:int,position:Optional[Position]=None,direction:Direction,lanceur:int):
         Entitee.__init__(self,position)
         self.etat = "intact" #Le niveau l'évacuera s'il n'est plus intact.
         self.priorite = 0
@@ -309,7 +309,7 @@ class Jet_de_mana(Projectile_magique):
 
 class Eclair_noir(Magie_explosive_percante):
     """Les projectiles crées par le sort d'éclair noir."""
-    def __init__(self,niveau:int,position:Position,direction:Direction,lanceur:int):
+    def __init__(self,niveau:int,position:Optional[Position]=None,direction:Direction,lanceur:int):
         Entitee.__init__(self,position)
         self.etat = "intact" #Le niveau l'évacuera s'il n'est plus intact.
         self.priorite = 0

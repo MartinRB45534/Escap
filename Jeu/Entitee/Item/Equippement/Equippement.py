@@ -3,7 +3,7 @@ from typing import Dict
 
 class Equipement(Item):
     """La classe des items qui peuvent être portés. Sont toujours actifs tant qu'ils sont portés."""
-    def __init__(self,position:Position):
+    def __init__(self,position:Optional[Position]=None):
         Item.__init__(self,position)
         self.taux_stats:Dict[str,float] = {}
 

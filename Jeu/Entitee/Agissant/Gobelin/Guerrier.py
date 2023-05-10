@@ -9,7 +9,7 @@ class Guerrier_gobelin(Gobelin):
     def get_offenses(self):
         offenses = self.offenses
         self.offenses = []
-        if self.etat != "vivant" or self.controleur == None:
+        if self.etat != "vivant" or self.controleur is None:
             etat = "incapacite"
         elif self.pv <= self.pv_max//2:
             etat = "fuite"

@@ -1,73 +1,74 @@
+from typing import Optional, Set
 from Jeu.Labyrinthe.Pattern import *
 from Jeu.Labyrinthe.Vue import *
 
 class Espace_schematique:
     def __init__(self):
-        self.frontiere:List[Cote] = []
-        self.cases:List[Position] = []
-        self.entrees:List[Position] = []
+        self.frontiere:Set[Cote] = set()
+        self.cases:Set[Position] = set()
+        self.entrees:Set[Position] = set()
         self.skip = True
 
     def get_cases(self):
         return self.cases
     
     def get_all_cases(self):
-        return self.cases+self.entrees
+        return self.cases|self.entrees
 
-    def dist(self,entree1,entree2):
+    def dist(self,entree1:Position,entree2:Position):
         if entree1 == entree2:
             return 0
         else:
             return len(self.cases)+1
 
 class Zone_inconnue(Espace_schematique): # Représente une zone de la carte qui n'a pas encore été explorée
-    def __init__(self,case:Position=None,zone=None):
+    def __init__(self,case:Optional[Position]=None,zone=None):
         if zone is not None and not isinstance(zone,Zone_inconnue):
             print("Erreur : zone doit être une Zone_inconnue")
             zone = None
-        self.cases:List[Position] = [case] if case != None else []
-        self.frontiere:List[Cote] = []
-        self.entrees:List[Position] = []
-        self.sorties:List[Position] = []
-        self.occupants:List[int] = zone.occupants if zone != None else []
+        self.cases:Set[Position] = {case} if case is not None else set()
+        self.frontiere:Set[Cote] = set()
+        self.entrees:Set[Position] = set()
+        self.sorties:Set[Position] = set()
+        self.occupants:Set[int] = zone.occupants if zone is not None else set()
         # Copier les informations de la zone précédente
         self.skip = False
 
     def fusionne(self,zone):
         if isinstance(zone,Zone_inconnue):
-            self.cases += zone.cases
-            self.frontiere += zone.frontiere
-            self.entrees += zone.entrees
-            self.sorties += zone.sorties
-            self.occupants += zone.occupants
+            self.cases |= zone.cases
+            self.frontiere |= zone.frontiere
+            self.entrees |= zone.entrees
+            self.sorties |= zone.sorties
+            self.occupants |= zone.occupants
             # Copier les informations de la zone fusionnée
         else:
             print("Erreur : zone doit être une Zone_inconnue")
 
 class Salle(Espace_schematique):
     def __init__(self,carre:Position):
-        self.frontiere:List[Cote] = []
-        self.cases:List[Position] = []
-        self.carres:List[Position] = [carre]
-        self.entrees:List[Position] = []
-        self.distances:List[List[int]] = []
+        self.frontiere:Set[Cote] = set()
+        self.cases:Set[Position] = set()
+        self.carres:Set[Position] = {carre}
+        self.entrees:Set[Position] = set()
+        self.distances:Dict[Set[Position],int] = {}
         self.skip = False
 
     def add_cases(self):
-        self.cases = []
+        self.cases = set()
         for case in [carre+dec for dec in Decalage(2,2) for carre in self.carres]:
             if not case in self.cases:
-                self.cases.append(case)
+                self.cases.add(case)
 
     def make_bord(self):
-        self.frontiere = [Cote(case,dir) for dir in DIRECTIONS for case in self.cases if not case + dir in self.cases]
+        self.frontiere = {Cote(case,dir) for dir in DIRECTIONS for case in self.cases if not case + dir in self.cases}
 
     def calcule_distances(self):
-        self.distances = []
-        for i in range(len(self.entrees)):
-            distances = [0]*(len(self.entrees)-i-1)
-            queue = [(self.entrees[i],0)]
-            visitees = [self.entrees[i]]
+        self.distances = {}
+        entrees = list(self.entrees)
+        for i in range(len(entrees)):
+            queue:List[Tuple[Position,int]] = [(entrees[i],0)]
+            visitees = [entrees[i]]
             while len(queue) :
                 position,distance = queue.pop(0)
                 for dir in DIRECTIONS:
@@ -75,21 +76,18 @@ class Salle(Espace_schematique):
                     if voisin in self.cases and voisin not in visitees:
                         visitees.append(voisin)
                         queue.append((voisin,distance+1))
-                        if voisin in self.entrees[i+1:]:
-                            distances[self.entrees.index(voisin)-i-1] = distance+1
-            self.distances.append(distances)
+                        if voisin in entrees[i+1:]:
+                            self.distances[{entrees[i],voisin}] = distance+1
 
-    def dist(self,entree1,entree2):
+    def dist(self,entree1:Position,entree2:Position):
         if entree1 == entree2:
             return 0
         else:
-            i1,i2 = self.entrees.index(entree1),self.entrees.index(entree2)
-            i,j = min(i1,i2),max(i1,i2)
-            return self.distances[i][j-i-1]
+            return self.distances.get({entree1,entree2},len(self.cases)+1)
 
 class Couloir(Espace_schematique):
-    def __init__(self,case:Position=None):
-        self.frontiere:List[Cote] = []
-        self.cases:List[Position] = [case] if case != None else []
-        self.entrees:List[Position] = []
+    def __init__(self,case:Optional[Position]=None):
+        self.frontiere:Set[Cote] = set()
+        self.cases:Set[Position] = {case} if case is not None else set()
+        self.entrees:Set[Position] = set()
         self.skip = True

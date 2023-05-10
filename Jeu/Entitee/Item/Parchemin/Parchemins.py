@@ -8,7 +8,7 @@ from Jeu.Systeme.Constantes_items.Items import *
 
 class Parchemin_purification(Parchemin):
     """Un parchemin qui soigne poisons et maladies."""
-    def __init__(self,position:Position):
+    def __init__(self,position:Optional[Position]=None):
         Parchemin.__init__(self,position,Purification(),50)
 
     def get_description(self,observation=0):
@@ -16,7 +16,7 @@ class Parchemin_purification(Parchemin):
 
 class Parchemin_vierge(Parchemin):
     """Un parchemin qui peut être imprégné d'une magie."""
-    def __init__(self,position:Position):
+    def __init__(self,position:Optional[Position]=None):
         Parchemin.__init__(self,position,Impregnation(),10)
 
     def get_description(self,observation=0):
@@ -24,7 +24,7 @@ class Parchemin_vierge(Parchemin):
 
 class Parchemin_impregne(Parchemin):
     """Un parchemin imprégné d'une magie."""
-    def __init__(self,position:Position,magie:Magie,cout:float): #Le cout dépend du niveau du parchemin d'imprégnation
+    def __init__(self,position:Optional[Position]=None,magie:Magie,cout:float): #Le cout dépend du niveau du parchemin d'imprégnation
         Parchemin.__init__(self,position,magie,cout)
 
     def utilise(self,agissant:Agissant):
@@ -81,7 +81,7 @@ class Parchemin_impregne(Parchemin):
         return["Un parchemin",f"Imprégné d'une magie ({self.effet.nom})"]
 
 class Parchemin_protection(Parchemin):
-    def __init__(self,position:Position):
+    def __init__(self,position:Optional[Position]=None):
         Parchemin.__init__(self,position,Protection_groupe(500,200),75)
 
     def get_description(self,observation=0):

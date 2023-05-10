@@ -7,7 +7,7 @@ class Degainable(Equipement):
 
 class Arme(Degainable):
     """La classe des équipements qui augmentent la force d'attaque."""
-    def __init__(self,position:Position,element:int,tranchant:float,portee:int):
+    def __init__(self,position:Optional[Position]=None,element:int,tranchant:float,portee:int):
         Equipement.__init__(self,position)
         self.element = element
         self.tranchant = tranchant

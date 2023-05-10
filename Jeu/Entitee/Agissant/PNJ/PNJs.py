@@ -16,7 +16,7 @@ class PNJ(Agissant, Interactif):
     Un personnage non-jouable (en vrai plutôt non-joué ici, il peut être controlable par un joueur).
     Se distingue par sa capacité à parler, obéir et le fait d'attendre le joueur jusqu'à le rencontrer.
     """
-    def __init__(self, controleur: Controleur, position: Position, identite: str, niveau: int, ID: int|None = None):
+    def __init__(self, controleur: Controleur, position: Position, identite: str, niveau: int, ID: Optional[int] = None):
         Agissant.__init__(self, controleur, position, identite, niveau, ID)
         self.dialogue = -1 #Le dialogue par défaut, celui des ordres
         self.replique = None #La réplique en cours de l'agissant vaut None lorsqu'il n'y a pas de dialogue en cours
@@ -67,7 +67,7 @@ class PNJ(Agissant, Interactif):
                 self.dialogue = 0
         offenses = self.offenses
         self.offenses = []
-        if self.etat != "vivant" or self.controleur == None:
+        if self.etat != "vivant" or self.controleur is None:
             etat = "incapacite"
         elif self.fuite():
             etat = "fuite"
@@ -107,7 +107,7 @@ class PNJ(Agissant, Interactif):
         elif self.antagonise_offensifs:
             for case in self.vue:
                 for ID_entitee in case.entitees:
-                    entitee = self.controleur[ID_entitee]
+                    entitee = self.controleur.entitees[ID_entitee]
                     if issubclass(entitee.get_classe(),Agissant):
                         if self.ID in self.controleur.get_esprit(entitee.esprit).ennemis:
                             self.insurge(ID_entitee,0.01,0)
@@ -152,14 +152,14 @@ class PJ(PNJ): #Les PJs sont des PNJs, parce que le mot PNJ est trompeur
     - des touches de contrôle
     - un interlocuteur
     """
-    def __init__(self, controleur: Controleur, position: Position, identite: str, niveau: int, ID: int|None = None):
+    def __init__(self, controleur: Controleur, position: Position, identite: str, niveau: int, ID: Optional[int] = None):
         PNJ.__init__(self,controleur, position, identite, niveau, ID)
         self.statut_simule:str = "attente"
-        self.skill_courant_simule:Type[Skill_intrasec]|None = None
-        self.dir_regard_simule:Direction|None = None
+        self.skill_courant_simule:Optional[Type[Skill_intrasec]] = None
+        self.dir_regard_simule:Optional[Direction] = None
         self.attente:int = -1
         self.nouvel_ordre:bool = False
-        self.interlocuteur:Interactif|PNJ|PNJ_mage|None = None
+        self.interlocuteur:Optional[Interactif] = None
         self.touches:Dict[str,Dict[Tuple[int],Dict[int,List[str]|Type[Skill_intrasec]|Direction|Type[Projectile]|str]]] = {
             "effets":{
             },
@@ -180,7 +180,7 @@ class PJ(PNJ): #Les PJs sont des PNJs, parce que le mot PNJ est trompeur
     def regarde(self, direction: Direction, force: bool = False):
         if self is self.controleur.joueur and self.attente and not force:
             self.dir_regard_simule = direction
-        elif direction != None:
+        elif direction is not None:
             self.dir_regard = direction
 
     def set_statut(self, statut: str, force: bool = False):

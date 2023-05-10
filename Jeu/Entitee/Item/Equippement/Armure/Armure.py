@@ -2,7 +2,7 @@ from Jeu.Entitee.Item.Equippement.Equippement import *
 
 class Armure(Equipement):
     """La classe des équipements de type armure. On ne peut en porter qu'une à la fois."""
-    def __init__(self,position:Position):
+    def __init__(self,position:Optional[Position]=None):
         Equipement.__init__(self,position)
         self.poids = 10 #C'est lourd !
         self.frottements = 8 #Il y a pire.

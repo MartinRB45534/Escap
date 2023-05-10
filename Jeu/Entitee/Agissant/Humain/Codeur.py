@@ -8,7 +8,7 @@ from Jeu.Entitee.Agissant.Humain.Humain import *
 
 class Codeur(Humain): #Le cinquième humain du jeu, à l'étage 4 (répond au nom de Dev, quand Il n'est pas occupé à programmer un autre jeu)
     """Ma classe."""
-    def __init__(self,controleur:Controleur,position:Position):
+    def __init__(self,controleur:Controleur,position:Optional[Position]=None):
 
         self.identite = 'codeur'
         self.place = 4

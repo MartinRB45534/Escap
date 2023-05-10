@@ -167,7 +167,7 @@ class Joueur:
 
         #Les agissants méritent leur nom :
         for agissant in self.agissants_courants :
-            while agissant.latence <= 0 and agissant.skill_courant != None : #Certains peuvent jouer plusieurs fois par tour !
+            while agissant.latence <= 0 and agissant.skill_courant is not None : #Certains peuvent jouer plusieurs fois par tour !
                 self.controleur.fait_agir(agissant)
                 agissant.on_action()
             agissant.on_action() #Pour les magies de parchemins
@@ -274,7 +274,7 @@ class Joueur:
             self.controleur.joueur.regarde(direction,True)
         if "skills" in effets: #La touche est liée à un skill (entre autres)
             skill:Type[Skill] = touches["skills"].get(mods,{}).get(touche)
-            if skill != None:
+            if skill is not None:
                 self.controleur.joueur.utilise(skill,True)
                 if issubclass(skill,Skills_offensifs): # Les skills qui correspondent à un statut d'attaque
                     self.controleur.joueur.set_statut("attaque",True)
@@ -305,7 +305,7 @@ class Joueur:
         if self.controleur.phase == TOUR:
             if not self.controleur.joueur.nouvel_ordre: #On ne veut pas désélectionner un skill qui n'a pas encore été utilisé au moins une fois
                 for touches_skills in self.controleur.joueur.touches["skills"].values(): #On ne sait pas quels modificateurs étaient actifs lorsque la touche a été pressée
-                    if touches_skills.get(touche) != None: #La touche relachée est liée à un skill
+                    if touches_skills.get(touche) is not None: #La touche relachée est liée à un skill
                         if touches_skills.get(touche) == self.controleur.joueur.skill_courant: #La touche relachée est celle du skill courant
                             self.controleur.joueur.set_statut("attente",True)
                             self.controleur.joueur.utilise(None,True)
@@ -492,7 +492,7 @@ class Joueur:
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
-                        if key != None:
+                        if key is not None:
                             run = False
                             self.parametres["cat_touches"][key] = "zone"
                             self.parametres["dir_touches"][key] = IN
@@ -503,7 +503,7 @@ class Joueur:
                     return
 
             screen.blit(pygame.image.load("RemplacementA.png"),(marge_gauche,marge_haut))
-            if key != None:
+            if key is not None:
                 screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+140,marge_haut+500))
             #Rajouter un texte explicatif sur le role de la touche A
 
@@ -514,7 +514,7 @@ class Joueur:
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
-                        if key != None:
+                        if key is not None:
                             run = False
                             self.parametres["cat_touches"][key] = "zone"
                             self.parametres["dir_touches"][key] = OUT
@@ -525,7 +525,7 @@ class Joueur:
                     return
 
             screen.blit(pygame.image.load("RemplacementE.png"),(marge_gauche,marge_haut))
-            if key != None:
+            if key is not None:
                 screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+320,marge_haut+500))
             #Rajouter un texte explicatif sur le role de la touche E
 
@@ -536,7 +536,7 @@ class Joueur:
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
-                        if key != None:
+                        if key is not None:
                             run = False
                             self.parametres["cat_touches"][key] = "zone"
                             self.parametres["dir_touches"][key] = HAUT
@@ -547,7 +547,7 @@ class Joueur:
                     return
 
             screen.blit(pygame.image.load("RemplacementZ.png"),(marge_gauche,marge_haut))
-            if key != None:
+            if key is not None:
                 screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+230,marge_haut+500))
             #Rajouter un texte explicatif sur le role de la touche Z
 
@@ -558,7 +558,7 @@ class Joueur:
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
-                        if key != None:
+                        if key is not None:
                             run = False
                             self.parametres["cat_touches"][key] = "zone"
                             self.parametres["dir_touches"][key] = BAS
@@ -569,7 +569,7 @@ class Joueur:
                     return
 
             screen.blit(pygame.image.load("RemplacementS.png"),(marge_gauche,marge_haut))
-            if key != None:
+            if key is not None:
                 screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+255,marge_haut+590))
             #Rajouter un texte explicatif sur le role de la touche S
 
@@ -580,7 +580,7 @@ class Joueur:
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
-                        if key != None:
+                        if key is not None:
                             run = False
                             self.parametres["cat_touches"][key] = "zone"
                             self.parametres["dir_touches"][key] = GAUCHE
@@ -591,7 +591,7 @@ class Joueur:
                     return
 
             screen.blit(pygame.image.load("RemplacementQ.png"),(marge_gauche,marge_haut))
-            if key != None:
+            if key is not None:
                 screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+165,marge_haut+590))
             #Rajouter un texte explicatif sur le role de la touche Q
 
@@ -602,7 +602,7 @@ class Joueur:
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
-                        if key != None:
+                        if key is not None:
                             run = False
                             self.parametres["cat_touches"][key] = "zone"
                             self.parametres["dir_touches"][key] = DROITE
@@ -613,7 +613,7 @@ class Joueur:
                     return
 
             screen.blit(pygame.image.load("RemplacementD.png"),(marge_gauche,marge_haut))
-            if key != None:
+            if key is not None:
                 screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+345,marge_haut+590))
             #Rajouter un texte explicatif sur le role de la touche D
 
@@ -624,7 +624,7 @@ class Joueur:
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
-                        if key != None:
+                        if key is not None:
                             run = False
                             self.parametres["cat_touches"][key] = "skill"
                             self.parametres["dir_touches"][key] = Skill_deplacement
@@ -635,7 +635,7 @@ class Joueur:
                     return
 
             screen.blit(pygame.image.load("RemplacementW.png"),(marge_gauche,marge_haut))
-            if key != None:
+            if key is not None:
                 screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+345,marge_haut+590))
             #Rajouter un texte explicatif sur le role de la touche W
 
@@ -646,7 +646,7 @@ class Joueur:
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
-                        if key != None:
+                        if key is not None:
                             run = False
                             self.parametres["cat_touches"][key] = "skill"
                             self.parametres["dir_touches"][key] = Skill_course
@@ -657,7 +657,7 @@ class Joueur:
                     return
 
             screen.blit(pygame.image.load("RemplacementR.png"),(marge_gauche,marge_haut))
-            if key != None:
+            if key is not None:
                 screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+345,marge_haut+590))
             #Rajouter un texte explicatif sur le role de la touche R
 
@@ -668,7 +668,7 @@ class Joueur:
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
-                        if key != None:
+                        if key is not None:
                             run = False
                             self.parametres["cat_touches"][key] = "skill"
                             self.parametres["dir_touches"][key] = Skill_ramasse
@@ -679,7 +679,7 @@ class Joueur:
                     return
 
             screen.blit(pygame.image.load("RemplacementM.png"),(marge_gauche,marge_haut))
-            if key != None:
+            if key is not None:
                 screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+345,marge_haut+590))
             #Rajouter un texte explicatif sur le role de la touche M
 
@@ -690,7 +690,7 @@ class Joueur:
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
-                        if key != None:
+                        if key is not None:
                             run = False
                             self.parametres["cat_touches"][key] = "skill"
                             self.parametres["dir_touches"][key] = Skill_stomp
@@ -701,7 +701,7 @@ class Joueur:
                     return
 
             screen.blit(pygame.image.load("RemplacementP.png"),(marge_gauche,marge_haut))
-            if key != None:
+            if key is not None:
                 screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+345,marge_haut+590))
             #Rajouter un texte explicatif sur le role de la touche P
 
@@ -712,7 +712,7 @@ class Joueur:
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
-                        if key != None:
+                        if key is not None:
                             run = False
                             self.parametres["cat_touches"][key] = "skill"
                             self.parametres["dir_touches"][key] = Skill_attaque
@@ -723,7 +723,7 @@ class Joueur:
                     return
 
             screen.blit(pygame.image.load("RemplacementX.png"),(marge_gauche,marge_haut))
-            if key != None:
+            if key is not None:
                 screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+345,marge_haut+590))
             #Rajouter un texte explicatif sur le role de la touche X
 
@@ -799,7 +799,7 @@ class Joueur:
                     self.controleur.tuto()
                     self.boucle()
             elif res == "ctrlv":
-                if GLOBALS["controleur"] != None:
+                if GLOBALS["controleur"] is not None:
                     self.controleurs.append(copy.deepcopy(GLOBALS["controleur"]))
             elif res == "ctrl":
                 if not self.set_parametres():

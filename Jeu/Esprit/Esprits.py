@@ -149,14 +149,14 @@ class Esprit_simple(Esprit):
 class Esprit_humain(Esprit_simple):
     """Un esprit qui dirige un ou plusieurs humains. Peut interragir avec d'autres esprits humains."""
     def __init__(self,corp:int,controleur:Controleur): #Les humains commencent tous séparément, donc ils ont leur propre esprit au début
-        Esprit.__init__(self,controleur[corp].identite)
+        Esprit.__init__(self,controleur.entitees[corp].identite)
         self.controleur = controleur
         self.ajoute_corp(corp)
         self.chef = corp #Les humains ne peuvent pas s'empêcher d'avoir des chefs
 
     def get_offenses(self):
         for corp in self.corps: #On vérifie si quelqu'un nous a offensé
-            agissant:Agissant = self.controleur[corp]
+            agissant:Agissant = self.controleur.entitees[corp]
             offenses,etat = agissant.get_offenses()
             self.corps[corp] = etat
             for offense in offenses:
@@ -178,7 +178,7 @@ class Esprit_humain(Esprit_simple):
             self.chef = None
             candidats:List[Humain] = []
             for corp in self.corps:
-                agissant:Agissant = self.controleur[corp]
+                agissant:Agissant = self.controleur.entitees[corp]
                 if "humain" in agissant.get_especes():
                     candidats.append(agissant) #Les humains sont les seuls à pouvoir diriger un esprit d'humain. Et les seuls à voter, aussi.
             votes_max = 0
@@ -195,7 +195,7 @@ class Esprit_humain(Esprit_simple):
         #Il va falloir créer un nouvel esprit pour l'humain exclus
         #Et il va falloir donner un nom à ce nouvel esprit
         #Les esprits humains sont nommés d'après leur porteur originel
-        humain:Humain = self.controleur[corp]
+        humain:Humain = self.controleur.entitees[corp]
         if humain.identite != self.nom: #Tout va bien
             self.controleur.esprits[humain.identite]=Esprit_humain(corp,self.controleur)
         else:
@@ -221,11 +221,11 @@ class Esprit_slime(Esprit_type):
         self.prejuges = ["humain"] #Vraiment ?
         self.pardon = 0.9 #La décroissance de l'importance avec le temps. Peut être supérieure à 1 pour s'en prendre en priorité aux ennemis ancestraux.
         self.resolution = 0
-        self.classe:Classe_principale = controleur[corp].classe_principale
+        self.classe:Classe_principale = controleur.entitees[corp].classe_principale
         self.ajoute_corp(corp)
 
     def merge(self,nom:str): #Regroupe deux esprits, lorsque des slimes se regroupent
-        esprit:Esprit_slime = self.controleur[nom]
+        esprit:Esprit_slime = self.controleur.entitees[nom]
         self.merge_classe(esprit.classe)
         Esprit.merge(self,nom)
 
@@ -241,7 +241,7 @@ class Esprit_slime(Esprit_type):
             self.classe.xp = classe.xp
         # for skill_intrasec in classe.skills_intrasecs:
         #     autre_skill_intrasec:Skill_intrasec = trouve_skill(self.classe,type(skill_intrasec))
-        #     if autre_skill_intrasec != None:
+        #     if autre_skill_intrasec is not None:
         #         if skill_intrasec.niveau > autre_skill_intrasec.niveau:
         #             self.classe.skills_intrasecs.remove(autre_skill_intrasec)
         #             self.classe.skills_intrasecs.append(skill_intrasec)
@@ -255,7 +255,7 @@ class Esprit_slime(Esprit_type):
 
         for skill in classe.skills:
             autre_skill:Skill = trouve_skill(self.classe,type(skill))
-            if autre_skill != None:
+            if autre_skill is not None:
                 if skill.niveau > autre_skill.niveau or (skill.niveau == autre_skill.niveau and skill.xp > autre_skill.xp):
                     self.classe.skills.remove(autre_skill)
                     self.classe.skills.append(skill)
@@ -268,7 +268,7 @@ class Esprit_slime(Esprit_type):
     def ajoute_corp(self,corp:int):
         if not corp in self.corps:
             self.corps[corp] = "incapacite"
-            slime:Slime=self.controleur[corp]
+            slime:Slime=self.controleur.entitees[corp]
             slime.rejoint(self.nom)
             slime.classe_principale = self.classe #C'est la plus grande force des slimes : progresser ensemble !
 

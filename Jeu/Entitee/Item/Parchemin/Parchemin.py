@@ -8,7 +8,7 @@ from Jeu.Effet.Effets_divers import Enseignement
 
 class Parchemin(Consommable):
     """La classe des consommables qui s'activent avec du mana."""
-    def __init__(self,position:Position,effet:Effet,cout:float):
+    def __init__(self,position:Optional[Position]=None,effet:Effet,cout:float):
         Item.__init__(self,position)
         self.effet = effet
         self.cout = cout
@@ -36,7 +36,7 @@ class Parchemin(Consommable):
 
 class Poly_de_cours(Parchemin):
     """Un parchemin qui enseigne une magie."""
-    def __init__(self,position:Position,magie:Type[Magie],cout:float):
+    def __init__(self,position:Optional[Position]=None,magie:Type[Magie],cout:float):
         Parchemin.__init__(self,position,Enseignement(magie),cout)
 
     def get_description(self,observation=0):

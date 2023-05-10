@@ -12,9 +12,9 @@ class Reanimation(On_fin_tour):
     def action(self,porteur):
         porteur.pv = porteur.pv_max*self.taux
         porteur.etat = "vivant"
-        if self.esprit != None:
+        if self.esprit is not None:
             esprit_porteur = porteur.controleur.get_esprit(porteur)
-            if esprit_porteur != None:
+            if esprit_porteur is not None:
                 esprit_porteur.retire_corp(porteur)
             self.esprit.ajoute_corp(porteur)
 

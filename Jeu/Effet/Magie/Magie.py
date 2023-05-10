@@ -39,7 +39,7 @@ class Magie_dirigee(Magie) :
 
     def execute(self,lanceur):
         if self.phase == "démarrage":
-            if self.direction != None:
+            if self.direction is not None:
                 self.action(lanceur)
             else:
                 self.miss_fire(lanceur)
@@ -58,7 +58,7 @@ class Magie_cible(Magie) :
 
     def execute(self,lanceur):
         if self.phase == "démarrage":
-            if self.cible != None:
+            if self.cible is not None:
                 self.action(lanceur)
             else:
                 self.miss_fire(lanceur)
@@ -87,7 +87,7 @@ class Magie_cible_dirigee(Magie_cible,Magie_dirigee):
 
     def execute(self,lanceur):
         if self.phase == "démarrage":
-            if self.direction != None and self.cible != None:
+            if self.direction is not None and self.cible is not None:
                 self.action(lanceur)
             else:
                 self.miss_fire(lanceur)
@@ -95,8 +95,8 @@ class Magie_cible_dirigee(Magie_cible,Magie_dirigee):
 
 class Portee_limitee(Magie_cible) :
     """La classe des magies qui ciblent quelque chose dans la proximité du joueur avec une portée limitée (sinon elles peuvent viser tout ce qui est dans le champ de vision du joueur)."""
-    def __init__(self,portee):
-        self.portee = portee
+    def __init__(self,portee_limite):
+        self.portee_limite = portee_limite
 
 class Cible_agissant(Magie_cible):
     """La classe des magies qui ciblent d'autres agissants."""

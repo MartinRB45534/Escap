@@ -24,16 +24,16 @@ Les dossiers Constantes_items, Constantes_magies, Constantes_skills contiennent 
 D�bloquer une situation
 Premi�re �tape : Controle + C dans le shell pour interrompre l'ex�cution.
 Deuxi�me �tape : depuis le shell, mains est une variable globale qui liste tous les objets Main en cours d'utilisation (les fichiers .p dans le r�pertoire � la derni�re v�rification). s'il y a un seul Main, mains[0][2] y acc�dera. Le controleur de la partie interrompue sauvagement devrait �tre mains[0][2].controleur, et le controleur donne acc�s � tous les �l�ments du jeu. Quelques exemple :
-	- mains[0][2].controleur[2] est le joueur, donc :
-	- mains[0][2].controleur[2].pv = 100 pour remettre les pvs du joueur � 100 , ou
-	- mains[0][2].controleur[2].position = ('�tage 10 : Boss',0,0) pour d�placer le joueur � l'�tage du boss, dans le coin en haut � droite
+	- mains[0][2].controleur.entitees[2] est le joueur, donc :
+	- mains[0][2].controleur.entitees[2].pv = 100 pour remettre les pvs du joueur � 100 , ou
+	- mains[0][2].controleur.entitees[2].position = ('�tage 10 : Boss',0,0) pour d�placer le joueur � l'�tage du boss, dans le coin en haut � droite
 	les ID de 1 � 10 sont r�serv�es aux humains, donc elles sont fixes, pour les autre :
 	- mains[0][2].controleur.entitees donne le dictionnaire de toutes les entitees, (agissants et items) class�es par ID, ensuite, c'est de l'essai erreur pour trouver la bonne
 	- mains[0][2].controleur.labs donne le dictionnaire de tous les labyrinthes (~= �tages pour l'instant) class�s par nom, ce qui aide pour la premi�re coordonn�e des positions
 	- mains[0][2].controleur.esprits donne le dictionnaire des esprits, et :
-	- mains[0][2].controleur[ID].esprit donne le nom de l'esprit de l'entit�e correspondant � ID, donc :
-	- mains[0][2].controleur.esprits[mains[0][2].controleur[ID].esprit].ennemis pour le dictionnaire des ennemis de l'esprit de l'entit�e correspondant � l'identifiant ID
-	- mains[0][2].controleur[mains[0][2].controleur[ID].position,mains[0][2].controleur[ID].dir_regard].effets donnerai la liste des effets du mur juste en face de l'entit�e correspondant � l'identifiant ID (probablement un Teleport qui conduit � la case voisine et �ventuellement un Mur ou une Porte qui bloque le passage)
+	- mains[0][2].controleur.entitees[ID].esprit donne le nom de l'esprit de l'entit�e correspondant � ID, donc :
+	- mains[0][2].controleur.esprits[mains[0][2].controleur.entitees[ID].esprit].ennemis pour le dictionnaire des ennemis de l'esprit de l'entit�e correspondant � l'identifiant ID
+	- mains[0][2].controleur[mains[0][2].controleur.entitees[ID].position,mains[0][2].controleur.entitees[ID].dir_regard].effets donnerai la liste des effets du mur juste en face de l'entit�e correspondant � l'identifiant ID (probablement un Teleport qui conduit � la case voisine et �ventuellement un Mur ou une Porte qui bloque le passage)
 	- mains[0][2].controleur.entitees_courantes pour la liste des IDs des entit�es en activit�, et
 	- mains[0][2].controleur.labs_courants pour la liste des noms des labyrinthe actifs
 Honn�tement la modification de position est la seule chose utile de ce que je viens de citer, d�s qu'on commence � ramener des entitees � la vie �a s'appelle tricher... Attention quand m�me quand on se rend dans un �tage inactif, penser � l'activer ou toute interraction avec l'environnement (les monstres ou les humains, par exemple) fera planter le jeu (prendre l'escalier pour sortir de l'�tage et y revenir r�active l'�tage, sinon mains[0][2].controleur.active_lab(nom_du_lab_�_activer) en rempla�ant nom_du_lab_�_activer par le nom du labyrinthe � activer.

@@ -534,22 +534,29 @@ CONSTANTES_STATS = {
         'special':False},
         }
 
-constantes_temps = {'tours':0,
+# La majuscule le place plus haut dans la liste des variables globales (pour débugger)
+Constantes_temps = {'tours':0,
                     'courant':0}
 
 constantes_deplacements = []
 
 def set_constantes_temps_courant():
-    constantes_temps['courant'] = time.time()
+    Constantes_temps['courant'] = time.time()
 
 def tourne_constantes_temps():
-    constantes_temps['tours'] += 1
+    Constantes_temps['tours'] += 1
 
 def add_constantes_temps(nom):
     new_courant = time.time()
-    duree = new_courant - constantes_temps['courant']
-    if nom in constantes_temps:
-        constantes_temps[nom] += duree
+    duree = new_courant - Constantes_temps['courant']
+    if nom in Constantes_temps:
+        Constantes_temps[nom] += duree
     else:
-        constantes_temps[nom] = duree
-    constantes_temps['courant'] = new_courant
+        Constantes_temps[nom] = duree
+    Constantes_temps['courant'] = new_courant
+
+def incr_compteur_temps(nom):
+    if nom in Constantes_temps:
+        Constantes_temps[nom] += 1
+    else:
+        Constantes_temps[nom] = 1

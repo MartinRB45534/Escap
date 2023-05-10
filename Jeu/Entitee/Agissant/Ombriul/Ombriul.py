@@ -10,13 +10,13 @@ from Jeu.Entitee.Agissant.Role.Roles import *
 
 class Ombriul(Dps): #/!\ Retravailler l'ombriul pour utiliser les rôles
     """Une créature des ténèbres, non-endémique du labyrinthe."""
-    def __init__(self,controleur:Controleur,position:Position,niveau:int):
+    def __init__(self,controleur:Controleur,position:Optional[Position]=None,niveau:int):
         Agissant.__init__(self,controleur,position,"ombriul",niveau)
 
     def get_offenses(self):
         offenses = self.offenses
         self.offenses = []
-        if self.etat != "vivant" or self.controleur == None:
+        if self.etat != "vivant" or self.controleur is None:
             etat = "incapacite"
         elif self.pv <= self.pv_max//6:
             etat = "fuite"

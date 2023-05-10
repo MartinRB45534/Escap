@@ -92,7 +92,7 @@ class Magie_protection_sacree(Multi_cible,Cible_agissant):
 
     def action(self,porteur):
         for ID in self.cible:
-            porteur.controleur[ID].effets.append(Protection_sacree(duree_protection_sacree[self.niveau-1],pv_protection_sacree[self.niveau-1])) #Ajouter une direction ?
+            porteur.controleur.entitees[ID].effets.append(Protection_sacree(duree_protection_sacree[self.niveau-1],pv_protection_sacree[self.niveau-1])) #Ajouter une direction ?
 
     def get_image(self):
         return SKIN_MAGIE_PROTECTION_SACREE
@@ -119,7 +119,7 @@ class Magie_teleportation(Multi_cible,Cible_case):
     def action(self,porteur):
         for i in range(len(self.cible)):
             for ID in porteur.controleur.trouve_occupants(self.cible[i]):
-                porteur.controleur[ID].effets.append(Teleportation(self.cible[i-1]))
+                porteur.controleur.entitees[ID].effets.append(Teleportation(self.cible[i-1]))
 
     def get_image(self):
         return SKIN_MAGIE_TELEPORTATION

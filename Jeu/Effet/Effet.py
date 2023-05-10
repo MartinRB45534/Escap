@@ -1,3 +1,4 @@
+from warnings import warn
 from Affichage.Skins.Skins import *
 from Jeu.Constantes import *
 
@@ -7,13 +8,13 @@ class Effet :
         self.phase = "démarrage"
         self.affiche = False
 
-    def action(self):
+    def action(self,*args):
         """La fonction qui exécute l'action de l'effet. En général, renvoie des valeurs que le controleur traitera."""
         print("a surdéfinir")
 
-    def execute(self):
+    def execute(self,*args):
         """La fonction qui est appelée par le controleur. Détermine, d'après les informations transmises par le controleur, si l'action doit être effectuée ou pas. Vérifie si l'effet doit encore exister ou non."""
-        print("a surdéfinir")
+        self.action(*args)
 
     def termine(self):
         """La fonction qui termine l'effet."""
@@ -32,8 +33,7 @@ class On_need(Effet) :
 
 class On_tick(Effet) :
     """La classe des effets appelés à chaque tour."""
-    def execute(self,porteur): #En général, prend en paramètre le porteur de l'effet. Pas toujours.
-        self.action(porteur)
+    pass
 
 class On_debut_tour(On_tick):
     """La classe des effets appelés au début du tour."""
@@ -62,20 +62,22 @@ class On_fin_tour(On_tick):
 class One_shot(Effet):
     """Classe des effets qui n'ont à être appelés qu'une seule fois."""
 
-    def execute(self,parametre): # La plupart des one_shot sont de cette forme...
+    def execute(self,*args): # La plupart des one_shot sont de cette forme...
         if self.phase == "démarrage" :
-            self.action(parametre)
+            self.action(*args)
             self.termine()
 
 class Delaye(One_shot):
     """Classe des effets qui s'exécutent avec du retard."""
+    def __init__(self,delai):
+        self.delai = delai
 
-    def execute(self,parametre):
+    def execute(self,*args):
         if self.phase == "démarrage" :
             if self.delai > 0:
                 self.delai -= 1
             else:
-                self.action(parametre)
+                self.action(*args)
                 self.termine()
 
 class Evenement(On_tick):
@@ -85,18 +87,14 @@ class Evenement(On_tick):
         self.temps_restant=temps_restant
         self.phase = "démarrage"
 
-    def action(self):
-        """La fonction qui exécute l'action de l'évènement."""
-        print("a surdéfinir")
-
-    def execute(self,parametre):
+    def execute(self,*args):
         self.temps_restant -= 1
         if self.phase == "démarrage" :
             self.phase = "en cours"
         elif self.temps_restant <= 0 :
             self.termine()
         else :
-            self.action(parametre)
+            self.action(*args)
 
 class Time_limited(Effet):
     """Classe des effets limités par le temps, qu'on ne peut pas considérer comme des événements car leur appel est irrégulier."""
@@ -114,8 +112,7 @@ class Time_limited(Effet):
 
 class On_attack(Effet):
     """Classe des effets appelés lors d'une attaque."""
-    def execute(self,attaque):
-        self.action(attaque)
+    pass
 
 class Enchantement(Evenement) :
     """Des effets avec un temps très long ! Leur classe à part permet de les affecter différement."""
@@ -123,10 +120,6 @@ class Enchantement(Evenement) :
         self.affiche = False
         self.temps_restant=temps_restant
         self.phase = "démarrage"
-
-    def action(self):
-        """La fonction qui exécute l'action de l'enchantement."""
-        print("a surdéfinir")
 
 class On_through(Effet):
     """La classe des effets déclenchés quand on traverse un mur."""
@@ -142,6 +135,7 @@ class On_step_out(Effet):
 
 class On_try_through(Effet):
     """La classe des effets déclenchés quand on essaye de traverser un mur."""
+    pass
 
 class Aura(On_tick):
     """La classe des auras (attachées à la case)."""

@@ -1,5 +1,7 @@
 import pygame
 
+from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
+
 class Illustration:
     def __init__(self,nom_fichier):
         try:
@@ -16,7 +18,7 @@ class Image(Illustration):
         screen.blit(pygame.transform.scale(pygame.transform.rotate(self.image,int(direction)*-90),tailles),position)
 
 class Skin(Illustration):
-    def dessine_toi(self,screen,position,taille=40,frame=1,frame_par_tour=1,direction=0):
+    def dessine_toi(self,screen,position,taille=40,frame=1,frame_par_tour=1,direction:int|Direction=0):
         screen.blit(pygame.transform.scale(pygame.transform.rotate(self.image,int(direction)*-90),(taille,taille)),position)
 
 PROFONDEUR_DE_CHAMP = 13

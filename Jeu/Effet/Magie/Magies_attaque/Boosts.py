@@ -64,7 +64,7 @@ class Magie_multi_boost(Cible_agissant,Multi_cible):
 
     def action(self,porteur):
         for cible in self.cible:
-            porteur.controleur[cible].effets.append(Dopage(porteur.ID,taux_multi_boost[self.niveau-1],duree_multi_boost[self.niveau-1]))
+            porteur.controleur.entitees[cible].effets.append(Dopage(porteur.ID,taux_multi_boost[self.niveau-1],duree_multi_boost[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_DOPAGE

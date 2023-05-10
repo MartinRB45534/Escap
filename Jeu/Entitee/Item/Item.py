@@ -4,23 +4,23 @@ from Jeu.Entitee.Agissant.Agissant import Agissant
 
 class Item(Mobile):
     """La classe des entitées inanimées. Peuvent se situer dans un inventaire. Peuvent être lancés (déconseillé pour les non-projectiles)."""
-    def __init__(self,position:Position):
+    def __init__(self,position:Optional[Position]):
         Entitee.__init__(self,position)
         self.etat = "intact" #Le niveau l'évacuera s'il n'est plus intact.
         self.priorite = 0 #Pour avoir le droit de la ramasser.
-        self.porteur = None
-        self.lanceur = None
-        self.direction = None #Utile uniquement quand l'item se déplace.
-        self.latence = 0 #Utile uniquement quand l'item se déplace.
-        self.vitesse = 1 #La quantitée soustraite à la latence chaque tour.
+        # self.porteur:Optional[int] = None #Utilisé ? /!\
+        self.lanceur:Optional[int] = None
+        self.direction:Optional[Direction] = None #Utile uniquement quand l'item se déplace.
+        self.latence:float = 0 #Utile uniquement quand l'item se déplace.
+        self.vitesse:float = 1 #La quantitée soustraite à la latence chaque tour.
         self.taux_vitesse = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à la vitesse. Correspond aux effets passager sur la vitesse.
-        self.poids = 10 #Utile uniquement quand l'item est lancé. Détermine le temps qu'il faut à l'agissant pour le lancer et le temps que l'item se déplacera.
-        self.frottements = 10 #Utile uniquement quand l'item se déplace. Détermine la latence à chaque déplacement.
-        self.hauteur = 0 #Utile uniquement quand l'item se déplace. Diminue à chaque tour. L'item s'immobilise à 0 (éventuellement déclenche des effets).
-        self.nom = "item"
+        self.poids:float = 10 #Utile uniquement quand l'item est lancé. Détermine le temps qu'il faut à l'agissant pour le lancer et le temps que l'item se déplacera.
+        self.frottements:float = 10 #Utile uniquement quand l'item se déplace. Détermine la latence à chaque déplacement.
+        self.hauteur:float = 0 #Utile uniquement quand l'item se déplace. Diminue à chaque tour. L'item s'immobilise à 0 (éventuellement déclenche des effets).
+        self.nom:str = "item"
 
     def get_direction(self):
-        if self.direction != None:
+        if self.direction is not None:
             return self.direction
         else:
             return DIRECTIONS[0]
@@ -109,6 +109,7 @@ class Item(Mobile):
     def get_description(self,observation=0):
         return ["Un item",f"Oopsie, on dirait que je n'ai pas codé la description pour {self}.","Désolé, et bonne chance."]
 
+    @staticmethod
     def get_image():
         return SKIN_VIDE
 
@@ -120,6 +121,7 @@ class Cadavre(Item):
     def get_description(self,observation=0):
         return ["Un cadavre","Où as-tu trouvé ça ?"]
 
+    @staticmethod
     def get_image():
         return SKIN_CADAVRE
 
@@ -131,6 +133,7 @@ class Oeuf(Item):
     def get_description(self,observation=0):
         return ["Un oeuf","Je n'ai rien pour le cuire..."]
 
+    @staticmethod
     def get_image():
         return SKIN_OEUF
 
@@ -144,8 +147,9 @@ class Ingredient(Item):
     def get_classe(self):
         return Ingredient
 
+    @staticmethod
     def get_image():
         return SKIN_INGREDIENT
 
-from Jeu.Entitee.Item.Projectile.Projectiles import Percant,Evanescent,Fragile
+from Jeu.Entitee.Item.Projectile.Projectiles import Percant, Evanescent, Fragile
 from Jeu.Effet.Effets_items import *

@@ -11,8 +11,8 @@ from math import ceil
 class Affichable:
     """Un élément qui s'affiche. Apparaît à l'écran."""
     def __init__(self):
-        self.tailles = [0,0] #La largeur et la hauteur (ou l'inverse ?)
-        self.position = [0,0]
+        self.tailles = (0,0) #La largeur et la hauteur (ou l'inverse ?)
+        self.position = (0,0)
 
     def set_tailles(self,tailles):
         self.tailles = tailles
@@ -61,8 +61,8 @@ class Affichable:
 class Affichage(Affichable):
     """Un élément de l'affichage. Peut contenir des sous-éléments."""
     def __init__(self):
-        self.tailles = [0,0] #La largeur et la hauteur (ou l'inverse ?)
-        self.position = [0,0]
+        self.tailles = (0,0) #La largeur et la hauteur (ou l'inverse ?)
+        self.position = (0,0)
         self.objets:List[Affichable] = [] #La liste des objets à afficher
 
     def set_objets(self,objets:List[Affichable]):
@@ -130,8 +130,8 @@ class Taille_variable(Affichable):
 
 class Proportionnel(Affichable):
     def __init__(self,proportions):
-        self.tailles = [0,0]
-        self.position = [0,0]
+        self.tailles = (0,0)
+        self.position = (0,0)
         self.proportions = proportions
 
     def get_tailles(self,tailles):
@@ -143,8 +143,8 @@ class Proportionnel(Affichable):
 class Marge(Affichable):
     """Un espace vide."""
     def __init__(self):
-        self.tailles = [0,0] #La largeur et la hauteur (ou l'inverse ?)
-        self.position = [0,0]
+        self.tailles = (0,0) #La largeur et la hauteur (ou l'inverse ?)
+        self.position = (0,0)
 
     def set_tailles(self,tailles):
         self.tailles = tailles
@@ -175,7 +175,7 @@ class Marge_horizontale(Marge):
 
 class Vignette(Affichable):
     """Un élément qui est juste une image."""
-    def __init__(self,position:Position,taille,skin,direction=0):
+    def __init__(self,position,taille,skin:Skin,direction:int|Direction=0):
         self.tailles = [taille,taille]
         self.position = position
         self.skin = skin
@@ -189,7 +189,7 @@ class Vignette(Affichable):
         self.skin.dessine_toi(screen,self.position,self.tailles[0],frame,frame_par_tour,self.direction)
 
 class Vignette_image(Vignette):
-    def __init__(self,position:Position,tailles,skin,direction=0):
+    def __init__(self,position,tailles,skin:Image,direction:int|Direction=0):
         self.tailles = tailles
         self.position = position
         self.skin = skin
@@ -201,8 +201,8 @@ class Vignette_image(Vignette):
 class Survolable(Affichable):
     """Un élément qui réagit au survol"""
     def __init__(self):
-        self.tailles = [0,0] #La largeur et la hauteur (ou l'inverse ?)
-        self.position = [0,0]
+        self.tailles = (0,0) #La largeur et la hauteur (ou l'inverse ?)
+        self.position = (0,0)
         self.marque_survol = False #Est-ce que la souris est dessus ?
 
     def survol(self,position):
@@ -218,8 +218,8 @@ class Survolable(Affichable):
 class Cliquable(Survolable): #Il faut être survolable pour être cliquable
     """Un élément qui réagit aux clics"""
     def __init__(self):
-        self.tailles = [0,0] #La largeur et la hauteur (ou l'inverse ?)
-        self.position = [0,0]
+        self.tailles = (0,0) #La largeur et la hauteur (ou l'inverse ?)
+        self.position = (0,0)
         self.marque_survol = False #Est-ce que la souris est dessus ?
         self.marque_actif = False #Est-ce que c'est l'élément actif  de la hiérarchie ?
         self.marque_courant = False #Est-ce que c'est l'élément courant de l'élément actif ?
@@ -258,8 +258,8 @@ class Cliquable(Survolable): #Il faut être survolable pour être cliquable
 
 class Knot(Cliquable):
     def __init__(self):
-        self.tailles = [0,0] #La largeur et la hauteur (ou l'inverse ?)
-        self.position = [0,0]
+        self.tailles = (0,0) #La largeur et la hauteur (ou l'inverse ?)
+        self.position = (0,0)
         self.marque_survol = False #Est-ce que la souris est dessus ?
         self.marque_actif = False #Est-ce que c'est l'élément actif  de la hiérarchie ?
         self.marque_courant = False #Est-ce que c'est l'élément courant de l'élément actif ?
@@ -322,7 +322,7 @@ class Knot(Cliquable):
         self.set_courant(None)
         self.unset_actif()
 
-    def set_courant(self,element: Cliquable):
+    def set_courant(self,element: Optional[Cliquable]):
         self.courant = element
         if element is None:
             self.set_actif()
@@ -409,6 +409,8 @@ class Knot(Cliquable):
         return False
     
     def through_out(self): # On veut revenir ici
+        if self.courant is None:
+            raise RuntimeError("Knot.through_out : self.courant is None")
         self.courant.unset_actif()
         self.set_actif()
         return self
@@ -434,12 +436,15 @@ class Knot(Cliquable):
 class Knot_vertical(Knot):
     """Un élément dont le contenu est disposé verticalement (donc next et previous correspondent à haut et bas)."""
     def through_previous(self):
+        assert self.courant is not None
         self.courant.unset_actif() # Devrait être inutile
         res = self.in_up()
         self.courant.set_actif()
         return res
     
     def through_next(self):
+        if self.courant is None:
+            raise RuntimeError("Knot.through_next : self.courant is None")
         self.courant.unset_actif() # Devrait être inutile
         res = self.in_down()
         self.courant.set_actif()
@@ -448,12 +453,14 @@ class Knot_vertical(Knot):
 class Knot_vertical_profondeur_agnostique(Knot):
     """Un knot_vertical qui ne fait pas de différence entre in et through (pour haut et bas)."""
     def through_up(self):
+        assert self.courant is not None
         self.courant.unset_actif() # Devrait être inutile
         res = self.in_up()
         self.courant.set_actif()
         return res
     
     def through_down(self):
+        assert self.courant is not None
         self.courant.unset_actif()
         res = self.in_down()
         self.courant.set_actif()
@@ -462,12 +469,14 @@ class Knot_vertical_profondeur_agnostique(Knot):
 class Knot_horizontal(Knot):
     """Un élément dont le contenu est disposé horizontalement (donc next et previous correspondent à gauche et droite)."""
     def through_previous(self):
+        assert self.courant is not None
         self.courant.unset_actif() # Devrait être inutile
         res = self.in_left()
         self.courant.set_actif()
         return res
     
     def through_next(self):
+        assert self.courant is not None
         self.courant.unset_actif() # Devrait être inutile
         res = self.in_right()
         self.courant.set_actif()
@@ -476,12 +485,14 @@ class Knot_horizontal(Knot):
 class Knot_horizontal_profondeur_agnostique(Knot):
     """Un knot_horizontal qui ne fait pas de différence entre in et through (pour gauche et droite)."""
     def through_left(self):
+        assert self.courant is not None
         self.courant.unset_actif() # Devrait être inutile
         res = self.in_left()
         self.courant.set_actif()
         return res
     
     def through_right(self):
+        assert self.courant is not None
         self.courant.unset_actif()
         res = self.in_right()
         self.courant.set_actif()
@@ -587,6 +598,7 @@ class Affichage_knot(Affichage,Knot):
                 self.unset_actif()
                 return clique
         elif clique:
+            assert isinstance(clique,Cliquable)
             self.select(clique,droit)
             self.unset_actif()
         else:
@@ -622,8 +634,8 @@ class Conteneur(Affichable):
         self.objets:List[Affichable] = [] #Il peut quand même avoir des objets 'normaux'
         self.contenu:List[Affichable] = [] #Les objets qu'il 'contient'
         self.fond = (0,0,0,0)
-        self.tailles = [0,0] #La largeur et la hauteur (ou l'inverse ?)
-        self.position = [0,0]
+        self.tailles = (0,0) #La largeur et la hauteur (ou l'inverse ?)
+        self.position = (0,0)
     
     def set_contenu(self,contenu):
         self.contenu = contenu
@@ -715,12 +727,12 @@ class Wrapper(Conteneur):
     """Un conteneur avec un unique élément"""
     def __init__(self):
         self.objets:List[Affichable] = [] #Il peut quand même avoir des objets 'normaux'
-        self.contenu:Affichable = None #L'objet qu'il 'contient'
+        self.contenu:Optional[Affichable] = None #L'objet qu'il 'contient'
         self.fond = (0,0,0,0)
-        self.tailles = [0,0] #La largeur et la hauteur (ou l'inverse ?)
-        self.position = [0,0]
+        self.tailles = (0,0) #La largeur et la hauteur (ou l'inverse ?)
+        self.position = (0,0)
     
-    def set_contenu(self,contenu:Affichable|None):
+    def set_contenu(self,contenu:Optional[Affichable]):
         self.contenu = contenu
 
     def set_fond(self,fond:Tuple[int,int,int,int]|Tuple[int,int,int]):
@@ -732,16 +744,18 @@ class Wrapper(Conteneur):
             objet.decale(decalage)
 
     def set_tailles(self,tailles:Tuple[int,int]):
+        assert self.contenu is not None
         self.tailles = tailles
         self.contenu.set_tailles(tailles)
 
     def get_tailles(self,tailles:Tuple[int,int]):
-        if self.contenu == None:
+        if self.contenu is None:
             print(f"{self} n'a pas de contenu !")
-            return [0,0]
+            return (0,0)
         return self.contenu.get_tailles(tailles)
 
     def affiche(self,screen:pygame.Surface,frame:int=1,frame_par_tour:int=1):
+        assert self.contenu is not None
         surf = pygame.Surface(self.tailles,pygame.SRCALPHA)
         surf.fill(self.fond)
         self.contenu.affiche(surf,frame,frame_par_tour)
@@ -750,6 +764,7 @@ class Wrapper(Conteneur):
             objet.affiche(screen,frame,frame_par_tour)
 
     def clique(self,position:List[int],droit:bool=False):
+        assert self.contenu is not None
         #Trouve l'élément survolé par la souris et le renvoie
         res = False
         if self.touche(position):
@@ -765,6 +780,7 @@ class Wrapper(Conteneur):
         return res
     
     def clique_placeholder(self,placeheldholder,droit:bool=False):
+        assert self.contenu is not None
         res = False
         res_contenu = self.contenu.clique_placeholder(placeheldholder,droit)
         if res_contenu:
@@ -776,6 +792,7 @@ class Wrapper(Conteneur):
         return res
 
     def survol(self,position):
+        assert self.contenu is not None
         #Trouve l'élément survolé par la souris et le renvoie
         res = False
         if self.touche(position):
@@ -791,6 +808,7 @@ class Wrapper(Conteneur):
         return res
 
     def scroll(self,position,x,y):
+        assert self.contenu is not None
         res = False
         if self.touche(position):
             pos_rel = [position[0]-self.position[0],position[1]-self.position[1]]
@@ -802,11 +820,13 @@ class Wrapper(Conteneur):
         return res
 
     def update(self):
+        assert self.contenu is not None
         self.contenu.update()
         for objet in self.objets:
             objet.update()
 
     def remove_unpickables(self):
+        assert self.contenu is not None
         self.contenu.remove_unpickables()
         for objet in self.objets:
             objet.remove_unpickables()
@@ -828,10 +848,11 @@ class Wrapper_cliquable(Wrapper,Cliquable):
         Cliquable.__init__(self)
 
         self.objets:List[Affichable] = []
-        self.contenu:Affichable = None #L'objet qu'il 'contient'
+        self.contenu:Optional[Affichable] = None #L'objet qu'il 'contient'
         self.fond = (0,0,0,0)
 
     def affiche(self,screen:pygame.Surface,frame:int=1,frame_par_tour:int=1):
+        assert self.contenu is not None
         surf = pygame.Surface(self.tailles,pygame.SRCALPHA)
         # On ajoute un contour
         if self.marque_survol:
@@ -886,7 +907,7 @@ class Wrapper_knot(Wrapper_cliquable,Knot):
         Knot.__init__(self)
 
         self.objets:List[Affichable] = []
-        self.contenu:Affichable = None #L'objet qu'il 'contient'
+        self.contenu:Optional[Affichable] = None #L'objet qu'il 'contient'
         self.fond = (0,0,0,0)
 
     def clique(self,position, droit:bool=False):
@@ -951,28 +972,31 @@ class Placeheldholder(Wrapper_knot):
 
 class Placeholder(Knot):
     """Un élément qui lie à un autre, ailleurs."""
-    def __init__(self, placeheldholder:Placeheldholder, placeheld:Knot=None, placeheldholder_ajuster:Affichage=None):
+    def __init__(self, placeheldholder:Placeheldholder, placeheld:Optional[Cliquable], placeheldholder_ajuster:Optional[Affichage]=None):
         Knot.__init__(self)
         self.placeheldholder = placeheldholder
         self.placeheldholder_ajuster = placeheldholder_ajuster if placeheldholder_ajuster else placeheldholder # L'élément le plus proche dans la parenté du placeheldholder dont la taille n'est pas affectée par la taille du placeheldholder (celui jusqu'auquel il faut remonter pour ajuster la taille du placeheldholder)
         self.set_courant(placeheld)
 
-    def set_courant(self,element: Cliquable):
+    def set_courant(self,element: Optional[Cliquable]):
         self.courant = element
         self.set_actif()
 
     def set_actif(self):
+        assert self.courant is not None
         super().set_actif()
         self.placeheldholder.set_contenu(self.courant)
-        if self.placeheldholder_ajuster.tailles != [0,0]:
+        if self.placeheldholder_ajuster.tailles != (0,0):
             self.placeheldholder_ajuster.set_tailles(self.placeheldholder_ajuster.tailles)
         self.courant.set_actif()
 
     def unset_actif(self):
+        assert self.courant is not None
         super().unset_actif()
         self.courant.unset_actif()
 
     def trouve_actif(self):
+        assert self.courant is not None
         self.marque_actif = True
         self.courant.trouve_actif()
 
@@ -987,14 +1011,16 @@ class Placeholder(Knot):
         return Cliquable.survol(self, position)
     
     def navigue(self, direction: Direction | int):
+        assert self.courant is not None
         res = self.courant.navigue(direction)
         self.actif = self.courant.actif
         return res
 
     def update(self):
+        assert self.courant is not None
         super().update()
         self.courant.update()
-        if self.placeheldholder.courant is self.courant and self.placeheldholder_ajuster.tailles != [0,0]:
+        if self.placeheldholder.courant is self.courant and self.placeheldholder_ajuster.tailles != (0,0):
             self.placeheldholder_ajuster.set_tailles(self.placeheldholder_ajuster.tailles)
 
 class Pavage(Conteneur):
@@ -1004,8 +1030,8 @@ class Pavage(Conteneur):
         self.contenu:List[Affichable] = [] #Les objets qu'il 'contient'
         self.repartition = [] #La répartition des objets contenus
         self.fond = (0,0,0,0)
-        self.tailles = [0,0] #La largeur et la hauteur (ou l'inverse ?)
-        self.position = [0,0]
+        self.tailles = (0,0) #La largeur et la hauteur (ou l'inverse ?)
+        self.position = (0,0)
 
     def set_contenu(self,contenu,repartition):
         if all(taille >= 0 for taille in repartition):
@@ -1026,12 +1052,13 @@ class Pavage_horizontal(Pavage):
         # print("Pavage_horizontal.set_tailles")
         libre = tailles[0] - sum(self.repartition[i] if self.repartition[i]>0 else self.contenu[i].get_tailles(tailles)[0] if not(self.repartition[i]) else 0 for i in range(len(self.repartition)))
         if libre < 0:
-            if tailles == [0, 0]:
+            if tailles == (0,0):
                 warn(f"Tailles nulles pour {self} !")
             else:
                 raise RuntimeError(f"Je ne peux pas faire rentrer {self.contenu} ({[self.repartition[i] if self.repartition[i]>0 else self.contenu[i].get_tailles(tailles)[0] if not(self.repartition[i]) else 0 for i in range(len(self.contenu))]}) en {self.repartition} ({tailles[0]}) dans {self} !")
         else:
             nb_portions = sum(taille for taille in self.repartition if taille<0)
+            portion = 0
             if nb_portions != 0: #Dans le cas contraire, on n'a pas besoin de définir portion
                 portion = libre/nb_portions
             somme = 0
@@ -1055,6 +1082,7 @@ class Pavage_horizontal(Pavage):
             warn(f"Je ne peux pas faire rentrer {self.contenu} ({[self.repartition[i] if self.repartition[i]>0 else self.contenu[i].get_tailles(tailles)[0] if not(self.repartition[i]) else 0 for i in range(len(self.contenu))]}) en {self.repartition} ({tailles[0]}) dans {self} !")
         else:
             nb_portions = sum(taille for taille in self.repartition if taille<0)
+            portion = 0
             if nb_portions != 0: #Dans le cas contraire, on n'a pas besoin de définir portion
                 portion = libre/nb_portions
             for i in range(len(self.repartition)):
@@ -1081,12 +1109,13 @@ class Pavage_vertical(Pavage):
         # print("Pavage_vertical.set_tailles")
         libre = tailles[1] - sum(self.repartition[i] if self.repartition[i]>0 else self.contenu[i].get_tailles(tailles)[1] if not(self.repartition[i]) else 0 for i in range(len(self.repartition)))
         if libre < 0:
-            if tailles == [0, 0]:
+            if tailles == (0,0):
                 warn(f"Tailles nulles pour {self} !")
             else:
                 raise RuntimeError(f"Je ne peux pas faire rentrer {self.contenu} ({[self.repartition[i] if self.repartition[i]>0 else self.contenu[i].get_tailles(tailles)[1] if not(self.repartition[i]) else 0 for i in range(len(self.contenu))]}) en {self.repartition} ({tailles[1]}) dans {self} !")
         else:
             nb_portions = sum(taille for taille in self.repartition if taille<0)
+            portion = 0
             if nb_portions != 0: #Dans le cas contraire, on n'a pas besoin de définir portion
                 portion = libre/nb_portions
             somme = 0
@@ -1112,6 +1141,7 @@ class Pavage_vertical(Pavage):
             warn(f"Je ne peux pas faire rentrer {self.contenu} ({[self.repartition[i] if self.repartition[i]>0 else self.contenu[i].get_tailles(tailles)[1] if not(self.repartition[i]) else 0 for i in range(len(self.contenu))]}) en {self.repartition} ({tailles[1]}) dans {self} !")
         else:
             nb_portions = sum(taille for taille in self.repartition if taille<0)
+            portion = 0
             if nb_portions != 0: #Dans le cas contraire, on n'a pas besoin de définir portion
                 portion = libre/nb_portions
             for i in range(len(self.repartition)):
@@ -1151,8 +1181,8 @@ class Liste(Conteneur):
         self.courant = 0 #L'élément 'courant' de la liste TODO : trouver un meilleur nom (ça risque de prêter à confusion)
         self.decalage = 0
         self.fond = (0,0,0,0)
-        self.tailles = [0,0] #La largeur et la hauteur (ou l'inverse ?)
-        self.position = [0,0]
+        self.tailles = (0,0) #La largeur et la hauteur (ou l'inverse ?)
+        self.position = (0,0)
 
     def set_contenu(self,contenu:List[Affichable],repartition:List[float],courant=0):
         # On vérifie qu'il n'y a pas de nombres négatifs dans la répartition
@@ -1212,6 +1242,9 @@ class Liste(Conteneur):
             if res_objet:
                 res = res_objet
         return res
+    
+    def ajuste(self,objet):
+        pass
 
     def scroll_liste(self,position,x,y):
         res = False
@@ -1393,7 +1426,7 @@ class Liste_menu(Wrapper_knot):
         Wrapper_knot.__init__(self)
         self.contenu:List[Cliquable] = []
         
-        self.liste = None
+        self.liste = Liste_verticale()
 
     def set_fond(self,fond):
         self.fond = fond
@@ -1433,7 +1466,6 @@ class Liste_menu(Wrapper_knot):
         listes.append(liste)
         if ligne == ligne_courante:
             liste_courante = liste
-        self.liste = Liste_verticale()
         self.liste.set_contenu([listes[j//2] if j%2 == 0 else Marge_horizontale() for j in range(-1,2*len(listes))],[0 if j%2 == 0 else 5 for j in range(-1,2*len(listes))])
         self.liste.set_tailles(self.tailles)
         self.liste.ajuste(liste_courante)
@@ -1482,6 +1514,7 @@ class Liste_menu(Wrapper_knot):
             res_objet = objet.clique(position,droit)
             if res_objet:
                 res = res_objet
+        assert res is None or isinstance(res,Cliquable)
         self.set_courant(res)
         return res
 
@@ -1550,7 +1583,7 @@ class Liste_menu(Wrapper_knot):
 
 class Texte(Cliquable):
     """Un élément qui est juste un bout de texte."""
-    def __init__(self,texte:str, texte_marque_survol:str=None, texte_marque_actif:str=None, texte_marque_courant:str=None, texte_est_courant:str=None, texte_actif:str=None):
+    def __init__(self,texte:str, texte_marque_survol:Optional[str]=None, texte_marque_actif:Optional[str]=None, texte_marque_courant:Optional[str]=None, texte_est_courant:Optional[str]=None, texte_actif:Optional[str]=None):
         Cliquable.__init__(self)
         # Élément le plus important : le texte "normal"
         self.texte=texte
@@ -1639,7 +1672,7 @@ class Pave(Taille_variable,Texte):
 
 class Paves(Pave):
     """Un pavé avec plusieurs lignes"""
-    def __init__(self, textes:List[str], textes_marques_survol:List[str]=None, textes_marques_actifs:List[str]=None, textes_marque_courant:str=None, textes_est_courant:str=None, textes_actifs:List[str]=None):
+    def __init__(self, textes:List[str], textes_marques_survol:Optional[List[str]]=None, textes_marques_actifs:Optional[List[str]]=None, textes_marque_courant:Optional[List[str]]=None, textes_est_courant:Optional[List[str]]=None, textes_actifs:Optional[List[str]]=None):
         Cliquable.__init__(self)
         self.textes=textes
         self.textes_marques_survol=textes_marques_survol if textes_marques_survol else self.textes
@@ -1648,7 +1681,7 @@ class Paves(Pave):
         self.textes_est_courant=textes_est_courant if textes_est_courant else self.textes
         self.textes_actifs=textes_actifs if textes_actifs else self.textes_est_courant
 
-    def get_textes(self,reset=False) -> str:
+    def get_textes(self,reset=False) -> List[str]:
         if self.marque_survol:
             if reset:
                 self.marque_survol = False
@@ -1792,7 +1825,7 @@ class Bouton(Wrapper_cliquable):
     def init(self):
         contenu = Pavage_vertical()
         triptique = Pavage_horizontal()
-        triptique.set_contenu([Marge_verticale(),Vignette([0,0],20,self.skin),Marge_verticale(),Texte(self.texte),Marge_verticale()],[5,0,5,0,5])
+        triptique.set_contenu([Marge_verticale(),Vignette((0,0),20,self.skin),Marge_verticale(),Texte(self.texte),Marge_verticale()],[5,0,5,0,5])
         contenu.set_contenu([Marge_horizontale(),triptique,Marge_horizontale()],[5,0,5])
         self.set_contenu(contenu)
 
@@ -1811,6 +1844,7 @@ class Bouton(Wrapper_cliquable):
             return self.fond
 
     def affiche(self,screen:pygame.Surface,frame:int=1,frame_par_tour:int=1):
+        assert self.contenu is not None
         surf = pygame.Surface(self.tailles,pygame.SRCALPHA)
         surf.fill(self.get_fond())
         self.contenu.affiche(surf,frame,frame_par_tour)
@@ -1820,6 +1854,7 @@ class Bouton(Wrapper_cliquable):
 
 class Bouton_test(Bouton):
     def get_tailles(self, tailles):
+        assert self.contenu is not None
         print(f"bouton : tailles {tailles} ; {self.contenu.get_tailles(tailles)} ({super().get_tailles(tailles)})")
         return super().get_tailles(tailles)
 
@@ -1829,19 +1864,19 @@ class Vignette_composee(Cliquable,Affichage):
         self.tailles = [taille,taille]
         self.objets = vignettes
         if shade or invalide:
-            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
+            self.objets.append(Vignette((0,0),taille,SKIN_SHADE))
         if invalide:
-            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
+            self.objets.append(Vignette((0,0),taille,SKIN_SHADE))
 
 class Vignette_placeholder(Vignette_composee, Placeholder):
-    def __init__(self,placeheldholder:Placeheldholder,placeheld:Knot,placeheldholder_ajuster:Affichage,vignettes:List[Affichable],taille,shade=False,invalide=False):
+    def __init__(self,placeheldholder:Placeheldholder,placeheld:Optional[Cliquable],placeheldholder_ajuster:Optional[Affichage],vignettes:List[Affichable],taille,shade=False,invalide=False):
         Placeholder.__init__(self,placeheldholder,placeheld,placeheldholder_ajuster)
         self.tailles = [taille,taille]
         self.objets = vignettes
         if shade or invalide:
-            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
+            self.objets.append(Vignette((0,0),taille,SKIN_SHADE))
         if invalide:
-            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
+            self.objets.append(Vignette((0,0),taille,SKIN_SHADE))
 
     def affiche(self, screen: pygame.Surface, frame: int = 1, frame_par_tour: int = 1):
         if self.marque_actif or self.marque_courant or self.marque_survol:
@@ -1868,8 +1903,8 @@ class Vignette_composee_texte(Vignette_composee):
                 tailles_texte = objet.get_tailles(self.tailles)
                 objet.set_position([self.tailles[0]-tailles_texte[0],self.tailles[1]-tailles_texte[1]])
 
-class Vignette_placeholder_texte(Vignette_composee_texte,Placeholder):
-    def __init__(self,placeheldholder:Placeheldholder,placeheld:Knot,placeheldholder_ajuster:Affichage,vignettes:List[Affichable],texte,taille,shade=False,invalide=False):
+class Vignette_placeholder_texte(Vignette_composee_texte,Vignette_placeholder):
+    def __init__(self,placeheldholder:Placeheldholder,placeheld:Optional[Cliquable],placeheldholder_ajuster:Optional[Affichage],vignettes:List[Affichable],texte,taille,shade=False,invalide=False):
         Vignette_placeholder.__init__(self,placeheldholder,placeheld,placeheldholder_ajuster,vignettes,taille,shade,invalide)
         texte = Texte(texte)
         self.objets.append(texte)
@@ -1882,22 +1917,22 @@ class Vignette_placeholder_updatable(Vignette_placeholder):
 
         self.shades:List[Affichable] = []
         if shade or invalide:
-            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
-            self.shades.append(Vignette([0,0],taille,SKIN_SHADE))
+            self.objets.append(Vignette((0,0),taille,SKIN_SHADE))
+            self.shades.append(Vignette((0,0),taille,SKIN_SHADE))
         if invalide:
-            self.objets.append(Vignette([0,0],taille,SKIN_SHADE))
-            self.shades.append(Vignette([0,0],taille,SKIN_SHADE))
+            self.objets.append(Vignette((0,0),taille,SKIN_SHADE))
+            self.shades.append(Vignette((0,0),taille,SKIN_SHADE))
 
 class Vignette_categorie(Vignette_placeholder):
     def __init__(self,placeheldholder:Placeheldholder,placeheld:Knot,categorie:Type[Potion|Parchemin|Cle|Arme|Bouclier|Armure|Haume|Anneau|Projectile|Ingredient|Cadavre|Oeuf],taille,shade=False,invalide=False):
-        vignettes = [Vignette([0,0],taille,categorie.get_image())]
+        vignettes:List[Affichable] = [Vignette((0,0),taille,categorie.get_image())]
 
         Vignette_placeholder.__init__(self,placeheldholder,placeheld,None,vignettes,taille,shade,invalide)
 
 class Vignette_recette(Vignette_placeholder):
     def __init__(self,placeheldholder:Placeheldholder,placeheld:Knot,recette,taille,shade=False,invalide=False):
         self.recette = recette
-        vignettes = [Vignette([0,0],taille,eval(recette["produit"])(None).get_skin())]
+        vignettes:List[Affichable] = [Vignette((0,0),taille,eval(recette["produit"])(None).get_skin())]
 
         Vignette_placeholder.__init__(self,placeheldholder,placeheld,None,vignettes,taille,shade,invalide)
 
@@ -1905,7 +1940,7 @@ class Vignette_ingredient(Vignette_placeholder_texte):
     def __init__(self,placeheldholder:Placeheldholder,ingredient:Item,quantite_necessaire,quantite_disponible,taille,shade=False,invalide=False):
         self.ingredient = ingredient
         placeheld = Paves(ingredient.get_description())
-        vignettes = [Vignette([0,0],taille,ingredient.get_skin())]
+        vignettes:List[Affichable] = [Vignette((0,0),taille,ingredient.get_skin())]
 
         Vignette_placeholder_texte.__init__(self,placeheldholder,placeheld,None,vignettes,f"{quantite_disponible}/{quantite_necessaire}",taille,shade,invalide or quantite_disponible < quantite_necessaire)
 
@@ -1914,7 +1949,7 @@ class Vignette_vente(Vignette_placeholder_texte):
         self.item = item
         self.prix = prix
         self.description = description
-        vignettes = [Vignette([0,0],taille,item.get_skin())]
+        vignettes:List[Affichable] = [Vignette((0,0),taille,item.get_skin())]
 
         Vignette_placeholder_texte.__init__(self,placeheldholder,placeheld,None,vignettes,f"{prix} €",taille,shade,invalide)
 
@@ -1923,30 +1958,30 @@ class Vignette_achat(Vignette_placeholder_texte):
         self.item = item
         self.prix = prix
         self.description = description
-        vignettes = [Vignette([0,0],taille,item.get_skin())]
+        vignettes:List[Affichable] = [Vignette((0,0),taille,item.get_skin())]
 
         Vignette_placeholder_texte.__init__(self,placeheldholder,placeheld,None,vignettes,f"{prix} €",taille,shade,invalide)
 
 class Vignette_magie(Vignette_composee):
     def __init__(self,magie:Magie,taille,shade=False,invalide=False):
         self.magie = magie
-        vignettes = [Vignette([0,0],taille,magie.get_skin())]
+        vignettes:List[Affichable] = [Vignette((0,0),taille,magie.get_skin())]
 
         Vignette_composee.__init__(self,vignettes,taille,shade,invalide)
 
 class Vignette_magie_placeholder(Vignette_placeholder):
     def __init__(self,placeheldholder:Placeheldholder,placeheld:Knot,magie:Magie,taille,shade=False,invalide=False):
         self.magie = magie
-        vignettes = [Vignette([0,0],taille,magie.get_skin())]
+        vignettes:List[Affichable] = [Vignette((0,0),taille,magie.get_skin())]
 
         Vignette_placeholder.__init__(self,placeheldholder,placeheld,None,vignettes,taille,shade,invalide)
 
 class Vignette_item(Vignette_composee):
-    def __init__(self,position,item:Item,taille,direction=None,shade=False,invalide=False):
+    def __init__(self,position,item:Agissant|Item,taille,direction=None,shade=False,invalide=False):
         self.item = item
-        if direction == None:
+        if direction is None:
             direction = item.get_direction()
-        vignettes = [Vignette(position,taille,item.get_skin(),direction)]
+        vignettes:List[Affichable] = [Vignette(position,taille,item.get_skin(),direction)]
         for effet in item.effets:
             if effet.affiche:
                 vignettes.append(Vignette(position,taille,effet.get_skin(),direction))
@@ -1956,33 +1991,46 @@ class Vignette_item(Vignette_composee):
 class Vignette_item_placeholder(Vignette_placeholder):
     def __init__(self,placeheldholder:Placeheldholder,placeheld:Knot,position,item:Item,taille,shade=False,invalide=False):
         self.item = item
-        vignettes = [Vignette(position,taille,item.get_skin())]
+        vignettes:List[Affichable] = [Vignette(position,taille,item.get_skin())]
 
         Vignette_placeholder.__init__(self,placeheldholder,placeheld,None,vignettes,taille,shade,invalide)
 
 class Vignettes_agissant(Vignette_composee):
     def __init__(self,position,agissant:Agissant,taille):
         self.agissant = agissant
+        assert agissant.controleur is not None
         direction = agissant.get_direction()
-        vignettes = []
+        vignettes:List[Affichable] = []
         arme = agissant.inventaire.arme
-        if arme != None:
-            vignettes.append(Vignette_item(position,agissant.controleur[arme],taille,direction))
+        if arme is not None:
+            item_arme = agissant.controleur.entitees[arme]
+            assert isinstance(item_arme,Arme)
+            vignettes.append(Vignette_item(position,item_arme,taille,direction))
         vignettes.append(Vignette(position,taille,agissant.get_skin(),direction))
         armure = agissant.inventaire.armure
-        if armure != None:
-            vignettes.append(Vignette_item(position,agissant.controleur[armure],taille,direction))
+        if armure is not None:
+            item_armure = agissant.controleur.entitees[armure]
+            assert isinstance(item_armure,Armure)
+            vignettes.append(Vignette_item(position,item_armure,taille,direction))
         bouclier = agissant.inventaire.bouclier
-        if bouclier != None:
-            vignettes.append(Vignette_item(position,agissant.controleur[bouclier],taille,direction))
+        if bouclier is not None:
+            item_bouclier = agissant.controleur.entitees[bouclier]
+            assert isinstance(item_bouclier,Bouclier)
+            vignettes.append(Vignette_item(position,item_bouclier,taille,direction))
         vignettes.append(Vignette(position,taille,agissant.get_skin_tete(),direction)) #Peut-être changer la direction de la tête indépendamment de celle du corps
         haume = agissant.inventaire.haume
-        if haume != None:
-            vignettes.append(Vignette_item(position,agissant.controleur[haume],taille,direction))
+        if haume is not None:
+            item_haume = agissant.controleur.entitees[haume]
+            assert isinstance(item_haume,Haume)
+            vignettes.append(Vignette_item(position,item_haume,taille,direction))
         for effet in agissant.effets:
             if effet.affiche:
                 vignettes.append(Vignette(position,taille,effet.get_skin(),direction))
-        esprit = agissant.controleur.get_esprit(agissant.controleur.joueur.esprit)
+        assert agissant.controleur.joueur is not None
+        nom_esprit = agissant.controleur.joueur.esprit
+        assert nom_esprit is not None
+        esprit = agissant.controleur.get_esprit(nom_esprit)
+        assert esprit is not None
         position_pv = [position[0]+ceil(taille*(2/19)),position[1]+ceil(taille*(2/19))]
         tailles_pv = [ceil(taille*((15*agissant.pv)/(19*agissant.pv_max))),ceil(taille*(15/19))]
         if agissant.ID in esprit.ennemis:
@@ -1998,27 +2046,33 @@ class Vignettes_agissant(Vignette_composee):
         Vignette_composee.__init__(self,vignettes,taille)
 
 class Vignettes_position(Vignette_composee):
-    def __init__(self,position: List[int], joueur: Agissant, vue: Representation_vue, pos: Position, taille: int, shade=False, invalide=False):
+    def __init__(self,position: List[int], joueur: PJ, vue: Representation_vue, pos: Position, taille: int, shade=False, invalide=False):
+        assert joueur.controleur is not None
+        assert joueur.esprit is not None
         self.pos = pos
-        vignettes = []
+        vignettes:List[Affichable] = []
         if pos in vue:
             vignettes.append(Vignette_case(position,joueur,vue,pos,taille))
-            if vue[pos].clarte>0:
-                entitees = vue[pos].entitees
+            case = vue.case_from_position(pos)
+            if case.clarte>0:
+                entitees = case.entitees
                 agissant = None
                 for ID_entitee in entitees:
-                    entitee = joueur.controleur[ID_entitee]
-                    if issubclass(entitee.get_classe(),Item):
+                    entitee = joueur.controleur.entitees[ID_entitee]
+                    if issubclass(entitee.get_classe(),Item) and isinstance(entitee,(Item,Agissant)):
                         vignettes.append(Vignette_item(position,entitee,taille)) #La direction est surtout utile pour les projectiles, sinon ils devraient tous être dans le même sens.
                     elif issubclass(entitee.get_classe(),Decors):
                         vignettes.append(Vignette(position,taille,entitee.get_skin()))
-                    else:
+                    elif issubclass(entitee.get_classe(),Agissant) and isinstance(entitee,Agissant):
                         agissant = entitee
-                if agissant != None: #Enfin l'agissant (s'il y en a un)
+                    else:
+                        raise ValueError("Entitee non reconnue")
+                if agissant is not None: #Enfin l'agissant (s'il y en a un)
                     vignettes.append(Vignettes_agissant(position,agissant,taille))
-                if vue[pos].effets != []:
+                if case.effets != []:
                     esprit = joueur.controleur.get_esprit(joueur.esprit)
-                    if any([effet[2] in esprit.corps for effet in vue[pos].effets]):
+                    assert esprit is not None
+                    if any([effet[2] in esprit.corps for effet in case.effets]):
                         vignettes.append(Vignette(position,taille,SKIN_ATTAQUE_DELAYEE_ALLIE))
                     else:
                         vignettes.append(Vignette(position,taille,SKIN_ATTAQUE_DELAYEE))
@@ -2031,9 +2085,10 @@ class Vignettes_position(Vignette_composee):
 
 class Vignette_case(Vignette_composee):
     def __init__(self,position,joueur:PJ,vue:Representation_vue,pos,taille):
-        vignettes = []
+        assert joueur.controleur is not None
+        vignettes:List[Affichable] = []
         if pos in vue:
-            vue_case = vue[pos]
+            vue_case = vue.case_from_position(pos)
             if not(vue_case.clarte):
                 vignettes.append(Vignette(position,taille,SKIN_BROUILLARD))
             elif vue_case.clarte==-1: #On a affaire à une case accessible mais pas vue
@@ -2041,11 +2096,11 @@ class Vignette_case(Vignette_composee):
                 for i in DIRECTIONS:
                     if vue_case.cibles[i][BASIQUE]:
                         pos_voisin = vue_case.position+i
-                        if pos_voisin in vue and vue[pos_voisin].clarte>0:
+                        if pos_voisin in vue and vue.case_from_position(pos_voisin).clarte>0:
                             vignettes.append(Vignette(position,taille,SKIN_MUR_BROUILLARD,i))
             else:
                 vignettes.append(Vignette(position,taille,SKINS_CASES[vue_case.code])) #La case en premier, donc en bas
-                case:Case = joueur.controleur[vue_case.position]
+                case:Case = joueur.controleur.case_from_position(vue_case.position)
                 for i in DIRECTIONS:
                     mur:Mur = case[i]
                     for effet in mur.effets:
@@ -2067,50 +2122,56 @@ class Vignette_case(Vignette_composee):
 class Vignette_allie(Vignette_placeholder_updatable):
     def __init__(self,placeheldholder:Placeheldholder,placeheldholder_ajuster:Affichage,agissant:Agissant,taille,shade=False,invalide=False):
         self.agissant = agissant
-        vignettes = [Vignettes_agissant([0,0],agissant,taille)]
+        assert agissant.controleur is not None
+        vignettes:List[Affichable] = [Vignettes_agissant((0,0),agissant,taille)]
         for statut in agissant.get_skins_statuts():
-            vignettes.append(Vignette([0,0],taille,statut))
+            vignettes.append(Vignette((0,0),taille,statut))
 
         Vignette_placeholder_updatable.__init__(self,placeheldholder,Description_allie(agissant.controleur,agissant),placeheldholder_ajuster,vignettes,taille,shade,invalide)
 
     def update(self):
+        assert self.courant is not None
         self.objets:List[Affichable] = []
         self.objets.append(Vignettes_agissant(self.position,self.agissant,self.tailles[0]))
         for statut in self.agissant.get_skins_statuts():
             self.objets.append(Vignette(self.position,self.tailles[0],statut))
         self.objets+=self.shades
         self.courant.update()
-        if self.placeheldholder.courant is self.courant and self.placeheldholder_ajuster.tailles != [0,0]:
+        if self.placeheldholder.courant is self.courant and self.placeheldholder_ajuster.tailles != (0,0):
             self.placeheldholder_ajuster.set_tailles(self.placeheldholder_ajuster.tailles)
 
 class Vignette_ennemi(Vignette_placeholder_updatable):
     def __init__(self,placeheldholder:Placeheldholder,placeheldholder_ajuster:Affichage,agissant:Agissant,taille,shade=False,invalide=False):
         self.agissant = agissant
-        vignettes = [Vignettes_agissant([0,0],agissant,taille)]
+        assert agissant.controleur is not None
+        vignettes:List[Affichable] = [Vignettes_agissant((0,0),agissant,taille)]
 
         Vignette_placeholder_updatable.__init__(self,placeheldholder,Description_ennemi(agissant.controleur, agissant),placeheldholder_ajuster,vignettes,taille,shade,invalide)
         
     def update(self):
+        assert self.courant is not None
         self.objets:List[Affichable] = []
         self.objets.append(Vignettes_agissant(self.position,self.agissant,self.tailles[0]))
         self.objets+=self.shades
         self.courant.update()
-        if self.placeheldholder.courant is self.courant and self.placeheldholder_ajuster.tailles != [0,0]:
+        if self.placeheldholder.courant is self.courant and self.placeheldholder_ajuster.tailles != (0,0):
             self.placeheldholder_ajuster.set_tailles(self.placeheldholder_ajuster.tailles)
 
 class Vignette_neutre(Vignette_placeholder_updatable):
     def __init__(self,placeheldholder:Placeheldholder,placeheldholder_ajuster:Affichage,agissant:Agissant,taille,shade=False,invalide=False):
         self.agissant = agissant
-        vignettes = [Vignettes_agissant([0,0],agissant,taille)]
+        assert agissant.controleur is not None
+        vignettes:List[Affichable] = [Vignettes_agissant((0,0),agissant,taille)]
 
         Vignette_placeholder_updatable.__init__(self,placeheldholder,Description_neutre(agissant.controleur, agissant),placeheldholder_ajuster,vignettes,taille,shade,invalide)
         
     def update(self):
+        assert self.courant is not None
         self.objets:List[Affichable] = []
         self.objets.append(Vignettes_agissant(self.position,self.agissant,self.tailles[0]))
         self.objets+=self.shades
         self.courant.update()
-        if self.placeheldholder.courant is self.courant and self.placeheldholder_ajuster.tailles != [0,0]:
+        if self.placeheldholder.courant is self.courant and self.placeheldholder_ajuster.tailles != (0,0):
             self.placeheldholder_ajuster.set_tailles(self.placeheldholder_ajuster.tailles)
 
 class Description_allie(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
@@ -2122,14 +2183,14 @@ class Description_allie(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
         self.fond = (200, 200, 200)
 
         self.paves = Paves(self.allie.get_texte_descriptif())
-        self.boutons = [
+        boutons = [
             Bouton(SKIN_REJOINDRE, "Rejoindre"),
             Bouton(SKIN_PARLER, "Parler") if isinstance(self.allie, PNJ) else None,
             Bouton(SKIN_AIDER, "Aider"),
             Bouton(SKIN_EXCLURE, "Exclure"),
         ]
 
-        self.boutons = [bouton for bouton in self.boutons if bouton is not None]
+        self.boutons = [bouton for bouton in boutons if bouton is not None]
 
         self.init()
 
@@ -2142,6 +2203,7 @@ class Description_allie(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
         self.fond = (200, 200, 200)
 
     def select(self, selection: Cliquable, droit: bool = False):
+        assert self.controleur.joueur is not None
         if not droit:
             if isinstance(selection, Bouton):
                 if selection.texte == "Rejoindre":
@@ -2153,7 +2215,9 @@ class Description_allie(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
                 elif selection.texte == "Aider":
                     pass #TODO : Définir l'action d'aide
                 elif selection.texte == "Exclure":
-                    esprit:Esprit = self.controleur[self.controleur.joueur.esprit]
+                    assert self.controleur.joueur.esprit is not None
+                    esprit:Optional[Esprit] = self.controleur.get_esprit(self.controleur.joueur.esprit)
+                    assert esprit is not None
                     if isinstance(esprit, Esprit_humain):
                         esprit.exclus(self.allie.ID)
         # TODO : indiquer que l'action a été effectuée
@@ -2170,15 +2234,16 @@ class Description_allie(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
             self.set_courant(self.boutons[self.boutons.index(self.courant) + 1])
 
     def update(self):
+        assert self.contenu is not None
         self.paves = Paves(self.allie.get_texte_descriptif())
-        self.boutons:List[Bouton|None] = [
+        boutons:List[Optional[Bouton]] = [
             Bouton(SKIN_REJOINDRE, "Rejoindre"),
             Bouton(SKIN_PARLER, "Parler") if isinstance(self.allie, PNJ) else None,
             Bouton(SKIN_AIDER, "Aider"),
             Bouton(SKIN_EXCLURE, "Exclure"),
         ]
 
-        self.boutons = [bouton for bouton in self.boutons if bouton is not None]
+        self.boutons:List[Bouton] = [bouton for bouton in boutons if bouton is not None]
 
         if isinstance(self.courant, Bouton):
             if self.courant.texte in [bouton.texte for bouton in self.boutons]:
@@ -2189,7 +2254,7 @@ class Description_allie(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
         self.contenu.update()
         for objet in self.objets:
             objet.update()
-        if self.tailles != [0, 0]:
+        if self.tailles != (0,0):
             self.set_tailles(self.tailles)
 
 class Description_neutre(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
@@ -2201,14 +2266,14 @@ class Description_neutre(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
         self.fond = (200, 200, 200)
 
         self.paves = Paves(self.neutre.get_texte_descriptif())
-        self.boutons = [
+        boutons:List[Optional[Bouton]] = [
             Bouton(SKIN_REJOINDRE, "Rejoindre"),
             Bouton(SKIN_PARLER, "Parler") if isinstance(self.neutre, PNJ) else None,
             Bouton(SKIN_ATTAQUER, "Attaquer"),
             Bouton(SKIN_ANTAGONISER, "Antagoniser"),
         ]
 
-        self.boutons = [bouton for bouton in self.boutons if bouton is not None]
+        self.boutons:List[Bouton] = [bouton for bouton in boutons if bouton is not None]
 
         self.init()
 
@@ -2221,6 +2286,7 @@ class Description_neutre(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
         self.fond = (200, 200, 200)
 
     def select(self, selection: Cliquable, droit: bool = False):
+        assert self.controleur.joueur is not None
         if not droit:
             if isinstance(selection, Bouton):
                 if selection.texte == "Rejoindre":
@@ -2233,7 +2299,9 @@ class Description_neutre(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
                     self.controleur.joueur.mouvement = 4
                     self.controleur.joueur.cible_deplacement = self.neutre.ID
                 elif selection.texte == "Antagoniser":
-                    esprit:Esprit = self.controleur[self.controleur.joueur.esprit]
+                    assert self.controleur.joueur.esprit is not None
+                    esprit:Optional[Esprit] = self.controleur.get_esprit(self.controleur.joueur.esprit)
+                    assert esprit is not None
                     esprit.ennemis[self.neutre.ID] = {"importance": 0.01, "dangerosite":0}
         # TODO : indiquer que l'action a été effectuée
 
@@ -2249,14 +2317,15 @@ class Description_neutre(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
             self.set_courant(self.boutons[self.boutons.index(self.courant) + 1])
 
     def update(self):
+        assert self.contenu is not None
         self.paves = Paves(self.neutre.get_texte_descriptif())
-        self.boutons = [
+        boutons:List[Optional[Bouton]] = [
             Bouton(SKIN_REJOINDRE, "Rejoindre"),
             Bouton(SKIN_PARLER, "Parler") if isinstance(self.neutre, PNJ) else None,
             Bouton(SKIN_ATTAQUER, "Attaquer"),
             Bouton(SKIN_ANTAGONISER, "Antagoniser"),
         ]
-        self.boutons = [bouton for bouton in self.boutons if bouton is not None]
+        self.boutons:List[Bouton] = [bouton for bouton in boutons if bouton is not None]
         if isinstance(self.courant, Bouton):
             if self.courant.texte in [bouton.texte for bouton in self.boutons]:
                 self.set_courant(self.boutons[[bouton.texte for bouton in self.boutons].index(self.courant.texte)])
@@ -2266,7 +2335,7 @@ class Description_neutre(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
         self.contenu.update()
         for objet in self.objets:
             objet.update()
-        if self.tailles != [0, 0]:
+        if self.tailles != (0,0):
             self.set_tailles(self.tailles)
 
 class Description_ennemi(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
@@ -2278,14 +2347,14 @@ class Description_ennemi(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
         self.fond = (200, 200, 200)
 
         self.paves = Paves(self.ennemi.get_texte_descriptif())
-        self.boutons = [
+        boutons:List[Optional[Bouton]] = [
             Bouton(SKIN_REJOINDRE, "Rejoindre"),
             Bouton(SKIN_PARLER, "Parler") if isinstance(self.ennemi, PNJ) else None,
             Bouton(SKIN_ATTAQUER, "Attaquer"),
             Bouton(SKIN_PRIORISER, "Prioriser"),
         ]
 
-        self.boutons = [bouton for bouton in self.boutons if bouton is not None]
+        self.boutons:List[Bouton] = [bouton for bouton in boutons if bouton is not None]
 
         self.init()
 
@@ -2298,6 +2367,7 @@ class Description_ennemi(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
         self.fond = (200, 200, 200)
 
     def select(self, selection: Cliquable, droit: bool = False):
+        assert self.controleur.joueur is not None
         if not droit:
             if isinstance(selection, Bouton):
                 if selection.texte == "Rejoindre":
@@ -2310,7 +2380,9 @@ class Description_ennemi(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
                     self.controleur.joueur.mouvement = 4
                     self.controleur.joueur.cible_deplacement = self.ennemi.ID
                 elif selection.texte == "Prioriser":
-                    esprit:Esprit = self.controleur[self.controleur.joueur.esprit]
+                    assert self.controleur.joueur.esprit is not None
+                    esprit:Optional[Esprit] = self.controleur.get_esprit(self.controleur.joueur.esprit)
+                    assert esprit is not None
                     esprit.ennemis[self.ennemi.ID]["importance"] += 1
         # TODO : indiquer que l'action a été effectuée
 
@@ -2326,14 +2398,15 @@ class Description_ennemi(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
             self.set_courant(self.boutons[self.boutons.index(self.courant) + 1])
 
     def update(self):
+        assert self.contenu is not None
         self.paves = Paves(self.ennemi.get_texte_descriptif())
-        self.boutons = [
+        boutons:List[Optional[Bouton]] = [
             Bouton(SKIN_REJOINDRE, "Rejoindre"),
             Bouton(SKIN_PARLER, "Parler") if isinstance(self.ennemi, PNJ) else None,
             Bouton(SKIN_ATTAQUER, "Attaquer"),
             Bouton(SKIN_PRIORISER, "Prioriser"),
         ]
-        self.boutons = [bouton for bouton in self.boutons if bouton is not None]
+        self.boutons:List[Bouton] = [bouton for bouton in boutons if bouton is not None]
         if isinstance(self.courant, Bouton):
             if self.courant.texte in [bouton.texte for bouton in self.boutons]:
                 self.set_courant(self.boutons[[bouton.texte for bouton in self.boutons].index(self.courant.texte)])
@@ -2343,7 +2416,7 @@ class Description_ennemi(Wrapper_knot, Knot_horizontal_profondeur_agnostique):
         self.contenu.update()
         for objet in self.objets:
             objet.update()
-        if self.tailles != [0, 0]:
+        if self.tailles != (0,0):
             self.set_tailles(self.tailles)
 
 class Description_item(Wrapper_knot, Knot_vertical_profondeur_agnostique):
@@ -2351,11 +2424,12 @@ class Description_item(Wrapper_knot, Knot_vertical_profondeur_agnostique):
         Wrapper_knot.__init__(self)
 
         self.controleur = controleur
-        self.item = item
+        self.item:Item = item
         self.fond = (200, 200, 200)
 
         self.paves = Paves(self.item.get_description())
-        self.boutons = [
+        assert self.controleur.joueur is not None
+        boutons:List[Optional[Bouton]] = [
             None if not isinstance(self.item,Equipement) else 
             (Bouton(SKIN_DESEQUIPER_ANNEAU, "Desequiper") if isinstance(self.item, Anneau) else
              Bouton(SKIN_DESEQUIPER_ARME, "Desequiper") if isinstance(self.item, Arme) else
@@ -2376,7 +2450,7 @@ class Description_item(Wrapper_knot, Knot_vertical_profondeur_agnostique):
             Bouton(SKIN_JETER, "Jeter"),
         ]
 
-        self.boutons = [bouton for bouton in self.boutons if bouton is not None]
+        self.boutons:List[Bouton] = [bouton for bouton in boutons if bouton is not None]
         self.set_default_courant()
 
         self.init()
@@ -2390,8 +2464,7 @@ class Description_item(Wrapper_knot, Knot_vertical_profondeur_agnostique):
         self.fond = (200, 200, 200)
 
     def select(self, selection: Cliquable, droit: bool = False):
-        print("selection")
-        print(selection)
+        assert self.controleur.joueur is not None
         if not droit:
             if isinstance(selection, Bouton):
                 print("bouton")
@@ -2401,12 +2474,16 @@ class Description_item(Wrapper_knot, Knot_vertical_profondeur_agnostique):
                 elif selection.texte == "Desequiper":
                     self.controleur.joueur.inventaire.desequippe([self.item])
                 elif selection.texte == "Lancer":
-                    self.controleur.joueur.utilise(trouve_skill(self.controleur.joueur.classe_principale, Skills_projectiles))
-                    self.controleur.joueur.projectile_courant = self.item
+                    skill = trouve_skill(self.controleur.joueur.classe_principale, Skills_projectiles)
+                    assert skill is not None
+                    self.controleur.joueur.utilise(type(skill))
+                    assert isinstance(self.item, Projectile)
+                    self.controleur.joueur.projectile_courant = self.item #/!\ Qu'est-ce qu'est exactement le projectile courant ? /!\
                 elif selection.texte == "Boire" or selection.texte == "Utiliser":
-                    self.item: Consommable
+                    assert isinstance (self.item, Consommable)
                     self.item.utilise(self.controleur.joueur)
                 elif selection.texte == "Jeter":
+                    assert self.controleur.joueur.position is not None
                     self.controleur.joueur.inventaire.drop(self.controleur.joueur.position, self.item.ID)
         self.update()
         # TODO : indiquer que l'action a été effectuée
@@ -2423,8 +2500,10 @@ class Description_item(Wrapper_knot, Knot_vertical_profondeur_agnostique):
             self.set_courant(self.boutons[self.boutons.index(self.courant) + 1])
 
     def update(self):
+        assert self.contenu is not None
         self.paves = Paves(self.item.get_description())
-        self.boutons = [
+        assert self.controleur.joueur is not None
+        boutons:List[Optional[Bouton]] = [
             None if not isinstance(self.item,Equipement) else
             (Bouton(SKIN_DESEQUIPER_ANNEAU, "Desequiper") if isinstance(self.item, Anneau) else
                 Bouton(SKIN_DESEQUIPER_ARME, "Desequiper") if isinstance(self.item, Arme) else
@@ -2444,7 +2523,7 @@ class Description_item(Wrapper_knot, Knot_vertical_profondeur_agnostique):
             Bouton(SKIN_UTILISER, "Utiliser") if isinstance(self.item, Parchemin) else None,
             Bouton(SKIN_JETER, "Jeter"),
         ]
-        self.boutons = [bouton for bouton in self.boutons if bouton is not None]
+        self.boutons:List[Bouton] = [bouton for bouton in boutons if bouton is not None]
         if isinstance(self.courant, Bouton):
             if self.courant.texte in [bouton.texte for bouton in self.boutons]:
                 self.set_courant(self.boutons[[bouton.texte for bouton in self.boutons].index(self.courant.texte)])
@@ -2454,5 +2533,5 @@ class Description_item(Wrapper_knot, Knot_vertical_profondeur_agnostique):
         self.contenu.update()
         for objet in self.objets:
             objet.update()
-        if self.tailles != [0, 0]:
+        if self.tailles != (0,0):
             self.set_tailles(self.tailles)

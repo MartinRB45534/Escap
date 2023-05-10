@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Type, TYPE_CHECKING
+from typing import Set, Type, TYPE_CHECKING
 if TYPE_CHECKING:
     from Jeu.Controleur import Controleur
     from Jeu.Entitee.Agissant.Agissant import Agissant
@@ -27,7 +27,7 @@ class Inventaire:
                       Cadavre:[], #Oui, on peut récupérer des cadavres, et alors, circluez, ya rien à voir...
                       Oeuf:[] #Vous allez quand même pas me dire que c'est l'oeuf qui vous choque ! Il y a marqué cadavre juste au dessus !
                       }
-        self.kiiz:List[Type[Item]] = [Potion,Parchemin,Cle,Arme,Bouclier,Armure,Haume,Anneau,Projectile,Ingredient,Cadavre,Oeuf]
+        self.kiiz:List[Type[Potion|Parchemin|Cle|Arme|Bouclier|Armure|Haume|Anneau|Projectile|Ingredient|Cadavre|Oeuf]] = [Potion,Parchemin,Cle,Arme,Bouclier,Armure,Haume,Anneau,Projectile,Ingredient,Cadavre,Oeuf]
         self.arme = None #L'arme équipée
         self.bouclier = None #Le bouclier équipé
         self.armure = None #L'armure équipée
@@ -39,12 +39,12 @@ class Inventaire:
         self.controleur = controleur
         for key in self.items:
             for item in self.items[key]:
-                self.controleur[item].active(controleur)
+                self.controleur.entitees[item].active(controleur)
 
     def desactive(self):
         for key in self.items:
             for item in self.items[key]:
-                self.controleur[item].desactive()
+                self.controleur.entitees[item].desactive()
         self.controleur = None
         
     def ramasse_item(self,ID_item: int):
@@ -53,20 +53,22 @@ class Inventaire:
         Entrée:
             -l'ID de l'item à ramasser
         """
-        item = self.controleur[ID_item]
-        item.position = None
-        self.items[item.get_classe()].append(ID_item)
+        item = self.controleur.entitees[ID_item]
+        if issubclass(item.get_classe(),Item):
+            self.ajoute(item)
 
     def ajoute(self,item:Item):
         #Comme la précédente, mais c'est l'item et non son ID qui est passé en paramètre
         item.position = None
-        self.items[item.get_classe()].append(item.ID)
+        classe = item.get_classe()
+        if classe in self.items:
+            self.items[classe].append(item.ID)
 
     # def utilise_item(self,ID_item:int):
     #     """Appelé en appuyant sur la touche espace, utilise l'item actuellement sélectionné."""
     #     ###L'utilisation varie beaucoup selon le type d'item :
-    #     if ID_item != None:
-    #         item:Item = self.controleur[ID_item]
+    #     if ID_item is not None:
+    #         item:Item = self.controleur.entitees[ID_item]
     #         if isinstance(item,Consommable): #Un consommable se consomme (si c'est un parchemin, l'activation peut échouer)
     #             item.utilise(self.controleur[self.possesseur])
     #         elif isinstance(item,Arme): #Un équipable s'équipe. Il y a certaines conditions.
@@ -90,7 +92,7 @@ class Inventaire:
         """Indique la quantité d'items correspondants à une classe voulue.""" #Pour les ingrédients des recettes
         res=0
         for ID in self.items[Ingredient]:
-            item:Item = self.controleur[ID]
+            item:Item = self.controleur.entitees[ID]
             if isinstance(item,classe) and item.etat == "intact":
                 res+=1
         return res
@@ -98,20 +100,20 @@ class Inventaire:
     def consomme(self,classe):
         """Consomme un ingrédient lors d'une opération d'alchimie.""" #/!\ Rien à voir avec les consommables !
         for ID in self.items[Ingredient]:
-            item:Item = self.controleur[ID]
+            item:Item = self.controleur.entitees[ID]
             if isinstance(item,classe) and item.etat == "intact":
                 item.etat = "brisé"
                 break
 
     def get_items_visibles(self):
         items_visibles:List[int] = []
-        if self.arme != None:
+        if self.arme is not None:
             items_visibles.append(self.arme)
-        if self.bouclier != None:
+        if self.bouclier is not None:
             items_visibles.append(self.bouclier)
-        if self.armure != None:
+        if self.armure is not None:
             items_visibles.append(self.armure)
-        if self.haume != None:
+        if self.haume is not None:
             items_visibles.append(self.haume)
         return items_visibles
 
@@ -119,7 +121,7 @@ class Inventaire:
         return self.arme
 
     def set_arme(self,ID:int):
-        item:Item = self.controleur[ID]
+        item:Item = self.controleur.entitees[ID]
         if isinstance(item,Arme):
             self.arme = ID
 
@@ -127,7 +129,7 @@ class Inventaire:
         return self.bouclier
 
     def set_bouclier(self,ID:int):
-        item:Item = self.controleur[ID]
+        item:Item = self.controleur.entitees[ID]
         if isinstance(item,Bouclier):
             self.bouclier = ID
 
@@ -135,7 +137,7 @@ class Inventaire:
         return self.armure
 
     def set_armure(self,ID:int):
-        item:Item = self.controleur[ID]
+        item:Item = self.controleur.entitees[ID]
         if isinstance(item,Armure):
             self.armure = ID
 
@@ -143,7 +145,7 @@ class Inventaire:
         return self.haume
 
     def set_haume(self,ID:int):
-        item:Item = self.controleur[ID]
+        item:Item = self.controleur.entitees[ID]
         if isinstance(item,Haume):
             self.haume = ID
 
@@ -151,7 +153,7 @@ class Inventaire:
         return self.anneau
 
     def set_anneau(self,ID:int):
-        item:Item = self.controleur[ID]
+        item:Item = self.controleur.entitees[ID]
         if isinstance(item,Anneau):
             if ID in self.anneau:
                 self.anneau.remove(ID)
@@ -163,16 +165,16 @@ class Inventaire:
 
     def get_equippement(self):
         equippement = []
-        if self.arme != None:
+        if self.arme is not None:
             equippement.append(self.arme)
-        if self.bouclier != None:
+        if self.bouclier is not None:
             equippement.append(self.bouclier)
-        if self.armure != None:
+        if self.armure is not None:
             equippement.append(self.armure)
-        if self.haume != None:
+        if self.haume is not None:
             equippement.append(self.haume)
         for anneau in self.anneau:
-            if anneau != None:
+            if anneau is not None:
                 equippement.append(anneau)
         return equippement
 
@@ -224,34 +226,40 @@ class Inventaire:
                     self.anneau.append(None)
 
     def get_clees(self):
-        clees:List[int] = []
+        clees:Set[str] = set()
         for ID_cle in self.items[Cle]:
-            cle:Cle = self.controleur[ID_cle]
+            cle:Cle = self.controleur.entitees[ID_cle]
             for code in cle.codes:
-                clees.append(code)
+                clees.add(code)
         return clees
 
     def get_clee(self,code):
+        assert self.controleur is not None
         cle = None
         for ID_cle in self.items[Cle]:
-            if code in self.controleur[ID_cle].codes:
+            cle = self.controleur.entitees[ID_cle]
+            assert isinstance(cle,Cle)
+            if code in cle.codes:
                 cle = ID_cle
         return cle
 
     def get_items(self):
-        items:List[Entitee] = []
+        assert self.controleur is not None
+        items:Set[Entitee] = set()
         for kii in self.kiiz:
             for ID in self.items[kii]:
-                items.append(self.controleur[ID])
+                items.add(self.controleur.entitees[ID])
         return items
 
     def nettoie_item(self): #Méthode appelée à chaque fin de tour pour supprimer les items retirés ou utilisés.
+        assert self.controleur is not None
         for cat in range(10): #On parcourt les catégories
             items = self.items[self.kiiz[cat]]
             for nb_item in range(len(items)-1,-1,-1): #On parcourt les items
                 ID_item = items[nb_item]
-                item:Item = self.controleur[ID_item]
-                if item.position != None or item.etat == "brisé": #S'il a été lancé ou n'est plus en état
+                item = self.controleur.entitees[ID_item]
+                assert isinstance(item,Item)
+                if item.position is not None or item.etat == "brisé": #S'il a été lancé ou n'est plus en état
                     items.remove(ID_item)
 
                     if self.arme == ID_item :
@@ -271,7 +279,7 @@ class Inventaire:
         for cat_item in self.kiiz : #On drop aussi les cadavres et les oeufs
             for ID_item in self.items[cat_item]:
                 self.drop(position,ID_item)
-                item:Item = self.controleur[ID_item]
+                item:Item = self.controleur.entitees[ID_item]
                 self.controleur.entitees_courantes.add(ID_item)
                 item.position = position
             self.items[cat_item]=[]
@@ -284,7 +292,7 @@ class Inventaire:
     def drop(self,position:Position,ID_item:int):
         for cat_item in self.kiiz :
             if ID_item in self.items[cat_item]:
-                item:Item = self.controleur[ID_item]
+                item:Item = self.controleur.entitees[ID_item]
                 self.controleur.entitees_courantes.add(ID_item)
                 item.position = position
                 self.items[cat_item].remove(ID_item)
@@ -306,15 +314,15 @@ class Inventaire:
         for cat_item in [Potion,Parchemin,Cle,Arme,Bouclier,Armure,Haume,Anneau,Projectile,Ingredient] : #On sépare les 'vrais' items des faux.
             items += self.items[cat_item]
         for ID_item in items :
-            item:Item = self.controleur[ID_item]
+            item:Item = self.controleur.entitees[ID_item]
             item.debut_tour()
             if item.etat == "suspens":
                 item.utilise(self.controleur[self.possesseur])
         #On ne manipule pas les cadavres
         for ID_oeuf in self.items[Oeuf]: #Mais les oeufs incubent !
-            oeuf:Agissant = self.controleur[ID_oeuf]
-            hatch:Hatching = trouve_skill(oeuf.classe_principale,Hatching)
-            if hatch != None:
+            oeuf:Agissant = self.controleur.entitees[ID_oeuf]
+            hatch:Optional[Hatching] = trouve_skill(oeuf.classe_principale,Hatching)
+            if hatch is not None:
                 if hatch.utilise(): #Et peuvent même éclore !
                     self.controleur.fait_eclore(oeuf,self.possesseur)# /!\ À coder !
 
@@ -323,7 +331,7 @@ class Inventaire:
         for cat_item in [Potion,Parchemin,Cle,Arme,Bouclier,Armure,Haume,Anneau,Projectile,Ingredient] : #On sépare les 'vrais' items des faux.
             items += self.items[cat_item]
         for ID_item in items :
-            item:Item = self.controleur[ID_item]
+            item:Item = self.controleur.entitees[ID_item]
             item.pseudo_debut_tour()
 
     def fin_tour(self):
@@ -331,19 +339,19 @@ class Inventaire:
         for item in [Potion,Parchemin,Cle,Arme,Bouclier,Armure,Haume,Anneau,Projectile,Ingredient] : #On sépare les 'vrais' items des faux.
             items += self.items[item]
         for ID_item in items :
-            item:Item = self.controleur[ID_item]
+            item:Item = self.controleur.entitees[ID_item]
             item.fin_tour() #Moins de choses à faire à la fin du tour.
         self.nettoie_item()
 
     def a_parchemin_vierge(self):
         for ID_parch in self.items[Parchemin]:
-            if isinstance(self.controleur[ID_parch],Parchemin_vierge):
+            if isinstance(self.controleur.entitees[ID_parch],Parchemin_vierge):
                 return True
         return False
 
     def consomme_parchemin_vierge(self):
         for ID_parch in self.items[Parchemin]:
-            parch:Parchemin = self.controleur[ID_parch]
+            parch:Parchemin = self.controleur.entitees[ID_parch]
             if isinstance(parch,Parchemin_vierge):
                 parch.etat = "brisé"
                 return True

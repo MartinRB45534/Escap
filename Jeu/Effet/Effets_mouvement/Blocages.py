@@ -15,12 +15,12 @@ class Mur_plein(On_try_through):
             ecrasement = None
             if not(issubclass(entitee.get_classe(),Item)):
                 ecrasement = trouve_skill(entitee.classe_principale,Skill_ecrasement)   # ou l'écraser.
-            if ecrasement != None :
+            if ecrasement is not None :
                 passage = ecrasement.utilise(self.durete,entitee.get_priorite())
                 if passage :
                     self.casse = True
                     mur_oppose = mur.get_mur_oppose()
-                    if mur_oppose != None:
+                    if mur_oppose is not None:
                         for effet in mur_oppose.effets :
                             if isinstance(effet,Mur_plein):
                                 effet.casse = True
@@ -47,9 +47,6 @@ class Mur_impassable(On_try_through):
     def action(self,mur,entitee):
         mur.peut_passer = False
 
-    def execute(self,mur,entitee):
-        self.action(mur,entitee)
-
     def get_skin(self,code):
         return SKINS_MURS[code]
 
@@ -63,20 +60,20 @@ class Porte(On_try_through):
         self.ferme = True
         self.auto = automatique
 
-    def action(self,mur,entitee):
+    def action(self,mur,entitee:Item|Agissant):
         if not(isinstance(entitee,Fantome)):          #Trois moyens de traverser une porte : être un fantome ;
             if not(isinstance(entitee,Agissant)) or not(self.code in entitee.get_clees()): # avoir la clée ;
                 ecrasement = None
-                if not(issubclass(entitee.get_classe(),Item)):
+                if isinstance(entitee,Agissant) and issubclass(entitee.get_classe(),Item):
                     ecrasement = trouve_skill(entitee.classe_principale,Skill_ecrasement)  # ou tout détruire !
-                if ecrasement != None :
+                if ecrasement is not None :
                     passage = ecrasement.utilise(self.durete,entitee.get_priorite())
                     if passage :
                         self.casse = True
                         self.affiche = False
                         self.ferme = False #Si on détruit la porte, elle n'est plus fermée...
                         mur_oppose = mur.get_mur_oppose()
-                        if mur_oppose != None:
+                        if mur_oppose is not None:
                             for effet in mur_oppose.effets :
                                 if isinstance(effet,Porte):
                                     effet.casse = True
@@ -89,7 +86,7 @@ class Porte(On_try_through):
             elif not(self.auto): #Si on a la clé et la porte n'est pas automatique, elle reste ouverte !
                 self.ferme = False
                 mur_oppose = mur.get_mur_oppose()
-                if mur_oppose != None:
+                if mur_oppose is not None:
                     for effet in mur_oppose.effets :
                         if isinstance(effet,Porte):
                             effet.ferme = False #On voudrait aussi ouvrir l'autre côté de la porte.

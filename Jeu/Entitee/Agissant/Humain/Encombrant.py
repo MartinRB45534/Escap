@@ -8,7 +8,7 @@ from Jeu.Entitee.Agissant.Humain.Humain import *
 
 class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyennement apprèciable, surtout si on essaye de draguer sa copine)
     """La classe de l'encombrant."""
-    def __init__(self,controleur:Controleur,position:Position):
+    def __init__(self,controleur:Controleur,position:Optional[Position]=None):
 
         self.identite = 'encombrant'
         self.place = 5

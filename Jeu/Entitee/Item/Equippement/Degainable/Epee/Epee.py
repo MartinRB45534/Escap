@@ -2,7 +2,7 @@ from Jeu.Entitee.Item.Equippement.Degainable.Degainable import *
 
 class Epee(Arme):
     """La classe des armes de type épée. Permettent de porter des coups semi-circulaires devant l'agissant."""
-    def __init__(self,position:Position,element:int,tranchant:float,portee:int):
+    def __init__(self,position:Optional[Position]=None,element:int,tranchant:float,portee:int):
         Arme.__init__(self,position,element,tranchant,portee)
         self.poids = 5
         self.frottements = 4

@@ -1,10 +1,11 @@
+from typing import Optional
 from Jeu.Effet.Effet import *
 from Jeu.Constantes import *
 from Jeu.Labyrinthe.Structure_spatiale.Position import *
 
 class Attaque(One_shot):
     """L'effet d'attaque dans sa version générale. Pour chaque case dans la zone, crée une attaque (version intermèdiaire). Attachée au responsable."""
-    def __init__(self,responsable=0,degats=0,element=TERRE,distance="contact",portee=1,propagation="C__S___",direction=None,autre=None,taux_autre=None):
+    def __init__(self,responsable:int=0,degats:float=0,element:int=TERRE,distance:str="contact",portee:float=1,propagation:str="C__S___",direction:Optional[Direction]=None,autre:Optional[str]=None,taux_autre:Optional[float]=None):
         self.affiche = False
         self.phase = "démarrage"
         self.responsable = responsable
@@ -47,14 +48,14 @@ class Attaque_decentree(Attaque_magique):
 
 class Attaque_delayee(Attaque_magique):
     """Une attaque qui se fera plus tard."""
-    def __init__(self,delai,responsable=0,degats=0,element=TERRE,portee=1,distance="distance",propagation="C__S___",direction=None,autre=None,taux_autre=None):
-        Attaque_magique.__init__(self,responsable,degats,element,portee,distance,propagation,direction,autre,taux_autre)
+    def __init__(self,delai,responsable=0,degats=0,element=TERRE,distance="distance",portee=1,propagation="C__S___",direction=None,autre=None,taux_autre=None):
+        Attaque_magique.__init__(self,responsable,degats,element,distance,portee,propagation,direction,autre,taux_autre)
         self.delai = delai
 
 class Attaque_decentree_delayee(Attaque_decentree,Attaque_delayee):
     """Une attaque magique typique : affecte une zone éloignée après un temps de retard."""
-    def __init__(self,position:Position,delai,responsable=0,degats=0,element=TERRE,portee=1,distance="distance",propagation="C__S___",direction=None,autre=None,taux_autre=None):
-        Attaque_magique.__init__(self,responsable,degats,element,portee,distance,propagation,direction,autre,taux_autre)
+    def __init__(self,position:Position,delai,responsable=0,degats=0,element=TERRE,distance="distance",portee=1,propagation="C__S___",direction=None,autre=None,taux_autre=None):
+        Attaque_magique.__init__(self,responsable,degats,element,distance,portee,propagation,direction,autre,taux_autre)
         self.position = position
         self.delai = delai
 
@@ -65,7 +66,7 @@ class Attaque_decentree_delayee(Attaque_decentree,Attaque_delayee):
 
 class Attaque_case(One_shot):
     """L'effet d'attaque dans sa version intermédiaire. Créée par une attaque (version générale), chargé d'attacher une attaque particulière aux agissants de la case, en passant d'abord les défenses de la case. Attachée à la case."""
-    def __init__(self,responsable,degats,element,distance="contact",direction = None,autre=None,taux_autre=None):
+    def __init__(self,responsable:int,degats:float,element:int,distance:str="contact",direction:Optional[Direction] = None,autre:Optional[str]=None,taux_autre:Optional[float]=None):
         self.affiche = True
         self.phase = "démarrage"
         self.responsable = responsable
@@ -80,10 +81,11 @@ class Attaque_case(One_shot):
         victimes_potentielles = case.controleur.trouve_agissants_courants(case.position)
         for victime_potentielle in victimes_potentielles:
             if not victime_potentielle in case.controleur.get_esprit(case.controleur[self.responsable].esprit).get_corps():
-                if self.autre == None :
-                    case.controleur[victime_potentielle].effets.append(Attaque_particulier(self.responsable,self.degats,self.element,self.distance,self.direction))
+                if self.autre is None :
+                    case.controleur.entitees[victime_potentielle].effets.append(Attaque_particulier(self.responsable,self.degats,self.element,self.distance,self.direction))
                 elif self.autre == "piercing":
-                    case.controleur[victime_potentielle].effets.append(Attaque_percante(self.responsable,self.degats,self.element,self.distance,self.direction,self.taux_autre))
+                    assert self.taux_autre is not None
+                    case.controleur.entitees[victime_potentielle].effets.append(Attaque_percante(self.responsable,self.degats,self.element,self.distance,self.direction,self.taux_autre))
 
     def execute(self,case):
         if self.phase == "démarrage":
@@ -138,7 +140,7 @@ class Attaque_particulier(One_shot):
 
 class Attaque_percante(Attaque_particulier): #Attention ! Perçant pour une attaque signifie qu'elle traverse les defenses. C'est totalement différend pour un item !
     """L'effet d'attaque dans sa version particulière. Créée par une attaque (version générale), chargé d'infligé les dégats, en passant d'abord les défenses de la case puis celles de l'agissant. Attachée à la victime. En prime, une partie de ses dégats ne sont pas bloquables."""
-    def __init__(self,responsable,degats,element,distance="contact",direction = None,taux_perce = 0):
+    def __init__(self,responsable:int,degats:float,element:int,distance:str="contact",direction:Optional[Direction] = None,taux_perce:float = 0):
         self.affiche = True
         self.phase = "démarrage"
         self.responsable = responsable
@@ -170,6 +172,6 @@ class Purification_lumineuse(Attaque):
         for position_touche in positions_touches:
             for victime_potentielle in controleur.trouve_agissants_courants(position_touche):
                 if not "humain" in controleur.get_especes(victime_potentielle):
-                    victime = controleur[victime_potentielle]
+                    victime = controleur.entitees[victime_potentielle]
                     victime.pv -= self.degats * victime.get_aff(OMBRE)
   

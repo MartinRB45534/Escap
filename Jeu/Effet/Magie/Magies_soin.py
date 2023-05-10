@@ -45,7 +45,7 @@ class Magie_multi_soin(Cible_agissant,Multi_cible):
 
     def action(self,lanceur):
         for cible in self.cible:
-            agissant_cible = lanceur.controleur[cible]
+            agissant_cible = lanceur.controleur.entitees[cible]
             agissant_cible.effets.append(Soin(lanceur.ID,self.gain_pv))
 
     def get_image(self):
@@ -148,7 +148,7 @@ class Magie_resurection(Magie):
 
     def action(self,lanceur):
         ID_cadavre = lanceur.inventaire.get_item_courant()
-        cadavre = lanceur.controleur[ID_cadavre]
+        cadavre = lanceur.controleur.entitees[ID_cadavre]
         if cadavre.get_classe() == Cadavre:
             lanceur.inventaire.drop(lanceur.position)
             cadavre.effets.append(Resurection())

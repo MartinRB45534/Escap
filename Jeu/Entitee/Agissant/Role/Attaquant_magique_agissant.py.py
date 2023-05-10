@@ -26,7 +26,7 @@ class Attaquant_magique_agissant(Mage):
         return defaut
 
     def get_impact(self):
-        if self.cible_magie != None:
+        if self.cible_magie is not None:
             return self.controleur[self.cible_magie].position
         else:
             return Agissant.get_impact(self)

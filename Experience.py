@@ -59,7 +59,7 @@ def experimente5():
             for agissant in agissants_courants :
                 agissant.post_decision()
             for agissant in agissants_courants :
-                while agissant.latence <= 0 and agissant.skill_courant != None :
+                while agissant.latence <= 0 and agissant.skill_courant is not None :
                     controleur.fait_agir(agissant)
                     agissant.on_action()
                 agissant.on_action()

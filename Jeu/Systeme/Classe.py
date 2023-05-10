@@ -1,5 +1,5 @@
 import random
-from typing import List, Type
+from typing import List, Optional, Type, TypeVar
 from Jeu.Constantes import *
 from Jeu.Systeme.Kumo_desu_ga_nanika import *
 
@@ -80,13 +80,15 @@ class Classe:
         for i in range(nb_evo):
             for cadeau in self.cad_evo[self.niveau]:
                 if issubclass(cadeau,Classe):
+                    cadeau = cadeau()
                     self.sous_classes.append(cadeau)
                     cadeau.evo() #La classe devrait encore être au niveau 0
                 elif issubclass(cadeau,Skill):
+                    cadeau = cadeau()
                     self.skills.append(cadeau)
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 elif isinstance(cadeau,int):
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
@@ -811,17 +813,17 @@ class Voleur(Classe):
 
         self.nom = "Voleur"
 
-def trouve_skill(classe:Classe,type_skill:Type):
-    trouve = None
+# T is a type, and must be a subclass of Skill_intrasec
+T = TypeVar('T', bound=Skill_intrasec)
+
+def trouve_skill(classe:Classe,type_skill:Type[T]) -> Optional[T]:
     for skill in classe.skills:
         if isinstance(skill,type_skill) and skill.niveau > 0: #On ne devrait pas avoir de skill a 0 mais on ne sait jamais.
-            trouve = skill
+            return skill
     for skill in classe.skills_intrasecs:
         if isinstance(skill,type_skill) and skill.niveau > 0: #On ne devrait pas avoir de skill a 0 mais on ne sait jamais.
-            trouve = skill
-    if trouve == None:
-        for sous_classe in classe.sous_classes: #On récurse la recherche dans les sous-classes.
-            trouve_bis = trouve_skill(sous_classe,type_skill)
-            if trouve_bis != None:
-                trouve = trouve_bis
-    return trouve
+            return skill
+    for sous_classe in classe.sous_classes: #On récurse la recherche dans les sous-classes.
+        trouve_bis = trouve_skill(sous_classe,type_skill)
+        if trouve_bis is not None:
+            return trouve_bis

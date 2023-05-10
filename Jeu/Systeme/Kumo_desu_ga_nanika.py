@@ -55,7 +55,7 @@ class Height_of_Occultism(Skill):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int):
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 # elif isinstance(cadeau,magie):
                 #     self.ajoute(cadeau)
                 else:
@@ -96,7 +96,7 @@ class Divine_Thread_Weaving(Skill):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int):
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 # elif isinstance(cadeau,magie):
                 #     self.ajoute(cadeau)
                 else:
@@ -139,7 +139,7 @@ class Jinx_Evil_Eye(Skill):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int):
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 # elif isinstance(cadeau,magie):
                 #     self.ajoute(cadeau)
                 else:
@@ -170,7 +170,7 @@ class Inert_Evil_Eye(Skill):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int):
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 # elif isinstance(cadeau,magie):
                 #     self.ajoute(cadeau)
                 else:
@@ -203,7 +203,7 @@ class Repellent_Evil_Eye(Skill):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int):
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 # elif isinstance(cadeau,magie):
                 #     self.ajoute(cadeau)
                 else:
@@ -237,7 +237,7 @@ class Annihilating_Evil_Eye(Skill):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int):
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 # elif isinstance(cadeau,magie):
                 #     self.ajoute(cadeau)
                 else:
@@ -480,7 +480,7 @@ class Lesser_Height_of_Occultism(Height_of_Occultism,Skill_intrasec):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int):
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 # elif isinstance(cadeau,magie):
                 #     self.ajoute(cadeau)
                 else:
@@ -521,7 +521,7 @@ class Lesser_Divine_Thread_Weaving(Divine_Thread_Weaving,Skill_intrasec):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int):
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 # elif isinstance(cadeau,magie):
                 #     self.ajoute(cadeau)
                 else:

@@ -3,7 +3,7 @@ from Jeu.Systeme.Constantes_items.Items import *
 
 class Potion_empoisonnee(Potion):
     """Une potion pas très bonne pour la santé."""
-    def __init__(self,position:Position):
+    def __init__(self,position:Optional[Position]=None):
         Potion.__init__(self,position,Poison(1,1,0.0101))
 
     def get_titre(self,observation=0):
@@ -17,7 +17,7 @@ class Potion_empoisonnee(Potion):
 
 class Potion_antidote(Potion):
     """Une potion qui élimine les poisons."""
-    def __init__(self,position:Position):
+    def __init__(self,position:Optional[Position]=None):
         Potion.__init__(self,position,Antidote())
 
     def get_titre(self,observation=0):
@@ -28,7 +28,7 @@ class Potion_antidote(Potion):
 
 class Potion_medicament(Potion):
     """Une potion qui élimine les maladies."""
-    def __init__(self,position:Position):
+    def __init__(self,position:Optional[Position]=None):
         Potion.__init__(self,position,Medicament())
 
     def get_titre(self,observation=0):
@@ -39,7 +39,7 @@ class Potion_medicament(Potion):
 
 class Potion_soin(Potion):
     """Une potion qui restaure les PVs."""
-    def __init__(self,position:Position,pv):
+    def __init__(self,position:Optional[Position]=None,pv):
         Potion.__init__(self,position,Soin(0,pv))
 
     def get_titre(self,observation=0):
@@ -50,12 +50,12 @@ class Potion_soin(Potion):
 
 class Potion_hypokute(Potion_soin):
     """Une potion qui restaure les PVs."""
-    def __init__(self,position:Position):
+    def __init__(self,position:Optional[Position]=None):
         Potion_soin.__init__(self,position,soin_potion_hypokute)
 
 class Potion_force(Potion):
     """Une potion qui augmente les dégats infligés."""
-    def __init__(self,position:Position):
+    def __init__(self,position:Optional[Position]=None):
         Potion.__init__(self,position,Enchantement_force(1.5,100))
 
     def get_titre(self,observation=0):
@@ -66,7 +66,7 @@ class Potion_force(Potion):
 
 #class Potion_defense(Potion):
 #    """Une potion qui protège des attaques."""
-#    def __init__(self,position:Position,pv):
+#    def __init__(self,position:Optional[Position]=None,pv):
 #        Potion.__init__(self,position,Enchantement_defense(duree,)) #/!\ Qu'est-ce qui m'est arrivé ici ?
 #
 #    def get_titre(self,observation=0):
@@ -77,7 +77,7 @@ class Potion_force(Potion):
 
 class Potion_vitesse(Potion):
     """Une potion qui augmente temporairement la vitesse."""
-    def __init__(self,position:Position,duree,vitesse):
+    def __init__(self,position:Optional[Position]=None,duree,vitesse):
         Potion.__init__(self,position,Enchantement_vitesse(duree,vitesse))
 
     def get_titre(self,observation=0):

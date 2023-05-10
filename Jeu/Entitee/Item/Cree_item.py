@@ -1,10 +1,13 @@
-from Jeu.Entitee.Item.Item import *
+from Jeu.Entitee.Item.Projectile.Projectiles import *
 from Jeu.Systeme.Classe import *
 
 class Cree_item:
     """La classe des créateurs d'item."""
     def __init__(self,classe_item = Item):
         self.item = classe_item
+
+    def cree_item(self,agissant:Agissant) -> Projectile:
+        raise NotImplementedError
 
 class Cree_fleche_de_base_skill(Cree_item):
     """La classe des créateurs de fleche de base, associé au skill de création de fleche."""
@@ -14,7 +17,7 @@ class Cree_fleche_de_base_skill(Cree_item):
 
     def cree_item(self,agissant:Agissant): #On ne lui donne que la classe principale, et il se débrouille pour trouver le skill
         skill = trouve_skill(agissant.classe_principale,Skill_creation_de_fleches)
-        if skill == None:
+        if skill is None:
             print("Euh... Quoi ? Qu'est-ce qui m'est arrivé ?")
             item = None
         else:
@@ -34,7 +37,7 @@ class Cree_fleche_percante_skill(Cree_item):
 
     def cree_item(self,agissant:Agissant): #On ne lui donne que la classe principale, et il se débrouille pour trouver le skill
         skill = trouve_skill(agissant.classe_principale,Skill_creation_de_fleches)
-        if skill == None:
+        if skill is None:
             print("Euh... Quoi ? Qu'est-ce qui m'est arrivé ?")
             item = None
         else:
@@ -54,7 +57,7 @@ class Cree_fleche_fantome_skill(Cree_item):
 
     def cree_item(self,agissant:Agissant): #On ne lui donne que la classe principale, et il se débrouille pour trouver le skill
         skill = trouve_skill(agissant.classe_principale,Skill_creation_de_fleches)
-        if skill == None:
+        if skill is None:
             print("Euh... Quoi ? Qu'est-ce qui m'est arrivé ?")
             item = None
         else:
@@ -74,7 +77,7 @@ class Cree_fleche_lourde_skill(Cree_item):
 
     def cree_item(self,agissant:Agissant): #On ne lui donne que la classe principale, et il se débrouille pour trouver le skill
         skill = trouve_skill(agissant.classe_principale,Skill_creation_de_fleches)
-        if skill == None:
+        if skill is None:
             print("Euh... Quoi ? Qu'est-ce qui m'est arrivé ?")
             item = None
         else:
@@ -94,7 +97,7 @@ class Cree_fleche_legere_skill(Cree_item):
 
     def cree_item(self,agissant:Agissant): #On ne lui donne que la classe principale, et il se débrouille pour trouver le skill
         skill = trouve_skill(agissant.classe_principale,Skill_creation_de_fleches)
-        if skill == None:
+        if skill is None:
             print("Euh... Quoi ? Qu'est-ce qui m'est arrivé ?")
             item = None
         else:
@@ -115,11 +118,8 @@ class Cree_fleche_explosive_skill(Cree_item):
     def cree_item(self,agissant:Agissant): #On ne lui donne que la classe principale, et il se débrouille pour trouver le skill
         skill_fleche = trouve_skill(agissant.classe_principale,Skill_creation_de_fleches)
         skill_explosif = trouve_skill(agissant.classe_principale,Skill_creation_d_explosifs)
-        if skill_fleche == skill_explosif == None:
-            print("Euh... Quoi ? Qu'est-ce qui m'est arrivé ?")
-            item = None
-        elif skill_fleche != None:
-            if skill_explosif != None:
+        if skill_fleche is not None:
+            if skill_explosif is not None:
                 if skill_fleche.niveau > skill_explosif.niveau :
                     niveau = skill_fleche.utilise(0.01) #L'xp gagné. En faire une variable /!\
                     item = self.item(niveau,None)
@@ -132,10 +132,13 @@ class Cree_fleche_explosive_skill(Cree_item):
                 niveau = skill_fleche.utilise(0.01) #L'xp gagné. En faire une variable /!\
                 item = self.item(niveau,None)
                 agissant.controleur.ajoute_entitee(item)
-        else:
+        elif skill_explosif is not None:
             niveau = skill_explosif.utilise(0.01) #L'xp gagné. En faire une variable /!\
             item = self.item(niveau,None)
             agissant.controleur.ajoute_entitee(item)
+        else:
+            print("Euh... Quoi ? Qu'est-ce qui m'est arrivé ?")
+            item = None
         return item
 
     def get_image(self):
@@ -149,7 +152,7 @@ class Cree_charge_de_base_skill(Cree_item):
 
     def cree_item(self,agissant:Agissant): #On ne lui donne que la classe principale, et il se débrouille pour trouver le skill
         skill = trouve_skill(agissant.classe_principale,Skill_creation_d_explosifs)
-        if skill == None:
+        if skill is None:
             print("Euh... Quoi ? Qu'est-ce qui m'est arrivé ?")
             item = None
         else:
@@ -169,7 +172,7 @@ class Cree_charge_lourde_skill(Cree_item):
 
     def cree_item(self,agissant:Agissant): #On ne lui donne que la classe principale, et il se débrouille pour trouver le skill
         skill = trouve_skill(agissant.classe_principale,Skill_creation_d_explosifs)
-        if skill == None:
+        if skill is None:
             print("Euh... Quoi ? Qu'est-ce qui m'est arrivé ?")
             item = None
         else:
@@ -189,7 +192,7 @@ class Cree_charge_etendue_skill(Cree_item):
 
     def cree_item(self,agissant:Agissant): #On ne lui donne que la classe principale, et il se débrouille pour trouver le skill
         skill = trouve_skill(agissant.classe_principale,Skill_creation_d_explosifs)
-        if skill == None:
+        if skill is None:
             print("Euh... Quoi ? Qu'est-ce qui m'est arrivé ?")
             item = None
         else:

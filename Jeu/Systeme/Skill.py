@@ -78,7 +78,7 @@ class Skill_magie(Skill,Skills_magiques):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int): #comment faire pour les autres types de cadeaux ?
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 # elif isinstance(cadeau,Magie): #On peut gagner une magie avec la montée de niveau du skill !
                 #     self.ajoute(cadeau)
                 else:
@@ -429,7 +429,7 @@ class Skill_blocage(Skill):
         self.xp_new += self.gain_xp
         return self.latence,self.taux_utilisation
 
-class Skill_course(Skill):
+class Skill_course(Skill,Skill_deplacement):
     """Le skill utilisé pour se déplacer. Lorsqu'il augmente de niveau, la vitesse de déplacement augmente aussi. C'est un skill intrasec à la classe principale.
        Les pnjs le sélectionnent lorsqu'il choisissent de se déplacer, alors que le joueur le sélectionne lorsqu'il appuie sur les touches. Le joueur peut aussi s'en servir lorsqu'il explore la minimap ou l'inventaire.
        C'est un skill actif, qui s'actionne quand on le réclame."""
@@ -499,7 +499,7 @@ class Skill_creation_de_fleches(Skill):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int): #comment faire pour les autres types de cadeaux ?
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 # elif isinstance(cadeau,Fleche): #On peut gagner un type de flèche avec la montée de niveau du skill ? /!\ Un skill ne connait pas les autres objets du jeu /!\
                 #     self.ajoute(cadeau)
                 else:
@@ -536,7 +536,7 @@ class Skill_creation_d_explosifs(Skill):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int): #Comment faire pour les autres types de cadeaux ?
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 # elif isinstance(cadeau,Explosif): #On peut gagner un type d'explosif avec la montée de niveau du skill ?
                 #     self.ajoute(cadeau)
                 else:
@@ -588,7 +588,7 @@ class Skill_echange(Skill):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int): #Comment faire pour les autres types de cadeaux ?
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 # elif isinstance(cadeau,Explosif): #On peut gagner un type d'explosif avec la montée de niveau du skill ?
                 #     self.ajoute(cadeau)
                 else:
@@ -662,7 +662,7 @@ class Skill_affinite_elementale(Skill):
                     cadeau.evo() #Le skill devrait encore être au niveau 0
                 el"""
                 if isinstance(cadeau,int): #Comment faire pour les autres types de cadeaux ?
-                    self.xp.append(cadeau)
+                    self.xp_new+=cadeau
                 else:
                     print("Le père Noël s'est trompé...")
             self.niveau+=1

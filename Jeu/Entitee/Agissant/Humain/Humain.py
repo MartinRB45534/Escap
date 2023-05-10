@@ -12,7 +12,7 @@ from Jeu.Dialogues.Dialogues import *
 
 class Humain(PNJ,Entitee_superieure):
     """La classe des pnjs et du joueur. A un comportement un peu plus complexe, et une personnalité."""
-    def __init__(self,controleur:Controleur,position:Position,identite:str,niveau:int,ID:int):
+    def __init__(self,controleur:Controleur,position:Optional[Position]=None,identite:str,niveau:int,ID:int):
         PNJ.__init__(self,controleur,position,identite,niveau,ID)
 
         self.appreciations=[0,0,0,0,0,0,0,0,0,0]
@@ -45,8 +45,8 @@ class Humain(PNJ,Entitee_superieure):
             print(f"{self.identite} a été tué par :")
             print(degats,element)
             print(ID)
-            print(self.controleur[ID])
+            print(self.controleur.entitees[ID])
             self.effets_mortuaires = self.effets
-            self.effets_mortuaires_tueur = self.controleur[ID].effets
+            self.effets_mortuaires_tueur = self.controleur.entitees[ID].effets
             self.controleur.pause = True
         self.insurge(ID,gravite,dangerosite)

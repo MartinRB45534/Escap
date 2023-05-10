@@ -2,7 +2,7 @@ from Jeu.Entitee.Item.Equippement.Equippement import *
 
 class Haume(Equipement):
     """La classe des équipements de type haume. On ne peut en porter qu'un à la fois."""
-    def __init__(self,position:Position):
+    def __init__(self,position:Optional[Position]=None):
         Equipement.__init__(self,position)
         self.poids = 3 #C'est plutôt léger.
         self.frottements = 6

@@ -1,7 +1,7 @@
 from Jeu.Entitee.Item.Equippement.Role.Reparateur.Reparateur import *
 
 class Pompe_a_pv(Reparateur): #Régénère une quantité fixe de pm
-    def __init__(self,position:Position,pv:float):
+    def __init__(self,position:Optional[Position]=None,pv:float):
         Equipement.__init__(self,position)
         self.pv = pv
 
@@ -12,7 +12,7 @@ class Pompe_a_pv(Reparateur): #Régénère une quantité fixe de pm
         return regen_pv + pv
 
 class Renforce_regen_pv(Reparateur): #Démultiplie l'efficacité de la régénération
-    def __init__(self,position:Position,taux_pv:float):
+    def __init__(self,position:Optional[Position]=None,taux_pv:float):
         Equipement.__init__(self,position)
         self.taux_pv = taux_pv
 

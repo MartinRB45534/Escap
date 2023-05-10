@@ -61,7 +61,7 @@ class Blizzard(Evenement,On_post_action):
         if self.phase == "en cours":
             occupants = case.controleur.trouve_mobiles_courants(case.position)
             for occupant in occupants :
-                case.controleur[occupant].latence.add_latence(self.gain_latence)
+                case.controleur.entitees[occupant].latence.add_latence(self.gain_latence)
 
     def execute(self,case):
         self.temps_restant -= 1
@@ -94,7 +94,7 @@ class Enseignement(One_shot,On_fin_tour):
 
     def action(self,porteur):
         skill = trouve_skill(porteur.classe_principale,Skill_magie)
-        if skill != None:
+        if skill is not None:
             skill.ajoute(self.magie)
 
 class Impregnation(One_shot,On_fin_tour):

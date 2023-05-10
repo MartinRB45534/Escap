@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List, TYPE_CHECKING
+from typing import List, TYPE_CHECKING, Optional
 
 from Jeu.Constantes import *
 from Affichage.Skins.Skins import *
@@ -11,13 +11,13 @@ if TYPE_CHECKING:
 
 class Entitee:
     """La classe des entitées"""
-    def __init__(self,position: Position,ID: int|None=None):
+    def __init__(self,position: Optional[Position]=None,ID: Optional[int]=None):
         self.position = position
         self.priorite = 0
         self.latence = 0
         self.effets:List[Effet] = []
         self.controleur = None
-        if ID==None:
+        if ID is None:
             self.ID = ID_MAX.incremente()
         else:
             self.ID = ID

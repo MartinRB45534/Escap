@@ -6,7 +6,7 @@ from Jeu.Systeme.Constantes_decors.Decors import *
 
 class Decors(Non_superposable):
     """La classe des éléments de décors qu'on ne peut pas traverser. On peut interagir avec certains ?"""
-    def __init__(self,position:Position):
+    def __init__(self,position:Optional[Position]=None):
         Entitee.__init__(self,position)
         self.etat  = "intact"
 
@@ -19,7 +19,7 @@ class Decors_interactif(Decors,Interactif):
 
 class Ustensile(Decors_interactif):
     """Permet de créer un Item à partir d'ingrédients"""
-    def __init__(self,position:Position,recettes:List[dict]):
+    def __init__(self,position:Optional[Position]=None,recettes:List[dict]):
         Decors.__init__(self,position)
         self.recettes = recettes #Les recettes de création d'Item
 

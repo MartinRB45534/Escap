@@ -25,7 +25,7 @@ class Esprit :
     def ajoute_corp(self,corp:int):
         if not corp in self.corps:
             self.corps[corp] = "incapacite"
-            self.controleur[corp].rejoint(self.nom)
+            self.controleur.entitees[corp].rejoint(self.nom)
 
     def ajoute_corps(self,corps:List[int]):
         for corp in corps:
@@ -50,46 +50,46 @@ class Esprit :
         if position in self.vue:
             case = self.vue[position]
             for ID in case.entitees:
-                if self.controleur[ID].etat == "vivant":
+                if self.controleur.entitees[ID].etat == "vivant":
                     if ID in self.ennemis:
                         new_importance = self.ennemis[ID]["importance"]
                         if new_importance > importance:
                             importance = new_importance
         return importance
 
-    def ajoute_vue(self,vue:Representation_vue) -> Tuple[List[Position],List[Position]]:
+    def ajoute_vue(self,vue:Representation_vue) -> Tuple[Set[Position],Set[Position]]:
         self.vue[vue.id] = vue
-        nouvelles_cases = []
-        cases_limites = []
+        nouvelles_cases = set()
+        cases_limites = set()
         for decalage in vue.decalage:
             case = vue[decalage]
             if case.clarte > 0:
                 self.vue[case.position].oubli = self.oubli
-                nouvelles_cases.append(case.position)
+                nouvelles_cases.add(case.position)
             else:
                 if case.clarte == -1:
-                    cases_limites.append(case.position)
+                    cases_limites.add(case.position)
                 self.vue[case.position].clarte = 0
                 self.vue[case.position].oubli = 0
                 self.vue[case.position].code = 0
                 self.vue[case.position].cibles = [[False,False,False,False,False],[False,False,False,False,False],[False,False,False,False,False],[False,False,False,False,False]]
-                self.vue[case.position].entitees = []
+                self.vue[case.position].entitees = set()
         return nouvelles_cases, cases_limites
 
-    def maj_vue(self,vue:Representation_vue) -> Tuple[List[Position],List[Position],List[Position]]:
-        cases_vues:List[Position] = []
-        nouvelles_cases:List[Position] = []
-        cases_limites:List[Position] = []
+    def maj_vue(self,vue:Representation_vue) -> Tuple[Set[Position],Set[Position],Set[Position]]:
+        cases_vues:Set[Position] = set()
+        nouvelles_cases:Set[Position] = set()
+        cases_limites:Set[Position] = set()
         for decalage in vue.decalage:
             case = vue[decalage]
             if case.clarte > 0: #Si la clarté est positive
-                cases_vues.append(case.position) 
+                cases_vues.add(case.position) 
                 if case.cibles != self.vue[case.position].cibles:
-                    nouvelles_cases.append(case.position)
+                    nouvelles_cases.add(case.position)
                 case.oubli = self.oubli
                 self.vue[case.position] = case #On remplace par la dernière version de la vision /!\ Et si certains n'y voient pas les mêmes choses ? (Genre des agissants invisibles ?)
             elif case.clarte == -1: #On est à la limite de la vision de quelqu'un
-                cases_limites.append(case.position)
+                cases_limites.add(case.position)
         return cases_vues, nouvelles_cases, cases_limites
 
     def merge_vue(self,vue:Representation_vue) -> Tuple[List[Position],List[Position]]:
@@ -107,20 +107,20 @@ class Esprit :
                 self.vue[case_other.position] = case_other #On remplace par la dernière version de la vision /!\ Et si certains n'y voient pas les mêmes choses ? (Genre des agissants invisibles ?)
         return cases_self, cases_other
 
-    def trouve_agissants_vue(self,vue:Representation_vue) -> Tuple[List[int],List[Tuple[int,Position]]]:
-        vus:List[int] = []
-        oublies:List[Tuple[int,Position]] = []
+    def trouve_agissants_vue(self,vue:Representation_vue) -> Tuple[Set[int],Set[Tuple[int,Position]]]:
+        vus:Set[int] = set()
+        oublies:Set[Tuple[int,Position]] = set()
         for decalage in vue.decalage:
             case = vue[decalage]
-            vus += case.entitees
+            vus |= case.entitees
             if case.position in self.vue:
-                oublies += [(ID,case.position) for ID in self.vue[case.position].entitees if not ID in case.entitees]
+                oublies |= {(ID,case.position) for ID in self.vue[case.position].entitees if not ID in case.entitees}
         return vus, oublies
 
     def trouve_agissants(self) -> List[int]:
-        agissants = []
+        agissants = set()
         for case in self.vue:
-            agissants += case.entitees
+            agissants |= case.entitees
         return sorted(agissants)
 
     def get_corps_vus(self) -> List[int]:
@@ -144,64 +144,63 @@ class Esprit :
                 neutres.append(agissant)
         return neutres
 
-    def oublie_agissants(self,agissants:List[int]):
+    def oublie_agissants(self,agissants:Set[int]):
         for case in self.vue:
             for ID in agissants:
-                if ID in case.entitees:
-                    case.entitees.remove(ID)
+                case.entitees.discard(ID)
         for zone in self.zones_inconnues:
             for ID in agissants:
-                if ID in zone.occupants:
-                    zone.occupants.remove(ID)
+                zone.occupants.discard(ID)
 
     def refait_vue(self):
-        vues:List[Representation_vue] = []
-        agissants_vus:List[int] = []
-        agissants_oublies:List[Tuple[int,Position]] = []
+        vues:Set[Representation_vue] = set()
+        agissants_vus:Set[int] = set()
+        agissants_oublies:Set[Tuple[int,Position]] = set()
         for corp in self.corps: #On récupère les vues
             if self.corps[corp] != "incapacite":
-                agissant:Agissant = self.controleur[corp]
-                vues.append(agissant.vue)
+                agissant:Agissant = self.controleur.entitees[corp]
+                vues.add(agissant.vue)
                 vus, oublies = self.trouve_agissants_vue(agissant.vue)
-                agissants_vus += vus
-                agissants_oublies += oublies
-        agissants_vus = [*set(agissants_vus)] #On enlève les doublons
-        agissants_oublies = [*set([tup for tup in agissants_oublies if not tup[0] in agissants_vus])] #On enlève les doublons et les agissants vus
+                agissants_vus |= vus
+                agissants_oublies |= oublies
+        agissants_oublies = {tup for tup in agissants_oublies if not tup[0] in agissants_vus} #On enlève les doublons et les agissants vus
+        add_constantes_temps("récupère vues")
         self.oublie_agissants(agissants_vus) #Puisqu'on les a vus, on n'a plus besoin de garder en mémoire leur position précédente. /!\ À modifier plus tard
+        add_constantes_temps("oublie agissants")
         for ID_agissant in agissants_vus:
             if not(ID_agissant in self.ennemis or ID_agissant in self.corps):
                 for espece in self.controleur.get_especes(ID_agissant):
                     if espece in self.prejuges:
                         self.ennemis[ID_agissant] = {"importance":0,"dangerosite":0}
-        cases_vues = []
-        nouvelles_cases = []
-        cases_limites = []
+        cases_vues = set()
+        nouvelles_cases = set()
+        cases_limites = set()
         for vue in vues :
             if vue.id in self.vue:
                 cases, nouvelles, limites = self.maj_vue(vue)
-                cases_vues+=cases
-                nouvelles_cases+=nouvelles
-                cases_limites+=limites
+                cases_vues|=cases
+                nouvelles_cases|=nouvelles
+                cases_limites|=limites
             else:
                 nouvelles, limites = self.ajoute_vue(vue)
-                cases_vues+=nouvelles
-                nouvelles_cases+=nouvelles
-                cases_limites+=limites
-        cases_vues = [*set(cases_vues)]
-        nouvelles_cases = [*set(nouvelles_cases)] #Pour retirer les doublons
+                cases_vues|=nouvelles
+                nouvelles_cases|=nouvelles
+                cases_limites|=limites
+        add_constantes_temps("reste")
         self.update_zones(cases_vues, nouvelles_cases, cases_limites, agissants_oublies)
         self.update_representation(nouvelles_cases)
+        add_constantes_temps("update zones et representation")
 
-    def update_zones(self,cases:List[Position],nouvelles_cases:List[Position],cases_limites:List[Position],agissants_oublies:List[Tuple[int,Position]]):
+    def update_zones(self,cases:Set[Position],nouvelles_cases:Set[Position],cases_limites:Set[Position],agissants_oublies:Set[Tuple[int,Position]]):
         cases_memorisees = [case.position for case in self.vue if case.oubli>0 and not case.position in cases]
         # print(cases)
         # print(nouvelles_cases)
-        zones_mod:List[Zone_inconnue] = []
+        zones_mod:Set[Zone_inconnue] = set()
         for case in nouvelles_cases:
             for zone in self.zones_inconnues:
                 if case in zone.cases:
                     # print("Scinde")
-                    zones_mod += self.scinde_zone(zone,case)
+                    zones_mod |= self.scinde_zone(zone,case)
         for zone in self.zones_inconnues:
             for case in zone.cases:
                 if case in cases_memorisees:
@@ -236,25 +235,25 @@ class Esprit :
             elif self.vue[case].clarte < 0:
                 print("Why !!?")
         for zone in self.zones_inconnues:
-            zone.entrees = []
-            zone.sorties = []
+            zone.entrees = set()
+            zone.sorties = set()
             for tup in agissants_oublies:
                 if tup[1] in zone.cases:
-                    zone.occupants.append(tup[0])
+                    zone.occupants.add(tup[0])
                 for DIR in DIRECTIONS:
                     voisin = self.vue[tup[1]].cibles[DIR][PASSE_ESCALIER]
                     if voisin and voisin in zone.cases:
-                        zone.occupants.append(tup[0])
+                        zone.occupants.add(tup[0])
             for case in zone.cases:
                 for DIR in DIRECTIONS:
                     voisin = self.vue[case].cibles[DIR][PASSE_ESCALIER]
                     if voisin and ((not voisin in self.vue) or self.vue[voisin].clarte == 0):
-                        zone.sorties.append(voisin)
-                        zones_mod.append(zone)
+                        zone.sorties.add(voisin)
+                        zones_mod.add(zone)
             for case in cases_limites:
                 if case in zone.cases:
                     zone.cases.remove(case)
-                    zone.entrees.append(case)
+                    zone.entrees.add(case)
                     cases_limites.remove(case)
                     zones_mod.append(zone)
             if zone.cases == [] and zone.entrees == []:
@@ -738,12 +737,12 @@ class Esprit :
         self.remove_couloir(couloir)
         return couloirs
 
-    def scinde_zone(self,zone:Zone_inconnue,case:Position):
+    def scinde_zone(self,zone:Zone_inconnue,case:Position) -> Set[Zone_inconnue]:
         zone.cases.remove(case)
-        voisins = [case+dir for dir in DIRECTIONS if case+dir in zone.cases]
-        zones = []
+        voisins = {case+dir for dir in DIRECTIONS if case+dir in zone.cases}
+        zones = set()
         while voisins != []:
-            depart = voisins.pop(0)
+            depart = voisins.pop()
             queue = [depart]
             zone.cases.remove(depart)
             new_zone = Zone_inconnue(depart,zone)
@@ -754,10 +753,10 @@ class Esprit :
                     if voisin in zone.cases and self.vue[position].cibles[dir][PASSE_ESCALIER]:
                         zone.cases.remove(voisin)
                         queue.append(voisin)
-                        new_zone.cases.append(voisin)
+                        new_zone.cases.add(voisin)
                         if voisin in voisins:
                             voisins.remove(voisin)
-            zones.append(new_zone)
+            zones.add(new_zone)
         self.remove_zone(zone)
         self.zones_inconnues += zones
         return zones
@@ -790,7 +789,7 @@ class Esprit :
 
     def get_offenses(self):
         for corp in self.corps: #On vérifie si quelqu'un nous a offensé
-            agissant:Agissant = self.controleur[corp]
+            agissant:Agissant = self.controleur.entitees[corp]
             offenses,etat = agissant.get_offenses()
             self.corps[corp] = etat
             for offense in offenses:
@@ -815,7 +814,7 @@ class Esprit :
         positions = []
         for corp in self.corps:
             if self.corps[corp] != "incapacite":
-                agissant = self.controleur[corp]
+                agissant = self.controleur.entitees[corp]
                 positions.append(agissant.position)
         return positions
 
@@ -824,7 +823,7 @@ class Esprit :
         self.resolution = 0
         self.oubli = 0
         for ID_corp in self.corps:
-            corp = self.controleur[ID_corp]
+            corp = self.controleur.entitees[ID_corp]
             self.resolution = max(self.resolution,corp.resolution)
             self.oubli = max(self.oubli,corp.oubli)
 
@@ -844,12 +843,13 @@ class Esprit :
 
     def calcule_trajets(self):
         # On détermine la dangerosité de chaque case en fonction des dégats qui vont y avoir lieu
-        pos_corps:Set[Position] = {self.controleur[corp].get_position() for corp in self.corps if self.corps[corp] != "incapacite"}
+        pos_corps:Set[Position] = {self.controleur.entitees[corp].get_position() for corp in self.corps if self.corps[corp] != "incapacite"}
         coef=7 #/!\ Expérimenter avec ce coef à l'occasion
         for case in self.vue:
             for effet in case.effets:
                 dangerosite = coef*effet[2]/(effet[1]+coef)
                 case["dangerosite",0] -= dangerosite
+        add_constantes_temps("attaques délayées")
 
         # On modifie légèrement pour pouvoir sortir des zones concernées
         coef_croissant = 1.1
@@ -858,6 +858,7 @@ class Esprit :
         seuils = self.trouve_seuils(self.get_pos_vues()) # On part des différents endroit d'où l'on voit, qui devraient théoriquement nous donner accès à toute notre vision
         self.set_skip(seuils,pos_corps)
         self.propage(seuils,coef_croissant,"dangerosite") # On propage de façon croissante à partir des seuils (vers l'intérieur)
+        add_constantes_temps("propagation des seuils")
 
         # On rajoute les ennemis
         coef_importance = 0.9
@@ -865,7 +866,7 @@ class Esprit :
         dangerosites = seuils
         importances:Set[Position] = set()
         for ID_ennemi in self.ennemis:
-            ennemi = self.controleur[ID_ennemi]
+            ennemi = self.controleur.entitees[ID_ennemi]
             if ennemi.etat == "vivant":
                 position = ennemi.get_position()
                 if position.lab in self.vue:
@@ -878,12 +879,15 @@ class Esprit :
                         self.vue[position]["dangerosite",0]=dangerosite
                     if not position in dangerosites: # On peut avoir des doublons (ennemis sur les seuils par exemple)
                         dangerosites.add(position)
+        add_constantes_temps("importance et dangerosité des ennemis")
         # On propage l'importance de façon décroissante à partir des ennemis
         self.set_skip(importances,pos_corps)
         self.propage(importances,coef_importance,"importance")
+        add_constantes_temps("propagation de l'importance des ennemis")
         # On propage la dangerosité de façon décroissante à partir des ennemis et des seuils
         self.set_skip(dangerosites,pos_corps)
         self.propage(dangerosites,coef_dangerosite,"dangerosite",comparateur=-1)
+        add_constantes_temps("propagation de la dangerosité des ennemis")
 
         # /!\ Prendre aussi en compte les alliés, et les cases inconnues (mais on va déjà tester ça)
 
@@ -1091,20 +1095,21 @@ class Esprit :
     #                 print(bas)
     #             print("")
 
-    def positions_utilisables(self,position:Position):
-        pos_utilisables:List[tuple[Position,int]]=[]
-        pos_obstacles:List[tuple[Position,int]]=[]
+    def positions_utilisables(self,position:Position)->Tuple[Dict[Position,int],Dict[Position,int]]:
+        pos_utilisables:Dict[Position,int]={}
+        pos_obstacles:Dict[Position,int]={}
 
         case = self.vue[position]
+        case:Representation_case
         if position in self.entrees:
             for direction in DIRECTIONS:
                 if case.cibles[direction][PASSE_ESCALIER]: # Si la case est accessible
                     if not any(case.cibles[direction][PASSE_ESCALIER] in espace.cases and espace.skip for espace in self.entrees[position]): # Si la case n'est pas skippée
                         if case.cibles[direction][PASSE_ESCALIER] in self.vue: # Si la case est visible
                             if case.entitees!=[]: # Si la case est occupée
-                                pos_obstacles.append((case.cibles[direction][PASSE_ESCALIER],1))
+                                pos_obstacles[case.cibles[direction][PASSE_ESCALIER]]=1
                             else:
-                                pos_utilisables.append((case.cibles[direction][PASSE_ESCALIER],1))
+                                pos_utilisables[case.cibles[direction][PASSE_ESCALIER]]=1
             for espace in self.entrees[position]:
                 if espace.skip: # Si l'espace est skippé
                     for entree in espace.entrees: # On ajoute toutes les entrées de l'espace
@@ -1132,7 +1137,7 @@ class Esprit :
         for corps in esprit.corps:
             if corps not in self.corps:
                 self.corps[corps] = esprit.corps[corps]
-                self.controleur[corps].rejoint(self.nom)
+                self.controleur.entitees[corps].rejoint(self.nom)
 
     def merge_enemies(self,esprit:Self):
         for ennemi in esprit.ennemis:
@@ -1162,10 +1167,16 @@ class Esprit :
         for corp in self.corps:
             if self.corps[corp] in ["attaque","fuite","soin","soutien"]:
                 self.deplace(corp)
+                add_constantes_temps("deplace")
+                incr_compteur_temps("deplace_")
             elif self.corps[corp] == "PNJ":
                 self.deplace_pnj(corp)
+                add_constantes_temps("deplace_pnj")
+                incr_compteur_temps("deplace_pnj_")
             elif self.corps[corp] == "PJ":
                 self.deplace_pj(corp)
+                add_constantes_temps("deplace_pj")
+                incr_compteur_temps("deplace_pj_")
 
     def fuite_utile(self,ID:int): #TODO inclure l'accessibilité
         for corp in self.corps:
@@ -1174,7 +1185,7 @@ class Esprit :
         return False
 
     def deplace(self,ID:int):
-        corp:Agissant = self.controleur[ID]
+        corp:Agissant = self.controleur.entitees[ID]
         position = corp.position
         case = self.vue[position]
         repoussante = case.repoussante
@@ -1192,7 +1203,7 @@ class Esprit :
                     entitees = case_pot.entitees
                     libre = True #On n'y va pas pour s'en enfuir après
                     for ID_entitee in entitees:
-                        entitee = self.controleur[ID_entitee]
+                        entitee = self.controleur.entitees[ID_entitee]
                         if issubclass(entitee.get_classe(),Non_superposable): #On ne peut pas aller sur cette case
                             libre = False
                             if issubclass(entitee.get_classe(),Agissant): #Elle est occupée par un agissant
@@ -1233,7 +1244,7 @@ class Esprit :
                             case_pot = self.vue[mur]
                             entitees = case_pot.entitees
                             for ID_entitee in entitees:
-                                entitee = corp.controleur[ID_entitee]
+                                entitee = corp.controleur.entitees[ID_entitee]
                                 if issubclass(entitee.get_classe(),Agissant): #Cette case est occupée par un agissant
                                     if corp.peut_voir(i) and ID_entitee in self.ennemis: #Et c'est un ennemi !
                                         if self.ennemis[ID_entitee]["importance"] > importance:
@@ -1245,7 +1256,7 @@ class Esprit :
                 if not isinstance(corp,Sentinelle) or isinstance(corp,Humain) or repoussante:
                     res = "exploration"
                     if len(dirs)>1: #On peut se permettre de choisir
-                        if corp.dir_regard != None: #L'agissant regarde quelque part
+                        if corp.dir_regard is not None: #L'agissant regarde quelque part
                             dir_back = corp.dir_regard.oppose()
                             if dir_back in dirs: #On ne veut pas y retourner
                                 dirs.remove(dir_back)
@@ -1275,7 +1286,7 @@ class Esprit :
         corp.set_statut(res)
 
     def deplace_pnj(self,ID:int):
-        pnj:PNJ = self.controleur[ID]
+        pnj:PNJ = self.controleur.entitees[ID]
         pnj.utilise(None)
         pnj.statut_pnj = "proximite"
         cible = pnj.position
@@ -1337,7 +1348,7 @@ class Esprit :
                         entitees = case_pot.entitees
                         libre = True
                         for ID_entitee in entitees:
-                            entitee = pnj.controleur[ID_entitee]
+                            entitee = pnj.controleur.entitees[ID_entitee]
                             if issubclass(entitee.get_classe(),Non_superposable): #On ne peut pas aller sur cette case
                                 libre = False
                                 if issubclass(entitee.get_classe(),Agissant): #Elle est occupée par un agissant
@@ -1350,7 +1361,7 @@ class Esprit :
                                         elif fuite : #Et un ordre de fuite !
                                             res = "fuite"
                                     elif pnj.mouvement == 2 and ID_entitee == pnj.cible_deplacement:
-                                        entitee = self.controleur[ID_entitee]
+                                        entitee = self.controleur.entitees[ID_entitee]
                                         if entitee == self.controleur.joueur and pnj.peut_voir(i): #Le PNJ peut enfin parler au joueur
                                             self.controleur.joueur.interlocuteur = pnj
                                             self.controleur.set_phase(DIALOGUE)
@@ -1394,7 +1405,7 @@ class Esprit :
                                 entitees = case_pot.entitees
                                 libre = True
                                 for ID_entitee in entitees:
-                                    entitee = pnj.controleur[ID_entitee]
+                                    entitee = pnj.controleur.entitees[ID_entitee]
                                     if issubclass(entitee.get_classe(),Agissant): #Cette case est occupée par un agissant
                                         if pnj.peut_voir(i) and ID_entitee in self.ennemis: #Et c'est un ennemi !
                                             if self.ennemis[ID_entitee]["importance"] > importance:
@@ -1406,7 +1417,7 @@ class Esprit :
                     if not isinstance(pnj,Sentinelle) or repoussante:
                         res = "exploration"
                         if len(dirs)>1: #On peut se permettre de choisir
-                            if pnj.dir_regard != None: #L'agissant regarde quelque part
+                            if pnj.dir_regard is not None: #L'agissant regarde quelque part
                                 dir_back = pnj.dir_regard.oppose()
                                 if dir_back in dirs: #On ne veut pas y retourner
                                     dirs.remove(dir_back)
@@ -1416,7 +1427,7 @@ class Esprit :
                     if repoussante:
                         res = "exploration"
                         if len(dirs)>1: #On peut se permettre de choisir
-                            if pnj.dir_regard != None: #L'agissant regarde quelque part
+                            if pnj.dir_regard is not None: #L'agissant regarde quelque part
                                 dir_back = pnj.dir_regard.oppose()
                                 if dir_back in dirs: #On ne veut pas y retourner
                                     dirs.remove(dir_back)
@@ -1444,7 +1455,7 @@ class Esprit :
             pnj.set_statut(res)
 
     def deplace_pj(self,ID:int):
-        pj:PJ = self.controleur[ID]
+        pj:PJ = self.controleur.entitees[ID]
         pj.statut_pnj = "proximite"
         if pj.mouvement == 0: #0 pour aller vers, 1 pour chercher et 2 pour aller au contact
             if isinstance(pj.cible_deplacement,int):
@@ -1504,7 +1515,7 @@ class Esprit :
                         entitees = case_pot.entitees
                         libre = True
                         for ID_entitee in entitees:
-                            entitee = pj.controleur[ID_entitee]
+                            entitee = pj.controleur.entitees[ID_entitee]
                             if issubclass(entitee.get_classe(),Non_superposable): #On ne peut pas aller sur cette case
                                 libre = False
                                 if issubclass(entitee.get_classe(),Agissant): #Elle est occupée par un agissant
@@ -1545,7 +1556,7 @@ class Esprit :
                                 entitees = case_pot.entitees
                                 libre = True
                                 for ID_entitee in entitees:
-                                    entitee = pj.controleur[ID_entitee]
+                                    entitee = pj.controleur.entitees[ID_entitee]
                                     if issubclass(entitee.get_classe(),Agissant): #Cette case est occupée par un agissant
                                         if pj.peut_voir(i) and ID_entitee in self.ennemis: #Et c'est un ennemi !
                                             if self.ennemis[ID_entitee]["importance"] > importance:
@@ -1557,7 +1568,7 @@ class Esprit :
                     if not isinstance(pj,Sentinelle) or repoussante:
                         res = "exploration"
                         if len(dirs)>1: #On peut se permettre de choisir
-                            if pj.dir_regard != None: #L'agissant regarde quelque part
+                            if pj.dir_regard is not None: #L'agissant regarde quelque part
                                 dir_back = pj.dir_regard.oppose()
                                 if dir_back in dirs: #On ne veut pas y retourner
                                     dirs.remove(dir_back)
@@ -1567,7 +1578,7 @@ class Esprit :
                     if repoussante:
                         res = "exploration"
                         if len(dirs)>1: #On peut se permettre de choisir
-                            if pj.dir_regard != None: #L'agissant regarde quelque part
+                            if pj.dir_regard is not None: #L'agissant regarde quelque part
                                 dir_back = pj.dir_regard.oppose()
                                 if dir_back in dirs: #On ne veut pas y retourner
                                     dirs.remove(dir_back)
@@ -1590,7 +1601,7 @@ class Esprit :
                             res = pj.simule_agit_en_vue(self)
 
     def simule_deplace(self,ID:int):
-        pj:PJ = self.controleur[ID]
+        pj:PJ = self.controleur.entitees[ID]
         position = pj.position
         case = self.vue[position]
         repoussante = case.repoussante
@@ -1608,7 +1619,7 @@ class Esprit :
                     entitees = case_pot.entitees
                     libre = True #On n'y va pas pour s'en enfuir après
                     for ID_entitee in entitees:
-                        entitee = self.controleur[ID_entitee]
+                        entitee = self.controleur.entitees[ID_entitee]
                         if issubclass(entitee.get_classe(),Non_superposable): #On ne peut pas aller sur cette case
                             libre = False
                             if issubclass(entitee.get_classe(),Agissant): #Elle est occupée par un agissant
@@ -1649,7 +1660,7 @@ class Esprit :
                             case_pot = self.vue[mur]
                             entitees = case_pot.entitees
                             for ID_entitee in entitees:
-                                entitee = pj.controleur[ID_entitee]
+                                entitee = pj.controleur.entitees[ID_entitee]
                                 if issubclass(entitee.get_classe(),Agissant): #Cette case est occupée par un agissant
                                     if pj.peut_voir(i) and ID_entitee in self.ennemis: #Et c'est un ennemi !
                                         if self.ennemis[ID_entitee]["importance"] > importance:
@@ -1661,7 +1672,7 @@ class Esprit :
                 if not isinstance(pj,Sentinelle) or isinstance(pj,Humain) or repoussante:
                     res = "exploration"
                     if len(dirs)>1: #On peut se permettre de choisir
-                        if pj.dir_regard != None: #L'agissant regarde quelque part
+                        if pj.dir_regard is not None: #L'agissant regarde quelque part
                             dir_back = pj.dir_regard.oppose()
                             if dir_back in dirs: #On ne veut pas y retourner
                                 dirs.remove(dir_back)
@@ -1703,6 +1714,9 @@ class Esprit :
         add_constantes_temps("offenses")
         self.trouve_strateges()
         add_constantes_temps("strateges")
+
+
+        # La suite est très lente, comment faire pour l'accélérer ?
         self.refait_vue() #On prend connaissance de son environnement
         #Il faudra éventuellement définir une stratégie
         add_constantes_temps("vue") # 12

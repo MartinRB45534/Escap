@@ -3,7 +3,7 @@ from Jeu.Entitee.Item.Equippement.Equippement import *
 
 class Anneau(Equipement):
     """La classe des équipements de type anneau. Le nombre d'anneaux qu'on peut porter dépend de l'espèce. Les anneaux peuvent avoir des effets très différends (magiques pour la plupart)."""
-    def __init__(self,position:Position):
+    def __init__(self,position:Optional[Position]=None):
         Equipement.__init__(self,position)
         self.poids = 1 #C'est très léger !
         self.frottement = 2 #Il y a mieux.

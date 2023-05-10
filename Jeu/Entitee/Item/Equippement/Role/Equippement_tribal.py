@@ -1,7 +1,7 @@
 from Jeu.Entitee.Item.Equippement.Equippement import *
 
 class Equipement_tribal(Equipement):
-    def __init__(self,position:Position,espece:str,taux:float):
+    def __init__(self,position:Optional[Position]=None,espece:str,taux:float):
         self.espece = espece
         self.taux = taux
 

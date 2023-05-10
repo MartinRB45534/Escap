@@ -13,7 +13,7 @@ from Modifiers import *
 
 class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (évidemment, c'est le personnage principal !)
     """La classe du joueur."""
-    def __init__(self,controleur:Controleur,position:Position):
+    def __init__(self,controleur:Controleur,position:Optional[Position]=None):
 
         self.identite = 'heros'
         self.place = 0
@@ -171,13 +171,13 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
             #On vérifie que le dialogue a lieu d'être : le joueur n'a pas rencontré d'autre monstre et il a assisté à la mort du gobelin
             if self.highest == 3 and (self.get_etage_courant() == 3 and self.vue[position].oubli > 0):
                 #On cherche un PNJ volontaire pour aller taper la causette :
-                paume:Humain = self.controleur[4]
+                paume:Humain = self.controleur.entitees[4]
                 if paume.esprit == "heros" and (paume.get_etage_courant() == 3 and paume.statut_pnj in ["exploration","proximite","en chemin"]):
                     paume.mouvement = 2
                     paume.cible_deplacement = 2
                     paume.dialogue = 2
                 else:
-                    peureuse:Humain = self.controleur[5]
+                    peureuse:Humain = self.controleur.entitees[5]
                     if peureuse.esprit == "heros" and (peureuse.get_etage_courant() == 3 and peureuse.statut_pnj in ["exploration","proximite","en chemin"]):
                         peureuse.mouvement = 2
                         peureuse.cible_deplacement = 2
@@ -190,13 +190,13 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
             #On vérifie que le dialogue a lieu d'être : le joueur a assisté à la mort du mage gobelin (et donc probablement à ses attaques)
             if self.highest == 4 and (self.get_etage_courant() == 4 and self.vue[position].oubli > 0):
                 #On cherche un PNJ volontaire pour aller taper la causette :
-                peureuse:Humain = self.controleur[5]
+                peureuse:Humain = self.controleur.entitees[5]
                 if peureuse.esprit == "heros" and (peureuse.get_etage_courant() == 4 and peureuse.statut_pnj in ["exploration","proximite","en chemin"]):
                     peureuse.mouvement = 2
                     peureuse.cible_deplacement = 2
                     peureuse.dialogue = 3
                 else:
-                    paume:Humain = self.controleur[4]
+                    paume:Humain = self.controleur.entitees[4]
                     if paume.esprit == "heros" and (paume.get_etage_courant() == 4 and paume.statut_pnj in ["exploration","proximite","en chemin"]):
                         paume.mouvement = 2
                         paume.cible_deplacement = 2
@@ -209,7 +209,7 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
             #On vérifie que le dialogue a lieu d'être : le joueur n'est pas encore passé à l'étage suivant
             if self.highest == 4 :
                 #On cherche un PNJ volontaire pour aller taper la causette :
-                peureuse:Humain = self.controleur[5]
+                peureuse:Humain = self.controleur.entitees[5]
                 if peureuse.esprit == "heros" and (peureuse.get_etage_courant() == 4 and peureuse.statut_pnj in ["exploration","proximite","en chemin"]):
                     peureuse.mouvement = 2
                     peureuse.cible_deplacement = 2
@@ -220,13 +220,13 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
         if self.first_step_:
             self.first_step_=False
             #On cherche un PNJ volontaire pour aller taper la causette :
-            peureuse:Humain = self.controleur[5]
+            peureuse:Humain = self.controleur.entitees[5]
             if peureuse.esprit == "heros" and peureuse.statut_pnj in ["exploration","proximite","en chemin"]:
                 peureuse.mouvement = 2
                 peureuse.cible_deplacement = 2
                 peureuse.dialogue = 5
             else:
-                paume:Humain = self.controleur[4]
+                paume:Humain = self.controleur.entitees[4]
                 if paume.esprit == "heros" and paume.statut_pnj in ["exploration","proximite","en chemin"]:
                     paume.mouvement = 2
                     paume.cible_deplacement = 2
@@ -238,7 +238,7 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
             self.first_door_=False
             #La porte qui lance le dialogue certifie qu'on y passe pour la première fois
             #On cherche un PNJ volontaire pour aller taper la causette :
-            peureuse:Humain = self.controleur[5]
+            peureuse:Humain = self.controleur.entitees[5]
             if peureuse.esprit == "heros" and peureuse.statut_pnj in ["exploration","proximite","en chemin"]:
                 peureuse.mouvement = 2
                 peureuse.cible_deplacement = 2
@@ -249,24 +249,24 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
         if self.first_teleport_:
             self.first_teleport_=False
             #On cherche un PNJ volontaire pour aller taper la causette :
-            alchimiste:Humain = self.controleur[7]
+            alchimiste:Humain = self.controleur.entitees[7]
             if alchimiste.esprit == "heros" and alchimiste.statut_pnj in ["exploration","proximite","en chemin"]:
                 alchimiste.mouvement = 2
                 alchimiste.dialogue = 2
             else:
-                peureuse:Humain = self.controleur[5]
+                peureuse:Humain = self.controleur.entitees[5]
                 if peureuse.esprit == "heros" and peureuse.statut_pnj in ["exploration","proximite","en chemin"]:
                     peureuse.mouvement = 2
                     peureuse.cible_deplacement = 2
                     peureuse.dialogue = 7
                 else:
-                    encombrant:Humain = self.controleur[6]
+                    encombrant:Humain = self.controleur.entitees[6]
                     if encombrant.esprit == "heros" and encombrant.statut_pnj in ["exploration","proximite","en chemin"]:
                         encombrant.mouvement = 2
                         encombrant.cible_deplacement = 2
                         encombrant.dialogue = 2
                     else:
-                        paume:Humain = self.controleur[4]
+                        paume:Humain = self.controleur.entitees[4]
                         if paume.esprit == "heros" and paume.statut_pnj in ["exploration","proximite","en chemin"]:
                             paume.mouvement = 2
                             paume.cible_deplacement = 2
@@ -764,7 +764,7 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
 #                     if creation_fleche !=  None:
 #                         creation_fleche.ajoute(Cree_fleche_explosive_skill())
 #                     creation_explosif = trouve_skill(self.classe_principale,Skill_creation_d_explosifs)
-#                     if creation_explosif != None:
+#                     if creation_explosif is not None:
 #                         creation_explosif.ajoute(Cree_fleche_explosive_skill())
 #                     self.choix_niveaux[CLASSIQUE][5] = FLECHE_EXPLOSIVE
 #             elif self.choix_niveaux[CLASSIQUE][2] == ESSENCE_MAGIQUE:
@@ -896,7 +896,7 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
 #                     if creation_fleche !=  None:
 #                         creation_fleche.ajoute(Cree_fleche_explosive_skill())
 #                     creation_explosif = trouve_skill(self.classe_principale,Skill_creation_d_explosifs)
-#                     if creation_explosif != None:
+#                     if creation_explosif is not None:
 #                         creation_explosif.ajoute(Cree_fleche_explosive_skill())
 #                     self.choix_niveaux[CLASSIQUE][7] = FLECHE_EXPLOSIVE
 #                 elif choix == ARTIFICIER:
@@ -1133,19 +1133,19 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
 #             self.aff_t *= 1.5
 #             self.aff_o *= 0.9 #L'ombre se mélange vraiment mal avec le reste
 #             self.choix_niveaux[ELEMENTAL][TERRE][affinite] = True
-#             if self.prem_terre == None:
+#             if self.prem_terre is None:
 #                 self.prem_terre = affinite
 #         elif choix == affinite_feu :
 #             self.aff_f *= 1.5
 #             self.aff_o *= 0.9 #L'ombre se mélange vraiment mal avec le reste
 #             self.choix_niveaux[ELEMENTAL][FEU][affinite] = True
-#             if self.prem_feu == None:
+#             if self.prem_feu is None:
 #                 self.prem_feu = affinite
 #         elif choix == affinite_glace :
 #             self.aff_g *= 1.5
 #             self.aff_o *= 0.9 #L'ombre se mélange vraiment mal avec le reste
 #             self.choix_niveaux[ELEMENTAL][GLACE][affinite] = True
-#             if self.prem_glace == None:
+#             if self.prem_glace is None:
 #                 self.prem_glace = affinite
 #         elif choix == affinite_ombre :
 #             self.aff_o *= 1.5
@@ -1153,7 +1153,7 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
 #             self.aff_f *= 0.9 #L'ombre se mélange vraiment mal avec le reste
 #             self.aff_g *= 0.9 #L'ombre se mélange vraiment mal avec le reste
 #             self.choix_niveaux[ELEMENTAL][OMBRE][affinite] = True
-#             if self.prem_ombre == None:
+#             if self.prem_ombre is None:
 #                 self.prem_ombre = affinite
 
 #         #Pour les auras, il faudra rajouter le choix de ratacher le skill à la classe élémentaliste
@@ -1185,7 +1185,7 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
 #             skill.ajoute(Magie_enchantement_sable)
 #             skill.ajoute(Magie_avalanche)
 #             self.choix_niveaux[ELEMENTAL][TERRE][MAGIE] = True
-#             if self.prem_terre == None:
+#             if self.prem_terre is None:
 #                 self.prem_terre = MAGIE
 #         elif choix == magie_feu :
 #             skill = trouve_skill(self.classe_principale,Skill_magie)
@@ -1193,7 +1193,7 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
 #             skill.ajoute(Magie_enchantement_flamme)
 #             skill.ajoute(Magie_brasier)
 #             self.choix_niveaux[ELEMENTAL][FEU][MAGIE] = True
-#             if self.prem_feu == None:
+#             if self.prem_feu is None:
 #                 self.prem_feu = MAGIE
 #         elif choix == magie_glace :
 #             skill = trouve_skill(self.classe_principale,Skill_magie)
@@ -1201,7 +1201,7 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
 #             skill.ajoute(Magie_enchantement_neige)
 #             skill.ajoute(Magie_blizzard)
 #             self.choix_niveaux[ELEMENTAL][GLACE][MAGIE] = True
-#             if self.prem_glace == None:
+#             if self.prem_glace is None:
 #                 self.prem_glace = MAGIE
 #         elif choix == magie_ombre :
 #             skill = trouve_skill(self.classe_principale,Skill_magie)
@@ -1209,7 +1209,7 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
 #             skill.ajoute(Magie_enchantement_tenebre)
 #             skill.ajoute(Magie_obscurite)
 #             self.choix_niveaux[ELEMENTAL][OMBRE][MAGIE] = True
-#             if self.prem_ombre == None:
+#             if self.prem_ombre is None:
 #                 self.prem_ombre = MAGIE
 
 #         # Pour les élémentaux, il faudra rajouter le choix de ratacher la classe d'élémental à la classe élémentaliste, et de déplacer le skill d'aura vers la nouvelle classe d'élémental (et le skill d'affinité si on le crée)

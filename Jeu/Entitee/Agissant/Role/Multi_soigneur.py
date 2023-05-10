@@ -15,7 +15,7 @@ class Multi_soigneur(Soigneur,Multi_mage):
         cibles = []
         skill = type(self.get_skill_magique())
         for ID in esprit.corps:
-            corp = self.controleur[ID]
+            corp = self.controleur.entitees[ID]
             if corp.etat == "vivant" and corp.pv < corp.pv_max:
                 cibles.append([corp.pv,ID])
         if len(cibles) == 1:

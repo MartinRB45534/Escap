@@ -455,7 +455,7 @@ class Affichage_centre_selection_lab(Wrapper_knot, Knot_vertical):
 
         self.controleur = controleur
         self.type_affichage_labyrinthe:Type[Affichage_labyrinthe_case_dialogue|Affichage_labyrinthe_case_magie|Affichage_labyrinthe_case_parchemin|Affichage_labyrinthe_direction_magie|Affichage_labyrinthe_direction_parchemin] = type_affichage_labyrinthe
-        self.affichage_labyrinthe:Affichage_labyrinthe|None = None
+        self.affichage_labyrinthe:Optional[Affichage_labyrinthe] = None
         self.boutons:List[Bouton] = []
         self.cible = None
         self.fond = (0, 0, 0)
@@ -1171,7 +1171,7 @@ class Affichage_categorie(Wrapper_knot, Knot_vertical, Knot_hierarchique_sinistr
         self.item_descr = Placeheldholder()
 
         self.liste_i = Liste_verticale()
-        self.items = [Vignette_item_placeholder(self.item_descr,Description_item(self.joueur.controleur, self.joueur.controleur[ID]),[0, 0], self.joueur.controleur[ID], 40, ID in self.joueur.inventaire.get_equippement()) for ID in self.joueur.inventaire.items[self.categorie]]
+        self.items = [Vignette_item_placeholder(self.item_descr,Description_item(self.joueur.controleur, self.joueur.controleur.entitees[ID]),[0, 0], self.joueur.controleur.entitees[ID], 40, ID in self.joueur.inventaire.get_equippement()) for ID in self.joueur.inventaire.items[self.categorie]]
         self.liste_i.set_contenu([self.items[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1, len(self.items)*2)], [0 if i%2==0 else 5 for i  in range(-1, len(self.items)*2)])
 
         if self.items:
@@ -1621,7 +1621,7 @@ class Affichage_agissants(Wrapper_knot, Knot_vertical):
         self.fond = (200, 200, 200)
         
         self.liste_agissants = Liste_verticale()
-        self.agissants = [self.type_vignette(placeheldholder, placeheldholder_ajuster, self.controleur[ID], 40) for ID in self.methode()]
+        self.agissants = [self.type_vignette(placeheldholder, placeheldholder_ajuster, self.controleur.entitees[ID], 40) for ID in self.methode()]
         self.liste_agissants.set_contenu([self.agissants[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1, len(self.agissants)*2)], [0 if i%2==0 else 5 for i  in range(-1, len(self.agissants)*2)])
         
         self.init()
@@ -1703,7 +1703,7 @@ class Affichage_agissants_cible(Wrapper_knot, Knot_vertical):
         self.multi = multi
         self.fond = (200, 200, 200)
 
-        self.agissants = [self.type_vignette(placeheldholder, placeheldholder_ajuster, self.controleur[ID], 40) for ID in self.methode()]
+        self.agissants = [self.type_vignette(placeheldholder, placeheldholder_ajuster, self.controleur.entitees[ID], 40) for ID in self.methode()]
         self.init()
 
     def init(self):
@@ -1945,7 +1945,7 @@ class Affichage_perso(Proportionnel):
 
         for ID in joueur.vue[position].entitees:
             if ID < 11:
-                entitee = joueur.controleur[ID]
+                entitee = joueur.controleur.entitees[ID]
                 if issubclass(entitee.get_classe(), Agissant):
                     for skin in entitee.get_skins_vue():
                         skin.dessine_toi(screen, (x, y), (largeur, hauteur), frame, frame_par_tour)
@@ -1966,7 +1966,7 @@ class Affichage_labyrinthe(Affichage_knot, Proportionnel):
 
     def update(self):
         courant = None
-        if self.controleur.joueur.vue != None:
+        if self.controleur.joueur.vue is not None:
             self.objets:List[Affichable] = []
             decs = [[dec.x, dec.y] for dec in self.controleur.joueur.vue.decalage if self.controleur.joueur.vue[dec].clarte > 0]
             visible = [min(decs, key=itemgetter(0))[0], max(decs, key=itemgetter(0))[0], min(decs, key=itemgetter(1))[1], max(decs, key=itemgetter(1))[1]]
@@ -2100,7 +2100,7 @@ class Affichage_labyrinthe_case_dialogue(Affichage_labyrinthe):
         self.cible = None
 
     def make_vignette(self, position: List[int], vue: Vue, position_vue: Position, taille: int):
-        return Vignettes_position(position, self.controleur.joueur, vue, position_vue, taille, self.cible != None and self.cible != position_vue)
+        return Vignettes_position(position, self.controleur.joueur, vue, position_vue, taille, self.cible is not None and self.cible != position_vue)
 
     def select(self, selection:Cliquable, droit:bool=False):
         if not droit:
@@ -2122,7 +2122,7 @@ class Affichage_labyrinthe_case_magie(Affichage_labyrinthe):
             self.cible = None
 
     def make_vignette(self, position: List[int], vue: Vue, position_vue: Position, taille: int):
-        return Vignettes_position(position, self.controleur.joueur, vue, position_vue, taille, self.cible != None and self.cible != position_vue, position_vue not in self.cibles)
+        return Vignettes_position(position, self.controleur.joueur, vue, position_vue, taille, self.cible is not None and self.cible != position_vue, position_vue not in self.cibles)
 
     def select(self, selection:Cliquable, droit:bool=False):
         if not droit:
@@ -2151,7 +2151,7 @@ class Affichage_labyrinthe_case_parchemin(Affichage_labyrinthe):
             self.cible = None
 
     def make_vignette(self, position: List[int], vue: Vue, position_vue: Position, taille: int):
-        return Vignettes_position(position, self.controleur.joueur, vue, position_vue, taille, self.cible != None and self.cible != position_vue, position_vue not in self.cibles)
+        return Vignettes_position(position, self.controleur.joueur, vue, position_vue, taille, self.cible is not None and self.cible != position_vue, position_vue not in self.cibles)
     
     def select(self, selection:Cliquable, droit:bool=False):
         if not droit:

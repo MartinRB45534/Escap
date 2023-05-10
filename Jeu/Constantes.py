@@ -2,20 +2,22 @@ import pygame
 
 VERSION = "0.0.-1"
 
-def trouve_skill(classe,type_skill):
-    trouve = None
-    for skill in classe.skills:
-        if isinstance(skill,type_skill) and skill.niveau > 0: #On ne devrait pas avoir de skill à 0 mais on ne sait jamais.
-            trouve = skill
-    for skill in classe.skills_intrasecs:
-        if isinstance(skill,type_skill) and skill.niveau > 0: #On ne devrait pas avoir de skill à 0 mais on ne sait jamais.
-            trouve = skill
-    if trouve == None:
-        for sous_classe in classe.sous_classes: #On récurse la recherche dans les sous-classes.
-            trouve_bis = trouve_skill(sous_classe,type_skill)
-            if trouve_bis != None:
-                trouve = trouve_bis
-    return trouve
+# T = TypeVar("T", bound=Type)
+
+# def trouve_skill(classe,type_skill:T) -> Optional[T]:
+#     trouve = None
+#     for skill in classe.skills:
+#         if isinstance(skill,type_skill) and skill.niveau > 0: #On ne devrait pas avoir de skill à 0 mais on ne sait jamais.
+#             trouve = skill
+#     for skill in classe.skills_intrasecs:
+#         if isinstance(skill,type_skill) and skill.niveau > 0: #On ne devrait pas avoir de skill à 0 mais on ne sait jamais.
+#             trouve = skill
+#     if trouve is None:
+#         for sous_classe in classe.sous_classes: #On récurse la recherche dans les sous-classes.
+#             trouve_bis = trouve_skill(sous_classe,type_skill)
+#             if trouve_bis is not None:
+#                 trouve = trouve_bis
+#     return trouve
 
 class Id_max:
     def __init__(self):
@@ -28,9 +30,9 @@ class Id_max:
     def set_id_max(self,n: int):
         self.valeur = n
 
-POLICE20 = pygame.font.SysFont(None, 20)
+POLICE20 = pygame.font.SysFont("Arial", 20)
 
-POLICE40 = pygame.font.SysFont(None, 40)
+POLICE40 = pygame.font.SysFont("Arial", 40)
 
 ID_MAX = Id_max()
 

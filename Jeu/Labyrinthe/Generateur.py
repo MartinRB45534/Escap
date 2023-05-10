@@ -67,7 +67,7 @@
 #         Fonction qui pregenere les paterns
 #         (on génère le squelette)
 #         """
-#         if self.paterns != None:
+#         if self.paterns is not None:
 #             for patern in self.paterns :
 #                 patern.pre_generation(self.matrice_cases)
 
@@ -76,7 +76,7 @@
 #         Fonction qui postgenere les paterns
 #         (on remplie les patterns)
 #         """
-#         if self.paterns != None:
+#         if self.paterns is not None:
 #             for patern in self.paterns :
 #                 patern.post_generation(self.matrice_cases)
 
@@ -143,7 +143,7 @@
 #             if cible in self.depart:
 #                 case_cible = self[cible]
 #                 mur_oppose = self.get_mur_oppose(mur)
-#                 if mur_oppose != None and case_cible.nb_murs_pleins()>=murs_requis and mur_oppose.is_touchable() and mur.is_touchable():
+#                 if mur_oppose is not None and case_cible.nb_murs_pleins()>=murs_requis and mur_oppose.is_touchable() and mur.is_touchable():
 #                     murs_utilisables.append(i)
 #         return murs_utilisables
 
@@ -181,11 +181,11 @@
 #         ou selon un nombre défini en entrée
 #         ou un pourcentage
 #         """
-#         if proba!=None:
+#         if proba is not None:
 #             self.casser_murs_selon_proba(proba)
-#         elif nbMurs!=None:
+#         elif nbMurs is not None:
 #             self.casser_murs(nbMurs)
-#         elif pourcentage!=None:
+#         elif pourcentage is not None:
 #             self.casser_murs(int(pourcentage/100*self.nb_murs_total()))
 #         else:
 #             print("mauvaise utilisation de la fonction, on ne sait que faire")

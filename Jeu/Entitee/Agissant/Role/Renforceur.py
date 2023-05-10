@@ -15,7 +15,7 @@ class Renforceur(Mage):
         cibles = []
         skill = type(self.get_skill_magique())
         for ID in esprit.corps:
-            corp = self.controleur[ID]
+            corp = self.controleur.entitees[ID]
             if corp.statut == "attaque":
                 cibles.append([esprit.get_importance(corp.get_impact()),ID])
         if cibles != [] and self.peut_caster():

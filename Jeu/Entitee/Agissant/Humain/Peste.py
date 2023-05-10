@@ -8,7 +8,7 @@ from Jeu.Entitee.Agissant.Humain.Humain import *
 
 class Peste(PNJ_mage,Multi_soigneur,Support_lointain,Humain): #La huitième humaine du jeu, à l'étage 7 (une sainte très à cheval sur beaucoup trop de trucs)
     """La classe de la peste."""
-    def __init__(self,controleur:Controleur,position:Position):
+    def __init__(self,controleur:Controleur,position:Optional[Position]=None):
 
         self.identite = 'peste'
         self.place = 7
