@@ -1,5 +1,9 @@
 # from typing import Any
-from typing import Any, Dict, Iterator, Literal, Tuple
+from typing import Any, Dict, Iterator, Literal, Optional, Self, Set, Tuple
+from Jeu.Entitee.Agissant.Agissant import Agissant
+from Jeu.Entitee.Decors.Decor import Decors
+from Jeu.Entitee.Item.Item import Item
+from Jeu.Labyrinthe.Case import Case
 from Jeu.Labyrinthe.Structure_spatiale.Espace import *
 from Jeu.Labyrinthe.Structure_spatiale.Espace import Decalage, List
 
@@ -10,7 +14,7 @@ class Vue(Espace):
         self.matrice_cases = matrice
         self.decalage = decalage
 
-    def __getitem__(self,key:Position|Decalage|Cote|tuple):
+    def __getitem__(self,key:Position|Decalage|Cote_position|Cote_decalage|tuple):
         if isinstance(key,tuple):
             return self.matrice_cases[key[0]][key[1]]
         elif isinstance(key,Position):
@@ -19,11 +23,11 @@ class Vue(Espace):
             return self.matrice_cases[key.x][key.y]
         elif isinstance(key,Decalage):
             return self.matrice_cases[key.x][key.y]
-        if isinstance(key,Cote):
+        if isinstance(key,Cote_position|Cote_decalage):
             return self[key.emplacement][key.direction]
         return NotImplemented
 
-    def __setitem__(self,key:Position|Decalage|Cote|tuple,value):
+    def __setitem__(self,key:Position|Decalage|Cote_position|Cote_decalage|tuple,value):
         if isinstance(key,tuple):
             self[key[0]][key[1]] = value
         elif isinstance(key,Position):
@@ -32,7 +36,7 @@ class Vue(Espace):
             self.matrice_cases[key.x][key.y] = value
         elif isinstance(key,Decalage):
             self.matrice_cases[key.x][key.y] = value
-        if isinstance(key,Cote):
+        if isinstance(key,Cote_position|Cote_decalage):
             self[key.emplacement][key.direction] = value
         else:
             return NotImplemented
@@ -44,7 +48,7 @@ class Vue(Espace):
             return item.lab == self.id and 0<=item.x<self.decalage.x and 0<=item.y<self.decalage.y
         elif isinstance(item,Decalage):
             return 0<=item.x<self.decalage.x and 0<=item.y<self.decalage.y
-        elif isinstance(item,Cote):
+        elif isinstance(item,Cote_position):
             return item.emplacement in self
         return NotImplemented
     
@@ -61,21 +65,23 @@ class Vue(Espace):
     def case_from_position(self,position:Position|Decalage):
         return self.matrice_cases[position.x][position.y]
 
-    def mur_from_cote(self,cote:Cote):
+    def mur_from_cote(self,cote:Cote_position|Cote_decalage):
         return self.matrice_cases[cote.emplacement.x][cote.emplacement.y][cote.direction]
 
 
 class Representation_case:
     """Regroupe les informations sur une case qui seront envoyées à l'agissant"""
-    def __init__(self,position:Position,clarte:float,code:int,cibles:List[List[Position|Literal[False]]],effets:List[List[int]],repoussante:bool):
-        self.position = position #La position de la case
+    def __init__(self,case:Case,clarte:float,code:int,cibles:List[List[Position|Literal[False]]],agissant:Optional[Agissant],decors:Optional[Decors],items:Set[Item],effets:List[List[int]],repoussante:bool):
+        self.case = case #La position de la case
         self.clarte = clarte #La clarté, qui vient d'être calculée pour l'agissant
         self.oubli = 0 #Pour le décompte de l'oubli
         self.trajets = {"dangerosite":[],"importance":[]}
         self.visitee = False #Pour savoir si la case a déjà été visitée
         self.code = code #Le code correspondant aux auras et autres effets
         self.cibles = cibles #Les murs et leur traversabilité pour l'agissant
-        self.entitees = set() #Pour stocker les entitées
+        self.agissant = agissant #L'éventuel agissant sur la case
+        self.decors = decors #L'éventuel décor de la case
+        self.items = items #Les éventuels items sur la case
         self.effets = effets #Pour stocker les effets (attaques delayées)
         self.repoussante = repoussante #Si la case est repoussante
 
@@ -91,9 +97,34 @@ class Representation_case:
             self.oubli = 0
             self.code = 0
             self.cibles:List[List[Position|Literal[False]]] = [[False,False,False,False,False],[False,False,False,False,False],[False,False,False,False,False],[False,False,False,False,False]]
-            self.entitees = set()
+            self.agissant = None
+            self.decors = None
+            self.items = set()
             return True
         return False
+    
+    def update(self, other:Self):
+        self.oubli = other.oubli
+        self.code = other.code
+        self.cibles = other.cibles
+        self.agissant = other.agissant
+        self.decors = other.decors
+        self.items = other.items
+        self.effets = other.effets
+        self.repoussante = other.repoussante
+    
+    def __getitem__(self,key:Tuple[str,int]) -> float:
+        trajet = self.trajets.get(key[0],[])
+        if len(trajet) > key[1] and -len(trajet) <= key[1] :
+            return trajet[key[1]]
+        return 0
+
+    def __setitem__(self,key:Tuple[str,int],value:float):
+        if key[0] not in self.trajets:
+            self.trajets[key[0]] = []
+        if len(self.trajets[key[0]]) <= key[1]:
+            self.trajets[key[0]] += [0]*(key[1]-len(self.trajets[key[0]])+1)
+        self.trajets[key[0]][key[1]] = value
 
 class Representation_vue(Vue):
     """Une représentation simplifiée d'un labyrinthe"""
@@ -102,14 +133,14 @@ class Representation_vue(Vue):
         self.matrice_cases = matrice
         self.decalage = decalage
         
-    def __contains__(self,item:Position|Decalage|Cote|tuple|None):
+    def __contains__(self,item:Position|Decalage|Cote_position|Cote_decalage|tuple|None):
         if item is None:
             return False
         elif isinstance(item,Position):
             return item.lab == self.id and 0<=item.x<self.decalage.x and 0<=item.y<self.decalage.y
         elif isinstance(item,Decalage):
             return 0<=item.x<self.decalage.x and 0<=item.y<self.decalage.y
-        elif isinstance(item,Cote):
+        elif isinstance(item,Cote_position|Cote_decalage):
             return item.emplacement in self
         return NotImplemented
     
@@ -128,8 +159,8 @@ class Representation_vue(Vue):
             raise ValueError("La position n'est pas au bon étage")
         return self.matrice_cases[position.x][position.y]
 
-    def mur_from_cote(self,cote:Cote) -> List[Position|Literal[False]]:
-        if isinstance(cote.emplacement,Position) and cote.emplacement.lab != self.id:
+    def mur_from_cote(self,cote:Cote_position|Cote_decalage) -> List[Position|Literal[False]]:
+        if isinstance(cote,Cote_position) and cote.emplacement.lab != self.id:
             raise ValueError("Le coté n'est pas au bon étage")
         return self.matrice_cases[cote.emplacement.x][cote.emplacement.y].cibles[cote.direction]
 
@@ -140,7 +171,7 @@ class Vues(dict[str,Representation_vue]):
             return False
         elif isinstance(item,Position):
             return item.lab in self and item in self[item.lab]
-        elif isinstance(item,Cote):
+        elif isinstance(item,Cote_position):
             return item.emplacement in self
         else:
             return dict.__contains__(self,item)
@@ -159,8 +190,5 @@ class Vues(dict[str,Representation_vue]):
     def case_from_position(self,position:Position) -> Representation_case:
         return self[position.lab].case_from_position(position)
 
-    def mur_from_cote(self,cote:Cote) -> List[Position|Literal[False]]:
-        if isinstance(cote.emplacement,Position):
-            return self[cote.emplacement.lab].mur_from_cote(cote)
-        else:
-            raise ValueError("Le cote n'est pas une position")
+    def mur_from_cote(self,cote:Cote_position) -> List[Position|Literal[False]]:
+        return self[cote.emplacement.lab].mur_from_cote(cote)

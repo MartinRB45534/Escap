@@ -1,19 +1,23 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
+# Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
 
-from Jeu.Entitee.Agissant.Humain.Humain import *
+# Imports des classes parentes
+from Jeu.Entitee.Agissant.Humain.Humain import Humain
 
 class Codeur(Humain): #Le cinquième humain du jeu, à l'étage 4 (répond au nom de Dev, quand Il n'est pas occupé à programmer un autre jeu)
     """Ma classe."""
-    def __init__(self,controleur:Controleur,position:Optional[Position]=None):
+    def __init__(self,controleur:Controleur,position:Position):
 
         self.identite = 'codeur'
         self.place = 4
 
-        Humain.__init__(self,controleur,position,self.identite,1,1) #La notion de niveau n'a pas d'emprise sur Dev... Il peut modifier son niveau simple 'self.niveau = '
+        Humain.__init__(self,controleur,self.identite,1,1,position) #La notion de niveau n'a pas d'emprise sur Dev... Il peut modifier son niveau simple 'self.niveau = '
 
         self.appreciations = [5,0,0,0,0,0,0,0,0,0]
 
@@ -41,6 +45,7 @@ class Codeur(Humain): #Le cinquième humain du jeu, à l'étage 4 (répond au no
             self.repliques = ["dialogue-5reponse1.1","dialogue-5reponse1.2"]
 
     def interprete(self,replique:str):
+        assert isinstance(self.controleur.joueur, Humain)
 
         #Premier dialogue
         #Le joueur arrive vers Dev
@@ -61,7 +66,7 @@ class Codeur(Humain): #Le cinquième humain du jeu, à l'étage 4 (répond au no
             self.replique="dialogue-1phrase1.2.2"
             self.repliques = ["dialogue-1reponse1.2.2.1"]
         elif replique == "dialogue-1reponse1.2.2.1":
-            self.appreciations[0] += 0.5
+            self.appreciations[self.controleur.joueur.place] += 0.5
             self.end_dialogue(-5)
 
         #Dialogue par défaut -2
@@ -119,3 +124,7 @@ class Codeur(Humain): #Le cinquième humain du jeu, à l'étage 4 (répond au no
 
     def get_texte_descriptif(self):
         return ["Vous voulez bien éviter de fouiller la vie privée des gens ?"]
+
+# Imports utilisés dans le code:
+from Affichage.Skins.Skins import SKIN_CODEUR, SKIN_CODEUR_VUE
+from Jeu.Dialogues.Dialogues_codeur import REPLIQUES_CODEUR

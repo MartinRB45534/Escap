@@ -2,8 +2,8 @@ from Jeu.Entitee.Item.Equippement.Degainable.Degainable import *
 
 class Bouclier(Degainable):
     """La classe des boucliers. Permettent de se protéger des attaques lorsqu'ils sont utilisés."""
-    def __init__(self,position:Optional[Position]=None,degats_bloques:float=0,taux_degats:float=0):
-        Equipement.__init__(self,position)
+    def __init__(self,controleur:Controleur,degats_bloques:float,taux_degats:float,position:Position=ABSENT):
+        Equipement.__init__(self,controleur,position)
         self.degats_bloques = degats_bloques
         self.taux_degats = taux_degats
         self.taux_stats = {}

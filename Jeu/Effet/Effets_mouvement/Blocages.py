@@ -1,7 +1,14 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING, Set
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Entitee.Entitee import Entitee
+    from Jeu.Entitee.Agissant.Agissant import Agissant
+    from Jeu.Labyrinthe.Mur import Mur
+
+# Imports des classes parentes
 from Jeu.Effet.Effet import *
-from Jeu.Entitee.Item.Item import *
-from Jeu.Systeme.Classe import *
-from Jeu.Constantes import *
 
 class Mur_plein(On_try_through):
     """L'effet qui correspond à la présence d'un mur plein sur le passage de l'entitee."""
@@ -10,10 +17,10 @@ class Mur_plein(On_try_through):
         self.durete = durete #La priorite qu'il faut avoir pour briser ce mur.
         self.casse = False
 
-    def action(self,mur,entitee):
+    def action(self,mur:Mur,entitee:Entitee):
         if not(isinstance(entitee,Fantome)): #Deux moyens de traverser un mur plein : être un fantome ;
             ecrasement = None
-            if not(issubclass(entitee.get_classe(),Item)):
+            if isinstance(entitee,Agissant):
                 ecrasement = trouve_skill(entitee.classe_principale,Skill_ecrasement)   # ou l'écraser.
             if ecrasement is not None :
                 passage = ecrasement.utilise(self.durete,entitee.get_priorite())
@@ -29,7 +36,7 @@ class Mur_plein(On_try_through):
             else :
                 mur.peut_passer = False
 
-    def execute(self,mur,entitee):
+    def execute(self,mur:Mur,entitee:Entitee):
         if not(self.casse) :
             self.action(mur,entitee)
 
@@ -44,7 +51,7 @@ class Mur_impassable(On_try_through):
     def __init__(self):
         self.affiche = True
 
-    def action(self,mur,entitee):
+    def action(self,mur:Mur,entitee:Entitee):
         mur.peut_passer = False
 
     def get_skin(self,code):
@@ -60,11 +67,11 @@ class Porte(On_try_through):
         self.ferme = True
         self.auto = automatique
 
-    def action(self,mur,entitee:Item|Agissant):
+    def action(self,mur:Mur,entitee:Entitee):
         if not(isinstance(entitee,Fantome)):          #Trois moyens de traverser une porte : être un fantome ;
             if not(isinstance(entitee,Agissant)) or not(self.code in entitee.get_clees()): # avoir la clée ;
                 ecrasement = None
-                if isinstance(entitee,Agissant) and issubclass(entitee.get_classe(),Item):
+                if isinstance(entitee,Agissant):
                     ecrasement = trouve_skill(entitee.classe_principale,Skill_ecrasement)  # ou tout détruire !
                 if ecrasement is not None :
                     passage = ecrasement.utilise(self.durete,entitee.get_priorite())
@@ -91,11 +98,11 @@ class Porte(On_try_through):
                         if isinstance(effet,Porte):
                             effet.ferme = False #On voudrait aussi ouvrir l'autre côté de la porte.
 
-    def execute(self,mur,entitee):
+    def execute(self,mur:Mur,entitee:Entitee):
         if not(self.casse) and self.ferme :
             self.action(mur,entitee)
 
-    def get_skin(self,clees = []):
+    def get_skin(self,clees:Set[str] = set()):
         if self.ferme and self.code in clees:
             return SKIN_PORTE_OUVRABLE
         elif self.ferme:
@@ -104,8 +111,9 @@ class Porte(On_try_through):
             return SKIN_PORTE_OUVERTE
 
 class Premiere_porte(Porte):
-    def execute(self,mur,entitee):
-        if entitee.ID == 2:
+    def execute(self,mur:Mur,entitee:Entitee):
+        if entitee == 2:
+            assert isinstance(entitee,Heros)
             entitee.first_door()
             Premiere_porte.execute = Porte.execute
         Porte.execute(self,mur,entitee)
@@ -113,7 +121,7 @@ class Premiere_porte(Porte):
 class Barriere(On_try_through):
     """L'effet qui correspond à la présence d'une barrière magique, qui bloque certaines entitées selon certains critères."""
 
-    def execute(self,mur,entitee):
+    def execute(self,mur:Mur,entitee:Entitee):
         self.action(mur,entitee)
 
     def get_skin(self):
@@ -125,7 +133,7 @@ class Barriere_classe(Barriere):
         self.affiche = True
         self.classe = classe
 
-    def action(self,mur,entitee): #Pour interdire certains coins aux fantômes
+    def action(self,mur:Mur,entitee:Entitee): #Pour interdire certains coins aux fantômes
         if isinstance(entitee,self.classe):
             mur.peut_passer = False
 
@@ -135,7 +143,7 @@ class Barriere_espece(Barriere):
         self.affiche = True
         self.espece = espece
 
-    def action(self,mur,entitee):
+    def action(self,mur:Mur,entitee:Entitee):
         if isinstance(entitee,Agissant) and self.espece in entitee.get_especes():
             mur.peut_passer = False
 
@@ -145,7 +153,7 @@ class Barriere_tribale(Barriere):
         self.affiche = True
         self.esprit = esprit
 
-    def action(self,mur,entitee): #Pour les zones protégées où seul le joueur et son groupe peuvent aller par exemple.
+    def action(self,mur:Mur,entitee:Entitee): #Pour les zones protégées où seul le joueur et son groupe peuvent aller par exemple.
         if isinstance(entitee,Agissant) and entitee.get_esprit() != self.esprit:
             mur.peut_passer = False
 
@@ -155,7 +163,7 @@ class Barriere_altitude(Barriere):
         self.affiche = True
         self.altitude = altitude
 
-    def action(self,mur,entitee): #Pour les zones protégées où seul le joueur et son groupe peuvent aller par exemple.
+    def action(self,mur:Mur,entitee:Entitee): #Pour les zones protégées où seul le joueur et son groupe peuvent aller par exemple.
         if not(isinstance(entitee,Item)) or not(entitee.hauteur >= self.altitude):
             mur.peut_passer = False
 
@@ -169,7 +177,7 @@ class Porte_classe(Porte_barriere):
         Porte.__init__(self,durete,code,automatique)
         self.classe = classe
 
-    def action(self,mur,entitee): #Pour interdire certains coins aux fantômes
+    def action(self,mur:Mur,entitee:Mur): #Pour interdire certains coins aux fantômes
         if isinstance(entitee,self.classe):
             if not(isinstance(entitee,Agissant)) or not(self.code in entitee.get_clees()):
                 mur.peut_passer = False
@@ -182,7 +190,7 @@ class Porte_espece(Porte_barriere):
         Porte.__init__(self,durete,code,automatique)
         self.espece = espece
 
-    def action(self,mur,entitee):
+    def action(self,mur:Mur,entitee:Entitee):
         if isinstance(entitee,Agissant) and self.espece in entitee.get_especes():
             if not(isinstance(entitee,Agissant)) or not(self.code in entitee.get_clees()):
                 mur.peut_passer = False
@@ -195,7 +203,7 @@ class Porte_tribale(Porte_barriere):
         Porte.__init__(self,durete,code,automatique)
         self.esprit = esprit
 
-    def action(self,mur,entitee): #Pour les zones protégées où seul le joueur et son groupe peuvent aller par exemple.
+    def action(self,mur:Mur,entitee:Entitee): #Pour les zones protégées où seul le joueur et son groupe peuvent aller par exemple.
         if isinstance(entitee,Agissant) and entitee.get_esprit() != self.esprit:
             if not(isinstance(entitee,Agissant)) or not(self.code in entitee.get_clees()):
                 mur.peut_passer = False
@@ -208,9 +216,17 @@ class Porte_altitude(Porte_barriere):
         Porte.__init__(self,durete,code,automatique)
         self.altitude = altitude
 
-    def action(self,mur,entitee): #Pour les zones protégées où seul le joueur et son groupe peuvent aller par exemple.
+    def action(self,mur:Mur,entitee:Entitee): #Pour les zones protégées où seul le joueur et son groupe peuvent aller par exemple.
         if not(isinstance(entitee,Item)) or not(entitee.hauteur >= self.altitude):
             if not(isinstance(entitee,Agissant)) or not(self.code in entitee.get_clees()):
                 mur.peut_passer = False
             elif not(self.auto): #Si on a la clé et la porte n'est pas automatique, elle reste ouverte !
                 self.ferme = False
+
+# Imports utilisés dans le code
+from Jeu.Entitee.Entitee import Entitee, Fantome
+from Jeu.Entitee.Agissant.Agissant import Agissant
+from Jeu.Entitee.Item.Item import Item
+from Jeu.Systeme.Classe import trouve_skill, Skill_ecrasement
+from Jeu.Entitee.Agissant.Humain.Heros import Heros
+from Affichage.Skins.Skins import SKIN_MUR_CASSE, SKINS_MURS, SKIN_PORTE, SKIN_PORTE_OUVRABLE, SKIN_PORTE_OUVERTE, SKIN_BARRIERE

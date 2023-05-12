@@ -8,8 +8,8 @@ from Jeu.Entitee.Item.Item import *
 
 class Projectile(Item):
     """La classe des items destinés à être lancés. Possèdent naturellement une vitesse non nulle."""
-    def __init__(self,position:Optional[Position]=None,vitesse:float=0,effets:List[Effet]=[]):
-        Item.__init__(self,position)
+    def __init__(self,controleur:Controleur,position:Position=ABSENT,vitesse:float=0,effets:List[Effet]=[]):
+        Item.__init__(self,controleur,position)
         self.vitesse = vitesse
         self.effets = effets #Les effets déclenché lors du choc avec un agissant.
 

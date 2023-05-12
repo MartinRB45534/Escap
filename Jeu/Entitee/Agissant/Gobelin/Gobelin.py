@@ -4,8 +4,8 @@ from Jeu.Entitee.Agissant.Role.Roles import *
 
 class Gobelin(Dps):
     """Le monstre de base. Faible, souvent en groupe."""
-    def __init__(self,controleur,position,niveau:int):
-        Agissant.__init__(self,controleur,position,"gobelin",niveau)
+    def __init__(self,controleur:Controleur,niveau:int,position:Position=ABSENT):
+        Agissant.__init__(self,controleur,"gobelin",niveau,position)
 
     def get_offenses(self):
         offenses = self.offenses
@@ -28,6 +28,6 @@ class Gobelin(Dps):
         return SKIN_TETE_GOBELIN
 
     def get_texte_descriptif(self):
-        return [f"Un gobelin (niveau {self.niveau})",f"ID : {self.ID}","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Les gobelins sont des monstres humanoïdes verts de petite taille. Généralement faibles, on les rencontre souvent en compagnie d'autres gobelins. Attention au nombre, et à leurs congénères plus spécialisés."]
+        return [f"Un gobelin (niveau {self.niveau})",f"ID : {self}","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Les gobelins sont des monstres humanoïdes verts de petite taille. Généralement faibles, on les rencontre souvent en compagnie d'autres gobelins. Attention au nombre, et à leurs congénères plus spécialisés."]
 
     #Est-ce qu'il a besoin d'une méthode spécifique ? Pour les offenses peut-être ?

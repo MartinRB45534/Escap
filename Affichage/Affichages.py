@@ -50,25 +50,28 @@ class Affichage_principal(Wrapper_knot, Knot_horizontal):
         
     def init_dialogue(self):
         """Crée l'affichage tel qu'il est pendant les phases de dialogues"""
+        assert isinstance(self.controleur.joueur.interlocuteur, Humain)
         droite = Affichage_droite_dialogue(self.controleur.joueur.interlocuteur)
         self.init_triptique(self.affichage_gauche, self.affichage_centre, droite, droite)
 
     def init_case_dialogue(self):
+        assert isinstance(self.controleur.joueur.interlocuteur, Humain)
         centre = Affichage_centre_case_dialogue(self.controleur)
         droite = Affichage_droite_dialogue(self.controleur.joueur.interlocuteur)
         self.init_triptique(self.affichage_gauche, centre, droite, centre)
 
     def init_case_magie(self):
         centre = Affichage_centre_case_magie(self.controleur)
-        droite = Affichage_droite(self.controleur.joueur.interlocuteur)
+        droite = Affichage_droite(self.controleur)
         self.init_triptique(self.affichage_gauche, centre, droite, centre)
 
     def init_case_parchemin(self):
         centre = Affichage_centre_case_parchemin(self.controleur)
-        droite = Affichage_droite(self.controleur.joueur.interlocuteur)
+        droite = Affichage_droite(self.controleur)
         self.init_triptique(self.affichage_gauche, centre, droite, centre)
 
     def init_agissant_dialogue(self):
+        assert isinstance(self.controleur.joueur.interlocuteur, Humain)
         gauche = Affichage_droite_dialogue(self.controleur.joueur.interlocuteur)
         droite = Affichage_droite_agissant_cible(self.controleur, False, AGISSANT_DIALOGUE)
         self.init_triptique(gauche, self.affichage_centre, droite, droite)
@@ -111,7 +114,7 @@ class Affichage_principal(Wrapper_knot, Knot_horizontal):
         menu = Pavage_vertical()
         boutons = Pavage_horizontal()
         onglets = Liste_horizontale()
-        onglets.set_contenu([Bouton(SKIN_ACHAT, "Achat"), Marge_verticale(), Bouton(SKIN_VENTE, "Vente")])
+        onglets.set_contenu([Bouton(SKIN_ACHAT, "Achat"), Marge_verticale(), Bouton(SKIN_VENTE, "Vente")], [0, 5, 0])
         boutons.set_contenu([Marge_verticale(), onglets, Marge_verticale(), Marge_verticale(), Bouton(SKIN_QUITTER, "Quitter"), Marge_verticale()], [5, 0, -1, 5, 0, 5])
         menu.set_contenu([Marge_horizontale(), boutons, Marge_horizontale(), Affichage_centre_ventes(self.controleur, droite), Marge_horizontale()], [5, 0, 5, -1, 5])
 
@@ -126,7 +129,7 @@ class Affichage_principal(Wrapper_knot, Knot_horizontal):
         menu = Pavage_vertical()
         boutons = Pavage_horizontal()
         onglets = Liste_horizontale()
-        onglets.set_contenu([Bouton(SKIN_ACHAT, "Achat"), Marge_verticale(), Bouton(SKIN_VENTE, "Vente")])
+        onglets.set_contenu([Bouton(SKIN_ACHAT, "Achat"), Marge_verticale(), Bouton(SKIN_VENTE, "Vente")], [0, 5, 0])
         boutons.set_contenu([Marge_verticale(), onglets, Marge_verticale(), Marge_verticale(), Bouton(SKIN_QUITTER, "Quitter"), Marge_verticale()], [5, 0, -1, 5, 0, 5])
         menu.set_contenu([Marge_horizontale(), boutons, Marge_horizontale(), Affichage_centre_achats(self.controleur, droite), Marge_horizontale()], [5, 0, 5, -1, 5])
         
@@ -146,12 +149,13 @@ class Affichage_principal(Wrapper_knot, Knot_horizontal):
     def init_auto_impregnations(self):
         droite = Placeheldholder()
 
-        gauche = Affichage_gauche_inventaire(self.controleur)
-        centre = Affichage_centre_auto_impregnations(self.controleur.joueur, droite)
+        gauche = Affichage_gauche_inventaire(self.controleur.joueur)
+        centre = Affichage_centre_auto_impregnations(self.controleur, droite)
         droite.set_contenu(Affichage_droite_impregnations(self.controleur, "De quelle magie est-ce que je veux imprégner ce parchemin ?", AUTO_IMPREGNATION))
         self.init_triptique(gauche, centre, droite, centre)
 
     def update(self):
+        assert self.contenu is not None
         if self.phase != self.controleur.phase: #On a changé de phase
             if self.phase == TOUR: # On quitte la phase de jeu "normale"
                 self.courant_ = self.courant # On sauvegarde l'objet courant
@@ -343,9 +347,9 @@ class Affichage_droite(Wrapper_knot, Knot_horizontal):
 
         self.agissant_descr = Placeheldholder()
 
-        self.allies = Affichage_agissants(self.agissant_descr, self, self.controleur, Vignette_allie, self.controleur.get_esprit(self.controleur.joueur.esprit).get_corps_vus)
-        self.neutres = Affichage_agissants(self.agissant_descr, self, self.controleur, Vignette_neutre, self.controleur.get_esprit(self.controleur.joueur.esprit).get_neutres_vus)
-        self.ennemis = Affichage_agissants(self.agissant_descr, self, self.controleur, Vignette_ennemi, self.controleur.get_esprit(self.controleur.joueur.esprit).get_ennemis_vus)
+        self.allies = Affichage_agissants(self.agissant_descr, self, self.controleur, Vignette_allie, self.controleur.joueur.esprit.get_corps_vus)
+        self.neutres = Affichage_agissants(self.agissant_descr, self, self.controleur, Vignette_neutre, self.controleur.joueur.esprit.get_neutres_vus)
+        self.ennemis = Affichage_agissants(self.agissant_descr, self, self.controleur, Vignette_ennemi, self.controleur.joueur.esprit.get_ennemis_vus)
         
         self.agissant_descr.set_contenu(Center_horizontal_texte("Aucun agissant sélectionné"))
         self.init_droite()
@@ -364,11 +368,10 @@ class Affichage_droite(Wrapper_knot, Knot_horizontal):
         if not droit:
             if isinstance(selection, Affichage_agissants):
                 self.set_courant(selection)
+                assert isinstance(self.courant, Affichage_agissants)
                 if self.courant.courant is None:
                     self.courant.set_default_courant()
                 self.init_droite()
-            elif isinstance(selection, Paves):
-                self.controleur.get_esprit(self.controleur.joueur.esprit).utilise(self.courant.agissant)
             self.set_tailles(self.tailles)
 
     def set_default_courant(self):
@@ -391,6 +394,7 @@ class Affichage_droite(Wrapper_knot, Knot_horizontal):
         return self
 
     def update(self):
+        assert self.contenu is not None
         if isinstance(self.courant, Affichage_agissants) and not self.courant.courant in self.allies.agissants + self.ennemis.agissants + self.neutres.agissants :
             self.agissant_descr.set_contenu(Center_horizontal_texte("Aucun agissant sélectionné"))
         self.set_tailles(self.tailles)
@@ -408,6 +412,7 @@ class Affichage_gauche_cout_magie(Wrapper_knot_bloque):
         self.init_gauche()
 
     def init_gauche(self):
+        assert self.courant is not None
         contenu = Pavage_horizontal()
         triptique = Liste_verticale()
         triptique.set_contenu([Marge_horizontale(), self.courant, Marge_horizontale(), Affichage_inventaire_ferme(self.controleur.joueur), Marge_horizontale(), Margin_texte("Classes & compétences"), Marge_horizontale()], [5, 0, 5, 0, 5, 0, 5]) # /!\ Remplacer par Affichage_classe_principale_ferme
@@ -421,10 +426,11 @@ class Affichage_gauche_cout_parchemin(Wrapper_knot_bloque):
 
         self.controleur = controleur
         self.fond = (255, 255, 255)
-        self.set_courant(Affichage_stats_cout_magie(self.controleur, cout_parchemin=True))
+        self.set_courant(Affichage_stats_cout_magie(self.controleur, parchemin=True))
         self.init_gauche()
 
     def init_gauche(self):
+        assert self.courant is not None
         contenu = Pavage_horizontal()
         triptique = Liste_verticale()
         triptique.set_contenu([Marge_horizontale(), self.courant, Marge_horizontale(), Affichage_inventaire_ferme(self.controleur.joueur), Marge_horizontale(), Margin_texte("Classes & compétences"), Marge_horizontale()], [5, 0, 5, 0, 5, 0, 5]) # /!\ Remplacer par Affichage_classe_principale_ferme
@@ -477,10 +483,12 @@ class Affichage_centre_selection_lab(Wrapper_knot, Knot_vertical):
         if not droit:
             if isinstance(selection, self.type_affichage_labyrinthe):
                 self.set_courant(selection)
+                assert isinstance(self.courant, self.type_affichage_labyrinthe)
                 self.courant.set_actif()
                 self.cible = self.courant.cible
             if isinstance(selection, Bouton) and selection.texte == "Confirmer":
                 if isinstance(self.courant, self.type_affichage_labyrinthe):
+                    assert isinstance(self.controleur.joueur.interlocuteur, PNJ)
                     self.controleur.joueur.interlocuteur.set_cible(self.cible)
                     self.controleur.joueur.controleur.unset_phase(CASE_DIALOGUE)
                     print(self.controleur.phases)
@@ -538,12 +546,11 @@ class Affichage_centre_direction_parchemin(Affichage_centre_selection_lab):
         Affichage_centre_selection_lab.__init__(self, controleur, Affichage_labyrinthe_direction_parchemin)
 
 class Affichage_centre_selection_liste_menu(Wrapper_knot_bloque):
-    def __init__(self, controleur: Controleur, placeheldholder:Placeheldholder, type_liste_menu: type):
+    def __init__(self, controleur: Controleur, placeheldholder:Placeheldholder, type_liste_menu: Type):
         Wrapper_knot.__init__(self)
 
         self.controleur = controleur
-        self.type_liste_menu:Affichage_liste_menu_recettes|Affichage_liste_menu_ventes|Affichage_liste_menu_achats|Affichage_liste_menu_impregnations|Affichage_liste_menu_auto_impregnations = type_liste_menu
-        self.liste_menu:Liste_menu = None
+        self.type_liste_menu:Type[Affichage_liste_menu_recettes|Affichage_liste_menu_ventes|Affichage_liste_menu_achats|Affichage_liste_menu_impregnations|Affichage_liste_menu_auto_impregnations] = type_liste_menu
         self.fond = (0, 0, 0)
         self.set_courant(self.type_liste_menu(self.controleur, placeheldholder))
         self.init_centre()
@@ -583,8 +590,9 @@ class Affichage_droite_dialogue(Wrapper_knot, Knot_vertical_profondeur_agnostiqu
         self.interlocuteur = interlocuteur
         self.fond = (255, 255, 255)
         self.replique = interlocuteur.replique
+        assert self.replique is not None
 
-        self.phrase = Pave(self.interlocuteur.get_replique(self.interlocuteur.replique))
+        self.phrase = Pave(self.interlocuteur.get_replique(self.replique))
         self.repliques = [Affichage_replique(self.interlocuteur.get_replique(replique), replique) for replique in self.interlocuteur.repliques]
 
         self.set_default_courant()
@@ -600,12 +608,15 @@ class Affichage_droite_dialogue(Wrapper_knot, Knot_vertical_profondeur_agnostiqu
         self.fond = (255, 255, 255)
 
     def update(self):
+        assert self.contenu is not None
         if self.replique != self.interlocuteur.replique:
             self.replique = self.interlocuteur.replique
-            self.phrase = Pave(self.interlocuteur.get_replique(self.interlocuteur.replique))
+            assert self.replique is not None
+            self.phrase = Pave(self.interlocuteur.get_replique(self.replique))
             self.repliques = [Affichage_replique(self.interlocuteur.get_replique(replique), replique) for replique in self.interlocuteur.repliques]
             self.init_droite()
             self.set_tailles(self.tailles)
+            assert isinstance(self.courant, Affichage_replique)
             if self.courant.actif:
                 self.repliques[0].set_actif()
             self.set_courant(self.repliques[0])
@@ -618,6 +629,7 @@ class Affichage_droite_dialogue(Wrapper_knot, Knot_vertical_profondeur_agnostiqu
                 if selection != self.courant:
                     self.set_courant(selection)
                 else:
+                    assert isinstance(self.courant, Affichage_replique)
                     self.interlocuteur.interprete(self.courant.replique)
             self.set_tailles(self.tailles)
 
@@ -629,11 +641,13 @@ class Affichage_droite_dialogue(Wrapper_knot, Knot_vertical_profondeur_agnostiqu
 
     def in_up(self):
         if self.courant != self.repliques[0]:
+            assert isinstance(self.courant, Affichage_replique)
             self.set_courant(self.repliques[self.repliques.index(self.courant)-1])
         return self
     
     def in_down(self):
         if self.courant != self.repliques[-1]:
+            assert isinstance(self.courant, Affichage_replique)
             self.set_courant(self.repliques[self.repliques.index(self.courant)+1])
         return self
 
@@ -751,7 +765,7 @@ class Affichage_droite_recette(Wrapper_knot, Knot_vertical):
         self.fond = (255, 255, 255)
         self.wrapper_descr = Placeheldholder()
         self.ingredients = [Vignette_ingredient(self.wrapper_descr,eval(ingredient)(None), self.recette["ingredients"][ingredient], self.controleur.joueur.inventaire.quantite(eval(ingredient)), 40) for ingredient in self.recette["ingredients"]]
-        self.vignette_recette = Vignette_recette(self.wrapper_descr,Paves(eval(recette["produit"])(None).get_description()),self.recette, 40, False, not self.controleur.joueur.inventaire.peut_fournir({eval(ingredient):self.recette["ingredients"][ingredient] for ingredient in self.recette["ingredients"]}))
+        self.vignette_recette = Vignette_recette(self.wrapper_descr,Paves(eval(recette["produit"])(ABSENT).get_description()),self.recette, 40, False, not self.controleur.joueur.inventaire.peut_fournir({eval(ingredient):self.recette["ingredients"][ingredient] for ingredient in self.recette["ingredients"]}))
         self.boutons = [Bouton(SKIN_VALIDER, "Confirmer"), Bouton(SKIN_QUITTER, "Annuler")]
         self.wrapper_descr.set_contenu(Center_texte("Choisissez les ingrédients à fournir."))
 
@@ -777,6 +791,7 @@ class Affichage_droite_recette(Wrapper_knot, Knot_vertical):
             if isinstance(selection, (Vignette_recette, Vignette_ingredient)):
                 self.set_courant(selection)
             if isinstance(selection, Bouton) and selection.texte == "Confirmer":
+                assert isinstance(self.controleur.joueur.interlocuteur, Alchimiste|Ustensile)
                 item = self.controleur.joueur.interlocuteur.cuisine(self.recette)
                 self.controleur.ajoute_entitee(item)
                 for ingredient in self.recette["ingredients"]:
@@ -840,11 +855,10 @@ class Affichage_droite_vente(Wrapper_knot_bloque):
         self.controleur = controleur
         self.item = item
         self.prix = prix
-        self.invalide = item.ID in self.controleur.joueur.inventaire.get_equippement()
+        self.invalide = item in self.controleur.joueur.inventaire.get_equippement()
         self.fond = (255, 255, 255)
 
         self.textes:List[str] = item.get_description() + [
-            item.get_description(), #/!\ Faire dépendre du max des capa d'observation du joueur et du vendeur
             f"Je veux bien t'en donner {prix} €.", 
         ]
         if self.invalide:
@@ -866,8 +880,8 @@ class Affichage_droite_vente(Wrapper_knot_bloque):
     def select(self, selection:Cliquable, droit:bool=False):
         if not droit:
             if isinstance(selection, Bouton) and selection.texte == "Vendre":
-                self.controleur.joueur.inventaire.drop(None, self.item.ID)
-                self.controleur.joueur.argent += self.prix
+                self.controleur.joueur.inventaire.drop(ABSENT, self.item)
+                # self.controleur.joueur.argent += self.prix
             self.set_tailles(self.tailles)
 
 class Affichage_droite_achat(Wrapper_knot_bloque):
@@ -877,11 +891,10 @@ class Affichage_droite_achat(Wrapper_knot_bloque):
         self.controleur = controleur
         self.item = item
         self.prix = prix
-        self.invalide = prix > self.controleur.joueur.argent
+        self.invalide = prix > 0# self.controleur.joueur.argent
         self.fond = (255, 255, 255)
 
         self.textes:List[str] = item.get_description() + [
-            item.get_description(), #/!\ Faire dépendre du max des capa d'observation du joueur et du vendeur
             f"Je veux bien t'en donner {prix} €.", 
         ]
         if self.invalide:
@@ -904,7 +917,7 @@ class Affichage_droite_achat(Wrapper_knot_bloque):
         if not droit:
             if isinstance(selection, Bouton) and selection.texte == "Acheter" and not self.invalide:
                 self.controleur.joueur.inventaire.ajoute(self.item)
-                self.controleur.joueur.argent -= self.prix
+                # self.controleur.joueur.argent -= self.prix
             self.set_tailles(self.tailles)
 
 class Affichage_droite_impregnations(Wrapper_knot_bloque):
@@ -976,6 +989,7 @@ class Affichage_droite_impregnation(Wrapper_knot, Knot_horizontal):
     def select(self, selection:Cliquable, droit:bool=False):
         if not droit:
             if isinstance(selection, Bouton) and selection.texte == "Impregner":
+                assert isinstance(self.controleur.joueur, PJ_mage) and isinstance(self.controleur.joueur.interlocuteur, PNJ_mage)
                 self.controleur.joueur.auto_impregne(self.magie.nom) if self.auto else self.controleur.joueur.interlocuteur.impregne(self.magie.nom)
                 self.controleur.unset_phase(AUTO_IMPREGNATION if self.auto else IMPREGNATION)
             if isinstance(selection, Bouton) and selection.texte == "Annuler":
@@ -1003,7 +1017,7 @@ class Affichage_droite_impregnation(Wrapper_knot, Knot_horizontal):
 
 class Affichage_stats_ferme(Wrapper_cliquable):
     def __init__(self, joueur: PJ):
-        Wrapper_knot.__init__(self)
+        Wrapper_cliquable.__init__(self)
 
         self.joueur = joueur
         self.fond = (200, 200, 200)
@@ -1021,7 +1035,7 @@ class Affichage_stats_ferme(Wrapper_cliquable):
 
 class Affichage_stats(Wrapper_cliquable): # Modifier en donnant la possibilité d'afficher le détail des stats
     def __init__(self, joueur: PJ):
-        Wrapper_knot.__init__(self)
+        Wrapper_cliquable.__init__(self)
 
         self.joueur = joueur
         self.fond = (200, 200, 200)
@@ -1092,7 +1106,7 @@ class Affichage_stats_cout_magie(Wrapper_knot, Knot_vertical):
 
 class Affichage_inventaire_ferme(Wrapper_cliquable):
     def __init__(self, joueur: PJ):
-        Wrapper_knot.__init__(self)
+        Wrapper_cliquable.__init__(self)
 
         self.joueur = joueur
         self.fond = (200, 200, 200)
@@ -1171,7 +1185,7 @@ class Affichage_categorie(Wrapper_knot, Knot_vertical, Knot_hierarchique_sinistr
         self.item_descr = Placeheldholder()
 
         self.liste_i = Liste_verticale()
-        self.items = [Vignette_item_placeholder(self.item_descr,Description_item(self.joueur.controleur, self.joueur.controleur.entitees[ID]),[0, 0], self.joueur.controleur.entitees[ID], 40, ID in self.joueur.inventaire.get_equippement()) for ID in self.joueur.inventaire.items[self.categorie]]
+        self.items = [Vignette_item_placeholder(self.item_descr,Description_item(self.joueur.controleur, item),[0, 0], item, 40, item in self.joueur.inventaire.get_equippement()) for item in self.joueur.inventaire.items[self.categorie]]
         self.liste_i.set_contenu([self.items[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1, len(self.items)*2)], [0 if i%2==0 else 5 for i  in range(-1, len(self.items)*2)])
 
         if self.items:
@@ -1195,7 +1209,7 @@ class Affichage_categorie(Wrapper_knot, Knot_vertical, Knot_hierarchique_sinistr
     #     if not droit:
     #         if isinstance(selection, Vignette_item_placeholder): #On veut afficher un item
     #             if selection == self.courant:
-    #                 self.joueur.inventaire.utilise_item(selection.item.ID)
+    #                 self.joueur.inventaire.utilise_item(selection.item)
 
     def set_default_courant(self):
         if self.items:
@@ -1218,12 +1232,13 @@ class Affichage_categorie(Wrapper_knot, Knot_vertical, Knot_hierarchique_sinistr
         return self
 
     def update(self):
+        assert self.contenu is not None
         i=0
-        items = self.joueur.inventaire.items[self.categorie]
+        items = [*self.joueur.inventaire.items[self.categorie]]
         while i < len(items) or i < len(self.items):
-            if i == len(items) or i == len(self.items) or items[i] != self.items[i].item.ID: #Les deux ne correspondent pas
-                if i == len(self.items) or self.items[i].item.ID in items: #Donc l'item n'a pas été retiré, mais d'autres ont été ajoutés avant
-                    item = Vignette_item_placeholder(self.item_descr,Description_item(self.joueur.controleur,self.joueur.controleur[items[i]]), [0, 0], self.joueur.controleur[items[i]], 40)
+            if i == len(items) or i == len(self.items) or items[i] != self.items[i].item: #Les deux ne correspondent pas
+                if i == len(self.items) or self.items[i].item in items: #Donc l'item n'a pas été retiré, mais d'autres ont été ajoutés avant
+                    item = Vignette_item_placeholder(self.item_descr,Description_item(self.joueur.controleur,items[i]), [0, 0], items[i], 40)
                     self.items.insert(i, item)
                     self.liste_i.insert(2*i, item, 0)
                     self.liste_i.insert(2*i, Marge_horizontale(), 5)
@@ -1390,6 +1405,7 @@ class Affichage_intrasecs(Wrapper_knot, Knot_vertical):
         return self
 
     def update(self):
+        assert self.contenu is not None
         i=0
         skills = self.classe.skills_intrasecs
         while i < len(skills) or i < len(self.skills):
@@ -1438,12 +1454,6 @@ class Affichage_skills(Wrapper_knot, Knot_vertical):
         self.set_contenu(contenu)
         self.fond = (200, 200, 200)
 
-    def init(self):
-        contenu = Pavage_horizontal()
-        contenu.set_contenu([Marge_verticale(), self.liste_skills, Marge_verticale()], [5, -1, 5])
-        self.set_contenu(contenu)
-        self.fond = (200, 200, 200)
-
     def select(self, selection:Cliquable, droit:bool=False):
         if not droit:
             if isinstance(selection, Affichage_skill): #On veut afficher un item
@@ -1478,6 +1488,7 @@ class Affichage_skills(Wrapper_knot, Knot_vertical):
         return self
 
     def update(self):
+        assert self.contenu is not None
         i=0
         skills = self.classe.skills
         while i < len(skills) or i < len(self.skills):
@@ -1515,7 +1526,7 @@ class Affichage_classes(Wrapper_knot, Knot_vertical):
         self.fond = (200, 200, 200)
         
         self.liste_classes = Liste_verticale()
-        self.classes = [Affichage_classe(classe) for classe in self.classe.sous_classes]
+        self.classes:List[Affichage_classe|Affichage_sous_classe] = [Affichage_classe(classe) for classe in self.classe.sous_classes]
         self.liste_classes.set_contenu([self.classes[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1, len(self.classes)*2)], [0 if i%2==0 else 5 for i  in range(-1, len(self.classes)*2)])
         
         self.init()
@@ -1530,12 +1541,12 @@ class Affichage_classes(Wrapper_knot, Knot_vertical):
         for i in range(len(self.classes)):
             if self.classes[i] != self.courant:
                 if isinstance(self.classes[i], Affichage_sous_classe):
-                    self.classe[i] = Affichage_classe(self.classes[i].classe)
+                    self.classes[i] = Affichage_classe(self.classes[i].classe)
                     self.liste_classes.replace(i*2+1, self.classes[i], 0)
             else:
-                self.classe[i] = Affichage_sous_classe(self.classes[i].classe)
+                self.classes[i] = Affichage_sous_classe(self.classes[i].classe)
                 self.liste_classes.replace(i*2+1, self.classes[i], 0)
-                self.set_courant(self.classe[i])
+                self.set_courant(self.classes[i])
 
         contenu = Pavage_horizontal()
         contenu.set_contenu([Marge_verticale(), self.liste_classes, Marge_verticale()], [5, -1, 5])
@@ -1548,8 +1559,10 @@ class Affichage_classes(Wrapper_knot, Knot_vertical):
                 if selection == self.courant:
                     self.init_sous_classe()
                 else:
+                    assert isinstance(self.courant, Affichage_classe|Affichage_sous_classe)
                     self.courant.unset_actif()
                     self.set_courant(selection)
+                    assert isinstance(self.courant, Affichage_sous_classe)
                     self.courant.set_actif()
                 self.set_tailles(self.tailles)
 
@@ -1580,6 +1593,7 @@ class Affichage_classes(Wrapper_knot, Knot_vertical):
         return self
 
     def update(self):
+        assert self.contenu is not None
         i=0
         classes = self.classe.sous_classes
         while i < len(classes) or i < len(self.classes):
@@ -1610,7 +1624,7 @@ class Affichage_classes(Wrapper_knot, Knot_vertical):
             objet.update()
 
 class Affichage_agissants(Wrapper_knot, Knot_vertical):
-    def __init__(self, placeheldholder:Placeheldholder, placeheldholder_ajuster:Affichage, controleur:Controleur, type_vignette:Type[Vignette_allie|Vignette_ennemi|Vignette_neutre], methode:Callable[[], List[int]]):
+    def __init__(self, placeheldholder:Placeheldholder, placeheldholder_ajuster:Affichable, controleur:Controleur, type_vignette:Type[Vignette_allie|Vignette_ennemi|Vignette_neutre], methode:Callable[[], Set[Agissant]]):
         Wrapper_knot.__init__(self)
 
         self.placeheldholder = placeheldholder
@@ -1621,7 +1635,7 @@ class Affichage_agissants(Wrapper_knot, Knot_vertical):
         self.fond = (200, 200, 200)
         
         self.liste_agissants = Liste_verticale()
-        self.agissants = [self.type_vignette(placeheldholder, placeheldholder_ajuster, self.controleur.entitees[ID], 40) for ID in self.methode()]
+        self.agissants = [self.type_vignette(placeheldholder, placeheldholder_ajuster, agissant, 40) for agissant in self.methode()]
         self.liste_agissants.set_contenu([self.agissants[i//2] if i%2==0 else Marge_horizontale() for i  in range(-1, len(self.agissants)*2)], [0 if i%2==0 else 5 for i  in range(-1, len(self.agissants)*2)])
         
         self.init()
@@ -1633,12 +1647,13 @@ class Affichage_agissants(Wrapper_knot, Knot_vertical):
         self.fond = (200, 200, 200)
 
     def update(self):
+        assert self.contenu is not None
         i=0
-        agissants = self.methode()
+        agissants = [*self.methode()]
         while i < len(agissants) or i < len(self.agissants):
-            if i == len(agissants) or i == len(self.agissants) or agissants[i] != self.agissants[i].agissant.ID: #Les deux ne correspondent pas
-                if i == len(self.agissants) or self.agissants[i].agissant.ID in agissants: #Donc l'agissant n'a pas été retiré, mais d'autres ont été ajoutés avant
-                    agissant = self.type_vignette(self.placeheldholder, self.placeheldholder_ajuster, self.controleur[agissants[i]], 40)
+            if i == len(agissants) or i == len(self.agissants) or agissants[i] != self.agissants[i].agissant: #Les deux ne correspondent pas
+                if i == len(self.agissants) or self.agissants[i].agissant in agissants: #Donc l'agissant n'a pas été retiré, mais d'autres ont été ajoutés avant
+                    agissant = self.type_vignette(self.placeheldholder, self.placeheldholder_ajuster, agissants[i], 40)
                     self.agissants.insert(i, agissant)
                     self.liste_agissants.insert(2*i, agissant, 0)
                     self.liste_agissants.insert(2*i, Marge_horizontale(), 5)
@@ -1687,7 +1702,7 @@ class Affichage_agissants(Wrapper_knot, Knot_vertical):
         return self
 
 class Affichage_agissants_cible(Wrapper_knot, Knot_vertical):
-    def __init__(self, placeheldholder:Placeheldholder, placeheldholder_ajuster:Affichage, controleur:Controleur, multi:bool, type_vignette:Type[Vignette_allie|Vignette_ennemi|Vignette_neutre], methode:Callable[[], List[int]]):
+    def __init__(self, placeheldholder:Placeheldholder, placeheldholder_ajuster:Affichable, controleur:Controleur, multi:bool, type_vignette:Type[Vignette_allie|Vignette_ennemi|Vignette_neutre], methode:Callable[[], List[int]]):
         Wrapper_knot.__init__(self)
 
         self.placeheldholder = placeheldholder
@@ -1724,24 +1739,24 @@ class Affichage_agissants_cible(Wrapper_knot, Knot_vertical):
         if not droit:
             if isinstance(selection, self.type_vignette):
                 if self.courant == selection:
-                    if self.multi and selection.agissant.ID in self.cible:
-                        self.cible.remove(selection.agissant.ID)
+                    if self.multi and selection.agissant in self.cible:
+                        self.cible.remove(selection.agissant)
                         self.set_courant(self.type_vignette(self.placeheldholder, self.placeheldholder_ajuster, selection.agissant, 40, True))
                         self.agissants[self.agissants.index(selection)] = self.courant
                     elif self.multi:
                         self.set_courant(self.type_vignette(self.placeheldholder, self.placeheldholder_ajuster, selection.agissant, 40, True, True))
                         self.agissants[self.agissants.index(selection)] = self.courant
-                        self.cible.append(selection.agissant.ID)
-                    elif selection.agissant.ID == self.cible:
+                        self.cible.append(selection.agissant)
+                    elif selection.agissant == self.cible:
                         self.set_courant(self.type_vignette(self.placeheldholder, self.placeheldholder_ajuster, selection.agissant, 40, True))
                         self.agissants[self.agissants.index(selection)] = self.courant
                         self.cible = None
                     else:
                         self.set_courant(self.type_vignette(self.placeheldholder, self.placeheldholder_ajuster, selection.agissant, 40, True, True))
                         self.agissants[self.agissants.index(selection)] = self.courant
-                        self.cible = selection.agissant.ID
+                        self.cible = selection.agissant
                 elif isinstance(self.courant, self.type_vignette):
-                    if self.courant.agissant.ID is self.cible or self.multi and self.courant.agissant.ID in self.cible:
+                    if self.courant.agissant is self.cible or self.multi and self.courant.agissant in self.cible:
                         self.agissants[self.agissants.index(self.courant)] = self.type_vignette(self.placeheldholder, self.placeheldholder_ajuster, selection.agissant, 40, True, True)
                     else:
                         self.agissants[self.agissants.index(self.courant)] = self.type_vignette(self.placeheldholder, self.placeheldholder_ajuster, selection.agissant, 40)
@@ -1861,7 +1876,7 @@ class Affichage_perso(Proportionnel):
         for distance in range(PROFONDEUR_DE_CHAMP): #On ne va pas plus loin que ça pour l'instant
             pos_case_centre = position + direction*distance
             if pos_case_centre in joueur.vue:
-                case = joueur.vue[pos_case_centre]
+                case = joueur.vue.case_from_position(pos_case_centre)
                 if case.clarte == -1:
                     skins.append(SKINS_CASES_NOIRES_VUES[distance][0])
                 elif case.clarte > 0:
@@ -1894,7 +1909,7 @@ class Affichage_perso(Proportionnel):
                 ecart = ecart_+1
                 pos_case_droite = pos_case_centre + (direction+1)*ecart #À droite du point de vue du joueur
                 if pos_case_droite in joueur.vue:
-                    case = joueur.vue[pos_case_droite]
+                    case = joueur.vue.case_from_position(pos_case_droite)
                     if case.clarte == -1:
                         skins.append(SKINS_CASES_NOIRES_VUES[distance][ecart])
                     elif case.clarte > 0:
@@ -1917,7 +1932,7 @@ class Affichage_perso(Proportionnel):
                                 skins.append(SKINS_ESCALIERS_HAUT_VUS[distance][ecart])
                 pos_case_droite = pos_case_centre + (direction-1)*ecart #À droite du point de vue du joueur
                 if pos_case_droite in joueur.vue:
-                    case = joueur.vue[pos_case_droite]
+                    case = joueur.vue.case_from_position(pos_case_droite)
                     ecart = -ecart
                     if case.clarte == -1:
                         skins.append(SKINS_CASES_NOIRES_VUES[distance][ecart])
@@ -1943,7 +1958,7 @@ class Affichage_perso(Proportionnel):
         for skin in skins:
             skin.dessine_toi(screen, (x, y), (largeur, hauteur), frame, frame_par_tour)
 
-        for ID in joueur.vue[position].entitees:
+        for ID in joueur.vue.case_from_position(position).entitees:
             if ID < 11:
                 entitee = joueur.controleur.entitees[ID]
                 if issubclass(entitee.get_classe(), Agissant):
@@ -1965,10 +1980,11 @@ class Affichage_labyrinthe(Affichage_knot, Proportionnel):
         self.update()
 
     def update(self):
+        assert isinstance(self.courant,Vignettes_position)
         courant = None
         if self.controleur.joueur.vue is not None:
             self.objets:List[Affichable] = []
-            decs = [[dec.x, dec.y] for dec in self.controleur.joueur.vue.decalage if self.controleur.joueur.vue[dec].clarte > 0]
+            decs = [[dec.x, dec.y] for dec in self.controleur.joueur.vue.decalage if self.controleur.joueur.vue.case_from_position(dec).clarte > 0]
             visible = [min(decs, key=itemgetter(0))[0], max(decs, key=itemgetter(0))[0], min(decs, key=itemgetter(1))[1], max(decs, key=itemgetter(1))[1]]
             distance = max(self.controleur.joueur.position.x-visible[0], visible[1]-self.controleur.joueur.position.x, self.controleur.joueur.position.y-visible[2], visible[3]-self.controleur.joueur.position.y) + 1 #On cherche à déterminer le carré qui comprend toutes les cases utiles de la vue
             debut_vue = self.controleur.joueur.position + distance * (HAUT + GAUCHE)
@@ -1996,7 +2012,7 @@ class Affichage_labyrinthe(Affichage_knot, Proportionnel):
                 objet.update()
         self.set_courant(courant)
 
-    def make_vignette(self, position:List[int], vue:Vue, position_vue:Position, taille:int):
+    def make_vignette(self, position:List[int], vue:Representation_vue, position_vue:Position, taille:int):
         return Vignettes_position(position, self.controleur.joueur, vue, position_vue, taille)
     
     def select(self, selection:Cliquable, droit:bool=False):
@@ -2059,7 +2075,7 @@ class Affichage_labyrinthe_jeu(Affichage_labyrinthe):
                 position = selection.pos
                 agissants = self.controleur.trouve_agissants(position)
                 if agissants:
-                    if agissants[0] == self.controleur.joueur.ID:
+                    if agissants[0] == self.controleur.joueur:
                         self.controleur.joueur.mouvement = 1
                     else:
                         self.controleur.joueur.mouvement = 0
@@ -2075,7 +2091,7 @@ class Affichage_labyrinthe_jeu(Affichage_labyrinthe):
                 interactifs = self.controleur.trouve_interactifs(position)
                 print(interactifs)
                 if interactifs:
-                    if interactifs[0] == self.controleur.joueur.ID:
+                    if interactifs[0] == self.controleur.joueur:
                         self.controleur.joueur.mouvement = 3
                     else:
                         self.controleur.joueur.mouvement = 2
@@ -2083,7 +2099,7 @@ class Affichage_labyrinthe_jeu(Affichage_labyrinthe):
                 else:
                     agissants = self.controleur.trouve_agissants(position)
                     if agissants:
-                        if agissants[0] == self.controleur.joueur.ID:
+                        if agissants[0] == self.controleur.joueur:
                             self.controleur.joueur.mouvement = 3
                         else:
                             self.controleur.joueur.mouvement = 2
@@ -2295,7 +2311,7 @@ class Affichage_skill(Cliquable, Pavage_horizontal):
         self.tailles = [0, 0] #La largeur et la hauteur (ou l'inverse ?)
         self.position = [0, 0]
         self.fond = (0, 0, 0, 0)
-        self.contenu:List[Affichable] = [None] #Les objets qu'il 'contient'
+        self.contenu:List[Affichable] = [] #Les objets qu'il 'contient'
         self.skill = skill
         self.init()
 
@@ -2308,7 +2324,7 @@ class Affichage_classe(Cliquable, Pavage_horizontal):
         self.tailles = [0, 0] #La largeur et la hauteur (ou l'inverse ?)
         self.position = [0, 0]
         self.fond = (0, 0, 0, 0)
-        self.contenu:List[Affichable] = [None] #Les objets qu'il 'contient'
+        self.contenu:List[Affichable] = [] #Les objets qu'il 'contient'
         self.classe = classe
         self.init()
 

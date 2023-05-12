@@ -1,8 +1,13 @@
-from Jeu.Effet.Magie.Magie import *
-from Jeu.Effet.Sante.Soins import *
-from Jeu.Effet.Sante.Resurection import *
-from Jeu.Effet.Sante.Reanimation import *
-from Jeu.Entitee.Item.Item import *
+from __future__ import annotations
+from typing import TYPE_CHECKING, List, Optional
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Entitee.Agissant.Agissant import Agissant
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+
+# Imports des classes parentes
+from Jeu.Effet.Magie.Magie import Cible_agissant,Cible_case,Portee_limitee,Magie,Multi_cible
 
 class Magie_soin(Cible_agissant):
     """La magie qui invoque un effet de soin sur un agissant ciblé."""
@@ -13,13 +18,14 @@ class Magie_soin(Cible_agissant):
         self.cout_pm = cout_pm_soin[niveau-1]
         self.latence = latence_soin[niveau-1]
         self.gain_pv = gain_pv_soin[niveau-1]
+        self.niveau = niveau
         self.temps = 10000
-        self.cible = None #Fixée par le controleur
+        self.cible:Optional[Agissant] = None #Fixée par le controleur
         self.affiche = True
 
-    def action(self,lanceur):
-        agissant_cible = lanceur.controleur[self.cible]
-        agissant_cible.effets.append(Soin(lanceur.ID,self.gain_pv))
+    def action(self,lanceur:Agissant):
+        assert self.cible is not None
+        self.cible.effets.append(Soin(lanceur,self.gain_pv))
 
     def get_image(self):
         return SKIN_MAGIE_SOIN
@@ -39,14 +45,14 @@ class Magie_multi_soin(Cible_agissant,Multi_cible):
         self.cout_pm = cout_pm_multi_soin[niveau-1]
         self.latence = latence_multi_soin[niveau-1]
         self.gain_pv = gain_pv_multi_soin[niveau-1]
+        self.niveau = niveau
         self.temps = 10000
-        self.cible = None #Fixée par le controleur
+        self.cible:List[Agissant] = [] #Fixée par le controleur
         self.affiche = True
 
-    def action(self,lanceur):
+    def action(self,lanceur:Agissant):
         for cible in self.cible:
-            agissant_cible = lanceur.controleur.entitees[cible]
-            agissant_cible.effets.append(Soin(lanceur.ID,self.gain_pv))
+            cible.effets.append(Soin(lanceur,self.gain_pv))
 
     def get_image(self):
         return SKIN_MAGIE_SOIN
@@ -66,13 +72,14 @@ class Magie_soin_superieur(Cible_agissant):
         self.cout_pm = cout_pm_soin_superieur[niveau-1]
         self.latence = latence_soin_superieur[niveau-1]
         self.gain_pv = gain_pv_soin_superieur[niveau-1]
+        self.niveau = niveau
         self.temps = 10000
-        self.cible = None #Fixée par le controleur
+        self.cible:Optional[Agissant] = None #Fixée par le controleur
         self.affiche = True
 
-    def action(self,lanceur):
-        agissant_cible = lanceur.controleur[self.cible]
-        agissant_cible.effets.append(Soin(lanceur.ID,self.gain_pv))
+    def action(self,lanceur:Agissant):
+        assert self.cible is not None
+        self.cible.effets.append(Soin(lanceur,self.gain_pv))
 
     def get_image(self):
         return SKIN_MAGIE_SOIN_SUPERIEUR
@@ -93,14 +100,16 @@ class Magie_soin_de_zone(Cible_case):
         self.latence = latence_soin_zone[niveau-1]
         self.gain_pv = gain_pv_soin_zone[niveau-1]
         self.portee = portee_soin_zone[niveau-1]
+        self.niveau = niveau
         self.temps = 10000
-        self.cible = None #Fixée par le controleur
+        self.cible:Optional[Position] = None #Fixée par le controleur
         self.affiche = True
 
-    def action(self,lanceur):
+    def action(self,lanceur:Agissant):
+        assert self.cible is not None
         poss = lanceur.controleur.get_pos_touches(self.cible,self.portee)
         for pos in poss:
-            lanceur.controleur[pos].effets.append(Soin_case(self.gain_pv,lanceur.ID))
+            lanceur.controleur.case_from_position(pos).effets.append(Soin_case(self.gain_pv,lanceur))
 
     def get_image(self):
         return SKIN_MAGIE_SOIN_ZONE
@@ -120,10 +129,11 @@ class Magie_auto_soin(Magie):
         self.cout_pm = cout_pm_soin_auto[niveau-1]
         self.latence = latence_soin_auto[niveau-1]
         self.gain_pv = gain_pv_soin_auto[niveau-1]
+        self.niveau = niveau
         self.affiche = True
 
-    def action(self,lanceur):
-        lanceur.effets.append(Soin(lanceur.ID,self.gain_pv))
+    def action(self,lanceur:Agissant):
+        lanceur.effets.append(Soin(lanceur,self.gain_pv))
 
     def get_image(self):
         return SKIN_MAGIE_AUTO_SOIN
@@ -144,13 +154,13 @@ class Magie_resurection(Magie):
         self.gain_xp = gain_xp_resurection[niveau-1]
         self.cout_pm = cout_pm_resurection[niveau-1]
         self.latence = latence_resurection[niveau-1]
+        self.niveau = niveau
         self.affiche = True
 
-    def action(self,lanceur):
-        ID_cadavre = lanceur.inventaire.get_item_courant()
-        cadavre = lanceur.controleur.entitees[ID_cadavre]
-        if cadavre.get_classe() == Cadavre:
-            lanceur.inventaire.drop(lanceur.position)
+    def action(self,lanceur:Agissant):
+        cadavre = lanceur.inventaire.get_item_courant()
+        if isinstance(cadavre,Cadavre):
+            lanceur.inventaire.drop(lanceur.position,cadavre)
             cadavre.effets.append(Resurection())
 
     def get_image(self):
@@ -174,16 +184,17 @@ class Magie_reanimation_de_zone(Cible_case,Portee_limitee):
         self.portee = portee_reanimation[niveau-1]
         self.portee_limite = portee_limite_reanimation[niveau-1]
         self.superiorite = superiorite_reanimation[niveau-1]
+        self.niveau = niveau
         self.temps = 10000
-        self.cible = None
+        self.cible:Optional[Position] = None
         self.affiche = True
 
-    def action(self,porteur):
+    def action(self,porteur:Agissant):
+        assert self.cible is not None
         cadavres = porteur.controleur.get_cadavres_touches(self.cible,self.portee)
-        esprit = porteur.controleur.get_esprit(porteur.get_esprit())
         for cadavre in cadavres:
             if cadavre.get_priorite()+self.superiorite < porteur.get_priorite():
-                cadavre.effets.append(Reanimation(self.taux_pv,esprit))
+                cadavre.effets.append(Reanimation(self.taux_pv,porteur.esprit))
 
     def get_image(self):
         return SKIN_MAGIE_REANIMATION_ZONE
@@ -193,3 +204,11 @@ class Magie_reanimation_de_zone(Cible_case,Portee_limitee):
 
     def get_description(self,observation=0):
         return ["Une magie de réanimation","Elle affecte tous les cadavres dans une zone à proximité du lanceur.","L'agissant rescussité récupère une partie de ses PVs, mais pas ses PMs. Il ne récupère pas son équippement, son argent ou ses effets, même permanents. Il rejoint le responsable de la réanimation. La réanimation échoue si la priorité de l'agissant est trop haut par rapport au responsable.",f"Coût : {self.cout_pm} PMs",f"PVs rendus : {self.taux_pv} des PVs max",f"Différence de priorité : {self.superiorite}",f"Portée de la zone de réanimation : {self.portee}",f"Portée du centre de la zone (par rapport au joueur) : {self.portee_limite}",f"Latence : {self.latence}"]
+
+# Imports utilisés dans le code
+from Jeu.Entitee.Item.Cadavre import Cadavre
+from Jeu.Effet.Sante.Reanimation import Reanimation
+from Jeu.Effet.Sante.Resurection import Resurection
+from Jeu.Effet.Sante.Soins import Soin, Soin_case
+from Jeu.Systeme.Constantes_magies.Magies import *
+from Affichage.Skins.Skins import SKIN_MAGIE_REANIMATION_ZONE, SKIN_MAGIE_RESURECTION, SKIN_MAGIE_AUTO_SOIN, SKIN_MAGIE_SOIN, SKIN_MAGIE_SOIN_SUPERIEUR, SKIN_MAGIE_SOIN_ZONE

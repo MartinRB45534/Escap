@@ -4,6 +4,7 @@ from typing import List, TYPE_CHECKING, Optional
 from Jeu.Constantes import *
 from Affichage.Skins.Skins import *
 from Jeu.Labyrinthe.Structure_spatiale.Bord import *
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
 
 if TYPE_CHECKING:
     from Jeu.Effet.Effets import Effet
@@ -11,12 +12,12 @@ if TYPE_CHECKING:
 
 class Entitee:
     """La classe des entitées"""
-    def __init__(self,position: Optional[Position]=None,ID: Optional[int]=None):
-        self.position = position
-        self.priorite = 0
-        self.latence = 0
+    def __init__(self,controleur:Controleur, position: Position=ABSENT, ID: Optional[int]=None):
+        self.position:Position = position
+        self.priorite:float = 0
+        self.latence:float = 0
         self.effets:List[Effet] = []
-        self.controleur = None
+        self.controleur = controleur
         if ID is None:
             self.ID = ID_MAX.incremente()
         else:
@@ -42,15 +43,6 @@ class Entitee:
 
     def get_skin(self):
         return SKIN_MYSTERE
-
-    def active(self,controleur:Controleur):
-        self.controleur = controleur
-
-    def get_classe(self):
-        return Entitee
-
-    def desactive(self):
-        self.controleur = None
 
 class Entitee_superieure(Entitee):
     """La classe des entitées qui font bouger le labyrinthe autour d'eux."""

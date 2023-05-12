@@ -14,17 +14,16 @@ class Renforceur(Mage):
     def agit_en_vue(self,esprit:Esprit,defaut = ""):
         cibles = []
         skill = type(self.get_skill_magique())
-        for ID in esprit.corps:
-            corp = self.controleur.entitees[ID]
+        for corp in esprit.corps:
+            assert isinstance(corp,Agissant)
             if corp.statut == "attaque":
-                cibles.append([esprit.get_importance(corp.get_impact()),ID])
+                cibles.append([esprit.get_importance(corp.get_impact()),corp])
         if cibles != [] and self.peut_caster():
             new_cibles = sorted(cibles, key=itemgetter(0))
             self.utilise(skill)
             self.set_magie_courante(self.caste())
             self.cible_magie = new_cibles[0][-1]
-            agissant:Agissant = self.controleur[new_cibles[0][-1]]
-            agissant.set_statut("attaque boostée")
+            self.cible_magie.set_statut("attaque boostée")
             defaut = "soutien"
             self.set_statut("soutien")
         return defaut

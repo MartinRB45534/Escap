@@ -8,24 +8,26 @@ from Jeu.Systeme.Constantes_items.Items import *
 
 class Parchemin_purification(Parchemin):
     """Un parchemin qui soigne poisons et maladies."""
-    def __init__(self,position:Optional[Position]=None):
-        Parchemin.__init__(self,position,Purification(),50)
+    def __init__(self,controleur:Controleur,position:Position=ABSENT):
+        Parchemin.__init__(self,controleur,Purification(),50,position)
 
     def get_description(self,observation=0):
         return ["Un parchemin","Soignera poisons et maladies."]
 
 class Parchemin_vierge(Parchemin):
     """Un parchemin qui peut être imprégné d'une magie."""
-    def __init__(self,position:Optional[Position]=None):
-        Parchemin.__init__(self,position,Impregnation(),10)
+    def __init__(self,controleur:Controleur,position:Position=ABSENT):
+        Parchemin.__init__(self,controleur,Impregnation(),10,position)
 
     def get_description(self,observation=0):
         return ["Un parchemin vierge","On peut y appliquer une magie."]
 
 class Parchemin_impregne(Parchemin):
     """Un parchemin imprégné d'une magie."""
-    def __init__(self,position:Optional[Position]=None,magie:Magie,cout:float): #Le cout dépend du niveau du parchemin d'imprégnation
-        Parchemin.__init__(self,position,magie,cout)
+    def __init__(self,controleur:Controleur,magie:Magie,cout:float,position:Position=ABSENT): #Le cout dépend du niveau du parchemin d'imprégnation
+        Item.__init__(self,controleur,position)
+        self.effet = magie
+        self.cout = cout
 
     def utilise(self,agissant:Agissant):
         if self.etat == "suspens": #On l'a suspendu précédemment, ça devrait être bon maintenant
@@ -81,8 +83,8 @@ class Parchemin_impregne(Parchemin):
         return["Un parchemin",f"Imprégné d'une magie ({self.effet.nom})"]
 
 class Parchemin_protection(Parchemin):
-    def __init__(self,position:Optional[Position]=None):
-        Parchemin.__init__(self,position,Protection_groupe(500,200),75)
+    def __init__(self,controleur:Controleur,position:Position=ABSENT):
+        Parchemin.__init__(self,controleur,Protection_groupe(500,200),75,position)
 
     def get_description(self,observation=0):
         return["Un parchemin","Permet de protéger tous ses alliés"]

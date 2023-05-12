@@ -2,8 +2,7 @@ from Jeu.Entitee.Item.Equippement.Equippement import *
 
 class Accelerateur(Equipement):
     """La classe des équipements qui augmentent la vitesse."""
-    def __init__(self,position:Optional[Position]=None,taux_vitesse:float):
-        Equipement.__init__(self,position)
+    def __init__(self,taux_vitesse:float):
         self.taux_vitesse = taux_vitesse
 
     def augmente_vitesse(self,vitesse:float):

@@ -52,7 +52,3 @@ from Jeu.Systeme.Constantes_magies.Constantes_vision import *
 from Jeu.Systeme.Constantes_magies.Constantes_vitalite import *
 from Jeu.Systeme.Constantes_magies.Constantes_vitesse import *
 from Jeu.Systeme.Constantes_magies.Constantes_volcan import *
-from Jeu.Systeme.Constantes_magies.Constantes_aura_terre import *
-from Jeu.Systeme.Constantes_magies.Constantes_aura_feu import *
-from Jeu.Systeme.Constantes_magies.Constantes_aura_glace import *
-from Jeu.Systeme.Constantes_magies.Constantes_aura_ombre import *

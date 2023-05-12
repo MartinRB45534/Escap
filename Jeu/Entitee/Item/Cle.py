@@ -2,8 +2,8 @@ from Jeu.Entitee.Item.Item import *
 
 class Cle(Item):
     """La classe des items qui ouvrent les portes (et les coffres ?)."""
-    def __init__(self,position:Optional[Position]=None,codes:List[str]):
-        Item.__init__(self,position)
+    def __init__(self,controleur:Controleur,codes:List[str],position:Position=ABSENT):
+        Item.__init__(self,controleur,position)
         self.codes = codes
 
     def get_codes(self):
@@ -21,5 +21,6 @@ class Cle(Item):
     def get_skin(self):
         return SKIN_CLE
 
+    @staticmethod
     def get_image():
         return SKIN_CLE

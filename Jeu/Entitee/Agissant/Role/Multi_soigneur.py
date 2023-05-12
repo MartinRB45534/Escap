@@ -14,10 +14,9 @@ class Multi_soigneur(Soigneur,Multi_mage):
     def agit_en_vue(self,esprit:Esprit,defaut = ""):
         cibles = []
         skill = type(self.get_skill_magique())
-        for ID in esprit.corps:
-            corp = self.controleur.entitees[ID]
+        for corp in esprit.corps:
             if corp.etat == "vivant" and corp.pv < corp.pv_max:
-                cibles.append([corp.pv,ID])
+                cibles.append([corp.pv,corp])
         if len(cibles) == 1:
             if self.peut_caster():
                 self.utilise(skill)

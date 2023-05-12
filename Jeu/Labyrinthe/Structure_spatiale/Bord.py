@@ -3,28 +3,28 @@ from Jeu.Labyrinthe.Structure_spatiale.Cote import *
 
 class Bord:
     """Représente les limites d'un espace"""
-    def __init__(self,emplacement: Union[Position,Decalage]):
+    def __init__(self,emplacement: Position|Decalage):
         self.emplacement = emplacement
 
     def __contains__(self,item):
         if item is None:
             return False
-        if isinstance(item,Cote):
+        if isinstance(item,Cote_position|Cote_decalage):
             if NB_DIRECTIONS == 4:
                 return (item.direction == HAUT and item.emplacement.y == 0 and 0 <= item.emplacement.x < self.emplacement.x) or (item.direction == BAS and item.emplacement.y == self.emplacement.y-1 and 0 <= item.emplacement.x < self.emplacement.x) or (item.direction == GAUCHE and item.emplacement.x == 0 and 0 <= item.emplacement.y < self.emplacement.y) or (item.direction == DROITE and item.emplacement.x == self.emplacement.x-1 and 0 <= item.emplacement.y < self.emplacement.y)
         return NotImplemented
 
     def __iter__(self):
         for i in range(self.emplacement.x):
-            yield Cote(Decalage(i,0),HAUT)
-            yield Cote(Decalage(i,self.emplacement.y-1),BAS)
+            yield Cote_decalage(Decalage(i,0),HAUT)
+            yield Cote_decalage(Decalage(i,self.emplacement.y-1),BAS)
         for j in range(self.emplacement.y):
-            yield Cote(Decalage(0,j),GAUCHE)
-            yield Cote(Decalage(self.emplacement.x-1,j),DROITE)
+            yield Cote_decalage(Decalage(0,j),GAUCHE)
+            yield Cote_decalage(Decalage(self.emplacement.x-1,j),DROITE)
 
 class Bord_dec(Bord):
     """Un bord, décalé dans l'espace"""
-    def __init__(self,position:Position,emplacement:Decalage=Decalage(1,1),entrees:List[Cote]=[]):
+    def __init__(self,position:Position,emplacement:Decalage=Decalage(1,1),entrees:List[Cote_decalage]=[]):
         self.position = position
         self.emplacement = emplacement
         self.entrees = entrees
@@ -32,13 +32,13 @@ class Bord_dec(Bord):
     def __contains__(self,item):
         if item is None:
             return False
-        if isinstance(item,Cote):
+        if isinstance(item,Cote_position|Cote_decalage):
             if NB_DIRECTIONS == 4:
                 item_pat = item-self.position
                 return (Bord.__contains__(self,item_pat) and not item_pat in self.entrees) #/!\ Jamais utilisé !?
         return NotImplemented
 
-    def __iter__(self) -> Iterator[Cote]:
+    def __iter__(self) -> Iterator[Cote_position]:
         for cote_pat in Bord.__iter__(self):
             if not cote_pat in self.entrees:
                 cote = cote_pat + self.position
@@ -49,7 +49,7 @@ class Bord_pat(Bord_dec):
     def __contains__(self,item):
         if item is None:
             return False
-        if isinstance(item,Cote):
+        if isinstance(item,Cote_position|Cote_decalage):
             if NB_DIRECTIONS == 4:
                 item_pat = item-self.position
                 item_opp = item_pat.oppose()
@@ -65,7 +65,7 @@ class Bord_pat(Bord_dec):
 
 class Bord_lab(Bord):
     """Représente les différents bords (bords réels, bords de patterns) d'un labyrinthe"""
-    def __init__(self,emplacement:Union[Position,Decalage],bords_interieurs:List[Bord_pat]):
+    def __init__(self,emplacement:Position|Decalage,bords_interieurs:List[Bord_pat]):
         self.emplacement = emplacement
         self.bords_interieurs = bords_interieurs
 

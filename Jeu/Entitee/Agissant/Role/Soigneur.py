@@ -14,10 +14,10 @@ class Soigneur(Mage):
     def agit_en_vue(self,esprit:Esprit,defaut = ""):
         cibles = []
         skill = type(self.get_skill_magique())
-        for ID in esprit.corps:
-            corp = self.controleur.entitees[ID]
+        for corp in esprit.corps:
+            assert isinstance(corp,Agissant)
             if corp.etat == "vivant" and corp.pv < corp.pv_max:
-                cibles.append([corp.pv,ID])
+                cibles.append([corp.pv,corp])
         if cibles != [] and self.peut_caster():
             new_cibles = sorted(cibles, key=itemgetter(0))
             self.utilise(skill)

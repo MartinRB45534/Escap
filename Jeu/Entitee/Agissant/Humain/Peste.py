@@ -1,19 +1,26 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
+# Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
 
-from Jeu.Entitee.Agissant.Humain.Humain import *
+# Imports des classes parentes
+from Jeu.Entitee.Agissant.Humain.Humain import Humain
+from Jeu.Entitee.Agissant.PNJ.PNJs import PNJ_mage
+from Jeu.Entitee.Agissant.Role.Multi_soigneur import Multi_soigneur
+from Jeu.Entitee.Agissant.Role.Support_lointain import Support_lointain
 
 class Peste(PNJ_mage,Multi_soigneur,Support_lointain,Humain): #La huitième humaine du jeu, à l'étage 7 (une sainte très à cheval sur beaucoup trop de trucs)
     """La classe de la peste."""
-    def __init__(self,controleur:Controleur,position:Optional[Position]=None):
+    def __init__(self,controleur:Controleur,position:Position):
 
         self.identite = 'peste'
         self.place = 7
 
-        Humain.__init__(self,controleur,position,self.identite,1,8) #Très bonne soigneuse, accessoirement
+        Humain.__init__(self,controleur,self.identite,1,8,position) #Très bonne soigneuse, accessoirement
 
         self.comportement_corps_a_corps = 2
         self.comportement_distance = 2
@@ -39,20 +46,20 @@ class Peste(PNJ_mage,Multi_soigneur,Support_lointain,Humain): #La huitième huma
     # /!\ Pour améliorer ça : ne pas fuir s'il n'y a nulle part où fuir et ne pas fuir si on n'est pas à portée de monstre
 
     def peut_caster(self):
-        return self.peut_payer(cout_pm_soin[trouve_skill(self.classe_principale,Skill_magie).niveau-1])
+        return self.peut_payer(cout_pm_soin[self.get_skill_magique().niveau-1])
 
     def caste(self):
         return "magie soin"
 
     def peut_multi_caster(self):
-        return self.peut_payer(cout_pm_multi_soin[trouve_skill(self.classe_principale,Skill_magie).niveau-1])
+        return self.peut_payer(cout_pm_multi_soin[self.get_skill_magique().niveau-1])
 
     def multi_caste(self):
         return "magie multi soin"
 
     def attaque(self,direction:Direction):
         #Quelle est sa magie de prédilection ? On lui donne la purification (magie unique qui a plus ou moins un élément de lumière)
-        if self.peut_payer(cout_pm_purification[trouve_skill(self.classe_principale,Skill_magie).niveau-1]):
+        if self.peut_payer(cout_pm_purification[self.get_skill_magique().niveau-1]):
             self.utilise(Skill_magie)
             self.set_magie_courante("magie purification")
             self.dir_magie = direction
@@ -82,6 +89,7 @@ class Peste(PNJ_mage,Multi_soigneur,Support_lointain,Humain): #La huitième huma
             self.repliques = ["dialogue1reponse1.1","dialogue1reponse1.2"]
 
     def interprete(self,replique:str):
+        assert isinstance(self.controleur.joueur, Humain)
 
         #Premier dialogue
         #Le joueur arrive par la porte
@@ -91,17 +99,17 @@ class Peste(PNJ_mage,Multi_soigneur,Support_lointain,Humain): #La huitième huma
         elif replique == "dialogue1reponse1.1.1":
             self.replique="dialogue1phrase1.1.1"
             self.repliques = ["dialogue1reponse1.1.1.1","dialogue1reponse1.1.1.2"]
-            self.controleur.get_esprit(self.controleur.joueur.esprit).merge(self.esprit)
+            self.controleur.joueur.esprit.merge(self.esprit)
         elif replique == "dialogue1reponse1.1.1.1":
             self.replique="dialogue1phrase1.1.1.1"
             self.repliques = ["dialogue1reponse1.1.1.1.1"]
         elif replique in ["dialogue1reponse1.1.1.1.1","dialogue1reponse1.1.1.2","dialogue1reponse1.1.2.1.2","dialogue1reponse1.2.1.1.1.1"]:
             self.end_dialogue()
-            self.controleur.get_esprit(self.controleur.joueur.esprit).merge(self.esprit)
+            self.controleur.joueur.esprit.merge(self.esprit)
             self.mouvement = 0 #Légèrement redondant ici
-            self.cible_deplacement = self.controleur.joueur.ID
+            self.cible_deplacement = self.controleur.joueur
         elif replique == "dialogue1reponse1.1.2":
-            self.appreciations[0] -= 0.5
+            self.appreciations[self.controleur.joueur.place] -= 0.5
             self.replique="dialogue1phrase1.1.2"
             self.repliques = ["dialogue1reponse1.1.2.1","dialogue1reponse1.1.2.2"]
         elif replique == "dialogue1reponse1.1.2.1":
@@ -125,7 +133,7 @@ class Peste(PNJ_mage,Multi_soigneur,Support_lointain,Humain): #La huitième huma
         elif replique == "dialogue1reponse1.2.1.1.1":
             self.replique="dialogue1phrase1.2.1.1.1"
             self.repliques = ["dialogue1reponse1.2.1.1.1.1"]
-            self.controleur.get_esprit(self.controleur.joueur.esprit).merge(self.esprit)
+            self.controleur.joueur.esprit.merge(self.esprit)
         elif replique == "dialogue1reponse1.2.2":
             self.replique="dialogue1phrase1.2.2"
             self.repliques = ["dialogue1reponse1.2.2.1"]
@@ -136,16 +144,16 @@ class Peste(PNJ_mage,Multi_soigneur,Support_lointain,Humain): #La huitième huma
             self.repliques = ["dialogue-2reponse1.1"]
         elif replique == "dialogue-2reponse1.1":
             self.end_dialogue(-4)
-            self.offenses.append([2,0.01,0])
+            self.offenses.append((self.controleur.joueur,0.01,0))
             self.statut_pnj = "exploration"
         elif replique == "dialogue-2reponse1.2":
             self.replique="dialogue-2phrase1.2"
             self.repliques = ["dialogue-2reponse1.2.1"]
-            self.controleur.get_esprit(self.controleur.joueur.esprit).merge(self.esprit)
+            self.controleur.joueur.esprit.merge(self.esprit)
         elif replique == "dialogue-2reponse1.2.1":
             self.end_dialogue()
             self.mouvement = 0 #Légèrement redondant ici
-            self.cible_deplacement = self.controleur.joueur.ID
+            self.cible_deplacement = self.controleur.joueur
 
         #Dialogue par défaut -3
         elif replique == "dialogue-3reponse1.1":
@@ -169,7 +177,7 @@ class Peste(PNJ_mage,Multi_soigneur,Support_lointain,Humain): #La huitième huma
             if self.controleur.joueur.inventaire.a_parchemin_vierge():
                 self.repliques.append("dialogue-1reponse1.3")
             self.repliques.append("dialogue-1reponse1.4")
-            self.cible_deplacement = self.controleur.joueur.ID
+            self.cible_deplacement = self.controleur.joueur
         elif replique == "dialogue-1reponse1.1.1.2":
             self.controleur.set_phase(AGISSANT_DIALOGUE)
         elif replique == "dialogue-1reponse1.1.2":
@@ -204,7 +212,8 @@ class Peste(PNJ_mage,Multi_soigneur,Support_lointain,Humain): #La huitième huma
 
         self.replique_courante = 0
 
-    def set_cible(self,cible:Union[int,Position]):
+    def set_cible(self,cible:int|Position):
+
         self.cible_deplacement = cible
         self.replique = "dialogue-1phrase1.1.1.2"
         self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"]
@@ -216,6 +225,7 @@ class Peste(PNJ_mage,Multi_soigneur,Support_lointain,Humain): #La huitième huma
         return REPLIQUES_PESTE[code]
 
     def impregne(self,nom:str):
+
         skill = self.get_skill_magique()
         latence,magie = skill.utilise(nom)
         self.latence += latence
@@ -223,7 +233,7 @@ class Peste(PNJ_mage,Multi_soigneur,Support_lointain,Humain): #La huitième huma
         if self.peut_payer(cout):
             self.controleur.joueur.inventaire.consomme_parchemin_vierge()
             self.paye(cout)
-            parch = Parchemin_impregne(None,magie,cout//2)
+            parch = Parchemin_impregne(self.controleur,magie,cout//2,ABSENT)
             self.controleur.ajoute_entitee(parch)
             self.controleur.joueur.inventaire.ajoute(parch)
             self.replique = "dialogue-1phrase1.3.1"
@@ -239,4 +249,13 @@ class Peste(PNJ_mage,Multi_soigneur,Support_lointain,Humain): #La huitième huma
         return SKIN_TETE_PESTE
 
     def get_texte_descriptif(self):
-        return [f"Une humaine (niveau {self.niveau})",f"ID : {self.ID}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Une sainte envoyée par son église pour purifier les monstres du labyrinthe."]
+        return [f"Une humaine (niveau {self.niveau})",f"ID : {self}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Une sainte envoyée par son église pour purifier les monstres du labyrinthe."]
+
+# Imports utilisés dans le code:
+from Jeu.Constantes import *
+from Jeu.Systeme.Classe import Skill_magie, Skill_stomp
+from Jeu.Systeme.Constantes_magies.Magies import *
+from Affichage.Skins.Skins import SKIN_TETE_PESTE
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+from Jeu.Entitee.Item.Parchemin.Parchemins import Parchemin_impregne
+from Jeu.Dialogues.Dialogues_peste import REPLIQUES_PESTE

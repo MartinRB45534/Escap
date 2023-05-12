@@ -1,5 +1,12 @@
-from Jeu.Effet.Magie.Magie import *
-from Jeu.Effet.Attaque.Attaque import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Entitee.Agissant.Agissant import Agissant
+
+# Imports des classes parentes
+from Jeu.Effet.Magie.Magie import Magie_dirigee, Magies_offensives
 
 class Magie_poing_magique(Magie_dirigee,Magies_offensives): #À modifier selon l'espèce qui l'utilise
     """La magie qui crée une attaque de poing magique."""
@@ -14,8 +21,8 @@ class Magie_poing_magique(Magie_dirigee,Magies_offensives): #À modifier selon l
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.effets.append(Attaque_magique(porteur.ID,degats_poing_magique[self.niveau-1],TERRE,"contact",portee_poing_magique[self.niveau-1],"Sd_T___",self.direction))
+    def action(self,porteur:Agissant):
+        porteur.effets.append(Attaque_magique(porteur,degats_poing_magique[self.niveau-1],TERRE,"contact",portee_poing_magique[self.niveau-1],"Sd_T___",self.direction))
 
     def get_image(self):
         return SKIN_MAGIE_POING_MAGIQUE
@@ -39,8 +46,8 @@ class Magie_poing_ardent(Magie_dirigee,Magies_offensives): #L'attaque de mélée
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.effets.append(Attaque_magique(porteur.ID,degats_poing_ardent[self.niveau-1],FEU,"contact",portee_poing_ardent[self.niveau-1],"Sd_T___",self.direction))
+    def action(self,porteur:Agissant):
+        porteur.effets.append(Attaque_magique(porteur,degats_poing_ardent[self.niveau-1],FEU,"contact",portee_poing_ardent[self.niveau-1],"Sd_T___",self.direction))
 
     def get_image(self):
         return SKIN_MAGIE_POING_MAGIQUE
@@ -64,8 +71,8 @@ class Magie_poing_sombre(Magie_dirigee,Magies_offensives):
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.effets.append(Attaque_magique(porteur.ID,degats_poing_sombre[self.niveau-1],OMBRE,"contact",portee_poing_sombre[self.niveau-1],"Sd_T___",self.direction))
+    def action(self,porteur:Agissant):
+        porteur.effets.append(Attaque_magique(porteur,degats_poing_sombre[self.niveau-1],OMBRE,"contact",portee_poing_sombre[self.niveau-1],"Sd_T___",self.direction))
 
     def get_image(self):
         return SKIN_MAGIE_POING_MAGIQUE
@@ -75,3 +82,9 @@ class Magie_poing_sombre(Magie_dirigee,Magies_offensives):
 
     def get_description(self,observation=0):
         return ["Une magie d'attaque","Inflige des dégats de terre aux agissants non-alliés devant le lanceur et à proximité.",f"Coût : {self.cout_pm}",f"Degats : {degats_poing_sombre[self.niveau-1]}",f"Portee de l'attaque : {portee_poing_sombre[self.niveau-1]}",f"Latence : {self.latence}"]
+
+# Imports utilisés dans le code
+from Jeu.Effet.Attaque.Attaque import Attaque_magique
+from Jeu.Systeme.Constantes_magies.Magies import *
+from Jeu.Constantes import *
+from Affichage.Skins.Skins import SKIN_MAGIE_POING_MAGIQUE

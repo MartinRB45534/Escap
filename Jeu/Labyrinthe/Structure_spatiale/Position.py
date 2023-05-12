@@ -63,3 +63,11 @@ class Position:
 
     def to_decalage(self):
         return Decalage(self.x,self.y)
+    
+class Nowhere(Position):
+    def __init__(self):
+        self.lab="Nowhere"
+        self.x=0
+        self.y=0
+
+ABSENT = Nowhere()

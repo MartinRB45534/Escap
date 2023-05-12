@@ -1,5 +1,13 @@
-from Jeu.Effet.Magie.Magie import *
-from Jeu.Effet.Attaque.Attaque import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Entitee.Agissant.Agissant import Agissant
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position, ABSENT
+
+# Imports des classes parentes
+from Jeu.Effet.Magie.Magie import Cible_case,Magies_offensives
 
 class Magie_volcan(Cible_case,Magies_offensives):
     """La magie qui crée une attaque de feu à un autre endroit."""
@@ -10,12 +18,12 @@ class Magie_volcan(Cible_case,Magies_offensives):
         self.cout_pm = cout_pm_volcan[niveau-1]
         self.latence = latence_volcan[niveau-1]
         self.niveau = niveau
-        self.cible = None
+        self.cible:Position = ABSENT
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.effets.append(Attaque_decentree_delayee(self.cible,delai_volcan[self.niveau-1],porteur.ID,degats_volcan[self.niveau-1],FEU,"distance",portee_volcan[self.niveau-1]))
+    def action(self,porteur:Agissant):
+        porteur.effets.append(Attaque_decentree_delayee(self.cible,delai_volcan[self.niveau-1],porteur,degats_volcan[self.niveau-1],FEU,"distance",portee_volcan[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_BRASIER
@@ -35,12 +43,12 @@ class Magie_secousse(Cible_case,Magies_offensives):
         self.cout_pm = cout_pm_secousse[niveau-1]
         self.latence = latence_secousse[niveau-1]
         self.niveau = niveau
-        self.cible = None
+        self.cible:Position = ABSENT
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.effets.append(Attaque_decentree_delayee(self.cible,delai_secousse[self.niveau-1],porteur.ID,degats_secousse[self.niveau-1],TERRE,"distance",portee_secousse[self.niveau-1]))
+    def action(self,porteur:Agissant):
+        porteur.effets.append(Attaque_decentree_delayee(self.cible,delai_secousse[self.niveau-1],porteur,degats_secousse[self.niveau-1],TERRE,"distance",portee_secousse[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_AVALANCHE
@@ -60,12 +68,12 @@ class Magie_petite_secousse(Cible_case,Magies_offensives):
         self.cout_pm = cout_pm_petite_secousse[niveau-1]
         self.latence = latence_petite_secousse[niveau-1]
         self.niveau = niveau
-        self.cible = None
+        self.cible:Position = ABSENT
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.effets.append(Attaque_decentree_delayee(self.cible,delai_petite_secousse[self.niveau-1],porteur.ID,degats_petite_secousse[self.niveau-1],TERRE,"distance",portee_petite_secousse[self.niveau-1]))
+    def action(self,porteur:Agissant):
+        porteur.effets.append(Attaque_decentree_delayee(self.cible,delai_petite_secousse[self.niveau-1],porteur,degats_petite_secousse[self.niveau-1],TERRE,"distance",portee_petite_secousse[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_AVALANCHE
@@ -75,3 +83,9 @@ class Magie_petite_secousse(Cible_case,Magies_offensives):
 
     def get_description(self,observation=0):
         return ["Une magie d'attaque","Inflige des dégats de terre aux agissants à proximité d'une case en vue de lanceur.",f"Coût : {self.cout_pm}",f"Dégats : {degats_petite_secousse[self.niveau-1]}",f"Portée : {portee_petite_secousse[self.niveau-1]}",f"Latence : {self.latence}"]
+
+# Imports utilisés dans le code
+from Jeu.Effet.Attaque.Attaque import Attaque_decentree_delayee
+from Jeu.Systeme.Constantes_magies.Magies import *
+from Affichage.Skins.Skins import *
+from Jeu.Constantes import *

@@ -4,7 +4,7 @@ from Jeu.Labyrinthe.Vue import *
 
 class Espace_schematique:
     def __init__(self):
-        self.frontiere:Set[Cote] = set()
+        self.frontiere:Set[Cote_position] = set()
         self.cases:Set[Position] = set()
         self.entrees:Set[Position] = set()
         self.skip = True
@@ -22,15 +22,15 @@ class Espace_schematique:
             return len(self.cases)+1
 
 class Zone_inconnue(Espace_schematique): # Représente une zone de la carte qui n'a pas encore été explorée
-    def __init__(self,case:Optional[Position]=None,zone=None):
+    def __init__(self,case:Position=ABSENT,zone=None):
         if zone is not None and not isinstance(zone,Zone_inconnue):
             print("Erreur : zone doit être une Zone_inconnue")
             zone = None
         self.cases:Set[Position] = {case} if case is not None else set()
-        self.frontiere:Set[Cote] = set()
+        self.frontiere:Set[Cote_position] = set()
         self.entrees:Set[Position] = set()
         self.sorties:Set[Position] = set()
-        self.occupants:Set[int] = zone.occupants if zone is not None else set()
+        self.occupants:Set[Agissant] = zone.occupants if zone is not None else set()
         # Copier les informations de la zone précédente
         self.skip = False
 
@@ -47,7 +47,7 @@ class Zone_inconnue(Espace_schematique): # Représente une zone de la carte qui 
 
 class Salle(Espace_schematique):
     def __init__(self,carre:Position):
-        self.frontiere:Set[Cote] = set()
+        self.frontiere:Set[Cote_position] = set()
         self.cases:Set[Position] = set()
         self.carres:Set[Position] = {carre}
         self.entrees:Set[Position] = set()
@@ -61,7 +61,7 @@ class Salle(Espace_schematique):
                 self.cases.add(case)
 
     def make_bord(self):
-        self.frontiere = {Cote(case,dir) for dir in DIRECTIONS for case in self.cases if not case + dir in self.cases}
+        self.frontiere = {Cote_position(case,dir) for dir in DIRECTIONS for case in self.cases if not case + dir in self.cases}
 
     def calcule_distances(self):
         self.distances = {}
@@ -86,8 +86,8 @@ class Salle(Espace_schematique):
             return self.distances.get({entree1,entree2},len(self.cases)+1)
 
 class Couloir(Espace_schematique):
-    def __init__(self,case:Optional[Position]=None):
-        self.frontiere:Set[Cote] = set()
-        self.cases:Set[Position] = {case} if case is not None else set()
+    def __init__(self,case:Position=ABSENT):
+        self.frontiere:Set[Cote_position] = set()
+        self.cases:List[Position] = [case] if case is not None else [] #Les cases d'un couloir doivent être ordonnées
         self.entrees:Set[Position] = set()
         self.skip = True

@@ -1,17 +1,20 @@
 from __future__ import annotations
-from typing import Dict, Union, TYPE_CHECKING
+from typing import Dict, Set, Union, TYPE_CHECKING
+
+from Jeu.Esprit.Esprit import NOBODY
 
 if TYPE_CHECKING:
     from Jeu.Controleur import Controleur
     from Jeu.Esprit.Esprit import Esprit
     from Jeu.Labyrinthe.Vue import Representation_vue
+    from Jeu.Entitee.Item.Cadavre import Cadavre
 
 from Jeu.Entitee.Entitee import *
 
 class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cadavre n'agit pas.
     """La classe des entitées animées. Capable de décision, de différentes actions, etc. Les principales caractéristiques sont l'ID, les stats, et la classe principale."""
-    def __init__(self,controleur:Controleur,position:Optional[Position]=None,identite:str="",niveau:int=0,ID:Optional[int]=None):
-        Entitee.__init__(self,position,ID)
+    def __init__(self,controleur:Controleur,identite:str,niveau:int,position:Position=ABSENT,ID: Optional[int]=None):
+        Entitee.__init__(self,controleur,position,ID)
         self.identite:str = identite
         stats=CONSTANTES_STATS[identite]
         self.pv_max:float = stats['pv'][niveau]
@@ -52,13 +55,13 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         self.etat = "vivant"
 
         #vue de l'agissant
-        self.vue:Optional[Representation_vue] = None
+        self.vue = Representation_vue(self.position.lab, [], Decalage(0,0))
 
-        self.offenses=[]
-        self.esprit=None
+        self.offenses:List[Tuple[Agissant,float,float]]=[]
+        self.esprit:Esprit=NOBODY
 
         #possessions de l'agissant
-        self.inventaire = Inventaire(self.ID,stats['doigts'])
+        self.inventaire = Inventaire(self,stats['doigts'],controleur)
 
         #la direction du regard
         self.regarde(HAUT)
@@ -67,12 +70,12 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
 
         #Pour lancer des magies
         self.talent = 1
-        self.magie_courante:Optional[str] = None
-        self.cible_magie:Optional[Union[Position,int,List[Position],List[int]]] = None
+        self.magie_courante:Optional[Type[Magie]] = None
+        self.cible_magie:Optional[Union[Position,Agissant,List[Position],List[Agissant]]] = None
         self.dir_magie:Optional[Direction] = None
         self.cout_magie:float = 0
         self.magie_parchemin:Optional[Magie] = None
-        self.cible_magie_parchemin:Optional[Union[Position,int,List[Position],List[int]]] = None
+        self.cible_magie_parchemin:Optional[Union[Position,Agissant,List[Position],List[Agissant]]] = None
         self.dir_magie_parchemin:Optional[Direction] = None
         self.cout_magie_parchemin:float = 0
         self.multi = False
@@ -80,8 +83,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         #Pour lancer des projectiles:
         self.projectile_courant:Optional[Cree_item] = None
 
-        self.latence = 0
-        self.hauteur = 0 #Des fois qu'on devienne un item
+        self.cadavre = Cadavre(controleur,self)
 
         if stats['magies']:
             skill:Optional[Skills_magiques] = trouve_skill(self.classe_principale,Skills_magiques)
@@ -95,24 +97,17 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
             for magie in stats['magies']:
                 skill.ajoute(eval(magie))
         if stats['items']:
-            new_items = []
+            new_items:Set[Item] = set()
             for item in stats['items']:
-                new_items.append(eval(item)(None,niveau))
-            controleur.ajoute_entitees(new_items)
+                new_items.add(eval(item)(None,niveau))
+            controleur.ajoute_items(new_items)
             self.inventaire.equippe(new_items)
         if stats['special']:
             pass
 
-    def active(self,controleur: Controleur):
         self.controleur = controleur
-        self.inventaire.active(self.controleur)
-
-    def desactive(self):
-        self.inventaire.desactive()
-        self.controleur = None
 
     def get_etage_courant(self):
-        assert self.position is not None
         return int(self.position.lab.split()[1])
 
     def get_stats_attaque(self,element:int):
@@ -123,11 +118,10 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         for taux in self.taux_stats.values():
             force *= taux
             affinite *= taux
-        return force,affinite,self.dir_regard,self.ID
+        return force,affinite,self.dir_regard,self
 
-    def get_impact(self):
-        assert self.position is not None
-        return Position(self.position.lab,self.position.x+[0,1,0,-1][self.dir_regard],self.position.y+[-1,0,1,0][self.dir_regard])
+    def get_impact(self) -> Position:
+        return self.position+self.dir_regard
 
 
     # Les actions de l'agissant
@@ -146,8 +140,8 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
     def agit_en_vue(self,esprit:Esprit,defaut = ""): #Par défaut, on n'a pas d'action à distance
         return defaut
 
-    def comporte_distance(self):
-        pass
+    def comporte_distance(self,degats:float):
+        return 0
 
     def veut_attaquer(self,degats:float=0):
         pass
@@ -187,11 +181,11 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
             projectile = self.projectile_courant.cree_item(self) #Le 'self.projectile_courant' est un créateur de projectile
         return projectile
 
-    def insurge(self,offenseur:int,gravite:float,dangerosite:float):
+    def insurge(self,offenseur:Agissant,gravite:float,dangerosite:float):
         if offenseur != 0:
-            self.offenses.append([offenseur,gravite,dangerosite])
+            self.offenses.append((offenseur,gravite,dangerosite))
 
-    def get_offenses(self):
+    def get_offenses(self) -> Tuple[List[Tuple[Agissant,float,float]],str]:
         offenses = self.offenses
         self.offenses = []
         etat = "vivant" #Rajouter des précisions
@@ -211,32 +205,28 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
             affinite = self.aff_o
             for taux in self.taux_aff_o.values():
                 affinite *= taux
-            for equippement in self.inventaire.get_equippement():
-                item = self.controleur.entitees[equippement]
+            for item in self.inventaire.get_equippement():
                 if isinstance(item,Tenebreux):
                     affinite *= item.taux_aff_ombre
         elif element == FEU :
             affinite = self.aff_f
             for taux in self.taux_aff_f.values():
                 affinite *= taux
-            for equippement in self.inventaire.get_equippement():
-                item = self.controleur.entitees[equippement]
+            for item in self.inventaire.get_equippement():
                 if isinstance(item,Incandescant):
                     affinite *= item.taux_aff_feu
         elif element == TERRE :
             affinite = self.aff_t
             for taux in self.taux_aff_t.values():
                 affinite *= taux
-            for equippement in self.inventaire.get_equippement():
-                item = self.controleur.entitees[equippement]
+            for item in self.inventaire.get_equippement():
                 if isinstance(item,Rocheux):
                     affinite *= item.taux_aff_terre
         elif element == GLACE :
             affinite = self.aff_g
             for taux in self.taux_aff_g.values():
                 affinite *= taux
-            for equippement in self.inventaire.get_equippement():
-                item = self.controleur.entitees[equippement]
+            for item in self.inventaire.get_equippement():
                 if isinstance(item,Neigeux):
                     affinite *= item.taux_aff_glace
         else :
@@ -287,8 +277,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         for taux in self.taux_stats.values() :
             regen_pv *= taux
         # /!\ Rajouter les effets négatifs du skill de magie infinie /!\
-        for equippement in self.inventaire.get_equippement():
-            item = self.controleur.entitees[equippement]
+        for item in self.inventaire.get_equippement():
             if isinstance(item,Reparateur):
                 regen_pv = item.regen_pv(regen_pv)
         return regen_pv
@@ -300,8 +289,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
             regen_pm *= taux
         for taux in self.taux_stats.values() :
             regen_pm *= taux
-        for equippement in self.inventaire.get_equippement():
-            item = self.controleur.entitees[equippement]
+        for item in self.inventaire.get_equippement():
             if isinstance(item,Reparateur_magique):
                 regen_pm = item.regen_pm(regen_pm)
         return regen_pm
@@ -313,8 +301,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
             vitesse *= taux
         for taux in self.taux_stats.values() :
             vitesse *= taux
-        for equippement in self.inventaire.get_equippement():
-            item = self.controleur.entitees[equippement]
+        for item in self.inventaire.get_equippement():
             if isinstance(item,Accelerateur):
                 vitesse = item.augmente_vitesse(vitesse)
         return vitesse
@@ -326,13 +313,12 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
             priorite *= taux
         for taux in self.taux_stats.values() :
             priorite *= taux
-        for equippement in self.inventaire.get_equippement():
-            item = self.controleur.entitees[equippement]
+        for item in self.inventaire.get_equippement():
             if isinstance(item,Anoblisseur):
                 priorite *= item.augmente_priorite(priorite)
         return priorite
 
-    def subit(self,degats:float,distance="contact",element=TERRE,ID=0): #L'ID 0 ne correspond à personne
+    def subit(self,offenseur:Agissant,degats:float,distance="contact",element=TERRE): #L'ID 0 ne correspond à personne
         gravite = degats/self.pv_max
         dangerosite = 0
         if distance == "contact":
@@ -352,9 +338,9 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
             self.regen_pv = self.regen_pv_min
         if self.pv <= 0: #Alors tuer les gens, je ne vous en parle pas !!!
             gravite += 0.5
-        self.insurge(ID,gravite,dangerosite)
+        self.insurge(offenseur,gravite,dangerosite)
 
-    def instakill(self,ID=0):
+    def instakill(self,responsable:Agissant):
         immortel = trouve_skill(self.classe_principale,Skill_immortel)
         if immortel is not None:
             if self.pv > 0:
@@ -362,18 +348,19 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         else:
             self.meurt()
 
-    def echape_instakill(self,ID:int):
-        self.insurge(ID,1,self.pv)
+    def echape_instakill(self,responsable:Agissant):
+        self.insurge(responsable,1,self.pv)
 
     def soigne(self,soin:float):
         self.pv += soin
         if self.pv >= self.pv_max:
             self.pv = self.pv_max
 
-    def rejoint(self,nom_esprit:str):
-        self.esprit = nom_esprit
+    def rejoint(self,esprit:Esprit):
+        self.esprit = esprit
 
     def meurt(self):
+        assert self.controleur is not None
         if self.position is None:
             raise ValueError("Un personnage qui n'a pas de position est en train de mourir !")
         self.pv = self.pm = 0
@@ -382,35 +369,24 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         self.taux_regen_pv = self.taux_regen_pm = self.taux_force = self.taux_priorite = self.taux_vitesse = self.taux_aff_o = self.taux_aff_f = self.taux_aff_t = self.taux_aff_g = self.taux_stats = {} #/!\ À corriger !
         self.effets = []
         self.inventaire.drop_all(self.position)
+        self.controleur.items_courants.add(self.cadavre)
+        self.cadavre.position = self.position
+        self.position = ABSENT
 
     def get_esprit(self):
         return self.esprit
-
-    def get_classe(self):
-        if self.etat == "vivant":
-            return self.__class__
-        if self.etat == "mort":
-            return Cadavre
-        if self.etat == "oeuf":
-            return Oeuf
-        raise ValueError("L'état de l'agissant est inconnu !")
 
     def get_especes(self):
         return self.especes
 
     def get_description(self,observation=0):
-        if self.etat == "vivant":
-            return ["Un agissant","Qu'est-ce qu'il fait dans mon inventaire ?"]
-        if self.etat == "mort":
-            return ["Un cadavre","Où as-tu trouvé ça ?"]
-        if self.etat == "oeuf":
-            return ["Un oeuf","Je n'ai rien pour le cuire..."]
+            return ["Un agissant","Qu'est-ce qu'il fait dans un inventaire ?"]
 
     def get_portee_vue(self):
         skill = trouve_skill(self.classe_principale,Skill_vision)
         if skill is None:
             print("Oups, je n'ai pas de skill vision ! Pourquoi ?")
-            print(self.ID)
+            print(self)
             portee = 0
         else :
             portee = skill.utilise()
@@ -418,15 +394,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         return portee
 
     def get_skin(self):
-        if self.etat == "vivant":
-            if self.esprit == "1":
-                return SKIN_VERT
-            elif self.esprit == "2":
-                return SKIN_ROUGE
-            else:
-                return SKIN_AGISSANT
-        else:
-            return SKIN_CADAVRE
+        return SKIN_AGISSANT
 
     def get_skins_statuts(self):
         if self.statut == "paix":
@@ -455,23 +423,17 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         assert self.controleur is not None
         skins = []
         if self.inventaire.arme is not None:
-            arme = self.controleur.entitees[self.inventaire.arme]
-            assert isinstance(arme,Arme)
-            skins.append(arme.get_skin_vue(self.forme))
+            skins.append(self.inventaire.arme.get_skin_vue(self.forme))
         skins.append(SKINS_CORPS_VUS[self.forme])
         if self.inventaire.armure is not None:
-            armure = self.controleur.entitees[self.inventaire.armure]
-            assert isinstance(armure,Armure)
-            skins.append(armure.get_skin_vue(self.forme))
+            skins.append(self.inventaire.armure.get_skin_vue(self.forme))
         skins.append(SKINS_TETES_VUES[self.forme_tete])
         if self.inventaire.haume is not None:
-            haume = self.controleur.entitees[self.inventaire.haume]
-            assert isinstance(haume,Haume)
-            skins.append(haume.get_skin_vue(self.forme))
+            skins.append(self.inventaire.haume.get_skin_vue(self.forme))
         return skins
 
     def get_texte_descriptif(self):
-        return ["Un agissant","Pourquoi n'a-t-il pas de description adaptée ?","Voici quelques informations utiles pour corriger l'erreur :",f"ID : {self.ID}",f"Espèces : {self.especes}",f"Class : {type(self)}",f"self : {self}","En espèrant que ça suffise, et désolé pour le dérangement."]
+        return ["Un agissant","Pourquoi n'a-t-il pas de description adaptée ?","Voici quelques informations utiles pour corriger l'erreur :",f"ID : {self}",f"Espèces : {self.especes}",f"Class : {type(self)}",f"self : {self}","En espèrant que ça suffise, et désolé pour le dérangement."]
 
     # Découvrons le déroulé d'un tour, avec agissant-san :
     def debut_tour(self):
@@ -498,18 +460,22 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
                     self.effets.append(effet)
                 # Quels autres skills peuvent tomber dans cette catégorie ?
             #Et les effets. Vous les voyez tous les beaux enchantements qui nous renforcent ?
-        for i in range(len(self.effets)-1,-1,-1) :
-            effet = self.effets[i]
-            if isinstance(effet,On_debut_tour):
-                effet.execute(self) #On exécute divers effets (dont les auras qu'on vient de rajouter au dessus)
-            if isinstance(effet,Time_limited):
-                effet.wait()
-            if effet.phase == "affichage": #L'affichage se fait en fin de tour
-                self.effets.remove(effet)
+            for i in range(len(self.effets)-1,-1,-1) :
+                effet = self.effets[i]
+                if isinstance(effet,On_debut_tour):
+                    effet.execute(self) #On exécute divers effets (dont les auras qu'on vient de rajouter au dessus)
+                if isinstance(effet,Time_limited):
+                    effet.wait()
+                if effet.phase == "affichage": #L'affichage se fait en fin de tour
+                    self.effets.remove(effet)
+        else:
+            print("Oups, je ne suis pas vivant, je ne peux pas débuter mon tour !")
 
     def pseudo_debut_tour(self): #Not sure why I wanted that to exist, honestly...
         if self.etat == "vivant":
             self.inventaire.pseudo_debut_tour()
+        else:
+            print("Oups, je ne suis pas vivant, je ne peux pas pseudo_débuter mon tour !")
 
     # Les esprits gambergent, tergiversent et hésitent.
 
@@ -559,8 +525,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         if skill is not None :
             taux *= skill.utilise()
         items:List[Defensif] = []
-        for equippement in self.inventaire.get_equippement():
-            item = self.controleur.entitees[equippement]
+        for item in self.inventaire.get_equippement():
             if isinstance(item,Defensif):
                 items.append(item)
         for attaque in attaques :
@@ -574,16 +539,19 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
     # Les autres subissent aussi des attaques.
 
     def fin_tour(self):
-        #Quelques effets avant la fin du tour (maladie, soin, tout ça tout ça...)
-        for i in range(len(self.effets)-1,-1,-1) :
-            effet = self.effets[i]
-            if isinstance(effet,On_fin_tour):
-                effet.execute(self)
-            elif isinstance(effet,Maladie):
-                effet.contagion(self)
-            if effet.phase == "terminé":
-                self.effets.remove(effet)
-        #Il est temps de voir si on peut encore recoller les morceaux.
+        if self.etat == "vivant":
+            #Quelques effets avant la fin du tour (maladie, soin, tout ça tout ça...)
+            for i in range(len(self.effets)-1,-1,-1) :
+                effet = self.effets[i]
+                if isinstance(effet,On_fin_tour):
+                    effet.execute(self)
+                elif isinstance(effet,Maladie):
+                    effet.contagion(self)
+                if effet.phase == "terminé":
+                    self.effets.remove(effet)
+            #Il est temps de voir si on peut encore recoller les morceaux.
+        else:
+            print("Oups, je ne suis pas vivant, je ne peux pas finir mon tour !")
         if self.etat == "vivant":
             if self.pv <= 0 :
                 immortel:Optional[Skill_immortel] = trouve_skill(self.classe_principale,Skill_immortel)
@@ -616,6 +584,8 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
                     print(self.niveau)
                     print(self.niveau)
                     print(self.classe_principale.niveau)
+        else:
+            print("Hum, apparemment ce n'est pas si inutile...")
 
     def level_up(self):
         niveau = self.classe_principale.niveau
@@ -632,6 +602,16 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         self.aff_t=stats['aff_t'][niveau]
         self.aff_g=stats['aff_g'][niveau]
         self.niveau = self.classe_principale.niveau
+
+class NoOne(Agissant):
+    def __init__(self):
+        pass
+
+    def __equal__(self, other):
+        if isinstance(other,NoOne):
+            return True
+        else:
+            return False
 
 from Jeu.Constantes import *
 from Affichage.Skins.Skins import *

@@ -58,10 +58,18 @@ class Mur:
             for effet in self.effets :
                 if isinstance(effet,On_through):
                     effet.execute(intrus) #Il est conseillé d'avoir un seul effet de déplacement, comme un seul effet d'autorisation de passage...
-            if issubclass(intrus.get_classe(),Item) and isinstance(intrus,Item):
+            if isinstance(intrus,Item):
                 intrus.vole()
-        elif issubclass(intrus.get_classe(),Item) and isinstance(intrus,Item):
+        elif isinstance(intrus,Item):
             intrus.heurte_mur()
+
+    def get_porte(self) -> Porte:
+        porte = None
+        for effet in self.effets :
+            if isinstance(effet,Porte):
+                porte = effet
+        assert porte is not None
+        return porte
 
     def peut_voir(self):
         visible = True

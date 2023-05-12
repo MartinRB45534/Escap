@@ -1,6 +1,7 @@
+from typing import Tuple
 import pygame
 
-def get_modifiers(mod):
+def get_modifiers(mod) -> Tuple|Tuple[int]:
     if mod == pygame.KMOD_NONE:
         return ()
     else:

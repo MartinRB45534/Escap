@@ -2,8 +2,8 @@ from Jeu.Entitee.Item.Equippement.Equippement import *
 
 class Haume(Equipement):
     """La classe des équipements de type haume. On ne peut en porter qu'un à la fois."""
-    def __init__(self,position:Optional[Position]=None):
-        Equipement.__init__(self,position)
+    def __init__(self,controleur:Controleur,position:Position=ABSENT):
+        Equipement.__init__(self,controleur,position)
         self.poids = 3 #C'est plutôt léger.
         self.frottements = 6
 
@@ -16,6 +16,7 @@ class Haume(Equipement):
     def get_description(self,observation=0):
         return ["Un haume","..."]
 
+    @staticmethod
     def get_image():
         return SKIN_CASQUE
 

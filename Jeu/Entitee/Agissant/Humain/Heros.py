@@ -1,34 +1,28 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
+# Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
 
-from Jeu.Entitee.Agissant.Humain.Humain import *
-from Jeu.Entitee.Decors.Decors import *
-# from Jeu.Entitee.Agissant.Inventaire import Sac_a_dos
-from Jeu.Effet.Effets import *
-from Jeu.Systeme.Classe import *
-from Modifiers import *
+# Imports des classes parentes
+from Jeu.Entitee.Agissant.Humain.Humain import Humain
+from Jeu.Entitee.Agissant.Role.Mage import Multi_mage
+from Jeu.Entitee.Agissant.PNJ.PNJs import PJ
 
 class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (évidemment, c'est le personnage principal !)
     """La classe du joueur."""
-    def __init__(self,controleur:Controleur,position:Optional[Position]=None):
+    def __init__(self,controleur:Controleur,position:Position):
+        PJ.__init__(self,controleur,position,self.identite,1,2)
 
         self.identite = 'heros'
         self.place = 0
 
-        Humain.__init__(self,controleur,position,self.identite,1,2)
+        Humain.__init__(self,controleur,self.identite,1,2,position)
 
         self.apreciations = [0,0,0,0,0,0,0,0,0,0]
         self.dialogue = -1
-
-        self.statut_simule:str = "attente"
-        self.skill_courant_simule:Type[Skill] = None
-        self.dir_regard_simule:Direction = None
-        self.attente:int = -1
-        self.nouvel_ordre:bool = False
-        self.interlocuteur:Interactif|PNJ|PNJ_mage|PJ = None
 
         # Remplacer tout ça par une "mémoire"
         self.first_kill_=True
@@ -145,7 +139,7 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
         return SKIN_TETE_HEROS
 
     def get_texte_descriptif(self):
-        return [f"Un humain (niveau {self.niveau})",f"ID : {self.ID}","Nom : Arvel","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Un humain récemment arrivé dans le labyrinthe."]
+        return [f"Un humain (niveau {self.niveau})",f"ID : {self}","Nom : Arvel","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Un humain récemment arrivé dans le labyrinthe."]
 
     def fuite(self,degats:float=0):
         #On fuit si on est en danger (pv trop bas) à condition d'avoir un chemin de fuite
@@ -164,39 +158,43 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
             elif self.highest == 2:
                 self.interagit()
 
-    def first_kill(self,position):
+    def first_kill(self,position:Position):
         """Fonction appelée lorsque le premier gobelin meurt. Déclenche un dialogue de circonstance."""
         if self.first_kill_:
             self.first_kill_=False
             #On vérifie que le dialogue a lieu d'être : le joueur n'a pas rencontré d'autre monstre et il a assisté à la mort du gobelin
-            if self.highest == 3 and (self.get_etage_courant() == 3 and self.vue[position].oubli > 0):
+            if self.highest == 3 and (self.get_etage_courant() == 3 and self.vue.case_from_position(position).oubli > 0):
                 #On cherche un PNJ volontaire pour aller taper la causette :
-                paume:Humain = self.controleur.entitees[4]
+                paume = self.controleur.agissants[4]
+                assert isinstance(paume, Humain)
                 if paume.esprit == "heros" and (paume.get_etage_courant() == 3 and paume.statut_pnj in ["exploration","proximite","en chemin"]):
                     paume.mouvement = 2
                     paume.cible_deplacement = 2
                     paume.dialogue = 2
                 else:
-                    peureuse:Humain = self.controleur.entitees[5]
+                    peureuse = self.controleur.agissants[5]
+                    assert isinstance(peureuse, Humain)
                     if peureuse.esprit == "heros" and (peureuse.get_etage_courant() == 3 and peureuse.statut_pnj in ["exploration","proximite","en chemin"]):
                         peureuse.mouvement = 2
                         peureuse.cible_deplacement = 2
                         peureuse.dialogue = 2
 
-    def magic_kill(self,position):
+    def magic_kill(self,position:Position):
         """Fonction appelée lorsque le premier mage gobelin meurt. Déclenche un dialogue de circonstance."""
         if self.magic_kill_:
             self.magic_kill_=False
             #On vérifie que le dialogue a lieu d'être : le joueur a assisté à la mort du mage gobelin (et donc probablement à ses attaques)
-            if self.highest == 4 and (self.get_etage_courant() == 4 and self.vue[position].oubli > 0):
+            if self.highest == 4 and (self.get_etage_courant() == 4 and self.vue.case_from_position(position).oubli > 0):
                 #On cherche un PNJ volontaire pour aller taper la causette :
-                peureuse:Humain = self.controleur.entitees[5]
+                peureuse = self.controleur.agissants[5]
+                assert isinstance(peureuse, Humain)
                 if peureuse.esprit == "heros" and (peureuse.get_etage_courant() == 4 and peureuse.statut_pnj in ["exploration","proximite","en chemin"]):
                     peureuse.mouvement = 2
                     peureuse.cible_deplacement = 2
                     peureuse.dialogue = 3
                 else:
-                    paume:Humain = self.controleur.entitees[4]
+                    paume = self.controleur.agissants[4]
+                    assert isinstance(paume, Humain)
                     if paume.esprit == "heros" and (paume.get_etage_courant() == 4 and paume.statut_pnj in ["exploration","proximite","en chemin"]):
                         paume.mouvement = 2
                         paume.cible_deplacement = 2
@@ -209,7 +207,8 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
             #On vérifie que le dialogue a lieu d'être : le joueur n'est pas encore passé à l'étage suivant
             if self.highest == 4 :
                 #On cherche un PNJ volontaire pour aller taper la causette :
-                peureuse:Humain = self.controleur.entitees[5]
+                peureuse = self.controleur.agissants[5]
+                assert isinstance(peureuse, Humain)
                 if peureuse.esprit == "heros" and (peureuse.get_etage_courant() == 4 and peureuse.statut_pnj in ["exploration","proximite","en chemin"]):
                     peureuse.mouvement = 2
                     peureuse.cible_deplacement = 2
@@ -220,13 +219,15 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
         if self.first_step_:
             self.first_step_=False
             #On cherche un PNJ volontaire pour aller taper la causette :
-            peureuse:Humain = self.controleur.entitees[5]
+            peureuse = self.controleur.agissants[5]
+            assert isinstance(peureuse, Humain)
             if peureuse.esprit == "heros" and peureuse.statut_pnj in ["exploration","proximite","en chemin"]:
                 peureuse.mouvement = 2
                 peureuse.cible_deplacement = 2
                 peureuse.dialogue = 5
             else:
-                paume:Humain = self.controleur.entitees[4]
+                paume = self.controleur.agissants[4]
+                assert isinstance(paume, Humain)
                 if paume.esprit == "heros" and paume.statut_pnj in ["exploration","proximite","en chemin"]:
                     paume.mouvement = 2
                     paume.cible_deplacement = 2
@@ -238,7 +239,8 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
             self.first_door_=False
             #La porte qui lance le dialogue certifie qu'on y passe pour la première fois
             #On cherche un PNJ volontaire pour aller taper la causette :
-            peureuse:Humain = self.controleur.entitees[5]
+            peureuse = self.controleur.agissants[5]
+            assert isinstance(peureuse, Humain)
             if peureuse.esprit == "heros" and peureuse.statut_pnj in ["exploration","proximite","en chemin"]:
                 peureuse.mouvement = 2
                 peureuse.cible_deplacement = 2
@@ -249,24 +251,28 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
         if self.first_teleport_:
             self.first_teleport_=False
             #On cherche un PNJ volontaire pour aller taper la causette :
-            alchimiste:Humain = self.controleur.entitees[7]
+            alchimiste = self.controleur.agissants[7]
+            assert isinstance(alchimiste, Humain)
             if alchimiste.esprit == "heros" and alchimiste.statut_pnj in ["exploration","proximite","en chemin"]:
                 alchimiste.mouvement = 2
                 alchimiste.dialogue = 2
             else:
-                peureuse:Humain = self.controleur.entitees[5]
+                peureuse = self.controleur.agissants[5]
+                assert isinstance(peureuse, Humain)
                 if peureuse.esprit == "heros" and peureuse.statut_pnj in ["exploration","proximite","en chemin"]:
                     peureuse.mouvement = 2
                     peureuse.cible_deplacement = 2
                     peureuse.dialogue = 7
                 else:
-                    encombrant:Humain = self.controleur.entitees[6]
+                    encombrant = self.controleur.agissants[6]
+                    assert isinstance(encombrant, Humain)
                     if encombrant.esprit == "heros" and encombrant.statut_pnj in ["exploration","proximite","en chemin"]:
                         encombrant.mouvement = 2
                         encombrant.cible_deplacement = 2
                         encombrant.dialogue = 2
                     else:
-                        paume:Humain = self.controleur.entitees[4]
+                        paume = self.controleur.agissants[4]
+                        assert isinstance(paume, Humain)
                         if paume.esprit == "heros" and paume.statut_pnj in ["exploration","proximite","en chemin"]:
                             paume.mouvement = 2
                             paume.cible_deplacement = 2
@@ -281,14 +287,22 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
         elif self.skill_courant == Skill_magie:
             magie:Magie = self.get_skill_magique().magies[self.magie_courante]
             if isinstance(magie,Cible_agissant):
-                return self.controleur[self.cible_magie].position
+                if isinstance(self.cible_magie,Agissant):
+                    return self.cible_magie.position
+                elif isinstance(self.cible_magie,int):
+                    return self.controleur.agissants[self.cible_magie].position
             elif isinstance(magie,Cible_case):
                 return self.cible_magie
             return self.position
         return self.position
 
-
-
+# Imports utilisés dans le code:
+from Jeu.Constantes import *
+from Affichage.Skins.Skins import SKIN_TETE_HEROS
+from Jeu.Entitee.Agissant.Agissant import Agissant
+from Jeu.Systeme.Classe import Skill_stomp, Skill_attaque, Skill_magie, Skill_deplacement, Skill_course, Skill_ramasse, Skill_ramasse_light
+from Jeu.Effet.Magie.Magie import Magie, Cible_agissant, Cible_case
+from Jeu.Labyrinthe.Structure_spatiale.Direction import HAUT, DROITE, BAS, GAUCHE
 
 
 
@@ -631,7 +645,7 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
 #                     self.pv_max += 100 #Même questions et remarque que plus haut (plus plus haut que ça)
 #                     self.choix_niveaux[CLASSIQUE][3] = BOOST_PV
 #                 elif choix == SORT_ACCELERATION:
-#                     magie = trouve_skill(self.classe_principale,Skill_magie)
+#                     magie = self.get_skill_magique()
 #                     magie.ajoute(Magie_acceleration) #Il faudra créer ce sort, sous peine de devoir commenter cette ligne
 #                     self.choix_niveaux[CLASSIQUE][3] = SORT_ACCELERATION
 #             elif self.choix_niveaux[CLASSIQUE][2] == ESSENCE_MAGIQUE:
@@ -644,20 +658,20 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
 #                     self.pm_max += 100 #Même questions et remarque que plus haut (encore plus haut que ça)
 #                     self.choix_niveaux[CLASSIQUE][3] = BOOST_PM
 #                 elif choix == ONDE_DE_CHOC:
-#                     magie = trouve_skill(self.classe_principale,Skill_magie)
+#                     magie = self.get_skill_magique()
 #                     magie.ajoute(Magie_onde_de_choc) #Il faudra créer ce sort, sous peine de devoir commenter cette ligne
 #                     self.choix_niveaux[CLASSIQUE][3] = ONDE_DE_CHOC
 #             elif self.choix_niveaux[CLASSIQUE][2] in [MAGIE_INFINIE,MAGIE_INFINIE_PAR_DEFAUT]:
 #                 if choix == SORT_DE_SOIN_SUPERIEUR:
-#                     magie = trouve_skill(self.classe_principale,Skill_magie)
+#                     magie = self.get_skill_magique()
 #                     magie.ajoute(Magie_soin_superieur) #Parce que le joueur a déjà un sort de soin ? Dès le début, obtenu en récompense d'un niveau précédent ?
 #                     self.choix_niveaux[CLASSIQUE][3] = SORT_DE_SOIN_SUPERIEUR
 #                 elif choix == ENCHANTEMENT_FORCE:
-#                     magie = trouve_skill(self.classe_principale,Skill_magie)
+#                     magie = self.get_skill_magique()
 #                     magie.ajoute(Magie_enchantement_force) #Vérifier le nom exact de la magie ("Enchantement_de_force" potentiellement)
 #                     self.choix_niveaux[CLASSIQUE][3] = ENCHANTEMENT_FORCE
 #                 elif choix == PROJECTION_ENERGIE:
-#                     magie = trouve_skill(self.classe_principale,Skill_magie)
+#                     magie = self.get_skill_magique()
 #                     magie.ajoute(Magie_jet_de_mana) #Il me semble que c'est bien la même chose
 #                     self.choix_niveaux[CLASSIQUE][3] = PROJECTION_ENERGIE
 
@@ -689,7 +703,7 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
 #                     lancer.boost_portee()
 #                     self.choix_niveaux[CLASSIQUE][4] = BOOST_PORTEE
 #                 elif choix == SORT_VISION:
-#                     magie = trouve_skill(self.classe_principale,Skill_magie)
+#                     magie = self.get_skill_magique()
 #                     magie.ajoute(Magie_enchantement_vision) #Peut-être proposer un autre sort, moins consommateur de PM, qui se place automatiquement sur le lanceur ?
 #                     self.choix_niveaux[CLASSIQUE][4] = SORT_VISION #Autre idée : un skill ou un sort qui permet d'afficher la vue de l'esprit, et pas celle du joueur. Pour avoir une meilleure compréhension des champs de bataille.
 #                 elif choix == CREATION_EXPLOSIF:
@@ -704,7 +718,7 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
 #                     self.classe_principale.sous_classes.append(classe)
 #                     self.choix_niveaux[CLASSIQUE][4] = ELEMENTALISTE
 #                 elif choix == RAYON_THERMIQUE:
-#                     magie = trouve_skill(self.classe_principale,Skill_magie)
+#                     magie = self.get_skill_magique()
 #                     magie.ajoute(Magie_laser)
 #                     self.choix_niveaux[CLASSIQUE][4] = RAYON_THERMIQUE
 #                 elif choix == REGEN_MP:
@@ -712,15 +726,15 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
 #                     self.choix_niveaux[CLASSIQUE][4] = REGEN_MP
 #             elif self.choix_niveaux[CLASSIQUE][2] in [MAGIE_INFINIE,MAGIE_INFINIE_PAR_DEFAUT]:
 #                 if choix == RAYON_THERMIQUE:
-#                     magie = trouve_skill(self.classe_principale,Skill_magie)
+#                     magie = self.get_skill_magique()
 #                     magie.ajoute(Magie_laser) #C'est bien les mêmes ?
 #                     self.choix_niveaux[CLASSIQUE][4] = RAYON_THERMIQUE
 #                 elif choix == ENCHANTEMENT_DEFENSE:
-#                     magie = trouve_skill(self.classe_principale,Skill_magie)
+#                     magie = self.get_skill_magique()
 #                     magie.ajoute(Magie_enchantement_defense) #À créer, je crois...
 #                     self.choix_niveaux[CLASSIQUE][4] = ENCHANTEMENT_DEFENSE
 #                 elif choix == REGEN_PM:
-#                     magie = trouve_skill(self.classe_principale,Skill_magie)
+#                     magie = self.get_skill_magique()
 #                     magie.ajoute(Magie_regeneration_pm) #Un transfert de pm à quelqu'un d'autre, grosso-modo. À créer, je pense.
 #                     self.choix_niveaux[CLASSIQUE][4] = REGEN_PM
 
@@ -785,7 +799,7 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
 #                     self.choix_niveaux[CLASSIQUE][5] = BOOST_PRIORITE_MAGIQUE
 #             elif self.choix_niveaux[CLASSIQUE][2] in [MAGIE_INFINIE,MAGIE_INFINIE_PAR_DEFAUT]:
 #                 if choix == ENCHANTEMENT_FAIBLESSE:
-#                     magie = trouve_skill(self.classe_principale,Skill_magie)
+#                     magie = self.get_skill_magique()
 #                     magie.ajoute(Magie_enchantement_faiblesse) #Donner toute la panoplie des déboosts d'un coup ?
 #                     self.choix_niveaux[CLASSIQUE][5] = ENCHANTEMENT_FAIBLESSE
 #                 elif choix == EPEISTE:
@@ -817,7 +831,7 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
 #                     self.classe_principale.skills.append(skill)
 #                     self.choix_niveaux[CLASSIQUE][6] = BOOST_PRIORITE_OBSERVATION
 #                 elif choix == SORT_AUTO_SOIN:
-#                     magie = trouve_skill(self.classe_principale,Skill_magie)
+#                     magie = self.get_skill_magique()
 #                     magie.ajoute(Magie_auto_soin)
 #                     self.choix_niveaux[CLASSIQUE][6] = SORT_AUTO_SOIN
 #             elif self.choix_niveaux[CLASSIQUE][2] == LANCER:
@@ -860,7 +874,7 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
 #                     self.classe_principale.skills.append(skill)
 #                     self.choix_niveaux[CLASSIQUE][6] = BOOST_SOIN
 #                 elif choix == ONDE_DE_CHOC:
-#                     magie = trouve_skill(self.classe_principale,Skill_magie)
+#                     magie = self.get_skill_magique()
 #                     magie.ajoute(Magie_onde_de_choc)
 #                     self.choix_niveaux[CLASSIQUE][6] = ONDE_DE_CHOC
 
@@ -872,7 +886,7 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
 #         elif niveau == 7:
 #             if self.choix_niveaux[CLASSIQUE][2] in [DEFENSE,DEFENSE_PAR_DEFAUT]:
 #                 if choix == SORT_DE_VUE: #Oh, un sort, il s'est perdu le pauvre ?
-#                     magie = trouve_skill(self.classe_principale,Skill_magie)
+#                     magie = self.get_skill_magique()
 #                     magie.ajoute(Magie_enchantement_de_vision) #Mettre un autre sort moins couteux, on n'a pas tant de mana nous !
 #                     self.choix_niveaux[CLASSIQUE][7] = SORT_DE_VUE
 #                 elif choix == VOL_PRIORITE:
@@ -914,16 +928,16 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
 #                     self.classe_principale.skills.append(skill)
 #                     self.choix_niveaux[CLASSIQUE][7] = INSTAKILL
 #                 elif choix == JET_DE_MANA:
-#                     magie = trouve_skill(self.classe_principale,Skill_magie)
+#                     magie = self.get_skill_magique()
 #                     magie.ajoute(Magie_jet_de_mana)
 #                     self.choix_niveaux[CLASSIQUE][7] = JET_DE_MANA
 #             elif self.choix_niveaux[CLASSIQUE][2] in [MAGIE_INFINIE,MAGIE_INFINIE_PAR_DEFAUT]:
 #                 if choix == ENCHANTEMENT_RENFORCEMENT:
-#                     magie = trouve_skill(self.classe_principale,Skill_magie)
+#                     magie = self.get_skill_magique()
 #                     magie.ajoute(Magie_enchantement_renforcement) # Pour renforcer les items ! Les épées, à tout hasard...
 #                     self.choix_niveaux[CLASSIQUE][7] = ENCHANTEMENT_RENFORCEMENT
 #                 elif choix == SORT_DE_PROTECTION:
-#                     magie = trouve_skill(self.classe_principale,Skill_magie)
+#                     magie = self.get_skill_magique()
 #                     magie.ajoute(Magie_protection) # Protège tous les gens autour (enfin, juste les alliés)
 #                     self.choix_niveaux[CLASSIQUE][7] = SORT_DE_PROTECTION
 #                 elif choix == BOOST_PM:
@@ -981,7 +995,7 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
 #                     self.choix_niveaux[CLASSIQUE][8] = BOOST_PRIORITE
 #             elif self.choix_niveaux[CLASSIQUE][2] in [MAGIE_INFINIE,MAGIE_INFINIE_PAR_DEFAUT]:
 #                 if choix == ENCHANTEMENT_DEFENSIF:
-#                     magie = trouve_skill(self.classe_principale,Skill_magie)
+#                     magie = self.get_skill_magique()
 #                     magie.ajoute(Magie_enchantement_defensif) #Confère à un objet des propriétés défensives
 #                     self.choix_niveaux[CLASSIQUE][5] = ENCHANTEMENT_DEFENSIF
 #                 elif choix == ENCHANTEUR:
@@ -1058,7 +1072,7 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
 #                     self.classe_principale.sous_classes.append(classe)
 #                     self.choix_niveaux[CLASSIQUE][9] = ANGE
 #                 elif choix == ENCHANTEMENT_ROUILLE:
-#                     magie = trouve_skill(self.classe_principale,Skill_magie)
+#                     magie = self.get_skill_magique()
 #                     magie.ajoute(Magie_enchantement_rouille) #Il me semble que c'est bien la même chose
 #                     self.choix_niveaux[CLASSIQUE][9] = ENCHANTEMENT_ROUILLE
 
@@ -1097,7 +1111,7 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
 #                     self.choix_niveaux[CLASSIQUE][10] = BOOST_PORTEE_EXPLOSIFS
 #             elif self.choix_niveaux[CLASSIQUE][2] == ESSENCE_MAGIQUE:
 #                 if choix == ECLAIR_NOIR:
-#                     magie = trouve_skill(self.classe_principale,Skill_magie)
+#                     magie = self.get_skill_magique()
 #                     magie.ajoute(Magie_eclair_noir) # À la fois le sort et le projectile le plus puissant du jeu ! Dévastateur dans toutes les situations, peut annihiler une horde et pousser le boss final à la fuite ! Ok, peut-être pas le boss final...
 #                     self.choix_niveaux[CLASSIQUE][10] = ECLAIR_NOIR
 #                 elif choix == BOOST_DEGATS_PROJECTILES:
@@ -1115,11 +1129,11 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
 #                     self.classe_principale.skills.append(skill)
 #                     self.choix_niveaux[CLASSIQUE][10] = BOOST_ENCHANTEMENT
 #                 elif choix == RESURECTION:
-#                     magie = trouve_skill(self.classe_principale,Skill_magie)
+#                     magie = self.get_skill_magique()
 #                     magie.ajoute(Magie_resurection) # Quand on laisse ses alliés faire tout le sale boulot, ça peut servir...
 #                     self.choix_niveaux[CLASSIQUE][10] = RESURECTION
 #                 elif choix == ECLAIR_NOIR:
-#                     magie = trouve_skill(self.classe_principale,Skill_magie)
+#                     magie = self.get_skill_magique()
 #                     magie.ajoute(Magie_eclair_noir) # À la fois le sort et le projectile le plus puissant du jeu ! Dévastateur dans toutes les situations, peut annihiler une horde et pousser le boss final à la fuite ! Ok, peut-être pas le boss final...
 #                     self.choix_niveaux[CLASSIQUE][10] = ECLAIR_NOIR
 
@@ -1180,7 +1194,7 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
 
 #         # Pour les magies, on se contente de les rajouter aux magies disponibles du skill magie (créer un skill spécifique qui peut rapporter de l'xp pour une autre classe que la principale ? vérifier que les magies n'y sont pas encore ?)
 #         elif choix == magie_terre :
-#             skill = trouve_skill(self.classe_principale,Skill_magie)
+#             skill = self.get_skill_magique()
 #             skill.ajoute(Magie_rocher)
 #             skill.ajoute(Magie_enchantement_sable)
 #             skill.ajoute(Magie_avalanche)
@@ -1188,7 +1202,7 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
 #             if self.prem_terre is None:
 #                 self.prem_terre = MAGIE
 #         elif choix == magie_feu :
-#             skill = trouve_skill(self.classe_principale,Skill_magie)
+#             skill = self.get_skill_magique()
 #             skill.ajoute(Magie_boule_de_feu)
 #             skill.ajoute(Magie_enchantement_flamme)
 #             skill.ajoute(Magie_brasier)
@@ -1196,7 +1210,7 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
 #             if self.prem_feu is None:
 #                 self.prem_feu = MAGIE
 #         elif choix == magie_glace :
-#             skill = trouve_skill(self.classe_principale,Skill_magie)
+#             skill = self.get_skill_magique()
 #             skill.ajoute(Magie_fleche_de_glace)
 #             skill.ajoute(Magie_enchantement_neige)
 #             skill.ajoute(Magie_blizzard)
@@ -1204,7 +1218,7 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
 #             if self.prem_glace is None:
 #                 self.prem_glace = MAGIE
 #         elif choix == magie_ombre :
-#             skill = trouve_skill(self.classe_principale,Skill_magie)
+#             skill = self.get_skill_magique()
 #             skill.ajoute(Magie_ombre_furtive)
 #             skill.ajoute(Magie_enchantement_tenebre)
 #             skill.ajoute(Magie_obscurite)

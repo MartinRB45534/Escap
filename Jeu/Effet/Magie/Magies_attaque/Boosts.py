@@ -1,5 +1,12 @@
-from Jeu.Effet.Magie.Magie import *
-from Jeu.Effet.Effets_divers import *
+from __future__ import annotations
+from typing import TYPE_CHECKING, List, Optional
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Entitee.Agissant.Agissant import Agissant
+
+# Imports des classes parentes
+from Jeu.Effet.Magie.Magie import Magie, Cible_agissant, Multi_cible
 
 class Magie_dopage(Magie):
     """La magie qui crée un effet de dopage sur l'agissant."""
@@ -12,8 +19,8 @@ class Magie_dopage(Magie):
         self.niveau = niveau
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.effets.append(Dopage(porteur.ID,taux_dopage[self.niveau-1],duree_dopage[self.niveau-1]))
+    def action(self,porteur:Agissant):
+        porteur.effets.append(Dopage(porteur,taux_dopage[self.niveau-1],duree_dopage[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_DOPAGE
@@ -33,12 +40,13 @@ class Magie_boost(Cible_agissant):
         self.cout_pm = cout_pm_boost[niveau-1]
         self.latence = latence_boost[niveau-1]
         self.niveau = niveau
-        self.cible = None
+        self.cible:Optional[Agissant] = None
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.controleur[self.cible].effets.append(Dopage(porteur.ID,taux_boost[self.niveau-1],duree_boost[self.niveau-1]))
+    def action(self,porteur:Agissant):
+        assert self.cible is not None
+        self.cible.effets.append(Dopage(porteur,taux_boost[self.niveau-1],duree_boost[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_DOPAGE
@@ -58,13 +66,13 @@ class Magie_multi_boost(Cible_agissant,Multi_cible):
         self.cout_pm = cout_pm_multi_boost[niveau-1]
         self.latence = latence_multi_boost[niveau-1]
         self.niveau = niveau
-        self.cible = None
+        self.cible:List[Agissant] = []
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
+    def action(self,porteur:Agissant):
         for cible in self.cible:
-            porteur.controleur.entitees[cible].effets.append(Dopage(porteur.ID,taux_multi_boost[self.niveau-1],duree_multi_boost[self.niveau-1]))
+            cible.effets.append(Dopage(porteur,taux_multi_boost[self.niveau-1],duree_multi_boost[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_DOPAGE
@@ -74,3 +82,8 @@ class Magie_multi_boost(Cible_agissant,Multi_cible):
 
     def get_description(self,observation=0):
         return ["Une magie de boost","Affecte un ou plusieurs agissants en vue du lanceur.","Les dégats de la prochaine attaque des agissants sont augentés.",f"Coût : {self.cout_pm}",f"Taux de dégats : {taux_multi_boost[self.niveau-1]}",f"Latence : {self.latence}"]
+
+# Imports utilisés dans le code
+from Jeu.Effet.Effets_divers import Dopage
+from Jeu.Systeme.Constantes_magies.Magies import *
+from Affichage.Skins.Skins import SKIN_MAGIE_DOPAGE

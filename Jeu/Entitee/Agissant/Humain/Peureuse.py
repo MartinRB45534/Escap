@@ -1,19 +1,26 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
+# Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
 
-from Jeu.Entitee.Agissant.Humain.Humain import *
+# Imports des classes parentes
+from Jeu.Entitee.Agissant.Humain.Humain import Humain
+from Jeu.Entitee.Agissant.PNJ.PNJs import PNJ_mage
+from Jeu.Entitee.Agissant.Role.Multi_renforceur import Multi_renforceur
+from Jeu.Entitee.Agissant.Role.Support_lointain import Support_lointain
 
 class Peureuse(PNJ_mage,Multi_renforceur,Support_lointain,Humain): #La quatrième humaine du jeu, à l'étage 3 (terrorisée par les monstres)
     """La classe de la peureuse."""
-    def __init__(self,controleur:Controleur,position:Optional[Position]=None):
+    def __init__(self,controleur:Controleur,position:Position):
 
         self.identite = 'peureuse'
         self.place = 3
 
-        Humain.__init__(self,controleur,position,self.identite,1,5) #Plutôt faible, de base
+        Humain.__init__(self,controleur,self.identite,1,5,position) #Plutôt faible, de base
 
         self.comportement_corps_a_corps = 2
         self.comportement_distance = 2
@@ -40,13 +47,13 @@ class Peureuse(PNJ_mage,Multi_renforceur,Support_lointain,Humain): #La quatrièm
     # et ne pas fuir s'il n'y a nulle part où fuir ou si le joueur a donné ordre de ne pas fuir et qu'on a suffisamment d'appréciation pour lui (rajouter un modificateur au taux_limite ?)
 
     def peut_multi_caster(self):
-        return self.peut_payer(cout_pm_multi_boost[trouve_skill(self.classe_principale,Skill_magie).niveau-1])
+        return self.peut_payer(cout_pm_multi_boost[self.get_skill_magique().niveau-1])
 
     def multi_caste(self):
         return "magie multi boost"
 
     def peut_caster(self):
-        return self.peut_payer(cout_pm_boost[trouve_skill(self.classe_principale,Skill_magie).niveau-1])
+        return self.peut_payer(cout_pm_boost[self.get_skill_magique().niveau-1])
 
     def caste(self):
         return "magie boost"
@@ -86,6 +93,7 @@ class Peureuse(PNJ_mage,Multi_renforceur,Support_lointain,Humain): #La quatrièm
             self.repliques = ["dialogue7reponse1.1","dialogue7reponse1.2","dialogue7reponse1.3"]
 
     def interprete(self,replique:str):
+        assert isinstance(self.controleur.joueur, Humain)
 
         #Premier dialogue
         #Le joueur arrive par l'escalier
@@ -105,11 +113,11 @@ class Peureuse(PNJ_mage,Multi_renforceur,Support_lointain,Humain): #La quatrièm
             self.replique="dialogue1phrase1.1.1.1"
             self.repliques = ["dialogue1reponse1.1.1.1.1","dialogue1reponse1.1.1.1.2"]
         elif replique == "dialogue1reponse1.1.1.1.2":
-            self.appreciations[0] += 0.5
+            self.appreciations[self.controleur.joueur.place] += 0.5
             self.end_dialogue()
-            self.controleur.get_esprit(self.controleur.joueur.esprit).merge(self.esprit)
+            self.controleur.joueur.esprit.merge(self.esprit)
             self.mouvement = 0 #Légèrement redondant ici
-            self.cible_deplacement = self.controleur.joueur.ID
+            self.cible_deplacement = self.controleur.joueur
         elif replique == "dialogue1reponse1.1.1.2":
             self.replique="dialogue1phrase1.1.1.2"
             self.repliques = ["dialogue1reponse1.1.1.2.1","dialogue1reponse1.1.1.2.2"]
@@ -127,15 +135,15 @@ class Peureuse(PNJ_mage,Multi_renforceur,Support_lointain,Humain): #La quatrièm
             self.repliques = ["dialogue1reponse1.1.1.1.1.2.1","dialogue1reponse1.1.1.1.1.2.2"]
         elif replique in ["dialogue1reponse1.1.1.1.1.2.1","dialogue1reponse1.1.1.2.1.1"]:
             self.end_dialogue()
-            self.controleur.get_esprit(self.controleur.joueur.esprit).merge(self.esprit)
+            self.controleur.joueur.esprit.merge(self.esprit)
             self.mouvement = 0 #Légèrement redondant ici
-            self.cible_deplacement = self.controleur.joueur.ID
+            self.cible_deplacement = self.controleur.joueur
         elif replique == "dialogue1reponse1.1.1.1.1.2.2":
-            self.appreciations[0]-= 0.5
+            self.appreciations[self.controleur.joueur.place]-= 0.5
             self.end_dialogue(-2)
             self.statut_pnj = "exploration"
         elif replique == "dialogue1reponse1.1.1.2.2":
-            self.appreciations[0]-= 0.5
+            self.appreciations[self.controleur.joueur.place]-= 0.5
             self.end_dialogue(-2)
             self.statut_pnj = "exploration"
         elif replique == "dialogue1reponse1.2":
@@ -181,10 +189,10 @@ class Peureuse(PNJ_mage,Multi_renforceur,Support_lointain,Humain): #La quatrièm
         elif replique in ["dialogue3reponse1.1.2","dialogue3reponse1.2"]:
             self.end_dialogue()
         elif replique == "dialogue3reponse1.1.1.1":
-            self.appreciations[0]+= 0.1
+            self.appreciations[self.controleur.joueur.place]+= 0.1
             self.end_dialogue()
         elif replique == "dialogue3reponse1.1.1.2":
-            self.appreciations[0]-= 0.3
+            self.appreciations[self.controleur.joueur.place]-= 0.3
             self.end_dialogue()
 
         #Dialogue de description des monstres
@@ -207,7 +215,7 @@ class Peureuse(PNJ_mage,Multi_renforceur,Support_lointain,Humain): #La quatrièm
             self.replique="dialogue4phrase1.1.1.1.2.1"
             self.repliques = ["dialogue4reponse1.1.1.1.2.1.1"]
         elif replique == "dialogue4reponse1.1.1.1.2.2":
-            self.appreciations[0]+= 0.5
+            self.appreciations[self.controleur.joueur.place]+= 0.5
             self.replique="dialogue4phrase1.1.1.1.2.2"
             self.repliques = ["dialogue4reponse1.1.1.1.2.1.1"]
         elif replique == "dialogue4reponse1.1.2":
@@ -227,7 +235,7 @@ class Peureuse(PNJ_mage,Multi_renforceur,Support_lointain,Humain): #La quatrièm
             self.repliques = ["dialogue4reponse1.1.2.1.1.1.1.1","dialogue4reponse1.1.2.1.1.1.1.2"]
         elif replique == "dialogue4reponse1.1.2.1.1.1.1.1":
             self.replique="dialogue4phrase1.1.2.1.1.1.1.1"
-            self.appreciations[0]+=0.5
+            self.appreciations[self.controleur.joueur.place]+=0.5
             self.repliques = ["dialogue4reponse1.1.1.1.2.1.1"]
         elif replique == "dialogue4reponse1.1.2.1.1.2":
             self.replique="dialogue4phrase1.1.2.1.1.2"
@@ -243,7 +251,7 @@ class Peureuse(PNJ_mage,Multi_renforceur,Support_lointain,Humain): #La quatrièm
         elif replique == "dialogue4reponse1.3":
             self.replique="dialogue4phrase1.3"
             self.repliques = ["dialogue4reponse1.2.1"]
-            self.appreciations[0]-= 0.3
+            self.appreciations[self.controleur.joueur.place]-= 0.3
 
         #Dialogue de la prison, première étape
         elif replique == "dialogue5reponse1.1":
@@ -256,24 +264,27 @@ class Peureuse(PNJ_mage,Multi_renforceur,Support_lointain,Humain): #La quatrièm
             self.replique="dialogue5phrase1.1.2"
             self.repliques = ["dialogue5reponse1.1.1.1"]
         elif replique == "dialogue5reponse1.1.1.1":
-            ID_clee = self.inventaire.get_clee("Porte_avant_prison_5")
-            self.inventaire.drop(None,ID_clee)
-            self.controleur.joueur.inventaire.ramasse_item(ID_clee) #On refile au joueur la clé dont il a besoin
+            clee = self.inventaire.get_clee("Porte_avant_prison_5")
+            assert clee is not None
+            self.inventaire.drop(ABSENT,clee)
+            self.controleur.joueur.inventaire.ajoute(clee) #On refile au joueur la clé dont il a besoin
             self.replique="dialogue5phrase1.1.1.1"
             self.repliques = ["dialogue5reponse1.1.1.1.1"]
         elif replique == "dialogue5reponse1.1.1.1.1":
             self.end_dialogue()
         elif replique == "dialogue5reponse1.2":
-            ID_clee = self.inventaire.get_clee("Porte_avant_prison_5")
-            self.inventaire.drop(None,ID_clee)
-            self.controleur.joueur.inventaire.ramasse_item(ID_clee) #On refile quand même au joueur la clé dont il a besoin
-            self.appreciations[0]+= 0.5
+            clee = self.inventaire.get_clee("Porte_avant_prison_5")
+            assert clee is not None
+            self.inventaire.drop(ABSENT,clee)
+            self.controleur.joueur.inventaire.ajoute(clee) #On refile quand même au joueur la clé dont il a besoin
+            self.appreciations[self.controleur.joueur.place]+= 0.5
             self.end_dialogue()
         elif replique == "dialogue5reponse1.3":
-            ID_clee = self.inventaire.get_clee("Porte_avant_prison_5")
-            self.inventaire.drop(None,ID_clee)
-            self.controleur.joueur.inventaire.ramasse_item(ID_clee) #On refile quand même au joueur la clé dont il a besoin
-            self.appreciations[0]-= 0.5
+            clee = self.inventaire.get_clee("Porte_avant_prison_5")
+            assert clee is not None
+            self.inventaire.drop(ABSENT,clee)
+            self.controleur.joueur.inventaire.ajoute(clee) #On refile quand même au joueur la clé dont il a besoin
+            self.appreciations[self.controleur.joueur.place]-= 0.5
             self.end_dialogue()
 
         #Dialogue de la prison, deuxième étape
@@ -286,10 +297,10 @@ class Peureuse(PNJ_mage,Multi_renforceur,Support_lointain,Humain): #La quatrièm
         elif replique == "dialogue6reponse1.1.1.1":
             self.end_dialogue()
         elif replique == "dialogue6reponse1.2":
-            self.appreciations[0]+= 0.5
+            self.appreciations[self.controleur.joueur.place]+= 0.5
             self.end_dialogue()
         elif replique == "dialogue6reponse1.3":
-            self.appreciations[0]-= 0.5
+            self.appreciations[self.controleur.joueur.place]-= 0.5
             self.end_dialogue()
 
         #Septième dialogue
@@ -302,7 +313,7 @@ class Peureuse(PNJ_mage,Multi_renforceur,Support_lointain,Humain): #La quatrièm
             self.repliques = ["dialogue7reponse1.2.1"]
         elif replique == "dialogue7reponse1.3":
             self.end_dialogue()
-            self.appreciations[0] -= 0.2
+            self.appreciations[self.controleur.joueur.place] -= 0.2
         elif replique == "dialogue7reponse1.1.1":
             self.replique="dialogue7phrase1.1.1"
             self.repliques = ["dialogue7reponse1.1.1.1","dialogue7reponse1.1.1.2"]
@@ -310,7 +321,7 @@ class Peureuse(PNJ_mage,Multi_renforceur,Support_lointain,Humain): #La quatrièm
             self.replique="dialogue7phrase1.1.2"
             self.repliques = ["dialogue7reponse1.1.2.1"]
         elif replique == "dialogue7reponse1.1.3":
-            self.appreciations[0] -= 0.1
+            self.appreciations[self.controleur.joueur.place] -= 0.1
             self.replique="dialogue7phrase1.1.3"
             self.repliques = ["dialogue7reponse1.1.3.1","dialogue7reponse1.1.3.2"]
         elif replique == "dialogue7reponse1.2.1":
@@ -325,12 +336,12 @@ class Peureuse(PNJ_mage,Multi_renforceur,Support_lointain,Humain): #La quatrièm
             self.replique="dialogue7phrase1.1.1"
             self.repliques = ["dialogue7reponse1.1.1.1","dialogue7reponse1.1.1.2"]
         elif replique == "dialogue7reponse1.1.3.1":
-            self.appreciations[0] -= 0.1
+            self.appreciations[self.controleur.joueur.place] -= 0.1
             self.replique="dialogue7phrase1.1.3.1"
             self.repliques = ["dialogue7reponse1.1.1.1.1","dialogue7reponse1.1.1.1.2"]
         elif replique == "dialogue7reponse1.1.3.2":
             self.end_dialogue()
-            self.appreciations[0] -= 0.2
+            self.appreciations[self.controleur.joueur.place] -= 0.2
         elif replique == "dialogue7reponse1.1.1.1.1":
             self.replique="dialogue7phrase1.1.1.1.1"
             self.repliques = ["dialogue7reponse1.1.1.1.1.1","dialogue7reponse1.1.1.1.1.2"]#Euh, non/oui, l'épéiste
@@ -425,7 +436,7 @@ class Peureuse(PNJ_mage,Multi_renforceur,Support_lointain,Humain): #La quatrièm
             if self.controleur.joueur.inventaire.a_parchemin_vierge():
                 self.repliques.append("dialogue-1reponse1.3")
             self.repliques.append("dialogue-1reponse1.4")
-            self.cible_deplacement = self.controleur.joueur.ID
+            self.cible_deplacement = self.controleur.joueur
         elif replique == "dialogue-1reponse1.1.1.2":
             self.controleur.set_phase(AGISSANT_DIALOGUE)
         elif replique == "dialogue-1reponse1.1.2":
@@ -460,7 +471,8 @@ class Peureuse(PNJ_mage,Multi_renforceur,Support_lointain,Humain): #La quatrièm
 
         self.replique_courante = 0
 
-    def set_cible(self,cible:Union[int,Position]):
+    def set_cible(self,cible:int|Position):
+
         self.cible_deplacement = cible
         self.replique = "dialogue-1phrase1.1.1.2"
         self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"]
@@ -472,6 +484,7 @@ class Peureuse(PNJ_mage,Multi_renforceur,Support_lointain,Humain): #La quatrièm
         return REPLIQUES_PEUREUSE[code]
 
     def impregne(self,nom:str):
+
         skill = self.get_skill_magique()
         latence,magie = skill.utilise(nom)
         self.latence += latence
@@ -479,7 +492,7 @@ class Peureuse(PNJ_mage,Multi_renforceur,Support_lointain,Humain): #La quatrièm
         if self.peut_payer(cout):
             self.controleur.joueur.inventaire.consomme_parchemin_vierge()
             self.paye(cout)
-            parch = Parchemin_impregne(None,magie,cout//2)
+            parch = Parchemin_impregne(self.controleur,magie,cout//2,ABSENT)
             self.controleur.ajoute_entitee(parch)
             self.controleur.joueur.inventaire.ajoute(parch)
             self.replique = "dialogue-1phrase1.3.1"
@@ -495,4 +508,12 @@ class Peureuse(PNJ_mage,Multi_renforceur,Support_lointain,Humain): #La quatrièm
         return SKIN_TETE_PEUREUSE
 
     def get_texte_descriptif(self):
-        return [f"Une humaine (niveau {self.niveau})",f"ID : {self.ID}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Une humaine terrorisée par les monstres. Elle peut quand-même se rendre utile."]
+        return [f"Une humaine (niveau {self.niveau})",f"ID : {self}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Une humaine terrorisée par les monstres. Elle peut quand-même se rendre utile."]
+
+# Imports utilisés dans le code:
+from Jeu.Constantes import *
+from Jeu.Systeme.Constantes_magies.Magies import *
+from Affichage.Skins.Skins import SKIN_TETE_PEUREUSE
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+from Jeu.Entitee.Item.Parchemin.Parchemins import Parchemin_impregne
+from Jeu.Dialogues.Dialogues_peureuse import REPLIQUES_PEUREUSE

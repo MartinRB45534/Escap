@@ -9,10 +9,9 @@ class Multi_soigneur_protecteur(Multi_soigneur):
 
     def agit_en_vue(self,esprit,defaut = ""):
         cibles = []
-        for ID in esprit.corps:
-            corp = self.controleur.entitees[ID]
+        for corp in esprit.corps:
             if corp.etat == "vivant" and corp.pv < corp.pv_max:
-                cibles.append([corp.pv,ID])
+                cibles.append([corp.pv,corp])
         if len(cibles) == 1:
             if self.peut_caster():
                 self.utilise(Skill_magie)
@@ -35,15 +34,14 @@ class Multi_soigneur_protecteur(Multi_soigneur):
                 defaut = "soin"
                 self.set_statut("soin")
         elif self.pm == self.pm_max: #On ne l'utilise que rarement... parce qu'il est cher
-            for ID in esprit.corps:
-                corp = self.controleur.entitees[ID]
+            for corp in esprit.corps:
                 if corp.etat == "vivant":
                     libre = True
                     for effet in corp.effets:
                         if isinstance(effet,Protection_sacree): #On ne peut pas avoir deux protections sacrées en même temps
                             libre = False
                     if libre:
-                        cibles.append(ID)
+                        cibles.append(corp)
             if cibles != []:
                 self.utilise(Skill_magie)
                 self.set_magie_courante("magie protection sacrée")

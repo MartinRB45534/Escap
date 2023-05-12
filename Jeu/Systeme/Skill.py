@@ -303,7 +303,7 @@ class Skill_vol(Skill):
     def __init__(self):
         Skill.__init__(self)
         self.latence=11
-        self.supériorite=11 #la quantité de priorité que l'agissant doit avoir en plus par rapport à la cible qu'il vole
+        self.superiorite=11 #la quantité de priorité que l'agissant doit avoir en plus par rapport à la cible qu'il vole
         self.gain_xp=0.1
         self.nom = "Vol"
 
@@ -330,7 +330,7 @@ class Skill_vol_de_priorite(Skill):
     def __init__(self):
         Skill.__init__(self)
         self.latence=11
-        self.supériorite=11 #la quantité de priorité que l'agissant doit avoir en plus par rapport à la cible qu'il vole. Peut-être la faire passer en négatif ?
+        self.superiorite=11 #la quantité de priorité que l'agissant doit avoir en plus par rapport à la cible qu'il vole. Peut-être la faire passer en négatif ?
         self.gain_xp=0.1
         self.nom = "Vol de priorite"
 
@@ -686,10 +686,10 @@ class Invite_de_commande(Skill):
 
     def utilise(self,touche):
         if touche == pygame.K_DELETE:
-            if len(self.chaine >= 1):
+            if len(self.chaine) >= 1:
                 self.chaine = self.chaine[:-1]
-        elif touche == pygame.K_ENTER:
+        elif touche == pygame.K_RETURN:
             eval(self.chaine) #/!\ Rajouter les variables globales pour que ça serve à quelque-chose !
             self.chaine = ""
         else: #On se limite aux trucs simples pour l'instant !
-            self.chaine.append(pygame.key.name(touche))
+            self.chaine+=pygame.key.name(touche)

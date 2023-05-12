@@ -1,15 +1,20 @@
+from __future__ import annotations
 from Affichage.Skins.Skins import *
 from Jeu.Entitee.Entitee import *
-from Jeu.Entitee.Agissant.Agissant import Agissant
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from Jeu.Entitee.Agissant.Agissant import Agissant
+    from Jeu.Controleur import Controleur
 
 class Item(Mobile):
     """La classe des entitées inanimées. Peuvent se situer dans un inventaire. Peuvent être lancés (déconseillé pour les non-projectiles)."""
-    def __init__(self,position:Optional[Position]):
-        Entitee.__init__(self,position)
+    def __init__(self,controleur:Controleur,position:Position, ID: Optional[int]=None):
+        Entitee.__init__(self,controleur,position,ID)
         self.etat = "intact" #Le niveau l'évacuera s'il n'est plus intact.
         self.priorite = 0 #Pour avoir le droit de la ramasser.
         # self.porteur:Optional[int] = None #Utilisé ? /!\
-        self.lanceur:Optional[int] = None
+        self.lanceur:Optional[Agissant] = None
         self.direction:Optional[Direction] = None #Utile uniquement quand l'item se déplace.
         self.latence:float = 0 #Utile uniquement quand l'item se déplace.
         self.vitesse:float = 1 #La quantitée soustraite à la latence chaque tour.
@@ -97,6 +102,9 @@ class Item(Mobile):
             if isinstance(effet,On_fin_tour):
                 effet.execute(self) #À condition qu'il y ait un prochain...
 
+    def get_classe(self):
+        return Item
+
     def get_skin_vue(self,forme):
         return SKINS_ITEMS_VUS[forme][self.nom]
 
@@ -112,30 +120,6 @@ class Item(Mobile):
     @staticmethod
     def get_image():
         return SKIN_VIDE
-
-class Cadavre(Item):
-
-    def get_titre(self,observation=0):
-        return "Cadavre"
-
-    def get_description(self,observation=0):
-        return ["Un cadavre","Où as-tu trouvé ça ?"]
-
-    @staticmethod
-    def get_image():
-        return SKIN_CADAVRE
-
-class Oeuf(Item):
-
-    def get_titre(self,observation=0):
-        return "Oeuf"
-
-    def get_description(self,observation=0):
-        return ["Un oeuf","Je n'ai rien pour le cuire..."]
-
-    @staticmethod
-    def get_image():
-        return SKIN_OEUF
 
 class Consommable(Item):
     """La classe des items qui peuvent être consommés. Ajoute à l'agissant un effet. Disparait après usage."""

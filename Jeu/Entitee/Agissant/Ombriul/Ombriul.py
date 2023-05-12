@@ -8,10 +8,10 @@ from Affichage.Skins.Skins import *
 from Jeu.Entitee.Agissant.Agissant import *
 from Jeu.Entitee.Agissant.Role.Roles import *
 
-class Ombriul(Dps): #/!\ Retravailler l'ombriul pour utiliser les rôles
+class Ombriul(Dps,Mage): #/!\ Retravailler l'ombriul pour utiliser les rôles
     """Une créature des ténèbres, non-endémique du labyrinthe."""
-    def __init__(self,controleur:Controleur,position:Optional[Position]=None,niveau:int):
-        Agissant.__init__(self,controleur,position,"ombriul",niveau)
+    def __init__(self,controleur:Controleur,niveau:int,position:Position=ABSENT):
+        Agissant.__init__(self,controleur,"ombriul",niveau,position)
 
     def get_offenses(self):
         offenses = self.offenses
@@ -25,7 +25,8 @@ class Ombriul(Dps): #/!\ Retravailler l'ombriul pour utiliser les rôles
         return offenses, etat
 
     def attaque(self,direction:Direction):
-        skill:Skills_magiques = trouve_skill(self.classe_principale,Skills_magiques) #Est-ce qu'il a le même Skill_magie que le joueur ?
+        skill = trouve_skill(self.classe_principale,Skills_magiques) #Est-ce qu'il a le même Skill_magie que le joueur ?
+        assert skill is not None
         self.regarde(direction)
         if self.peut_payer(cout_pm_poing_sombre[skill.niveau-1]): #Quelle est l'attaque magique des gobelins ?
             self.utilise(Skill_magie)
@@ -45,4 +46,4 @@ class Ombriul(Dps): #/!\ Retravailler l'ombriul pour utiliser les rôles
         return SKIN_TETE_OMBRIUL
 
     def get_texte_descriptif(self):
-        return [f"Un ombriul (niveau {self.niveau})",f"ID : {self.ID}","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Les ombriuls ne font pas partie des espèces endémiques au labyrinthe. Ils y prolifèrent depuis quelques temps grâce à l'ombre, qui est leur élément de prédilection."]
+        return [f"Un ombriul (niveau {self.niveau})",f"ID : {self}","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Les ombriuls ne font pas partie des espèces endémiques au labyrinthe. Ils y prolifèrent depuis quelques temps grâce à l'ombre, qui est leur élément de prédilection."]

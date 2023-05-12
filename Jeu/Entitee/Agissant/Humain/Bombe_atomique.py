@@ -1,19 +1,26 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
+# Imports utilis√©s uniquement dans les annotations
 if TYPE_CHECKING:
     from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
 
-from Jeu.Entitee.Agissant.Humain.Humain import *
+# Imports des classes parentes
+from Jeu.Entitee.Agissant.Humain.Humain import Humain
+from Jeu.Entitee.Agissant.PNJ.PNJs import PNJ_mage
+from Jeu.Entitee.Agissant.Role.Attaquant_magique_case import Attaquant_magique_case
+from Jeu.Entitee.Agissant.Role.Support import Support
 
 class Bombe_atomique(PNJ_mage,Attaquant_magique_case,Support,Humain): #La neuvi√®me humaine du jeu, √† l'√©tage 8 (une magicienne l√©g√®rement aguicheuse)
     """La classe de la bombe atomique."""
-    def __init__(self,controleur:Controleur,position:Optional[Position]=None):
+    def __init__(self,controleur:Controleur,position:Position):
 
         self.identite = 'bombe_atomique'
         self.place = 8
 
-        Humain.__init__(self,controleur,position,self.identite,1,9) #Ses magies sont litt√©ralement explosives !
+        Humain.__init__(self,controleur,self.identite,1,9,position) #Ses magies sont litt√©ralement explosives !
 
         self.comportement_corps_a_corps = 2 #0 pour attaquer, 1 pour ignorer, 2 pour fuir
         self.comportement_distance = 1 #0 pour foncer dans le tas, 1 pour tenter une attaque √† distance puis se rapprocher, 2 pour tenter une attaque √† distance puis fuir, 3 pour fuir puis tenter une attaque √† distance
@@ -40,14 +47,14 @@ class Bombe_atomique(PNJ_mage,Attaquant_magique_case,Support,Humain): #La neuvi√
         return (self.pv+degats) / self.pv_max <= taux_limite
 
     def peut_caster(self):
-        return self.peut_payer(cout_pm_volcan[trouve_skill(self.classe_principale,Skill_magie).niveau-1])
+        return self.peut_payer(cout_pm_volcan[self.get_skill_magique().niveau-1])
 
     def caste(self):
         return "magie volcan"
 
     def attaque(self,direction:Direction):
         #Quelle est sa magie de pr√©dilection ? Pour l'instant on va prendre l'avalanche
-        if self.peut_payer(cout_pm_poing_ardent[trouve_skill(self.classe_principale,Skill_magie).niveau-1]):
+        if self.peut_payer(cout_pm_poing_ardent[self.get_skill_magique().niveau-1]):
             self.utilise(Skill_magie)
             self.set_magie_courante("magie poing ardent")
         else:
@@ -55,13 +62,14 @@ class Bombe_atomique(PNJ_mage,Attaquant_magique_case,Support,Humain): #La neuvi√
         self.set_statut("attaque")
 
     def start_dialogue(self): #On commence un nouveau dialogue !
+
         #On initialise nos attributs
         self.replique_courante = 0
         #La plupart d√©pendent du dialogue
         if self.dialogue == -1: #Le joueur est venu nous voir de son propre chef
             self.replique = "dialogue-1phrase1"
             self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"]
-            if self.controleur.joueur.a_parchemin_vierge():
+            if self.controleur.joueur.inventaire.a_parchemin_vierge():
                 self.repliques.append("dialogue-1reponse1.3")
         elif self.dialogue == -2:
             self.replique = "dialogue-2phrase1"
@@ -74,11 +82,12 @@ class Bombe_atomique(PNJ_mage,Attaquant_magique_case,Support,Humain): #La neuvi√
             self.repliques = ["dialogue1reponse1.1","dialogue1reponse1.2"]
 
     def interprete(self,replique:str):
+        assert isinstance(self.controleur.joueur,Humain)
 
         #Premier dialogue
         #Le joueur arrive par la porte
         if replique == "dialogue1reponse1.1":
-            self.appreciations[0] += 0.5
+            self.appreciations[self.controleur.joueur.place] += 0.5
             self.replique="dialogue1phrase1.1"
             self.repliques = ["dialogue1reponse1.1.1","dialogue1reponse1.1.2"]
         elif replique == "dialogue1reponse1.1.1":
@@ -86,14 +95,14 @@ class Bombe_atomique(PNJ_mage,Attaquant_magique_case,Support,Humain): #La neuvi√
             self.repliques = ["dialogue1reponse1.1.1.1","dialogue1reponse1.1.1.2"]
         elif replique in ["dialogue1reponse1.1.1.1","dialogue1reponse1.1.2.1","dialogue1reponse1.1.3.1.1","dialogue1reponse1.1.4.1.1","dialogue1reponse1.1.4.2.2","dialogue1reponse1.2.1.1.1","dialogue1reponse1.2.2.2.2"]:
             self.end_dialogue()
-            self.controleur.get_esprit(self.controleur.joueur.esprit).merge(self.esprit)
+            self.controleur.joueur.esprit.merge(self.esprit)
             self.mouvement = 0 #L√©g√®rement redondant ici
-            self.cible_deplacement = self.controleur.joueur.ID
+            self.cible_deplacement = self.controleur.joueur
         elif replique == "dialogue1reponse1.1.1.2":
             self.end_dialogue(-2)
             self.statut_pnj = "exploration"
         elif replique == "dialogue1reponse1.1.2":
-            self.appreciations[0] += 0.5
+            self.appreciations[self.controleur.joueur.place] += 0.5
             self.replique="dialogue1phrase1.1.2"
             self.repliques = ["dialogue1reponse1.1.2.1","dialogue1reponse1.1.1.2"]
         elif replique == "dialogue1reponse1.2":
@@ -105,7 +114,7 @@ class Bombe_atomique(PNJ_mage,Attaquant_magique_case,Support,Humain): #La neuvi√
         elif replique == "dialogue1reponse1.2.1.1":
             self.replique="dialogue1phrase1.2.1.1"
             self.repliques = ["dialogue1reponse1.2.1.1.1"]
-            self.controleur.get_esprit(self.controleur.joueur.esprit).merge(self.esprit)
+            self.controleur.joueur.esprit.merge(self.esprit)
         elif replique == "dialogue1reponse1.2.1.2":
             self.end_dialogue(-2)
             self.statut_pnj = "exploration"
@@ -115,7 +124,7 @@ class Bombe_atomique(PNJ_mage,Attaquant_magique_case,Support,Humain): #La neuvi√
         elif replique == "dialogue1reponse1.2.2.1":
             self.replique="dialogue1phrase1.2.2.1"
             self.repliques = ["dialogue1reponse1.2.2.1.1"]
-            self.controleur.get_esprit(self.controleur.joueur.esprit).merge(self.esprit)
+            self.controleur.joueur.esprit.merge(self.esprit)
         elif replique == "dialogue1reponse1.2.2.2":
             self.replique="dialogue1phrase1.2.2.2"
             self.repliques = ["dialogue1reponse1.2.2.2.1","dialogue1reponse1.2.2.2.2"]
@@ -124,7 +133,7 @@ class Bombe_atomique(PNJ_mage,Attaquant_magique_case,Support,Humain): #La neuvi√
             self.repliques = ["dialogue1reponse1.2.2.2.1.1"]
         elif replique == "dialogue1reponse1.2.2.2.1.1":
             self.end_dialogue(-3)
-            self.offenses.append([2,0.01,0])
+            self.offenses.append((self.controleur.joueur,0.01,0))
             self.statut_pnj = "exploration"
 
         #Dialogue par d√©faut -2
@@ -132,7 +141,7 @@ class Bombe_atomique(PNJ_mage,Attaquant_magique_case,Support,Humain): #La neuvi√
             self.replique="dialogue-2phrase1.1"
             self.repliques = ["dialogue-2reponse1.1.1"]
         elif replique == "dialogue-2reponse1.1.1":
-            self.appreciations[0] -= 0.5
+            self.appreciations[self.controleur.joueur.place] -= 0.5
             self.end_dialogue()
         elif replique == "dialogue-2reponse1.2":
             self.end_dialogue(-2)
@@ -158,7 +167,7 @@ class Bombe_atomique(PNJ_mage,Attaquant_magique_case,Support,Humain): #La neuvi√
             if self.controleur.joueur.inventaire.a_parchemin_vierge():
                 self.repliques.append("dialogue-1reponse1.3")
             self.repliques.append("dialogue-1reponse1.4")
-            self.cible_deplacement = self.controleur.joueur.ID
+            self.cible_deplacement = self.controleur.joueur
         elif replique == "dialogue-1reponse1.1.1.2":
             self.controleur.set_phase(AGISSANT_DIALOGUE)
         elif replique == "dialogue-1reponse1.1.2":
@@ -194,7 +203,8 @@ class Bombe_atomique(PNJ_mage,Attaquant_magique_case,Support,Humain): #La neuvi√
 
         self.replique_courante = 0
 
-    def set_cible(self,cible:Union[int,Position]):
+    def set_cible(self,cible:int|Position):
+
         self.cible_deplacement = cible
         self.replique = "dialogue-1phrase1.1.1.2"
         self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"]
@@ -206,14 +216,14 @@ class Bombe_atomique(PNJ_mage,Attaquant_magique_case,Support,Humain): #La neuvi√
         return REPLIQUES_BOMBE_ATOMIQUE[code]
 
     def impregne(self,nom:str):
-        skill = trouve_skill(self.classe_principale,Skill_magie)
+        skill = self.get_skill_magique()
         latence,magie = skill.utilise(nom)
         self.latence += latence
         cout = magie.cout_pm
         if self.peut_payer(cout):
             self.controleur.joueur.inventaire.consomme_parchemin_vierge()
             self.paye(cout)
-            parch = Parchemin_impregne(None,magie,cout//2)
+            parch = Parchemin_impregne(self.controleur,magie,cout//2,ABSENT)
             self.controleur.ajoute_entitee(parch)
             self.controleur.joueur.inventaire.ajoute(parch)
             self.replique = "dialogue-1phrase1.3.1"
@@ -229,4 +239,14 @@ class Bombe_atomique(PNJ_mage,Attaquant_magique_case,Support,Humain): #La neuvi√
         return SKIN_TETE_BOMBE_ATOMIQUE
 
     def get_texte_descriptif(self):
-        return [f"Une humaine (niveau {self.niveau})",f"ID : {self.ID}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Une aventuri√®re magicienne. Sp√©cialis√©e dans les sorts de feu."]
+        return [f"Une humaine (niveau {self.niveau})",f"ID : {self}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Une aventuri√®re magicienne. Sp√©cialis√©e dans les sorts de feu."]
+
+# Imports utilis√©s dans le code:
+from Jeu.Constantes import *
+from Jeu.Systeme.Classe import Skill_magie, Skill_stomp
+from Jeu.Systeme.Constantes_skills.Skills import *
+from Jeu.Systeme.Constantes_magies.Magies import *
+from Affichage.Skins.Skins import SKIN_TETE_BOMBE_ATOMIQUE
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+from Jeu.Entitee.Item.Parchemin.Parchemins import Parchemin_impregne
+from Jeu.Dialogues.Dialogues_bombe_atomique import REPLIQUES_BOMBE_ATOMIQUE

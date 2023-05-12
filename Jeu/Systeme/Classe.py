@@ -639,7 +639,7 @@ class Ange(Classe):
         boost = Skill_boost_ange()
         soin = Skill_soin()
         regen_MP = Skill_regeneration_MP()
-        aura = Skill_aura_divine()
+        aura = Skill_aura_divine(None) #/*\ À adapter /*\
 
         skills_intrasecs = [boost,soin,regen_MP,aura]
 

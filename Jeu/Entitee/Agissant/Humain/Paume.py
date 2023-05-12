@@ -1,19 +1,25 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
+# Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
 
-from Jeu.Entitee.Agissant.Humain.Humain import *
+# Imports des classes parentes
+from Jeu.Entitee.Agissant.Humain.Humain import Humain
+from Jeu.Entitee.Agissant.Role.Tank import Tank
+from Jeu.Entitee.Agissant.Role.Sentinelle import Sentinelle
 
 class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2 (complêtement paumé, rejoint le joueur sauf rares exceptions)
     """La classe du mec paumé."""
-    def __init__(self,controleur:Controleur,position:Optional[Position]=None):
+    def __init__(self,controleur:Controleur,position:Position):
 
         self.identite = 'paume'
         self.place = 2
 
-        Humain.__init__(self,controleur,position,self.identite,1,4) #Plutôt faible, de base
+        Humain.__init__(self,controleur,self.identite,1,4,position) #Plutôt faible, de base
 
         self.appreciations = [1,1,3,2,0,0,0,7,4,-1]
         self.dialogue = 1
@@ -64,6 +70,7 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
             self.repliques = ["dialogue5reponse1.1","dialogue5reponse1.2","dialogue5reponse1.3"]
 
     def interprete(self,replique:str):
+        assert isinstance(self.controleur.joueur, Humain)
 
         #Premier dialogue
         #Le joueur arrive par l'escalier
@@ -82,21 +89,21 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
         elif replique == "dialogue1reponse1.1.1.1.1":
             self.replique="dialogue1phrase1.1.1.1.1"
             self.repliques = ["dialogue1reponse1.1.1.1.1.1"]
-            self.appreciations[0]+= 0.5
-            self.controleur.get_esprit(self.controleur.joueur.esprit).merge(self.esprit)
+            self.appreciations[self.controleur.joueur.place]+= 0.5
+            self.controleur.joueur.esprit.merge(self.esprit)
         elif replique == "dialogue1reponse1.1.1.1.1.1":
             self.replique="dialogue1phrase1.1.1.1.1.1"
             self.repliques=["dialogue1reponse1.1.1.1.1.1.1"]
         elif replique == "dialogue1reponse1.1.1.1.1.1.1":
             self.end_dialogue()
             self.mouvement = 0 #Légèrement redondant ici
-            self.cible_deplacement = self.controleur.joueur.ID
+            self.cible_deplacement = self.controleur.joueur
         elif replique == "dialogue1reponse1.1.1.1.2":
-            self.appreciations[0]-= 0.5
+            self.appreciations[self.controleur.joueur.place]-= 0.5
             self.end_dialogue(-2)
             self.statut_pnj = "exploration"
         elif replique == "dialogue1reponse1.2":
-            self.appreciations[0]-= 0.5
+            self.appreciations[self.controleur.joueur.place]-= 0.5
             self.end_dialogue(-2)
             self.statut_pnj = "exploration"
 
@@ -113,20 +120,20 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
         elif replique == "dialogue-2reponse1.3":
             self.replique="dialogue-2phrase1.3"
             self.repliques = ["dialogue-2reponse1.3.1"]
-            self.appreciations[0]+= 0.5
+            self.appreciations[self.controleur.joueur.place]+= 0.5
         elif replique == "dialogue-2reponse1.3.1":
             self.replique="dialogue-2phrase1.3.1"
             self.repliques = ["dialogue-2reponse1.3.1.1","dialogue-2reponse1.3.1.2"]
-            self.controleur.get_esprit(self.controleur.joueur.esprit).merge(self.esprit)
+            self.controleur.joueur.esprit.merge(self.esprit)
         elif replique == "dialogue-2reponse1.3.1.1":
-            self.appreciations[0]-= 0.5
+            self.appreciations[self.controleur.joueur.place]-= 0.5
             self.end_dialogue()
             self.mouvement = 0 #Légèrement redondant ici
-            self.cible_deplacement = self.controleur.joueur.ID
+            self.cible_deplacement = self.controleur.joueur
         elif replique == "dialogue-2reponse1.3.1.2":
             self.end_dialogue()
             self.mouvement = 0 #Légèrement redondant ici
-            self.cible_deplacement = self.controleur.joueur.ID
+            self.cible_deplacement = self.controleur.joueur
 
         #Deuxième dialogue
         #On vient de tuer le premier gobelin
@@ -143,7 +150,7 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
             self.repliques = ["dialogue2reponse1.3.1.1","dialogue2reponse1.3.1.2"]
         elif replique == "dialogue2reponse1.3.2":
             self.replique = "dialogue2phrase1.3.2" #/!\ Modifier pour mentionner l'attaque avec une arme quand les skins auront été créés
-            if self.controleur.entitees[5].esprit == "heros":
+            if self.controleur.agissants[5].esprit == "heros":
                 self.replique = "dialogue2phrase1.3.2/peureuse"
             self.repliques = ["dialogue2reponse1.3.1.1","dialogue2reponse1.3.1.2"]
         elif replique == "dialogue2reponse1.3.3":
@@ -177,7 +184,7 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
             self.replique="dialogue4phrase1.2"
             self.repliques = ["dialogue4reponse1.1.1"]
         elif replique == "dialogue4reponse1.3":
-            self.appreciations[0]-= 0.5
+            self.appreciations[self.controleur.joueur.place]-= 0.5
             self.end_dialogue()
 
         #Cinquième dialogue
@@ -190,7 +197,7 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
             self.repliques = ["dialogue5reponse1.2.1"]
         elif replique == "dialogue5reponse1.3":
             self.end_dialogue()
-            self.appreciations[0] -= 0.2
+            self.appreciations[self.controleur.joueur.place] -= 0.2
         elif replique == "dialogue5reponse1.1.1":
             self.replique="dialogue5phrase1.1.1"
             self.repliques = ["dialogue5reponse1.1.1.1","dialogue5reponse1.1.1.2"]
@@ -198,7 +205,7 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
             self.replique="dialogue5phrase1.1.2"
             self.repliques = ["dialogue5reponse1.1.2.1"]
         elif replique == "dialogue5reponse1.1.3":
-            self.appreciations[0] -= 0.1
+            self.appreciations[self.controleur.joueur.place] -= 0.1
             self.replique="dialogue5phrase1.1.3"
             self.repliques = ["dialogue5reponse1.1.3.1","dialogue5reponse1.1.3.2"]
         elif replique == "dialogue5reponse1.2.1":
@@ -213,12 +220,12 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
             self.replique="dialogue5phrase1.1.1"
             self.repliques = ["dialogue5reponse1.1.1.1","dialogue5reponse1.1.1.2"]
         elif replique == "dialogue5reponse1.1.3.1":
-            self.appreciations[0] -= 0.1
+            self.appreciations[self.controleur.joueur.place] -= 0.1
             self.replique="dialogue5phrase1.1.3.1"
             self.repliques = ["dialogue5reponse1.1.1.1.1","dialogue5reponse1.1.1.1.2"]
         elif replique == "dialogue5reponse1.1.3.2":
             self.end_dialogue()
-            self.appreciations[0] -= 0.2
+            self.appreciations[self.controleur.joueur.place] -= 0.2
         elif replique == "dialogue5reponse1.1.1.1.1":
             self.replique="dialogue5phrase1.1.1.1.1"
             self.repliques = ["dialogue5reponse1.1.1.1.1.1","dialogue5reponse1.1.1.1.1.2"]#Euh, non/oui, l'épéiste
@@ -310,7 +317,7 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
         elif replique == "dialogue-1reponse1.1.1.1":
             self.replique = "dialogue-1phrase1.1.1.1"
             self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.3"]
-            self.cible_deplacement = self.controleur.joueur.ID
+            self.cible_deplacement = self.controleur.joueur
         elif replique == "dialogue-1reponse1.1.1.2":
             self.controleur.set_phase(AGISSANT_DIALOGUE)
         elif replique == "dialogue-1reponse1.1.2":
@@ -336,10 +343,7 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
         return REPLIQUES_PAUME[code]
 
     def get_skin(self):
-        if self.etat == "vivant":
-            return SKIN_CORPS_PAUME
-        else:
-            return SKIN_CADAVRE
+        return SKIN_CORPS_PAUME
 
     def get_skin_tete(self):
         return SKIN_TETE_PAUME
@@ -348,4 +352,9 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
         if self.statut is None:
             self.set_statut("")
             print("Hey, mon statut vaut None, pourquoi !?")
-        return [f"Un humain (niveau {self.niveau})",f"ID : {self.ID}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Un humain terrorisé par les labyrinthes. Il espère pouvoir sortir un jour de cet enfer."]
+        return [f"Un humain (niveau {self.niveau})",f"ID : {self}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Un humain terrorisé par les labyrinthes. Il espère pouvoir sortir un jour de cet enfer."]
+
+# Imports utilisés dans le code:
+from Jeu.Constantes import *
+from Affichage.Skins.Skins import SKIN_TETE_PAUME, SKIN_CORPS_PAUME
+from Jeu.Dialogues.Dialogues_paume import REPLIQUES_PAUME

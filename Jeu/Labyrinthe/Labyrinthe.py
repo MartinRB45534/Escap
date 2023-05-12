@@ -11,7 +11,7 @@ from Jeu.Labyrinthe.Pattern import *
 from Jeu.Labyrinthe.Vue import *
 
 class Labyrinthe(Vue):
-    def __init__(self,ID:str,decalage:Decalage,depart:Position,patterns:List[Pattern]=[],durete = 1,niveau = 1,element = TERRE,proba=0.1,poids:List[int]=[1]*NB_DIRECTIONS):
+    def __init__(self,controleur:Controleur,ID:str,decalage:Decalage,depart:Position,patterns:List[Pattern]=[],durete = 1,niveau = 1,element = TERRE,proba=0.1,poids:List[int]=[1]*NB_DIRECTIONS):
         #print("Initialisation du labyrinthe")
         self.id = ID #Correspond à la clé du labyrinthe. Créer un init différend pour chaque lab ?
         self.decalage = decalage
@@ -21,7 +21,7 @@ class Labyrinthe(Vue):
 
         self.depart = depart
 
-        self.matrice_cases = [[Case(Position(self.id,j,i),niveau,element) for i in range(decalage.y)]for j in range(decalage.x)]
+        self.matrice_cases = [[Case(controleur,Position(self.id,j,i),niveau,element) for i in range(decalage.y)]for j in range(decalage.x)]
         self.bord = Bord_lab(self.decalage,[pattern.bord for pattern in patterns])
 
         for cote in Bord(self.decalage):
@@ -31,7 +31,7 @@ class Labyrinthe(Vue):
         self.cases_visitees = None
 
         self.temps_restant = -1 #Devient positif quand le labyrinthe est actif sans entitée supérieure
-        self.controleur = None #Tant qu'il n'est pas actif, il n'a pas de controleur à qui se référer
+        self.controleur = controleur
 
         self.generation(proba,poids)
 
@@ -42,7 +42,7 @@ class Labyrinthe(Vue):
             return item.lab == self.id and 0<=item.x<self.decalage.x and 0<=item.y<self.decalage.y
         elif isinstance(item,Decalage):
             return 0<=item.x<self.decalage.x and 0<=item.y<self.decalage.y
-        elif isinstance(item,Cote):
+        elif isinstance(item,Cote_position|Cote_decalage):
             return item.emplacement in self
         return NotImplemented
 
@@ -59,7 +59,7 @@ class Labyrinthe(Vue):
     def case_from_position(self,position:Position|Decalage) -> Case:
         return self.matrice_cases[position.x][position.y]
 
-    def mur_from_cote(self,cote:Cote) -> Mur:
+    def mur_from_cote(self,cote:Cote_position|Cote_decalage) -> Mur:
         return self.matrice_cases[cote.emplacement.x][cote.emplacement.y][cote.direction]
 
     def generation(self,proba:float,poids:List[int]):
@@ -147,13 +147,13 @@ class Labyrinthe(Vue):
 
         #print("Fini")
 
-    def murs_utilisables(self,position:Position,nb_murs=NB_DIRECTIONS) -> List[Cote]:
+    def murs_utilisables(self,position:Position,nb_murs=NB_DIRECTIONS) -> List[Cote_position]:
         """
         Fonction qui prend en entrées:
             les voisins de la case
         et qui renvoie les directions ou les murs sont cassables
         """
-        murs_utilisables:List[Cote]=[]
+        murs_utilisables:List[Cote_position]=[]
 
         for cote in Bord_dec(position):
             opp = cote.oppose()
@@ -182,10 +182,10 @@ class Labyrinthe(Vue):
             raise Exception("Pas de retour ?")
         return Representation_vue(self.id,matrice,self.decalage)
             
-    def getMatrice_cases(self):
-        #on obtient une copie indépendante du labyrinthe
-        new_mat = [[self.matrice_cases[j][i].get_copie() for i in range(self.decalage.y)]for j in range(self.decalage.x)]
-        return new_mat
+    # def getMatrice_cases(self):
+    #     #on obtient une copie indépendante du labyrinthe
+    #     new_mat = [[self.matrice_cases[j][i].get_copie() for i in range(self.decalage.y)]for j in range(self.decalage.x)]
+    #     return new_mat
 
     def get_case(self,position:Position):
         return self.case_from_position(position)
@@ -215,24 +215,13 @@ class Labyrinthe(Vue):
         if self.temps_restant >= 0:
             if self.temps_restant == 0:
                 self.controleur.desactive_lab(self.id)
-                self.controleur = None
-                for i in range(self.decalage.x):
-                    for j in range(self.decalage.y):
-                        self.matrice_cases[i][j].desactive()
             self.temps_restant -= 1
     #Et c'est la fin du tour !
 
     def quitte(self):
         self.temps_restant = 5
 
-    def active(self,controleur:Controleur):
-        self.controleur = controleur
-        self.temps_restant = -1 #Au cas où
-        for i in range(self.decalage.x):
-            for j in range(self.decalage.y):
-                self.matrice_cases[i][j].active(controleur)
-
-    def attaque(self,position:Position,portee:int,propagation:str,direction:Optional[Direction],obstacles:Set[Position]):
+    def attaque(self,position:Position,portee:float,propagation:str,direction:Optional[Direction],obstacles:Set[Position]):
         self.resoud(position,portee,"attaque",propagation,direction,obstacles)
 
     def resoud(self,position:Position,portee:float,action="vue",propagation="C__S_Pb",direction:Optional[Direction]=None,dead_ends:Set=set(),reset=True,clees:Set[str]=set()) -> Optional[List[List[Representation_case]]]:

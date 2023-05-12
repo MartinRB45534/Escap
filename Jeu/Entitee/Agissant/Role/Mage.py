@@ -17,20 +17,22 @@ class Mage(Agissant):
         return self.get_skill_magique().menu_magie()
 
     def get_skill_magique(self) -> Skills_magiques:
-        return trouve_skill(self.classe_principale,Skills_magiques)
+        skill = trouve_skill(self.classe_principale,Skills_magiques)
+        assert skill is not None
+        return skill
 
     def auto_impregne(self,nom:str):
-        skill:Skill_magie = trouve_skill(self.classe_principale,Skill_magie)
+        skill = self.get_skill_magique()
         latence,magie = skill.utilise(nom)
         self.latence += latence
         cout = magie.cout_pm
         if self.peut_payer(cout):
-            self.controleur.joueur.inventaire.consomme_parchemin_vierge()
+            self.inventaire.consomme_parchemin_vierge()
             self.controleur.unset_phase(AUTO_IMPREGNATION)
             self.paye(cout)
-            parch = Parchemin_impregne(None,magie,cout//2)
+            parch = Parchemin_impregne(self.controleur,magie,cout//2)
             self.controleur.ajoute_entitee(parch)
-            self.controleur.joueur.inventaire.ajoute(parch)
+            self.inventaire.ajoute(parch)
 
 class Multi_mage(Mage):
     """Les agissants qui lancent des sorts.

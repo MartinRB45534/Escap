@@ -1,8 +1,7 @@
 from Jeu.Entitee.Item.Equippement.Role.Defensif.Defensif import *
 
 class Defensif_proportion(Defensif):
-    def __init__(self,position:Optional[Position]=None,taux_degats:float):
-        Equipement.__init__(self,position)
+    def __init__(self,taux_degats:float,position:Position=ABSENT):
         self.taux_degats = taux_degats
 
     def intercepte(self,attaque):
@@ -12,8 +11,7 @@ class Defensif_proportion(Defensif):
         attaque.degats *= (1-degats_bloques)
 
 class Defensif_seuil(Defensif):
-    def __init__(self,position:Optional[Position]=None,degats):
-        Equipement.__init__(self,position)
+    def __init__(self,degats:float):
         self.degats = degats
 
     def intercepte(self,attaque):
@@ -24,8 +22,7 @@ class Defensif_seuil(Defensif):
             attaque.degats = 0
 
 class Defensif_plafond(Defensif):
-    def __init__(self,position:Optional[Position]=None,degats):
-        Equipement.__init__(self,position)
+    def __init__(self,degats:float):
         self.degats = degats
 
     def intercepte(self,attaque):
@@ -36,8 +33,7 @@ class Defensif_plafond(Defensif):
             attaque.degats = degats
 
 class Defensif_valeur(Defensif):
-    def __init__(self,position:Optional[Position]=None,degats):
-        Equipement.__init__(self,position)
+    def __init__(self,degats:float):
         self.degats = degats
 
     def intercepte(self,attaque):

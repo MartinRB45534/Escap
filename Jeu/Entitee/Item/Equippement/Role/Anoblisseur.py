@@ -2,8 +2,7 @@ from Jeu.Entitee.Item.Equippement.Equippement import *
 
 class Anoblisseur(Equipement):
     """La classe des équipements qui augmentent la priorité."""
-    def __init__(self,position:Optional[Position]=None,taux_priorite:float):
-        Equipement.__init__(self,position)
+    def __init__(self,taux_priorite:float):
         self.taux_priorite = taux_priorite
 
     def augmente_priorite(self,priorite:float):

@@ -22,7 +22,7 @@ class Cree_fleche_de_base_skill(Cree_item):
             item = None
         else:
             niveau = skill.utilise(0.01) #L'xp gagné. En faire une variable /!\
-            item = self.item(niveau,None)
+            item = self.item(agissant.controleur,niveau)
             agissant.controleur.ajoute_entitee(item)
         return item
 
@@ -42,7 +42,7 @@ class Cree_fleche_percante_skill(Cree_item):
             item = None
         else:
             niveau = skill.utilise(0.01) #L'xp gagné. En faire une variable /!\
-            item = self.item(niveau,None)
+            item = self.item(agissant.controleur,niveau)
             agissant.controleur.ajoute_entitee(item)
         return item
 
@@ -62,7 +62,7 @@ class Cree_fleche_fantome_skill(Cree_item):
             item = None
         else:
             niveau = skill.utilise(0.01) #L'xp gagné. En faire une variable /!\
-            item = self.item(niveau,None)
+            item = self.item(agissant.controleur,niveau)
             agissant.controleur.ajoute_entitee(item)
         return item
 
@@ -82,7 +82,7 @@ class Cree_fleche_lourde_skill(Cree_item):
             item = None
         else:
             niveau = skill.utilise(0.01) #L'xp gagné. En faire une variable /!\
-            item = self.item(niveau,None)
+            item = self.item(agissant.controleur,niveau)
             agissant.controleur.ajoute_entitee(item)
         return item
 
@@ -102,7 +102,7 @@ class Cree_fleche_legere_skill(Cree_item):
             item = None
         else:
             niveau = skill.utilise(0.01) #L'xp gagné. En faire une variable /!\
-            item = self.item(niveau,None)
+            item = self.item(agissant.controleur,niveau)
             agissant.controleur.ajoute_entitee(item)
         return item
 
@@ -122,19 +122,19 @@ class Cree_fleche_explosive_skill(Cree_item):
             if skill_explosif is not None:
                 if skill_fleche.niveau > skill_explosif.niveau :
                     niveau = skill_fleche.utilise(0.01) #L'xp gagné. En faire une variable /!\
-                    item = self.item(niveau,None)
+                    item = self.item(agissant.controleur,niveau)
                     agissant.controleur.ajoute_entitee(item)
                 else:
                     niveau = skill_explosif.utilise(0.01) #L'xp gagné. En faire une variable /!\
-                    item = self.item(niveau,None)
+                    item = self.item(agissant.controleur,niveau)
                     agissant.controleur.ajoute_entitee(item)
             else:
                 niveau = skill_fleche.utilise(0.01) #L'xp gagné. En faire une variable /!\
-                item = self.item(niveau,None)
+                item = self.item(agissant.controleur,niveau)
                 agissant.controleur.ajoute_entitee(item)
         elif skill_explosif is not None:
             niveau = skill_explosif.utilise(0.01) #L'xp gagné. En faire une variable /!\
-            item = self.item(niveau,None)
+            item = self.item(agissant.controleur,niveau)
             agissant.controleur.ajoute_entitee(item)
         else:
             print("Euh... Quoi ? Qu'est-ce qui m'est arrivé ?")
@@ -157,7 +157,7 @@ class Cree_charge_de_base_skill(Cree_item):
             item = None
         else:
             niveau = skill.utilise(0.01) #L'xp gagné. En faire une variable /!\
-            item = self.item(niveau,None)
+            item = self.item(agissant.controleur,niveau)
             agissant.controleur.ajoute_entitee(item)
         return item
 
@@ -177,7 +177,7 @@ class Cree_charge_lourde_skill(Cree_item):
             item = None
         else:
             niveau = skill.utilise(0.01) #L'xp gagné. En faire une variable /!\
-            item = self.item(niveau,None)
+            item = self.item(agissant.controleur,niveau)
             agissant.controleur.ajoute_entitee(item)
         return item
 
@@ -197,7 +197,7 @@ class Cree_charge_etendue_skill(Cree_item):
             item = None
         else:
             niveau = skill.utilise(0.01) #L'xp gagné. En faire une variable /!\
-            item = self.item(niveau,None)
+            item = self.item(agissant.controleur,niveau)
             agissant.controleur.ajoute_entitee(item)
         return item
 

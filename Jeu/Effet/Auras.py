@@ -1,6 +1,13 @@
-from Jeu.Effet.Effet import *
-from Jeu.Constantes import *
-from Jeu.Systeme.Constantes_magies.Magies import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Entitee.Agissant.Agissant import Agissant
+    from Jeu.Labyrinthe.Case import Case
+
+# Imports des classes parentes
+from Jeu.Effet.Effet import Aura, One_shot, On_debut_tour, Evenement
 
 # On va distinguer 3 types d'aura :
 #   - Les auras naturellement attachées à une case. Ce sont des auras élémentaires. Elles peuvent être temporairement réprimée par une autre aura élémentale.
@@ -10,31 +17,32 @@ from Jeu.Systeme.Constantes_magies.Magies import *
 
 class Aura_elementale(Aura):
     """La classe des effets d'auras élémentales. Attaché à la case."""
-
-    def action(self,porteur):
-        cases = porteur.controleur.get_cases_touches(porteur.position,self.portee)
-        priorite = porteur.priorite + self.priorite
-        for case in cases:
-            case.ajoute_aura(self.effet(self.niveau,porteur.ID,priorite))
+    def __init__(self,priorite:float):
+        self.phase = "démarrage"
+        self.responsable = 0
+        self.priorite = priorite
+        self.affiche = False
 
 class Aura_permanente(Aura_elementale):
     """La classe des effets d'aura élémentales permanentes, celles qui représentent l'élément par défaut de la case."""
 
-    def execute(self,case):
+    def execute(self,case:Case):
         if self.phase == "démarrage":
             self.phase = "en cours"
 
-class Terre(One_shot,Aura_elementale):
-    """L'effet qui applique l'aura de terre à une case. Laissé ici par un agissant."""
-
-    def __init__(self,responsable,priorite):
+class Aura_temporaire(Aura_elementale):
+    """La classe des effets d'aura élémentales temporaires, celles qui sont appliquées par un agissant."""
+    def __init__(self,responsable:Agissant,priorite:float):
         self.phase = "démarrage"
         self.responsable = responsable
         self.priorite = priorite
         self.distance = 0
         self.affiche = False
 
-    def execute(self,case):
+class Terre(One_shot,Aura_temporaire):
+    """L'effet qui applique l'aura de terre à une case. Laissé ici par un agissant."""
+
+    def execute(self,case:Case):
         if self.phase == "démarrage":
             self.termine() #Pour l'instant elle ne fait rien. Rien qu'empêcher les autres auras de s'exprimer. Je suppose que ça peut servir quand on visite des étages non-terrestres.
         case.code += 1 #0 ou 1, selon que la case a une aura de Terre ou non
@@ -42,37 +50,26 @@ class Terre(One_shot,Aura_elementale):
 class Terre_permanente(Aura_permanente):
     """L'effet qui applique l'aura de terre à une case. Il a toujours été là, et il n'en bougera pas."""
 
-    def __init__(self,priorite):
-        self.phase = "démarrage"
-        self.responsable = 0
-        self.priorite = priorite
-        self.affiche = False
-
-    def execute(self,case):
+    def execute(self,case:Case):
         case.code += 1 #0 ou 1, selon que la case a une aura de Terre ou non
 
-class Feu(Evenement,Aura_elementale):
+class Feu(Evenement,Aura_temporaire):
     """L'effet qui applique l'aura de feu à une case. Laissé ici par un agissant."""
 
-    def __init__(self,responsable,priorite,duree):
-        self.phase = "démarrage"
+    def __init__(self,responsable:Agissant,priorite:float,duree:float):
+        Aura_temporaire.__init__(self,responsable,priorite)
         self.temps_restant = duree
-        self.responsable = responsable
-        self.priorite = priorite
-        self.distance = 0
-        self.affiche = False
 
-    def action(self,case):
+    def action(self,case:Case):
         contr = case.controleur
         occupants = contr.trouve_agissants_courants(case.position)
-        lanceur = contr[self.responsable]
         for occupant in occupants :
-            agissant = contr[occupant]
-            if agissant.esprit != lanceur.esprit :
-                agissant.subit(self.temps_restant,"proximité",FEU,self.responsable)
+            assert isinstance(occupant,Agissant)
+            if occupant.esprit != self.responsable.esprit :
+                occupant.subit(self.responsable,self.temps_restant,"proximité",FEU)
         case.code += 2 #0 ou 2, selon que la case a une aura de Feu ou non
 
-    def execute(self,case):
+    def execute(self,case:Case):
         self.temps_restant -= 1
         self.priorite -= 0.3 #La priorite diminue progressivement, donc une aura de feu descend rarement jusqu'à 0 dégats.
         if self.phase == "démarrage" :
@@ -85,25 +82,22 @@ class Feu(Evenement,Aura_elementale):
 class Feu_permanent(Aura_permanente):
     """L'effet qui applique l'aura de feu à une case. Il a toujours été là, et il n'en bougera pas."""
 
-    def __init__(self,priorite,degats):
-        self.phase = "démarrage"
-        self.responsable = 0
-        self.priorite = priorite
+    def __init__(self,priorite:float,degats:float):
+        Aura_permanente.__init__(self,priorite)
         self.degats = degats
-        self.affiche = False
 
-    def action(self,case):
+    def action(self,case:Case):
         contr = case.controleur
         occupants = contr.trouve_agissants_courants(case.position)
         for occupant in occupants :
-            agissant = contr[occupant]
-            agissant.subit(self.degats,"distance",FEU)
+            assert isinstance(occupant,Agissant)
+            occupant.subit(NoOne(),self.degats,"distance",FEU)
         case.code += 2 #0 ou 2, selon que la case a une aura de Feu ou non
 
-class Glace(One_shot,Aura_elementale):
+class Glace(One_shot,Aura_temporaire):
     """L'effet qui applique l'aura de glace à une case. Laissé ici par un agissant."""
 
-    def __init__(self,responsable,priorite,gain_latence):
+    def __init__(self,responsable:Agissant,priorite:float,gain_latence:float):
         self.phase = "démarrage"
         self.responsable = responsable
         self.priorite = priorite
@@ -111,17 +105,16 @@ class Glace(One_shot,Aura_elementale):
         self.distance = 0
         self.affiche = False
 
-    def action(self,case):
+    def action(self,case:Case):
         contr = case.controleur
         occupants = contr.trouve_mobiles_courants(case.position)
-        lanceur = contr[self.responsable]
         for occupant in occupants :
-            agissant = contr[occupant]
-            if agissant.esprit != lanceur.esprit and GLACE not in agissant.immunites :
-                agissant.latence += self.gain_latence
+            assert isinstance(occupant,Agissant)
+            if occupant.esprit != self.responsable.esprit and GLACE not in occupant.immunites :
+                occupant.latence += self.gain_latence
         case.code += 4 #0 ou 4, selon que la case a une aura de Glace ou non
 
-    def execute(self,case):
+    def execute(self,case:Case):
         if self.phase == "démarrage":
             self.action(case)
             self.termine()
@@ -129,26 +122,26 @@ class Glace(One_shot,Aura_elementale):
 class Glace_permanente(Aura_permanente):
     """L'effet qui applique l'aura de glace à une case. Il a toujours été là, et il n'en bougera pas."""
 
-    def __init__(self,priorite,gain_latence):
+    def __init__(self,priorite:float,gain_latence:float):
         self.phase = "démarrage"
         self.responsable = 0
         self.priorite = priorite
         self.gain_latence = gain_latence
         self.affiche = False
 
-    def action(self,case):
+    def action(self,case:Case):
         contr = case.controleur
         occupants = contr.trouve_mobiles_courants(case.position)
         for occupant in occupants :
-            agissant = contr[occupant]
-            if GLACE not in agissant.immunites :
-                agissant.latence += self.gain_latence
+            assert isinstance(occupant,Agissant)
+            if GLACE not in occupant.immunites :
+                occupant.latence += self.gain_latence
         case.code += 4 #0 ou 4, selon que la case a une aura de Glace ou non
 
-class Ombre(One_shot,Aura_elementale):
+class Ombre(One_shot,Aura_temporaire):
     """L'effet qui applique l'aura d'ombre à une case. Laissé ici par un agissant."""
 
-    def __init__(self,responsable,priorite,gain_opacite):
+    def __init__(self,responsable:Agissant,priorite:float,gain_opacite:float):
         self.phase = "démarrage"
         self.responsable = responsable
         self.priorite = priorite
@@ -156,11 +149,11 @@ class Ombre(One_shot,Aura_elementale):
         self.distance = 0
         self.affiche = False
 
-    def action(self,case):
+    def action(self,case:Case):
         case.opacite_bonus = self.gain_opacite
         case.code += 8 #0 ou 8, selon que la case a une aura d'Ombre ou non. Comme l'ombre et le reste sont incompatibles, les codes 9 à 15 sont libres. Le code maximum pour la partie élémentaire est 8
 
-    def execute(self,case):
+    def execute(self,case:Case):
         if self.phase == "démarrage":
             self.action(case)
             self.termine()
@@ -168,14 +161,14 @@ class Ombre(One_shot,Aura_elementale):
 class Ombre_permanente(Aura_permanente):
     """L'effet qui applique l'aura d'ombre à une case. Il a toujours été là, et il n'en bougera pas."""
 
-    def __init__(self,priorite,gain_opacite):
+    def __init__(self,priorite:float,gain_opacite:float):
         self.phase = "démarrage"
         self.responsable = 0
         self.priorite = priorite
         self.gain_opacite = gain_opacite
         self.affiche = False
 
-    def action(self,case):
+    def action(self,case:Case):
         case.opacite_bonus = self.gain_opacite
         case.code += 8 #0 ou 8, selon que la case a une aura d'Ombre ou non. Comme l'ombre et le reste sont incompatibles, les codes 9 à 15 sont libres. Le code maximum pour la partie élémentaire est 8
 
@@ -192,11 +185,11 @@ class Aura_terre(One_shot,On_debut_tour):
         self.effet = Terre
         self.affiche = False
 
-    def action(self,porteur):
+    def action(self,porteur:Agissant):
         cases = porteur.controleur.get_cases_touches(porteur.position,self.portee)
         priorite = porteur.priorite + self.priorite
         for case in cases:
-            case.ajoute_aura(self.effet(porteur.ID,priorite))
+            case.ajoute_aura(self.effet(porteur,priorite))
 
 class Aura_feu(One_shot,On_debut_tour):
     """Le centre de l'aura de feu d'un agissant. Attaché à l'agissant, placera les effets voulus sur les cases voisines."""
@@ -210,11 +203,11 @@ class Aura_feu(One_shot,On_debut_tour):
         self.effet = Feu
         self.affiche = False
 
-    def action(self,porteur):
+    def action(self,porteur:Agissant):
         cases = porteur.controleur.get_cases_touches(porteur.position,self.portee)
         priorite = porteur.priorite + self.priorite
         for case in cases:
-            case.ajoute_aura(self.effet(porteur.ID,priorite,self.duree))
+            case.ajoute_aura(self.effet(porteur,priorite,self.duree))
 
 class Aura_glace(One_shot,On_debut_tour):
     """Le centre de l'aura de glace d'un agissant. Attaché à l'agissant, placera les effets voulus sur les cases voisines."""
@@ -228,11 +221,11 @@ class Aura_glace(One_shot,On_debut_tour):
         self.effet = Glace
         self.affiche = False
 
-    def action(self,porteur):
+    def action(self,porteur:Agissant):
         cases = porteur.controleur.get_cases_touches(porteur.position,self.portee)
         priorite = porteur.priorite + self.priorite
         for case in cases:
-            case.ajoute_aura(self.effet(porteur.ID,priorite,self.gain_latence))
+            case.ajoute_aura(self.effet(porteur,priorite,self.gain_latence))
 
 class Aura_ombre(One_shot,On_debut_tour):
     """Le centre de l'aura d'ombre d'un agissant. Attaché à l'agissant, placera les effets voulus sur les cases voisines."""
@@ -246,8 +239,13 @@ class Aura_ombre(One_shot,On_debut_tour):
         self.effet = Ombre
         self.affiche = False
 
-    def action(self,porteur):
+    def action(self,porteur:Agissant):
         cases = porteur.controleur.get_cases_touches(porteur.position,self.portee)
         priorite = porteur.priorite + self.priorite
         for case in cases:
-            case.ajoute_aura(self.effet(porteur.ID,priorite,self.gain_opacite))
+            case.ajoute_aura(self.effet(porteur,priorite,self.gain_opacite))
+
+# Imports utilisés dans le code
+from Jeu.Systeme.Constantes_skills.Skills import *
+from Jeu.Constantes import *
+from Jeu.Entitee.Agissant.Agissant import NoOne

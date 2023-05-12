@@ -1,4 +1,5 @@
 import time
+from typing import Dict
 
 import numpy as np
 
@@ -535,8 +536,10 @@ CONSTANTES_STATS = {
         }
 
 # La majuscule le place plus haut dans la liste des variables globales (pour débugger)
-Constantes_temps = {'tours':0,
-                    'courant':0}
+Constantes_temps:Dict[str,float] = {
+    'tours':0,
+    'courant':0,
+}
 
 constantes_deplacements = []
 

@@ -11,7 +11,7 @@ class Bouton:
         self.couleurs = couleurs
         self.image = image
 
-def menu(parametres,screen,couleur=(255,255,255),illustration=SKIN_ESCAP,police=POLICE20):
+def menu(parametres,screen:pygame.Surface,couleur=(255,255,255),illustration=SKIN_ESCAP,police=POLICE20):
     res = False
     clock = pygame.time.Clock()
     boutons = [Bouton(*parametre) for parametre in parametres] #J'ai appris quelque chose aujourd'hui !
@@ -68,6 +68,7 @@ def menu(parametres,screen,couleur=(255,255,255),illustration=SKIN_ESCAP,police=
         illustration.dessine_toi(screen,(debut_largeur,debut_hauteur))
         marge_haut = start
         marge_gauche = debut_largeur + 50
+        descr = []
         for i in range(imin,imax+1) :
             if i == curseur:
                 pygame.draw.rect(screen,boutons[i].couleurs[1],(marge_gauche-2,marge_haut-2,304,taille+4)) #/!\ Remplacer le 304 par une variable calculée en fonction de la longueur des titres

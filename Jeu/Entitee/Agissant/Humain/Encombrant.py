@@ -1,19 +1,24 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
+# Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
 
-from Jeu.Entitee.Agissant.Humain.Humain import *
+# Imports des classes parentes
+from Jeu.Entitee.Agissant.Humain.Humain import Humain
+from Jeu.Entitee.Agissant.Role.Dps import Dps
 
 class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyennement apprèciable, surtout si on essaye de draguer sa copine)
     """La classe de l'encombrant."""
-    def __init__(self,controleur:Controleur,position:Optional[Position]=None):
+    def __init__(self,controleur:Controleur,position:Position):
 
         self.identite = 'encombrant'
         self.place = 5
 
-        Humain.__init__(self,controleur,position,self.identite,1,6) #En plus il a fallu que ce soit un combattant relativement aguerri...
+        Humain.__init__(self,controleur,self.identite,1,6,position) #En plus il a fallu que ce soit un combattant relativement aguerri...
 
         self.antagonise_offensifs = True #Il a un bon instinct pour sentir le danger
 
@@ -57,6 +62,7 @@ class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyenne
             self.repliques = ["dialogue2reponse1.1","dialogue2reponse1.2","dialogue2reponse1.3"]
 
     def interprete(self,replique:str):
+        assert isinstance(self.controleur.joueur, Humain)
 
         #Premier dialogue
         #Le joueur arrive par la porte
@@ -65,18 +71,19 @@ class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyenne
             self.repliques = ["dialogue1reponse1.1.1","dialogue1reponse1.1.2"]
         elif replique in ["dialogue1reponse1.1.1","dialogue1reponse1.2.1.1"]:
             self.replique="dialogue1phrase1.1.1"
-            ID_clee = self.inventaire.get_clee("Porte_sortie_encombrant_5")
-            self.inventaire.drop(None,ID_clee)
-            self.controleur.joueur.inventaire.ramasse_item(ID_clee)
+            clee = self.inventaire.get_clee("Porte_sortie_encombrant_5")
+            assert clee is not None
+            self.inventaire.drop(ABSENT,clee)
+            self.controleur.joueur.inventaire.ajoute(clee)
             self.repliques = ["dialogue1reponse1.1.1.1"]
-            self.controleur.get_esprit(self.controleur.joueur.esprit).merge(self.esprit)
+            self.controleur.joueur.esprit.merge(self.esprit)
         elif replique == "dialogue1reponse1.1.1.1":
             self.replique="dialogue1phrase1.1.1.1"
             self.repliques = ["dialogue1reponse1.1.1.1.1"]
         elif replique == "dialogue1reponse1.1.1.1.1":
             self.end_dialogue()
             self.mouvement = 0 #Légèrement redondant ici
-            self.cible_deplacement = self.controleur.joueur.ID
+            self.cible_deplacement = self.controleur.joueur
         elif replique == "dialogue1reponse1.1.2":
             self.replique="dialogue1phrase1.1.2"
             self.repliques = ["dialogue1reponse1.1.2.1"]
@@ -105,7 +112,7 @@ class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyenne
             self.repliques = ["dialogue2reponse1.2.1"]
         elif replique == "dialogue2reponse1.3":
             self.end_dialogue()
-            self.appreciations[0] -= 0.2
+            self.appreciations[self.controleur.joueur.place] -= 0.2
         elif replique == "dialogue2reponse1.1.1":
             self.replique="dialogue2phrase1.1.1"
             self.repliques = ["dialogue2reponse1.1.1.1","dialogue2reponse1.1.1.2"]
@@ -113,7 +120,7 @@ class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyenne
             self.replique="dialogue2phrase1.1.2"
             self.repliques = ["dialogue2reponse1.1.2.1"]
         elif replique == "dialogue2reponse1.1.3":
-            self.appreciations[0] -= 0.1
+            self.appreciations[self.controleur.joueur.place] -= 0.1
             self.replique="dialogue2phrase1.1.3"
             self.repliques = ["dialogue2reponse1.1.3.1","dialogue2reponse1.1.3.2"]
         elif replique == "dialogue2reponse1.2.1":
@@ -128,12 +135,12 @@ class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyenne
             self.replique="dialogue2phrase1.1.1"
             self.repliques = ["dialogue2reponse1.1.1.1","dialogue2reponse1.1.1.2"]
         elif replique == "dialogue2reponse1.1.3.1":
-            self.appreciations[0] -= 0.1
+            self.appreciations[self.controleur.joueur.place] -= 0.1
             self.replique="dialogue2phrase1.1.3.1"
             self.repliques = ["dialogue2reponse1.1.1.1.1","dialogue2reponse1.1.1.1.2"]
         elif replique == "dialogue2reponse1.1.3.2":
             self.end_dialogue()
-            self.appreciations[0] -= 0.2
+            self.appreciations[self.controleur.joueur.place] -= 0.2
         elif replique == "dialogue2reponse1.1.1.1.1":
             self.replique="dialogue2phrase1.1.1.1.1"
             self.repliques = ["dialogue2reponse1.1.1.1.1.1","dialogue2reponse1.1.1.1.1.2"]#Euh, non/oui, l'épéiste
@@ -230,7 +237,7 @@ class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyenne
         elif replique == "dialogue-1reponse1.1.1.1":
             self.replique = "dialogue-1phrase1.1.3"
             self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.3"]
-            self.cible_deplacement = self.controleur.joueur.ID
+            self.cible_deplacement = self.controleur.joueur
         elif replique == "dialogue-1reponse1.1.1.2":
             self.controleur.set_phase(AGISSANT_DIALOGUE)
         elif replique == "dialogue-1reponse1.1.2":
@@ -260,4 +267,10 @@ class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyenne
         return SKIN_TETE_ENCOMBRANT
 
     def get_texte_descriptif(self):
-        return [f"Un humain (niveau {self.niveau})",f"ID : {self.ID}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Un aventurier épéiste. Il a été capturé par les gobelins."]
+        return [f"Un humain (niveau {self.niveau})",f"ID : {self}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Un aventurier épéiste. Il a été capturé par les gobelins."]
+
+# Imports utilisés dans le code:
+from Jeu.Constantes import *
+from Affichage.Skins.Skins import SKIN_TETE_ENCOMBRANT
+from Jeu.Dialogues.Dialogues_encombrant import REPLIQUES_ENCOMBRANT
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT

@@ -11,18 +11,21 @@ from Jeu.Labyrinthe.Structure_spatiale.Direction import *
 from Jeu.Labyrinthe.Vue import Representation_case
 
 class Case:
-    def __init__(self,position:Position,niveau = 1,element = TERRE,effets:List[Effet] = [],opacite = 1):
+    def __init__(self,controleur:Controleur,position:Position,niveau = 1,element = TERRE,effets:List[Effet] = [],opacite = 1):
         # Par défaut, pas de murs.
         self.position = position
         self.murs = [Mur(position+direction,niveau) for direction in DIRECTIONS]
         self.opacite = opacite
-        self.opacite_bonus = 0
+        self.opacite_bonus:float = 0
         self.niveau = niveau
         self.element = element
         self.clarte:float = 0
         self.code = 0
         self.repoussante = False
-        self.effets = [] #Les cases ont aussi des effets ! Les auras, par exemple.
+        self.agissant:Optional[Agissant] = None #On peut avoir un agissant sur la case, qui peut être un monstre, un joueur, etc.
+        self.decors:Optional[Decors] = None #On peut avoir un décors (mais pas les deux ? à voir)
+        self.items:Set[Item] = set() #On peut avoir des items sur la case
+        self.effets:List[Effet] = [] #Les cases ont aussi des effets ! Les auras, par exemple.
         self.effets += effets
         if self.element == TERRE:
             self.effets.append(Terre_permanente(self.niveau*2))
@@ -32,7 +35,7 @@ class Case:
             self.effets.append(Glace_permanente(self.niveau,self.niveau/10))
         elif self.element == OMBRE:
             self.effets.append(Ombre_permanente(self.niveau,self.niveau/2))
-        self.controleur = None
+        self.controleur = controleur
 
     def __getitem__(self,key:Direction) -> Mur:
         return self.murs[key]
@@ -58,7 +61,7 @@ class Case:
         self.code = 0
         priorite_max = 0
         IDmax = 0
-        auras = {}
+        auras:Dict[int,List[Aura_elementale]] = {}
 
         for effet in self.effets:
             if isinstance(effet,Aura_elementale):
@@ -120,11 +123,11 @@ class Case:
             else :
                 self.code += 1
         else:
-            on_attaques = []
-            attaques = []
+            on_attaques:Set[On_attack] = set()
+            attaques:Set[Attaque_case] = set()
             priorite_max = 0
             IDmax = 0
-            auras = {}
+            auras:Dict[int,List[Aura_elementale]] = {}
 
             for effet in self.effets:
                 if isinstance(effet,Aura_elementale):
@@ -138,11 +141,11 @@ class Case:
                         IDmax = ID
                         priorite_max = prio
                 elif isinstance(effet,On_attack):
-                    on_attaques.append(effet)
+                    on_attaques.add(effet)
                 elif (isinstance(effet,Attaque_case_delayee) and effet.delai > 0):
                     effet.execute(self) #On diminue le délai
                 elif isinstance(effet,Attaque_case):
-                    attaques.append(effet)
+                    attaques.add(effet)
                 elif isinstance(effet,On_post_action): #Les auras non-élémentales sont aussi des On_post_action
                     effet.execute(self)
 
@@ -234,7 +237,7 @@ class Case:
         return self.opacite + self.opacite_bonus
 
     def get_infos(self,clees:Set[str]): #Est-ce que ce serait plus clair sous forme de dictionnaire ? Ou d'objet ?
-        return Representation_case(self.position, self.clarte, self.calcule_code(), self.get_cibles_fermes(clees), self.get_codes_effets(), self.repoussante)
+        return Representation_case(self, self.clarte, self.calcule_code(), self.get_cibles_fermes(clees), self.agissant, self.decors, self.items.copy(), self.get_codes_effets(), self.repoussante)
 
     def calcule_code(self):#La fonction qui calcule le code correpondant à l'état de la case. De base, 0. Modifié d'après les effets subits par la case.
         return self.code
@@ -249,17 +252,7 @@ class Case:
                 effets.append([effet.responsable,effet.delai,effet.degats])
         return effets
 
-    def get_copie(self):
-        copie = Case(self.position,self.niveau,self.element,self.effets,self.opacite)
-        copie.murs = self.murs
-        return copie
-
-    def active(self,controleur:Controleur):
-        self.controleur = controleur
-        for mur in self.murs :
-            mur.active(controleur)
-
-    def desactive(self):
-        self.controleur = None
-        for mur in self.murs :
-            mur.desactive()
+    # def get_copie(self):
+    #     copie = Case(self.controleur,self.position,self.niveau,self.element,self.effets,self.opacite)
+    #     copie.murs = self.murs
+    #     return copie

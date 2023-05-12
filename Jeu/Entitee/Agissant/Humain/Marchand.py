@@ -1,19 +1,24 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
+# Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
 
-from Jeu.Entitee.Agissant.Humain.Humain import *
+# Imports des classes parentes
+from Jeu.Entitee.Agissant.Humain.Humain import Humain
+from Jeu.Entitee.Agissant.Role.Dps import Dps
 
 class Marchand(Dps,Humain): #Le dixième humain du jeu, à l'étage 9 (le seul lien avec l'extérieur)
     """La classe du marchand."""
-    def __init__(self,controleur:Controleur,position:Optional[Position]=None):
+    def __init__(self,controleur:Controleur,position:Position):
 
         self.identite = 'marchand'
         self.place = 9
 
-        Humain.__init__(self,controleur,position,self.identite,1,10) #Il a un skill d'échange d'objet avec son patron à l'extérieur
+        Humain.__init__(self,controleur,self.identite,1,10,position) #Il a un skill d'échange d'objet avec son patron à l'extérieur
 
         self.appreciations = [0,0,-1,0,0,-1,0,3,0,2]
         self.dialogue = 1
@@ -52,6 +57,7 @@ class Marchand(Dps,Humain): #Le dixième humain du jeu, à l'étage 9 (le seul l
             self.repliques = ["dialogue1reponse1.1"]
 
     def interprete(self,replique:str):
+        assert isinstance(self.controleur.joueur, Humain)
 
         #Premier dialogue
         #Le joueur arrive par la porte
@@ -66,19 +72,19 @@ class Marchand(Dps,Humain): #Le dixième humain du jeu, à l'étage 9 (le seul l
             self.repliques = ["dialogue1reponse1.1.2.1.1","dialogue1reponse1.1.2.1.2"]
         elif replique == "dialogue1reponse1.1.2.1.1":
             self.end_dialogue()
-            self.controleur.get_esprit(self.controleur.joueur.esprit).merge(self.esprit)
+            self.controleur.joueur.esprit.merge(self.esprit)
             self.mouvement = 0 #Légèrement redondant ici
-            self.cible_deplacement = self.controleur.joueur.ID
+            self.cible_deplacement = self.controleur.joueur
         elif replique == "dialogue1reponse1.1.2.1.2":
             self.end_dialogue(-2)
         elif replique == "dialogue1reponse1.1.1":
             self.replique="dialogue1phrase1.1.1"
             self.repliques = ["dialogue1reponse1.1.1.1"]
-            self.controleur.get_esprit(self.controleur.joueur.esprit).merge(self.esprit)
+            self.controleur.joueur.esprit.merge(self.esprit)
         elif replique == "dialogue1reponse1.1.1.1":
             self.end_dialogue()
             self.mouvement = 0 #Légèrement redondant ici
-            self.cible_deplacement = self.controleur.joueur.ID
+            self.cible_deplacement = self.controleur.joueur
 
         #Dialogue par défaut:
         elif replique == "dialogue-1reponse1.1":
@@ -94,7 +100,7 @@ class Marchand(Dps,Humain): #Le dixième humain du jeu, à l'étage 9 (le seul l
         elif replique == "dialogue-1reponse1.1.1.1.1":
             self.replique = "dialogue-1phrase1.1.1.1.1"
             self.repliques = ["dialogue-1reponse1.1.1","dialogue-1reponse1.1.2","dialogue-1reponse1.1.3"]
-            self.cible_deplacement = self.controleur.joueur.ID
+            self.cible_deplacement = self.controleur.joueur
         elif replique == "dialogue-1reponse1.1.1.1.2":
             self.controleur.set_phase(AGISSANT_DIALOGUE)
         elif replique == "dialogue-1reponse1.1.1.2":
@@ -138,4 +144,9 @@ class Marchand(Dps,Humain): #Le dixième humain du jeu, à l'étage 9 (le seul l
         return SKIN_TETE_MARCHAND
 
     def get_texte_descriptif(self):
-        return [f"Un humain (niveau {self.niveau})",f"ID : {self.ID}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Un marchand perdu dans le labyrinthe. Il peut obtenir des objets de l'extérieur ou en envoyer, mais il ne peut pas sortir lui-même..."]
+        return [f"Un humain (niveau {self.niveau})",f"ID : {self}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Un marchand perdu dans le labyrinthe. Il peut obtenir des objets de l'extérieur ou en envoyer, mais il ne peut pas sortir lui-même..."]
+
+# Imports utilisés dans le code:
+from Jeu.Constantes import *
+from Affichage.Skins.Skins import SKIN_TETE_MARCHAND
+from Jeu.Dialogues.Dialogues_marchand import REPLIQUES_MARCHAND

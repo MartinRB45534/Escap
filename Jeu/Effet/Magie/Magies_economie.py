@@ -1,6 +1,12 @@
-from Jeu.Effet.Magie.Magie import *
-from Jeu.Effet.Effets_divers import *
-from Jeu.Effet.Attaque.Attaque import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Entitee.Agissant.Agissant import Agissant
+
+# Imports des classes parentes
+from Jeu.Effet.Magie.Magie import Magie_cout
 
 class Magie_reserve(Magie_cout):
     """La magie qui fait une réserve de mana."""
@@ -14,7 +20,7 @@ class Magie_reserve(Magie_cout):
         self.temps = 100000
         self.affiche = True
 
-    def action(self,porteur):
+    def action(self,porteur:Agissant):
         porteur.effets.append(Reserve_mana(self.cout_pm*taux_reserve[self.niveau-1]))
 
     def get_image(self):
@@ -38,7 +44,7 @@ class Magie_investissement(Magie_cout):
         self.temps = 100000
         self.affiche = True
 
-    def action(self,porteur):
+    def action(self,porteur:Agissant):
         porteur.effets.append(Investissement_mana(duree_investissement[self.niveau-1],self.cout_pm*taux_investissement[self.niveau-1]))
 
     def get_image(self):
@@ -62,8 +68,8 @@ class Magie_explosion_de_mana(Magie_cout):
         self.temps = 100000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.effets.append(Attaque_magique(porteur.ID,self.cout_pm*taux_degats_explosion_de_mana[self.niveau-1],TERRE,"contact",portee_explosion_de_mana[self.niveau-1]))
+    def action(self,porteur:Agissant):
+        porteur.effets.append(Attaque_magique(porteur,self.cout_pm*taux_degats_explosion_de_mana[self.niveau-1],TERRE,"contact",portee_explosion_de_mana[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_EXPLOSION_DE_MANA
@@ -73,3 +79,10 @@ class Magie_explosion_de_mana(Magie_cout):
 
     def get_description(self,observation=0):
         return ["Une magie d'attaque","Inflige des dégats de terre aux agissants non-alliés à proximité.","Les dégats dépendent des PMs dépensés pour lancer le sort",f"Taux de dégats : {taux_degats_explosion_de_mana[self.niveau-1]}",f"Portee de l'attaque : {portee_explosion_de_mana[self.niveau-1]}",f"Latence : {self.latence}"]
+
+# Imports utilisés dans le code
+from Jeu.Effet.Effets_divers import Reserve_mana,Investissement_mana
+from Jeu.Effet.Attaque.Attaque import Attaque_magique
+from Jeu.Constantes import *
+from Jeu.Systeme.Constantes_magies.Magies import *
+from Affichage.Skins.Skins import SKIN_MAGIE_RESERVE,SKIN_MAGIE_INVESTISSEMENT,SKIN_MAGIE_EXPLOSION_DE_MANA

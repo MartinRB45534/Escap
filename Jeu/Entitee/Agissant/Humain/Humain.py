@@ -12,10 +12,11 @@ from Jeu.Dialogues.Dialogues import *
 
 class Humain(PNJ,Entitee_superieure):
     """La classe des pnjs et du joueur. A un comportement un peu plus complexe, et une personnalité."""
-    def __init__(self,controleur:Controleur,position:Optional[Position]=None,identite:str,niveau:int,ID:int):
-        PNJ.__init__(self,controleur,position,identite,niveau,ID)
+    def __init__(self,controleur:Controleur,identite:str,niveau:int,ID:int,position:Position=ABSENT):
+        PNJ.__init__(self,controleur,identite,niveau,ID,position)
 
-        self.appreciations=[0,0,0,0,0,0,0,0,0,0]
+        self.appreciations:List[float]=[0,0,0,0,0,0,0,0,0,0]
+        self.place:int
 
     def get_skin(self):
         if self.etat == "vivant":
@@ -23,7 +24,7 @@ class Humain(PNJ,Entitee_superieure):
         else:
             return SKIN_CADAVRE
 
-    def subit(self,degats:float,distance="contact",element=TERRE,ID=0): #L'ID 0 ne correspond à personne
+    def subit(self,responsable:Agissant,degats:float,distance="contact",element=TERRE): #L'ID 0 ne correspond à personne
         gravite = degats/self.pv_max
         dangerosite = 0
         if distance == "contact":
@@ -44,9 +45,9 @@ class Humain(PNJ,Entitee_superieure):
             gravite += 0.5
             print(f"{self.identite} a été tué par :")
             print(degats,element)
-            print(ID)
-            print(self.controleur.entitees[ID])
+            print(responsable.ID)
+            print(responsable)
             self.effets_mortuaires = self.effets
-            self.effets_mortuaires_tueur = self.controleur.entitees[ID].effets
+            self.effets_mortuaires_tueur = responsable.effets
             self.controleur.pause = True
-        self.insurge(ID,gravite,dangerosite)
+        self.insurge(responsable,gravite,dangerosite)

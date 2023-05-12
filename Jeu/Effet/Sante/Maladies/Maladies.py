@@ -1,11 +1,16 @@
-from Jeu.Effet.Effet import *
-from Jeu.Effet.Sante.Maladies.Maladie import *
-from Jeu.Constantes import *
-import random
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Entitee.Agissant.Agissant import Agissant
+
+# Imports des classes parentes
+from Jeu.Effet.Sante.Maladies.Maladie import Maladie
 
 class Tirnogose(Maladie):
     """Maladie qui cause une perte progressive de PV. Peut se transmettre aux voisins."""
-    def __init__(self,contagiosite,distance,persistence,virulence):
+    def __init__(self,contagiosite:float,distance:float,persistence:float,virulence:float):
         self.affiche = False
         self.phase = "démarrage"
         self.contagiosite = contagiosite
@@ -14,14 +19,14 @@ class Tirnogose(Maladie):
         self.immunite = 0
         self.virulence = virulence
 
-    def action(self,malade):
+    def action(self,malade:Agissant):
         if self.phase == "en cours" :
             malade.pv -= self.virulence
             self.immunite += 1
 
 class Fibaluse(Maladie):
     """Maladie qui réduit les statistiques. Peut se transmettre aux voisins."""
-    def __init__(self,contagiosite,distance,persistence,virulence):
+    def __init__(self,contagiosite:float,distance:float,persistence:float,virulence:float):
         self.affiche = False
         self.phase = "démarrage"
         self.contagiosite = contagiosite
@@ -30,7 +35,7 @@ class Fibaluse(Maladie):
         self.immunite = 0
         self.virulence = virulence
 
-    def action(self,malade):
+    def action(self,malade:Agissant):
         if self.phase == "démarrage" and "maladf" not in malade.taux_stats :
             malade.taux_stats["maladf"] = self.virulence
         elif self.phase == "en cours" :
@@ -38,7 +43,7 @@ class Fibaluse(Maladie):
         elif self.phase == "terminé" :
             malade.taux_stats.pop("maladf")
 
-    def execute(self,malade):
+    def execute(self,malade:Agissant):
         if self.phase == "démarrage" :
             self.action(malade)
             self.phase = "en cours"
@@ -50,7 +55,7 @@ class Fibaluse(Maladie):
 
 class Ibsutiomialgie(Maladie):
     """Maladie qui peut causer une mort subite. Peut se transmettre aux voisins."""
-    def __init__(self,contagiosite,distance,persistence,virulence):
+    def __init__(self,contagiosite:float,distance:float,persistence:float,virulence:float):
         self.affiche = False
         self.phase = "démarrage"
         self.contagiosite = contagiosite
@@ -59,8 +64,11 @@ class Ibsutiomialgie(Maladie):
         self.immunite = 0
         self.virulence = virulence
 
-    def action(self,malade):
+    def action(self,malade:Agissant):
         if self.phase == "démarrage" and random.random() < self.virulence :
             malade.meurt()
         elif self.phase == "en cours" :
             self.immunite += 1
+
+# Imports utilisés dans le code
+import random

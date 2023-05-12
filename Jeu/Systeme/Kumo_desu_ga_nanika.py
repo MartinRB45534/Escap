@@ -124,7 +124,7 @@ class Jinx_Evil_Eye(Skill):
     """Le skill de malédiction de kumoko."""
     def __init__(self):
         Skill.__init__(self)
-        self.taux_absorbtion = 0 #Kumoko absorbe une partie des PV et PM restants de son adversaire.
+        self.taux_absorption = 0 #Kumoko absorbe une partie des PV et PM restants de son adversaire.
         self.gain_xp = 0.1
 
     def evo(self,nb_evo=1):
@@ -266,6 +266,7 @@ class Evil_Eye(Skill):
     """Le skill qui controle les Evil_Eyes de kumoko."""
     def __init__(self):
         Skill.__init__(self)
+        self.gain_xp = 0.1
         self.eyes = [["Libre",None]]*8
 
     def evo(self,nb_evo=1):
@@ -350,6 +351,7 @@ class Taboo(Skill):
     def __init__(self):
         Skill.__init__(self)
         self.gain_xp = 0.01
+        self.taux = 1 #Le skill est au niveau 1, il n'a pas encore été utilisé.
 
     def evo(self,nb_evo=1):
         for i in range(nb_evo):
@@ -375,42 +377,42 @@ class Immortality(Skill):
         self.xp_new+=self.gain_xp
         return self.coef
 
-class Egg_Laying(Skill):
-    """Le skill de ponte de kumoko."""
-    def __init__(self):
-        Skill.__init__(self)
-        self.progeniture = []
-        self.pontes = 0 #Le nombre d'oeufs qu'elle a pondus. Elle arrête de compter après 11.
-        self.latence = 1
-        self.gain_xp = 0.01
+# class Egg_Laying(Skill):
+#     """Le skill de ponte de kumoko."""
+#     def __init__(self):
+#         Skill.__init__(self)
+#         self.progeniture = []
+#         self.pontes = 0 #Le nombre d'oeufs qu'elle a pondus. Elle arrête de compter après 11.
+#         self.latence = 1
+#         self.gain_xp = 0.01
 
-    def gagne_xp(self):
-        for enfant in self.progeniture:
-            self.xp_new += enfant.classe_principale.gagne_xp() #!!! Ne pas leur faire gagner l'xp deux fois !!! Kumoko récupère de l'xp de ses enfants.
-        res = self.xp_new*self.propagation
-        self.xp+=self.xp_new
-        self.xp_new=0
-        if self.next_evo=="xp":
-            self.check_evo()
-        return res
+#     def gagne_xp(self):
+#         for enfant in self.progeniture:
+#             self.xp_new += enfant.classe_principale.gagne_xp() #!!! Ne pas leur faire gagner l'xp deux fois !!! Kumoko récupère de l'xp de ses enfants.
+#         res = self.xp_new*self.propagation
+#         self.xp+=self.xp_new
+#         self.xp_new=0
+#         if self.next_evo=="xp":
+#             self.check_evo()
+#         return res
 
-    def evo(self,nb_evo):
-        for i in range(nb_evo):
-            self.niveau += 1
+#     def evo(self,nb_evo):
+#         for i in range(nb_evo):
+#             self.niveau += 1
 
-    def utilise(self):
-        if self.naissance < 11: #On est toujours dans les dix premiers oeufs.
-            libre = True
-            for enfant in self.progeniture :
-                if enfant.etat == "oeuf" :
-                    libre = False
-                    return self.latence, None
-        else :
-            libre = True
-        # if libre :
-        #     oeuf = Nightmare_vestige(self.position)
-        #     oeuf.evo(self.niveau)
-        #     return self.latence, oeuf #Les enfant de kumoko n'évoluent pas, mais ils ont le niveau qu'avait le skill Egg_Laying à leur naissance.
+#     def utilise(self):
+#         if self.pontes < 11: #On est toujours dans les dix premiers oeufs.
+#             libre = True
+#             for enfant in self.progeniture :
+#                 if enfant.etat == "oeuf" :
+#                     libre = False
+#                     return self.latence, None
+#         else :
+#             libre = True
+#         if libre :
+#             oeuf = Nightmare_vestige(self.position)
+#             oeuf.evo(self.niveau)
+#             return self.latence, oeuf #Les enfant de kumoko n'évoluent pas, mais ils ont le niveau qu'avait le skill Egg_Laying à leur naissance.
 
 #Les skills des nightmare vestiges sont des version inférieures de ceux de kumoko :
 class Hatching(Skill):

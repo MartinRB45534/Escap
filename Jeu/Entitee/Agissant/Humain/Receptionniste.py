@@ -1,19 +1,24 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
+# Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
 
-from Jeu.Entitee.Agissant.Humain.Humain import *
+# Imports des classes parentes
+from Jeu.Entitee.Agissant.Humain.Humain import Humain
+from Jeu.Entitee.Agissant.Role.Dps import Dps
 
 class Receptionniste(Dps,Humain): #Le deuxième humain du jeu, à l'étage 1 (engage la conversation après la chute, indique les commandes de base)
     """La classe du récéptionniste."""
-    def __init__(self,controleur,position):
+    def __init__(self,controleur:Controleur,position:Position):
 
         self.identite = 'receptionniste'
         self.place = 1
 
-        Humain.__init__(self,controleur,position,self.identite,2,3) #À un haut niveau dès le départ
+        Humain.__init__(self,controleur,self.identite,2,3,position) #À un haut niveau dès le départ
 
         self.antagonise_offensifs = True #Des années d'expérience lui ont appris à repérer les monstres offensifs
 
@@ -53,6 +58,7 @@ class Receptionniste(Dps,Humain): #Le deuxième humain du jeu, à l'étage 1 (en
             self.repliques = ["dialogue2reponse1.1","dialogue2reponse1.2"]
 
     def interprete(self,replique:str):
+        assert isinstance(self.controleur.joueur, Humain)
 
         #Premier dialogue
         #Le receptionniste accueil le joueur
@@ -60,7 +66,7 @@ class Receptionniste(Dps,Humain): #Le deuxième humain du jeu, à l'étage 1 (en
             self.replique="dialogue1phrase1.1"
             self.repliques = ["dialogue1reponse1.1.1"]
         elif replique == "dialogue1reponse1.1.1":
-            self.appreciations[0]+= 0.5
+            self.appreciations[self.controleur.joueur.place] += 0.5
             self.end_dialogue(2)
 
         #Deuxième dialogue
@@ -104,11 +110,15 @@ class Receptionniste(Dps,Humain): #Le deuxième humain du jeu, à l'étage 1 (en
 
         self.replique_courante = 0
 
-    def get_replique(self,code):
+    def get_replique(self,code:str):
         return REPLIQUES_RECEPTIONNISTE[code]
 
     def get_skin_tete(self):
         return SKIN_TETE_RECEPTIONNISTE
 
     def get_texte_descriptif(self):
-        return [f"Un humain (niveau {self.niveau})",f"ID : {self.ID}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Un aventurier épéiste."]
+        return [f"Un humain (niveau {self.niveau})",f"ID : {self}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Un aventurier épéiste."]
+
+# Imports utilisés dans le code:
+from Affichage.Skins.Skins import SKIN_TETE_RECEPTIONNISTE
+from Jeu.Dialogues.Dialogues_receptionniste import REPLIQUES_RECEPTIONNISTE

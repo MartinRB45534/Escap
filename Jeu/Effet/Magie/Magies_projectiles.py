@@ -1,5 +1,13 @@
-from Jeu.Effet.Magie.Magie import *
-from Jeu.Entitee.Item.Projectile.Projectiles import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Entitee.Agissant.Agissant import Agissant
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+
+# Imports des classes parentes
+from Jeu.Effet.Magie.Magie import Magie_dirigee,Magie_cible_dirigee,Cible_case,Portee_limitee
 
 class Magie_boule_de_feu(Magie_dirigee):
     """La magie qui invoque une boule de feu."""
@@ -14,8 +22,9 @@ class Magie_boule_de_feu(Magie_dirigee):
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.controleur.ajoute_entitee(Boule_de_feu(self.niveau,porteur.position,self.direction,porteur.ID))
+    def action(self,porteur:Agissant):
+        assert self.direction is not None
+        porteur.controleur.ajoute_entitee(Boule_de_feu(porteur.controleur,self.niveau,self.direction,porteur,porteur.position))
 
     def get_image(self):
         return SKIN_MAGIE_BOULE_DE_FEU
@@ -39,8 +48,9 @@ class Magie_fleche_de_glace(Magie_dirigee):
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.controleur.ajoute_entitee(Fleche_de_glace(self.niveau,porteur.position,self.direction,porteur.ID))
+    def action(self,porteur:Agissant):
+        assert self.direction is not None
+        porteur.controleur.ajoute_entitee(Fleche_de_glace(porteur.controleur,self.niveau,self.direction,porteur,porteur.position))
 
     def get_image(self):
         return SKIN_MAGIE_FLECHE_DE_GLACE
@@ -64,8 +74,9 @@ class Magie_rocher(Magie_dirigee):
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.controleur.ajoute_entitee(Rocher(self.niveau,porteur.position,self.direction,porteur.ID))
+    def action(self,porteur:Agissant):
+        assert self.direction is not None
+        porteur.controleur.ajoute_entitee(Rocher(porteur.controleur,self.niveau,self.direction,porteur,porteur.position))
 
     def get_image(self):
         return SKIN_MAGIE_ROCHER
@@ -86,14 +97,15 @@ class Magie_ombre_furtive(Magie_cible_dirigee,Cible_case,Portee_limitee):
         self.latence = latence_ombre_furtive[niveau-1]
         self.portee_limite = portee_ombre_furtive[niveau-1]
         self.niveau = niveau
-        self.cible = None
+        self.cible:Position = ABSENT
         self.direction = None
         self.temps = 10000
         self.temps_dir = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.controleur.ajoute_entitee(Ombre_furtive(self.niveau,self.cible,self.direction,porteur.ID))
+    def action(self,porteur:Agissant):
+        assert self.direction is not None
+        porteur.controleur.ajoute_entitee(Ombre_furtive(porteur.controleur,self.niveau,self.direction,porteur,self.cible))
 
     def get_image(self):
         return SKIN_MAGIE_OMBRE_FURTIVE
@@ -117,8 +129,9 @@ class Magie_jet_de_mana(Magie_dirigee):
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.controleur.ajoute_entitee(Jet_de_mana(self.niveau,porteur.position,self.direction,porteur.ID))
+    def action(self,porteur:Agissant):
+        assert self.direction is not None
+        porteur.controleur.ajoute_entitee(Jet_de_mana(porteur.controleur,self.niveau,self.direction,porteur,porteur.position))
 
     def get_image(self):
         return SKIN_MAGIE_JET_DE_MANA
@@ -142,8 +155,9 @@ class Magie_eclair_noir(Magie_dirigee):
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.controleur.ajoute_entitee(Eclair_noir(self.niveau,porteur.position,self.direction,porteur.ID))
+    def action(self,porteur:Agissant):
+        assert self.direction is not None
+        porteur.controleur.ajoute_entitee(Eclair_noir(porteur.controleur,self.niveau,self.direction,porteur,porteur.position))
 
     def get_image(self):
         return SKIN_MAGIE_ECLAIR_NOIR
@@ -153,3 +167,9 @@ class Magie_eclair_noir(Magie_dirigee):
 
     def get_description(self,observation=0):
         return ["Une magie de projectile","Invoque un éclair noir {self.niveau} à l'emplacement du lanceur.","L'éclair noir inflige des dégats de terre au contact d'un agissant, explose au contact d'un mur ou d'un agissant et inflige des dégats de terre à proximité, et poursuit sa course si l'agissant meurt.",f"Coût : {self.cout_pm} PMs",f"Dégats de contact : {degats_choc_eclair_noir[self.niveau-1]}",f"Dégats d'explosion : {degats_explosifs_eclair_noir[self.niveau-1]}",f"Portée de l'explosion : {portee_eclair_noir[self.niveau-1]}",f"Latence : {self.latence}"]
+
+# Imports utilisés dans le code
+from Jeu.Systeme.Constantes_magies.Magies import *
+from Jeu.Entitee.Item.Projectile.Projectiles import Eclair_noir, Jet_de_mana, Ombre_furtive, Boule_de_feu, Rocher, Fleche_de_glace
+from Affichage.Skins.Skins import SKIN_MAGIE_ECLAIR_NOIR, SKIN_MAGIE_BOULE_DE_FEU, SKIN_MAGIE_JET_DE_MANA, SKIN_MAGIE_OMBRE_FURTIVE, SKIN_MAGIE_ROCHER, SKIN_MAGIE_FLECHE_DE_GLACE
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT

@@ -1,19 +1,26 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
+# Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
 
-from Jeu.Entitee.Agissant.Humain.Humain import *
+# Imports des classes parentes
+from Jeu.Entitee.Agissant.Humain.Humain import Humain
+from Jeu.Entitee.Agissant.PNJ.PNJs import PNJ_mage
+from Jeu.Entitee.Agissant.Role.Attaquant_magique_case import Attaquant_magique_case
+from Jeu.Entitee.Agissant.Role.Support import Support
 
 class Alchimiste(PNJ_mage,Attaquant_magique_case,Support,Humain): #Le septième humain du jeu, à l'étage 6 (un faiseur de potions aux magies diverses)
     """La classe de l'alchimiste."""
-    def __init__(self,controleur,position):
+    def __init__(self,controleur:Controleur,position:Position):
 
         self.identite = 'alchimiste'
         self.place = 6
 
-        Humain.__init__(self,controleur,position,self.identite,1,7) #Puissant, mais pas le plus utile en combat...
+        Humain.__init__(self,controleur,self.identite,1,7,position) #Puissant, mais pas le plus utile en combat...
 
         self.comportement_corps_a_corps = 2 #0 pour attaquer, 1 pour ignorer, 2 pour fuir
         self.comportement_distance = 1 #0 pour foncer dans le tas, 1 pour tenter une attaque à distance puis se rapprocher, 2 pour tenter une attaque à distance puis fuir, 3 pour fuir puis tenter une attaque à distance
@@ -39,14 +46,14 @@ class Alchimiste(PNJ_mage,Attaquant_magique_case,Support,Humain): #Le septième 
         return (self.pv+degats) / self.pv_max <= taux_limite
 
     def peut_caster(self):
-        return self.peut_payer(cout_pm_secousse[trouve_skill(self.classe_principale,Skill_magie).niveau-1])
+        return self.peut_payer(cout_pm_secousse[self.get_skill_magique().niveau-1])
 
     def caste(self):
         return "magie secousse"
 
-    def attaque(self,direction):
+    def attaque(self,direction:Direction):
         #Quelle est sa magie de prédilection ? Pour l'instant on va prendre l'avalanche
-        if self.peut_payer(cout_pm_avalanche[trouve_skill(self.classe_principale,Skill_magie).niveau-1]):
+        if self.peut_payer(cout_pm_avalanche[self.get_skill_magique().niveau-1]):
             self.utilise(Skill_magie)
             self.set_magie_courante("magie poing magique") #/!\
             self.dir_magie = direction
@@ -54,6 +61,7 @@ class Alchimiste(PNJ_mage,Attaquant_magique_case,Support,Humain): #Le septième 
             self.utilise(Skill_stomp)
 
     def start_dialogue(self): #On commence un nouveau dialogue !
+
         #On initialise nos attributs
         self.replique_courante = 0
         #La plupart dépendent du dialogue
@@ -73,22 +81,23 @@ class Alchimiste(PNJ_mage,Attaquant_magique_case,Support,Humain): #Le septième 
             self.repliques = ["dialogue2reponse1.1","dialogue2reponse1.2","dialogue2reponse1.3"]
 
     def interprete(self,replique:str):
+        assert isinstance(self.controleur.joueur,Humain)
 
         #Premier dialogue
         #Le joueur arrive par la porte
         if replique == "dialogue1reponse1.1":
             self.replique="dialogue1phrase1.1"
             self.repliques = ["dialogue1reponse1.1.1","dialogue1reponse1.1.2"]
-            self.controleur.get_esprit(self.controleur.joueur.esprit).merge(self.esprit)
+            self.controleur.joueur.esprit.merge(self.esprit)
         elif replique == "dialogue1reponse1.1.1":
             self.replique="dialogue1phrase1.1.1"
             self.repliques = ["dialogue1reponse1.1.2"]
         elif replique == "dialogue1reponse1.1.2":
             self.end_dialogue()
             self.mouvement = 0 #Légèrement redondant ici
-            self.cible_deplacement = self.controleur.joueur.ID
+            self.cible_deplacement = self.controleur.joueur
         elif replique == "dialogue1reponse1.2":
-            self.appreciations[0] -= 0.5
+            self.appreciations[self.controleur.joueur.place] -= 0.5
             self.end_dialogue(-2)
             self.statut_pnj = "exploration"
 
@@ -102,7 +111,7 @@ class Alchimiste(PNJ_mage,Attaquant_magique_case,Support,Humain): #Le septième 
             self.repliques = ["dialogue2reponse1.2.1"]
         elif replique == "dialogue2reponse1.3":
             self.end_dialogue()
-            self.appreciations[0] -= 0.2
+            self.appreciations[self.controleur.joueur.place] -= 0.2
         elif replique == "dialogue2reponse1.1.1":
             self.replique="dialogue2phrase1.1.1"
             self.repliques = ["dialogue2reponse1.1.1.1","dialogue2reponse1.1.1.2"]
@@ -110,7 +119,7 @@ class Alchimiste(PNJ_mage,Attaquant_magique_case,Support,Humain): #Le septième 
             self.replique="dialogue2phrase1.1.2"
             self.repliques = ["dialogue2reponse1.1.2.1"]
         elif replique == "dialogue2reponse1.1.3":
-            self.appreciations[0] -= 0.1
+            self.appreciations[self.controleur.joueur.place] -= 0.1
             self.replique="dialogue2phrase1.1.3"
             self.repliques = ["dialogue2reponse1.1.3.1","dialogue2reponse1.1.3.2"]
         elif replique == "dialogue2reponse1.2.1":
@@ -125,12 +134,12 @@ class Alchimiste(PNJ_mage,Attaquant_magique_case,Support,Humain): #Le septième 
             self.replique="dialogue2phrase1.1.1"
             self.repliques = ["dialogue2reponse1.1.1.1","dialogue2reponse1.1.1.2"]
         elif replique == "dialogue2reponse1.1.3.1":
-            self.appreciations[0] -= 0.1
+            self.appreciations[self.controleur.joueur.place] -= 0.1
             self.replique="dialogue2phrase1.1.3.1"
             self.repliques = ["dialogue2reponse1.1.1.1.1","dialogue2reponse1.1.1.1.2"]
         elif replique == "dialogue2reponse1.1.3.2":
             self.end_dialogue()
-            self.appreciations[0] -= 0.2
+            self.appreciations[self.controleur.joueur.place] -= 0.2
         elif replique == "dialogue2reponse1.1.1.1.1":
             self.replique="dialogue2phrase1.1.1.1.1"
             self.repliques = ["dialogue2reponse1.1.1.1.1.1","dialogue2reponse1.1.1.1.1.2"]#Euh, non/oui, l'épéiste
@@ -220,7 +229,7 @@ class Alchimiste(PNJ_mage,Attaquant_magique_case,Support,Humain): #Le septième 
             self.statut_pnj = "exploration"
         elif replique == "dialogue-2reponse1.1.2":
             self.end_dialogue(-2)
-            self.offenses.append([2,0.01,0])
+            self.offenses.append((self.controleur.joueur,0.01,0))
             self.statut_pnj = "exploration"
         elif replique == "dialogue-2reponse1.2":
             self.replique="dialogue-2phrase1.2"
@@ -228,11 +237,11 @@ class Alchimiste(PNJ_mage,Attaquant_magique_case,Support,Humain): #Le septième 
         elif replique == "dialogue-2reponse1.2.1":
             self.replique="dialogue-2phrase1.2.1"
             self.repliques = ["dialogue-2reponse1.2.1.1"]
-            self.controleur.get_esprit(self.controleur.joueur.esprit).merge(self.esprit)
+            self.controleur.joueur.esprit.merge(self.esprit)
         elif replique == "dialogue-2reponse1.2.1.1":
             self.end_dialogue()
             self.mouvement = 0 #Légèrement redondant ici
-            self.cible_deplacement = self.controleur.joueur.ID
+            self.cible_deplacement = self.controleur.joueur
 
         #Dialogue par défaut:
         elif replique == "dialogue-1reponse1.1":
@@ -245,10 +254,10 @@ class Alchimiste(PNJ_mage,Attaquant_magique_case,Support,Humain): #Le septième 
         elif replique == "dialogue-1reponse1.1.1.1":
             self.replique = "dialogue-1phrase1.1.3"
             self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.4"]
-            if self.controleur.joueur.a_parchemin_vierge():
+            if self.controleur.joueur.inventaire.a_parchemin_vierge():
                 self.repliques.append("dialogue-1reponse1.3")
             self.repliques.append("dialogue-1reponse1.5")
-            self.cible_deplacement = self.controleur.joueur.ID
+            self.cible_deplacement = self.controleur.joueur
         elif replique == "dialogue-1reponse1.1.1.2":
             self.controleur.set_phase(AGISSANT_DIALOGUE)
         elif replique == "dialogue-1reponse1.1.2":
@@ -256,7 +265,7 @@ class Alchimiste(PNJ_mage,Attaquant_magique_case,Support,Humain): #Le septième 
         elif replique == "dialogue-1reponse1.1.3":
             self.replique="dialogue-1phrase1.1.3"
             self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.4"]
-            if self.controleur.joueur.a_parchemin_vierge():
+            if self.controleur.joueur.inventaire.a_parchemin_vierge():
                 self.repliques.append("dialogue-1reponse1.3")
             self.repliques.append("dialogue-1reponse1.5")
             self.mouvement = 1
@@ -265,7 +274,7 @@ class Alchimiste(PNJ_mage,Attaquant_magique_case,Support,Humain): #Le septième 
         elif replique == "dialogue-1reponse1.4":
             self.controleur.set_phase(RECETTE)
         elif replique == "dialogue-1reponse1.4.1":
-            parch = Parchemin_vierge(None)
+            parch = Parchemin_vierge(self.controleur,ABSENT)
             self.controleur.ajoute_entitee(parch)
             self.controleur.joueur.inventaire.ajoute(parch)
             self.replique = "dialogue-1phrase1.4.1"
@@ -295,7 +304,8 @@ class Alchimiste(PNJ_mage,Attaquant_magique_case,Support,Humain): #Le septième 
 
         self.replique_courante = 0
 
-    def set_cible(self,cible):
+    def set_cible(self,cible:int|Position):
+
         self.cible_deplacement = cible
         self.replique = "dialogue-1phrase1.1.1.2"
         self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"]
@@ -304,10 +314,11 @@ class Alchimiste(PNJ_mage,Attaquant_magique_case,Support,Humain): #Le septième 
         self.repliques.append("dialogue-1reponse1.4")
         self.repliques.append("dialogue-1reponse1.5")
 
-    def get_replique(self,code):
+    def get_replique(self,code:str):
         return REPLIQUES_ALCHIMISTE[code]
 
-    def impregne(self,nom):
+    def impregne(self,nom:str):
+
         skill = self.get_skill_magique()
         latence,magie = skill.utilise(nom)
         self.latence += latence
@@ -315,7 +326,7 @@ class Alchimiste(PNJ_mage,Attaquant_magique_case,Support,Humain): #Le septième 
         if self.peut_payer(cout):
             self.controleur.joueur.inventaire.consomme_parchemin_vierge()
             self.paye(cout)
-            parch = Parchemin_impregne(None,magie,cout//2)
+            parch = Parchemin_impregne(self.controleur,magie,cout//2,ABSENT)
             self.controleur.ajoute_entitee(parch)
             self.controleur.joueur.inventaire.ajoute(parch)
             self.replique = "dialogue-1phrase1.3.1"
@@ -329,16 +340,29 @@ class Alchimiste(PNJ_mage,Attaquant_magique_case,Support,Humain): #Le septième 
             self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.3","dialogue-1reponse1.4","dialogue-1reponse1.5"]
 
     def get_recettes(self):
-        alchimie = trouve_skill(self.classe_principale,Skill_alchimie)
-        return(recettes_alchimie[alchimie.niveau])
+        return(recettes_alchimie[self.get_skill_alchimie().niveau])
 
     def cuisine(self,recette):
-        alchimie = trouve_skill(self.classe_principale,Skill_alchimie)
-        alchimie.utilise(recette["xp"])
+        self.get_skill_alchimie().utilise(recette["xp"])
         return eval(recette["produit"])(None)
+    
+    def get_skill_alchimie(self):
+        skill = trouve_skill(self.classe_principale,Skill_alchimie)
+        assert skill is not None
+        return skill
 
     def get_skin_tete(self):
         return SKIN_TETE_ALCHIMISTE
 
     def get_texte_descriptif(self):
-        return [f"Un humain (niveau {self.niveau})",f"ID : {self.ID}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Un alchimiste."]
+        return [f"Un humain (niveau {self.niveau})",f"ID : {self}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Un alchimiste."]
+
+# Imports utilisés dans le code:
+from Jeu.Constantes import *
+from Jeu.Systeme.Classe import trouve_skill, Skill_alchimie, Skill_magie, Skill_stomp
+from Jeu.Systeme.Constantes_skills.Skills import *
+from Jeu.Systeme.Constantes_magies.Magies import *
+from Affichage.Skins.Skins import SKIN_TETE_ALCHIMISTE
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+from Jeu.Entitee.Item.Parchemin.Parchemins import Parchemin_vierge, Parchemin_impregne
+from Jeu.Dialogues.Dialogues_alchimiste import REPLIQUES_ALCHIMISTE

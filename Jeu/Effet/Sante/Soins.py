@@ -1,7 +1,13 @@
-from Jeu.Effet.Effet import *
-from Jeu.Effet.Sante.Maladies.Maladie import *
-from Jeu.Effet.Sante.Poison import *
-from Jeu.Constantes import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Entitee.Agissant.Agissant import Agissant
+    from Jeu.Labyrinthe.Case import Case
+
+# Imports des classes parentes
+from Jeu.Effet.Effet import On_fin_tour, One_shot, On_post_action
 
 class Antidote(One_shot,On_fin_tour):
     """Effet qui supprime les effets de poison du joueur."""
@@ -9,7 +15,7 @@ class Antidote(One_shot,On_fin_tour):
         self.affiche = False
         self.phase = "démarrage"
 
-    def action(self,porteur):
+    def action(self,porteur:Agissant):
         for effet in porteur.effets:
             if isinstance(effet,Poison):
                 effet.phase = "terminé" # Rajouter une condition de priorite
@@ -20,7 +26,7 @@ class Medicament(One_shot,On_fin_tour):
         self.affiche = False
         self.phase = "démarrage"
 
-    def action(self,porteur):
+    def action(self,porteur:Agissant):
         for effet in porteur.effets:
             if isinstance(effet,Maladie): # Créer des médicaments différents selon les maladies ?
                 effet.phase = "terminé" # Rajouter une condition de priorite
@@ -31,35 +37,35 @@ class Purification(One_shot,On_fin_tour):
         self.affiche = False
         self.phase = "démarrage"
 
-    def action(self,porteur):
+    def action(self,porteur:Agissant):
         for effet in porteur.effets:
             if isinstance(effet,(Maladie,Poison)):
                 effet.phase = "terminé" # Rajouter une condition de priorite
 
 class Soin_case(On_post_action):
     """Un effet de soin. À répercuter sur les occupants éventuels de la case."""
-    def __init__(self,gain_pv,responsable=0,cible="alliés"):
+    def __init__(self,gain_pv,responsable:Agissant,cible="alliés"):
         self.phase = "démarrage"
         self.gain_pv = gain_pv
         self.responsable = responsable
         self.cible = cible
         self.affiche = True
 
-    def action(self,case):
+    def action(self,case:Case):
         cibles_potentielles = case.controleur.trouve_agissants_courants(case.position)
         for cible_potentielle in cibles_potentielles:
             if self.responsable == 0: #Pas de responsable. Sérieusement ?
-                case.controleur.entitees[cible_potentielle].effets.append(Soin(self.responsable,self.gain_pv))
+                cible_potentielle.effets.append(Soin(self.responsable,self.gain_pv))
             else:
-                esprit = case.controleur.get_esprit(case.controleur[self.responsable].esprit)
+                esprit = self.responsable.esprit
                 if esprit is None: #Pas d'esprit ? Sérieusement ?
-                    case.controleur.entitees[cible_potentielle].effets.append(Soin(self.responsable,self.gain_pv))
-                elif self.cible == "alliés" and cible_potentielle in case.controleur.get_esprit(case.controleur[self.responsable].esprit).get_corps():
-                    case.controleur.entitees[cible_potentielle].effets.append(Soin(self.responsable,self.gain_pv))
-                elif self.cible == "neutres" and not cible_potentielle in case.controleur.get_esprit(case.controleur[self.responsable].esprit).get_ennemis():
-                    case.controleur.entitees[cible_potentielle].effets.append(Soin(self.responsable,self.gain_pv))
+                    cible_potentielle.effets.append(Soin(self.responsable,self.gain_pv))
+                elif self.cible == "alliés" and cible_potentielle in esprit.get_corps():
+                    cible_potentielle.effets.append(Soin(self.responsable,self.gain_pv))
+                elif self.cible == "neutres" and not cible_potentielle in esprit.get_ennemis():
+                    cible_potentielle.effets.append(Soin(self.responsable,self.gain_pv))
 
-    def execute(self,case):
+    def execute(self,case:Case):
         if self.phase == "démarrage" :
             self.action(case)
             self.termine()
@@ -72,13 +78,18 @@ class Soin(On_fin_tour):
         self.gain_pv = gain_pv
         self.affiche = True
 
-    def action(self,porteur):
+    def action(self,porteur:Agissant):
         porteur.soigne(self.gain_pv)
 
-    def execute(self,porteur):
+    def execute(self,porteur:Agissant):
         if self.phase == "démarrage" :
             self.action(porteur)
             self.termine()
 
     def get_skin(self):
         return SKIN_SOIN
+
+# Imports utilisés dans le code
+from Jeu.Effet.Sante.Maladies.Maladie import Maladie
+from Jeu.Effet.Sante.Poison import Poison
+from Affichage.Skins.Skins import SKIN_SOIN

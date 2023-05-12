@@ -2,8 +2,8 @@ from Jeu.Entitee.Item.Equippement.Equippement import *
 
 class Armure(Equipement):
     """La classe des équipements de type armure. On ne peut en porter qu'une à la fois."""
-    def __init__(self,position:Optional[Position]=None):
-        Equipement.__init__(self,position)
+    def __init__(self,controleur:Controleur,position:Position=ABSENT):
+        Equipement.__init__(self,controleur,position)
         self.poids = 10 #C'est lourd !
         self.frottements = 8 #Il y a pire.
 
@@ -16,6 +16,7 @@ class Armure(Equipement):
     def get_description(self,observation=0):
         return ["Une armure","Essaye de l'enfiler !"]
 
+    @staticmethod
     def get_image():
         return SKIN_ARMURE
 

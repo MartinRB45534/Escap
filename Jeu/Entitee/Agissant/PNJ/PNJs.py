@@ -16,15 +16,15 @@ class PNJ(Agissant, Interactif):
     Un personnage non-jouable (en vrai plutôt non-joué ici, il peut être controlable par un joueur).
     Se distingue par sa capacité à parler, obéir et le fait d'attendre le joueur jusqu'à le rencontrer.
     """
-    def __init__(self, controleur: Controleur, position: Position, identite: str, niveau: int, ID: Optional[int] = None):
-        Agissant.__init__(self, controleur, position, identite, niveau, ID)
+    def __init__(self, controleur: Controleur, identite: str, niveau: int, ID: Optional[int] = None, position: Position = ABSENT):
+        Agissant.__init__(self, controleur, identite, niveau, position, ID)
         self.dialogue = -1 #Le dialogue par défaut, celui des ordres
         self.replique = None #La réplique en cours de l'agissant vaut None lorsqu'il n'y a pas de dialogue en cours
         self.repliques = [] #Les réponses possibles de l'interlocuteur
         self.replique_courante = 0 #La réponse sélectionnée
 
         self.mouvement = 3 #0 pour un déplacement vague, 1 pour chercher, 2 pour un déplacement ciblé (prioritaire et précis), 3 pour l'attente, 4 pour l'attaque (déplacement ciblé et attaque dès qu'à portée)
-        self.cible_deplacement = self.ID #Une ID pour suivre quelqu'un, ou une position pour s'y diriger
+        self.cible_deplacement = self #Une ID pour suivre quelqu'un, ou une position pour s'y diriger
         self.comportement_corps_a_corps = 0 #0 pour attaquer, 1 pour ignorer, 2 pour fuir
         self.comportement_distance = 0 #0 pour foncer dans le tas, 1 pour tenter une attaque à distance puis se rapprocher, 2 pour tenter une attaque à distance puis fuir, 3 pour fuir puis tenter une attaque à distance
         self.antagonise_neutres = False #Si True, sera offensé par la simple vision d'un neutre (utile pour fuir les ennemis avant qu'ils n'attaquent)
@@ -100,17 +100,14 @@ class PNJ(Agissant, Interactif):
         Agissant.debut_tour(self)
         if self.antagonise_neutres:
             for case in self.vue:
-                for entitee in case.entitees:
-                    if not self.controleur.est_item(entitee):
-                        if not entitee in self.controleur.get_esprit(self.esprit).ennemis:
-                            self.insurge(entitee,0.01,0)
+                if case.agissant is not None:
+                    if not case.agissant in self.esprit.ennemis:
+                        self.insurge(case.agissant,0.01,0)
         elif self.antagonise_offensifs:
             for case in self.vue:
-                for ID_entitee in case.entitees:
-                    entitee = self.controleur.entitees[ID_entitee]
-                    if issubclass(entitee.get_classe(),Agissant):
-                        if self.ID in self.controleur.get_esprit(entitee.esprit).ennemis:
-                            self.insurge(ID_entitee,0.01,0)
+                if case.agissant is not None:
+                    if self in case.agissant.esprit.ennemis:
+                        self.insurge(case.agissant,0.01,0)
 
     def start_dialogue(self):
         raise NotImplementedError(f"Je ne peux pas commencer un dialogue. Parce que tu n'as pas surdéfini la méthode start_dialogue pour {self}.")
@@ -134,7 +131,7 @@ class PNJ_mage(PNJ,Mage):
         if self.peut_payer(cout):
             self.controleur.joueur.inventaire.consomme_parchemin_vierge()
             self.paye(cout)
-            parch = Parchemin_impregne(None,magie,cout//2)
+            parch = Parchemin_impregne(self.controleur,magie,cout//2)
             self.controleur.ajoute_entitee(parch)
             self.controleur.joueur.inventaire.ajoute(parch)
             self.replique = "dialogue-1phrase1.3.1"
@@ -153,14 +150,14 @@ class PJ(PNJ): #Les PJs sont des PNJs, parce que le mot PNJ est trompeur
     - un interlocuteur
     """
     def __init__(self, controleur: Controleur, position: Position, identite: str, niveau: int, ID: Optional[int] = None):
-        PNJ.__init__(self,controleur, position, identite, niveau, ID)
+        PNJ.__init__(self,controleur, identite, niveau, ID, position)
         self.statut_simule:str = "attente"
         self.skill_courant_simule:Optional[Type[Skill_intrasec]] = None
         self.dir_regard_simule:Optional[Direction] = None
         self.attente:int = -1
         self.nouvel_ordre:bool = False
         self.interlocuteur:Optional[Interactif] = None
-        self.touches:Dict[str,Dict[Tuple[int],Dict[int,List[str]|Type[Skill_intrasec]|Direction|Type[Projectile]|str]]] = {
+        self.touches:Dict[str,Dict[Tuple|Tuple[int],Dict[int,List[str]|Type[Skill_intrasec]|Direction|Type[Projectile]|str]]] = {
             "effets":{
             },
             "skills":{
@@ -171,7 +168,7 @@ class PJ(PNJ): #Les PJs sont des PNJs, parce que le mot PNJ est trompeur
             "magies":{},
         }
 
-    def utilise(self, skill: Skill_intrasec, force: bool = False):
+    def utilise(self, skill:Optional[Type[Skill_intrasec]], force: bool = False):
         if self is self.controleur.joueur and self.attente and not force:
             self.skill_courant_simule = skill
         else:
@@ -197,8 +194,8 @@ class PJ(PNJ): #Les PJs sont des PNJs, parce que le mot PNJ est trompeur
             if self.peut_voir(direction):
                 pos = self.position+direction
                 interactifs = self.controleur.trouve_interactifs_courants(pos)
-                if interactifs!=[]:
-                    interactif = self.controleur[interactifs[0]] # Est-ce que je continue à appeler ça un interlocuteur ?
+                if interactifs != set():
+                    interactif = interactifs.pop() # Est-ce que je continue à appeler ça un interlocuteur ?
                     if isinstance(interactif,PNJ):
                         self.interlocuteur = interactif
                         self.controleur.set_phase(DIALOGUE)
@@ -218,3 +215,15 @@ class PJ_mage(PJ, PNJ_mage):
             self.magie_courante_simule = magie
         else:
             self.magie_courante = magie
+            
+    def auto_impregne(self,nom:str):
+        skill = self.get_skill_magique()
+        latence,magie = skill.utilise(nom)
+        self.latence += latence
+        cout = magie.cout_pm
+        if self.peut_payer(cout):
+            self.inventaire.consomme_parchemin_vierge()
+            self.paye(cout)
+            parch = Parchemin_impregne(self.controleur,magie,cout//2)
+            self.controleur.ajoute_entitee(parch)
+            self.inventaire.ajoute(parch)

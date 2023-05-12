@@ -1,6 +1,12 @@
-from Jeu.Effet.Magie.Magie import *
-from Jeu.Effet.Attaque.Attaque import *
-from Jeu.Effet.Effets_divers import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Entitee.Agissant.Agissant import Agissant
+
+# Imports des classes parentes
+from Jeu.Effet.Magie.Magie import Magie_dirigee,Magies_offensives
 
 class Magie_laser(Magie_dirigee,Magies_offensives):
     """La magie qui crée une attaque de laser."""
@@ -15,8 +21,8 @@ class Magie_laser(Magie_dirigee,Magies_offensives):
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.effets.append(Attaque_magique(porteur.ID,degats_laser[self.niveau-1],TERRE,'proximité',portee_laser[self.niveau-1],"R__T___",self.direction))
+    def action(self,porteur:Agissant):
+        porteur.effets.append(Attaque_magique(porteur,degats_laser[self.niveau-1],TERRE,'proximité',portee_laser[self.niveau-1],"R__T___",self.direction))
 
     def get_image(self):
         return SKIN_MAGIE_LASER
@@ -38,8 +44,8 @@ class Magie_brasier(Magies_offensives):
         self.niveau = niveau
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.effets.append(Attaque_magique(porteur.ID,degats_brasier[self.niveau-1],FEU,"proximité",portee_brasier[self.niveau-1]))
+    def action(self,porteur:Agissant):
+        porteur.effets.append(Attaque_magique(porteur,degats_brasier[self.niveau-1],FEU,"proximité",portee_brasier[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_BRASIER
@@ -63,8 +69,8 @@ class Magie_avalanche(Magie_dirigee,Magies_offensives):
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.effets.append(Attaque_magique(porteur.ID,degats_avalanche[self.niveau-1],TERRE,"proximité",portee_avalanche[self.niveau-1],"S__S_Pb",self.direction))
+    def action(self,porteur:Agissant):
+        porteur.effets.append(Attaque_magique(porteur,degats_avalanche[self.niveau-1],TERRE,"proximité",portee_avalanche[self.niveau-1],"S__S_Pb",self.direction))
 
     def get_image(self):
         return SKIN_MAGIE_AVALANCHE
@@ -86,8 +92,8 @@ class Magie_purification(Magies_offensives):
         self.niveau = niveau
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.effets.append(Purification_lumineuse(porteur.ID,degats_purification[self.niveau-1],portee_purification[self.niveau-1])) #Ajouter une direction ?
+    def action(self,porteur:Agissant):
+        porteur.effets.append(Purification_lumineuse(porteur,degats_purification[self.niveau-1],portee_purification[self.niveau-1])) #Ajouter une direction ?
 
     def get_image(self):
         return SKIN_MAGIE_PURIFICATION
@@ -97,3 +103,9 @@ class Magie_purification(Magies_offensives):
 
     def get_description(self,observation=0):
         return ["Une magie de purification","Inflige des dégats aux agissants à proximité du lanceur.","Les dégats sont inversement proportionnels à l'affinité à l'ombre.","La purification n'est pas une attaque, mais se comporte comme telle.",f"Coût : {self.cout_pm}",f"Dégats : {degats_purification[self.niveau-1]}",f"Portée : {portee_purification[self.niveau-1]}",f"Latence : {self.latence}"]
+
+# Imports utilisés dans le code
+from Jeu.Effet.Attaque.Attaque import Attaque_magique, Purification_lumineuse
+from Jeu.Systeme.Constantes_magies.Magies import *
+from Jeu.Constantes import *
+from Affichage.Skins.Skins import *

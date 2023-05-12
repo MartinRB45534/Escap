@@ -1,6 +1,12 @@
-from Jeu.Effet.Magie.Magie import *
-from Jeu.Effet.Effets_items import *
-from Jeu.Effet.Enchantements import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Entitee.Agissant.Agissant import Agissant
+
+# Imports des classes parentes
+from Jeu.Effet.Magie.Magie import Enchante_agissant, Enchante_item
 
 class Magie_enchantement_faiblesse(Enchante_agissant):
     """La magie qui place un enchantement de faiblesse sur un agissant."""
@@ -11,12 +17,13 @@ class Magie_enchantement_faiblesse(Enchante_agissant):
         self.cout_pm = cout_pm_faiblesse[niveau-1]
         self.latence = latence_faiblesse[niveau-1]
         self.niveau = niveau
-        self.cible = None
+        self.cible:Optional[Agissant] = None
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.controleur[self.cible].effets.append(Enchantement_force(duree_faiblesse[self.niveau-1],gain_force_faiblesse[self.niveau-1]))
+    def action(self,porteur:Agissant):
+        assert self.cible is not None
+        self.cible.effets.append(Enchantement_force(duree_faiblesse[self.niveau-1],gain_force_faiblesse[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_FAIBLESSE
@@ -36,12 +43,13 @@ class Magie_enchantement_cecite(Enchante_agissant):
         self.cout_pm = cout_pm_cecite[niveau-1]
         self.latence = latence_cecite[niveau-1]
         self.niveau = niveau
-        self.cible = None
+        self.cible:Optional[Agissant] = None
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.controleur[self.cible].effets.append(Enchantement_vision(duree_cecite[self.niveau-1],gain_vision_cecite[self.niveau-1]))
+    def action(self,porteur:Agissant):
+        assert self.cible is not None
+        self.cible.effets.append(Enchantement_vision(duree_cecite[self.niveau-1],gain_vision_cecite[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_CECITE
@@ -61,12 +69,13 @@ class Magie_enchantement_perte_de_pv(Enchante_agissant):
         self.cout_pm = cout_pm_perte_de_pv[niveau-1]
         self.latence = latence_perte_de_pv[niveau-1]
         self.niveau = niveau
-        self.cible = None
+        self.cible:Optional[Agissant] = None
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.controleur[self.cible].effets.append(Enchantement_pv(duree_perte_de_pv[self.niveau-1],gain_pv_perte_de_pv[self.niveau-1]))
+    def action(self,porteur:Agissant):
+        assert self.cible is not None
+        self.cible.effets.append(Enchantement_pv(duree_perte_de_pv[self.niveau-1],gain_pv_perte_de_pv[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_PERTE_DE_PV
@@ -86,12 +95,13 @@ class Magie_enchantement_perte_de_pm(Enchante_agissant):
         self.cout_pm = cout_pm_perte_de_pm[niveau-1]
         self.latence = latence_perte_de_pm[niveau-1]
         self.niveau = niveau
-        self.cible = None
+        self.cible:Optional[Agissant] = None
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.controleur[self.cible].effets.append(Enchantement_pm(duree_perte_de_pm[self.niveau-1],gain_pm_perte_de_pm[self.niveau-1]))
+    def action(self,porteur:Agissant):
+        assert self.cible is not None
+        self.cible.effets.append(Enchantement_pm(duree_perte_de_pm[self.niveau-1],gain_pm_perte_de_pm[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_PERTE_DE_PM
@@ -111,12 +121,13 @@ class Magie_enchantement_confusion(Enchante_agissant):
         self.cout_pm = cout_pm_confusion[niveau-1]
         self.latence = latence_confusion[niveau-1]
         self.niveau = niveau
-        self.cible = None
+        self.cible:Optional[Agissant] = None
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.controleur[self.cible].effets.append(Enchantement_confusion(duree_confusion[self.niveau-1],taux_erreur_confusion[self.niveau-1]))
+    def action(self,porteur:Agissant):
+        assert self.cible is not None
+        self.cible.effets.append(Enchantement_confusion(duree_confusion[self.niveau-1],taux_erreur_confusion[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_CONFUSION
@@ -136,12 +147,13 @@ class Magie_enchantement_poches_trouees(Enchante_agissant):
         self.cout_pm = cout_pm_poches_trouees[niveau-1]
         self.latence = latence_poches_trouees[niveau-1]
         self.niveau = niveau
-        self.cible = None
+        self.cible:Optional[Agissant] = None
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.controleur[self.cible].effets.append(Enchantement_poches_trouees(duree_poches_trouees[self.niveau-1],taux_drop_poches_trouees[self.niveau-1]))
+    def action(self,porteur:Agissant):
+        assert self.cible is not None
+        self.cible.effets.append(Enchantement_poches_trouees(duree_poches_trouees[self.niveau-1],taux_drop_poches_trouees[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_POCHES_TROUEES
@@ -161,12 +173,13 @@ class Magie_enchantement_force(Enchante_agissant):
         self.cout_pm = cout_pm_force[niveau-1]
         self.latence = latence_force[niveau-1]
         self.niveau = niveau
-        self.cible = None
+        self.cible:Optional[Agissant] = None
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.controleur[self.cible].effets.append(Enchantement_force(duree_force[self.niveau-1],gain_force[self.niveau-1]))
+    def action(self,porteur:Agissant):
+        assert self.cible is not None
+        self.cible.effets.append(Enchantement_force(duree_force[self.niveau-1],gain_force[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_FORCE
@@ -186,12 +199,13 @@ class Magie_enchantement_vision(Enchante_agissant):
         self.cout_pm = cout_pm_vision[niveau-1]
         self.latence = latence_vision[niveau-1]
         self.niveau = niveau
-        self.cible = None
+        self.cible:Optional[Agissant] = None
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.controleur[self.cible].effets.append(Enchantement_vision(duree_vision[self.niveau-1],gain_vision[self.niveau-1]))
+    def action(self,porteur:Agissant):
+        assert self.cible is not None
+        self.cible.effets.append(Enchantement_vision(duree_vision[self.niveau-1],gain_vision[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_VISION
@@ -211,12 +225,13 @@ class Magie_enchantement_vitalite(Enchante_agissant):
         self.cout_pm = cout_pm_vitalite[niveau-1]
         self.latence = latence_vitalite[niveau-1]
         self.niveau = niveau
-        self.cible = None
+        self.cible:Optional[Agissant] = None
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.controleur[self.cible].effets.append(Enchantement_pv(duree_vitalite[self.niveau-1],gain_pv_vitalite[self.niveau-1]))
+    def action(self,porteur:Agissant):
+        assert self.cible is not None
+        self.cible.effets.append(Enchantement_pv(duree_vitalite[self.niveau-1],gain_pv_vitalite[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_VITALITE
@@ -236,12 +251,13 @@ class Magie_enchantement_absorption(Enchante_agissant):
         self.cout_pm = cout_pm_absorption[niveau-1]
         self.latence = latence_absorption[niveau-1]
         self.niveau = niveau
-        self.cible = None
+        self.cible:Optional[Agissant] = None
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.controleur[self.cible].effets.append(Enchantement_pm(duree_absorption[self.niveau-1],gain_pm_absorption[self.niveau-1]))
+    def action(self,porteur:Agissant):
+        assert self.cible is not None
+        self.cible.effets.append(Enchantement_pm(duree_absorption[self.niveau-1],gain_pm_absorption[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_ABSORPTION
@@ -261,12 +277,13 @@ class Magie_enchantement_celerite(Enchante_agissant):
         self.cout_pm = cout_pm_celerite[niveau-1]
         self.latence = latence_celerite[niveau-1]
         self.niveau = niveau
-        self.cible = None
+        self.cible:Optional[Agissant] = None
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.controleur[self.cible].effets.append(Enchantement_vitesse(duree_celerite[self.niveau-1],gain_vitesse_celerite[self.niveau-1]))
+    def action(self,porteur:Agissant):
+        assert self.cible is not None
+        self.cible.effets.append(Enchantement_vitesse(duree_celerite[self.niveau-1],gain_vitesse_celerite[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_CELERITE
@@ -286,12 +303,13 @@ class Magie_enchantement_immunite(Enchante_agissant):
         self.cout_pm = cout_pm_immunite[niveau-1]
         self.latence = latence_immunite[niveau-1]
         self.niveau = niveau
-        self.cible = None
+        self.cible:Optional[Agissant] = None
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.controleur[self.cible].effets.append(Enchantement_immunite(duree_immunite[self.niveau-1],superiorite_immunite[self.niveau-1]))
+    def action(self,porteur:Agissant):
+        assert self.cible is not None
+        self.cible.effets.append(Enchantement_immunite(duree_immunite[self.niveau-1],superiorite_immunite[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_IMMUNITE
@@ -311,12 +329,13 @@ class Magie_enchantement_flamme(Enchante_agissant):
         self.cout_pm = cout_pm_flamme[niveau-1]
         self.latence = latence_flamme[niveau-1]
         self.niveau = niveau
-        self.cible = None
+        self.cible:Optional[Agissant] = None
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.controleur[self.cible].effets.append(Enchantement_flamme(duree_flamme[self.niveau-1],gain_affinite_flamme[self.niveau-1]))
+    def action(self,porteur:Agissant):
+        assert self.cible is not None
+        self.cible.effets.append(Enchantement_flamme(duree_flamme[self.niveau-1],gain_affinite_flamme[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_FLAMME
@@ -336,12 +355,13 @@ class Magie_enchantement_neige(Enchante_agissant):
         self.cout_pm = cout_pm_neige[niveau-1]
         self.latence = latence_neige[niveau-1]
         self.niveau = niveau
-        self.cible = None
+        self.cible:Optional[Agissant] = None
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.controleur[self.cible].effets.append(Enchantement_neige(duree_neige[self.niveau-1],gain_affinite_neige[self.niveau-1]))
+    def action(self,porteur:Agissant):
+        assert self.cible is not None
+        self.cible.effets.append(Enchantement_neige(duree_neige[self.niveau-1],gain_affinite_neige[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_NEIGE
@@ -361,12 +381,13 @@ class Magie_enchantement_sable(Enchante_agissant):
         self.cout_pm = cout_pm_sable[niveau-1]
         self.latence = latence_sable[niveau-1]
         self.niveau = niveau
-        self.cible = None
+        self.cible:Optional[Agissant] = None
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.controleur[self.cible].effets.append(Enchantement_sable(duree_sable[self.niveau-1],gain_affinite_sable[self.niveau-1]))
+    def action(self,porteur:Agissant):
+        assert self.cible is not None
+        self.cible.effets.append(Enchantement_sable(duree_sable[self.niveau-1],gain_affinite_sable[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_SABLE
@@ -386,12 +407,13 @@ class Magie_enchantement_tenebre(Enchante_agissant):
         self.cout_pm = cout_pm_tenebre[niveau-1]
         self.latence = latence_tenebre[niveau-1]
         self.niveau = niveau
-        self.cible = None
+        self.cible:Optional[Agissant] = None
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.controleur[self.cible].effets.append(Enchantement_tenebre(duree_tenebre[self.niveau-1],gain_affinite_tenebre[self.niveau-1]))
+    def action(self,porteur:Agissant):
+        assert self.cible is not None
+        self.cible.effets.append(Enchantement_tenebre(duree_tenebre[self.niveau-1],gain_affinite_tenebre[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_TENEBRE
@@ -411,12 +433,13 @@ class Magie_enchantement_rouille(Enchante_item): #Il faudrait cibler un item vis
         self.cout_pm = cout_pm_rouille[niveau-1]
         self.latence = latence_rouille[niveau-1]
         self.niveau = niveau
-        self.cible = None
+        self.cible:Optional[Item] = None
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.controleur[self.cible].effets.append(Enchantement_arme(duree_rouille[self.niveau-1],gain_force_rouille[self.niveau-1],gain_portee_rouille[self.niveau-1])) #Comment affecter aussi les autres types d'équippement ?
+    def action(self,porteur:Agissant):
+        assert self.cible is not None
+        self.cible.effets.append(Enchantement_arme(duree_rouille[self.niveau-1],gain_force_rouille[self.niveau-1],gain_portee_rouille[self.niveau-1])) #Comment affecter aussi les autres types d'équippement ?
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_ROUILLE
@@ -436,12 +459,13 @@ class Magie_enchantement_renforcement(Enchante_item):
         self.cout_pm = cout_pm_renforcement[niveau-1]
         self.latence = latence_renforcement[niveau-1]
         self.niveau = niveau
-        self.cible = None
+        self.cible:Optional[Item] = None
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.controleur[self.cible].effets.append(Enchantement_arme(duree_renforcement[self.niveau-1],gain_force_renforcement[self.niveau-1],gain_portee_renforcement[self.niveau-1]))
+    def action(self,porteur:Agissant):
+        assert self.cible is not None
+        self.cible.effets.append(Enchantement_arme(duree_renforcement[self.niveau-1],gain_force_renforcement[self.niveau-1],gain_portee_renforcement[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_RENFORCEMENT
@@ -461,12 +485,13 @@ class Magie_enchantement_bombe(Enchante_item):
         self.cout_pm = cout_pm_bombe[niveau-1]
         self.latence = latence_bombe[niveau-1]
         self.niveau = niveau
-        self.cible = None
+        self.cible:Optional[Item] = None
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.controleur[self.cible].effets.append(Enchantement_bombe(duree_bombe[self.niveau-1],On_hit(portee_bombe[self.niveau-1],degats_bombe[self.niveau-1])))
+    def action(self,porteur:Agissant):
+        assert self.cible is not None
+        self.cible.effets.append(Enchantement_bombe(duree_bombe[self.niveau-1],On_hit(portee_bombe[self.niveau-1],degats_bombe[self.niveau-1])))
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_BOMBE
@@ -476,3 +501,9 @@ class Magie_enchantement_bombe(Enchante_item):
 
     def get_description(self,observation=0):
         return ["Un enchantement","Affecte un item à proximité du lanceur.","L'enchantement de bombe confère un effet explosif à l'item pour une certaine durée (s'il est lancé, il explose au contact d'un agissant ou d'un mur et inflige des dégats de terre aux agissants à proximité).",f"Coût : {self.cout_pm} PMs",f"Dégats de l'explosion : {degats_bombe[self.niveau-1]}",f"Portee de l'explosion : {portee_bombe[self.niveau-1]}",f"Durée de l'enchantement : {duree_bombe[self.niveau-1]}",f"Latence : {self.latence}"]
+
+# Imports utilisés dans le code
+from Jeu.Effet.Enchantements import *
+from Jeu.Effet.Effets_items import On_hit
+from Jeu.Systeme.Constantes_magies.Magies import *
+from Affichage.Skins.Skins import SKIN_MAGIE_ENCHANTEMENT_BOMBE,SKIN_MAGIE_ENCHANTEMENT_RENFORCEMENT,SKIN_MAGIE_ENCHANTEMENT_ROUILLE

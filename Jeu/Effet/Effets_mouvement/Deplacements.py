@@ -1,8 +1,15 @@
-from Jeu.Effet.Effet import *
-from Jeu.Entitee.Agissant.Humain.Heros import Heros
-from Jeu.Entitee.Item.Item import *
-from Jeu.Systeme.Classe import *
-from Jeu.Constantes import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Entitee.Entitee import Entitee
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from Jeu.Controleur import Controleur
+
+# Imports des classes parentes
+from Jeu.Effet.Effet import On_through
+
 
 class Teleport(On_through):
     """L'effet de téléportation, qui modifie la position de l'agissant (il peut aussi s'agir d'un déplacement normal)."""
@@ -15,23 +22,20 @@ class Teleport(On_through):
         assert entitee.position is not None
         # On va chercher un éventuel occupant de la case cible
         occupants = entitee.controleur.trouve_non_superposables(self.position)
-        if issubclass(entitee.get_classe(),Item) and isinstance(entitee,Item):
+        if isinstance(entitee,Item):
             if entitee.position.lab!=self.position.lab: #Un item passe quoi qu'il arrive
                 entitee.controleur.move(self.position,entitee)
             else:
                 entitee.set_position(self.position)
-            for ID in occupants:
-                occupant = entitee.controleur.entitees[ID]
-                assert isinstance(occupant,Non_superposable)
+            for occupant in occupants:
                 entitee.heurte_non_superposable(occupant) #Mais il heurte les occupants
-        elif issubclass(entitee.get_classe(),Agissant) and isinstance(entitee,Agissant):
+        elif isinstance(entitee,Agissant):
             passe = True
             if occupants != []:
                 ecrasement = trouve_skill(entitee.classe_principale,Skill_ecrasement) #On peut peut-être écraser l'occupant de l'autre case
                 if ecrasement is not None:
                     for occupant in occupants:
-                        agissant = entitee.controleur.entitees[occupant]
-                        if not ecrasement.utilise(agissant.get_priorite(),entitee.get_priorite()):
+                        if not ecrasement.utilise(occupant.get_priorite(),entitee.get_priorite()):
                             passe = False
                 else:
                     passe = False
@@ -45,13 +49,13 @@ class Teleport(On_through):
                     if dir_oppose is not None:
                         entitee.regarde(dir_oppose.oppose())
 
-    def get_dir_oppose(self,controleur):
+    def get_dir_oppose(self,controleur:Controleur):
         dir_oppose = None
         for i in DIRECTIONS:
-            mur_potentiel = controleur[self.position,i]
+            mur_potentiel = controleur.mur_from_cote(Cote_position(self.position,i))
             cible_potentielle = mur_potentiel.get_cible()
             if cible_potentielle is not None :
-                for mur in controleur[cible_potentielle].murs:
+                for mur in controleur.case_from_position(cible_potentielle).murs:
                     if self in mur.effets:
                         dir_oppose = i
         return dir_oppose
@@ -60,10 +64,9 @@ class Teleport(On_through):
         return SKIN_PORTAIL
 
 class Premier_portail(Teleport):
-    def execute(self,*args):
-        entitee = args[0]
+    def execute(self,entitee:Entitee):
         assert isinstance(entitee,Agissant)
-        if entitee.ID == 2:
+        if entitee == 2:
             assert isinstance(entitee,Heros)
             entitee.first_teleport()
             Premier_portail.execute = Teleport.execute
@@ -82,11 +85,18 @@ class Escalier(Teleport):
             return SKIN_ESCALIER_BAS
 
 class Premiere_marche(Escalier):
-    def execute(self,*args):
-        entitee = args[0]
-        assert isinstance(entitee,Agissant)
+    def execute(self,entitee:Entitee):
         if entitee.ID == 2:
             assert isinstance(entitee,Heros)
             entitee.first_step()
             Premiere_marche.execute = Escalier.execute
         Escalier.execute(self,entitee)
+
+# Imports utilisés dans le code
+from Jeu.Labyrinthe.Structure_spatiale.Direction import *
+from Jeu.Labyrinthe.Structure_spatiale.Cote import Cote_position
+from Jeu.Systeme.Classe import trouve_skill, Skill_ecrasement
+from Jeu.Entitee.Agissant.Agissant import Agissant
+from Jeu.Entitee.Item.Item import Item
+from Affichage.Skins.Skins import *
+from Jeu.Entitee.Agissant.Humain.Heros import Heros

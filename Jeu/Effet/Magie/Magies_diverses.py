@@ -1,6 +1,13 @@
-from Jeu.Effet.Magie.Magie import *
-from Jeu.Effet.Effets_divers import *
-from Jeu.Effet.Effets_protection import *
+from __future__ import annotations
+from typing import TYPE_CHECKING, List, Optional
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Entitee.Agissant.Agissant import Agissant
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+
+# Imports des classes parentes
+from Jeu.Effet.Magie.Magie import Magie, Multi_cible, Cible_agissant, Cible_case
 
 class Magie_blizzard(Magie):
     """La magie qui crée un effet de blizzard autour de l'agissant."""
@@ -13,7 +20,7 @@ class Magie_blizzard(Magie):
         self.niveau = niveau
         self.affiche = True
 
-    def action(self,porteur):
+    def action(self,porteur:Agissant):
         cases = porteur.controleur.get_cases_touches(porteur.position,portee_blizzard[self.niveau-1])
         for case in cases:
             case.effets.append(Blizzard(self.niveau))
@@ -38,7 +45,7 @@ class Magie_obscurite(Magie):
         self.niveau = niveau
         self.affiche = True
 
-    def action(self,porteur):
+    def action(self,porteur:Agissant):
         cases = porteur.controleur.get_cases_touches(porteur.position,portee_obscurite[self.niveau-1])
         for case in cases:
             case.effets.append(Obscurite(self.niveau))
@@ -52,7 +59,7 @@ class Magie_obscurite(Magie):
     def get_description(self,observation=0):
         return ["Une magie d'obscurité","Affecte les cases à proximité du lanceur.","L'obscurité augmente l'opacité des cases, rendant plus difficile de voir au travers.",f"Coût : {self.cout_pm}",f"Portee de la magie : {portee_obscurite[self.niveau-1]}",f"Opacité supplémentaire : {gain_opacite_obscurite[self.niveau-1]}",f"Latence : {self.latence}"]
 
-class Magie_instakill(Magie_cible):
+class Magie_instakill(Cible_agissant):
     """La magie qui crée un effet d'instakill sur un agissant."""
     nom = "magie instakill"
     def __init__(self,niveau:int):
@@ -61,12 +68,13 @@ class Magie_instakill(Magie_cible):
         self.cout_pm = cout_pm_instakill[niveau-1]
         self.latence = latence_instakill[niveau-1]
         self.niveau = niveau
-        self.cible = None
+        self.cible:Optional[Agissant] = None
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        porteur.controleur[self.cible].effets.append(Instakill(porteur.ID,porteur.priorite - superiorite_instakill[self.niveau-1]))
+    def action(self,porteur:Agissant):
+        assert self.cible is not None
+        self.cible.effets.append(Instakill(porteur,porteur.priorite - superiorite_instakill[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_INSTAKILL
@@ -86,13 +94,13 @@ class Magie_protection_sacree(Multi_cible,Cible_agissant):
         self.cout_pm = cout_pm_protection_sacree[niveau-1]
         self.latence = latence_protection_sacree[niveau-1]
         self.niveau = niveau
-        self.cible = None
+        self.cible:List[Agissant] = []
         self.temps = 10000
         self.affiche = True
 
-    def action(self,porteur):
-        for ID in self.cible:
-            porteur.controleur.entitees[ID].effets.append(Protection_sacree(duree_protection_sacree[self.niveau-1],pv_protection_sacree[self.niveau-1])) #Ajouter une direction ?
+    def action(self,porteur:Agissant):
+        for cible in self.cible:
+            cible.effets.append(Protection_sacree(duree_protection_sacree[self.niveau-1],pv_protection_sacree[self.niveau-1])) #Ajouter une direction ?
 
     def get_image(self):
         return SKIN_MAGIE_PROTECTION_SACREE
@@ -111,15 +119,15 @@ class Magie_teleportation(Multi_cible,Cible_case):
         self.gain_xp = gain_xp_teleportation[niveau-1]
         self.cout_pm = cout_pm_teleportation[niveau-1]
         self.latence = latence_teleportation[niveau-1]
-        self.cible = None
+        self.cible:List[Position] = []
         self.temps = 100000
         self.niveau = niveau
         self.affiche = True
 
-    def action(self,porteur):
+    def action(self,porteur:Agissant):
         for i in range(len(self.cible)):
-            for ID in porteur.controleur.trouve_occupants(self.cible[i]):
-                porteur.controleur.entitees[ID].effets.append(Teleportation(self.cible[i-1]))
+            for agissant in porteur.controleur.trouve_occupants(self.cible[i]):
+                agissant.effets.append(Teleport(self.cible[i-1]))
 
     def get_image(self):
         return SKIN_MAGIE_TELEPORTATION
@@ -129,3 +137,10 @@ class Magie_teleportation(Multi_cible,Cible_case):
 
     def get_description(self,observation=0):
         return ["Une magie de téléportation","Affecte les entitées sur les cases sélectionnées.","Les entitées de chaque case sont déplacées sur la case précédente. Les entitées de la première case sont envoyées sur la dernière case.",f"Coût : {self.cout_pm}",f"Latence : {self.latence}"]
+
+# Imports utilisés dans le code
+from Jeu.Systeme.Constantes_magies.Magies import *
+from Jeu.Effet.Effets_mouvement.Deplacements import Teleport
+from Jeu.Effet.Effets_divers import Instakill, Blizzard, Obscurite
+from Jeu.Effet.Effets_protection import Protection_sacree
+from Affichage.Skins.Skins import SKIN_MAGIE_INSTAKILL, SKIN_MAGIE_PROTECTION_SACREE, SKIN_MAGIE_TELEPORTATION, SKIN_MAGIE_BLIZZARD, SKIN_MAGIE_OBSCURITE

@@ -3,8 +3,8 @@ from Jeu.Entitee.Agissant.Gobelin.Gobelin import *
 class Explorateur_gobelin(Fuyard,Gobelin):
     """Un gobelin rapide et trop curieux.
        Il a une meilleure vitesse que les gobelins de base, qui l'avantage aussi en combat."""
-    def __init__(self,controleur,position,niveau:int):
-        Agissant.__init__(self,controleur,position,"explorateur_gobelin",niveau)
+    def __init__(self,controleur:Controleur,niveau:int,position:Position=ABSENT):
+        Agissant.__init__(self,controleur,"explorateur_gobelin",niveau,position)
 
     def get_offenses(self):
         offenses = self.offenses

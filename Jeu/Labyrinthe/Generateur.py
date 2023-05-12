@@ -25,7 +25,7 @@
 #         if item is None:
 #             return False
 #         elif isinstance(item,Position):
-#             return item.lab == self.ID and 0<=item.x<self.largeur and 0<=item.y<self.hauteur
+#             return item.lab == self and 0<=item.x<self.largeur and 0<=item.y<self.hauteur
 #         elif isinstance(item,Decalage):
 #             return 0<=item.x<self.largeur and 0<=item.y<self.hauteur
 #         return NotImplemented

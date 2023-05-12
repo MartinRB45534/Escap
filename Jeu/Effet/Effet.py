@@ -1,6 +1,13 @@
+from __future__ import annotations
 from warnings import warn
-from Affichage.Skins.Skins import *
-from Jeu.Constantes import *
+from typing import TYPE_CHECKING
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Entitee.Entitee import Entitee
+    from Jeu.Labyrinthe.Mur import Mur
+
+# Pas de classe parente
 
 class Effet :
     """Les effets regroupent des choses qui arrivent à des éléments du système. Ils peuvent cibler une case, un mur, un agissant, un étage, etc. et sont souvent limités dans le temps ou par d'autres conditions. Ils sont évalués par le controleur dans différentes circonstances."""
@@ -123,7 +130,13 @@ class Enchantement(Evenement) :
 
 class On_through(Effet):
     """La classe des effets déclenchés quand on traverse un mur."""
-    pass
+    def execute(self, entitee:Entitee):
+        """L'action à effectuer quand on traverse un mur."""
+        pass
+
+    def action(self, entitee:Entitee):
+        """L'action à effectuer quand on traverse un mur."""
+        pass
 
 class On_step_in(Effet):
     """La classe des effets déclenchés lorsqu'on marche sur une case."""
@@ -135,8 +148,13 @@ class On_step_out(Effet):
 
 class On_try_through(Effet):
     """La classe des effets déclenchés quand on essaye de traverser un mur."""
-    pass
+    def action(self,mur:Mur,entitee:Entitee):
+        """L'action à effectuer quand on essaye de traverser un mur."""
+        pass
 
 class Aura(On_tick):
     """La classe des auras (attachées à la case)."""
     pass #Ne doit pas être instanciée
+
+# Imports utilisés dans le code
+from Affichage.Skins.Skins import SKIN_EFFET
