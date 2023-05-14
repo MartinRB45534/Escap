@@ -1,10 +1,22 @@
-from Jeu.Entitee.Agissant.Gobelin.Gobelin import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
 
-class Chef_gobelin(Gobelin):
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+
+# Imports des classes parentes
+from Jeu.Entitee.Agissant.Gobelin.Base_gobelin import Base_gobelin
+
+# Valeurs par défaut des paramètres
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+
+class Chef_gobelin(Base_gobelin):
     """Un gobelin qui dirige un groupe.
        Bonnes stats, augmente l'efficacité de l'esprit."""
     def __init__(self,controleur:Controleur,niveau:int,position:Position=ABSENT):
-        Agissant.__init__(self,controleur,"chef_gobelin",niveau,position)
+        Base_gobelin.__init__(self,controleur,"chef_gobelin",niveau,position)
 
     def get_offenses(self):
         offenses = self.offenses

@@ -1,16 +1,23 @@
-import random
-from typing import List, Optional, Type, TypeVar
-from Jeu.Constantes import *
-from Jeu.Systeme.Kumo_desu_ga_nanika import *
+from __future__ import annotations
+from typing import TYPE_CHECKING, List, TypeVar, Optional
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Systeme.Skill import Skill
+    from Jeu.Systeme.Skill_intrasec import Skill_intrasec
+
+# Pas de classe parente
+
+# Valeurs par défaut des paramètres
 
 class Classe:
     """!!! Classe != class !!! Correspond aux classes avec des niveaux, qui évoluent, contiennent des skills, etc."""
-    def __init__(self,conditions_evo=[0,10,20,30,40,50,60,70,80,90],skills_intrasecs=[],skills=[],cadeaux_evo=[[],[],[],[],[],[],[],[],[],[]]):
+    def __init__(self,conditions_evo=[0,10,20,30,40,50,60,70,80,90],skills_intrasecs:List[Skill_intrasec]=[],skills:List[Skill]=[],cadeaux_evo=[[],[],[],[],[],[],[],[],[],[]]):
         """conditions_evo : les conditions d'évolution de la classe au niveau supérieur ; si c'est un nombre, indique l'xp nécessaire à l'évolution, si c'est une chaine de caractère, indique la fonction capable d'évaluer la condition
            skills_intrasecs : les skills obtenus automatiquement avec la classe
            cadeux_evo : les récompenses d'évolution ; peuvent être des skills, des classes ou de l'xp""" #Plus vraiment, en fait... À rafraichir
-        self.skills:List[Skill]=skills
-        self.skills_intrasecs:List[Skill_intrasec]=skills_intrasecs
+        self.skills=skills
+        self.skills_intrasecs=skills_intrasecs
         self.sous_classes:List[Classe]=[] #Une classe peut posséder des sous-classes, qui contribueront à son évolution moins qu'à celle de la classe principale
         self.niveau=0 #Le niveau devrais passer à 1 lorsqu'on acquiert la classe
         self.cond_evo=conditions_evo
@@ -96,7 +103,7 @@ class Classe:
                 skill.evo()
 
     def get_skills_actifs(self):
-        skills = []
+        skills:List[Skill_intrasec] = []
         for skill in self.skills:
             if isinstance(skill,(Skill_magie,Skill_analyse,Skill_vol,Skill_stomp,Skill_attaque,Skill_blocage,Skill_lancer,Skill_course)):
                 skills.append(skill) #Ne prend pas en compte la création d'items pour l'instant !
@@ -109,7 +116,7 @@ class Classe:
 
     def debut_tour(self):
         """Fonction qui renvoie tous les skills qui ont besoin d'être appelés au début du tour (juste les auras pour l'instant)."""
-        skills = []
+        skills:List[Skill_intrasec] = []
         for skill in self.skills:
             if isinstance(skill,Skill_debut_tour):
                 skills.append(skill)
@@ -127,8 +134,8 @@ class Classe_principale(Classe):
     """La classe principale de l'agissant. Le niveau d'un agissant est égal au niveau de sa classe principale. Pour les agissants capables de s'améliorer, l'utilisation de la procédure gagne_xp de la classe principale provoque récursivement l'utilisation de cette procédure sur tous les sous-classe est skills de l'agissant. L'amélioration de la classe principale provoque une amélioration des statistiques de l'agissant.
        Pour le joueur, une amélioration de la classe principale permet de choisir une récompense dans l'arbre de compétence ou dans l'arbre élémental (ou deux dans l'arbre élémental avec la classe élémentaliste)."""
     def __init__(self,identite,niveau:int):
-        skills_intrasecs = []
-        skills = []
+        skills_intrasecs:List[Skill_intrasec] = []
+        skills:List[Skill] = []
         cond_evo = [0,10,20,30,40,50,60,70,80,90]
 
         if identite == 'heros' :
@@ -467,8 +474,8 @@ class Classe_principale(Classe):
 ##                print(identite+" ? Qu'est-ce que c'est que ça ?")
 ##        else :
 ##            if identite == "nightmare_vestige": #Créés par les oeufs de kumoko quand ils éclosent, se battent pour kumoko mais sont capables de la tuer. Tous leurs skills sont intrasecs, et augmentent avec la classe principale au niveau de kumoko quand elle les crée.
-##                skills = [Hatching()]
-##                skills_intrasecs = [Lesser_Skanda(),Lesser_Wisdom(),Lesser_Height_of_Occultism({}),Lesser_Divine_Thread_Weaving(),Lesser_Scythe()] #Lui donner des magies de kumoko au hasard ? Pareil pour les Evil_Eyes ? En tous cas l'Abyss_magic.
+##                skills:List[Skill] = [Hatching()]
+##                skills_intrasecs:List[Skill_intrasec] = [Lesser_Skanda(),Lesser_Wisdom(),Lesser_Height_of_Occultism({}),Lesser_Divine_Thread_Weaving(),Lesser_Scythe()] #Lui donner des magies de kumoko au hasard ? Pareil pour les Evil_Eyes ? En tous cas l'Abyss_magic.
 ##                Classe.__init__(self,[0]*10,skills_intrasecs,skills) #Hatching() est le compte à rebours avant l'éclosion. Tant qu'il est de niveau < 10, l'apparence du vestige est un oeuf (item). Quand il éclot, il prend son apparence d'arraignée blanche. S'il éclot dans un inventaire, il sera du côté de son possesseur.
 ##            self.evo(niveau)
 
@@ -485,11 +492,11 @@ class Artificier(Classe):
 
         creation_explo = Skill_creation_d_explosifs()
         lancer = Skill_lancer()
-        skills = [lancer,creation_explo] #Les skills sont au niveau 0, ainsi le controleur proposera de les réunir avec un skill identique de plus haut niveau si l'agissant en a, puis détruira tous les skills de niveau 0.
+        skills:List[Skill] = [lancer,creation_explo] #Les skills sont au niveau 0, ainsi le controleur proposera de les réunir avec un skill identique de plus haut niveau si l'agissant en a, puis détruira tous les skills de niveau 0.
 
         boosts = Skill_boost_explosifs()
 
-        skills_intrasecs = [boosts]
+        skills_intrasecs:List[Skill_intrasec] = [boosts]
 
         cad_evo = [[],[],[],[],[],[],[],[],[],[]] #Rajouter des explosifs
 
@@ -504,11 +511,11 @@ class Archer(Classe):
 
         creation_fleches = Skill_creation_de_fleches()
         lancer = Skill_lancer()
-        skills = [lancer,creation_fleches] #Les skills sont au niveau 0, ainsi le controleur proposera de les réunir avec un skill identique de plus haut niveau si l'agissant en a, puis détruira tous les skills de niveau 0.
+        skills:List[Skill] = [lancer,creation_fleches] #Les skills sont au niveau 0, ainsi le controleur proposera de les réunir avec un skill identique de plus haut niveau si l'agissant en a, puis détruira tous les skills de niveau 0.
 
         boosts = Skill_boost_fleches()
 
-        skills_intrasecs = [boosts]
+        skills_intrasecs:List[Skill_intrasec] = [boosts]
 
         cad_evo = [[],[],[],[],[],[],[],[],[],[]] #Rajouter des flèches
 
@@ -523,11 +530,11 @@ class Sniper(Classe):
 
         creation_fleches = Skill_creation_de_fleches()
         lancer = Skill_lancer() #Peut-être le remplacer par une version plus puissante, mais lente ?
-        skills = [lancer,creation_fleches] #Les skills sont au niveau 0, ainsi le controleur proposera de les réunir avec un skill identique de plus haut niveau si l'agissant en a, puis détruira tous les skills de niveau 0.
+        skills:List[Skill] = [lancer,creation_fleches] #Les skills sont au niveau 0, ainsi le controleur proposera de les réunir avec un skill identique de plus haut niveau si l'agissant en a, puis détruira tous les skills de niveau 0.
 
         boosts = Skill_boost_fleches_sniper()
 
-        skills_intrasecs = [boosts]
+        skills_intrasecs:List[Skill_intrasec] = [boosts]
 
         cad_evo = [[],[],[],[],[],[],[],[],[],[]] #Rajouter des flèches
 
@@ -542,11 +549,11 @@ class Epeiste(Classe):
 
         epee = Skill_manipulation_epee()
         arme = Skill_manipulation_arme()
-        skills = [epee,arme] #Le skill est au niveau 0, ainsi le controleur proposera de le réunir avec un skill identique de plus haut niveau si l'agissant en a, puis détruira tous les skills de niveau 0.
+        skills:List[Skill] = [epee,arme] #Le skill est au niveau 0, ainsi le controleur proposera de le réunir avec un skill identique de plus haut niveau si l'agissant en a, puis détruira tous les skills de niveau 0.
 
         boosts = Skill_boost_epee()
 
-        skills_intrasecs = [boosts]
+        skills_intrasecs:List[Skill_intrasec] = [boosts]
 
         Classe.__init__(self,cond_evo,skills_intrasecs,skills)
 
@@ -559,11 +566,11 @@ class Lancier(Classe):
 
         lance = Skill_manipulation_lance()
         arme = Skill_manipulation_arme()
-        skills = [lance,arme] #Le skill est au niveau 0, ainsi le controleur proposera de le réunir avec un skill identique de plus haut niveau si l'agissant en a, puis détruira tous les skills de niveau 0.
+        skills:List[Skill] = [lance,arme] #Le skill est au niveau 0, ainsi le controleur proposera de le réunir avec un skill identique de plus haut niveau si l'agissant en a, puis détruira tous les skills de niveau 0.
 
         boosts = Skill_boost_lance()
 
-        skills_intrasecs = [boosts]
+        skills_intrasecs:List[Skill_intrasec] = [boosts]
 
         Classe.__init__(self,cond_evo,skills_intrasecs,skills)
 
@@ -576,11 +583,11 @@ class Porteur_de_bouclier(Classe):
 
         bouclier = Skill_manipulation_bouclier()
         arme = Skill_manipulation_arme()
-        skills = [bouclier,arme] #Le skill est au niveau 0, ainsi le controleur proposera de le réunir avec un skill identique de plus haut niveau si l'agissant en a, puis détruira tous les skills de niveau 0.
+        skills:List[Skill] = [bouclier,arme] #Le skill est au niveau 0, ainsi le controleur proposera de le réunir avec un skill identique de plus haut niveau si l'agissant en a, puis détruira tous les skills de niveau 0.
 
         boosts = Skill_boost_bouclier()
 
-        skills_intrasecs = [boosts]
+        skills_intrasecs:List[Skill_intrasec] = [boosts]
 
         Classe.__init__(self,cond_evo,skills_intrasecs,skills)
 
@@ -595,11 +602,11 @@ class Homme_d_arme(Classe):
         lance = Skill_manipulation_lance()
         bouclier = Skill_manipulation_bouclier()
         arme = Skill_manipulation_arme()
-        skills = [epee,lance,bouclier,arme] #Le skill est au niveau 0, ainsi le controleur proposera de le réunir avec un skill identique de plus haut niveau si l'agissant en a, puis détruira tous les skills de niveau 0.
+        skills:List[Skill] = [epee,lance,bouclier,arme] #Le skill est au niveau 0, ainsi le controleur proposera de le réunir avec un skill identique de plus haut niveau si l'agissant en a, puis détruira tous les skills de niveau 0.
 
         boosts = Skill_boost_armes()
 
-        skills_intrasecs = [boosts]
+        skills_intrasecs:List[Skill_intrasec] = [boosts]
 
         Classe.__init__(self,cond_evo,skills_intrasecs,skills)
 
@@ -612,7 +619,7 @@ class Enchanteur(Classe):
 
         boosts = Skill_boost_enchantements()
 
-        skills_intrasecs = [boosts]
+        skills_intrasecs:List[Skill_intrasec] = [boosts]
 
         Classe.__init__(self,cond_evo,skills_intrasecs)
 
@@ -625,7 +632,7 @@ class Soutien(Classe):
 
         boosts = Skill_boost_soutien()
 
-        skills_intrasecs = [boosts]
+        skills_intrasecs:List[Skill_intrasec] = [boosts]
 
         Classe.__init__(self,cond_evo,skills_intrasecs)
 
@@ -641,7 +648,7 @@ class Ange(Classe):
         regen_MP = Skill_regeneration_MP()
         aura = Skill_aura_divine(None) #/*\ À adapter /*\
 
-        skills_intrasecs = [boost,soin,regen_MP,aura]
+        skills_intrasecs:List[Skill_intrasec] = [boost,soin,regen_MP,aura]
 
         Classe.__init__(self,cond_evo,skills_intrasecs)
 
@@ -652,14 +659,14 @@ class Elementaliste(Classe):
     def __init__(self):
         cond_evo = [0,10,20,30,40,50,60,70,80,90] #Mettre la possession de classes d'élémental comme condition des niveaux 4,7 et 10 (respectivement 1, 2 et 3 classes) ?
 
-        skills = []
+        skills:List[Skill] = []
         for element in []: #remplacer par les éléments quand je les aurai créés, ainsi que les effets
             skills.append(Skill_aura_elementale(element))
             skills.append(Skill_affinite_elementale(element))
 
         boosts = Skill_boost_elementaliste()
 
-        skills_intrasecs = [boosts]
+        skills_intrasecs:List[Skill_intrasec] = [boosts]
 
         Classe.__init__(self,cond_evo,skills_intrasecs,skills)
 
@@ -674,11 +681,11 @@ class Elemental_de_terre(Elemental):
     def __init__(self):
         cond_evo = [0,10,20,30,40,50,60,70,80,90]
 
-        skills = []
+        skills:List[Skill] = []
 
         boosts = Skill_boost_elemental_terre()
 
-        skills_intrasecs = [boosts]
+        skills_intrasecs:List[Skill_intrasec] = [boosts]
 
         Classe.__init__(self,cond_evo,skills_intrasecs,skills)
 
@@ -689,11 +696,11 @@ class Elemental_de_feu(Elemental):
     def __init__(self):
         cond_evo = [0,10,20,30,40,50,60,70,80,90]
 
-        skills = []
+        skills:List[Skill] = []
 
         boosts = Skill_boost_elemental_feu()
 
-        skills_intrasecs = [boosts]
+        skills_intrasecs:List[Skill_intrasec] = [boosts]
 
         Classe.__init__(self,cond_evo,skills_intrasecs,skills)
 
@@ -704,11 +711,11 @@ class Elemental_de_glace(Elemental):
     def __init__(self):
         cond_evo = [0,10,20,30,40,50,60,70,80,90]
 
-        skills = []
+        skills:List[Skill] = []
 
         boosts = Skill_boost_elemental_glace()
 
-        skills_intrasecs = [boosts]
+        skills_intrasecs:List[Skill_intrasec] = [boosts]
 
         Classe.__init__(self,cond_evo,skills_intrasecs,skills)
 
@@ -719,11 +726,11 @@ class Elemental_d_ombre(Elemental):
     def __init__(self):
         cond_evo = [0,10,20,30,40,50,60,70,80,90]
 
-        skills = []
+        skills:List[Skill] = []
 
         boosts = Skill_boost_elemental_ombre()
 
-        skills_intrasecs = [boosts]
+        skills_intrasecs:List[Skill_intrasec] = [boosts]
 
         Classe.__init__(self,cond_evo,skills_intrasecs,skills)
 
@@ -736,11 +743,11 @@ class Magicien(Classe):
 
         magie = Skill_magie()
 
-        skills = [magie]
+        skills:List[Skill] = [magie]
 
         boosts = Skill_boost_magicien()
 
-        skills_intrasecs = [boosts]
+        skills_intrasecs:List[Skill_intrasec] = [boosts]
 
         Classe.__init__(self,cond_evo,skills_intrasecs,skills)
 
@@ -753,12 +760,12 @@ class Necromancien(Classe):
 
         immortalite = Skill_immortel() #Les nécromanciens autres que le joueur ne possèdent pas ce skill, et ne peuvent donc pas le transférer.
 
-        skills = [immortalite]
+        skills:List[Skill] = [immortalite]
 
         boosts = Skill_boost_necromancien()
         reanimation = Skill_reanimation()
 
-        skills_intrasecs = [boosts,reanimation]
+        skills_intrasecs:List[Skill_intrasec] = [boosts,reanimation]
 
         Classe.__init__(self,cond_evo,skills_intrasecs,skills)
 
@@ -771,12 +778,12 @@ class Maitre_de_la_mort(Classe):
 
         immortalite = Skill_immortel() #Seul le joueur peut obtenir cette classe. Il possède forcément le skill immortel pour en arriver là.
 
-        skills = [immortalite]
+        skills:List[Skill] = [immortalite]
 
         boosts = Skill_boost_maitre_de_la_mort()
         reanimation = Skill_reanimation_renforcee() #Les skills du maitre de la mort sont plus puissants que ceux du nécromancien
 
-        skills_intrasecs = [boosts,reanimation]
+        skills_intrasecs:List[Skill_intrasec] = [boosts,reanimation]
 
         Classe.__init__(self,cond_evo,skills_intrasecs,skills)
 
@@ -789,7 +796,7 @@ class Assassin(Classe):
 
         boosts = Skill_boost_instakill()
 
-        skills_intrasecs = [boosts]
+        skills_intrasecs:List[Skill_intrasec] = [boosts]
 
         Classe.__init__(self,cond_evo,skills_intrasecs)
 
@@ -803,18 +810,19 @@ class Voleur(Classe):
         vol = Skill_vol()
         vol_priorite = Skill_vol_de_priorite() #Rajouter les autres skills de vols s'ils ne sont pas inclus dans ceux là.
 
-        skills = [vol,vol_priorite]
+        skills:List[Skill] = [vol,vol_priorite]
 
         boosts = Skill_boost_vol()
 
-        skills_intrasecs = [boosts]
+        skills_intrasecs:List[Skill_intrasec] = [boosts]
 
         Classe.__init__(self,cond_evo,skills_intrasecs,skills)
 
         self.nom = "Voleur"
 
 # T is a type, and must be a subclass of Skill_intrasec
-T = TypeVar('T', bound=Skill_intrasec)
+if TYPE_CHECKING:
+    T = TypeVar('T', bound=Skill_intrasec)
 
 def trouve_skill(classe:Classe,type_skill:Type[T]) -> Optional[T]:
     for skill in classe.skills:
@@ -827,3 +835,6 @@ def trouve_skill(classe:Classe,type_skill:Type[T]) -> Optional[T]:
         trouve_bis = trouve_skill(sous_classe,type_skill)
         if trouve_bis is not None:
             return trouve_bis
+
+# Imports utilisés dans le code
+from Jeu.Systeme.Kumo_desu_ga_nanika import *

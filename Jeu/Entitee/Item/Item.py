@@ -1,11 +1,19 @@
 from __future__ import annotations
-from Affichage.Skins.Skins import *
-from Jeu.Entitee.Entitee import *
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
+# Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Jeu.Entitee.Agissant.Agissant import Agissant
     from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
+    from Jeu.Entitee.Agissant.Agissant import Agissant
+    from Jeu.Entitee.Entitee import Non_superposable
+
+# Imports des classes parentes
+from Jeu.Entitee.Entitee import Mobile
+
+# Valeurs par défaut des paramètres
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Item(Mobile):
     """La classe des entitées inanimées. Peuvent se situer dans un inventaire. Peuvent être lancés (déconseillé pour les non-projectiles)."""
@@ -135,5 +143,10 @@ class Ingredient(Item):
     def get_image():
         return SKIN_INGREDIENT
 
-from Jeu.Entitee.Item.Projectile.Projectiles import Percant, Evanescent, Fragile
-from Jeu.Effet.Effets_items import *
+# Imports utilisés dans le code
+from Jeu.Entitee.Entitee import Entitee
+from Jeu.Entitee.Item.Projectile.Projectiles import Percant, Fragile, Evanescent
+from Jeu.Labyrinthe.Structure_spatiale.Direction import DIRECTIONS
+from Affichage.Skins.Skins import SKIN_VIDE, SKIN_INGREDIENT, SKINS_ITEMS_VUS
+from Jeu.Effet.Effet import On_debut_tour, On_fin_tour, Time_limited
+from Jeu.Effet.Effets_items import En_sursis, On_hit

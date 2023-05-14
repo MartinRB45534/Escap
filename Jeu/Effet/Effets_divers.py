@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Type
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
@@ -96,7 +96,7 @@ class Teleportation(One_shot,On_post_action):
 
 class Enseignement(One_shot,On_fin_tour):
     """Effet qui enseigne une magie au joueur."""
-    def __init__(self,magie:Magie):
+    def __init__(self,magie:Type[Magie]):
         self.affiche = False
         self.magie = magie
         self.phase = "démarrage"

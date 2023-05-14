@@ -1,4 +1,9 @@
-from Jeu.Entitee.Agissant.Agissant import *
+from __future__ import annotations
+
+# Pas d'imports pour les annotations
+
+# Imports des classes parentes
+from Jeu.Entitee.Agissant.Agissant import Agissant
 
 class Bourrin(Agissant):
     """Les agissants qui combattent en fonçant dans le tas."""

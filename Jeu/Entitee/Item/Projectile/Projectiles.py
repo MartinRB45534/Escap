@@ -1,9 +1,20 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING
 
-from Jeu.Entitee.Item.Projectile.Projectile import *
-from Jeu.Systeme.Constantes_projectiles.Projectiles import *
-from Jeu.Systeme.Constantes_magies.Magies import *
-from Jeu.Labyrinthe.Structure_spatiale.Direction import *
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
+    from Jeu.Entitee.Agissant.Agissant import Agissant
+
+# Imports des classes parentes
+from Jeu.Entitee.Item.Projectile.Projectile import Projectile
+from Jeu.Entitee.Item.Item import Item
+from Jeu.Entitee.Entitee import Fantome
+
+# Valeurs par défaut des paramètres
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Explosif(Projectile):
     """La classe des projectiles qui explosent. Affectés différemment par certains skills."""
@@ -328,3 +339,10 @@ class Eclair_noir(Magie_explosive_percante):
         self.niveau = niveau #On garde l'info pour un éventuel observateur
 
     ### Lui créer un get_skin !
+
+# Imports utilisés dans la code
+from Affichage.Skins.Skins import SKIN_FLECHE_DE_GLACE,SKIN_ROCHER,SKIN_OMBRE_FURTIVE,SKIN_BOULE_DE_FEU,SKIN_EXPLOSE,SKIN_EXPLOSIF,SKIN_FLECHE
+from Jeu.Systeme.Constantes_magies.Magies import *
+from Jeu.Systeme.Constantes_projectiles.Projectiles import *
+from Jeu.Effet.Effets_items import On_hit
+from Jeu.Constantes import OMBRE,FEU,GLACE

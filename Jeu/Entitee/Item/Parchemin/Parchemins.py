@@ -1,10 +1,17 @@
-from Jeu.Entitee.Item.Parchemin.Parchemin import *
-from Jeu.Effet.Effets_divers import *
-from Jeu.Effet.Sante.Maladies.Maladies import *
-from Jeu.Effet.Magie.Magie import *
-from Jeu.Effet.Effets_protection import *
-from Jeu.Entitee.Item.Parchemin.Polys import *
-from Jeu.Systeme.Constantes_items.Items import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from Jeu.Entitee.Agissant.Agissant import Agissant
+
+# Imports des classes parentes
+from Jeu.Entitee.Item.Parchemin.Parchemin import Parchemin
+
+# Valeurs par défaut des paramètres
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Parchemin_purification(Parchemin):
     """Un parchemin qui soigne poisons et maladies."""
@@ -88,3 +95,11 @@ class Parchemin_protection(Parchemin):
 
     def get_description(self,observation=0):
         return["Un parchemin","Permet de protéger tous ses alliés"]
+
+# Imports utilisés dans le code
+from Jeu.Effet.Magie.Magie import Magie, Magie_cible, Magie_dirigee, Magie_cout, Cible_agissant, Cible_case
+from Jeu.Effet.Effets_protection import Protection_groupe
+from Jeu.Effet.Effets_divers import Impregnation
+from Jeu.Effet.Sante.Soins import Purification
+from Jeu.Entitee.Item.Item import Item
+from Jeu.Constantes import AGISSANT_PARCHEMIN, CASE_PARCHEMIN, COUT_PARCHEMIN, DIRECTION_PARCHEMIN

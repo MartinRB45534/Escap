@@ -1,14 +1,16 @@
 from __future__ import annotations
-from typing import List, TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, List
 
-from Jeu.Constantes import *
-from Affichage.Skins.Skins import *
-from Jeu.Labyrinthe.Structure_spatiale.Bord import *
-from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
-
+# Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Jeu.Effet.Effets import Effet
     from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from Jeu.Effet.Effet import Effet
+
+# Pas de classe parente
+
+# Valeurs par défaut des paramètres
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Entitee:
     """La classe des entitées"""
@@ -68,3 +70,8 @@ class Mobile(Entitee):
 
     def set_latence(self,latence: float):
         self.latence = latence
+
+# Imports utilisés dans le code
+from Jeu.Labyrinthe.Structure_spatiale.Direction import DIRECTIONS
+from Jeu.Constantes import ID_MAX
+from Affichage.Skins.Skins import SKIN_MYSTERE

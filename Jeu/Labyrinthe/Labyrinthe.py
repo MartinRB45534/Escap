@@ -1,14 +1,25 @@
 from __future__ import annotations
-from typing import List, TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, List, Tuple, Optional, Set
 
+# Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Jeu.Entitee.Entitees import *
+    from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
+    from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
+    from Jeu.Labyrinthe.Structure_spatiale.Cote import Cote_position,Cote_decalage
+    from Jeu.Labyrinthe.Vue import Representation_case
+    from Jeu.Labyrinthe.Pattern import Pattern
+    from Jeu.Labyrinthe.Case import Case
+    from Jeu.Labyrinthe.Mur import Mur
+    from Jeu.Entitee.Agissant.Agissant import Agissant
+    from Jeu.Entitee.Entitee import Mobile
 
-# from Jeu.Constantes import *
-# from Jeu.Effet.Effets import *
-# from Jeu.Labyrinthe.Generateur import *
-from Jeu.Labyrinthe.Pattern import *
-from Jeu.Labyrinthe.Vue import *
+# Import des classes parentes
+from Jeu.Labyrinthe.Vue import Vue
+
+# Valeurs par défaut des paramètres
+from Jeu.Constantes import NB_DIRECTIONS, TERRE
 
 class Labyrinthe(Vue):
     def __init__(self,controleur:Controleur,ID:str,decalage:Decalage,depart:Position,patterns:List[Pattern]=[],durete = 1,niveau = 1,element = TERRE,proba=0.1,poids:List[int]=[1]*NB_DIRECTIONS):
@@ -396,3 +407,14 @@ class Labyrinthe(Vue):
                     datas_utilisables.append(nouv_data)
 
         return datas_utilisables
+
+# Imports utilisés dans le code
+from Jeu.Effet.Effets_mouvement.Blocages import Mur_impassable
+from Jeu.Labyrinthe.Case import Case
+from Jeu.Labyrinthe.Mur import Mur
+from Jeu.Labyrinthe.Structure_spatiale.Direction import DIRECTIONS
+from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+from Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
+from Jeu.Labyrinthe.Structure_spatiale.Bord import Bord, Bord_dec, Bord_lab
+from Jeu.Labyrinthe.Vue import Representation_vue
+import random

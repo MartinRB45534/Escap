@@ -1,11 +1,23 @@
-from Affichage.Skins.Skins import *
-from Jeu.Entitee.Agissant.Agissant import *
-from Jeu.Entitee.Agissant.Role.Roles import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
 
-class Gobelin(Dps):
-    """Le monstre de base. Faible, souvent en groupe."""
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+
+# Imports des classes parentes
+from Jeu.Entitee.Agissant.Gobelin.Base_gobelin import Base_gobelin
+from Jeu.Entitee.Agissant.Role.Dps import Dps
+
+# Valeurs par défaut des paramètres
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+
+class Gobelin(Base_gobelin,Dps):
+    """Un gobelin qui dirige un groupe.
+       Bonnes stats, augmente l'efficacité de l'esprit."""
     def __init__(self,controleur:Controleur,niveau:int,position:Position=ABSENT):
-        Agissant.__init__(self,controleur,"gobelin",niveau,position)
+        Base_gobelin.__init__(self,controleur,"gobelin",niveau,position)
 
     def get_offenses(self):
         offenses = self.offenses
@@ -18,16 +30,5 @@ class Gobelin(Dps):
             etat = "attaque"
         return offenses, etat
 
-    def get_skin(self):
-        if self.etat == "vivant":
-            return SKIN_CORPS_GOBELIN
-        else:
-            return SKIN_CADAVRE
-
-    def get_skin_tete(self):
-        return SKIN_TETE_GOBELIN
-
     def get_texte_descriptif(self):
         return [f"Un gobelin (niveau {self.niveau})",f"ID : {self}","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Les gobelins sont des monstres humanoïdes verts de petite taille. Généralement faibles, on les rencontre souvent en compagnie d'autres gobelins. Attention au nombre, et à leurs congénères plus spécialisés."]
-
-    #Est-ce qu'il a besoin d'une méthode spécifique ? Pour les offenses peut-être ?

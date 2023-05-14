@@ -1,6 +1,16 @@
-from typing import Optional, Set
-from Jeu.Labyrinthe.Pattern import *
-from Jeu.Labyrinthe.Vue import *
+from __future__ import annotations
+from typing import TYPE_CHECKING, Set, Dict, List, Tuple
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Entitee.Agissant.Agissant import Agissant
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from Jeu.Labyrinthe.Structure_spatiale.Cote import Cote_position
+
+# Pas de classe parente
+
+# Valeurs par défaut des paramètres
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Espace_schematique:
     def __init__(self):
@@ -91,3 +101,7 @@ class Couloir(Espace_schematique):
         self.cases:List[Position] = [case] if case is not None else [] #Les cases d'un couloir doivent être ordonnées
         self.entrees:Set[Position] = set()
         self.skip = True
+
+# Imports utilisés dans le code
+from Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
+from Jeu.Labyrinthe.Structure_spatiale.Direction import DIRECTIONS

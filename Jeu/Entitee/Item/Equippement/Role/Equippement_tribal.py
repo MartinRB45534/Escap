@@ -1,4 +1,12 @@
-from Jeu.Entitee.Item.Equippement.Equippement import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Entitee.Agissant.Agissant import Agissant
+
+# Imports des classes parentes
+from Jeu.Entitee.Item.Equippement.Equippement import Equipement
 
 class Equipement_tribal(Equipement):
     def __init__(self,espece:str,taux:float):

@@ -1,4 +1,16 @@
-from Jeu.Entitee.Item.Equippement.Equippement import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+
+# Imports des classes parentes
+from Jeu.Entitee.Item.Equippement.Equippement import Equipement
+
+# Valeurs par défaut des paramètres
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Haume(Equipement):
     """La classe des équipements de type haume. On ne peut en porter qu'un à la fois."""
@@ -22,3 +34,6 @@ class Haume(Equipement):
 
     def get_skin(self):
         return SKIN_CASQUE_BASIQUE
+
+# Imports utilisés dans le code
+from Affichage.Skins.Skins import SKIN_CASQUE,SKIN_CASQUE_BASIQUE

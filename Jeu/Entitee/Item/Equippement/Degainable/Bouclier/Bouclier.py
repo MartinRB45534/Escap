@@ -1,4 +1,16 @@
-from Jeu.Entitee.Item.Equippement.Degainable.Degainable import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+
+# Imports des classes parentes
+from Jeu.Entitee.Item.Equippement.Degainable.Degainable import Degainable
+
+# Valeurs par défaut des paramètres
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Bouclier(Degainable):
     """La classe des boucliers. Permettent de se protéger des attaques lorsqu'ils sont utilisés."""
@@ -31,3 +43,8 @@ class Bouclier(Degainable):
     @staticmethod
     def get_image():
         return SKIN_BOUCLIER
+
+# Imports utilisés dans le code
+from Affichage.Skins.Skins import SKIN_BOUCLIER
+from Jeu.Effet.Attaque.Attaque import Attaque
+from Jeu.Entitee.Item.Equippement.Equippement import Equipement

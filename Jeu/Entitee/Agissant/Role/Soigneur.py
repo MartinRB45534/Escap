@@ -1,20 +1,17 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from Jeu.Esprit.Esprit import Esprit
+# Pas d'imports pour les annotations
 
-from operator import itemgetter
-from Jeu.Entitee.Agissant.Role.Mage import *
-from Jeu.Systeme.Constantes_magies.Magies import *
+# Imports des classes parentes
+from Jeu.Entitee.Agissant.Role.Mage import Mage
 
 class Soigneur(Mage):
     """Les agissants capables de soigner les autres."""
 
-    def agit_en_vue(self,esprit:Esprit,defaut = ""):
+    def agit_en_vue(self,defaut = ""):
         cibles = []
         skill = type(self.get_skill_magique())
-        for corp in esprit.corps:
+        for corp in self.esprit.corps:
             assert isinstance(corp,Agissant)
             if corp.etat == "vivant" and corp.pv < corp.pv_max:
                 cibles.append([corp.pv,corp])
@@ -26,3 +23,8 @@ class Soigneur(Mage):
             defaut = "soin"
             self.set_statut("soin")
         return defaut
+
+# Imports utilisés dans le code
+from Jeu.Entitee.Agissant.Agissant import Agissant
+from Jeu.Systeme.Classe import Skill_magie
+from operator import itemgetter

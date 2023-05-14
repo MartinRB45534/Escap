@@ -1,12 +1,18 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
+# Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
 
-from Affichage.Skins.Skins import *
-from Jeu.Entitee.Agissant.Agissant import *
-from Jeu.Entitee.Agissant.Role.Roles import *
+# Imports des classes parentes
+from Jeu.Entitee.Agissant.Role.Mage import Mage
+from Jeu.Entitee.Agissant.Role.Dps import Dps
+
+# Valeurs par défaut des paramètres
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Ombriul(Dps,Mage): #/!\ Retravailler l'ombriul pour utiliser les rôles
     """Une créature des ténèbres, non-endémique du labyrinthe."""
@@ -47,3 +53,9 @@ class Ombriul(Dps,Mage): #/!\ Retravailler l'ombriul pour utiliser les rôles
 
     def get_texte_descriptif(self):
         return [f"Un ombriul (niveau {self.niveau})",f"ID : {self}","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Les ombriuls ne font pas partie des espèces endémiques au labyrinthe. Ils y prolifèrent depuis quelques temps grâce à l'ombre, qui est leur élément de prédilection."]
+
+# Imports utilisés dans le code
+from Jeu.Entitee.Agissant.Agissant import Agissant
+from Affichage.Skins.Skins import SKIN_CORPS_OMBRIUL, SKIN_TETE_OMBRIUL, SKIN_CADAVRE
+from Jeu.Systeme.Classe import trouve_skill, Skills_magiques, Skill_magie, Skill_stomp
+from Jeu.Systeme.Constantes_magies.Magies import cout_pm_poing_sombre

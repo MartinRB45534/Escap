@@ -1,15 +1,24 @@
 from __future__ import annotations
-from typing import Dict, Set, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional, Type, List, Tuple, Dict, Set
 
-from Jeu.Esprit.Esprit import NOBODY
-
+# Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
+    from Jeu.Effet.Magie.Magie import Magie
+    from Jeu.Systeme.Skill_intrasec import Skill_intrasec
+    from Jeu.Systeme.Classe import Classe_principale
+    from Jeu.Entitee.Agissant.Inventaire import Inventaire
     from Jeu.Esprit.Esprit import Esprit
-    from Jeu.Labyrinthe.Vue import Representation_vue
-    from Jeu.Entitee.Item.Cadavre import Cadavre
+    from Jeu.Entitee.Item.Item import Item
 
-from Jeu.Entitee.Entitee import *
+# Imports des classes parentes
+from Jeu.Entitee.Entitee import Non_superposable, Mobile
+
+# Valeurs par défaut des paramètres
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+from Jeu.Constantes import TERRE
 
 class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cadavre n'agit pas.
     """La classe des entitées animées. Capable de décision, de différentes actions, etc. Les principales caractéristiques sont l'ID, les stats, et la classe principale."""
@@ -51,7 +60,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         self.resolution = stats['resolution']
         self.forme:str = stats['forme']
         self.forme_tete:str = stats['forme_tete']
-        self.set_statut("attente")
+        self.statut = "attente"
         self.etat = "vivant"
 
         #vue de l'agissant
@@ -64,18 +73,18 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         self.inventaire = Inventaire(self,stats['doigts'],controleur)
 
         #la direction du regard
-        self.regarde(HAUT)
+        self.dir_regard = HAUT
 
         self.skill_courant:Optional[Type[Skill_intrasec]] = None
 
         #Pour lancer des magies
         self.talent = 1
         self.magie_courante:Optional[Type[Magie]] = None
-        self.cible_magie:Optional[Union[Position,Agissant,List[Position],List[Agissant]]] = None
+        self.cible_magie:Optional[Position|Agissant|List[Position]|List[Agissant]] = None
         self.dir_magie:Optional[Direction] = None
         self.cout_magie:float = 0
         self.magie_parchemin:Optional[Magie] = None
-        self.cible_magie_parchemin:Optional[Union[Position,Agissant,List[Position],List[Agissant]]] = None
+        self.cible_magie_parchemin:Optional[Position|Agissant|List[Position]|List[Agissant]] = None
         self.dir_magie_parchemin:Optional[Direction] = None
         self.cout_magie_parchemin:float = 0
         self.multi = False
@@ -613,14 +622,25 @@ class NoOne(Agissant):
         else:
             return False
 
-from Jeu.Constantes import *
-from Affichage.Skins.Skins import *
-from Jeu.Effet.Effets_protection import *
-from Jeu.Effet.Effets_divers import *
-from Jeu.Effet.Sante.Maladies.Maladies import *
-from Jeu.Effet.Magie.Magies import *
-from Jeu.Entitee.Agissant.Inventaire import Inventaire
-from Jeu.Systeme.Constantes_stats import *
-from Jeu.Systeme.Classe import *
+# Imports utilisés dans le code (il y en a beaucoup !!!)
+from Jeu.Entitee.Entitee import Entitee
+from Jeu.Systeme.Constantes_stats import CONSTANTES_STATS
+from Jeu.Labyrinthe.Structure_spatiale.Direction import HAUT, DIRECTIONS
+from Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
+from Jeu.Labyrinthe.Vue import Representation_vue
+from Jeu.Esprit.Esprit import NOBODY
+from Jeu.Entitee.Item.Cree_item import Cree_item
+from Jeu.Entitee.Item.Cadavre import Cadavre
+from Jeu.Entitee.Item.Equippement.Role.Elementaires import Tenebreux, Rocheux, Neigeux, Incandescant
+from Jeu.Entitee.Item.Equippement.Role.Defensif.Defensif import Defensif
+from Jeu.Entitee.Item.Equippement.Role.Accelerateur import Accelerateur
+from Jeu.Entitee.Item.Equippement.Role.Anoblisseur import Anoblisseur
+from Jeu.Entitee.Item.Equippement.Role.Reparateur.Reparateur import Reparateur
+from Jeu.Entitee.Item.Equippement.Role.Reparateur_magique.Reparateur_magique import Reparateur_magique
 from Jeu.Entitee.Item.Items import *
-from Jeu.Entitee.Item.Cree_item import *
+from Jeu.Entitee.Agissant.Inventaire import Inventaire
+from Jeu.Entitee.Agissant.Agissants import *
+from Jeu.Systeme.Classe import trouve_skill, Classe_principale, Skills_magiques, Skill_defense, Skill_immortel, Skill_essence_magique, Skill_attaque, Skill_stomp, Skill_deplacement, Skill_magie_infinie, Skill_vision, Skill_aura
+from Jeu.Effet.Effets import *
+from Jeu.Constantes import OMBRE, TERRE, GLACE, FEU
+from Affichage.Skins.Skins import SKIN_AGISSANT, SKIN_STATUT_ATTAQUE, SKIN_STATUT_ATTAQUE_BOOSTEE, SKIN_STATUT_PAIX, SKIN_STATUT_FUITE, SKIN_STATUT_EXPLORATION, SKIN_STATUT_RAPPROCHE, SKIN_STATUT_SOIN, SKIN_STATUT_SOUTIEN, SKINS_CORPS_VUS, SKINS_TETES_VUES, SKIN_VIDE

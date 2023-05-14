@@ -14,11 +14,11 @@ from Jeu.Entitee.Agissant.PNJ.PNJs import PJ
 class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (évidemment, c'est le personnage principal !)
     """La classe du joueur."""
     def __init__(self,controleur:Controleur,position:Position):
-        PJ.__init__(self,controleur,position,self.identite,1,2)
 
         self.identite = 'heros'
         self.place = 0
 
+        PJ.__init__(self,controleur,position,self.identite,1,2)
         Humain.__init__(self,controleur,self.identite,1,2,position)
 
         self.apreciations = [0,0,0,0,0,0,0,0,0,0]

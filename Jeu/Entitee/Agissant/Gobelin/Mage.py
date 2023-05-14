@@ -1,11 +1,24 @@
-from Jeu.Entitee.Agissant.Gobelin.Gobelin import *
-from Jeu.Entitee.Agissant.Humain.Heros import Heros
+from __future__ import annotations
+from typing import TYPE_CHECKING
 
-class Mage_gobelin(Attaquant_magique_case,Support,Gobelin):
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+
+# Imports des classes parentes
+from Jeu.Entitee.Agissant.Gobelin.Base_gobelin import Base_gobelin
+from Jeu.Entitee.Agissant.Role.Attaquant_magique_case import Attaquant_magique_case
+from Jeu.Entitee.Agissant.Role.Support import Support
+
+# Valeurs par défaut des paramètres
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+
+class Mage_gobelin(Attaquant_magique_case,Support,Base_gobelin):
     """Un gobelin avec un potentiel magique.
        Il peut utiliser une attaque magique."""
     def __init__(self,controleur:Controleur,niveau:int,position:Position=ABSENT):
-        Agissant.__init__(self,controleur,"mage_gobelin",niveau,position)
+        Base_gobelin.__init__(self,controleur,"mage_gobelin",niveau,position)
 
     def peut_caster(self):
         skill_magie = self.get_skill_magique()
@@ -45,9 +58,14 @@ class Mage_gobelin(Attaquant_magique_case,Support,Gobelin):
 class Deuxieme_monstre(Mage_gobelin):
     """Le premier mage gobelin."""
     def __init__(self,controleur:Controleur,niveau:int,position:Position=ABSENT):
-        Agissant.__init__(self,controleur,"deuxieme_monstre",niveau,position)
+        Base_gobelin.__init__(self,controleur,"deuxieme_monstre",niveau,position)
 
     def meurt(self):
         assert isinstance(self.controleur.joueur,Heros)
         self.controleur.joueur.magic_kill(self.position)
-        Agissant.meurt(self)
+        super().meurt()
+
+# Imports utilisés dans le code
+from Jeu.Systeme.Constantes_magies.Magies import cout_pm_petite_secousse, cout_pm_poing_magique
+from Jeu.Systeme.Classe import Skill_magie, Skill_stomp
+from Jeu.Entitee.Agissant.Humain.Heros import Heros

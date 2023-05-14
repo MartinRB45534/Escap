@@ -1,4 +1,9 @@
-from Jeu.Entitee.Item.Equippement.Role.Reparateur_magique.Reparateur_magique import *
+from __future__ import annotations
+
+# Pas d'import pour les annotations
+
+# Imports des classes parentes
+from Jeu.Entitee.Item.Equippement.Role.Reparateur_magique.Reparateur_magique import Reparateur_magique
 
 class Pompe_a_pm(Reparateur_magique): #Régénère une quantité fixe de pm
     def __init__(self,pm:float):

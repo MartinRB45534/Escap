@@ -1,3 +1,4 @@
+from Jeu.Entitee.Agissant.Gobelin.Base_gobelin import *
 from Jeu.Entitee.Agissant.Gobelin.Chef import *
 from Jeu.Entitee.Agissant.Gobelin.Explorateur import *
 from Jeu.Entitee.Agissant.Gobelin.Gobelin import *

@@ -1,5 +1,16 @@
-from Jeu.Entitee.Item.Equippement.Equippement import *
-# from Jeu.Entitee.Item.Equippement.Role.Roles import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+
+# Imports des classes parentes
+from Jeu.Entitee.Item.Equippement.Equippement import Equipement
+
+# Valeurs par défaut des paramètres
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Anneau(Equipement):
     """La classe des équipements de type anneau. Le nombre d'anneaux qu'on peut porter dépend de l'espèce. Les anneaux peuvent avoir des effets très différends (magiques pour la plupart)."""
@@ -23,3 +34,6 @@ class Anneau(Equipement):
     @staticmethod
     def get_image():
         return SKIN_ANNEAU
+
+# Imports utilisés dans le code
+from Affichage.Skins.Skins import SKIN_ANNEAU

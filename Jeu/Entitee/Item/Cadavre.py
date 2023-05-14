@@ -1,11 +1,17 @@
-from Affichage.Skins.Skins import SKIN_CADAVRE
-from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT, Position
+from __future__ import annotations
 from typing import TYPE_CHECKING
 
+# Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
     from Jeu.Entitee.Agissant.Agissant import Agissant
+
+# Imports des classes parentes
 from Jeu.Entitee.Item.Item import Item
+
+# Valeurs par défaut des paramètres
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Cadavre(Item):
     def __init__(self,controleur:Controleur,agissant:Agissant,position:Position=ABSENT):
@@ -23,3 +29,6 @@ class Cadavre(Item):
     @staticmethod
     def get_image():
         return SKIN_CADAVRE
+
+# Imports utilisés dans le code
+from Affichage.Skins.Skins import SKIN_CADAVRE

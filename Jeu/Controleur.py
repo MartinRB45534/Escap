@@ -1,19 +1,36 @@
 from __future__ import annotations
-from typing import Dict, List, Any, Set, Tuple, TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, List, Tuple, Optional, Set, Any
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Labyrinthe.Labyrinthe import Labyrinthe
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
+    from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
+    from Jeu.Labyrinthe.Structure_spatiale.Cote import Cote_position,Cote_decalage
+    from Jeu.Labyrinthe.Pattern import Pattern
+    from Jeu.Labyrinthe.Case import Case
+    from Jeu.Entitee.Agissant.Agissant import Agissant
+    from Jeu.Entitee.Agissant.PNJ.PNJs import PJ
+    from Jeu.Entitee.Item.Item import Item
+    from Jeu.Entitee.Entitee import Mobile
+    from Jeu.Entitee.Decors.Decor import Decors
+    from Jeu.Esprit.Esprit import Esprit
+
+# Pas de classe parente
+
+# Valeurs par défaut des paramètres
+from Jeu.Effet.Effets_mouvement.Deplacements import Teleport, Escalier
+from Jeu.Entitee.Agissant.Agissant import NoOne
+
+# Constantes
 from Jeu.Constantes import *
-from Jeu.Systeme.Constantes_skills.Skills import *
+from Jeu.Systeme.Constantes_decors.Decors import *
 from Jeu.Systeme.Constantes_items.Items import *
 from Jeu.Systeme.Constantes_magies.Magies import *
-from Jeu.Systeme.Constantes_decors.Decors import *
 from Jeu.Systeme.Constantes_projectiles.Projectiles import *
+from Jeu.Systeme.Constantes_skills.Skills import *
 from Jeu.Systeme.Constantes_stats import *
-if TYPE_CHECKING:
-    from Jeu.Entitee.Entitees import *
-    from Jeu.Labyrinthe.Labyrinthe import *
-    from Jeu.Effet.Effets import *
-    from Jeu.Esprit.Esprits import *
-
-from Jeu.Effet.Effets_mouvement.Deplacements import Teleport
 
 try:
     from Jeu.Equilibrage import *
@@ -1628,8 +1645,9 @@ class Controleur():
                 poss.add(position)
         return poss
 
-from Jeu.Constantes import *
-from Jeu.Entitee.Entitees import *
-from Jeu.Labyrinthe.Labyrinthe import *
+# Imports utilisés dans le code
 from Jeu.Effet.Effets import *
+from Jeu.Entitee.Entitees import *
 from Jeu.Esprit.Esprits import *
+from Jeu.Labyrinthe.Labyrinthes import *
+from Jeu.Systeme.Classe import *

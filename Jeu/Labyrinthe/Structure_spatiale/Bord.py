@@ -1,5 +1,19 @@
-from typing import Iterator, List
-from Jeu.Labyrinthe.Structure_spatiale.Cote import *
+from __future__ import annotations
+from typing import TYPE_CHECKING, List, Iterator
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
+    from Jeu.Labyrinthe.Structure_spatiale.Cote import Cote_position, Cote_decalage
+
+# Pas de classe parente
+
+# Variables de classe
+from Jeu.Constantes import NB_DIRECTIONS
+
+# Valeurs par défaut des paramètres
+from Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
 
 class Bord:
     """Représente les limites d'un espace"""
@@ -99,3 +113,6 @@ class Bord_lab(Bord):
                     if not passe:
                         yield cote
 
+# Imports utilisés dans le code
+from Jeu.Labyrinthe.Structure_spatiale.Direction import HAUT, BAS, GAUCHE, DROITE
+from Jeu.Labyrinthe.Structure_spatiale.Cote import Cote_decalage, Cote_position

@@ -1,8 +1,15 @@
-from Jeu.Entitee.Agissant.Agissants import *
-from Jeu.Esprit.Representation_spatiale import *
+from __future__ import annotations
+from typing import TYPE_CHECKING, List, Dict, Set, Tuple, Self, Literal
 
-from typing import Dict, Literal, Self, Set, Tuple
-import operator
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from Jeu.Entitee.Agissant.Agissant import Agissant
+    from Jeu.Labyrinthe.Vue import Representation_case, Representation_vue
+    from Jeu.Esprit.Representation_spatiale import Espace_schematique
+
+# Pas de classe parente
 
 class Esprit :
     """La classe des esprits, qui manipulent les agisants."""
@@ -1171,7 +1178,7 @@ class Esprit :
         attaque = corp.veut_attaquer(case["dangerosite",0])
         res = "attente"
         for i in DIRECTIONS: #On commence par se renseigner sur les possibilités :
-            mur:Union[Position,Literal[False]] = case.cibles[i][self.resolution]
+            mur:Position|Literal[False] = case.cibles[i][self.resolution]
             if mur:
                 if mur in position and corp.vue.case_from_position(mur).clarte>0:
                     case_pot = self.vue.case_from_position(mur)
@@ -1207,7 +1214,7 @@ class Esprit :
                 corp.utilise(None)
                 importance = 0
                 for i in DIRECTIONS:
-                    mur:Union[Position,Literal[False]] = case.cibles[i][self.resolution]
+                    mur:Position|Literal[False] = case.cibles[i][self.resolution]
                     if mur:
                         if mur.lab in self.vue:
                             case_pot = self.vue.case_from_position(mur)
@@ -1315,7 +1322,7 @@ class Esprit :
                 if pnj == 4: # /!\ Remplacer par une propriété du PNJ
                     pnj.statut_pnj = "paume"
             for i in DIRECTIONS:
-                mur:Union[Position,Literal[False]] = case.cibles[i][self.resolution]
+                mur:Position|Literal[False] = case.cibles[i][self.resolution]
                 if mur:
                     if mur in position and pnj.vue.case_from_position(mur).clarte>0:
                         case_pot = self.vue.case_from_position(mur)
@@ -1365,7 +1372,7 @@ class Esprit :
                     pnj.utilise(None)
                     importance = 0
                     for i in DIRECTIONS:
-                        mur:Union[Position,Literal[False]] = case.cibles[i][self.resolution]
+                        mur:Position|Literal[False] = case.cibles[i][self.resolution]
                         if mur:
                             if mur.lab in self.vue:
                                 case_pot = self.vue.case_from_position(mur)
@@ -1462,3 +1469,16 @@ class Mindless(Esprit):
         pass
 
 NOBODY = Mindless()
+
+# Imports utilisés dans le code
+from Jeu.Labyrinthe.Vue import Vues
+from Jeu.Esprit.Representation_spatiale import Salle, Couloir, Zone_inconnue
+from Jeu.Systeme.Constantes_stats import add_constantes_temps, incr_compteur_temps, constantes_deplacements
+from Jeu.Constantes import PASSE_ESCALIER, BASIQUE, DIALOGUE
+from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction, DIRECTIONS, HAUT, DROITE, BAS, GAUCHE
+from Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
+from Jeu.Entitee.Agissant.PNJ.PNJs import PNJ, PJ
+from Jeu.Entitee.Agissant.Role.Sentinelle import Sentinelle
+from Jeu.Entitee.Agissant.Humain.Humain import Humain
+import random
+import operator

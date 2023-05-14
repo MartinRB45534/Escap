@@ -1,10 +1,21 @@
-from Jeu.Entitee.Item.Potion.Potion import *
-from Jeu.Systeme.Constantes_items.Items import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+
+# Imports des classes parentes
+from Jeu.Entitee.Item.Potion.Potion import Potion
+
+# Valeurs par défaut des paramètres
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Potion_empoisonnee(Potion):
     """Une potion pas très bonne pour la santé."""
     def __init__(self,controleur:Controleur,position:Position=ABSENT):
-        Potion.__init__(self,controleur,Poison(1,1,0.0101),position)
+        Potion.__init__(self,controleur,Poison(NoOne(),1,0.0101),position)
 
     def get_titre(self,observation=0):
         return "Potion empoisonnée"
@@ -86,5 +97,10 @@ class Potion_vitesse(Potion):
     def get_description(self,observation=0):
         return ["Une potion","Augmente temporairement la vitesse de l'utilisateur. À utiliser au début d'un échange de coups ou lors d'une fuite."]
 
-from Jeu.Effet.Magie.Magies import *
-from Jeu.Effet.Sante.Maladies.Maladies import *
+# Imports utilisés dans le code
+from Jeu.Effet.Sante.Poison import Poison
+from Jeu.Effet.Sante.Soins import Soin, Antidote, Medicament
+from Jeu.Effet.Enchantements import Enchantement_force, Enchantement_vitesse
+from Jeu.Entitee.Agissant.Agissant import NoOne
+from Jeu.Systeme.Constantes_items.Items import soin_potion_hypokute
+from Affichage.Skins.Skins import SKIN_POTION_POISON

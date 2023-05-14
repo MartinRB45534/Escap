@@ -1,5 +1,15 @@
-from Jeu.Entitee.Item.Projectile.Projectiles import *
-from Jeu.Systeme.Classe import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Entitee.Agissant.Agissant import Agissant
+    from Jeu.Entitee.Item.Projectile.Projectile import Projectile
+
+# Pas de classe parente
+
+# Valeurs par défaut des paramètres
+from Jeu.Entitee.Item.Item import Item
 
 class Cree_item:
     """La classe des créateurs d'item."""
@@ -204,5 +214,7 @@ class Cree_charge_etendue_skill(Cree_item):
     def get_image(self):
         return SKIN_CREE_CHARGE_ETENDUE
 
-from Jeu.Entitee.Item.Items import *
-from Jeu.Entitee.Agissant.Agissant import *
+# Imports utilisés dans le code
+from Affichage.Skins.Skins import SKIN_CREE_CHARGE_DE_BASE, SKIN_CREE_CHARGE_ETENDUE, SKIN_CREE_CHARGE_LOURDE, SKIN_CREE_FLECHE_EXPLOSIVE, SKIN_CREE_FLECHE_LEGERE, SKIN_CREE_FLECHE_LOURDE, SKIN_CREE_FLECHE_DE_BASE, SKIN_CREE_FLECHE_FANTOME
+from Jeu.Entitee.Item.Projectile.Projectiles import Fleche_explosive, Fleche_legere, Fleche_lourde, Charge_de_base, Charge_lourde, Charge_etendue, Fleche_de_base, Fleche_fantome
+from Jeu.Systeme.Classe import trouve_skill, Skill_creation_d_explosifs, Skill_creation_de_fleches

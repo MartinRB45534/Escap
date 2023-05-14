@@ -1,17 +1,17 @@
 from __future__ import annotations
-from typing import Dict, MutableSet, Set, Type, TYPE_CHECKING
-from warnings import warn
+from typing import TYPE_CHECKING, Optional, Type, List, Dict, Set
 
-from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+# Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from Jeu.Controleur import Controleur
-    from Jeu.Entitee.Agissant.Agissant import Agissant
-    from Jeu.Entitee.Entitee import Entitee
-    from Jeu.Entitee.Item.Item import Item
     from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from Jeu.Entitee.Agissant.Agissant import Agissant
+    from Jeu.Entitee.Item.Item import Item
 
-from Jeu.Entitee.Item.Items import Potion,Parchemin,Cle,Arme,Bouclier,Armure,Haume,Anneau,Projectile,Ingredient,Cadavre,Oeuf,Consommable,Parchemin_vierge
-from Jeu.Systeme.Classe import *
+# Pas de classe parente
+
+# Valeurs par défaut des paramètres
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Inventaire:
 
@@ -31,7 +31,7 @@ class Inventaire:
         self.cadavres:Set[Cadavre] = set() #Oui, on peut récupérer des cadavres, et alors, circluez, ya rien à voir...
         self.oeufs:Set[Oeuf] = set() #Vous allez quand même pas me dire que c'est l'oeuf qui vous choque ! Il y a marqué cadavre juste au dessus !
 
-        self.items:dict[Type[Potion|Parchemin|Cle|Arme|Bouclier|Armure|Haume|Anneau|Projectile|Ingredient|Cadavre|Oeuf],Set] = {
+        self.items:Dict[Type[Potion|Parchemin|Cle|Arme|Bouclier|Armure|Haume|Anneau|Projectile|Ingredient|Cadavre|Oeuf],Set] = {
             Potion:self.potions,
             Parchemin:self.parchemins,
             Cle:self.cles,
@@ -292,5 +292,20 @@ class Inventaire:
                 return True
         return False
 
-from Jeu.Entitee.Item.Items import Potion,Parchemin,Cle,Arme,Bouclier,Armure,Haume,Anneau,Projectile,Ingredient,Cadavre,Oeuf,Consommable,Parchemin_vierge
-from Jeu.Systeme.Classe import *
+# Imports utilisés dans le code (il y en a beaucoup !!!)
+from Jeu.Entitee.Item.Potion.Potion import Potion
+from Jeu.Entitee.Item.Parchemin.Parchemin import Parchemin
+from Jeu.Entitee.Item.Cle import Cle
+from Jeu.Entitee.Item.Equippement.Degainable.Degainable import Arme
+from Jeu.Entitee.Item.Equippement.Degainable.Bouclier.Bouclier import Bouclier
+from Jeu.Entitee.Item.Equippement.Armure.Armure import Armure
+from Jeu.Entitee.Item.Equippement.Haume.Haume import Haume
+from Jeu.Entitee.Item.Equippement.Anneau.Anneau import Anneau
+from Jeu.Entitee.Item.Projectile.Projectile import Projectile
+from Jeu.Entitee.Item.Item import Ingredient
+from Jeu.Entitee.Item.Cadavre import Cadavre
+from Jeu.Entitee.Item.Oeuf import Oeuf
+from Jeu.Entitee.Item.Parchemin.Parchemins import Parchemin_vierge
+from Jeu.Systeme.Classe import trouve_skill, Hatching
+from warnings import warn
+import random

@@ -1,5 +1,8 @@
-from warnings import warn
+from __future__ import annotations
 
+# Pas d'import pour les annotations
+
+# Pas de classe parente
 
 class Decalage:
     def __init__(self,x:int,y:int):
@@ -65,3 +68,6 @@ class Decalage:
                 xs=range(0,self.x-1)
             for j in xs:
                 yield Decalage(j,i)
+
+# Imports utilisés dans le code
+from warnings import warn

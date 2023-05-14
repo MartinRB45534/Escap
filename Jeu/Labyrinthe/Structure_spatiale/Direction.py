@@ -1,6 +1,11 @@
+from __future__ import annotations
+
+# Pas d'import pour les annotations
+
+# Pas de classe parente
+
+# Variables de classe
 from Jeu.Constantes import NB_DIRECTIONS
-from Jeu.Labyrinthe.Structure_spatiale.Position import *
-from Jeu.Labyrinthe.Structure_spatiale.Angle import *
 
 class Direction:
     directions = NB_DIRECTIONS
@@ -98,3 +103,9 @@ if NB_DIRECTIONS==4:
     BAS=Direction(2)
     GAUCHE=Direction(3)
 DIRECTIONS = [Direction(i) for i in range(Direction.directions)]
+
+# Imports utilisés dans le code
+from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+from Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
+from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
+from Jeu.Labyrinthe.Structure_spatiale.Angle import Angle

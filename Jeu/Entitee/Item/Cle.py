@@ -1,4 +1,17 @@
-from Jeu.Entitee.Item.Item import *
+from __future__ import annotations
+from typing import TYPE_CHECKING, List
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from Jeu.Entitee.Agissant.Agissant import Agissant
+
+# Imports des classes parentes
+from Jeu.Entitee.Item.Item import Item
+
+# Valeurs par défaut des paramètres
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Cle(Item):
     """La classe des items qui ouvrent les portes (et les coffres ?)."""
@@ -24,3 +37,6 @@ class Cle(Item):
     @staticmethod
     def get_image():
         return SKIN_CLE
+
+# Imports utilisés dans le code
+from Affichage.Skins.Skins import SKIN_CLE

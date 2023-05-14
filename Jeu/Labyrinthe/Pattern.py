@@ -1,7 +1,14 @@
-# from Jeu.Constantes import *
-# from Jeu.Effet.Effets import *
-from Jeu.Labyrinthe.Case import *
-from Jeu.Labyrinthe.Structure_spatiale.Espace import *
+from __future__ import annotations
+from typing import TYPE_CHECKING, List
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
+    from Jeu.Labyrinthe.Structure_spatiale.Cote import Cote_position,Cote_decalage
+
+# Import des classes parentes
+from Jeu.Labyrinthe.Structure_spatiale.Espace import Espace
 
 class Pattern(Espace):
     def __init__(self,position:Position,decalage:Decalage,entrees:List[Cote_decalage]=[],codes:List[str]=[],vide=True):
@@ -39,3 +46,8 @@ class Pattern(Espace):
     def __iter__(self):
         for decalage in self.decalage:
             yield self.position + decalage
+
+# Imports utilisés dans le code
+from Jeu.Labyrinthe.Structure_spatiale.Bord import Bord_pat
+from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+from Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage

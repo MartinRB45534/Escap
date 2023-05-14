@@ -1,5 +1,17 @@
-from Jeu.Entitee.Item.Item import *
-from typing import Dict
+from __future__ import annotations
+from typing import TYPE_CHECKING, Dict
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from Jeu.Entitee.Agissant.Agissant import Agissant
+
+# Imports des classes parentes
+from Jeu.Entitee.Item.Item import Item
+
+# Valeurs par défaut des paramètres
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Equipement(Item):
     """La classe des items qui peuvent être portés. Sont toujours actifs tant qu'ils sont portés."""

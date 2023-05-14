@@ -1,15 +1,22 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional, Type, List, Tuple, Dict
 
-from Jeu.Systeme.Skill_intrasec import Skill_intrasec
-from Jeu.Labyrinthe.Structure_spatiale.Position import Position
-from Jeu.Entitee.Decors.Decor import Decors_interactif, Ustensile
-
+# Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
+    from Jeu.Effet.Magie.Magie import Magie
+    from Jeu.Systeme.Skill_intrasec import Skill_intrasec
+    from Jeu.Entitee.Item.Projectile.Projectile import Projectile
 
-from Jeu.Entitee.Agissant.Agissant import *
-from Jeu.Entitee.Agissant.Role.Roles import *
+# Imports des classes parentes
+from Jeu.Entitee.Agissant.Agissant import Agissant
+from Jeu.Entitee.Entitee import Interactif
+from Jeu.Entitee.Agissant.Role.Mage import Mage
+
+# Valeurs par défaut des paramètres
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class PNJ(Agissant, Interactif):
     """
@@ -227,3 +234,10 @@ class PJ_mage(PJ, PNJ_mage):
             parch = Parchemin_impregne(self.controleur,magie,cout//2)
             self.controleur.ajoute_entitee(parch)
             self.inventaire.ajoute(parch)
+
+# Imports utilisés dans le code
+from Affichage.Skins.Skins import SKIN_STATUT_PAUME, SKIN_STATUT_PERDU, SKIN_STATUT_CHERCHE, SKIN_STATUT_CHEMIN, SKIN_STATUT_PROXIMITE
+from Jeu.Constantes import DIALOGUE, RECETTE
+from Jeu.Entitee.Item.Parchemin.Parchemins import Parchemin_impregne
+from Jeu.Entitee.Decors.Decors import Ustensile
+from Jeu.Entitee.Decors.Decor import Decors_interactif

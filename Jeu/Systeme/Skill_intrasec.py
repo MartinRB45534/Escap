@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Type
 from Jeu.Effet.Magie.Magie import Magie
 from Affichage.Skins import *
 from Affichage.Skins.Skins import *
@@ -55,7 +55,7 @@ class Skills_magiques(Skill_intrasec):
         self.latence = 0 #La latence dépend du sort utilisé
         self.gain_xp = 0 #L'xp dépend du sort utilisé et du mana dépensé
 
-    def ajoute(self,magie:Magie):
+    def ajoute(self,magie:Type[Magie]):
         """Ajoute une magie au skill"""
         self.magies[magie.nom]=magie
 

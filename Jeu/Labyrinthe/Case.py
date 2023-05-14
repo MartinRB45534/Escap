@@ -1,14 +1,23 @@
 from __future__ import annotations
-from typing import List, TYPE_CHECKING, Set
+from typing import TYPE_CHECKING, List, Optional, Set, Dict
 
+# Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Jeu.Entitee.Entitees import *
+    from Jeu.Controleur import Controleur
+    from Jeu.Effet.Effet import Effet
+    from Jeu.Effet.Auras import Aura
+    from Jeu.Entitee.Entitee import Entitee, Mobile
+    from Jeu.Entitee.Agissant.Agissant import Agissant
+    from Jeu.Entitee.Item.Item import Item
+    from Jeu.Entitee.Decors.Decor import Decors
+    from Jeu.Labyrinthe.Mur import Mur
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
 
-# from Jeu.Constantes import *
-from Jeu.Labyrinthe.Mur import *
-from Jeu.Effet.Auras import *
-from Jeu.Labyrinthe.Structure_spatiale.Direction import *
-from Jeu.Labyrinthe.Vue import Representation_case
+# Pas de classe parente
+
+# Valeurs des paramètres par défaut
+from Jeu.Constantes import TERRE
 
 class Case:
     def __init__(self,controleur:Controleur,position:Position,niveau = 1,element = TERRE,effets:List[Effet] = [],opacite = 1):
@@ -256,3 +265,12 @@ class Case:
     #     copie = Case(self.controleur,self.position,self.niveau,self.element,self.effets,self.opacite)
     #     copie.murs = self.murs
     #     return copie
+
+# Imports utilisés dans le code
+from Jeu.Labyrinthe.Mur import Mur
+from Jeu.Labyrinthe.Structure_spatiale.Direction import DIRECTIONS
+from Jeu.Labyrinthe.Vue import Representation_case
+from Jeu.Constantes import TERRE, FEU, GLACE, OMBRE
+from Jeu.Effet.Auras import Terre_permanente, Feu_permanent, Glace_permanente, Ombre_permanente, Aura_elementale, Terre, Feu, Glace, Ombre
+from Jeu.Effet.Effet import On_debut_tour, Time_limited, On_attack, On_post_action, On_step_in, On_step_out
+from Jeu.Effet.Attaque.Attaque import Attaque_case, Attaque_case_delayee

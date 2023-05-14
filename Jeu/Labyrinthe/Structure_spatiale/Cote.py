@@ -1,4 +1,13 @@
-from Jeu.Labyrinthe.Structure_spatiale.Direction import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
+    from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
+
+# Pas de classe parente
 
 class Cote_decalage:
     def __init__(self,emplacement: Decalage,direction:Direction):
@@ -15,12 +24,16 @@ class Cote_decalage:
         emplacement = self.emplacement + other
         if isinstance(emplacement,Decalage):
             return Cote_decalage(emplacement,self.direction)
+        elif isinstance(emplacement,Position):
+            return Cote_position(emplacement,self.direction)
         return NotImplemented
 
     def __radd__(self,other):
         emplacement = other + self.emplacement
         if isinstance(emplacement,Decalage):
             return Cote_decalage(emplacement,self.direction)
+        elif isinstance(emplacement,Position):
+            return Cote_position(emplacement,self.direction)
         return NotImplemented
 
     def __eq__(self,other):
@@ -44,7 +57,9 @@ class Cote_position:
 
     def __sub__(self,other):
         emplacement = self.emplacement - other
-        if isinstance(emplacement,Position):
+        if isinstance(emplacement,Decalage):
+            return Cote_decalage(emplacement,self.direction)
+        elif isinstance(emplacement,Position):
             return Cote_position(emplacement,self.direction)
         return NotImplemented
 
@@ -73,3 +88,7 @@ class Cote_position:
 
     def oppose(self):
         return Cote_position(self.emplacement+self.direction,self.direction.oppose())
+    
+# Imports utilisés dans le code
+from Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
+from Jeu.Labyrinthe.Structure_spatiale.Position import Position

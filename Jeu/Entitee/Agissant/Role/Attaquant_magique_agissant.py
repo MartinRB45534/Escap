@@ -1,10 +1,9 @@
-from typing import TYPE_CHECKING
+from __future__ import annotations
 
-if TYPE_CHECKING:
-    from Jeu.Esprit.Esprit import Esprit
+# Pas d'imports pour les annotations
 
-from operator import itemgetter
-from Jeu.Entitee.Agissant.Role.Mage import *
+# Imports des classes parentes
+from Jeu.Entitee.Agissant.Role.Mage import Mage
 
 class Attaquant_magique_agissant(Mage):
     """Les agissants qui combattent en lançant des attaques magiques de loin sur des agissants."""
@@ -29,3 +28,8 @@ class Attaquant_magique_agissant(Mage):
             return self.cible_magie.position
         else:
             return Agissant.get_impact(self)
+
+# Imports utilisés dans le code
+from Jeu.Entitee.Agissant.Agissant import Agissant
+from Jeu.Systeme.Classe import Skill_magie
+from operator import itemgetter

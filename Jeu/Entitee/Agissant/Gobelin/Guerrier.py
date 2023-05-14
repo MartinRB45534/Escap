@@ -1,10 +1,23 @@
-from Jeu.Entitee.Agissant.Gobelin.Gobelin import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
 
-class Guerrier_gobelin(Gobelin):
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+
+# Imports des classes parentes
+from Jeu.Entitee.Agissant.Gobelin.Base_gobelin import Base_gobelin
+from Jeu.Entitee.Agissant.Role.Fuyard import Fuyard
+
+# Valeurs par défaut des paramètres
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+
+class Guerrier_gobelin(Base_gobelin):
     """Un gobelin agressif est avide de sang.
        Il a une meilleure attaque que les gobelins de base."""
     def __init__(self,controleur:Controleur,niveau:int,position:Position=ABSENT):
-        Agissant.__init__(self,controleur,"guerrier_gobelin",niveau,position)
+        Base_gobelin.__init__(self,controleur,"guerrier_gobelin",niveau,position)
 
     def get_offenses(self):
         offenses = self.offenses

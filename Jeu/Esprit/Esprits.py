@@ -1,10 +1,16 @@
 from __future__ import annotations
-from typing import List, TYPE_CHECKING
+from typing import TYPE_CHECKING, List, Set
 
+# Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Jeu.Entitee.Entitees import *
+    from Jeu.Controleur import Controleur
+    from Jeu.Entitee.Agissant.Agissant import Agissant
+    from Jeu.Entitee.Agissant.Humain.Humain import Humain
+    from Jeu.Entitee.Agissant.Slime.Slime import Slime
+    from Jeu.Systeme.Classe import Classe_principale
 
-from Jeu.Esprit.Esprit import *
+# Imports des classes parentes
+from Jeu.Esprit.Esprit import Esprit
 
 # class Esprit_type(Esprit):
 #     """Un esprit caricatural, pour les besoins de mes expériences."""
@@ -254,3 +260,5 @@ class Esprit_slime(Esprit):
 
     #/!\ Faire un processus de décision propre aux slimes, qui prend en compte les capacités (communes heureusement) et la situation de chacun
 
+# Imports utilisés dans le code
+from Jeu.Systeme.Classe import trouve_skill

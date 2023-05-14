@@ -1,15 +1,17 @@
-from operator import itemgetter
-from Jeu.Entitee.Agissant.Agissant import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+# Pas d'imports pour les annotations
+
+# Imports des classes parentes
 from Jeu.Entitee.Agissant.Role.Multi_soigneur import Multi_soigneur
-from Jeu.Systeme.Constantes_magies.Magies import *
-from Jeu.Effet.Magie.Magies import *
 
 class Multi_soigneur_protecteur(Multi_soigneur):
     """Les multi_soigneurs capables de placer un sort de protection lorsqu'il n'y a personne à soigner.""" #Vraiment juste la peste (en fait même pas la peste)
 
-    def agit_en_vue(self,esprit,defaut = ""):
+    def agit_en_vue(self,defaut = ""):
         cibles = []
-        for corp in esprit.corps:
+        for corp in self.esprit.corps:
             if corp.etat == "vivant" and corp.pv < corp.pv_max:
                 cibles.append([corp.pv,corp])
         if len(cibles) == 1:
@@ -34,7 +36,7 @@ class Multi_soigneur_protecteur(Multi_soigneur):
                 defaut = "soin"
                 self.set_statut("soin")
         elif self.pm == self.pm_max: #On ne l'utilise que rarement... parce qu'il est cher
-            for corp in esprit.corps:
+            for corp in self.esprit.corps:
                 if corp.etat == "vivant":
                     libre = True
                     for effet in corp.effets:
@@ -49,3 +51,8 @@ class Multi_soigneur_protecteur(Multi_soigneur):
                 defaut = "soin"
                 self.set_statut("soin")
         return defaut
+
+# Imports utilisés dans le code
+from Jeu.Effet.Effets_protection import Protection_sacree
+from Jeu.Systeme.Classe import Skill_magie
+from operator import itemgetter

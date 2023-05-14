@@ -1,21 +1,21 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from Jeu.Esprit.Esprit import Esprit
+# Pas d'imports pour les annotations
 
-from operator import itemgetter
-from Jeu.Entitee.Agissant.Role.Renforceur import *
+# Imports des classes parentes
+from Jeu.Entitee.Agissant.Role.Renforceur import Renforceur
+from Jeu.Entitee.Agissant.Role.Mage import Multi_mage
 
 class Multi_renforceur(Renforceur,Multi_mage):
     """Les agissants qui peuvent booster plusieurs alliés à la fois."""
 
-    def agit_en_vue(self,esprit:Esprit,defaut = ""):
+    def agit_en_vue(self,defaut = ""):
         cibles = []
         skill = type(self.get_skill_magique())
-        for corp in esprit.corps:
+        for corp in self.esprit.corps:
             if corp.statut == "attaque":
-                cibles.append([esprit.get_importance(corp.get_impact()),corp])
+                cibles.append([self.esprit.get_importance(corp.get_impact()),corp])
         if len(cibles) == 1:
             if self.peut_caster():
                 self.utilise(skill)
@@ -42,3 +42,6 @@ class Multi_renforceur(Renforceur,Multi_mage):
                 defaut = "soutien"
                 self.set_statut("soutien")
         return defaut
+
+# Imports utilisés dans le code
+from operator import itemgetter

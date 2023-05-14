@@ -1,4 +1,9 @@
-from Jeu.Entitee.Item.Equippement.Equippement import *
+from __future__ import annotations
+
+# Pas d'import pour les annotations
+
+# Imports des classes parentes
+from Jeu.Entitee.Item.Equippement.Equippement import Equipement
 
 class Reparateur(Equipement):
     """La classe des équipements qui régénèrent les pv."""

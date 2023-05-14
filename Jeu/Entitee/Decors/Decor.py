@@ -1,8 +1,16 @@
-from Jeu.Constantes import *
-from Affichage.Skins.Skins import *
-from Jeu.Entitee.Entitee import *
-from Jeu.Systeme.Constantes_decors.Decors import *
+from __future__ import annotations
+from typing import TYPE_CHECKING, List
 
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+
+# Imports des classes parentes
+from Jeu.Entitee.Entitee import Non_superposable, Interactif
+
+# Valeurs par défaut des paramètres
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Decors(Non_superposable):
     """La classe des éléments de décors qu'on ne peut pas traverser. On peut interagir avec certains ?"""
@@ -27,7 +35,10 @@ class Ustensile(Decors_interactif):
         return self.recettes
 
     def cuisine(self,recette:dict):
-        return eval(recette["produit"])(None)
+        return eval(recette["produit"])(self.controleur,ABSENT)
 
     def get_classe(self):
         return Ustensile
+    
+# Imports utilisés dans le code
+from Jeu.Entitee.Entitee import Entitee

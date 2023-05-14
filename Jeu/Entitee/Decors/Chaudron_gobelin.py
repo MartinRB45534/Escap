@@ -1,6 +1,16 @@
-from Affichage.Skins.Skins import *
-from Jeu.Entitee.Decors.Decor import *
-from Jeu.Systeme.Constantes_decors.Decors import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+
+# Imports des classes parentes
+from Jeu.Entitee.Decors.Decor import Ustensile
+
+# Valeurs par défaut des paramètres
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Chaudron_gobelin(Ustensile):
     """Un chaudron, trouvé en général dans un camp de gobelins."""
@@ -15,3 +25,7 @@ class Chaudron_gobelin(Ustensile):
             return SKIN_CHAUDRON_GOBELIN
         else:
             return SKIN_CHAUDRON_GOBELIN_BRISE # Pour le skill d'écrasement
+
+# Imports utilisés dans le code
+from Jeu.Systeme.Constantes_decors.Decors import recettes_chaudron_gobelin
+from Affichage.Skins.Skins import SKIN_CHAUDRON_GOBELIN,SKIN_CHAUDRON_GOBELIN_BRISE

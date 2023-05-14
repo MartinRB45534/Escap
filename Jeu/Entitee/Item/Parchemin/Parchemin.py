@@ -1,10 +1,19 @@
 from __future__ import annotations
-from typing import Type, TYPE_CHECKING
+from typing import TYPE_CHECKING, Type
+
+# Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
+    from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from Jeu.Entitee.Agissant.Agissant import Agissant
+    from Jeu.Effet.Effet import Effet
     from Jeu.Effet.Magie.Magie import Magie
 
-from Jeu.Entitee.Item.Item import *
-from Jeu.Effet.Effets_divers import Enseignement
+# Imports des classes parentes
+from Jeu.Entitee.Item.Item import Consommable
+
+# Valeurs par défaut des paramètres
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Parchemin(Consommable):
     """La classe des consommables qui s'activent avec du mana."""
@@ -42,3 +51,8 @@ class Poly_de_cours(Parchemin):
 
     def get_description(self,observation=0):
         return["Un parchemin de cours","Probablement perdu par un élève.","D'après les tâches de sang, il fuyait un monstre."]
+
+# Imports utilisés dans le code
+from Affichage.Skins.Skins import SKIN_PARCHEMIN
+from Jeu.Effet.Effets_divers import Enseignement
+from Jeu.Entitee.Item.Item import Item

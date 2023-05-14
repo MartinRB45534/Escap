@@ -1,14 +1,19 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
+# Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from Jeu.Entitee.Agissant.Agissant import Agissant
 
-from Affichage.Skins.Skins import *
-from Jeu.Entitee.Agissant.Agissant import *
-from Jeu.Entitee.Agissant.Role.Roles import *
-from Jeu.Entitee.Agissant.PNJ.PNJs import *
-from Jeu.Dialogues.Dialogues import *
+# Imports des classes parentes
+from Jeu.Entitee.Entitee import Entitee_superieure
+from Jeu.Entitee.Agissant.PNJ.PNJs import PNJ
+
+# Valeurs par défaut des paramètres
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+from Jeu.Constantes import TERRE
 
 class Humain(PNJ,Entitee_superieure):
     """La classe des pnjs et du joueur. A un comportement un peu plus complexe, et une personnalité."""
@@ -51,3 +56,6 @@ class Humain(PNJ,Entitee_superieure):
             self.effets_mortuaires_tueur = responsable.effets
             self.controleur.pause = True
         self.insurge(responsable,gravite,dangerosite)
+
+# Imports utilisés dans le code
+from Affichage.Skins.Skins import SKIN_CORPS_HUMAIN, SKIN_CADAVRE

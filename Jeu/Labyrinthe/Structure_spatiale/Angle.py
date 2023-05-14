@@ -1,3 +1,10 @@
+from __future__ import annotations
+
+# Pas d'import pour les annotations
+
+# Pas de classe parente
+
+# Variables de classe
 from Jeu.Constantes import NB_DIRECTIONS
 
 class Angle:

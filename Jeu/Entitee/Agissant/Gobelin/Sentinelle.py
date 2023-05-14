@@ -1,11 +1,24 @@
-from Jeu.Entitee.Agissant.Gobelin.Gobelin import *
-from Jeu.Entitee.Agissant.Humain.Heros import Heros
+from __future__ import annotations
+from typing import TYPE_CHECKING
 
-class Sentinelle_gobelin(Tank,Gobelin,Sentinelle):
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+
+# Imports des classes parentes
+from Jeu.Entitee.Agissant.Gobelin.Base_gobelin import Base_gobelin
+from Jeu.Entitee.Agissant.Role.Sentinelle import Sentinelle
+from Jeu.Entitee.Agissant.Role.Tank import Tank
+
+# Valeurs par défaut des paramètres
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+
+class Sentinelle_gobelin(Tank,Base_gobelin,Sentinelle):
     """Un gobelin qui reste sur place tant qu'il ne voit pas d'ennemi. Créé spécifiquement pour les premiers étages et le tutoriel.
        Il a une meilleure défense que les gobelins de base."""
     def __init__(self,controleur:Controleur,niveau:int,position:Position=ABSENT):
-        Agissant.__init__(self,controleur,"sentinelle_gobelin",niveau,position)
+        Base_gobelin.__init__(self,controleur,"sentinelle_gobelin",niveau,position)
 
     def get_offenses(self):
         offenses = self.offenses
@@ -26,19 +39,22 @@ class Sentinelle_gobelin(Tank,Gobelin,Sentinelle):
 class Premier_monstre(Sentinelle_gobelin):
     """La première sentinelle gobelin. Réduire ses stats pour en faire un 1/2 shot ?"""
     def __init__(self,controleur:Controleur,niveau:int,position:Position=ABSENT):
-        Agissant.__init__(self,controleur,"premier_monstre",niveau,position)
+        Base_gobelin.__init__(self,controleur,"premier_monstre",niveau,position)
 
     def meurt(self):
         assert isinstance(self.controleur.joueur,Heros)
         self.controleur.joueur.first_kill(self.position)
-        Agissant.meurt(self)
+        super().meurt()
 
 class Troisieme_monstre(Sentinelle_gobelin):
     """La deuxième sentinelle gobelin. Réduire ses stats pour en faire un 3/4 shot ?"""
     def __init__(self,controleur:Controleur,niveau:int,position:Position=ABSENT):
-        Agissant.__init__(self,controleur,"troisieme_monstre",niveau,position)
+        Base_gobelin.__init__(self,controleur,"troisieme_monstre",niveau,position)
 
     def meurt(self):
         assert isinstance(self.controleur.joueur,Heros)
         self.controleur.joueur.third_kill()
-        Agissant.meurt(self)
+        super().meurt()
+
+# Imports utilises dans le code
+from Jeu.Entitee.Agissant.Humain.Heros import Heros

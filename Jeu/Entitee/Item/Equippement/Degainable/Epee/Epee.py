@@ -1,4 +1,16 @@
-from Jeu.Entitee.Item.Equippement.Degainable.Degainable import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+
+# Imports des classes parentes
+from Jeu.Entitee.Item.Equippement.Degainable.Degainable import Arme
+
+# Valeurs par défaut des paramètres
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Epee(Arme):
     """La classe des armes de type épée. Permettent de porter des coups semi-circulaires devant l'agissant."""
@@ -15,3 +27,6 @@ class Epee(Arme):
 
     def get_skin(self):
         return SKIN_EPEE
+
+# Imports utilisés dans le code
+from Affichage.Skins.Skins import SKIN_EPEE

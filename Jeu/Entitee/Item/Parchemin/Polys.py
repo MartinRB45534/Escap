@@ -1,6 +1,16 @@
-from Jeu.Entitee.Item.Parchemin.Parchemin import *
-from Jeu.Effet.Magie.Magies import *
-from Jeu.Systeme.Constantes_items.Items import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+
+# Imports des classes parentes
+from Jeu.Entitee.Item.Parchemin.Parchemin import Poly_de_cours
+
+# Valeurs par défaut des paramètres
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Poly_soin(Poly_de_cours):
     """Un parchemin qui enseigne la magie de soin."""
@@ -321,3 +331,12 @@ class Poly_instakill(Poly_de_cours):
 
     def get_description(self,observation=0):
         return["Un parchemin de cours","Intitulé : 'BANI807 Instakill'","Qu'est-ce que c'est ?"]
+
+# Imports utilisés dans le code
+from Jeu.Effet.Magie.Magies_soin import Magie_auto_soin, Magie_soin, Magie_soin_de_zone, Magie_resurection, Magie_reanimation_de_zone
+from Jeu.Effet.Magie.Magies_projectiles import Magie_boule_de_feu, Magie_eclair_noir, Magie_fleche_de_glace, Magie_jet_de_mana, Magie_ombre_furtive, Magie_rocher
+from Jeu.Effet.Magie.Magies_enchantement import Magie_enchantement_bombe, Magie_enchantement_absorption, Magie_enchantement_cecite, Magie_enchantement_celerite, Magie_enchantement_confusion, Magie_enchantement_faiblesse, Magie_enchantement_flamme, Magie_enchantement_force, Magie_enchantement_immunite, Magie_enchantement_neige, Magie_enchantement_perte_de_pm, Magie_enchantement_perte_de_pv, Magie_enchantement_poches_trouees, Magie_enchantement_renforcement, Magie_enchantement_rouille, Magie_enchantement_sable, Magie_enchantement_tenebre, Magie_enchantement_vision, Magie_enchantement_vitalite
+from Jeu.Effet.Magie.Magies_economie import Magie_investissement, Magie_explosion_de_mana, Magie_reserve
+from Jeu.Effet.Magie.Magies_attaque.Attaques_corps_a_corps import Magie_laser, Magie_brasier, Magie_avalanche
+from Jeu.Effet.Magie.Magies_attaque.Boosts import Magie_dopage
+from Jeu.Effet.Magie.Magies_diverses import Magie_blizzard, Magie_obscurite, Magie_instakill

@@ -1,11 +1,18 @@
-# from typing import Any
-from typing import Any, Dict, Iterator, Literal, Optional, Self, Set, Tuple
-from Jeu.Entitee.Agissant.Agissant import Agissant
-from Jeu.Entitee.Decors.Decor import Decors
-from Jeu.Entitee.Item.Item import Item
-from Jeu.Labyrinthe.Case import Case
-from Jeu.Labyrinthe.Structure_spatiale.Espace import *
-from Jeu.Labyrinthe.Structure_spatiale.Espace import Decalage, List
+from __future__ import annotations
+from typing import TYPE_CHECKING, List, Tuple, Optional, Set, Iterator, Literal, Self
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
+    from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
+    from Jeu.Labyrinthe.Structure_spatiale.Cote import Cote_position,Cote_decalage
+    from Jeu.Labyrinthe.Vue import Representation_case
+    from Jeu.Labyrinthe.Case import Case
+    from Jeu.Entitee.Agissant.Agissant import Agissant
+
+# Import des classes parentes
+from Jeu.Labyrinthe.Structure_spatiale.Espace import Espace
 
 class Vue(Espace):
     """Une représentation simplifiée d'un labyrinthe"""
@@ -192,3 +199,8 @@ class Vues(dict[str,Representation_vue]):
 
     def mur_from_cote(self,cote:Cote_position) -> List[Position|Literal[False]]:
         return self[cote.emplacement.lab].mur_from_cote(cote)
+    
+# Imports utilisés dans le code
+from Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
+from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+from Jeu.Labyrinthe.Structure_spatiale.Cote import Cote_position, Cote_decalage

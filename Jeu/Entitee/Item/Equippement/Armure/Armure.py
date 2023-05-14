@@ -1,4 +1,16 @@
-from Jeu.Entitee.Item.Equippement.Equippement import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+
+# Imports des classes parentes
+from Jeu.Entitee.Item.Equippement.Equippement import Equipement
+
+# Valeurs par défaut des paramètres
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Armure(Equipement):
     """La classe des équipements de type armure. On ne peut en porter qu'une à la fois."""
@@ -22,3 +34,6 @@ class Armure(Equipement):
 
     def get_skin(self):
         return SKIN_ARMURE_BASIQUE
+
+# Imports utilisés dans le code
+from Affichage.Skins.Skins import SKIN_ARMURE, SKIN_ARMURE_BASIQUE

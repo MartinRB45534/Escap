@@ -1,4 +1,11 @@
-from Jeu.Labyrinthe.Structure_spatiale.Bord import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
+
+# Pas de classe parente
 
 class Espace:
     """La classe qui représente un élément de l'espace (un étage de labyrinthe, une salle d'un étage, etc.)"""
@@ -34,3 +41,8 @@ class Espace:
     def __iter__(self):
         for decalage in self.decalage:
             yield self[decalage]
+
+# Imports utilisés dans le code
+from Jeu.Labyrinthe.Structure_spatiale.Bord import Bord
+from Jeu.Labyrinthe.Structure_spatiale.Cote import Cote_decalage
+from Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage

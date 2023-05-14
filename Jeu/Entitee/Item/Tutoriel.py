@@ -1,11 +1,29 @@
-from Jeu.Entitee.Item.Item import *
-from Jeu.Entitee.Item.Cle import *
-from Jeu.Entitee.Item.Equippement.Equippements import *
-from Jeu.Entitee.Item.Parchemin.Parchemins import *
-from Jeu.Entitee.Item.Potion.Potions import *
-from Jeu.Entitee.Item.Projectile.Projectiles import *
-from Affichage.Skins.Skins import *
-from Jeu.Constantes import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Controleur import Controleur
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from Jeu.Entitee.Agissant.Agissant import Agissant
+
+# Imports des classes parentes
+from Jeu.Entitee.Item.Equippement.Armure.Armure import Armure
+from Jeu.Entitee.Item.Equippement.Degainable.Lance.Lance import Lance
+from Jeu.Entitee.Item.Equippement.Degainable.Epee.Epee import Epee
+from Jeu.Entitee.Item.Equippement.Haume.Haume import Haume
+from Jeu.Entitee.Item.Equippement.Anneau.Anneau import Anneau
+from Jeu.Entitee.Item.Equippement.Role.Defensif.Defensifs import Defensif_valeur, Defensif_proportion, Defensif_plafond
+from Jeu.Entitee.Item.Equippement.Role.Accelerateur import Accelerateur
+from Jeu.Entitee.Item.Equippement.Role.Anoblisseur import Anoblisseur
+from Jeu.Entitee.Item.Equippement.Role.Equippement_tribal import Equipement_tribal
+from Jeu.Entitee.Item.Equippement.Role.Reparateur.Reparateurs import Pompe_a_pv
+from Jeu.Entitee.Item.Equippement.Role.Reparateur_magique.Reparateurs_magiques import Pompe_a_pm
+from Jeu.Entitee.Item.Equippement.Role.Elementaires import Rocheux
+from Jeu.Entitee.Item.Item import Ingredient
+
+# Valeurs par défaut des paramètres
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
 
 #Quelques items pour le tutoriel :
 
@@ -439,3 +457,10 @@ class Peau_gobelin(Ingredient):
 
     def get_skin(self):
         return SKIN_PEAU_GOBELIN
+
+# Imports utilisés dans le code
+from Jeu.Entitee.Item.Item import Item
+from Jeu.Entitee.Item.Equippement.Degainable.Degainable import Arme
+from Jeu.Systeme.Constantes_items.Items import *
+from Jeu.Constantes import TERRE, GLACE
+from Affichage.Skins.Skins import SKIN_ANNEAU, SKIN_HYPOKUTE, SKIN_PIERRE_SOLIDE, SKIN_DENT, SKIN_PEAU_GOBELIN, SKIN_EPEE_GOBELIN, SKIN_LANCE_GOBELIN, SKIN_ARMURE_GOBELIN, SKIN_CASQUE_GOBELIN, SKIN_BANDEAU_GOBELIN, SKIN_CIMETERE_GOBELIN, SKIN_LANCE_DOR, SKIN_ARMURE_DOR, SKIN_EPEE, SKIN_ARMURE_BASIQUE, SKIN_TUNIQUE_ALCHIMISTE, SKIN_TUNIQUE_ENCHANTEE, SKIN_SOUTANE, SKIN_ROBE_MAGIQUE, SKIN_ROBE_SORCIERE, SKIN_CHAPEAU_DE_SORCIERE, SKIN_EPEE_MARCHAND

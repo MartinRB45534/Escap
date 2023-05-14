@@ -1,4 +1,9 @@
-from Jeu.Entitee.Agissant.Agissant import *
+from __future__ import annotations
+
+# Pas d'imports pour les annotations
+
+# Imports des classes parentes
+from Jeu.Entitee.Agissant.Agissant import Agissant
 
 class Mage(Agissant):
     """Les agissants qui lancent des sorts.
@@ -43,3 +48,8 @@ class Multi_mage(Mage):
 
     def multi_caste(self):
         return None
+    
+# Imports utilisés dans le code
+from Jeu.Systeme.Classe import trouve_skill, Skills_magiques
+from Jeu.Entitee.Item.Parchemin.Parchemins import Parchemin_impregne
+from Jeu.Constantes import AUTO_IMPREGNATION

@@ -1,20 +1,19 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from Jeu.Esprit.Esprit import Esprit
+# Pas d'imports pour les annotations
 
-from operator import itemgetter
-from Jeu.Entitee.Agissant.Role.Soigneur import *
-from Jeu.Systeme.Constantes_magies.Magies import *
+# Imports des classes parentes
+from Jeu.Entitee.Agissant.Role.Soigneur import Soigneur
+from Jeu.Entitee.Agissant.Role.Mage import Multi_mage
 
 class Multi_soigneur(Soigneur,Multi_mage):
     """Les soigneurs capables de soigner plusieurs agissants à la fois."""
 
-    def agit_en_vue(self,esprit:Esprit,defaut = ""):
+    def agit_en_vue(self,defaut = ""):
         cibles = []
         skill = type(self.get_skill_magique())
-        for corp in esprit.corps:
+        for corp in self.esprit.corps:
             if corp.etat == "vivant" and corp.pv < corp.pv_max:
                 cibles.append([corp.pv,corp])
         if len(cibles) == 1:
@@ -39,3 +38,6 @@ class Multi_soigneur(Soigneur,Multi_mage):
                 defaut = "soin"
                 self.set_statut("soin")
         return defaut
+
+# Imports utilisés dans le code
+from operator import itemgetter

@@ -1,13 +1,19 @@
 from __future__ import annotations
-from typing import List, TYPE_CHECKING, Literal, Set
+from typing import TYPE_CHECKING, List, Literal, Optional, Set, Type
 
+# Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Jeu.Entitee.Entitees import *
+    from Jeu.Controleur import Controleur
+    from Jeu.Effet.Effet import Effet
+    from Jeu.Effet.Effets_mouvement.Deplacements import Teleport, Escalier
+    from Jeu.Entitee.Entitee import Entitee
+    from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
 
-# from Jeu.Constantes import *
-# from Jeu.Entitee.Item.Item import *
-from Jeu.Effet.Effets_mouvement.Blocages import *
-from Jeu.Effet.Effets_mouvement.Deplacements import *
+# Pas de classe parente
+
+# Valeurs par défaut des paramètres
+from Jeu.Effet.Effets_mouvement.Deplacements import Teleport, Escalier
 
 class Mur:
     def __init__(self,cible:Position,niveau:int):
@@ -63,8 +69,8 @@ class Mur:
         elif isinstance(intrus,Item):
             intrus.heurte_mur()
 
-    def get_porte(self) -> Porte:
-        porte = None
+    def get_porte(self):
+        porte:Optional[Porte] = None
         for effet in self.effets :
             if isinstance(effet,Porte):
                 porte = effet
@@ -222,3 +228,10 @@ class Mur:
 
     def desactive(self):
         self.controleur = None
+
+# Imports utilisés dans le code
+from Jeu.Effet.Effet import On_try_through, On_through
+from Jeu.Effet.Effets_mouvement.Blocages import Mur_impassable, Mur_plein, Porte, Porte_barriere, Barriere
+from Jeu.Effet.Effets_mouvement.Deplacements import Teleport
+from Jeu.Entitee.Item.Item import Item
+from Jeu.Labyrinthe.Structure_spatiale.Direction import HAUT, BAS
