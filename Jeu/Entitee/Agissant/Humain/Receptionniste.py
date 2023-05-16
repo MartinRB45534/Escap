@@ -117,7 +117,7 @@ class Receptionniste(Dps,Humain): #Le deuxième humain du jeu, à l'étage 1 (en
         return SKIN_TETE_RECEPTIONNISTE
 
     def get_texte_descriptif(self):
-        return [f"Un humain (niveau {self.niveau})",f"ID : {self}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Un aventurier épéiste."]
+        return [f"Un humain (niveau {self.niveau})",f"ID : {self.ID}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Un aventurier épéiste."]
 
 # Imports utilisés dans le code:
 from Affichage.Skins.Skins import SKIN_TETE_RECEPTIONNISTE

@@ -40,6 +40,9 @@ class Cote_decalage:
         if isinstance(other,Cote_decalage):
             return self.emplacement == other.emplacement and self.direction == other.direction
         return False
+    
+    def __hash__(self):
+        return hash((self.emplacement,self.direction))
 
     def __str__(self):
         return f"Coté : {self.emplacement}, {self.direction}"
@@ -79,6 +82,9 @@ class Cote_position:
         if isinstance(other,Cote_position|Cote_decalage):
             return self.emplacement == other.emplacement and self.direction == other.direction
         return False
+    
+    def __hash__(self):
+        return hash((self.emplacement,self.direction))
 
     def __str__(self):
         return f"Coté : {self.emplacement}, {self.direction}"

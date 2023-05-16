@@ -15,7 +15,7 @@ class Renforceur(Mage):
             assert isinstance(corp,Agissant)
             if corp.statut == "attaque":
                 cibles.append([self.esprit.get_importance(corp.get_impact()),corp])
-        if cibles != [] and self.peut_caster():
+        if cibles and self.peut_caster():
             new_cibles = sorted(cibles, key=itemgetter(0))
             self.utilise(skill)
             self.set_magie_courante(self.caste())

@@ -508,7 +508,7 @@ class Peureuse(PNJ_mage,Multi_renforceur,Support_lointain,Humain): #La quatrièm
         return SKIN_TETE_PEUREUSE
 
     def get_texte_descriptif(self):
-        return [f"Une humaine (niveau {self.niveau})",f"ID : {self}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Une humaine terrorisée par les monstres. Elle peut quand-même se rendre utile."]
+        return [f"Une humaine (niveau {self.niveau})",f"ID : {self.ID}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Une humaine terrorisée par les monstres. Elle peut quand-même se rendre utile."]
 
 # Imports utilisés dans le code:
 from Jeu.Constantes import *

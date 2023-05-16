@@ -45,7 +45,7 @@ class Shaman_gobelin(Renforceur,Support_lointain,Base_gobelin):
         return offenses, etat
 
     def get_texte_descriptif(self):
-        return [f"Un shaman gobelin (niveau {self.niveau})",f"ID : {self}","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Caché à l'arrière, loin des combats, le shaman fourni pourtant aux autres gobelins un renforcement non négligeable. Essayez de le tuer en priorité !"]
+        return [f"Un shaman gobelin (niveau {self.niveau})",f"ID : {self.ID}","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Caché à l'arrière, loin des combats, le shaman fourni pourtant aux autres gobelins un renforcement non négligeable. Essayez de le tuer en priorité !"]
 
 # Imports utilisés dans le code
 from Jeu.Systeme.Constantes_magies.Magies import cout_pm_boost

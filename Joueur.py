@@ -402,7 +402,7 @@ class Joueur:
     #     screen.blit(POLICE40.render("tuer par les monstres.",True,(255,255,255)),(marge_gauche+350,marge_haut+490))
     #     screen.blit(POLICE40.render("Retrouvez les autres humains",True,(255,255,255)),(marge_gauche+832,marge_haut+40))
     #     screen.blit(POLICE40.render("pour vous échapper tous ensemble.",True,(255,255,255)),(marge_gauche+800,marge_haut+80))
-    #     while panneau != 0:
+    #     while panneau:
     #         events = pygame.event.get()
     #         for event in events :
     #             if event.type == pygame.QUIT :

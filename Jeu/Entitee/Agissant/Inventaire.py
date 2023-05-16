@@ -206,7 +206,7 @@ class Inventaire:
         for classe in self.items:
             for item in self.items[classe]:
                 assert isinstance(item,Item)
-                if item.position is not None or item.etat == "brisé": #S'il a été lancé ou n'est plus en état
+                if item.position != ABSENT or item.etat == "brisé": #S'il a été lancé ou n'est plus en état
                     self.items[classe].remove(item)
                     if self.arme is item :
                         self.arme = None
@@ -293,6 +293,7 @@ class Inventaire:
         return False
 
 # Imports utilisés dans le code (il y en a beaucoup !!!)
+from Jeu.Entitee.Item.Item import Item
 from Jeu.Entitee.Item.Potion.Potion import Potion
 from Jeu.Entitee.Item.Parchemin.Parchemin import Parchemin
 from Jeu.Entitee.Item.Cle import Cle

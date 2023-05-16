@@ -1057,7 +1057,7 @@ class Pavage_horizontal(Pavage):
         else:
             nb_portions = sum(taille for taille in self.repartition if taille<0)
             portion = 0
-            if nb_portions != 0: #Dans le cas contraire, on n'a pas besoin de définir portion
+            if nb_portions: #Dans le cas contraire, on n'a pas besoin de définir portion
                 portion = libre/nb_portions
             somme = 0
             for i in range(len(self.repartition)):
@@ -1081,7 +1081,7 @@ class Pavage_horizontal(Pavage):
         else:
             nb_portions = sum(taille for taille in self.repartition if taille<0)
             portion = 0
-            if nb_portions != 0: #Dans le cas contraire, on n'a pas besoin de définir portion
+            if nb_portions: #Dans le cas contraire, on n'a pas besoin de définir portion
                 portion = libre/nb_portions
             for i in range(len(self.repartition)):
                 taille = self.repartition[i]
@@ -1114,7 +1114,7 @@ class Pavage_vertical(Pavage):
         else:
             nb_portions = sum(taille for taille in self.repartition if taille<0)
             portion = 0
-            if nb_portions != 0: #Dans le cas contraire, on n'a pas besoin de définir portion
+            if nb_portions: #Dans le cas contraire, on n'a pas besoin de définir portion
                 portion = libre/nb_portions
             somme = 0
             for i in range(len(self.repartition)):
@@ -1140,7 +1140,7 @@ class Pavage_vertical(Pavage):
         else:
             nb_portions = sum(taille for taille in self.repartition if taille<0)
             portion = 0
-            if nb_portions != 0: #Dans le cas contraire, on n'a pas besoin de définir portion
+            if nb_portions: #Dans le cas contraire, on n'a pas besoin de définir portion
                 portion = libre/nb_portions
             for i in range(len(self.repartition)):
                 taille = self.repartition[i]
@@ -1275,7 +1275,7 @@ class Liste_verticale(Liste):
             decalage += tailles[1]-somme
         if self.decalage + decalage > 0:
             decalage = -self.decalage
-        if decalage != 0:
+        if decalage:
             for contenu in self.contenu:
                 contenu.decale([0,decalage])
             self.decalage += decalage
@@ -1286,14 +1286,14 @@ class Liste_verticale(Liste):
     def scroll(self,position,x,y):
         if self.scroll_liste(position,x,y): #Un de nos éléments a scrollé
             return True
-        elif self.touche(position) and y != 0: #Personne n'a scrollé, peut-être qu'on peut le faire
+        elif self.touche(position) and y: #Personne n'a scrollé, peut-être qu'on peut le faire
             taille_contenu = sum(self.repartition[i] if self.repartition[i] else self.contenu[i].get_tailles(self.tailles)[1] for i in range(len(self.repartition)))
             if taille_contenu > self.tailles[1]: # On ne scrolle pas si on ne peut même pas remplir tout l'espace disponible
                 if y<0:
                     decalage = max(y,self.tailles[1] - taille_contenu - self.decalage)
                 else:
                     decalage = min(y,-self.decalage)
-                if decalage != 0:
+                if decalage:
                     for contenu in self.contenu:
                         contenu.decale([0,decalage])
                     self.decalage += decalage
@@ -1306,7 +1306,7 @@ class Liste_verticale(Liste):
             decalage = -element.position[1]
         elif element.position[1]+element.tailles[1] > self.tailles[1]:
             decalage = self.tailles[1]-element.position[1]-element.tailles[1]
-        if decalage != 0:
+        if decalage:
             for contenu in self.contenu:
                 contenu.decale([0,decalage])
             self.decalage += decalage
@@ -1355,7 +1355,7 @@ class Liste_horizontale(Liste):
             decalage += tailles[0]-somme
         if self.decalage + decalage > 0:
             decalage = -self.decalage
-        if decalage != 0:
+        if decalage:
             for contenu in self.contenu:
                 contenu.decale([decalage,0])
             self.decalage += decalage
@@ -1368,14 +1368,14 @@ class Liste_horizontale(Liste):
     def scroll(self,position,x,y):
         if self.scroll_liste(position,x,y): #Un de nos éléments a scrollé
             return True
-        elif self.touche(position) and x != 0: #Personne n'a scrollé, peut-être qu'on peut le faire
+        elif self.touche(position) and x: #Personne n'a scrollé, peut-être qu'on peut le faire
             taille_contenu = sum(self.repartition[i] if self.repartition[i] else self.contenu[i].get_tailles(self.tailles)[0] for i in range(len(self.repartition)))
             if taille_contenu > self.tailles[0]: # On ne scrolle pas si on ne peut même pas remplir tout l'espace disponible
                 if x<0:
                     decalage = max(x,self.tailles[0] - taille_contenu - self.decalage)
                 else:
                     decalage = min(x,-self.decalage)
-                if decalage != 0:
+                if decalage:
                     for contenu in self.contenu:
                         contenu.decale([decalage,0])
                     self.decalage += decalage
@@ -1388,7 +1388,7 @@ class Liste_horizontale(Liste):
             decalage = -element.position[0]
         elif element.position[0]+element.tailles[0] > self.tailles[0]:
             decalage = self.tailles[0]-element.position[0]-element.tailles[0]
-        if decalage != 0:
+        if decalage:
             for contenu in self.contenu:
                 contenu.decale([decalage,0])
             self.decalage += decalage
@@ -2048,7 +2048,7 @@ class Vignettes_position(Vignette_composee):
                     vignettes.append(Vignette(position,taille,case.decors.get_skin()))
                 if case.agissant is not None: #Enfin l'agissant (s'il y en a un)
                     vignettes.append(Vignettes_agissant(position,case.agissant,taille))
-                if case.effets != []:
+                if case.effets:
                     if any([effet[2] in joueur.esprit.corps for effet in case.effets]):
                         vignettes.append(Vignette(position,taille,SKIN_ATTAQUE_DELAYEE_ALLIE))
                     else:

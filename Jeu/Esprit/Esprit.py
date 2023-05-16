@@ -118,9 +118,10 @@ class Esprit :
         for case in vue:
             if case.agissant is not None:
                 vus.add(case.agissant)
-            old_agissant = self.vue.case_from_position(case.case.position).agissant
-            if case.case.position in self.vue and old_agissant is not None and case.agissant != self.vue.case_from_position(case.case.position).agissant:
-                oublies.add((old_agissant,case))
+            if case.case.position in self.vue:
+                old_agissant = self.vue.case_from_position(case.case.position).agissant
+                if old_agissant is not None and case.agissant != old_agissant:
+                    oublies.add((old_agissant,case))
         return vus, oublies
 
     def trouve_agissants(self) -> Set[Agissant]:
@@ -202,7 +203,7 @@ class Esprit :
         for case in cases_memorisees:
             zone = Zone_inconnue(case.case.position)
             self.zones_inconnues.add(zone)
-            for zone_ in self.zones_inconnues:
+            for zone_ in [*self.zones_inconnues]:
                 if zone_ != zone:
                     for DIR in DIRECTIONS:
                         voisin = case.cibles[DIR][PASSE_ESCALIER]
@@ -242,13 +243,13 @@ class Esprit :
                     if voisin and ((not voisin in self.vue) or self.vue.case_from_position(voisin).clarte == 0):
                         zone.sorties.add(voisin)
                         zones_mod.add(zone)
-            for case in cases_limites:
+            for case in [*cases_limites]:
                 if case in zone.cases:
                     zone.cases.remove(case)
                     zone.entrees.add(case)
                     cases_limites.remove(case)
                     zones_mod.add(zone)
-            if zone.cases == [] and zone.entrees == []:
+            if zone.cases == set() and zone.entrees == set():
                 self.remove_zone(zone)
 
     def update_representation(self,cases:Set[Representation_case]):
@@ -283,7 +284,7 @@ class Esprit :
                 salle = Salle(carre)
                 # print(len(salle.carres))
                 self.salles.add(salle)
-                for salle_ in self.salles:
+                for salle_ in [*self.salles]:
                     if salle_ != salle: #Peut arriver si on partage plusieurs cases avec une salle existante
                         for dir in DIRECTIONS:
                             if carre+dir in salle_.carres: #Ces deux carrés partagent deux cases : les deux salles n'en forment qu'une seule
@@ -293,7 +294,7 @@ class Esprit :
                                 break
                 salles_mod.add(salle)
             for dec in Decalage(2,2):
-                for couloir in self.couloirs:
+                for couloir in [*self.couloirs]:
                     if carre+dec in couloir.cases: #Cette case appartenait à un couloir. Ce n'est plus le cas car des murs ont été ouverts (portes, écrasement, etc.) et elle appartient désormais à une salle
                         couloirs_mod |= self.scinde_couloir(couloir,carre+dec)
         # print("Salles :")
@@ -302,7 +303,7 @@ class Esprit :
         # print(len(salles_mod))
         # print("Intersection")
         # print(len([salle for salle in salles_mod if salle in self.salles]))
-        for salle in salles_mod:
+        for salle in [*salles_mod]:
             if salle in self.salles: #On peut en avoir retirées
                 # print("Salle modifiée !")
                 # print(len(salle.carres))
@@ -344,10 +345,10 @@ class Esprit :
                 else:
                     couloir = Couloir(case.case.position)
                     self.couloirs.add(couloir)
-                    for couloir_ in self.couloirs:
+                    for couloir_ in [*self.couloirs]:
                         if couloir_ != couloir:
                             for dir in DIRECTIONS:
-                                if case+dir in couloir_.cases and case.cibles[dir][PASSE_ESCALIER] and self.vue.case_from_position(case+dir).cibles[dir.oppose()][PASSE_ESCALIER]:
+                                if case.case.position+dir in couloir_.cases and case.cibles[dir][PASSE_ESCALIER] and self.vue.case_from_position(case.case.position+dir).cibles[dir.oppose()][PASSE_ESCALIER]:
                                     couloir = self.fusionne_couloirs(couloir_,couloir)
                                     break
                 if couloir not in couloirs_mod:
@@ -361,7 +362,7 @@ class Esprit :
                 if case.case.position.x in range(2,5) and case.case.position.y in range(7,10):
                     print("Bad check")
                     print(case.case.position.x, case.case.position.y)
-        for couloir in couloirs_mod:
+        for couloir in [*couloirs_mod]:
             if couloir in self.couloirs:
                 couloir.entrees = set()
                 for dir in DIRECTIONS:
@@ -381,7 +382,7 @@ class Esprit :
     def downdate_zones(self,cases:List[Position]):
         zones_mod:List[Zone_inconnue] = []
         for case in cases:
-            for zone in self.zones_inconnues:
+            for zone in [*self.zones_inconnues]:
                 if case in zone.cases:
                     zones_mod += self.scinde_zone(zone,case)
         for zone in zones_mod:
@@ -406,7 +407,7 @@ class Esprit :
                 carres_suppr.append(carre_pot)
         salles_mod:List[Salle] = [] #Les salles qu'on a modifiées
         for carre in carres_suppr:
-            for salle in self.salles:
+            for salle in [*self.salles]:
                 if carre in salle.carres:
                     salles_mod += self.scinde_salle(salle,carre)
         couloirs_mod:List[Couloir] = []
@@ -422,7 +423,7 @@ class Esprit :
                 salle.entrees = {bord.emplacement for bord in salle.frontiere if self.vue.case_from_position(bord.emplacement).cibles[bord.direction][4]}
                 salle.calcule_distances()
         for case in cases:
-            for couloir in self.couloirs:
+            for couloir in [*self.couloirs]:
                 if case in couloir.cases:
                     couloirs_mod += self.scinde_couloir(couloir,case)
         for couloir in couloirs_mod:
@@ -457,8 +458,8 @@ class Esprit :
                 if case in zone.cases:
                     zones_mod |= self.scinde_zone(zone,case)
                     break
-        for zone in self.zones_inconnues:
-            for zone_ in esprit.zones_inconnues:
+        for zone in [*self.zones_inconnues]:
+            for zone_ in [*esprit.zones_inconnues]:
                 for case in zone.cases:
                     if case in zone_.cases:
                         zones_mod.add(esprit.fusionne_zones(zone,zone_))
@@ -484,12 +485,12 @@ class Esprit :
         carres_pot_self:List[Position] = []
         for case in cases_self:
             for dec in Decalage(2,2):
-                if case-dec in self.vue and case-dec+Decalage(1,1) in self.vue:
-                    carres_pot_esprit.append(case-dec)
+                if case.case.position-dec in self.vue and case.case.position-dec+Decalage(1,1) in self.vue:
+                    carres_pot_esprit.append(case.case.position-dec)
         for case in cases_esprit:
             for dec in Decalage(2,2):
-                if case-dec in esprit.vue and case-dec+Decalage(1,1) in esprit.vue:
-                    carres_pot_self.append(case-dec)
+                if case.case.position-dec in esprit.vue and case.case.position-dec+Decalage(1,1) in esprit.vue:
+                    carres_pot_self.append(case.case.position-dec)
         carres_esprit:List[Position] = []
         carres_self:List[Position] = []
         for carre in carres_pot_esprit:
@@ -513,7 +514,7 @@ class Esprit :
             if libre:
                 salle = Salle(carre)
                 esprit.salles.add(salle)
-                for salle_ in esprit.salles:
+                for salle_ in [*esprit.salles]:
                     if salle_ != salle: #Peut arriver si on partage plusieurs cases avec une salle existante
                         for dir in DIRECTIONS:
                             if carre+dir in salle_.carres: #Ces deux carrés partagent deux cases : les deux salles n'en forment qu'une seule
@@ -542,7 +543,7 @@ class Esprit :
             if libre:
                 salle = Salle(carre)
                 self.salles.add(salle)
-                for salle_ in self.salles:
+                for salle_ in [*self.salles]:
                     if salle_ != salle:
                         for dir in DIRECTIONS:
                             if carre+dir in salle_.carres:
@@ -561,7 +562,7 @@ class Esprit :
                         break
         for salle in esprit.salles:
             self.salles.add(salle)
-            for salle_ in self.salles:
+            for salle_ in [*self.salles]:
                 if salle_ != salle:
                     for carre in salle.carres:
                         for dir in DIRECTIONS:
@@ -607,13 +608,13 @@ class Esprit :
                     for couloir_ in self.couloirs:
                         if couloir_ != couloir:
                             for dir in DIRECTIONS:
-                                if case+dir in couloir_.cases and case.cibles[dir][PASSE_ESCALIER] and self.vue.case_from_position(case+dir).cibles[dir.oppose()][PASSE_ESCALIER]:
+                                if case.case.position+dir in couloir_.cases and case.cibles[dir][PASSE_ESCALIER] and self.vue.case_from_position(case.case.position+dir).cibles[dir.oppose()][PASSE_ESCALIER]:
                                     couloir = self.fusionne_couloirs(couloir_,couloir)
                                     break
                     for couloir_ in esprit.couloirs:
                         if couloir_ != couloir:
                             for dir in DIRECTIONS:
-                                if case+dir in couloir_.cases and case.cibles[dir][PASSE_ESCALIER] and self.vue.case_from_position(case+dir).cibles[dir.oppose()][PASSE_ESCALIER]:
+                                if case.case.position+dir in couloir_.cases and case.cibles[dir][PASSE_ESCALIER] and self.vue.case_from_position(case.case.position+dir).cibles[dir.oppose()][PASSE_ESCALIER]:
                                     couloir = self.fusionne_couloirs(couloir_,couloir)
                                     self.couloirs.add(couloir)
                                     esprit.couloirs.remove(couloir)
@@ -634,7 +635,7 @@ class Esprit :
                         break
             if couloir not in couloirs_mod:
                 couloirs_mod.append(couloir)
-        for couloir in couloirs_mod:
+        for couloir in couloirs_mod[::-1]:
             if couloir in self.couloirs:
                 couloir.entrees = set()
                 for dir in DIRECTIONS:
@@ -657,6 +658,12 @@ class Esprit :
         return salle1
 
     def fusionne_couloirs(self,couloir1:Couloir,couloir2:Couloir): #couloir1 est probablement plus gros que couloir2
+        if all([case in couloir1.cases for case in couloir2.cases]):
+            self.remove_couloir(couloir2)
+            return couloir1
+        if all([case in couloir2.cases for case in couloir1.cases]):
+            self.remove_couloir(couloir1)
+            return couloir2
         for dir in DIRECTIONS:
             if self.vue.case_from_position(couloir1.cases[0]).cibles[dir][PASSE_ESCALIER] == couloir2.cases[0] and self.vue.case_from_position(couloir2.cases[0]).cibles[dir.oppose()][PASSE_ESCALIER] == couloir1.cases[0]:
                 couloir1.cases = list(reversed(couloir1.cases)) + couloir2.cases # Et c'est tout ?
@@ -687,7 +694,7 @@ class Esprit :
         salle.carres.remove(carre)
         voisins = [carre+dir for dir in DIRECTIONS if carre+dir in salle.carres]
         salles:Set[Salle] = set()
-        while voisins != []:
+        while voisins:
             depart = voisins.pop(0)
             queue = [depart]
             salle.carres.remove(depart)
@@ -711,12 +718,12 @@ class Esprit :
         i = couloir.cases.index(case)
         cases1,cases2 = couloir.cases[:i],couloir.cases[i+1:]
         couloirs = set()
-        if cases1 != []:
+        if cases1:
             couloir1 = Couloir()
             couloir1.cases = cases1
             self.couloirs.add(couloir1)
             couloirs.add(couloir1)
-        if cases2 != []:
+        if cases2:
             couloir2 = Couloir()
             couloir2.cases = cases2
             self.couloirs.add(couloir2)
@@ -728,7 +735,7 @@ class Esprit :
         zone.cases.remove(case)
         voisins = {case+dir for dir in DIRECTIONS if case+dir in zone.cases}
         zones = set()
-        while voisins != []:
+        while voisins:
             depart = voisins.pop()
             queue = [depart]
             zone.cases.remove(depart)
@@ -996,7 +1003,7 @@ class Esprit :
     #                         centre += "x"
     #                     else:
     #                         centre += " "
-    #                     if case.entitees != []:
+    #                     if case.entitees:
     #                         occ = " "
     #                         for occupant in case.entitees:
     #                             if occupant in self.corps:
@@ -1199,11 +1206,11 @@ class Esprit :
             if comportement == 0 : #Foncer tête baissée ! Pour les combattants au corps à corps
                 res = "deplacement"
             elif comportement == 1 or (comportement > 1 and not self.fuite_utile(corp)): #Tenter une action, puis approcher. Pour les effets à distance qui ont besoin de ne pas être trop loin.
-                res = corp.agit_en_vue(self,"deplacement")
+                res = corp.agit_en_vue("deplacement")
                 if repoussante:
                     res = "deplacement"
             elif comportement == 2: #Tenter une action, puis fuir. Pour les effets à distance qui peuvent se permettre d'être loin.
-                res = corp.agit_en_vue(self,"fuite")
+                res = corp.agit_en_vue("fuite")
                 if repoussante:
                     res = "fuite"
             elif comportement == 3 : #La fuite ! Quand les pvs sont bas
@@ -1249,7 +1256,7 @@ class Esprit :
                         if corp.ID == 4:
                             constantes_deplacements.append([self.controleur.nb_tours,"deplacement",corp.dir_regard,new_cases])
                     else:
-                        res = corp.agit_en_vue(self)
+                        res = corp.agit_en_vue()
                 elif res == "fuite":
                     new_cases = sorted(cases,key=operator.itemgetter("dangerosite","importance")) #2 pour le chemin d'accès indirect, 3 pour le chemin d'accès direct
                     if new_cases[-1]["direction"]: #La première case (i.e. les valeurs les moins élevées) n'est pas celle où l'on est
@@ -1259,7 +1266,7 @@ class Esprit :
                         if corp.ID == 4:
                             constantes_deplacements.append([self.controleur.nb_tours,"fuite",corp.dir_regard,new_cases])
                     else:
-                        res = corp.agit_en_vue(self)
+                        res = corp.agit_en_vue()
         corp.set_statut(res)
 
     def deplace_pnj(self,pnj:PNJ):
@@ -1267,9 +1274,9 @@ class Esprit :
         pnj.statut_pnj = "proximite"
         cible = pnj.position
         if pnj.mouvement == 0: #0 pour aller vers, 1 pour chercher et 2 pour aller au contact
-            if isinstance(pnj.cible_deplacement,int):
-                if self.controleur.agissants[pnj.cible_deplacement].etat == "vivant":
-                    cible = self.controleur.agissants[pnj.cible_deplacement].get_position()
+            if isinstance(pnj.cible_deplacement,Agissant):
+                if pnj.cible_deplacement.etat == "vivant":
+                    cible = pnj.cible_deplacement.get_position()
                     portee = 7
                 else:
                     cible = pnj.get_position()
@@ -1284,9 +1291,9 @@ class Esprit :
             portee = 1 #C'est juste pour qu'il puisse aller où il veut
             pnj.statut_pnj = "exploration"
         elif pnj.mouvement == 2:
-            if isinstance(pnj.cible_deplacement,int):
-                if self.controleur.agissants[pnj.cible_deplacement].etat == "vivant":
-                    cible = self.controleur.agissants[pnj.cible_deplacement].get_position()
+            if isinstance(pnj.cible_deplacement,Agissant):
+                if pnj.cible_deplacement.etat == "vivant":
+                    cible = pnj.cible_deplacement.get_position()
                     portee = 0
                 else:
                     cible = pnj.get_position()
@@ -1358,11 +1365,11 @@ class Esprit :
                 if comportement == 0 : #Foncer tête baissée ! Pour les combattants au corps à corps
                     res = "deplacement"
                 elif comportement == 1: #Tenter une action, puis approcher. Pour les effets à distance qui ont besoin de ne pas être trop loin.
-                    res = pnj.agit_en_vue(self,"deplacement")
+                    res = pnj.agit_en_vue("deplacement")
                     if repoussante:
                         res = "deplacement"
                 elif comportement == 2: #Tenter une action, puis fuir. Pour les effets à distance qui peuvent se permettre d'être loin.
-                    res = pnj.agit_en_vue(self,"fuite")
+                    res = pnj.agit_en_vue("fuite")
                     if repoussante:
                         res = "fuite"
                 elif comportement == 3 : #La fuite ! Quand les pvs sont bas
@@ -1415,7 +1422,7 @@ class Esprit :
                             if pnj.ID == 4:
                                 constantes_deplacements.append([self.controleur.nb_tours,"deplacement loin",pnj.dir_regard,new_cases])
                         else:
-                            res = pnj.agit_en_vue(self)
+                            res = pnj.agit_en_vue()
                     elif res == "fuite":
                         new_cases = sorted(cases,key=operator.itemgetter("dangerosite","importance")) #2 pour le chemin d'accès indirect, 3 pour le chemin d'accès direct
                         if new_cases[-1]["direction"]: #La première case (i.e. les valeurs les moins élevées) n'est pas celle où l'on est
@@ -1425,7 +1432,7 @@ class Esprit :
                             if pnj.ID == 4:
                                 constantes_deplacements.append([self.controleur.nb_tours,"fuite loin",pnj.dir_regard,new_cases])
                         else:
-                            res = pnj.agit_en_vue(self)
+                            res = pnj.agit_en_vue()
             pnj.set_statut(res)
 
     def oublie(self):
@@ -1477,6 +1484,8 @@ from Jeu.Systeme.Constantes_stats import add_constantes_temps, incr_compteur_tem
 from Jeu.Constantes import PASSE_ESCALIER, BASIQUE, DIALOGUE
 from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction, DIRECTIONS, HAUT, DROITE, BAS, GAUCHE
 from Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
+from Jeu.Labyrinthe.Structure_spatiale.Position import Position
+from Jeu.Entitee.Agissant.Agissant import Agissant
 from Jeu.Entitee.Agissant.PNJ.PNJs import PNJ, PJ
 from Jeu.Entitee.Agissant.Role.Sentinelle import Sentinelle
 from Jeu.Entitee.Agissant.Humain.Humain import Humain

@@ -249,7 +249,7 @@ class Peste(PNJ_mage,Multi_soigneur,Support_lointain,Humain): #La huitième huma
         return SKIN_TETE_PESTE
 
     def get_texte_descriptif(self):
-        return [f"Une humaine (niveau {self.niveau})",f"ID : {self}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Une sainte envoyée par son église pour purifier les monstres du labyrinthe."]
+        return [f"Une humaine (niveau {self.niveau})",f"ID : {self.ID}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Une sainte envoyée par son église pour purifier les monstres du labyrinthe."]
 
 # Imports utilisés dans le code:
 from Jeu.Constantes import *

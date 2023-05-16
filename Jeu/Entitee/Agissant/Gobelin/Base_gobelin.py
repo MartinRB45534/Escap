@@ -38,7 +38,7 @@ class Base_gobelin(Agissant):
         return SKIN_TETE_GOBELIN
 
     def get_texte_descriptif(self):
-        return [f"Un gobelin (niveau {self.niveau})",f"ID : {self}","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Ce gobelin là ne devrait pas exister..."]
+        return [f"Un gobelin (niveau {self.niveau})",f"ID : {self.ID}","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Ce gobelin là ne devrait pas exister..."]
 
     #Est-ce qu'il a besoin d'une méthode spécifique ? Pour les offenses peut-être ?
 

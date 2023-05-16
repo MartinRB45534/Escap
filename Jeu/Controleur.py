@@ -786,6 +786,7 @@ class Controleur():
         #TODO: À rajouter
         #Et on active le lab du joueur
         self.joueur = Heros(self,Position("Étage 1 : couloir",13,0))
+        self.joueur.position = Position("Étage 2 : labyrinthe",0,0)
         self.ajoute_entitee(self.joueur)
         self.esprits["heros"] = Esprit_humain(self.joueur,self)
         assert self.joueur.position is not None
@@ -812,7 +813,7 @@ class Controleur():
     #     #Rajouter une  vérification pour ne prendre que les cases vides ?
     #     agissants = []
     #     for i in range(nombre):
-    #         if poss != []:
+    #         if poss:
     #             j = random.randrange(len(poss))
     #             pos = poss.pop(j) #On choisit aléatoirement la position de l'agissant et on ne veut pas la réutiliser
     #             agissant = classe(self,pos,niveau)
@@ -1052,7 +1053,8 @@ class Controleur():
 
     def fait_agir(self,agissant:Agissant):
         agissant.set_statut("passif")
-        if isinstance(agissant, PJ) and agissant is self.joueur:
+        if agissant is self.joueur:
+            assert isinstance(agissant, PJ)
             agissant.nouvel_ordre = False
         type_skill = agissant.skill_courant
         assert type_skill is not None
@@ -1232,7 +1234,6 @@ class Controleur():
                 position = agissant.get_position()
                 agissant.add_latence(latence)
 
-                assert position is not None
                 lab = self.labs[position.lab]
                 lab.veut_passer(agissant,direction)
 
@@ -1623,7 +1624,7 @@ class Controleur():
                                 pos_obstacles.add(obstacle.get_position())
         elif traverse == "ennemis":
             obstacles_possibles = self.get_entitees_etage(position.lab)
-            if responsable!=0:
+            if responsable:
                 if isinstance(responsable,Agissant):
                     if responsable.esprit is not None:
                         for obstacle in obstacles_possibles:

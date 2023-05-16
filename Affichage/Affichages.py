@@ -665,9 +665,9 @@ class Affichage_droite_agissant_cible(Wrapper_knot, Knot_horizontal):
 
         self.agissant_descr = Placeheldholder()
 
-        self.allies = Affichage_agissants_cible(self.agissant_descr, self, self.controleur, multi, Vignette_allie, self.controleur.get_esprit(self.controleur.joueur.esprit).get_corps_vus)
-        self.ennemis = Affichage_agissants_cible(self.agissant_descr, self, self.controleur, multi, Vignette_ennemi, self.controleur.get_esprit(self.controleur.joueur.esprit).get_ennemis_vus)
-        self.neutres = Affichage_agissants_cible(self.agissant_descr, self, self.controleur, multi, Vignette_neutre, self.controleur.get_esprit(self.controleur.joueur.esprit).get_neutres_vus)
+        self.allies = Affichage_agissants_cible(self.agissant_descr, self, self.controleur, multi, Vignette_allie, self.controleur.joueur.esprit.get_corps_vus)
+        self.ennemis = Affichage_agissants_cible(self.agissant_descr, self, self.controleur, multi, Vignette_ennemi, self.controleur.joueur.esprit.get_ennemis_vus)
+        self.neutres = Affichage_agissants_cible(self.agissant_descr, self, self.controleur, multi, Vignette_neutre, self.controleur.joueur.esprit.get_neutres_vus)
         
         self.agissant_descr.set_contenu(Center_horizontal_texte("Sélectionnez un agissant"))
         self.init_droite()
@@ -1379,7 +1379,7 @@ class Affichage_intrasecs(Wrapper_knot, Knot_vertical):
                 self.set_tailles(self.tailles)
 
     def set_default_courant(self):
-        if self.skills != []:
+        if self.skills:
             self.set_courant(self.skills[0])
             self.init()
             self.set_tailles(self.tailles)
@@ -1462,7 +1462,7 @@ class Affichage_skills(Wrapper_knot, Knot_vertical):
                 self.set_tailles(self.tailles)
 
     def set_default_courant(self):
-        if self.skills != []:
+        if self.skills:
             self.set_courant(self.skills[0])
             self.init()
             self.set_tailles(self.tailles)
@@ -1567,7 +1567,7 @@ class Affichage_classes(Wrapper_knot, Knot_vertical):
                 self.set_tailles(self.tailles)
 
     def set_default_courant(self):
-        if self.classes != []:
+        if self.classes:
             self.set_courant(self.classes[0])
             self.init()
             self.set_tailles(self.tailles)
@@ -1650,6 +1650,7 @@ class Affichage_agissants(Wrapper_knot, Knot_vertical):
         assert self.contenu is not None
         i=0
         agissants = [*self.methode()]
+        agissants.sort(key=lambda agissant: agissant.ID)
         while i < len(agissants) or i < len(self.agissants):
             if i == len(agissants) or i == len(self.agissants) or agissants[i] != self.agissants[i].agissant: #Les deux ne correspondent pas
                 if i == len(self.agissants) or self.agissants[i].agissant in agissants: #Donc l'agissant n'a pas été retiré, mais d'autres ont été ajoutés avant
@@ -1702,7 +1703,7 @@ class Affichage_agissants(Wrapper_knot, Knot_vertical):
         return self
 
 class Affichage_agissants_cible(Wrapper_knot, Knot_vertical):
-    def __init__(self, placeheldholder:Placeheldholder, placeheldholder_ajuster:Affichable, controleur:Controleur, multi:bool, type_vignette:Type[Vignette_allie|Vignette_ennemi|Vignette_neutre], methode:Callable[[], List[int]]):
+    def __init__(self, placeheldholder:Placeheldholder, placeheldholder_ajuster:Affichable, controleur:Controleur, multi:bool, type_vignette:Type[Vignette_allie|Vignette_ennemi|Vignette_neutre], methode:Callable[[], Set[Agissant]]):
         Wrapper_knot.__init__(self)
 
         self.placeheldholder = placeheldholder
@@ -1718,7 +1719,7 @@ class Affichage_agissants_cible(Wrapper_knot, Knot_vertical):
         self.multi = multi
         self.fond = (200, 200, 200)
 
-        self.agissants = [self.type_vignette(placeheldholder, placeheldholder_ajuster, self.controleur.entitees[ID], 40) for ID in self.methode()]
+        self.agissants = [self.type_vignette(placeheldholder, placeheldholder_ajuster, agissant, 40) for agissant in self.methode()]
         self.init()
 
     def init(self):
@@ -1884,7 +1885,7 @@ class Affichage_perso(Proportionnel):
                     if not case.cibles[direction][PASSE_ESCALIER]:
                         skins.append(SKINS_MURS_FACE_VUS[distance][0])
                     else:
-                        traj = joueur.controleur.get_trajet(case.position, direction)
+                        traj = joueur.controleur.get_trajet(case.case.position, direction)
                         if traj == "escalier bas":
                             skins.append(SKINS_ESCALIERS_BAS_FACE_VUS[distance][0])
                         elif traj == "escalier haut":
@@ -1892,7 +1893,7 @@ class Affichage_perso(Proportionnel):
                     if not case.cibles[direction-1][4]:
                         skins.append(SKINS_MURS_VUS[distance][0][0])
                     else:
-                        traj = joueur.controleur.get_trajet(case.position, direction-1)
+                        traj = joueur.controleur.get_trajet(case.case.position, direction-1)
                         if traj == "escalier bas":
                             skins.append(SKINS_ESCALIERS_BAS_VUS[distance][0][0])
                         elif traj == "escalier haut":
@@ -1900,7 +1901,7 @@ class Affichage_perso(Proportionnel):
                     if not case.cibles[direction-3][4]:
                         skins.append(SKINS_MURS_VUS[distance][0][1])
                     else:
-                        traj = joueur.controleur.get_trajet(case.position, direction-3)
+                        traj = joueur.controleur.get_trajet(case.case.position, direction-3)
                         if traj == "escalier bas":
                             skins.append(SKINS_ESCALIERS_BAS_VUS[distance][0][1])
                         elif traj == "escalier haut":
@@ -1917,7 +1918,7 @@ class Affichage_perso(Proportionnel):
                         if not case.cibles[direction][PASSE_ESCALIER]:
                             skins.append(SKINS_MURS_FACE_VUS[distance][ecart])#Rajouter aussi les distinctions des téléportations
                         else:
-                            traj = joueur.controleur.get_trajet(case.position, direction)
+                            traj = joueur.controleur.get_trajet(case.case.position, direction)
                             if traj == "escalier bas":
                                 skins.append(SKINS_ESCALIERS_BAS_FACE_VUS[distance][ecart])
                             elif traj == "escalier haut":
@@ -1925,7 +1926,7 @@ class Affichage_perso(Proportionnel):
                         if not case.cibles[direction-3][4]:
                             skins.append(SKINS_MURS_VUS[distance][ecart])#Pareil
                         else:
-                            traj = joueur.controleur.get_trajet(case.position, direction-3)
+                            traj = joueur.controleur.get_trajet(case.case.position, direction-3)
                             if traj == "escalier bas":
                                 skins.append(SKINS_ESCALIERS_BAS_VUS[distance][ecart])
                             elif traj == "escalier haut":
@@ -1941,7 +1942,7 @@ class Affichage_perso(Proportionnel):
                         if not case.cibles[direction][PASSE_ESCALIER]:
                             skins.append(SKINS_MURS_FACE_VUS[distance][ecart])
                         else:
-                            traj = joueur.controleur.get_trajet(case.position, direction)
+                            traj = joueur.controleur.get_trajet(case.case.position, direction)
                             if traj == "escalier bas":
                                 skins.append(SKINS_ESCALIERS_BAS_FACE_VUS[distance][ecart])
                             elif traj == "escalier haut":
@@ -1949,7 +1950,7 @@ class Affichage_perso(Proportionnel):
                         if not case.cibles[direction-1][4]:
                             skins.append(SKINS_MURS_VUS[distance][ecart])
                         else:
-                            traj = joueur.controleur.get_trajet(case.position, direction-1)
+                            traj = joueur.controleur.get_trajet(case.case.position, direction-1)
                             if traj == "escalier bas":
                                 skins.append(SKINS_ESCALIERS_BAS_VUS[distance][ecart])
                             elif traj == "escalier haut":
@@ -1958,13 +1959,12 @@ class Affichage_perso(Proportionnel):
         for skin in skins:
             skin.dessine_toi(screen, (x, y), (largeur, hauteur), frame, frame_par_tour)
 
-        for ID in joueur.vue.case_from_position(position).entitees:
-            if ID < 11:
-                entitee = joueur.controleur.entitees[ID]
-                if issubclass(entitee.get_classe(), Agissant):
-                    for skin in entitee.get_skins_vue():
+        case = joueur.vue.case_from_position(position)
+        if case.agissant:
+            if isinstance(case.agissant,Humain):
+                if case.agissant.etat == "vivant":
+                    for skin in case.agissant.get_skins_vue():
                         skin.dessine_toi(screen, (x, y), (largeur, hauteur), frame, frame_par_tour)
-                    break
 
 class Affichage_labyrinthe(Affichage_knot, Proportionnel):
     def __init__(self, controleur: Controleur):
@@ -1980,33 +1980,34 @@ class Affichage_labyrinthe(Affichage_knot, Proportionnel):
         self.update()
 
     def update(self):
-        assert isinstance(self.courant,Vignettes_position)
+        assert isinstance(self.courant,Vignettes_position|None)
         courant = None
         if self.controleur.joueur.vue is not None:
             self.objets:List[Affichable] = []
-            decs = [[dec.x, dec.y] for dec in self.controleur.joueur.vue.decalage if self.controleur.joueur.vue.case_from_position(dec).clarte > 0]
-            visible = [min(decs, key=itemgetter(0))[0], max(decs, key=itemgetter(0))[0], min(decs, key=itemgetter(1))[1], max(decs, key=itemgetter(1))[1]]
-            distance = max(self.controleur.joueur.position.x-visible[0], visible[1]-self.controleur.joueur.position.x, self.controleur.joueur.position.y-visible[2], visible[3]-self.controleur.joueur.position.y) + 1 #On cherche à déterminer le carré qui comprend toutes les cases utiles de la vue
-            debut_vue = self.controleur.joueur.position + distance * (HAUT + GAUCHE)
-            nb_cases = distance*2 + 1
-            taille_case = int(min(self.tailles) // (nb_cases-1))
-            hauteur_exploitee = taille_case * nb_cases
-            marge = (min(self.tailles) - hauteur_exploitee) // 2
-            self.nb_cases = nb_cases
-            marge_haut = self.position[1]+marge#+taille_case//2
-            for j in range(self.nb_cases):
-                marge_gauche = self.position[0]+marge#+taille_case//2
-                for i in range(self.nb_cases):
-                    pos = debut_vue + Decalage(i, j)
-                    position = [marge_gauche, marge_haut]
-                    vignette = self.make_vignette(position, self.controleur.joueur.vue, pos, taille_case)
-                    if self.courant and vignette.pos == self.courant.pos:
-                        courant = vignette
-                        if self.courant.actif:
-                            vignette.set_actif()
-                    self.objets.append(vignette)
-                    marge_gauche += taille_case
-                marge_haut += taille_case
+            decs = [[dec.x, dec.y] for dec in self.controleur.joueur.vue.decalage if self.controleur.joueur.vue.case_from_decalage(dec).clarte > 0]
+            if decs :
+                visible = [min(decs, key=itemgetter(0))[0], max(decs, key=itemgetter(0))[0], min(decs, key=itemgetter(1))[1], max(decs, key=itemgetter(1))[1]]
+                distance = max(self.controleur.joueur.position.x-visible[0], visible[1]-self.controleur.joueur.position.x, self.controleur.joueur.position.y-visible[2], visible[3]-self.controleur.joueur.position.y) + 1 #On cherche à déterminer le carré qui comprend toutes les cases utiles de la vue
+                debut_vue = self.controleur.joueur.position + distance * (HAUT + GAUCHE)
+                nb_cases = distance*2 + 1
+                taille_case = int(min(self.tailles) // (nb_cases-1))
+                hauteur_exploitee = taille_case * nb_cases
+                marge = (min(self.tailles) - hauteur_exploitee) // 2
+                self.nb_cases = nb_cases
+                marge_haut = self.position[1]+marge#+taille_case//2
+                for j in range(self.nb_cases):
+                    marge_gauche = self.position[0]+marge#+taille_case//2
+                    for i in range(self.nb_cases):
+                        pos = debut_vue + Decalage(i, j)
+                        position = [marge_gauche, marge_haut]
+                        vignette = self.make_vignette(position, self.controleur.joueur.vue, pos, taille_case)
+                        if self.courant and vignette.pos == self.courant.pos:
+                            courant = vignette
+                            if self.courant.actif:
+                                vignette.set_actif()
+                        self.objets.append(vignette)
+                        marge_gauche += taille_case
+                    marge_haut += taille_case
         else:
             for objet in self.objets:
                 objet.update()
@@ -2075,11 +2076,11 @@ class Affichage_labyrinthe_jeu(Affichage_labyrinthe):
                 position = selection.pos
                 agissants = self.controleur.trouve_agissants(position)
                 if agissants:
-                    if agissants[0] == self.controleur.joueur:
+                    if self.controleur.joueur in agissants:
                         self.controleur.joueur.mouvement = 1
                     else:
                         self.controleur.joueur.mouvement = 0
-                        self.controleur.joueur.cible_deplacement = agissants[0]
+                        self.controleur.joueur.cible_deplacement = agissants.pop()
                 else:
                     self.controleur.joueur.mouvement = 0
                     self.controleur.joueur.cible_deplacement = position
@@ -2091,19 +2092,19 @@ class Affichage_labyrinthe_jeu(Affichage_labyrinthe):
                 interactifs = self.controleur.trouve_interactifs(position)
                 print(interactifs)
                 if interactifs:
-                    if interactifs[0] == self.controleur.joueur:
+                    if self.controleur.joueur in interactifs:
                         self.controleur.joueur.mouvement = 3
                     else:
                         self.controleur.joueur.mouvement = 2
-                        self.controleur.joueur.cible_deplacement = interactifs[0]
+                        self.controleur.joueur.cible_deplacement = interactifs.pop()
                 else:
                     agissants = self.controleur.trouve_agissants(position)
                     if agissants:
-                        if agissants[0] == self.controleur.joueur:
+                        if self.controleur.joueur in agissants:
                             self.controleur.joueur.mouvement = 3
                         else:
                             self.controleur.joueur.mouvement = 2
-                            self.controleur.joueur.cible_deplacement = agissants[0]
+                            self.controleur.joueur.cible_deplacement = agissants.pop()
                     else:
                         self.controleur.joueur.mouvement = 2
                         self.controleur.joueur.cible_deplacement = position
@@ -2115,7 +2116,7 @@ class Affichage_labyrinthe_case_dialogue(Affichage_labyrinthe):
 
         self.cible = None
 
-    def make_vignette(self, position: List[int], vue: Vue, position_vue: Position, taille: int):
+    def make_vignette(self, position: List[int], vue: Representation_vue, position_vue: Position, taille: int):
         return Vignettes_position(position, self.controleur.joueur, vue, position_vue, taille, self.cible is not None and self.cible != position_vue)
 
     def select(self, selection:Cliquable, droit:bool=False):
@@ -2137,7 +2138,7 @@ class Affichage_labyrinthe_case_magie(Affichage_labyrinthe):
         else:
             self.cible = None
 
-    def make_vignette(self, position: List[int], vue: Vue, position_vue: Position, taille: int):
+    def make_vignette(self, position: List[int], vue: Representation_vue, position_vue: Position, taille: int):
         return Vignettes_position(position, self.controleur.joueur, vue, position_vue, taille, self.cible is not None and self.cible != position_vue, position_vue not in self.cibles)
 
     def select(self, selection:Cliquable, droit:bool=False):
@@ -2166,7 +2167,7 @@ class Affichage_labyrinthe_case_parchemin(Affichage_labyrinthe):
         else:
             self.cible = None
 
-    def make_vignette(self, position: List[int], vue: Vue, position_vue: Position, taille: int):
+    def make_vignette(self, position: List[int], vue: Representation_vue, position_vue: Position, taille: int):
         return Vignettes_position(position, self.controleur.joueur, vue, position_vue, taille, self.cible is not None and self.cible != position_vue, position_vue not in self.cibles)
     
     def select(self, selection:Cliquable, droit:bool=False):
@@ -2191,7 +2192,7 @@ class Affichage_labyrinthe_direction_magie(Affichage_labyrinthe):
 
         self.direction = HAUT
 
-    def make_vignette(self, position: List[int], vue: Vue, position_vue: Position, taille: int):
+    def make_vignette(self, position: List[int], vue: Representation_vue, position_vue: Position, taille: int):
         vignette = Vignettes_position(position, self.controleur.joueur, vue, position_vue, taille)
         if isinstance(self.controleur.joueur.magie_courante, Magie_cible_dirigee):
             if position_vue == self.controleur.joueur.cible_magie:
@@ -2228,7 +2229,7 @@ class Affichage_labyrinthe_direction_parchemin(Affichage_labyrinthe):
 
         self.direction = HAUT
 
-    def make_vignette(self, position: List[int], vue: Vue, position_vue: Position, taille: int):
+    def make_vignette(self, position: List[int], vue: Representation_vue, position_vue: Position, taille: int):
         vignette = Vignettes_position(position, self.controleur.joueur, vue, position_vue, taille)
         if isinstance(self.controleur.joueur.magie_parchemin, Magie_cible_dirigee):
             if position_vue == self.controleur.joueur.cible_magie_parchemin:

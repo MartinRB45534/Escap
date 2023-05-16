@@ -131,7 +131,7 @@ class Labyrinthe(Vue):
         #le stack est une liste de positions
         stack:List[Position]=[position]
 
-        while len(stack)!=0 :
+        while len(stack) :
 
             #on récupère les coords de là où l'on est cad la dernière case dans le stack
             position = stack[len(stack)-1]
@@ -272,7 +272,7 @@ class Labyrinthe(Vue):
 
         retrait = 1
 
-        while len(queue)!=0 :
+        while len(queue) :
 
             data=queue[0]
             position = data[0]
@@ -412,7 +412,7 @@ class Labyrinthe(Vue):
 from Jeu.Effet.Effets_mouvement.Blocages import Mur_impassable
 from Jeu.Labyrinthe.Case import Case
 from Jeu.Labyrinthe.Mur import Mur
-from Jeu.Labyrinthe.Structure_spatiale.Direction import DIRECTIONS
+from Jeu.Labyrinthe.Structure_spatiale.Direction import DIRECTIONS, Direction
 from Jeu.Labyrinthe.Structure_spatiale.Position import Position
 from Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
 from Jeu.Labyrinthe.Structure_spatiale.Bord import Bord, Bord_dec, Bord_lab

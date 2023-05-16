@@ -15,7 +15,7 @@ class Soigneur(Mage):
             assert isinstance(corp,Agissant)
             if corp.etat == "vivant" and corp.pv < corp.pv_max:
                 cibles.append([corp.pv,corp])
-        if cibles != [] and self.peut_caster():
+        if cibles and self.peut_caster():
             new_cibles = sorted(cibles, key=itemgetter(0))
             self.utilise(skill)
             self.set_magie_courante(self.caste())

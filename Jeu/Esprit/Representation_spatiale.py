@@ -61,7 +61,7 @@ class Salle(Espace_schematique):
         self.cases:Set[Position] = set()
         self.carres:Set[Position] = {carre}
         self.entrees:Set[Position] = set()
-        self.distances:Dict[Set[Position],int] = {}
+        self.distances:Dict[Tuple[Position,Position],int] = {}
         self.skip = False
 
     def add_cases(self):
@@ -71,7 +71,7 @@ class Salle(Espace_schematique):
                 self.cases.add(case)
 
     def make_bord(self):
-        self.frontiere = {Cote_position(case,dir) for dir in DIRECTIONS for case in self.cases if not case + dir in self.cases}
+        self.frontiere = {Cote_position(case,dir) for dir in DIRECTIONS for case in self.cases if case + dir not in self.cases}
 
     def calcule_distances(self):
         self.distances = {}
@@ -87,13 +87,13 @@ class Salle(Espace_schematique):
                         visitees.append(voisin)
                         queue.append((voisin,distance+1))
                         if voisin in entrees[i+1:]:
-                            self.distances[{entrees[i],voisin}] = distance+1
+                            self.distances[(entrees[i],voisin)] = distance+1
 
     def dist(self,entree1:Position,entree2:Position):
         if entree1 == entree2:
             return 0
         else:
-            return self.distances.get({entree1,entree2},len(self.cases)+1)
+            return self.distances.get((entree1,entree2),self.distances.get((entree2,entree1),len(self.cases)+1))
 
 class Couloir(Espace_schematique):
     def __init__(self,case:Position=ABSENT):
@@ -101,7 +101,11 @@ class Couloir(Espace_schematique):
         self.cases:List[Position] = [case] if case is not None else [] #Les cases d'un couloir doivent être ordonnées
         self.entrees:Set[Position] = set()
         self.skip = True
+    
+    def get_all_cases(self):
+        return {*self.cases}|self.entrees
 
 # Imports utilisés dans le code
 from Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
 from Jeu.Labyrinthe.Structure_spatiale.Direction import DIRECTIONS
+from Jeu.Labyrinthe.Structure_spatiale.Cote import Cote_position

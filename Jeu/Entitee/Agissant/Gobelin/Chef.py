@@ -30,4 +30,4 @@ class Chef_gobelin(Base_gobelin):
         return offenses, etat
 
     def get_texte_descriptif(self):
-        return [f"Un chef gobelin (niveau {self.niveau})",f"ID : {self}","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Les gobelins forment une société organisée, dirigée par un chef. Ce dernier doit se remarquer par sa force, pourtant il ne se sépare presque jamais de sa garde rapprochée..."]
+        return [f"Un chef gobelin (niveau {self.niveau})",f"ID : {self.ID}","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Les gobelins forment une société organisée, dirigée par un chef. Ce dernier doit se remarquer par sa force, pourtant il ne se sépare presque jamais de sa garde rapprochée..."]

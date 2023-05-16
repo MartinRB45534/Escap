@@ -24,7 +24,7 @@ class Multi_renforceur(Renforceur,Multi_mage):
                 self.cible_magie.set_statut("attaque boostée")
                 defaut = "soutien"
                 self.set_statut("soutien")
-        elif cibles != []:
+        elif cibles:
             if self.peut_multi_caster():
                 self.utilise(skill)
                 self.set_magie_courante(self.multi_caste())

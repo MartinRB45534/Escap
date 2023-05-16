@@ -30,9 +30,9 @@ class Id_max:
     def set_id_max(self,n: int):
         self.valeur = n
 
-POLICE20 = pygame.font.SysFont("Arial", 20)
+POLICE20 = pygame.font.SysFont("Default", 20)
 
-POLICE40 = pygame.font.SysFont("Arial", 40)
+POLICE40 = pygame.font.SysFont("Default", 40)
 
 ID_MAX = Id_max()
 

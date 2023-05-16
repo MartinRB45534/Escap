@@ -14,7 +14,7 @@ class Skill_intrasec:
            cadeux_evo : les récompenses d'évolution ; peuvent être des skills (?), des classes (?) ou de l'xp"""
         self.niveau=0 #Le niveau devrais passer à 1 lorsqu'on acquiert le skill
         self.cad_evo=cadeaux_evo
-        self.xp_new=0 #Contabilise l'xp obtenue pendant le tour, pour la propagation
+        self.xp_new:float=0 #Contabilise l'xp obtenue pendant le tour, pour la propagation
         self.propagation=0.5 #Certains skills ont un taux de propagation plus important (?)
         self.nom="Skill anonyme"
         

@@ -14,7 +14,7 @@ class Attaquant_magique_agissant(Mage):
         for case in self.vue:
             if case.agissant is not None and case.agissant in self.esprit.ennemis:
                     cibles.append([self.esprit.ennemis[case.agissant]["importance"],case.agissant])
-        if cibles != [] and self.peut_caster():
+        if cibles and self.peut_caster():
             new_cibles = sorted(cibles, key=itemgetter(0))
             self.utilise(Skill_magie)
             self.set_magie_courante(self.caste())

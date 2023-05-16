@@ -81,6 +81,9 @@ class Direction:
         elif isinstance(other,Decalage):
             return self.to_decalage() == other
         return NotImplemented
+    
+    def __hash__(self) -> int:
+        return hash(self.direction)
 
     def to_decalage(self):
         if self.directions == 4:

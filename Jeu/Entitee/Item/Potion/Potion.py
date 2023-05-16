@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from Jeu.Controleur import Controleur
+    from Jeu.Entitee.Agissant.Agissant import Agissant
     from Jeu.Labyrinthe.Structure_spatiale.Position import Position
     from Jeu.Effet.Effet import Effet
 
@@ -19,7 +20,7 @@ class Potion(Consommable):
         Item.__init__(self,controleur,position)
         self.effet = effet
 
-    def utilise(self,agissant):
+    def utilise(self,agissant:Agissant):
         agissant.ajoute_effet(self.effet)
         self.etat = "brisé"
 

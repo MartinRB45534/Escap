@@ -21,7 +21,7 @@ class Multi_soigneur_protecteur(Multi_soigneur):
                 self.cible_magie = cibles[0]
                 defaut = "soin"
                 self.set_statut("soin")
-        elif cibles != []:
+        elif cibles:
             if self.peut_multi_caster():
                 self.utilise(Skill_magie)
                 self.set_magie_courante(self.multi_caste())
@@ -44,7 +44,7 @@ class Multi_soigneur_protecteur(Multi_soigneur):
                             libre = False
                     if libre:
                         cibles.append(corp)
-            if cibles != []:
+            if cibles:
                 self.utilise(Skill_magie)
                 self.set_magie_courante("magie protection sacrée")
                 self.cible_magie = cibles

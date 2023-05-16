@@ -79,7 +79,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
 
         #Pour lancer des magies
         self.talent = 1
-        self.magie_courante:Optional[Type[Magie]] = None
+        self.magie_courante:Optional[Magie] = None
         self.cible_magie:Optional[Position|Agissant|List[Position]|List[Agissant]] = None
         self.dir_magie:Optional[Direction] = None
         self.cout_magie:float = 0
@@ -146,7 +146,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         self.regarde(direction)
         self.utilise(Skill_deplacement) #La plupart des monstres n'ont pas ce skill !
 
-    def agit_en_vue(self,esprit:Esprit,defaut = ""): #Par défaut, on n'a pas d'action à distance
+    def agit_en_vue(self,defaut = ""): #Par défaut, on n'a pas d'action à distance
         return defaut
 
     def comporte_distance(self,degats:float):
@@ -191,7 +191,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         return projectile
 
     def insurge(self,offenseur:Agissant,gravite:float,dangerosite:float):
-        if offenseur != 0:
+        if offenseur:
             self.offenses.append((offenseur,gravite,dangerosite))
 
     def get_offenses(self) -> Tuple[List[Tuple[Agissant,float,float]],str]:
@@ -430,7 +430,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
 
     def get_skins_vue(self):
         assert self.controleur is not None
-        skins = []
+        skins:List[Image] = []
         if self.inventaire.arme is not None:
             skins.append(self.inventaire.arme.get_skin_vue(self.forme))
         skins.append(SKINS_CORPS_VUS[self.forme])
@@ -442,7 +442,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         return skins
 
     def get_texte_descriptif(self):
-        return ["Un agissant","Pourquoi n'a-t-il pas de description adaptée ?","Voici quelques informations utiles pour corriger l'erreur :",f"ID : {self}",f"Espèces : {self.especes}",f"Class : {type(self)}",f"self : {self}","En espèrant que ça suffise, et désolé pour le dérangement."]
+        return ["Un agissant","Pourquoi n'a-t-il pas de description adaptée ?","Voici quelques informations utiles pour corriger l'erreur :",f"ID : {self.ID}",f"Espèces : {self.especes}",f"Class : {type(self)}",f"self : {self}","En espèrant que ça suffise, et désolé pour le dérangement."]
 
     # Découvrons le déroulé d'un tour, avec agissant-san :
     def debut_tour(self):

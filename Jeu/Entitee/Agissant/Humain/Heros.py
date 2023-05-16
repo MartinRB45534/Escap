@@ -139,7 +139,7 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
         return SKIN_TETE_HEROS
 
     def get_texte_descriptif(self):
-        return [f"Un humain (niveau {self.niveau})",f"ID : {self}","Nom : Arvel","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Un humain récemment arrivé dans le labyrinthe."]
+        return [f"Un humain (niveau {self.niveau})",f"ID : {self.ID}","Nom : Arvel","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Un humain récemment arrivé dans le labyrinthe."]
 
     def fuite(self,degats:float=0):
         #On fuit si on est en danger (pv trop bas) à condition d'avoir un chemin de fuite
@@ -537,7 +537,7 @@ from Jeu.Labyrinthe.Structure_spatiale.Direction import HAUT, DROITE, BAS, GAUCH
 #             if self.arbre and self.etage == 0:
 #                 self.etage = 1
 #             elif not(self.arbre) and self.etage == 0:
-#                 if len(self.choix_elems) != 0: #Attention au cas où on n'a plus de choix élémentaux valides
+#                 if len(self.choix_elems): #Attention au cas où on n'a plus de choix élémentaux valides
 #                     self.etage = 1
 #         elif touche == pygame.K_DOWN :
 #             if self.etage == 1:

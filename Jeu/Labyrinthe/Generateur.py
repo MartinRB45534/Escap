@@ -101,7 +101,7 @@
 #         stack=[position]
     
 
-#         while len(stack)!=0 :
+#         while len(stack) :
             
 #             #on récupère les coords de là où l'on est cad la dernière case dans le stack
 #             position = stack[len(stack)-1]
@@ -230,7 +230,7 @@
 #         casser = False
 
 #         murs=self.murs_utilisables(self.voisins_case(position_case))
-#         if len(murs)!=0:
+#         if len(murs):
 #             mur_a_casser=random.randrange(0,len(murs))
 #             self.casser_mur(self[position_case,murs[mur_a_casser]])
 #             casser = True

@@ -85,7 +85,7 @@ class Multi_cible(Magie_cible) :
 
     def execute(self,lanceur:Agissant):
         if self.phase == "démarrage":
-            if self.cible != []:
+            if self.cible:
                 self.action(lanceur)
             else:
                 self.miss_fire(lanceur)

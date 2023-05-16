@@ -239,7 +239,7 @@ class Bombe_atomique(PNJ_mage,Attaquant_magique_case,Support,Humain): #La neuvi�
         return SKIN_TETE_BOMBE_ATOMIQUE
 
     def get_texte_descriptif(self):
-        return [f"Une humaine (niveau {self.niveau})",f"ID : {self}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Une aventurière magicienne. Spécialisée dans les sorts de feu."]
+        return [f"Une humaine (niveau {self.niveau})",f"ID : {self.ID}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Une aventurière magicienne. Spécialisée dans les sorts de feu."]
 
 # Imports utilisés dans le code:
 from Jeu.Constantes import *

@@ -52,7 +52,7 @@ class Ombriul(Dps,Mage): #/!\ Retravailler l'ombriul pour utiliser les rôles
         return SKIN_TETE_OMBRIUL
 
     def get_texte_descriptif(self):
-        return [f"Un ombriul (niveau {self.niveau})",f"ID : {self}","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Les ombriuls ne font pas partie des espèces endémiques au labyrinthe. Ils y prolifèrent depuis quelques temps grâce à l'ombre, qui est leur élément de prédilection."]
+        return [f"Un ombriul (niveau {self.niveau})",f"ID : {self.ID}","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Les ombriuls ne font pas partie des espèces endémiques au labyrinthe. Ils y prolifèrent depuis quelques temps grâce à l'ombre, qui est leur élément de prédilection."]
 
 # Imports utilisés dans le code
 from Jeu.Entitee.Agissant.Agissant import Agissant

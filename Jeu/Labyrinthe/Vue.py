@@ -10,6 +10,8 @@ if TYPE_CHECKING:
     from Jeu.Labyrinthe.Vue import Representation_case
     from Jeu.Labyrinthe.Case import Case
     from Jeu.Entitee.Agissant.Agissant import Agissant
+    from Jeu.Entitee.Item.Item import Item
+    from Jeu.Entitee.Decors.Decor import Decors
 
 # Import des classes parentes
 from Jeu.Labyrinthe.Structure_spatiale.Espace import Espace
@@ -165,6 +167,9 @@ class Representation_vue(Vue):
         if position.lab != self.id:
             raise ValueError("La position n'est pas au bon étage")
         return self.matrice_cases[position.x][position.y]
+    
+    def case_from_decalage(self,decalage:Decalage) -> Representation_case:
+        return self.matrice_cases[decalage.x][decalage.y]
 
     def mur_from_cote(self,cote:Cote_position|Cote_decalage) -> List[Position|Literal[False]]:
         if isinstance(cote,Cote_position) and cote.emplacement.lab != self.id:

@@ -18,8 +18,6 @@ class Teleport(On_through):
         self.position = position
 
     def action(self,entitee: Entitee):
-        assert entitee.controleur is not None
-        assert entitee.position is not None
         # On va chercher un éventuel occupant de la case cible
         occupants = entitee.controleur.trouve_non_superposables(self.position)
         if isinstance(entitee,Item):
@@ -31,7 +29,7 @@ class Teleport(On_through):
                 entitee.heurte_non_superposable(occupant) #Mais il heurte les occupants
         elif isinstance(entitee,Agissant):
             passe = True
-            if occupants != []:
+            if occupants != set():
                 ecrasement = trouve_skill(entitee.classe_principale,Skill_ecrasement) #On peut peut-être écraser l'occupant de l'autre case
                 if ecrasement is not None:
                     for occupant in occupants:

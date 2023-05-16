@@ -132,7 +132,7 @@ class On_through(Effet):
     """La classe des effets déclenchés quand on traverse un mur."""
     def execute(self, entitee:Entitee):
         """L'action à effectuer quand on traverse un mur."""
-        pass
+        self.action(entitee)
 
     def action(self, entitee:Entitee):
         """L'action à effectuer quand on traverse un mur."""

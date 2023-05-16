@@ -21,7 +21,7 @@ class En_sursis(One_shot,On_fin_tour):
         self.affiche = False
 
     def action(self,item:Item):
-        if item.controleur.trouve_agissants_courants(item.get_position()) != []:
+        if item.controleur.trouve_agissants_courants(item.get_position()):
             if isinstance(item,(Fragile,Evanescent)):
                 item.etat = "brisé"
             else :

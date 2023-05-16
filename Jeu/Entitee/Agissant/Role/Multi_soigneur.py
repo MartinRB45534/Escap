@@ -23,7 +23,7 @@ class Multi_soigneur(Soigneur,Multi_mage):
                 self.cible_magie = cibles[0][-1]
                 defaut = "soin"
                 self.set_statut("soin")
-        elif cibles != []:
+        elif cibles:
             if self.peut_multi_caster():
                 self.utilise(skill)
                 self.set_magie_courante(self.multi_caste())
