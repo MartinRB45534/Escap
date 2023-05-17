@@ -20,9 +20,9 @@ class Potion(Consommable):
         Item.__init__(self,controleur,position)
         self.effet = effet
 
-    def utilise(self,agissant:Agissant):
-        agissant.ajoute_effet(self.effet)
-        self.etat = "brisé"
+    # def utilise(self,agissant:Agissant):
+    #     agissant.ajoute_effet(self.effet)
+    #     self.etat = "brisé"
 
     def get_description(self,observation=0):
         return ["Une potion","Tu veux la boire ?"]

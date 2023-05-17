@@ -90,7 +90,7 @@ class Caste_fractionnaire(Caste):
     def execute(self):
         self.latence += self.get_vitesse()
         parts_accomplies = int((self.latence/self.latence_max)*self.parts)
-        diff = parts_accomplies*self.cout - self.mana
+        diff = parts_accomplies*self.cout/self.parts - self.mana
         if diff > 0:
             if self.agissant.peut_payer(diff):
                 self.mana += diff

@@ -250,8 +250,6 @@ class Inventaire:
         for classe in self.items:
             for item in self.items[classe]:
                 item.debut_tour()
-                if isinstance(item,Parchemin) and item.etat == "suspens":
-                    item.utilise(self.possesseur)
         #On ne manipule pas les cadavres
         for oeuf in self.oeufs: #Mais les oeufs incubent !
             hatch:Optional[Hatching] = trouve_skill(oeuf.agissant.classe_principale,Hatching)

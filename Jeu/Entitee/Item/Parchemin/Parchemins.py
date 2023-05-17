@@ -36,55 +36,55 @@ class Parchemin_impregne(Parchemin):
         self.effet = magie
         self.cout = cout
 
-    def utilise(self,agissant:Agissant):
-        if self.etat == "suspens": #On l'a suspendu précédemment, ça devrait être bon maintenant
-            if agissant.peut_payer(self.cout):
-                agissant.paye(self.cout)
-                self.etat = "brisé"
-                magie = self.effet
-                agissant.effets.append(magie)
-                reussite = True
-                if isinstance(magie,Magie_cible) :
-                    agissant.controleur.select_cible_parchemin(magie,agissant)
-                if isinstance(magie,Magie_dirigee) :
-                    agissant.controleur.select_direction_parchemin(magie,agissant)
-                if isinstance(magie,Magie_cout) :
-                    agissant.controleur.select_cout_parchemin(magie,agissant)
-                if not reussite :
-                    magie.miss_fire(agissant)
-        else:
-            if agissant is agissant.controleur.joueur:
-                if isinstance(self.effet,Cible_agissant):
-                    agissant.magie_parchemin = self.effet
-                    agissant.controleur.set_phase(AGISSANT_PARCHEMIN)
-                    self.etat = "suspens"
-                if isinstance(self.effet,Cible_case):
-                    agissant.magie_parchemin = self.effet
-                    agissant.controleur.set_phase(CASE_PARCHEMIN)
-                    self.etat = "suspens"
-                if isinstance(self.effet,Magie_cout):
-                    agissant.magie_parchemin = self.effet
-                    agissant.controleur.set_phase(COUT_PARCHEMIN)
-                    self.etat = "suspens"
-                if isinstance(self.effet,Magie_dirigee):
-                    agissant.magie_parchemin = self.effet
-                    agissant.controleur.set_phase(DIRECTION_PARCHEMIN)
-                    self.etat = "suspens"
-            if self.etat != "suspens": #On n'a pas eu besoin de le suspendre, on peut directement le lancer
-                if agissant.peut_payer(self.cout) :
-                    agissant.paye(self.cout)
-                    self.etat = "brisé"
-                    magie = self.effet
-                    agissant.effets.append(magie)
-                    reussite = True
-                    if isinstance(magie,Magie_cible) :
-                        agissant.controleur.select_cible_parchemin(magie,agissant)
-                    if isinstance(magie,Magie_dirigee) :
-                        agissant.controleur.select_direction_parchemin(magie,agissant)
-                    if isinstance(magie,Magie_cout) :
-                        agissant.controleur.select_cout_parchemin(magie,agissant)
-                    if not reussite :
-                        magie.miss_fire(agissant)
+    # def utilise(self,agissant:Agissant):
+    #     if self.etat == "suspens": #On l'a suspendu précédemment, ça devrait être bon maintenant
+    #         if agissant.peut_payer(self.cout):
+    #             agissant.paye(self.cout)
+    #             self.etat = "brisé"
+    #             magie = self.effet
+    #             agissant.effets.append(magie)
+    #             reussite = True
+    #             if isinstance(magie,Magie_cible) :
+    #                 agissant.controleur.select_cible_parchemin(magie,agissant)
+    #             if isinstance(magie,Magie_dirigee) :
+    #                 agissant.controleur.select_direction_parchemin(magie,agissant)
+    #             if isinstance(magie,Magie_cout) :
+    #                 agissant.controleur.select_cout_parchemin(magie,agissant)
+    #             if not reussite :
+    #                 magie.miss_fire(agissant)
+    #     else:
+    #         if agissant is agissant.controleur.joueur:
+    #             if isinstance(self.effet,Cible_agissant):
+    #                 agissant.magie_parchemin = self.effet
+    #                 agissant.controleur.set_phase(AGISSANT_PARCHEMIN)
+    #                 self.etat = "suspens"
+    #             if isinstance(self.effet,Cible_case):
+    #                 agissant.magie_parchemin = self.effet
+    #                 agissant.controleur.set_phase(CASE_PARCHEMIN)
+    #                 self.etat = "suspens"
+    #             if isinstance(self.effet,Magie_cout):
+    #                 agissant.magie_parchemin = self.effet
+    #                 agissant.controleur.set_phase(COUT_PARCHEMIN)
+    #                 self.etat = "suspens"
+    #             if isinstance(self.effet,Magie_dirigee):
+    #                 agissant.magie_parchemin = self.effet
+    #                 agissant.controleur.set_phase(DIRECTION_PARCHEMIN)
+    #                 self.etat = "suspens"
+    #         if self.etat != "suspens": #On n'a pas eu besoin de le suspendre, on peut directement le lancer
+    #             if agissant.peut_payer(self.cout) :
+    #                 agissant.paye(self.cout)
+    #                 self.etat = "brisé"
+    #                 magie = self.effet
+    #                 agissant.effets.append(magie)
+    #                 reussite = True
+    #                 if isinstance(magie,Magie_cible) :
+    #                     agissant.controleur.select_cible_parchemin(magie,agissant)
+    #                 if isinstance(magie,Magie_dirigee) :
+    #                     agissant.controleur.select_direction_parchemin(magie,agissant)
+    #                 if isinstance(magie,Magie_cout) :
+    #                     agissant.controleur.select_cout_parchemin(magie,agissant)
+    #                 if not reussite :
+    #                     magie.miss_fire(agissant)
 
     def get_description(self,observation=0):
         return["Un parchemin",f"Imprégné d'une magie ({self.effet.nom})"]

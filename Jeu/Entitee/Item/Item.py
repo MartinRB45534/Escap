@@ -131,8 +131,7 @@ class Item(Mobile):
 
 class Consommable(Item):
     """La classe des items qui peuvent être consommés. Ajoute à l'agissant un effet. Disparait après usage."""
-    def utilise(self,porteur:Agissant):
-        pass
+    pass
 
 class Ingredient(Item):
     """La classe des ingrédients d'alchimie."""

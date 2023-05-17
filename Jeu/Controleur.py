@@ -1028,9 +1028,27 @@ class Controleur():
             if entitee.position == position and isinstance(entitee,classe):
                 entitees.add(entitee)
         return entitees
+    
+    def trouve_items_classe_courants(self,position:Position,classe:Type[Item]=Item):
+        entitees:Set[classe] = set()
+        for entitee in self.items_courants:
+            if entitee.position == position and isinstance(entitee,classe):
+                entitees.add(entitee)
+        return entitees
 
-    def trouve_items_courants(self,position:Position):
-        return self.trouve_classe_courants(position,Item)
+    def trouve_agissants_classe_courants(self,position:Position,classe:Type[Agissant]=Agissant):
+        entitees:Set[classe] = set()
+        for entitee in self.agissants_courants:
+            if entitee.position == position and isinstance(entitee,classe):
+                entitees.add(entitee)
+        return entitees
+    
+    def trouve_decors_classe_courants(self,position:Position,classe:Type[Decors]=Decors):
+        entitees:Set[classe] = set()
+        for entitee in self.decors_courants:
+            if entitee.position == position and isinstance(entitee,classe):
+                entitees.add(entitee)
+        return entitees
 
     def trouve_non_superposables_courants(self,position:Position):
         return self.trouve_classe_courants(position,Non_superposable)
@@ -1040,9 +1058,6 @@ class Controleur():
 
     def trouve_mobiles_courants(self,position:Position):
         return self.trouve_classe_courants(position,Mobile)
-
-    def trouve_agissants_courants(self,position:Position):
-        return self.trouve_classe_courants(position,Agissant)
 
     def trouve_occupants_courants(self,position:Position):
         occupants:Set[Entitee] = set()

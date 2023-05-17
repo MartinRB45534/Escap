@@ -41,16 +41,3 @@ class Action:
         return vitesse
 
     # Il faut que l'action soit affichée, comme un skin par-dessus l'agissant
-
-class Action_skill(Action):
-    """
-    Les actions provoquées par un skill.
-    """
-    def __init__(self,agissant:Agissant,latence:float,skill:Skill_intrasec,xp:float):
-        super().__init__(agissant,latence)
-        self.skill = skill
-        self.xp = xp
-
-    def termine(self):
-        """L'action est terminée."""
-        self.skill.xp_new += self.xp

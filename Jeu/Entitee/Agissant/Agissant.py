@@ -127,7 +127,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         for taux in self.taux_stats.values():
             force *= taux
             affinite *= taux
-        return force,affinite,self.dir_regard,self
+        return force,affinite
 
     def get_impact(self) -> Position:
         return self.position+self.dir_regard

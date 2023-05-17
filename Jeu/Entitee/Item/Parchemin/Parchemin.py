@@ -28,11 +28,11 @@ class Parchemin(Consommable):
     def get_description(self,observation=0):
         return ["Un parchemin","C'est quoi ces gribouillis ?"]
 
-    def utilise(self,agissant:Agissant):
-        if agissant.peut_payer(self.cout) :
-            agissant.paye(self.cout)
-            agissant.ajoute_effet(self.effet)
-            self.etat = "brisé"
+    # def utilise(self,agissant:Agissant):
+    #     if agissant.peut_payer(self.cout) :
+    #         agissant.paye(self.cout)
+    #         agissant.ajoute_effet(self.effet)
+    #         self.etat = "brisé"
 
     def get_classe(self):
         return Parchemin

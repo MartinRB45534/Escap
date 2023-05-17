@@ -15,27 +15,6 @@ from Jeu.Effet.Effet import *
 # Valeurs par défaut des paramètres
 from Jeu.Constantes import TERRE
 
-class Attaque(One_shot):
-    """L'effet d'attaque dans sa version générale. Pour chaque case dans la zone, crée une attaque (version intermèdiaire). Attachée au responsable."""
-    def __init__(self,responsable:Agissant,degats:float,element:int=TERRE,distance:str="contact",portee:float=1,propagation:str="C__S___",direction:Optional[Direction]=None,autre:Optional[str]=None,taux_autre:Optional[float]=None):
-        self.affiche = False
-        self.phase = "démarrage"
-        self.responsable = responsable
-        self.degats = degats
-        self.element = element
-        self.portee = portee
-        self.propagation = propagation
-        self.direction = direction
-        self.autre = autre
-        self.taux_autre = taux_autre
-        self.distance = distance
-
-    def action(self,controleur:Controleur):
-        position = self.responsable.get_position()
-        positions_touches = controleur.get_pos_touches(position,self.portee,self.propagation,self.direction,"alliés",self.responsable)
-        for position_touche in positions_touches:
-            controleur.case_from_position(position_touche).effets.append(Attaque_case(self.responsable,self.degats,self.element,self.distance,self.direction,self.autre,self.taux_autre))
-
 class Attaque_magique(Attaque):
     """Une attaque créée par magie."""
     def __init__(self,responsable:Agissant,degats,element=TERRE,distance="proximité",portee=1,propagation="C__S___",direction=None,autre=None,taux_autre=None):
