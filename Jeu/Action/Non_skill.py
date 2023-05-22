@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from Jeu.Action.Magie.Magie import Magie
 
 # Imports des classes parentes
-from Jeu.Action.Action import Action
+from Jeu.Action.Action import Action, Action_final
 from Jeu.Action.Caste import Caste, Caste_continu, Caste_final, Caste_initial, Caste_fractionnaire
 
 class Vole(Action):
@@ -22,7 +22,7 @@ class Vole(Action):
         pass
         # TODO: Ajouter le get_skin
 
-class Consomme(Action):
+class Consomme(Action_final):
     """
     L'action d'utilisation d'un consommable (potion ou parchemin) lorsque celui-ci se contente de placer un effet.
     """
@@ -32,8 +32,7 @@ class Consomme(Action):
         self.item.etat = "utilise"
         self.effet = effet
 
-    def termine(self):
-        """L'action est terminée."""
+    def action(self):
         self.agissant.effets.append(self.effet)
         self.item.etat = "brisé"
 
@@ -85,22 +84,30 @@ class Lit_effet_continu(Lit_effet,Caste_continu):
 class Lit_effet_fractionnaire(Lit_effet,Caste_fractionnaire):
     pass
 
-class Impregne(Lit):
+class Impregne(Lit,Action_final,Caste_final):
     """
     L'action d'imprégner une magie sur un parchemin.
     """
     def __init__(self,agissant:Agissant,latence:float,item:Parchemin):
-        super().__init__(agissant,latence,item)
+        Lit.__init__(self,agissant,latence,item)
         self.taux_cout_impregne = 0.5
         self.taux_cout_caste = 0.5
         self.taux_latence_impregne = 0.1
         self.taux_latence_caste = 0.9
         self.magie:Optional[Magie] = None
 
-    def termine(self):
+    def action(self):
         """L'action est terminée."""
         if self.magie is not None:
             self.item.action = self.magie # Le parchemin est imprégné de la magie
             self.item.etat = "intact"
         else:
             self.interrompt()
+
+    def set_magie(self,magie:Magie):
+        """Définit la magie à imprégner."""
+        self.magie = magie
+        self.cout = magie.cout*self.taux_cout_impregne
+        self.latence = magie.latence*self.taux_latence_impregne
+        self.magie.cout*=self.taux_cout_caste
+        self.magie.latence*=self.taux_latence_caste

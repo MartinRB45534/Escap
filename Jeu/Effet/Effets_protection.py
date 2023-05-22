@@ -8,45 +8,45 @@ if TYPE_CHECKING:
     from Jeu.Entitee.Item.Equippement.Degainable.Bouclier.Bouclier import Bouclier
     from Jeu.Labyrinthe.Structure_spatiale.Position import Position
     from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
-    from Jeu.Effet.Attaque.Attaque import Attaque
+    from Jeu.Effet.Attaque.Attaque import Attaque_case
 
 # Imports des classes parentes
 from Jeu.Effet.Effet import One_shot, Evenement, Effet, On_post_action, Time_limited, On_attack
 
-class Protection_general(Evenement,On_post_action):
-    """Le joueur qui a utilisé un bouclier 'protège' une zone autour de lui. C'est à dire qu'à chaque tour, d'après sa position, sa direction et les murs, certaines cases reçoivent une protection jusqu'à la fin du tour."""
-    def __init__(self,temps_restant:float,bouclier:Bouclier):
-        self.affiche = False
-        self.temps_restant = temps_restant
-        self.phase = "démarrage"
-        self.bouclier = bouclier #Techniquement c'est le bouclier qui intercepte.
+# class Protection_general(Evenement,On_post_action):
+#     """Le joueur qui a utilisé un bouclier 'protège' une zone autour de lui. C'est à dire qu'à chaque tour, d'après sa position, sa direction et les murs, certaines cases reçoivent une protection jusqu'à la fin du tour."""
+#     def __init__(self,temps_restant:float,bouclier:Bouclier):
+#         self.affiche = False
+#         self.temps_restant = temps_restant
+#         self.phase = "démarrage"
+#         self.bouclier = bouclier #Techniquement c'est le bouclier qui intercepte.
 
-    def action(self,agissant:Agissant):
-        cases = agissant.controleur.get_cases_touches(agissant.get_position(),0) #Seule la case de l'agissant est protégée par cette version de la protection.
-        for case in cases :
-            case.effets.append(Protection_bouclier(1,self.bouclier,[agissant.dir_regard]))
+#     def action(self,agissant:Agissant):
+#         cases = agissant.controleur.get_cases_touches(agissant.get_position(),0) #Seule la case de l'agissant est protégée par cette version de la protection.
+#         for case in cases :
+#             case.effets.append(Protection_bouclier(1,self.bouclier,[agissant.dir_regard]))
 
-class Protection_zone(One_shot,On_post_action):
-    def __init__(self,protection:Effet,cible:str,position:Position,propagation:str,portee:float,direction:Optional[Direction]=None,traverse="tout"):
-        self.affiche = False
-        self.phase = "démarrage"
-        self.position = position
-        self.propagation = propagation
-        self.portee = portee
-        self.direction = direction
-        self.traverse = traverse
-        self.cible = cible
-        self.protection = protection
+# class Protection_zone(One_shot,On_post_action):
+#     def __init__(self,protection:Effet,cible:str,position:Position,propagation:str,portee:float,direction:Optional[Direction]=None,traverse="tout"):
+#         self.affiche = False
+#         self.phase = "démarrage"
+#         self.position = position
+#         self.propagation = propagation
+#         self.portee = portee
+#         self.direction = direction
+#         self.traverse = traverse
+#         self.cible = cible
+#         self.protection = protection
 
-    def action(self,porteur:Agissant):
-        if self.cible == "case":
-            cases = porteur.controleur.get_cases_touches(self.position,self.portee,self.propagation,self.direction,self.traverse,porteur)
-            for case in cases :
-                case.effets.append(copy.copy(self.protection))
-        elif self.cible == "agissant":
-            agissants = porteur.controleur.get_touches_pos(porteur,self.position,self.portee,self.propagation,self.direction)
-            for agissant in agissants :
-                agissant.effets.append(copy.copy(self.protection))
+#     def action(self,porteur:Agissant):
+#         if self.cible == "case":
+#             cases = porteur.controleur.get_cases_touches(self.position,self.portee,self.propagation,self.direction,self.traverse,porteur)
+#             for case in cases :
+#                 case.effets.append(copy.copy(self.protection))
+#         elif self.cible == "agissant":
+#             agissants = porteur.controleur.get_touches_pos(porteur,self.position,self.portee,self.propagation,self.direction)
+#             for agissant in agissants :
+#                 agissant.effets.append(copy.copy(self.protection))
 
 class Protection_groupe(One_shot,On_post_action):
     def __init__(self,duree:float,degats:float):
@@ -89,7 +89,7 @@ class Protection_mur(Time_limited,On_attack):
         self.PV = PV
         self.PV_max = PV #Pour afficher les PVs de la protection
 
-    def action(self,attaque:Attaque):
+    def action(self,attaque:Attaque_case):
         if self.PV < attaque.degats:
             attaque.degats = -self.PV
             self.PV = 0
@@ -103,7 +103,7 @@ class Protection_mur(Time_limited,On_attack):
 
 class Protection_sacree(Protection_mur):
     """Particulièrement efficace contre les attaques d'ombre."""
-    def action(self,attaque:Attaque):
+    def action(self,attaque:Attaque_case):
         if attaque.element == OMBRE:
             if 2*self.PV < attaque.degats:
                 attaque.degats = -2*self.PV

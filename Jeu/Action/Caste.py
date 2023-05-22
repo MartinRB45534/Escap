@@ -17,6 +17,14 @@ class Caste(Action):
         self.mana:float = 0
         self.cout:float
 
+    def paye(self):
+        """On essaye de payer le coût du sort."""
+        if self.agissant.peut_payer(self.cout):
+            self.mana = self.cout
+            self.agissant.paye(self.cout)
+        else:
+            self.interrompt()
+
     def interrompt(self):
         """L'action est interrompue. Le sort missfire."""
         self.agissant.subit(NoOne(), self.mana) # Est-ce que c'est une punition trop dure pour les interruptions ?
@@ -28,19 +36,11 @@ class Caste_final(Caste):
     """
     Lorsque le mana est absorbé à la fin du cast.
     """
-    def execute(self):
-        """L'action est appelée à chaque tour."""
-        self.latence += self.get_vitesse()
-        if self.latence >= self.latence_max:
-            if self.agissant.peut_payer(self.cout):
-                self.mana = self.cout
-                self.agissant.paye(self.cout)
-                self.termine()
-            else:
-                self.interrompt() # Pas punitif puisqu'aucun mana n'a encore été dépensé.
-            return True
-        return False
-        
+    def termine(self):
+        """L'action est terminée."""
+        self.paye()
+        super().termine()
+
 class Caste_initial(Caste):
     """
     Lorsque le mana est absorbé au début du cast.
@@ -48,32 +48,25 @@ class Caste_initial(Caste):
     def execute(self):
         """L'action est appelée à chaque tour."""
         if self.latence == 0:
-            if self.agissant.peut_payer(self.cout):
-                self.mana = self.cout
-                self.agissant.paye(self.cout)
-            else:
-                self.interrompt() # Pas punitif puisqu'aucun mana n'a encore été dépensé, et pas de temps de perdu non plus.
-                return True
-        self.latence += self.get_vitesse()
-        if self.latence >= self.latence_max:
-            self.termine()
-            return True
-        return False
+            self.paye()
+        return super().execute()
         
 class Caste_continu(Caste):
     """
     Lorsque le mana est absorbé à chaque tour.
     """
+    def paye(self):
+        """On essaye de payer une partie du coût du sort."""
+        cout = (self.latence/self.latence_max)*self.cout - self.mana
+        if self.agissant.peut_payer(cout):
+            self.mana += cout
+            self.agissant.paye(cout)
+        else:
+            self.interrompt()
+
     def execute(self):
         self.latence += self.get_vitesse()
-        diff = (self.latence/self.latence_max)*self.cout - self.mana
-        if diff > 0:
-            if self.agissant.peut_payer(diff):
-                self.mana += diff
-                self.agissant.paye(diff)
-            else:
-                self.interrompt() # Peut être beaucoup plus punitif puisqu'on a dépensé presque autant qu'on pouvait.
-                return True
+        self.paye()
         if self.latence >= self.latence_max:
             self.termine()
             return True
@@ -87,16 +80,19 @@ class Caste_fractionnaire(Caste):
         super().__init__(agissant, latence)
         self.parts: int = 1
 
+    def paye(self):
+        """On essaye de payer une partie du coût du sort."""
+        parts_accomplies = int((self.latence/self.latence_max)*self.parts)
+        cout = parts_accomplies*self.cout/self.parts - self.mana
+        if self.agissant.peut_payer(cout):
+            self.mana += cout
+            self.agissant.paye(cout)
+        else:
+            self.interrompt()
+
     def execute(self):
         self.latence += self.get_vitesse()
-        parts_accomplies = int((self.latence/self.latence_max)*self.parts)
-        diff = parts_accomplies*self.cout/self.parts - self.mana
-        if diff > 0:
-            if self.agissant.peut_payer(diff):
-                self.mana += diff
-                self.agissant.paye(diff)
-            else:
-                self.interrompt() # Peut être plus ou moins punitif selon le nombre de parts et le remplissage de la dernière part.
+        self.paye()
         if self.latence >= self.latence_max:
             self.termine()
             return True

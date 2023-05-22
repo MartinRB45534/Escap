@@ -11,6 +11,7 @@ if TYPE_CHECKING:
 
 # Imports des classes parentes
 from Jeu.Action.Action_skill import Action_skill
+from Jeu.Action.Action import Action_final, Action_parcellaire
 
 # Valeurs par défaut des paramètres
 from Jeu.Constantes import TERRE
@@ -28,14 +29,19 @@ class Attaque(Action_skill):
         self.propagation = propagation
         self.distance = distance
 
-    def termine(self):
-        super().termine()
+    def action(self):
         force,affinite = self.agissant.get_stats_attaque(self.element)
         degats = force*self.taux*affinite
         position = self.agissant.position
         positions_touchees = self.agissant.controleur.get_pos_touches(position,self.portee,self.propagation,self.direction,"alliés",self.agissant)
         for position in positions_touchees:
             self.agissant.controleur.case_from_position(position).effets.append(Attaque_case(self.agissant,degats,self.element,self.distance,self.direction))
+
+class Attaque_final(Action_final,Attaque):
+    """
+    Une attaque qui se fait à la fin de la latence.
+    """
+    # L'attaque la plus courante, correspond aussi au stomp
 
 class Attaque_arme(Attaque):
     """
@@ -49,8 +55,7 @@ class Attaque_arme(Attaque):
         self.distance = distance
         self.arme = arme
 
-    def termine(self):
-        super().termine()
+    def action(self):
         element,tranchant,portee = self.arme.get_stats_attaque()
         force,affinite = self.agissant.get_stats_attaque(element)
         degats = force*self.taux*affinite*tranchant
@@ -59,7 +64,13 @@ class Attaque_arme(Attaque):
         for position in positions_touchees:
             self.agissant.controleur.case_from_position(position).effets.append(Attaque_case(self.agissant,degats,element,self.distance,self.direction))
 
-class Attaque_multiple(Attaque_arme): # Les attaques sans arme ne peuvent pas être multiples
+class Attaque_arme_final(Action_final,Attaque_arme):
+    """
+    Une attaque avec une arme qui se fait à la fin de la latence.
+    """
+    # L'attaque avec une arme la plus courante (correspond aux attaques de base à l'épée et la lance)
+
+class Attaque_multiple(Action_parcellaire,Attaque_arme): # Les attaques sans arme ne peuvent pas être multiples
     """
     Une attaque complexe avec plusieurs coups.
     """
@@ -72,28 +83,14 @@ class Attaque_multiple(Attaque_arme): # Les attaques sans arme ne peuvent pas ê
         self.distance = distance
         self.arme = arme
 
-    def execute(self):
-        self.latence += self.get_vitesse()
-        while sum(self.latences[:len(self.latences)-len(self.directions)]) <= self.latence:
-            element,tranchant,portee = self.arme.get_stats_attaque()
-            force,affinite = self.agissant.get_stats_attaque(element)
-            degats = force*self.taux[0]*affinite*tranchant
-            position = self.agissant.position
-            positions_touchees = self.agissant.controleur.get_pos_touches(position,portee,self.propagations[0],self.directions[0],"alliés",self.agissant)
-            for position in positions_touchees:
-                self.agissant.controleur.case_from_position(position).effets.append(Attaque_case(self.agissant,degats,element,self.distance,self.directions[0]))
-            self.taux.pop(0)
-            self.directions.pop(0)
-            self.propagations.pop(0)
-        if self.latence >= sum(self.latences):
-            self.termine()
-            return True
-        return False
-    
-    def termine(self):
-        Action_skill.termine(self)
-
-
+    def action(self):
+        element,tranchant,portee = self.arme.get_stats_attaque()
+        force,affinite = self.agissant.get_stats_attaque(element)
+        degats = force*self.taux[self.rempli]*affinite*tranchant
+        position = self.agissant.position
+        positions_touchees = self.agissant.controleur.get_pos_touches(position,portee,self.propagations[self.rempli],self.directions[self.rempli],"alliés",self.agissant)
+        for position in positions_touchees:
+            self.agissant.controleur.case_from_position(position).effets.append(Attaque_case(self.agissant,degats,element,self.distance,self.directions[self.rempli]))
 
 # Imports utilisés dans le code
 from Jeu.Effet.Attaque.Attaque import Attaque_case
