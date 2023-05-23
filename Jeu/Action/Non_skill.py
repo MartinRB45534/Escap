@@ -11,16 +11,8 @@ if TYPE_CHECKING:
     from Jeu.Action.Magie.Magie import Magie
 
 # Imports des classes parentes
-from Jeu.Action.Action import Action, Action_final
+from Jeu.Action.Action import Action_final
 from Jeu.Action.Caste import Caste, Caste_continu, Caste_final, Caste_initial, Caste_fractionnaire
-
-class Vole(Action):
-    """
-    L'action des items qui volent.
-    """
-    def get_skin(self):
-        pass
-        # TODO: Ajouter le get_skin
 
 class Consomme(Action_final):
     """
