@@ -789,7 +789,6 @@ class Controleur():
         self.joueur.position = Position("Étage 2 : labyrinthe",0,0)
         self.ajoute_entitee(self.joueur)
         self.esprits["heros"] = Esprit_humain(self.joueur,self)
-        assert self.joueur.position is not None
         self.active_lab(self.joueur.position.lab)
 
     # def duel(self,esprit1: Esprit,esprit2: Esprit,niveau_1=1,niveau_2=1,tailles_lab=(20,20),vide=True,vue=False,screen=None):
@@ -903,7 +902,6 @@ class Controleur():
     def move(self,position: Position,entitee: Entitee): #Non utilisé dans la version de mi-juillet
         """Fonction appelée quand une entitée change de labyrinthe. En entrée, la position cible et l'entitée avant son déplacement.
            Si le labyrinthe de départ n'a plus d'entitée supérieure, on va devoir préparer sa désactivation. Si le labyrinthe d'arrivée n'avait pas d'entitée supérieure, il va falloir l'activer."""
-        assert entitee.position is not None
         ancien_lab = entitee.position.lab
         nouveau_lab = position.lab
         if isinstance(entitee,Entitee_superieure): #Si on a une entitée supérieure :
@@ -1066,324 +1064,324 @@ class Controleur():
                 occupants.add(entitee)
         return occupants
 
-    def fait_agir(self,agissant:Agissant):
-        agissant.set_statut("passif")
-        if agissant is self.joueur:
-            assert isinstance(agissant, PJ)
-            agissant.nouvel_ordre = False
-        type_skill = agissant.skill_courant
-        assert type_skill is not None
-        skill = trouve_skill(agissant.classe_principale,type_skill)
-        if skill is None :
-            print("On ne peut pas utiliser un skill que l'on n'a pas... et on ne devrait pas pouvoir le choisir d'ailleurs : "+str(type_skill))
-        else :
+    # def fait_agir(self,agissant:Agissant):
+    #     agissant.set_statut("passif")
+    #     if agissant is self.joueur:
+    #         assert isinstance(agissant, PJ)
+    #         agissant.nouvel_ordre = False
+    #     type_skill = agissant.skill_courant
+    #     assert type_skill is not None
+    #     skill = trouve_skill(agissant.classe_principale,type_skill)
+    #     if skill is None :
+    #         print("On ne peut pas utiliser un skill que l'on n'a pas... et on ne devrait pas pouvoir le choisir d'ailleurs : "+str(type_skill))
+    #     else :
 
 
 
-            # if isinstance(skill, Skill_analyse): #À améliorer ! /!\
-            #     mallus,niveau,cible = skill.utilise()
-            #     self.lance_analyse(mallus,niveau,cible)
+    #         # if isinstance(skill, Skill_analyse): #À améliorer ! /!\
+    #         #     mallus,niveau,cible = skill.utilise()
+    #         #     self.lance_analyse(mallus,niveau,cible)
 
 
 
-            # elif isinstance(skill, Skill_vol):
-            #     possesseur,item = self.selectionne_item_vol()
-            #     latence,reussite = skill.utilise(possesseur.priorite,agissant.priorite)
-            #     agissant.add_latence(latence)
-            #     if reussite :
-            #         possesseur.inventaire.supprime_item(item)
-            #         agissant.inventaire.ramasse_item(item)
-            #         if isinstance(agissant,Heros):
-            #             affichage = agissant.affichage
-            #             affichage.message(f"Tu as volé avec succès un {item} à {possesseur} !")
-            #     else :
-            #         possesseur.persecuteurs.append(agissant)
-            #     #refaire les autres vols sur le même modèle /!\
+    #         # elif isinstance(skill, Skill_vol):
+    #         #     possesseur,item = self.selectionne_item_vol()
+    #         #     latence,reussite = skill.utilise(possesseur.priorite,agissant.priorite)
+    #         #     agissant.add_latence(latence)
+    #         #     if reussite :
+    #         #         possesseur.inventaire.supprime_item(item)
+    #         #         agissant.inventaire.ramasse_item(item)
+    #         #         if isinstance(agissant,Heros):
+    #         #             affichage = agissant.affichage
+    #         #             affichage.message(f"Tu as volé avec succès un {item} à {possesseur} !")
+    #         #     else :
+    #         #         possesseur.persecuteurs.append(agissant)
+    #         #     #refaire les autres vols sur le même modèle /!\
 
 
 
-            if isinstance(skill, Skill_ramasse):
-                pos = agissant.get_position()
-                assert pos is not None
-                items = self.trouve_items_courants(pos)
-                latence = 1
-                for item in items:
-                    assert isinstance(item,Item)
-                    latence_item,reussite = skill.utilise(item.priorite-agissant.get_priorite())
-                    latence += latence_item
-                    if reussite:
-                        agissant.inventaire.ajoute(item)
-                agissant.add_latence(latence)
+    #         if isinstance(skill, Skill_ramasse):
+    #             pos = agissant.get_position()
+    #             assert pos is not None
+    #             items = self.trouve_items_courants(pos)
+    #             latence = 1
+    #             for item in items:
+    #                 assert isinstance(item,Item)
+    #                 latence_item,reussite = skill.utilise(item.priorite-agissant.get_priorite())
+    #                 latence += latence_item
+    #                 if reussite:
+    #                     agissant.inventaire.ajoute(item)
+    #             agissant.add_latence(latence)
 
 
 
-            elif isinstance(skill, Skill_ramasse_light):
-                pos = agissant.get_position()
-                assert pos is not None
-                items = self.trouve_items_courants(pos)
-                latence = 1
-                for item in items:
-                    if isinstance(item,ITEMS_LIGHTS):
-                        latence_item,reussite = skill.utilise(item.priorite-agissant.get_priorite())
-                        latence += latence_item
-                        if reussite:
-                            agissant.inventaire.ajoute(item)
-                agissant.add_latence(latence)
+    #         elif isinstance(skill, Skill_ramasse_light):
+    #             pos = agissant.get_position()
+    #             assert pos is not None
+    #             items = self.trouve_items_courants(pos)
+    #             latence = 1
+    #             for item in items:
+    #                 if isinstance(item,ITEMS_LIGHTS):
+    #                     latence_item,reussite = skill.utilise(item.priorite-agissant.get_priorite())
+    #                     latence += latence_item
+    #                     if reussite:
+    #                         agissant.inventaire.ajoute(item)
+    #             agissant.add_latence(latence)
 
 
 
-            elif isinstance(skill, Skill_stomp):
-                #Une attaque qui se fait sans arme.
-                force,affinite,direction,ID = agissant.get_stats_attaque(TERRE)
-                latence,taux,portee = skill.utilise()
+    #         elif isinstance(skill, Skill_stomp):
+    #             #Une attaque qui se fait sans arme.
+    #             force,affinite,direction,ID = agissant.get_stats_attaque(TERRE)
+    #             latence,taux,portee = skill.utilise()
 
-                degats = force*taux*affinite
-                attaque = Attaque(ID,degats,TERRE,"contact",portee)
+    #             degats = force*taux*affinite
+    #             attaque = Attaque(ID,degats,TERRE,"contact",portee)
 
-                agissant.add_latence(latence)
-                agissant.effets.append(attaque)
-
-
-
-            elif isinstance(skill, Skill_attaque):
-                #Une attaque qui se fait avec une arme.
-                arme = agissant.get_arme()
-                if arme is None:
-                    print("On ne peut pas utiliser un skill d'attaque sans arme...")
-                else:
-                    assert isinstance(arme,Arme)
-                    element,tranchant,portee = arme.get_stats_attaque()
-                    force,affinite,direction,ID = agissant.get_stats_attaque(element)
-                    latence,taux = skill.utilise()
-
-                    taux_manipulation = 1
-                    manipulation = trouve_skill(agissant.classe_principale,Skill_manipulation_arme)
-                    if manipulation is not None :
-                        taux_manipulation = manipulation.utilise_attaque()
-
-                    if isinstance(arme,Epee) :
-                        if manipulation is None :
-                            manipulation = trouve_skill(agissant.classe_principale,Skill_manipulation_epee)
-                            if manipulation is not None :
-                                taux_manipulation = manipulation.utilise()
-
-                        forme = "Sd_S___" #Dans un monde idéal, les skills de manipulation donnerait accès à d'autres formes
-
-                    elif isinstance(arme,Lance) :
-                        if manipulation is None :
-                            manipulation = trouve_skill(agissant.classe_principale,Skill_manipulation_lance)
-                            if manipulation is not None :
-                                taux_manipulation = manipulation.utilise()
-
-                        forme = "R__S___" #Dans un monde idéal, les skills de manipulation donnerait accès à d'autres formes
-                    else :
-                        raise ValueError(f"Quelle est cette arme ? {arme}")
-
-                    degats = force*affinite*tranchant*taux*taux_manipulation
-                    attaque = Attaque(ID,degats,element,"contact",portee,forme,direction)
-
-                    agissant.add_latence(latence)
-                    agissant.effets.append(attaque)
+    #             agissant.add_latence(latence)
+    #             agissant.effets.append(attaque)
 
 
 
-            elif isinstance(skill, Skill_blocage) :
-                #Pour être protégé par le bouclier pendant les tours suivants.
-                bouclier = agissant.get_bouclier()
-                if bouclier is None:
-                    print("On ne peut pas utiliser un skill de blocage sans bouclier...")
-                else:
-                    assert isinstance(bouclier,Bouclier)
-                    latence,taux_skill = skill.utilise()
+    #         elif isinstance(skill, Skill_attaque):
+    #             #Une attaque qui se fait avec une arme.
+    #             arme = agissant.get_arme()
+    #             if arme is None:
+    #                 print("On ne peut pas utiliser un skill d'attaque sans arme...")
+    #             else:
+    #                 assert isinstance(arme,Arme)
+    #                 element,tranchant,portee = arme.get_stats_attaque()
+    #                 force,affinite,direction,ID = agissant.get_stats_attaque(element)
+    #                 latence,taux = skill.utilise()
 
-                    taux_manipulation = 1
-                    duree = 3
-                    manipulation = trouve_skill(agissant.classe_principale,Skill_manipulation_arme)
-                    if manipulation is not None :
-                        taux_manipulation,duree = manipulation.utilise()
-                    else :
-                        manipulation = trouve_skill(agissant.classe_principale,Skill_manipulation_bouclier)
-                        if manipulation is not None :
-                            taux_manipulation,duree = manipulation.utilise()
+    #                 taux_manipulation = 1
+    #                 manipulation = trouve_skill(agissant.classe_principale,Skill_manipulation_arme)
+    #                 if manipulation is not None :
+    #                     taux_manipulation = manipulation.utilise_attaque()
 
-                    taux = taux_skill * taux_manipulation
+    #                 if isinstance(arme,Epee) :
+    #                     if manipulation is None :
+    #                         manipulation = trouve_skill(agissant.classe_principale,Skill_manipulation_epee)
+    #                         if manipulation is not None :
+    #                             taux_manipulation = manipulation.utilise()
 
-                    effet = Protection_general(duree,bouclier) #Dans un monde idéal, les skills de manipulation donnerait accès à d'autres effets
+    #                     forme = "Sd_S___" #Dans un monde idéal, les skills de manipulation donnerait accès à d'autres formes
 
-                    for effet_prec in agissant.effets :
-                        if isinstance(effet_prec,Protection_general):
-                            agissant.effets.remove(effet_prec) #On ne peut pas avoir deux protections à la fois !
+    #                 elif isinstance(arme,Lance) :
+    #                     if manipulation is None :
+    #                         manipulation = trouve_skill(agissant.classe_principale,Skill_manipulation_lance)
+    #                         if manipulation is not None :
+    #                             taux_manipulation = manipulation.utilise()
 
-                    agissant.add_latence(latence)
-                    agissant.effets.append(effet)
-                    effet.execute(agissant) #On passe l'effet en phase "en cours"
-                    bouclier.taux_degats = taux # /!\ Est-ce que c'est vraiment comme ça que ça s'utilise ?
+    #                     forme = "R__S___" #Dans un monde idéal, les skills de manipulation donnerait accès à d'autres formes
+    #                 else :
+    #                     raise ValueError(f"Quelle est cette arme ? {arme}")
 
+    #                 degats = force*affinite*tranchant*taux*taux_manipulation
+    #                 attaque = Attaque(ID,degats,element,"contact",portee,forme,direction)
 
-
-            elif isinstance(skill,Skills_projectiles) :
-                projectile = agissant.get_item_lancer()
-
-                if projectile is not None :
-                    if isinstance(projectile,int): #Un agissant bien élevé manipule le moins d'objets possible, et leur préfère leurs ID
-                        projectile = self.items[projectile]
-                    assert isinstance(projectile,Projectile)
-                    latence,hauteur,vitesse = skill.utilise()
-                    agissant.add_latence(latence*projectile.poids)
-                    projectile.position = agissant.get_position()
-                    projectile.hauteur = hauteur*agissant.force/projectile.poids
-                    projectile.taux_vitesse["lancementv"]=vitesse
-                    projectile.direction = agissant.dir_regard
-                    projectile.lanceur = agissant
-                    self.items_courants.add(projectile)
-                else :
-                    if isinstance(agissant,Heros):
-                        print("J'ai dû mal comprendre...")
-                        print("Tu veux lancer un item que tu n'as pas !?")
+    #                 agissant.add_latence(latence)
+    #                 agissant.effets.append(attaque)
 
 
 
-            elif isinstance(skill,Skill_deplacement) :
-                latence,niveau = skill.utilise()
-                direction = agissant.get_direction()
-                position = agissant.get_position()
-                agissant.add_latence(latence)
+    #         elif isinstance(skill, Skill_blocage) :
+    #             #Pour être protégé par le bouclier pendant les tours suivants.
+    #             bouclier = agissant.get_bouclier()
+    #             if bouclier is None:
+    #                 print("On ne peut pas utiliser un skill de blocage sans bouclier...")
+    #             else:
+    #                 assert isinstance(bouclier,Bouclier)
+    #                 latence,taux_skill = skill.utilise()
 
-                lab = self.labs[position.lab]
-                lab.veut_passer(agissant,direction)
+    #                 taux_manipulation = 1
+    #                 duree = 3
+    #                 manipulation = trouve_skill(agissant.classe_principale,Skill_manipulation_arme)
+    #                 if manipulation is not None :
+    #                     taux_manipulation,duree = manipulation.utilise()
+    #                 else :
+    #                     manipulation = trouve_skill(agissant.classe_principale,Skill_manipulation_bouclier)
+    #                     if manipulation is not None :
+    #                         taux_manipulation,duree = manipulation.utilise()
+
+    #                 taux = taux_skill * taux_manipulation
+
+    #                 effet = Protection_general(duree,bouclier) #Dans un monde idéal, les skills de manipulation donnerait accès à d'autres effets
+
+    #                 for effet_prec in agissant.effets :
+    #                     if isinstance(effet_prec,Protection_general):
+    #                         agissant.effets.remove(effet_prec) #On ne peut pas avoir deux protections à la fois !
+
+    #                 agissant.add_latence(latence)
+    #                 agissant.effets.append(effet)
+    #                 effet.execute(agissant) #On passe l'effet en phase "en cours"
+    #                 bouclier.taux_degats = taux # /!\ Est-ce que c'est vraiment comme ça que ça s'utilise ?
 
 
 
-            # elif isinstance(skill,Skill_soin) :
-            #     latence,soin,portee = skill.utilise()
-            #     agissant.add_latence(latence)
-            #     position = agissant.get_position()
+    #         elif isinstance(skill,Skills_projectiles) :
+    #             projectile = agissant.get_item_lancer()
+
+    #             if projectile is not None :
+    #                 if isinstance(projectile,int): #Un agissant bien élevé manipule le moins d'objets possible, et leur préfère leurs ID
+    #                     projectile = self.items[projectile]
+    #                 assert isinstance(projectile,Projectile)
+    #                 latence,hauteur,vitesse = skill.utilise()
+    #                 agissant.add_latence(latence*projectile.poids)
+    #                 projectile.position = agissant.get_position()
+    #                 projectile.hauteur = hauteur*agissant.force/projectile.poids
+    #                 projectile.taux_vitesse["lancementv"]=vitesse
+    #                 projectile.direction = agissant.dir_regard
+    #                 projectile.lanceur = agissant
+    #                 self.items_courants.add(projectile)
+    #             else :
+    #                 if isinstance(agissant,Heros):
+    #                     print("J'ai dû mal comprendre...")
+    #                     print("Tu veux lancer un item que tu n'as pas !?")
+
+
+
+    #         elif isinstance(skill,Skill_deplacement) :
+    #             latence,niveau = skill.utilise()
+    #             direction = agissant.get_direction()
+    #             position = agissant.get_position()
+    #             agissant.add_latence(latence)
+
+    #             lab = self.labs[position.lab]
+    #             lab.veut_passer(agissant,direction)
+
+
+
+    #         # elif isinstance(skill,Skill_soin) :
+    #         #     latence,soin,portee = skill.utilise()
+    #         #     agissant.add_latence(latence)
+    #         #     position = agissant.get_position()
                 
-            #     assert position is not None
-            #     poss = self.
-            #     for pos in poss:
-            #         self.case_from_position(pos).effets.append(Soin_case(soin,agissant))
+    #         #     assert position is not None
+    #         #     poss = self.
+    #         #     for pos in poss:
+    #         #         self.case_from_position(pos).effets.append(Soin_case(soin,agissant))
 
 
 
-            # elif isinstance(skill,Skill_regeneration_MP) :
-            #     latence,regen,portee = skill.utilise()
-            #     agissant.add_latence(latence)
-            #     position = agissant.get_position()
+    #         # elif isinstance(skill,Skill_regeneration_MP) :
+    #         #     latence,regen,portee = skill.utilise()
+    #         #     agissant.add_latence(latence)
+    #         #     position = agissant.get_position()
 
-            #     assert position is not None
-            #     poss = self.
-            #     for pos in poss:
-            #         self.case_from_position(pos).effets.append(Re
-
-
-
-            # elif isinstance(skill,Skill_reanimation) :
-            #     cadavre = self[agissant.cible]
-            #     latence,taux,sup = skill.utilise()
-            #     agissant.add_latence(latence)
-            #     if cadavre.priorite + sup < agissant.priorite :
-            #         esprit = self.get_esprit(agissant)
-            #         cadavre.effets.append(Reanimation(taux,esprit))
-            #     else:
-            #         cadavre.effets.append(Reanimation(taux,self.get_esprit(cadavre)))
-
-
-            elif isinstance(skill,Skills_magiques) :
-                magie = agissant.magie_courante
-                assert magie is not None
-                latence,magie = skill.utilise(magie.nom)
-                if magie is not None:
-                    cout = magie.cout_pm
-                    if agissant.peut_payer(cout) :
-                        agissant.effets.append(magie)
-                        reussite = True
-                        #if isinstance(agissant,Heros):
-                        #    malchance = trouve_skill(agissant.classe_principale,Skill_malchanceux)
-                        #else:
-                        #    malchance = None
-                        #if malchance is not None:
-                        #    reussite = malchance.utilise("cast_magic")
-                        if isinstance(magie,Magie_cible) :
-                            self.select_cible(magie,agissant)
-                        if isinstance(magie,Magie_dirigee) :
-                            self.select_direction(magie,agissant)
-                        if isinstance(magie,Magie_cout) :
-                            self.select_cout(magie,agissant)
-                        agissant.paye(magie.cout_pm)
-                        agissant.add_latence(latence)
-                        if not reussite :
-                            magie.miss_fire(agissant)
-                else:
-                    print("On ne peut pas utiliser une magie que l'on a pas !")
-                    print(magie,agissant)
+    #         #     assert position is not None
+    #         #     poss = self.
+    #         #     for pos in poss:
+    #         #         self.case_from_position(pos).effets.append(Re
 
 
 
-            # elif type_skill in [Divine_Thread_Weaving,Lesser_Divine_Thread_Weaving] :
-            #     action = agissant.action
-            #     latence,item = skill.utilise(action)
-            #     agissant.add_latence(latence)
-            #     self.items.append(item)
+    #         # elif isinstance(skill,Skill_reanimation) :
+    #         #     cadavre = self[agissant.cible]
+    #         #     latence,taux,sup = skill.utilise()
+    #         #     agissant.add_latence(latence)
+    #         #     if cadavre.priorite + sup < agissant.priorite :
+    #         #         esprit = self.get_esprit(agissant)
+    #         #         cadavre.effets.append(Reanimation(taux,esprit))
+    #         #     else:
+    #         #         cadavre.effets.append(Reanimation(taux,self.get_esprit(cadavre)))
+
+
+    #         elif isinstance(skill,Skills_magiques) :
+    #             magie = agissant.magie_courante
+    #             assert magie is not None
+    #             latence,magie = skill.utilise(magie.nom)
+    #             if magie is not None:
+    #                 cout = magie.cout_pm
+    #                 if agissant.peut_payer(cout) :
+    #                     agissant.effets.append(magie)
+    #                     reussite = True
+    #                     #if isinstance(agissant,Heros):
+    #                     #    malchance = trouve_skill(agissant.classe_principale,Skill_malchanceux)
+    #                     #else:
+    #                     #    malchance = None
+    #                     #if malchance is not None:
+    #                     #    reussite = malchance.utilise("cast_magic")
+    #                     if isinstance(magie,Magie_cible) :
+    #                         self.select_cible(magie,agissant)
+    #                     if isinstance(magie,Magie_dirigee) :
+    #                         self.select_direction(magie,agissant)
+    #                     if isinstance(magie,Magie_cout) :
+    #                         self.select_cout(magie,agissant)
+    #                     agissant.paye(magie.cout_pm)
+    #                     agissant.add_latence(latence)
+    #                     if not reussite :
+    #                         magie.miss_fire(agissant)
+    #             else:
+    #                 print("On ne peut pas utiliser une magie que l'on a pas !")
+    #                 print(magie,agissant)
 
 
 
-            # elif type_skill in [Scythe,Lesser_Scythe] :
-            #     perce,element,taux = skill.utilise()
-            #     attaque = Attaque(agissant,agissant.force*taux,element,"contact",1,"R__T_Pb",agissant.direction,"piercing",perce)
-            #     self.tentative_attaque(attaque)
+    #         # elif type_skill in [Divine_Thread_Weaving,Lesser_Divine_Thread_Weaving] :
+    #         #     action = agissant.action
+    #         #     latence,item = skill.utilise(action)
+    #         #     agissant.add_latence(latence)
+    #         #     self.items.append(item)
 
 
 
-            # elif isinstance(skill, Egg_Laying):
-            #     latence, oeuf = skill.utilise()
-            #     agissant.add_latence(latence)
-            #     if oeuf is not None :
-            #         self.ajoute_entitee(oeuf)
+    #         # elif type_skill in [Scythe,Lesser_Scythe] :
+    #         #     perce,element,taux = skill.utilise()
+    #         #     attaque = Attaque(agissant,agissant.force*taux,element,"contact",1,"R__T_Pb",agissant.direction,"piercing",perce)
+    #         #     self.tentative_attaque(attaque)
 
 
 
-            # elif isinstance(skill, Skill_merge):
-            #     ID_cible = agissant.cible_merge
-            #     latence = skill.utilise()
-            #     if ID_cible is not None:
-            #         esprit = self.entitees[ID_cible].esprit
-            #         self.get_esprit(agissant.esprit).merge(esprit) #/!\ Syntaxe probablement fausse et foireuse, à vérifier
-            #     agissant.add_latence(latence)
+    #         # elif isinstance(skill, Egg_Laying):
+    #         #     latence, oeuf = skill.utilise()
+    #         #     agissant.add_latence(latence)
+    #         #     if oeuf is not None :
+    #         #         self.ajoute_entitee(oeuf)
 
 
 
-            # elif isinstance(skill, Skill_absorb):
-            #     items = self.trouve_items_courants(agissant.get_position())
-            #     latence = 1
-            #     for ID_item in items:
-            #         item = self.entitees[ID_item]
-            #         latence_item,reussite = skill.utilise(item.priorite-agissant.get_priorite())
-            #         latence += latence_item
-            #         if reussite:
-            #             agissant.inventaire.ramasse_item(ID_item)
-            #             if item.get_classe() == Cadavre:
-            #                 pass #/!\ Comment le skill est choisi ? Au hasard ? Comment différencier le type de slime (copie le skill au niveau 1, copie le skill à son niveau, vole le skill et laisse une copie au niveau 1, prend le skill mais le laisse quand même)
-            #     agissant.add_latence(latence)
+    #         # elif isinstance(skill, Skill_merge):
+    #         #     ID_cible = agissant.cible_merge
+    #         #     latence = skill.utilise()
+    #         #     if ID_cible is not None:
+    #         #         esprit = self.entitees[ID_cible].esprit
+    #         #         self.get_esprit(agissant.esprit).merge(esprit) #/!\ Syntaxe probablement fausse et foireuse, à vérifier
+    #         #     agissant.add_latence(latence)
 
 
 
-            # elif isinstance(skill, Skill_divide):
-            #     latence = skill.utilise()
-            #     if agissant.peut_payer(20): #Insérer le cout ici d'une façon ou d'une autre /!\
-            #         new_slime = type(agissant)(agissant.position,agissant.niveau,True)
-            #         agissant.paye(20)
-            #         agissant.subit(20) # /!\ Ne pas utiliser subit() !
-            #     agissant.add_latence(latence)
+    #         # elif isinstance(skill, Skill_absorb):
+    #         #     items = self.trouve_items_courants(agissant.get_position())
+    #         #     latence = 1
+    #         #     for ID_item in items:
+    #         #         item = self.entitees[ID_item]
+    #         #         latence_item,reussite = skill.utilise(item.priorite-agissant.get_priorite())
+    #         #         latence += latence_item
+    #         #         if reussite:
+    #         #             agissant.inventaire.ramasse_item(ID_item)
+    #         #             if item.get_classe() == Cadavre:
+    #         #                 pass #/!\ Comment le skill est choisi ? Au hasard ? Comment différencier le type de slime (copie le skill au niveau 1, copie le skill à son niveau, vole le skill et laisse une copie au niveau 1, prend le skill mais le laisse quand même)
+    #         #     agissant.add_latence(latence)
 
 
 
-    def fait_voler(self,item:Item):
-        direction = item.get_direction()
-        position = item.get_position()
-        assert position is not None
-        lab = self.labs[position.lab]
-        lab.veut_passer(item,direction)
+    #         # elif isinstance(skill, Skill_divide):
+    #         #     latence = skill.utilise()
+    #         #     if agissant.peut_payer(20): #Insérer le cout ici d'une façon ou d'une autre /!\
+    #         #         new_slime = type(agissant)(agissant.position,agissant.niveau,True)
+    #         #         agissant.paye(20)
+    #         #         agissant.subit(20) # /!\ Ne pas utiliser subit() !
+    #         #     agissant.add_latence(latence)
+
+
+
+    # def fait_voler(self,item:Item):
+    #     direction = item.get_direction()
+    #     position = item.get_position()
+    #     assert position is not None
+    #     lab = self.labs[position.lab]
+    #     lab.veut_passer(item,direction)
 
     def fait_eclore(self,oeuf:Oeuf,couveur:Agissant):
         # On pose l'oeuf à l'emplacement de l'agissant
@@ -1393,30 +1391,29 @@ class Controleur():
         self.ajoute_entitee(poussin)
         # On retire l'oeuf de la liste des entitees
 
-    def select_cible(self,magie:Magie_cible,agissant:Agissant):
-        # if random.random() < agissant.talent :
-            magie.cible = agissant.cible_magie
+    # def select_cible(self,magie:Magie_cible,agissant:Agissant):
+    #     # if random.random() < agissant.talent :
+    #         magie.cible = agissant.cible_magie
         
-    def select_direction(self,magie:Magie_dirigee,agissant:Agissant):
-        # if random.random() < agissant.talent :
-            magie.direction = agissant.dir_magie
+    # def select_direction(self,magie:Magie_dirigee,agissant:Agissant):
+    #     # if random.random() < agissant.talent :
+    #         magie.direction = agissant.dir_magie
 
-    def select_cout(self,magie:Magie_cout,agissant:Agissant):
-        magie.cout_pm = agissant.cout_magie
+    # def select_cout(self,magie:Magie_cout,agissant:Agissant):
+    #     magie.cout = agissant.cout_magie
 
-    def select_cible_parchemin(self,magie:Magie_cible,agissant:Agissant):
-        # if random.random() < agissant.talent :
-            magie.cible = agissant.cible_magie_parchemin
+    # def select_cible_parchemin(self,magie:Magie_cible,agissant:Agissant):
+    #     # if random.random() < agissant.talent :
+    #         magie.cible = agissant.cible_magie_parchemin
         
-    def select_direction_parchemin(self,magie:Magie_dirigee,agissant:Agissant):
-        # if random.random() < agissant.talent :
-            magie.direction = agissant.dir_magie_parchemin
+    # def select_direction_parchemin(self,magie:Magie_dirigee,agissant:Agissant):
+    #     # if random.random() < agissant.talent :
+    #         magie.direction = agissant.dir_magie_parchemin
 
-    def select_cout_parchemin(self,magie:Magie_cout,agissant:Agissant):
-        magie.cout_pm = agissant.cout_magie_parchemin
+    # def select_cout_parchemin(self,magie:Magie_cout,agissant:Agissant):
+    #     magie.cout = agissant.cout_magie_parchemin
 
     def get_cibles_potentielles_agissants(self,magie:Magie_cible,joueur:PJ):
-        assert joueur.position is not None
         cibles_potentielles = set()
         for case in self.esprits["heros"].vue:
             if case.agissant is not None:
@@ -1434,7 +1431,6 @@ class Controleur():
         return cibles
 
     def get_cibles_potentielles_items(self,magie:Magie_cible,joueur:PJ):
-        assert joueur.position is not None
         cibles_potentielles:Set[Item] = set()
         for case in self.esprits["heros"].vue:
             cibles_potentielles |= case.items
@@ -1453,9 +1449,7 @@ class Controleur():
         return cibles
 
     def get_cibles_potentielles_cases(self,magie:Magie_cible,joueur:PJ):
-        assert joueur.position is not None
         esprit = joueur.esprit
-        assert esprit is not None
         cibles_potentielles = set()
         for case in esprit.vue:
             cibles_potentielles.add(case.case.position)
@@ -1662,6 +1656,7 @@ class Controleur():
         return poss
 
 # Imports utilisés dans le code
+from Jeu.Action.Actions import *
 from Jeu.Effet.Effets import *
 from Jeu.Entitee.Entitees import *
 from Jeu.Esprit.Esprits import *

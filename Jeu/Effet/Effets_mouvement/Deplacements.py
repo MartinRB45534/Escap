@@ -63,9 +63,7 @@ class Teleport(On_through):
 
 class Premier_portail(Teleport):
     def execute(self,entitee:Entitee):
-        assert isinstance(entitee,Agissant)
-        if entitee == 2:
-            assert isinstance(entitee,Heros)
+        if isinstance(entitee,Heros):
             entitee.first_teleport()
             Premier_portail.execute = Teleport.execute
         Teleport.execute(self,entitee)
@@ -84,8 +82,7 @@ class Escalier(Teleport):
 
 class Premiere_marche(Escalier):
     def execute(self,entitee:Entitee):
-        if entitee.ID == 2:
-            assert isinstance(entitee,Heros)
+        if isinstance(entitee,Heros):
             entitee.first_step()
             Premiere_marche.execute = Escalier.execute
         Escalier.execute(self,entitee)

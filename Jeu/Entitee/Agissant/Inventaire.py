@@ -69,7 +69,6 @@ class Inventaire:
 
     def quantite(self,classe:Type[Ingredient]):
         """Indique la quantité d'items correspondants à une classe voulue.""" #Pour les ingrédients des recettes
-        assert self.controleur is not None
         res=0
         for item in self.ingredients:
             if isinstance(item,classe) and item.etat == "intact":
@@ -78,7 +77,6 @@ class Inventaire:
 
     def consomme(self,classe:Type[Ingredient]):
         """Consomme un ingrédient lors d'une opération d'alchimie.""" #/!\ Rien à voir avec les consommables !
-        assert self.controleur is not None
         for item in self.ingredients:
             if isinstance(item,classe) and item.etat == "intact":
                 item.etat = "brisé"
@@ -195,17 +193,15 @@ class Inventaire:
                 return cle
 
     def get_items(self):
-        assert self.controleur is not None
         items:Set[Item] = set()
         for item_set in self.items.values():
             items|=item_set            
         return items
 
     def nettoie_item(self): #Méthode appelée à chaque fin de tour pour supprimer les items retirés ou utilisés.
-        assert self.controleur is not None
         for classe in self.items:
             for item in self.items[classe]:
-                assert isinstance(item,Item)
+                assert isinstance(item,classe)
                 if item.position != ABSENT or item.etat == "brisé": #S'il a été lancé ou n'est plus en état
                     self.items[classe].remove(item)
                     if self.arme is item :
@@ -258,16 +254,13 @@ class Inventaire:
                     self.controleur.fait_eclore(oeuf,self.possesseur)# /!\ À coder !
 
     def pseudo_debut_tour(self):
-        assert self.controleur is not None
         items:Set[Item] = set()
         for cat_item in [Potion,Parchemin,Cle,Arme,Bouclier,Armure,Haume,Anneau,Projectile,Ingredient] : #On sépare les 'vrais' items des faux.
             items |= self.items[cat_item]
         for item in items :
-            assert isinstance(item,Item)
             item.pseudo_debut_tour()
 
     def fin_tour(self):
-        assert self.controleur is not None
         items:Set[Item] = set()
         for item in [Potion,Parchemin,Cle,Arme,Bouclier,Armure,Haume,Anneau,Projectile,Ingredient] : #On sépare les 'vrais' items des faux.
             items |= self.items[item]
@@ -276,21 +269,26 @@ class Inventaire:
         self.nettoie_item()
 
     def a_parchemin_vierge(self):
-        assert self.controleur is not None
         for parchemin in self.items[Parchemin]:
-            if isinstance(parchemin,Parchemin_vierge):
+            if isinstance(parchemin,Parchemin_vierge) and isinstance(parchemin.action_portee,Impregne) and parchemin.action_portee.magie is None:
                 return True
         return False
+    
+    def get_parchemin_vierge(self):
+        for parchemin in self.items[Parchemin]:
+            if isinstance(parchemin,Parchemin_vierge) and isinstance(parchemin.action_portee,Impregne) and parchemin.action_portee.magie is None:
+                return parchemin
+        return None
 
-    def consomme_parchemin_vierge(self):
-        assert self.controleur is not None
-        for parchemin in self.items[Parchemin]:
-            if isinstance(parchemin,Parchemin_vierge):
-                parchemin.etat = "brisé"
-                return True
-        return False
+    # def consomme_parchemin_vierge(self):
+    #     for parchemin in self.items[Parchemin]:
+    #         if isinstance(parchemin,Parchemin_vierge):
+    #             parchemin.etat = "brisé"
+    #             return True
+    #     return False
 
 # Imports utilisés dans le code (il y en a beaucoup !!!)
+from Jeu.Action.Non_skill import Impregne
 from Jeu.Entitee.Item.Item import Item
 from Jeu.Entitee.Item.Potion.Potion import Potion
 from Jeu.Entitee.Item.Parchemin.Parchemin import Parchemin

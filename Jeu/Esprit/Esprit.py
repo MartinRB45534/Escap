@@ -1215,7 +1215,7 @@ class Esprit :
                     res = "fuite"
             elif comportement == 3 : #La fuite ! Quand les pvs sont bas
                 res = "fuite"
-        if res in ["deplacement","fuite"] and corp.latence <= 0:
+        if res in ["deplacement","fuite"] and (corp.action is None or corp.action.latence <= 0):
             if len(cases) == 1: #Pas de cases libres à proximité, on va essayer d'attaquer pour s'en sortir
                 res = "bloqué"
                 corp.utilise(None)

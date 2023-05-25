@@ -22,7 +22,6 @@ class Mage_gobelin(Attaquant_magique_case,Support,Base_gobelin):
 
     def peut_caster(self):
         skill_magie = self.get_skill_magique()
-        assert skill_magie is not None
         return self.peut_payer(cout_pm_petite_secousse[skill_magie.niveau-1])
 
     def caste(self):
@@ -31,13 +30,12 @@ class Mage_gobelin(Attaquant_magique_case,Support,Base_gobelin):
     def attaque(self,direction):
         self.regarde(direction)
         skill_magie = self.get_skill_magique()
-        assert skill_magie is not None
         if self.peut_payer(cout_pm_poing_magique[skill_magie.niveau-1]): #Quelle est l'attaque magique des gobelins ?
-            self.utilise(Skill_magie)
-            self.set_magie_courante("magie poing magique")
-            self.dir_magie = direction
+            skill_magie.fait(self,self.caste(),direction)
         else:
-            self.utilise(Skill_stomp)
+            skill = trouve_skill(self.classe_principale,Skill_stomp)
+            assert skill is not None
+            self.fait(skill.fait(self,direction))
         self.set_statut("attaque")
 
     def get_offenses(self):
@@ -61,11 +59,12 @@ class Deuxieme_monstre(Mage_gobelin):
         Base_gobelin.__init__(self,controleur,"deuxieme_monstre",niveau,position)
 
     def meurt(self):
-        assert isinstance(self.controleur.joueur,Heros)
-        self.controleur.joueur.magic_kill(self.position)
+        if isinstance(self.controleur.joueur,Heros):
+            self.controleur.joueur.magic_kill(self.position)
         super().meurt()
 
 # Imports utilisés dans le code
 from Jeu.Systeme.Constantes_magies.Magies import cout_pm_petite_secousse, cout_pm_poing_magique
 from Jeu.Systeme.Classe import Skill_magie, Skill_stomp
 from Jeu.Entitee.Agissant.Humain.Heros import Heros
+from Jeu.Systeme.Classe import trouve_skill

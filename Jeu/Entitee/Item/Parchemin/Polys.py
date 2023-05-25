@@ -333,10 +333,10 @@ class Poly_instakill(Poly_de_cours):
         return["Un parchemin de cours","Intitulé : 'BANI807 Instakill'","Qu'est-ce que c'est ?"]
 
 # Imports utilisés dans le code
-from Jeu.Effet.Magie.Magies_soin import Magie_auto_soin, Magie_soin, Magie_soin_de_zone, Magie_resurection, Magie_reanimation_de_zone
-from Jeu.Effet.Magie.Magies_projectiles import Magie_boule_de_feu, Magie_eclair_noir, Magie_fleche_de_glace, Magie_jet_de_mana, Magie_ombre_furtive, Magie_rocher
-from Jeu.Effet.Magie.Magies_enchantement import Magie_enchantement_bombe, Magie_enchantement_absorption, Magie_enchantement_cecite, Magie_enchantement_celerite, Magie_enchantement_confusion, Magie_enchantement_faiblesse, Magie_enchantement_flamme, Magie_enchantement_force, Magie_enchantement_immunite, Magie_enchantement_neige, Magie_enchantement_perte_de_pm, Magie_enchantement_perte_de_pv, Magie_enchantement_poches_trouees, Magie_enchantement_renforcement, Magie_enchantement_rouille, Magie_enchantement_sable, Magie_enchantement_tenebre, Magie_enchantement_vision, Magie_enchantement_vitalite
-from Jeu.Effet.Magie.Magies_economie import Magie_investissement, Magie_explosion_de_mana, Magie_reserve
-from Jeu.Effet.Magie.Magies_attaque.Attaques_corps_a_corps import Magie_laser, Magie_brasier, Magie_avalanche
-from Jeu.Effet.Magie.Magies_attaque.Boosts import Magie_dopage
-from Jeu.Effet.Magie.Magies_diverses import Magie_blizzard, Magie_obscurite, Magie_instakill
+from Jeu.Action.Magie.Magies_soin import Magie_auto_soin, Magie_soin, Magie_soin_de_zone, Magie_resurection, Magie_reanimation_de_zone
+from Jeu.Action.Magie.Magies_projectiles import Magie_boule_de_feu, Magie_eclair_noir, Magie_fleche_de_glace, Magie_jet_de_mana, Magie_ombre_furtive, Magie_rocher
+from Jeu.Action.Magie.Magies_enchantement import Magie_enchantement_bombe, Magie_enchantement_absorption, Magie_enchantement_cecite, Magie_enchantement_celerite, Magie_enchantement_confusion, Magie_enchantement_faiblesse, Magie_enchantement_flamme, Magie_enchantement_force, Magie_enchantement_immunite, Magie_enchantement_neige, Magie_enchantement_perte_de_pm, Magie_enchantement_perte_de_pv, Magie_enchantement_poches_trouees, Magie_enchantement_renforcement, Magie_enchantement_rouille, Magie_enchantement_sable, Magie_enchantement_tenebre, Magie_enchantement_vision, Magie_enchantement_vitalite
+from Jeu.Action.Magie.Magies_economie import Magie_investissement, Magie_explosion_de_mana, Magie_reserve
+from Jeu.Action.Magie.Magies_attaque.Attaques_corps_a_corps import Magie_laser, Magie_brasier, Magie_avalanche
+from Jeu.Action.Magie.Magies_attaque.Boosts import Magie_dopage
+from Jeu.Action.Magie.Magies_diverses import Magie_blizzard, Magie_obscurite, Magie_instakill

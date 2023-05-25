@@ -62,9 +62,8 @@ class Feu(Evenement,Aura_temporaire):
 
     def action(self,case:Case):
         contr = case.controleur
-        occupants = contr.trouve_agissants_courants(case.position)
+        occupants = contr.trouve_agissants_classe_courants(case.position)
         for occupant in occupants :
-            assert isinstance(occupant,Agissant)
             if occupant.esprit != self.responsable.esprit :
                 occupant.subit(self.responsable,self.temps_restant,"proximité",FEU)
         case.code += 2 #0 ou 2, selon que la case a une aura de Feu ou non
@@ -88,9 +87,8 @@ class Feu_permanent(Aura_permanente):
 
     def action(self,case:Case):
         contr = case.controleur
-        occupants = contr.trouve_agissants_courants(case.position)
+        occupants = contr.trouve_agissants_classe_courants(case.position)
         for occupant in occupants :
-            assert isinstance(occupant,Agissant)
             occupant.subit(NoOne(),self.degats,"distance",FEU)
         case.code += 2 #0 ou 2, selon que la case a une aura de Feu ou non
 
@@ -109,8 +107,7 @@ class Glace(One_shot,Aura_temporaire):
         contr = case.controleur
         occupants = contr.trouve_mobiles_courants(case.position)
         for occupant in occupants :
-            assert isinstance(occupant,Agissant)
-            if occupant.esprit != self.responsable.esprit and GLACE not in occupant.immunites :
+            if isinstance(occupant,Item) or (isinstance(occupant, Agissant) and occupant.esprit != self.responsable.esprit and GLACE not in occupant.immunites) :
                 occupant.latence += self.gain_latence
         case.code += 4 #0 ou 4, selon que la case a une aura de Glace ou non
 
@@ -133,8 +130,7 @@ class Glace_permanente(Aura_permanente):
         contr = case.controleur
         occupants = contr.trouve_mobiles_courants(case.position)
         for occupant in occupants :
-            assert isinstance(occupant,Agissant)
-            if GLACE not in occupant.immunites :
+            if  isinstance(occupant,Item) or (isinstance(occupant, Agissant) and GLACE not in occupant.immunites) :
                 occupant.latence += self.gain_latence
         case.code += 4 #0 ou 4, selon que la case a une aura de Glace ou non
 
@@ -249,3 +245,4 @@ class Aura_ombre(One_shot,On_debut_tour):
 from Jeu.Systeme.Constantes_skills.Skills import *
 from Jeu.Constantes import *
 from Jeu.Entitee.Agissant.Agissant import NoOne
+from Jeu.Entitee.Item.Item import Item

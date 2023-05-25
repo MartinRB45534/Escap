@@ -22,7 +22,6 @@ class Shaman_gobelin(Renforceur,Support_lointain,Base_gobelin):
 
     def peut_caster(self):
         skill_magie = self.get_skill_magique()
-        assert skill_magie is not None
         return self.peut_payer(cout_pm_boost[skill_magie.niveau-1])
 
     def caste(self):

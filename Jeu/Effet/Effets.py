@@ -5,5 +5,4 @@ from Jeu.Effet.Effets_mouvement.Deplacements import *
 from Jeu.Effet.Effets_divers import *
 from Jeu.Effet.Effets_protection import *
 from Jeu.Effet.Enchantements import *
-from Jeu.Effet.Magie.Magies import *
 from Jeu.Effet.Sante.Maladies.Maladies import *

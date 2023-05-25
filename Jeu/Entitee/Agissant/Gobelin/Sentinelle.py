@@ -42,8 +42,8 @@ class Premier_monstre(Sentinelle_gobelin):
         Base_gobelin.__init__(self,controleur,"premier_monstre",niveau,position)
 
     def meurt(self):
-        assert isinstance(self.controleur.joueur,Heros)
-        self.controleur.joueur.first_kill(self.position)
+        if isinstance(self.controleur.joueur,Heros):
+            self.controleur.joueur.first_kill(self.position)
         super().meurt()
 
 class Troisieme_monstre(Sentinelle_gobelin):
@@ -52,8 +52,8 @@ class Troisieme_monstre(Sentinelle_gobelin):
         Base_gobelin.__init__(self,controleur,"troisieme_monstre",niveau,position)
 
     def meurt(self):
-        assert isinstance(self.controleur.joueur,Heros)
-        self.controleur.joueur.third_kill()
+        if isinstance(self.controleur.joueur,Heros):
+            self.controleur.joueur.third_kill()
         super().meurt()
 
 # Imports utilises dans le code

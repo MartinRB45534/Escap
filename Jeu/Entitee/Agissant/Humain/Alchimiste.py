@@ -322,7 +322,7 @@ class Alchimiste(PNJ_mage,Attaquant_magique_case,Support,Humain): #Le septième 
         skill = self.get_skill_magique()
         latence,magie = skill.utilise(nom)
         self.latence += latence
-        cout = magie.cout_pm
+        cout = magie.cout
         if self.peut_payer(cout):
             self.controleur.joueur.inventaire.consomme_parchemin_vierge()
             self.paye(cout)

@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from Jeu.Labyrinthe.Structure_spatiale.Position import Position
     from Jeu.Entitee.Agissant.Agissant import Agissant
     from Jeu.Effet.Effet import Effet
-    from Jeu.Effet.Magie.Magie import Magie
+    from Jeu.Action.Magie.Magie import Magie
 
 # Imports des classes parentes
 from Jeu.Entitee.Item.Item import Consommable

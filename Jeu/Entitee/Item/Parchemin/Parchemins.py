@@ -6,6 +6,8 @@ if TYPE_CHECKING:
     from Jeu.Controleur import Controleur
     from Jeu.Labyrinthe.Structure_spatiale.Position import Position
     from Jeu.Entitee.Agissant.Agissant import Agissant
+    from Jeu.Action.Magie.Magie import Magie
+    from Jeu.Action.Action import Action
 
 # Imports des classes parentes
 from Jeu.Entitee.Item.Parchemin.Parchemin import Parchemin
@@ -21,20 +23,27 @@ class Parchemin_purification(Parchemin):
     def get_description(self,observation=0):
         return ["Un parchemin","Soignera poisons et maladies."]
 
+# class Parchemin_impregne(Parchemin):
+#     """Un parchemin imprégné d'une magie."""
+#     def __init__(self,controleur:Controleur,magie:Magie,cout:float,position:Position=ABSENT):
+#         Item.__init__(self,controleur,position)
+#         self.action_portee:Impregne|Magie = magie
+
 class Parchemin_vierge(Parchemin):
     """Un parchemin qui peut être imprégné d'une magie."""
     def __init__(self,controleur:Controleur,position:Position=ABSENT):
-        Parchemin.__init__(self,controleur,Impregnation(),10,position)
+        Item.__init__(self,controleur,position)
+        self.action_portee:Action = Impregne(NoOne(), 0, self)
 
     def get_description(self,observation=0):
         return ["Un parchemin vierge","On peut y appliquer une magie."]
 
-class Parchemin_impregne(Parchemin):
-    """Un parchemin imprégné d'une magie."""
-    def __init__(self,controleur:Controleur,magie:Magie,cout:float,position:Position=ABSENT): #Le cout dépend du niveau du parchemin d'imprégnation
-        Item.__init__(self,controleur,position)
-        self.effet = magie
-        self.cout = cout
+# class Parchemin_impregne(Parchemin):
+#     """Un parchemin imprégné d'une magie."""
+#     def __init__(self,controleur:Controleur,magie:Magie,cout:float,position:Position=ABSENT): #Le cout dépend du niveau du parchemin d'imprégnation
+#         Item.__init__(self,controleur,position)
+#         self.effet = magie
+#         self.cout = cout
 
     # def utilise(self,agissant:Agissant):
     #     if self.etat == "suspens": #On l'a suspendu précédemment, ça devrait être bon maintenant
@@ -86,8 +95,8 @@ class Parchemin_impregne(Parchemin):
     #                 if not reussite :
     #                     magie.miss_fire(agissant)
 
-    def get_description(self,observation=0):
-        return["Un parchemin",f"Imprégné d'une magie ({self.effet.nom})"]
+    # def get_description(self,observation=0):
+    #     return["Un parchemin",f"Imprégné d'une magie ({self.effet.nom})"]
 
 class Parchemin_protection(Parchemin):
     def __init__(self,controleur:Controleur,position:Position=ABSENT):
@@ -97,9 +106,9 @@ class Parchemin_protection(Parchemin):
         return["Un parchemin","Permet de protéger tous ses alliés"]
 
 # Imports utilisés dans le code
-from Jeu.Effet.Magie.Magie import Magie, Magie_cible, Magie_dirigee, Magie_cout, Cible_agissant, Cible_case
+from Jeu.Action.Action import Action
+from Jeu.Action.Non_skill import Impregne
 from Jeu.Effet.Effets_protection import Protection_groupe
-from Jeu.Effet.Effets_divers import Impregnation
 from Jeu.Effet.Sante.Soins import Purification
 from Jeu.Entitee.Item.Item import Item
-from Jeu.Constantes import AGISSANT_PARCHEMIN, CASE_PARCHEMIN, COUT_PARCHEMIN, DIRECTION_PARCHEMIN
+from Jeu.Entitee.Agissant.Agissant import NoOne

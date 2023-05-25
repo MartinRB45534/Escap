@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from Jeu.Controleur import Controleur
     from Jeu.Labyrinthe.Structure_spatiale.Position import Position
     from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
-    from Jeu.Effet.Magie.Magie import Magie
+    from Jeu.Action.Magie.Magie import Magie
     from Jeu.Systeme.Skill_intrasec import Skill_intrasec
     from Jeu.Systeme.Classe import Classe_principale
     from Jeu.Entitee.Agissant.Inventaire import Inventaire
@@ -74,24 +74,11 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
 
         #la direction du regard
         self.dir_regard = HAUT
-
-        self.skill_courant:Optional[Type[Skill_intrasec]] = None
+        self.action:Optional[Action] = None
 
         #Pour lancer des magies
         self.talent = 1
-        self.magie_courante:Optional[Magie] = None
-        self.cible_magie:Optional[Position|Agissant|List[Position]|List[Agissant]] = None
-        self.dir_magie:Optional[Direction] = None
-        self.cout_magie:float = 0
-        self.magie_parchemin:Optional[Magie] = None
-        self.cible_magie_parchemin:Optional[Position|Agissant|List[Position]|List[Agissant]] = None
-        self.dir_magie_parchemin:Optional[Direction] = None
-        self.cout_magie_parchemin:float = 0
-        self.multi = False
-
-        #Pour lancer des projectiles:
-        self.projectile_courant:Optional[Cree_item] = None
-
+        
         self.cadavre = Cadavre(controleur,self)
 
         if stats['magies']:
@@ -114,8 +101,6 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         if stats['special']:
             pass
 
-        self.controleur = controleur
-
     def get_etage_courant(self):
         return int(self.position.lab.split()[1])
 
@@ -132,19 +117,24 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
     def get_impact(self) -> Position:
         return self.position+self.dir_regard
 
-
     # Les actions de l'agissant
     def attaque(self,direction:Direction):
         self.regarde(direction)
-        if self.get_arme() is not None:
-            self.utilise(Skill_attaque)
+        skill = trouve_skill(self.classe_principale,Skill_attaque)
+        arme = self.get_arme()
+        if skill and arme:
+            self.fait(skill.fait(self,direction,arme))
         else:
-            self.utilise(Skill_stomp)
+            skill = trouve_skill(self.classe_principale,Skill_stomp)
+            assert skill is not None
+            self.fait(skill.fait(self,direction))
         self.set_statut("attaque")
 
     def va(self,direction:Direction):
         self.regarde(direction)
-        self.utilise(Skill_deplacement) #La plupart des monstres n'ont pas ce skill !
+        skill = trouve_skill(self.classe_principale,Skill_deplacement)
+        assert skill is not None
+        self.fait(skill.fait(self,direction))
 
     def agit_en_vue(self,defaut = ""): #Par défaut, on n'a pas d'action à distance
         return defaut
@@ -164,8 +154,8 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         else:
             return DIRECTIONS[0]
 
-    def utilise(self,skill:Optional[Type[Skill_intrasec]],force:bool=False):
-        self.skill_courant = skill
+    def fait(self,action:Action,force:bool=False):
+        self.action = action
 
     def regarde(self,direction:Direction,force:bool=False):
         if direction is not None:
@@ -183,12 +173,12 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
     def get_clees(self):
         return self.inventaire.get_clees()
 
-    def get_item_lancer(self):
-        if self.projectile_courant is None : #On lance l'item courant
-            projectile = self.inventaire.get_item_courant()
-        else : #On lance un item qu'on crée
-            projectile = self.projectile_courant.cree_item(self) #Le 'self.projectile_courant' est un créateur de projectile
-        return projectile
+    # def get_item_lancer(self):
+    #     if self.projectile_courant is None : #On lance l'item courant
+    #         projectile = self.inventaire.get_item_courant()
+    #     else : #On lance un item qu'on crée
+    #         projectile = self.projectile_courant.cree_item(self) #Le 'self.projectile_courant' est un créateur de projectile
+    #     return projectile
 
     def insurge(self,offenseur:Agissant,gravite:float,dangerosite:float):
         if offenseur:
@@ -203,12 +193,9 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         return offenses, etat
 
     def peut_voir(self,direction:Direction):
-        assert self.controleur is not None
-        assert self.position is not None
         return self.controleur.case_from_position(self.position)[direction].peut_voir()
 
     def get_aff(self,element:int):
-        assert self.controleur is not None
         affinite = 1
         if element == OMBRE :
             affinite = self.aff_o
@@ -279,7 +266,6 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         return total
 
     def get_total_regen_pv(self):
-        assert self.controleur is not None
         regen_pv = self.regen_pv
         for taux in self.taux_regen_pv.values() :
             regen_pv *= taux
@@ -292,7 +278,6 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         return regen_pv
 
     def get_total_regen_pm(self):
-        assert self.controleur is not None
         regen_pm = self.regen_pm
         for taux in self.taux_regen_pm.values() :
             regen_pm *= taux
@@ -304,7 +289,6 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         return regen_pm
 
     def get_vitesse(self):
-        assert self.controleur is not None
         vitesse = self.vitesse
         for taux in self.taux_vitesse.values() :
             vitesse *= taux
@@ -316,7 +300,6 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         return vitesse
 
     def get_priorite(self):
-        assert self.controleur is not None
         priorite = self.priorite
         for taux in self.taux_priorite.values() :
             priorite *= taux
@@ -369,7 +352,6 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         self.esprit = esprit
 
     def meurt(self):
-        assert self.controleur is not None
         if self.position is None:
             raise ValueError("Un personnage qui n'a pas de position est en train de mourir !")
         self.pv = self.pm = 0
@@ -429,7 +411,6 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         return SKIN_VIDE
 
     def get_skins_vue(self):
-        assert self.controleur is not None
         skins:List[Image] = []
         if self.inventaire.arme is not None:
             skins.append(self.inventaire.arme.get_skin_vue(self.forme))
@@ -459,8 +440,6 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
             if self.pm > self.pm_max:
                 self.pm = self.pm_max
             self.inventaire.debut_tour()
-            if self.latence >= 0:
-                self.latence -= self.get_vitesse()
             # Partie auras à retravailler         /!\ Qu'est-ce que je voulais retravailler là ?
             skills = self.classe_principale.debut_tour()
             for skill in skills :
@@ -496,7 +475,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
 
     # Les agissants agissent, les items projetés se déplacent, éventuellement explosent.
     def on_action(self):
-        self.utilise(None, True) #Si on a de la chance, on pourra jouer plusieurs fois dans le tour ! (Bientôt...)
+        self.action = None #Si on a de la chance, on pourra jouer plusieurs fois dans le tour ! (Bientôt...)
         for effet in self.effets:
             if isinstance(effet,On_action):
                 effet.execute(self) #Principalement les lancements de magies
@@ -515,12 +494,11 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         for attaque in attaques :
             for dopage in dopages:
                 dopage.execute(attaque)
-            attaque.execute(self.controleur) #C'est à dire qu'on attaque autour de nous. On n'en est pas encore à subir.
+            attaque.execute() #C'est à dire qu'on attaque autour de nous. On n'en est pas encore à subir.
 
     # Tout le monde s'est préparé, a placé ses attaques sur les autres, etc. Les cases ont protégé leurs occupants.
 
     def pre_attack(self):
-        assert self.controleur is not None
         #On est visé par plein d'attaques ! Espérons qu'on puisse se protéger.
         attaques:List[Attaque_particulier] = []
         on_attaques:List[On_attack] = []
@@ -623,6 +601,7 @@ class NoOne(Agissant):
             return False
 
 # Imports utilisés dans le code (il y en a beaucoup !!!)
+from Jeu.Action.Attaque import Attaque
 from Jeu.Entitee.Entitee import Entitee
 from Jeu.Systeme.Constantes_stats import CONSTANTES_STATS
 from Jeu.Labyrinthe.Structure_spatiale.Direction import HAUT, DIRECTIONS

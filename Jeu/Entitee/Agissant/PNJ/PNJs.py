@@ -6,7 +6,8 @@ if TYPE_CHECKING:
     from Jeu.Controleur import Controleur
     from Jeu.Labyrinthe.Structure_spatiale.Position import Position
     from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
-    from Jeu.Effet.Magie.Magie import Magie
+    from Jeu.Action.Action import Action
+    from Jeu.Action.Magie.Magie import Magie
     from Jeu.Systeme.Skill_intrasec import Skill_intrasec
     from Jeu.Entitee.Item.Projectile.Projectile import Projectile
 
@@ -130,25 +131,22 @@ class PNJ_mage(PNJ,Mage):
     Un PNJ qui pratique la magie.
     """
 
-    def impregne(self,nom:str):
-        skill = self.get_skill_magique()
-        latence,magie = skill.utilise(nom)
-        self.latence += latence
-        cout = magie.cout_pm
-        if self.peut_payer(cout):
-            self.controleur.joueur.inventaire.consomme_parchemin_vierge()
-            self.paye(cout)
-            parch = Parchemin_impregne(self.controleur,magie,cout//2)
-            self.controleur.ajoute_entitee(parch)
-            self.controleur.joueur.inventaire.ajoute(parch)
-            self.replique = "dialogue-1phrase1.3.1"
-            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"] #La question personnelle est pour quand le joueur veut faire avancer les interractions.
-            if self.controleur.joueur.inventaire.a_parchemin_vierge():
-                self.repliques.append("dialogue-1reponse1.3")
-            self.repliques.append("dialogue-1reponse1.4")
+
+    def impregne(self,nom:str,parch:Parchemin_vierge):
+        if self.controleur.joueur.interlocuteur is self: #Si l'imprégnation est demandée par le joueur
+            if super().impregne(nom,parch):
+                self.replique = "dialogue-1phrase1.3.1"
+                self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"] #La question personnelle est pour quand le joueur veut faire avancer les interractions.
+                if self.controleur.joueur.inventaire.a_parchemin_vierge():
+                    self.repliques.append("dialogue-1reponse1.3")
+                self.repliques.append("dialogue-1reponse1.4")
+                return True
+            else:
+                self.replique = "dialogue-1phrase1.3.1echec"
+                self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.3","dialogue-1reponse1.4"] #La question personnelle est pour quand le joueur veut faire avancer les interractions.
+                return False
         else:
-            self.replique = "dialogue-1phrase1.3.1echec"
-            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.3","dialogue-1reponse1.4"] #La question personnelle est pour quand le joueur veut faire avancer les interractions.
+            return super().impregne(nom,parch)
 
 class PJ(PNJ): #Les PJs sont des PNJs, parce que le mot PNJ est trompeur
     """
@@ -159,7 +157,7 @@ class PJ(PNJ): #Les PJs sont des PNJs, parce que le mot PNJ est trompeur
     def __init__(self, controleur: Controleur, position: Position, identite: str, niveau: int, ID: Optional[int] = None):
         PNJ.__init__(self,controleur, identite, niveau, ID, position)
         self.statut_simule:str = "attente"
-        self.skill_courant_simule:Optional[Type[Skill_intrasec]] = None
+        self.action_simule:Optional[Action] = None
         self.dir_regard_simule:Optional[Direction] = None
         self.attente:int = -1
         self.nouvel_ordre:bool = False
@@ -175,11 +173,11 @@ class PJ(PNJ): #Les PJs sont des PNJs, parce que le mot PNJ est trompeur
             "magies":{},
         }
 
-    def utilise(self, skill:Optional[Type[Skill_intrasec]], force: bool = False):
+    def fait(self, action:Action, force: bool = False):
         if self is self.controleur.joueur and self.attente and not force:
-            self.skill_courant_simule = skill
+            self.action_simule = action
         else:
-            self.skill_courant = skill
+            self.action = action
 
     def regarde(self, direction: Direction, force: bool = False):
         if self is self.controleur.joueur and self.attente and not force:
@@ -217,27 +215,12 @@ class PJ(PNJ): #Les PJs sont des PNJs, parce que le mot PNJ est trompeur
                     break
 
 class PJ_mage(PJ, PNJ_mage):
-    def set_magie_courante(self, magie: Type[Magie], force: bool = False):
-        if self is self.controleur.joueur and self.attente and not force:
-            self.magie_courante_simule = magie
-        else:
-            self.magie_courante = magie
-            
-    def auto_impregne(self,nom:str):
-        skill = self.get_skill_magique()
-        latence,magie = skill.utilise(nom)
-        self.latence += latence
-        cout = magie.cout_pm
-        if self.peut_payer(cout):
-            self.inventaire.consomme_parchemin_vierge()
-            self.paye(cout)
-            parch = Parchemin_impregne(self.controleur,magie,cout//2)
-            self.controleur.ajoute_entitee(parch)
-            self.inventaire.ajoute(parch)
+    pass
 
 # Imports utilisés dans le code
 from Affichage.Skins.Skins import SKIN_STATUT_PAUME, SKIN_STATUT_PERDU, SKIN_STATUT_CHERCHE, SKIN_STATUT_CHEMIN, SKIN_STATUT_PROXIMITE
+from Jeu.Action.Non_skill import Impregne
 from Jeu.Constantes import DIALOGUE, RECETTE
-from Jeu.Entitee.Item.Parchemin.Parchemins import Parchemin_impregne
+from Jeu.Entitee.Item.Parchemin.Parchemins import Parchemin_vierge
 from Jeu.Entitee.Decors.Decors import Ustensile
 from Jeu.Entitee.Decors.Decor import Decors_interactif

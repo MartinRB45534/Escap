@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Optional, List
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from Jeu.Controleur import Controleur
+    from Jeu.Action.Action import Action
     from Jeu.Labyrinthe.Structure_spatiale.Position import Position
     from Jeu.Effet.Effet import Effet
 
@@ -17,7 +18,6 @@ class Entitee:
     def __init__(self,controleur:Controleur, position: Position=ABSENT, ID: Optional[int]=None):
         self.position:Position = position
         self.priorite:float = 0
-        self.latence:float = 0
         self.effets:List[Effet] = []
         self.controleur = controleur
         if ID is None:
@@ -64,12 +64,16 @@ class Non_superposable(Entitee):
 
 class Mobile(Entitee):
     """La classe des entitées qui peuvent se déplacer (par elles-mêmes pour les agissants, en étant lancées pour les items)."""
+    def __init__(self):
+        self.action:Optional[Action] = None
 
     def add_latence(self,latence: float):
-        self.latence += latence
+        if self.action is not None:
+            self.action.latence += latence
 
     def set_latence(self,latence: float):
-        self.latence = latence
+        if self.action is not None:
+            self.action.latence = latence
 
 # Imports utilisés dans le code
 from Jeu.Labyrinthe.Structure_spatiale.Direction import DIRECTIONS

@@ -1,10 +1,14 @@
 from typing import List, Tuple, Type
-from Jeu.Effet.Magie.Magie import Magie
+from Jeu.Action.Magie.Magie import Magie
+from Jeu.Entitee.Agissant.Agissant import Agissant
+from Jeu.Entitee.Item.Equippement.Degainable.Degainable import Arme
 from Affichage.Skins import *
 from Affichage.Skins.Skins import *
 from Jeu.Constantes import *
 from Jeu.Systeme.Constantes_skills.Skills import *
-
+from Jeu.Action.Action import Action
+from Jeu.Action.Attaque import Attaque, Attaque_arme
+from Jeu.Action.Deplacement import Marche, Court
 #Les skills sont la base des actions qui ont lieu dans le jeu (action voulues ou automatiques). Les skills intrasecs sont liés à une classe, et montent de niveau quand la classe monte de niveau.
 
 class Skill_intrasec:
@@ -36,11 +40,20 @@ class Skill_intrasec:
 
     def get_skin(self):
         return SKIN_MYSTERE
+    
+class Actif(Skill_intrasec):
+    """Les skills qui genèrent les actions"""
+    def fait(self) -> Action:
+        """Fait l'action"""
+        raise NotImplementedError
 
-class Skills_offensifs(Skill_intrasec):
+class Skills_offensifs(Actif):
     """La classe des skills qui produisent une attaque."""
+    def fait(self) -> Attaque:
+        """Fait l'attaque"""
+        raise NotImplementedError
 
-class Skills_projectiles(Skill_intrasec):
+class Skills_projectiles(Skill_intrasec): #/!\ Retravailler un jour
     """La classe des skills qui lancent un objet."""
 
     def utilise(self) -> Tuple[float, float, float]:
@@ -62,8 +75,12 @@ class Skills_magiques(Skill_intrasec):
     def menu_magie(self) -> List[Magie]:
         """Renvoie la liste des magies que le skill peut lancer"""
         raise NotImplementedError
+    
+    def fait(self,nom:str,**kwargs) -> Magie:
+        """Fait la magie nommée nom"""
+        return self.magies[nom](**kwargs)
 
-    def utilise(self,nom:str) -> Tuple[int,Magie]:
+    def utilise(self,nom:str) -> Magie:
         """Utilise la magie nommée nom, et renvoie la latence et la magie utilisée"""
         raise NotImplementedError
 
@@ -85,6 +102,12 @@ class Skill_deplacement(Skill_intrasec):
         for i in range(nb_evo):
             self.niveau+=1 #Le niveau augmente
             #Pas d'autre cadeau
+
+    def fait(self,agissant,direction,course=False) -> Marche:
+        """Fait le déplacement"""
+        if course:
+            return Court(agissant,latence_deplacement[self.niveau-1],direction)
+        return Marche(agissant,latence_course[self.niveau-1],direction)
         
     def utilise(self):
         """fonction qui utilise le skill"""

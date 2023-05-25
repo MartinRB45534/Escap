@@ -4,33 +4,26 @@ from typing import TYPE_CHECKING, Optional, List
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from Jeu.Entitee.Entitee import Entitee
-    from Jeu.Entitee.Agissant.Agissant import Agissant, NoOne
+    from Jeu.Entitee.Agissant.Agissant import Agissant
     from Entitee.Item.Projectile.Projectile import Projectile
     from Jeu.Effet.Effet import Effet
     from Jeu.Effet.Effet import Enchantement
     from Jeu.Labyrinthe.Structure_spatiale.Position import Position
     from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
+    from Jeu.Systeme.Classe import Skill_intrasec
 
 # Imports des classes parentes
-from Jeu.Effet.Effet import On_action
+from Jeu.Action.Caste import Caste
+from Jeu.Action.Action_skill import Action_skill
 
-class Magie(On_action):
-    """La classe des magies. Un effet qui s'attache au lanceur le temps de remplir les paramètres, puis se lance avant la phase d'attaque."""
-    nom = "magie"
-    def __init__(self,gain_xp:float,cout_pm:float,latence:float): #Toutes ces caractéristiques sont déterminées par la sous-classe au moment de l'instanciation, en fonction de la magie utilisée et du niveau.
+class Magie(Caste,Action_skill):
+    """La classe des magies. Précédemment un effet."""
+    nom = "magie" # Vraiment utile ?
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float): #Toutes ces caractéristiques sont déterminées par la sous-classe au moment de l'instanciation, en fonction de la magie utilisée et du niveau.
+        super().__init__(agissant, latence)
+        self.skill = skill
         self.gain_xp = gain_xp
-        self.cout_pm = cout_pm
-        self.latence = latence
-        self.phase = "démarrage"
-        self.affiche = True
-
-    def execute(self,lanceur:Agissant):
-        if self.phase == "démarrage":
-            self.action(lanceur)
-            self.termine()
-
-    def miss_fire(self,lanceur:Agissant):
-        lanceur.subit(NoOne(), 20)
+        self.cout = cout_pm
 
     def get_titre(self,observation=0):
         return f"Magie ({type(self)})"
@@ -50,14 +43,6 @@ class Magie_dirigee(Magie) :
         self.temps_dir = temps
         self.direction:Optional[Direction] = None
 
-    def execute(self,lanceur:Agissant):
-        if self.phase == "démarrage":
-            if self.direction is not None:
-                self.action(lanceur)
-            else:
-                self.miss_fire(lanceur)
-            self.termine()
-
 class Magie_cout(Magie):
     """La classe des magies dont le coût peut varier."""
     def __init__(self,temps:float):
@@ -69,27 +54,11 @@ class Magie_cible(Magie) :
         self.temps = temps
         self.cible:Optional[Agissant|Direction|Position|List] = None
 
-    def execute(self,lanceur:Agissant):
-        if self.phase == "démarrage":
-            if self.cible is not None:
-                self.action(lanceur)
-            else:
-                self.miss_fire(lanceur)
-            self.termine()
-
 class Multi_cible(Magie_cible) :
     """La classe des magies qui nécessitent plusieurs cibles."""
     def __init__(self,temps:float):
         self.temps = temps
         self.cible:List[int|Direction|Position] = []
-
-    def execute(self,lanceur:Agissant):
-        if self.phase == "démarrage":
-            if self.cible:
-                self.action(lanceur)
-            else:
-                self.miss_fire(lanceur)
-            self.termine()
 
 class Magie_cible_dirigee(Magie_cible,Magie_dirigee):
     def __init__(self,temps_dir:float,temps:float):
@@ -97,14 +66,6 @@ class Magie_cible_dirigee(Magie_cible,Magie_dirigee):
         self.temps = temps
         self.cible:Optional[int|Direction|Position] = None
         self.direction:Optional[Direction] = None
-
-    def execute(self,lanceur:Agissant):
-        if self.phase == "démarrage":
-            if self.direction is not None and self.cible is not None:
-                self.action(lanceur)
-            else:
-                self.miss_fire(lanceur)
-            self.termine()
 
 class Portee_limitee(Magie_cible) :
     """La classe des magies qui ciblent quelque chose dans la proximité du joueur avec une portée limitée (sinon elles peuvent viser tout ce qui est dans le champ de vision du joueur)."""
@@ -135,8 +96,8 @@ class Cible_case(Magie_cible):
 
 class Invocation(Magie):
     """La classe des magies qui créent une entitée (un agissant pour se battre à vos côtés, un projectile magique pour attaquer les ennemis, un item à utiliser plus tard..."""
-    def __init__(self,gain_xp:float,cout_pm:float,latence:float,entitee:Entitee):
-        Magie.__init__(self,gain_xp,cout_pm,latence)
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,entitee:Entitee):
+        Magie.__init__(self,skill,agissant,gain_xp,cout_pm,latence)
         self.entitee = entitee
 
     def invoque(self):
@@ -144,8 +105,8 @@ class Invocation(Magie):
 
 class Invocation_projectile(Invocation,Magie_dirigee):
     """La classe des magies qui créent une entitée avec un attribut direction."""
-    def __init__(self,gain_xp:float,cout_pm:float,latence:float,temps:float,entitee:Projectile):
-        Magie.__init__(self,gain_xp,cout_pm,latence)
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,temps:float,entitee:Projectile):
+        Magie.__init__(self,skill,agissant,gain_xp,cout_pm,latence)
         Magie_dirigee.__init__(self,temps)
         self.entitee = entitee
 
@@ -154,8 +115,8 @@ class Invocation_projectile(Invocation,Magie_dirigee):
 
 class Creation_effet(Magie):
     """La classe des magies qui créent un effet (un effet sur le long terme, comme les enchantement, ou sur le court terme, comme un boost ou déboost passager)."""
-    def __init__(self,gain_xp:float,cout_pm:float,latence:float,effet:Effet):
-        Magie.__init__(self,gain_xp,cout_pm,latence)
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,effet:Effet):
+        Magie.__init__(self,skill,agissant,gain_xp,cout_pm,latence)
         self.effet = effet
 
     def get_effet(self):
@@ -163,8 +124,8 @@ class Creation_effet(Magie):
 
 class Enchante(Creation_effet):
     """La classe des magies qui créent des enchantements (des effets sur le très, très long terme)."""
-    def __init__(self,gain_xp:float,cout_pm:float,latence:float,enchantement:Enchantement):
-        Magie.__init__(self,gain_xp,cout_pm,latence)
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,enchantement:Enchantement):
+        Magie.__init__(self,skill,agissant,gain_xp,cout_pm,latence)
         self.enchantement = enchantement
 
     def get_enchantement(self):
@@ -172,20 +133,20 @@ class Enchante(Creation_effet):
 
 class Enchante_item(Enchante,Cible_item):
     """La classe des magies qui enchantent un item."""
-    def __init__(self,gain_xp:float,cout_pm:float,latence:float,temps:float,enchantement:Enchantement):
-        Enchante.__init__(self,gain_xp,cout_pm,latence,enchantement)
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,temps:float,enchantement:Enchantement):
+        Enchante.__init__(self,skill,agissant,gain_xp,cout_pm,latence,enchantement)
         Magie_cible.__init__(self,temps)
 
 class Enchante_cases(Enchante,Cible_case,Multi_cible):
     """La classe des magies qui enchantent des cases."""
-    def __init__(self,gain_xp:float,cout_pm:float,latence:float,temps:float,enchantement:Enchantement):
-        Enchante.__init__(self,gain_xp,cout_pm,latence,enchantement)
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,temps:float,enchantement:Enchantement):
+        Enchante.__init__(self,skill,agissant,gain_xp,cout_pm,latence,enchantement)
         Magie_cible.__init__(self,temps)
 
 class Enchante_agissant(Enchante,Cible_agissant):
     """La classe des magies qui enchantent un agissant."""
-    def __init__(self,gain_xp:float,cout_pm:float,latence:float,temps:float,enchantement:Enchantement):
-        Enchante.__init__(self,gain_xp,cout_pm,latence,enchantement)
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,temps:float,enchantement:Enchantement):
+        Enchante.__init__(self,skill,agissant,gain_xp,cout_pm,latence,enchantement)
         Magie_cible.__init__(self,temps)
 
 # Imports utilisés dans le code

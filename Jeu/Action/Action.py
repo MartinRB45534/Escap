@@ -13,7 +13,7 @@ class Action:
     """
     def __init__(self,agissant:Agissant,latence:float):
         self.agissant = agissant # Pour ne pas avoir à repasser l'agissant en paramètre à chaque fois
-        self.latence = 0 # Le temps écoulé depuis le début de l'action
+        self.latence:float = 0 # Le temps écoulé depuis le début de l'action
         self.latence_max = latence # Le temps que l'action doit durer
         self.taux_vitesse = {} # Les taux de vitesse de l'action (impactés par la glace, etc.)
 

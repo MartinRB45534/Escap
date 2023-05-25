@@ -4,24 +4,21 @@ from typing import TYPE_CHECKING
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from Jeu.Entitee.Agissant.Agissant import Agissant
+    from Jeu.Systeme.Classe import Skill_intrasec
 
 # Imports des classes parentes
-from Jeu.Effet.Magie.Magie import Magie_cout
+from Jeu.Action.Magie.Magie import Magie, Magie_cout
 
 class Magie_reserve(Magie_cout):
     """La magie qui fait une réserve de mana."""
     nom = "magie reserve"
-    def __init__(self,niveau:int):
-        self.phase = "démarrage"
-        self.gain_xp = gain_xp_reserve[niveau-1]
-        self.cout_pm = 0
-        self.latence = latence_reserve[niveau-1]
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
+        Magie.__init__(self,skill,agissant,gain_xp_reserve[niveau-1],0,latence_reserve[niveau-1])
         self.niveau = niveau
         self.temps = 100000
-        self.affiche = True
 
-    def action(self,porteur:Agissant):
-        porteur.effets.append(Reserve_mana(self.cout_pm*taux_reserve[self.niveau-1]))
+    def action(self):
+        self.agissant.effets.append(Reserve_mana(self.cout*taux_reserve[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_RESERVE
@@ -35,17 +32,13 @@ class Magie_reserve(Magie_cout):
 class Magie_investissement(Magie_cout):
     """La magie qui crée un investissement."""
     nom = "magie investissement"
-    def __init__(self,niveau:int):
-        self.phase = "démarrage"
-        self.gain_xp = gain_xp_investissement[niveau-1]
-        self.cout_pm = 0
-        self.latence = latence_investissement[niveau-1]
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
+        Magie.__init__(self,skill,agissant,gain_xp_investissement[niveau-1],0,latence_investissement[niveau-1])
         self.niveau = niveau
         self.temps = 100000
-        self.affiche = True
 
-    def action(self,porteur:Agissant):
-        porteur.effets.append(Investissement_mana(duree_investissement[self.niveau-1],self.cout_pm*taux_investissement[self.niveau-1]))
+    def action(self):
+        self.agissant.effets.append(Investissement_mana(duree_investissement[self.niveau-1],self.cout*taux_investissement[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_INVESTISSEMENT
@@ -59,17 +52,13 @@ class Magie_investissement(Magie_cout):
 class Magie_explosion_de_mana(Magie_cout):
     """La magie qui crée une explosion de mana."""
     nom = "magie explosion de mana"
-    def __init__(self,niveau:int):
-        self.phase = "démarrage"
-        self.gain_xp = gain_xp_explosion_de_mana[niveau-1]
-        self.cout_pm = 0
-        self.latence = latence_explosion_de_mana[niveau-1]
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
+        Magie.__init__(self,skill,agissant,gain_xp_explosion_de_mana[niveau-1],0,latence_explosion_de_mana[niveau-1])
         self.niveau = niveau
         self.temps = 100000
-        self.affiche = True
 
-    def action(self,porteur:Agissant):
-        porteur.effets.append(Attaque_magique(porteur,self.cout_pm*taux_degats_explosion_de_mana[self.niveau-1],TERRE,"contact",portee_explosion_de_mana[self.niveau-1]))
+    def action(self):
+        self.agissant.effets.append(Attaque_magique(self.agissant,self.cout*taux_degats_explosion_de_mana[self.niveau-1],TERRE,"contact",portee_explosion_de_mana[self.niveau-1]))
 
     def get_image(self):
         return SKIN_MAGIE_EXPLOSION_DE_MANA

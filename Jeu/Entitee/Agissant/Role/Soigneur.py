@@ -12,7 +12,6 @@ class Soigneur(Mage):
         cibles = []
         skill = type(self.get_skill_magique())
         for corp in self.esprit.corps:
-            assert isinstance(corp,Agissant)
             if corp.etat == "vivant" and corp.pv < corp.pv_max:
                 cibles.append([corp.pv,corp])
         if cibles and self.peut_caster():

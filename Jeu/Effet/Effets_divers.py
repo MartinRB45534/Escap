@@ -6,9 +6,9 @@ if TYPE_CHECKING:
     from Jeu.Entitee.Agissant.Agissant import Agissant
     from Jeu.Entitee.Item.Item import Item
     from Jeu.Labyrinthe.Case import Case
-    from Jeu.Effet.Attaque.Attaque import Attaque
+    from Jeu.Action.Attaque import Attaque
     from Jeu.Labyrinthe.Structure_spatiale.Position import Position
-    from Jeu.Effet.Magie.Magie import Magie
+    from Jeu.Action.Magie.Magie import Magie
 
 # Imports des classes parentes
 from Jeu.Effet.Effet import On_need, One_shot, On_debut_tour, Evenement, Time_limited, On_post_action, On_fin_tour
@@ -106,11 +106,11 @@ class Enseignement(One_shot,On_fin_tour):
         if skill is not None:
             skill.ajoute(self.magie)
 
-class Impregnation(One_shot,On_fin_tour):
-    """Effet qui impregne le parchemin d'une magie."""
-    def __init__(self):
-        self.affiche = False
-        self.phase = "démarrage"
+# class Impregnation(One_shot,On_fin_tour):
+#     """Effet qui impregne le parchemin d'une magie."""
+#     def __init__(self):
+#         self.affiche = False
+#         self.phase = "démarrage"
 
 class Dopage(One_shot,Time_limited):
     """Effet qui "dope" la prochaine attaque du joueur."""
@@ -123,7 +123,7 @@ class Dopage(One_shot,Time_limited):
 
     def action(self,attaque:Attaque):
         if self.phase == "démarrage" :
-            attaque.degats *= self.taux_degats
+            attaque.taux *= self.taux_degats
 
     def get_skin(self):
         return SKIN_DOPAGE

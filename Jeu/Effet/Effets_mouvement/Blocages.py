@@ -112,8 +112,7 @@ class Porte(On_try_through):
 
 class Premiere_porte(Porte):
     def execute(self,mur:Mur,entitee:Entitee):
-        if entitee == 2:
-            assert isinstance(entitee,Heros)
+        if isinstance(entitee,Heros):
             entitee.first_door()
             Premiere_porte.execute = Porte.execute
         Porte.execute(self,mur,entitee)

@@ -301,7 +301,7 @@ from Jeu.Constantes import *
 from Affichage.Skins.Skins import SKIN_TETE_HEROS
 from Jeu.Entitee.Agissant.Agissant import Agissant
 from Jeu.Systeme.Classe import Skill_stomp, Skill_attaque, Skill_magie, Skill_deplacement, Skill_course, Skill_ramasse, Skill_ramasse_light
-from Jeu.Effet.Magie.Magie import Magie, Cible_agissant, Cible_case
+from Jeu.Action.Magie.Magie import Magie, Cible_agissant, Cible_case
 from Jeu.Labyrinthe.Structure_spatiale.Direction import HAUT, DROITE, BAS, GAUCHE
 
 

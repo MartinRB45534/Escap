@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
     from Jeu.Entitee.Agissant.Agissant import Agissant
     from Jeu.Entitee.Entitee import Non_superposable
+    from Jeu.Action.Deplacement import Vole
 
 # Imports des classes parentes
 from Jeu.Entitee.Entitee import Mobile
@@ -21,12 +22,9 @@ class Item(Mobile):
         Entitee.__init__(self,controleur,position,ID)
         self.etat = "intact" #Le niveau l'évacuera s'il n'est plus intact.
         self.priorite = 0 #Pour avoir le droit de la ramasser.
-        # self.porteur:Optional[int] = None #Utilisé ? /!\
+        self.action:Optional[Vole] = None #Utile uniquement quand l'item est lancé. Les items ne peuvent que voler
         self.lanceur:Optional[Agissant] = None
         self.direction:Optional[Direction] = None #Utile uniquement quand l'item se déplace.
-        self.latence:float = 0 #Utile uniquement quand l'item se déplace.
-        self.vitesse:float = 1 #La quantitée soustraite à la latence chaque tour.
-        self.taux_vitesse = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à la vitesse. Correspond aux effets passager sur la vitesse.
         self.poids:float = 10 #Utile uniquement quand l'item est lancé. Détermine le temps qu'il faut à l'agissant pour le lancer et le temps que l'item se déplacera.
         self.frottements:float = 10 #Utile uniquement quand l'item se déplace. Détermine la latence à chaque déplacement.
         self.hauteur:float = 0 #Utile uniquement quand l'item se déplace. Diminue à chaque tour. L'item s'immobilise à 0 (éventuellement déclenche des effets).
@@ -37,12 +35,6 @@ class Item(Mobile):
             return self.direction
         else:
             return DIRECTIONS[0]
-
-    def get_vitesse(self):
-        vitesse = self.vitesse
-        for taux in self.taux_vitesse.values() :
-            vitesse *= taux
-        return vitesse
 
     def heurte_non_superposable(self,non_superposable:Non_superposable):
         for effet in self.effets :
@@ -77,9 +69,8 @@ class Item(Mobile):
             self.arret()
 
     def arret(self):
-        self.latence = 0
-        if "lancementv" in self.taux_vitesse:
-            self.taux_vitesse.pop("lancementv")
+        if self.action is not None:
+            self.action = None
         self.hauteur = 0
 
     #Découvrons le déroulé d'un tour, avec item-kun :
@@ -97,15 +88,13 @@ class Item(Mobile):
     #Les agissants font leurs trucs, le controleur nous déplace, nous heurte (aïe !), tout le monde s'étripe...
     def vole(self):
         #On voooole (si on a été lancé)
-        self.hauteur -= self.poids
-        self.add_latence(self.frottements)
+        if self.action is not None:
+            self.action.execute()
         if self.hauteur <= 0:
             self.atterit()
 
     def fin_tour(self):
         #C'est déjà fini ? Vivement le prochain !
-        if self.hauteur > 0:
-            self.latence -= self.get_vitesse()
         for effet in self.effets:
             if isinstance(effet,On_fin_tour):
                 effet.execute(self) #À condition qu'il y ait un prochain...

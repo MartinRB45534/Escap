@@ -1,6 +1,9 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING, Optional
 
-# Pas d'imports pour les annotations
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Entitee.Item.Parchemin.Parchemins import Parchemin_vierge
 
 # Imports des classes parentes
 from Jeu.Entitee.Agissant.Agissant import Agissant
@@ -26,18 +29,17 @@ class Mage(Agissant):
         assert skill is not None
         return skill
 
-    def auto_impregne(self,nom:str):
+    def impregne(self,nom:str,parch:Parchemin_vierge):
         skill = self.get_skill_magique()
-        latence,magie = skill.utilise(nom)
-        self.latence += latence
-        cout = magie.cout_pm
-        if self.peut_payer(cout):
-            self.inventaire.consomme_parchemin_vierge()
-            self.controleur.unset_phase(AUTO_IMPREGNATION)
-            self.paye(cout)
-            parch = Parchemin_impregne(self.controleur,magie,cout//2)
-            self.controleur.ajoute_entitee(parch)
-            self.inventaire.ajoute(parch)
+        magie = skill.utilise(nom)
+        if isinstance(parch.action_portee,Impregne) and parch.action_portee.magie is None:
+            parch.action_portee.set_magie(magie)
+        else:
+            return False
+        if self.action is not None:
+            self.action.interrompt()
+        self.action = parch.action_portee
+        return True
 
 class Multi_mage(Mage):
     """Les agissants qui lancent des sorts.
@@ -51,5 +53,4 @@ class Multi_mage(Mage):
     
 # Imports utilisés dans le code
 from Jeu.Systeme.Classe import trouve_skill, Skills_magiques
-from Jeu.Entitee.Item.Parchemin.Parchemins import Parchemin_impregne
-from Jeu.Constantes import AUTO_IMPREGNATION
+from Jeu.Action.Non_skill import Impregne

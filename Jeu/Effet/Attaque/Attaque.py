@@ -75,8 +75,10 @@ class Attaque_case(One_shot):
                 if self.autre is None :
                     victime_potentielle.effets.append(Attaque_particulier(self.responsable,self.degats,self.element,self.distance,self.direction))
                 elif self.autre == "piercing":
-                    assert self.taux_autre is not None
-                    victime_potentielle.effets.append(Attaque_percante(self.responsable,self.degats,self.element,self.distance,self.direction,self.taux_autre))
+                    if self.taux_autre is None:
+            self.interrompt()
+        else:
+                        victime_potentielle.effets.append(Attaque_percante(self.responsable,self.degats,self.element,self.distance,self.direction,self.taux_autre))
 
     def execute(self,case):
         if self.phase == "démarrage":
@@ -161,8 +163,7 @@ class Purification_lumineuse(Attaque):
         position = self.responsable.get_position()
         positions_touches = controleur.get_pos_touches(position,self.portee,"C__S___",None,"tout")
         for position_touche in positions_touches:
-            for victime_potentielle in controleur.trouve_agissants_courants(position_touche):
-                assert isinstance(victime_potentielle,Agissant)
+            for victime_potentielle in controleur.trouve_agissants_classe_courants(position_touche):
                 if not "humain" in victime_potentielle.especes:
                     victime_potentielle.pv -= self.degats * victime_potentielle.get_aff(OMBRE)
 

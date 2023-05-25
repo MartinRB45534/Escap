@@ -7,6 +7,7 @@ if TYPE_CHECKING:
     from Jeu.Entitee.Item.Item import Consommable
     from Jeu.Entitee.Item.Potion.Potion import Potion
     from Jeu.Entitee.Item.Parchemin.Parchemin import Parchemin
+    from Jeu.Entitee.Item.Parchemin.Parchemins import Parchemin_vierge
     from Jeu.Effet.Effet import Effet
     from Jeu.Action.Magie.Magie import Magie
 
@@ -80,8 +81,9 @@ class Impregne(Lit,Action_final,Caste_final):
     """
     L'action d'imprégner une magie sur un parchemin.
     """
-    def __init__(self,agissant:Agissant,latence:float,item:Parchemin):
+    def __init__(self,agissant:Agissant,latence:float,item:Parchemin_vierge):
         Lit.__init__(self,agissant,latence,item)
+        self.item:Parchemin_vierge
         self.taux_cout_impregne = 0.5
         self.taux_cout_caste = 0.5
         self.taux_latence_impregne = 0.1
@@ -91,10 +93,15 @@ class Impregne(Lit,Action_final,Caste_final):
     def action(self):
         """L'action est terminée."""
         if self.magie is not None:
-            self.item.action = self.magie # Le parchemin est imprégné de la magie
+            self.item.action_portee = self.magie # Le parchemin est imprégné de la magie
             self.item.etat = "intact"
         else:
             self.interrompt()
+
+    def interrompt(self):
+        """L'action est interrompue."""
+        self.item.etat = "intact"
+        self.magie = None
 
     def set_magie(self,magie:Magie):
         """Définit la magie à imprégner."""
