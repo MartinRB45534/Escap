@@ -9,5 +9,3 @@ latence_secousse = [7,9,9,8,8,8,7,7,7,7]
 degats_secousse = [5,20,30,40,50,60,70,80,90,100]
 
 portee_secousse = [4,6,6,7,7,8,8,9,9,10]
-
-delai_secousse = [4,6,6,6,5,5,5,4,4,3]

@@ -475,7 +475,9 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
 
     # Les agissants agissent, les items projetés se déplacent, éventuellement explosent.
     def on_action(self):
-        self.action = None #Si on a de la chance, on pourra jouer plusieurs fois dans le tour ! (Bientôt...)
+        if self.action is not None:
+            if self.action.execute():
+                self.action = None
         for effet in self.effets:
             if isinstance(effet,On_action):
                 effet.execute(self) #Principalement les lancements de magies

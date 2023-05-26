@@ -483,27 +483,6 @@ class Peureuse(PNJ_mage,Multi_renforceur,Support_lointain,Humain): #La quatrièm
     def get_replique(self,code:str):
         return REPLIQUES_PEUREUSE[code]
 
-    def impregne(self,nom:str):
-
-        skill = self.get_skill_magique()
-        latence,magie = skill.utilise(nom)
-        self.latence += latence
-        cout = magie.cout_pm
-        if self.peut_payer(cout):
-            self.controleur.joueur.inventaire.consomme_parchemin_vierge()
-            self.paye(cout)
-            parch = Parchemin_impregne(self.controleur,magie,cout//2,ABSENT)
-            self.controleur.ajoute_entitee(parch)
-            self.controleur.joueur.inventaire.ajoute(parch)
-            self.replique = "dialogue-1phrase1.3.1"
-            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"] #La question personnelle est pour quand le joueur veut faire avancer les interractions.
-            if self.controleur.joueur.inventaire.a_parchemin_vierge():
-                self.repliques.append("dialogue-1reponse1.3")
-            self.repliques.append("dialogue-1reponse1.4")
-        else:
-            self.replique = "dialogue-1phrase1.3.1echec"
-            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.3","dialogue-1reponse1.4"] #La question personnelle est pour quand le joueur veut faire avancer les interractions.
-
     def get_skin_tete(self):
         return SKIN_TETE_PEUREUSE
 
@@ -515,5 +494,4 @@ from Jeu.Constantes import *
 from Jeu.Systeme.Constantes_magies.Magies import *
 from Affichage.Skins.Skins import SKIN_TETE_PEUREUSE
 from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
-from Jeu.Entitee.Item.Parchemin.Parchemins import Parchemin_impregne
 from Jeu.Dialogues.Dialogues_peureuse import REPLIQUES_PEUREUSE

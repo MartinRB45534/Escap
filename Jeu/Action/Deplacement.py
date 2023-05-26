@@ -64,7 +64,7 @@ class Marche(Deplace,Action_final):
         pass
         # TODO: Ajouter le get_skin
 
-class Court(Marche):
+class Cours(Marche):
     """
     Juste un skin différent.
     """

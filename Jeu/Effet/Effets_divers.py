@@ -70,7 +70,9 @@ class Blizzard(Evenement,On_post_action):
         if self.phase == "en cours":
             occupants = case.controleur.trouve_mobiles_courants(case.position)
             for occupant in occupants :
-                occupant.latence+=self.gain_latence
+                assert isinstance(occupant,Agissant|Item)
+                if occupant.action is not None:
+                    occupant.action.latence -= self.gain_latence
 
     def execute(self,case:Case):
         self.temps_restant -= 1

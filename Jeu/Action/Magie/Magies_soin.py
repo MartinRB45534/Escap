@@ -8,19 +8,15 @@ if TYPE_CHECKING:
     from Jeu.Systeme.Classe import Skill_intrasec
 
 # Imports des classes parentes
-from Jeu.Action.Magie.Magie import Cible_agissant,Cible_case,Portee_limitee,Magie,Multi_cible
+from Jeu.Action.Magie.Magie import Cible_agissant,Cible_case,Portee_limitee,Magie,Cible_agissants
 
 class Magie_soin(Cible_agissant):
     """La magie qui invoque un effet de soin sur un agissant ciblé."""
     nom = "magie soin"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_soin[niveau-1],cout_pm_soin[niveau-1],latence_soin[niveau-1])
-        self.niveau = niveau
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,cible:Optional[Agissant]=None):
+        Magie.__init__(self,skill,agissant,gain_xp_soin[niveau-1],cout_pm_soin[niveau-1],latence_soin[niveau-1],niveau)
+        Cible_agissant.__init__(self,cible)
         self.gain_pv = gain_pv_soin[niveau-1]
-        self.niveau = niveau
-        self.temps = 10000
-        self.cible:Optional[Agissant] = None #Fixée par le controleur
-        self.affiche = True
 
     def action(self,lanceur:Agissant):
         if self.cible is None:
@@ -37,15 +33,13 @@ class Magie_soin(Cible_agissant):
     def get_description(self,observation=0):
         return ["Une magie de soin","Elle affecte un agissant à portée de vue du lanceur.",f"Coût : {self.cout} PMs",f"Soin : {self.gain_pv} PVs",f"Latence : {self.latence}"]
 
-class Magie_multi_soin(Cible_agissant,Multi_cible):
+class Magie_multi_soin(Cible_agissants):
     """La magie qui invoque un effet de soin sur des agissants ciblés."""
     nom = "magie multi soin"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_multi_soin[niveau-1],cout_pm_multi_soin[niveau-1],latence_multi_soin[niveau-1])
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,cible:List[Agissant],niveau:int):
+        Magie.__init__(self,skill,agissant,gain_xp_multi_soin[niveau-1],cout_pm_multi_soin[niveau-1],latence_multi_soin[niveau-1],niveau)
+        Cible_agissants.__init__(self,cible)
         self.gain_pv = gain_pv_multi_soin[niveau-1]
-        self.niveau = niveau
-        self.temps = 10000
-        self.cible:List[Agissant] = [] #Fixée par le controleur
 
     def action(self,lanceur:Agissant):
         for cible in self.cible:
@@ -63,12 +57,10 @@ class Magie_multi_soin(Cible_agissant,Multi_cible):
 class Magie_soin_superieur(Cible_agissant):
     """La magie qui invoque un effet de soin sur un agissant ciblé."""
     nom = "magie_soin_superieur"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_soin_superieur[niveau-1],cout_pm_soin_superieur[niveau-1],latence_soin_superieur[niveau-1])
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,cible:Optional[Agissant]=None):
+        Magie.__init__(self,skill,agissant,gain_xp_soin_superieur[niveau-1],cout_pm_soin_superieur[niveau-1],latence_soin_superieur[niveau-1],niveau)
+        Cible_agissant.__init__(self,cible)
         self.gain_pv = gain_pv_soin_superieur[niveau-1]
-        self.niveau = niveau
-        self.temps = 10000
-        self.cible:Optional[Agissant] = None #Fixée par le controleur
 
     def action(self,lanceur:Agissant):
         if self.cible is None:
@@ -88,13 +80,11 @@ class Magie_soin_superieur(Cible_agissant):
 class Magie_soin_de_zone(Cible_case):
     """La magie qui invoque un effet de soin sur une zone."""
     nom = "magie zone de soin"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_soin_zone[niveau-1],cout_pm_soin_zone[niveau-1],latence_soin_zone[niveau-1])
+    def __init__(self,niveau:int,skill:Skill_intrasec,agissant:Agissant,case:Optional[Position]=None):
+        Magie.__init__(self,skill,agissant,gain_xp_soin_zone[niveau-1],cout_pm_soin_zone[niveau-1],latence_soin_zone[niveau-1],niveau)
+        Cible_case.__init__(self,case)
         self.gain_pv = gain_pv_soin_zone[niveau-1]
         self.portee = portee_soin_zone[niveau-1]
-        self.niveau = niveau
-        self.temps = 10000
-        self.cible:Optional[Position] = None #Fixée par le controleur
 
     def action(self,lanceur:Agissant):
         if self.cible is None:
@@ -117,7 +107,7 @@ class Magie_auto_soin(Magie):
     """La magie qui invoque un effet de soin sur son lanceur."""
     nom = "magie auto soin"
     def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_soin_auto[niveau-1],cout_pm_soin_auto[niveau-1],latence_soin_auto[niveau-1])
+        Magie.__init__(self,skill,agissant,gain_xp_soin_auto[niveau-1],cout_pm_soin_auto[niveau-1],latence_soin_auto[niveau-1],niveau)
         self.gain_pv = gain_pv_soin_auto[niveau-1]
         self.niveau = niveau
 
@@ -139,8 +129,7 @@ class Magie_resurection(Magie):
     """La magie qui invoque un effet de resurection."""
     nom = "magie resurection"
     def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_resurection[niveau-1],cout_pm_resurection[niveau-1],latence_resurection[niveau-1])
-        self.niveau = niveau
+        Magie.__init__(self,skill,agissant,gain_xp_resurection[niveau-1],cout_pm_resurection[niveau-1],latence_resurection[niveau-1],niveau)
 
     def action(self,lanceur:Agissant):
         cadavre = lanceur.inventaire.get_item_courant()
@@ -160,15 +149,13 @@ class Magie_resurection(Magie):
 class Magie_reanimation_de_zone(Cible_case,Portee_limitee):
     """La magie qui invoque un effet de reanimation sur tous les cadavres d'une zone."""
     nom = "magie reanimation"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_reanimation[niveau-1],cout_pm_reanimation[niveau-1],latence_reanimation[niveau-1])
+    def __init__(self,niveau:int,skill:Skill_intrasec,agissant:Agissant,case:Optional[Position]=None):
+        Magie.__init__(self,skill,agissant,gain_xp_reanimation[niveau-1],cout_pm_reanimation[niveau-1],latence_reanimation[niveau-1],niveau)
+        Cible_case.__init__(self,case)
         self.taux_pv = taux_pv_reanimation[niveau-1]
         self.portee = portee_reanimation[niveau-1]
         self.portee_limite = portee_limite_reanimation[niveau-1]
         self.superiorite = superiorite_reanimation[niveau-1]
-        self.niveau = niveau
-        self.temps = 10000
-        self.cible:Optional[Position] = None
 
     def action(self):
         if self.cible is None:

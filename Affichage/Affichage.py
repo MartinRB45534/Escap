@@ -2437,14 +2437,20 @@ class Description_item(Wrapper_knot, Knot_vertical_profondeur_agnostique):
                 elif selection.texte == "Desequiper":
                     self.controleur.joueur.inventaire.desequippe([self.item])
                 elif selection.texte == "Lancer":
-                    skill = trouve_skill(self.controleur.joueur.classe_principale, Skills_projectiles)
-                    assert skill is not None
-                    self.controleur.joueur.utilise(type(skill))
-                    assert isinstance(self.item, Projectile)
-                    self.controleur.joueur.projectile_courant = self.item #/!\ Qu'est-ce qu'est exactement le projectile courant ? /!\
+                    print("Hey, tu as oublié de coder le lancer de projectile !")
+                    # skill = trouve_skill(self.controleur.joueur.classe_principale, Skills_projectiles)
+                    # assert skill is not None
+                    # self.controleur.joueur.utilise(type(skill))
+                    # assert isinstance(self.item, Projectile)
+                    # self.controleur.joueur.projectile_courant = self.item #/!\ Qu'est-ce qu'est exactement le projectile courant ? /!\
                 elif selection.texte == "Boire" or selection.texte == "Utiliser":
                     assert isinstance (self.item, Consommable)
-                    self.item.utilise(self.controleur.joueur)
+                    if isinstance (self.item, Parchemin_vierge):
+                        self.controleur.joueur.fait(self.item.action_portee)
+                    elif isinstance (self.item, Parchemin):
+                        self.controleur.joueur.fait(Lit_effet_initial(self.controleur.joueur, self.item.duree, self.item, self.item.effet))
+                    elif isinstance (self.item, Potion):
+                        self.controleur.joueur.fait(Boit(self.controleur.joueur, self.item.duree, self.item, self.item.effet))
                 elif selection.texte == "Jeter":
                     assert self.controleur.joueur.position is not None
                     self.controleur.joueur.inventaire.drop(self.controleur.joueur.position, self.item)

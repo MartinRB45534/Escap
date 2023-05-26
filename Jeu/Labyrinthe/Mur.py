@@ -64,8 +64,6 @@ class Mur:
             for effet in self.effets :
                 if isinstance(effet,On_through):
                     effet.execute(intrus) #Il est conseillé d'avoir un seul effet de déplacement, comme un seul effet d'autorisation de passage...
-            if isinstance(intrus,Item):
-                intrus.vole()
         elif isinstance(intrus,Item):
             intrus.heurte_mur()
 

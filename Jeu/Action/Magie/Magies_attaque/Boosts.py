@@ -13,8 +13,7 @@ class Magie_dopage(Magie):
     """La magie qui crée un effet de dopage sur l'agissant."""
     nom = "magie dopage"
     def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_dopage[niveau-1],cout_pm_dopage[niveau-1],latence_dopage[niveau-1])
-        self.niveau = niveau
+        Magie.__init__(self,skill,agissant,gain_xp_dopage[niveau-1],cout_pm_dopage[niveau-1],latence_dopage[niveau-1],niveau)
 
     def action(self):
         self.agissant.effets.append(Dopage(self.agissant,taux_dopage[self.niveau-1],duree_dopage[self.niveau-1]))
@@ -31,11 +30,9 @@ class Magie_dopage(Magie):
 class Magie_boost(Cible_agissant):
     """La magie qui crée un effet de dopage sur un autre agissant."""
     nom = "magie boost"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_boost[niveau-1],cout_pm_boost[niveau-1],latence_boost[niveau-1])
-        self.niveau = niveau
-        self.cible:Optional[Agissant] = None
-        self.temps = 10000
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,cible:Optional[Agissant]=None):
+        Magie.__init__(self,skill,agissant,gain_xp_boost[niveau-1],cout_pm_boost[niveau-1],latence_boost[niveau-1],niveau)
+        self.cible:Optional[Agissant] = cible
 
     def action(self):
         if self.cible is None:
@@ -56,10 +53,8 @@ class Magie_multi_boost(Cible_agissant,Multi_cible):
     """La magie qui crée un effet de dopage sur plusieurs autres agissants."""
     nom = "magie multi boost"
     def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_multi_boost[niveau-1],cout_pm_multi_boost[niveau-1],latence_multi_boost[niveau-1])
-        self.niveau = niveau
+        Magie.__init__(self,skill,agissant,gain_xp_multi_boost[niveau-1],cout_pm_multi_boost[niveau-1],latence_multi_boost[niveau-1],niveau)
         self.cible:List[Agissant] = []
-        self.temps = 10000
 
     def action(self):
         for cible in self.cible:

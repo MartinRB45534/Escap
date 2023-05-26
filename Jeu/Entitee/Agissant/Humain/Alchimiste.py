@@ -11,9 +11,10 @@ if TYPE_CHECKING:
 from Jeu.Entitee.Agissant.Humain.Humain import Humain
 from Jeu.Entitee.Agissant.PNJ.PNJs import PNJ_mage
 from Jeu.Entitee.Agissant.Role.Attaquant_magique_case import Attaquant_magique_case
+from Jeu.Entitee.Agissant.Role.Attaquant_magique_poing import Attaquant_magique_poing
 from Jeu.Entitee.Agissant.Role.Support import Support
 
-class Alchimiste(PNJ_mage,Attaquant_magique_case,Support,Humain): #Le septième humain du jeu, à l'étage 6 (un faiseur de potions aux magies diverses)
+class Alchimiste(PNJ_mage,Attaquant_magique_case,Attaquant_magique_poing,Support,Humain): #Le septième humain du jeu, à l'étage 6 (un faiseur de potions aux magies diverses)
     """La classe de l'alchimiste."""
     def __init__(self,controleur:Controleur,position:Position):
 
@@ -51,14 +52,11 @@ class Alchimiste(PNJ_mage,Attaquant_magique_case,Support,Humain): #Le septième 
     def caste(self):
         return "magie secousse"
 
-    def attaque(self,direction:Direction):
-        #Quelle est sa magie de prédilection ? Pour l'instant on va prendre l'avalanche
-        if self.peut_payer(cout_pm_avalanche[self.get_skill_magique().niveau-1]):
-            self.utilise(Skill_magie)
-            self.set_magie_courante("magie poing magique") #/!\
-            self.dir_magie = direction
-        else:
-            self.utilise(Skill_stomp)
+    def peut_frapper(self):
+        return self.peut_payer(cout_pm_avalanche[self.get_skill_magique().niveau-1])
+
+    def frappe(self):
+        return "magie avalanche"
 
     def start_dialogue(self): #On commence un nouveau dialogue !
 
@@ -317,27 +315,22 @@ class Alchimiste(PNJ_mage,Attaquant_magique_case,Support,Humain): #Le septième 
     def get_replique(self,code:str):
         return REPLIQUES_ALCHIMISTE[code]
 
-    def impregne(self,nom:str):
-
-        skill = self.get_skill_magique()
-        latence,magie = skill.utilise(nom)
-        self.latence += latence
-        cout = magie.cout
-        if self.peut_payer(cout):
-            self.controleur.joueur.inventaire.consomme_parchemin_vierge()
-            self.paye(cout)
-            parch = Parchemin_impregne(self.controleur,magie,cout//2,ABSENT)
-            self.controleur.ajoute_entitee(parch)
-            self.controleur.joueur.inventaire.ajoute(parch)
-            self.replique = "dialogue-1phrase1.3.1"
-            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"]
-            if self.controleur.joueur.inventaire.a_parchemin_vierge():
-                self.repliques.append("dialogue-1reponse1.3")
-            self.repliques.append("dialogue-1reponse1.4")
-            self.repliques.append("dialogue-1reponse1.5")
+    def impregne(self,nom:str,parch:Parchemin_vierge):
+        if self.controleur.joueur.interlocuteur is self: #Si l'imprégnation est demandée par le joueur
+            if super().impregne(nom,parch):
+                self.replique = "dialogue-1phrase1.3.1"
+                self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"] #La question personnelle est pour quand le joueur veut faire avancer les interractions.
+                if self.controleur.joueur.inventaire.a_parchemin_vierge():
+                    self.repliques.append("dialogue-1reponse1.3")
+                self.repliques.append("dialogue-1reponse1.4")
+                self.repliques.append("dialogue-1reponse1.5")
+                return True
+            else:
+                self.replique = "dialogue-1phrase1.3.1echec"
+                self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.3","dialogue-1reponse1.4","dialogue-1reponse1.5"] #La question personnelle est pour quand le joueur veut faire avancer les interractions.
+                return False
         else:
-            self.replique = "dialogue-1phrase1.3.1echec"
-            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.3","dialogue-1reponse1.4","dialogue-1reponse1.5"]
+            return super().impregne(nom,parch)
 
     def get_recettes(self):
         return(recettes_alchimie[self.get_skill_alchimie().niveau])
@@ -359,10 +352,10 @@ class Alchimiste(PNJ_mage,Attaquant_magique_case,Support,Humain): #Le septième 
 
 # Imports utilisés dans le code:
 from Jeu.Constantes import *
-from Jeu.Systeme.Classe import trouve_skill, Skill_alchimie, Skill_magie, Skill_stomp
+from Jeu.Systeme.Classe import trouve_skill, Skill_alchimie
 from Jeu.Systeme.Constantes_skills.Skills import *
 from Jeu.Systeme.Constantes_magies.Magies import *
 from Affichage.Skins.Skins import SKIN_TETE_ALCHIMISTE
 from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
-from Jeu.Entitee.Item.Parchemin.Parchemins import Parchemin_vierge, Parchemin_impregne
+from Jeu.Entitee.Item.Parchemin.Parchemins import Parchemin_vierge
 from Jeu.Dialogues.Dialogues_alchimiste import REPLIQUES_ALCHIMISTE

@@ -9,12 +9,13 @@ if TYPE_CHECKING:
 
 # Imports des classes parentes
 from Jeu.Entitee.Agissant.Role.Mage import Mage
+from Jeu.Entitee.Agissant.Role.Attaquant_magique_poing import Attaquant_magique_poing
 from Jeu.Entitee.Agissant.Role.Dps import Dps
 
 # Valeurs par défaut des paramètres
 from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
 
-class Ombriul(Dps,Mage): #/!\ Retravailler l'ombriul pour utiliser les rôles
+class Ombriul(Dps,Attaquant_magique_poing): #/!\ Retravailler l'ombriul pour utiliser les rôles
     """Une créature des ténèbres, non-endémique du labyrinthe."""
     def __init__(self,controleur:Controleur,niveau:int,position:Position=ABSENT):
         Agissant.__init__(self,controleur,"ombriul",niveau,position)
@@ -29,18 +30,12 @@ class Ombriul(Dps,Mage): #/!\ Retravailler l'ombriul pour utiliser les rôles
         else:
             etat = "attaque"
         return offenses, etat
-
-    def attaque(self,direction:Direction):
-        skill = trouve_skill(self.classe_principale,Skills_magiques) #Est-ce qu'il a le même Skill_magie que le joueur ?
-        assert skill is not None
-        self.regarde(direction)
-        if self.peut_payer(cout_pm_poing_sombre[skill.niveau-1]): #Quelle est l'attaque magique des gobelins ?
-            self.utilise(Skill_magie)
-            self.set_magie_courante("magie poing sombre")
-            self.dir_magie = direction
-        else:
-            self.utilise(Skill_stomp)
-        self.set_statut("attaque")
+    
+    def peut_frapper(self):
+        return self.peut_payer(cout_pm_poing_sombre[self.classe_principale.niveau-1])
+    
+    def frappe(self):
+        return "magie poing sombre"
 
     def get_skin(self):
         if self.etat == "vivant":

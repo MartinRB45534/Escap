@@ -31,7 +31,10 @@ class Mage_gobelin(Attaquant_magique_case,Support,Base_gobelin):
         self.regarde(direction)
         skill_magie = self.get_skill_magique()
         if self.peut_payer(cout_pm_poing_magique[skill_magie.niveau-1]): #Quelle est l'attaque magique des gobelins ?
-            skill_magie.fait(self,self.caste(),direction)
+            action = skill_magie.fait("magie poing magique",self)
+            assert isinstance(action,Magie_poing_magique)
+            action.direction = direction
+            self.fait(action)
         else:
             skill = trouve_skill(self.classe_principale,Skill_stomp)
             assert skill is not None
@@ -65,6 +68,7 @@ class Deuxieme_monstre(Mage_gobelin):
 
 # Imports utilisés dans le code
 from Jeu.Systeme.Constantes_magies.Magies import cout_pm_petite_secousse, cout_pm_poing_magique
-from Jeu.Systeme.Classe import Skill_magie, Skill_stomp
+from Jeu.Systeme.Classe import Skill_stomp
+from Jeu.Action.Magie.Magies_attaque.Poings_magiques import Magie_poing_magique
 from Jeu.Entitee.Agissant.Humain.Heros import Heros
 from Jeu.Systeme.Classe import trouve_skill

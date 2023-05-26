@@ -28,9 +28,10 @@ class Shaman_gobelin(Renforceur,Support_lointain,Base_gobelin):
         return "magie boost"
 
     def boost(self,cible):
-        self.utilise(Skill_magie)
-        self.set_magie_courante("magie boost")
-        self.cible_magie = cible
+        action = self.get_skill_magique().fait(self.caste(),self)
+        assert isinstance(action,Magie_boost)
+        action.cible = cible
+        self.fait(action)
 
     def get_offenses(self):
         offenses = self.offenses
@@ -48,4 +49,4 @@ class Shaman_gobelin(Renforceur,Support_lointain,Base_gobelin):
 
 # Imports utilisés dans le code
 from Jeu.Systeme.Constantes_magies.Magies import cout_pm_boost
-from Jeu.Systeme.Classe import Skill_magie
+from Jeu.Action.Magie.Magies_attaque.Boosts import Magie_boost

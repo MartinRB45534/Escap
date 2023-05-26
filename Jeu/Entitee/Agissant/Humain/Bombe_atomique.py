@@ -4,16 +4,16 @@ from typing import TYPE_CHECKING
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from Jeu.Controleur import Controleur
-    from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
     from Jeu.Labyrinthe.Structure_spatiale.Position import Position
 
 # Imports des classes parentes
 from Jeu.Entitee.Agissant.Humain.Humain import Humain
 from Jeu.Entitee.Agissant.PNJ.PNJs import PNJ_mage
 from Jeu.Entitee.Agissant.Role.Attaquant_magique_case import Attaquant_magique_case
+from Jeu.Entitee.Agissant.Role.Attaquant_magique_poing import Attaquant_magique_poing
 from Jeu.Entitee.Agissant.Role.Support import Support
 
-class Bombe_atomique(PNJ_mage,Attaquant_magique_case,Support,Humain): #La neuvième humaine du jeu, à l'étage 8 (une magicienne légèrement aguicheuse)
+class Bombe_atomique(PNJ_mage,Attaquant_magique_case,Attaquant_magique_poing,Support,Humain): #La neuvième humaine du jeu, à l'étage 8 (une magicienne légèrement aguicheuse)
     """La classe de la bombe atomique."""
     def __init__(self,controleur:Controleur,position:Position):
 
@@ -51,15 +51,12 @@ class Bombe_atomique(PNJ_mage,Attaquant_magique_case,Support,Humain): #La neuvi�
 
     def caste(self):
         return "magie volcan"
-
-    def attaque(self,direction:Direction):
-        #Quelle est sa magie de prédilection ? Pour l'instant on va prendre l'avalanche
-        if self.peut_payer(cout_pm_poing_ardent[self.get_skill_magique().niveau-1]):
-            self.utilise(Skill_magie)
-            self.set_magie_courante("magie poing ardent")
-        else:
-            self.utilise(Skill_stomp)
-        self.set_statut("attaque")
+    
+    def peut_frapper(self):
+        return self.peut_payer(cout_pm_poing_ardent[self.get_skill_magique().niveau-1])
+    
+    def frappe(self):
+        return "magie poing ardent"
 
     def start_dialogue(self): #On commence un nouveau dialogue !
 
@@ -215,26 +212,6 @@ class Bombe_atomique(PNJ_mage,Attaquant_magique_case,Support,Humain): #La neuvi�
     def get_replique(self,code:str):
         return REPLIQUES_BOMBE_ATOMIQUE[code]
 
-    def impregne(self,nom:str):
-        skill = self.get_skill_magique()
-        latence,magie = skill.utilise(nom)
-        self.latence += latence
-        cout = magie.cout_pm
-        if self.peut_payer(cout):
-            self.controleur.joueur.inventaire.consomme_parchemin_vierge()
-            self.paye(cout)
-            parch = Parchemin_impregne(self.controleur,magie,cout//2,ABSENT)
-            self.controleur.ajoute_entitee(parch)
-            self.controleur.joueur.inventaire.ajoute(parch)
-            self.replique = "dialogue-1phrase1.3.1"
-            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"]
-            if self.controleur.joueur.inventaire.a_parchemin_vierge():
-                self.repliques.append("dialogue-1reponse1.3")
-            self.repliques.append("dialogue-1reponse1.4")
-        else:
-            self.replique = "dialogue-1phrase1.3.1echec"
-            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.3","dialogue-1reponse1.4"]
-
     def get_skin_tete(self):
         return SKIN_TETE_BOMBE_ATOMIQUE
 
@@ -243,10 +220,6 @@ class Bombe_atomique(PNJ_mage,Attaquant_magique_case,Support,Humain): #La neuvi�
 
 # Imports utilisés dans le code:
 from Jeu.Constantes import *
-from Jeu.Systeme.Classe import Skill_magie, Skill_stomp
-from Jeu.Systeme.Constantes_skills.Skills import *
 from Jeu.Systeme.Constantes_magies.Magies import *
 from Affichage.Skins.Skins import SKIN_TETE_BOMBE_ATOMIQUE
-from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
-from Jeu.Entitee.Item.Parchemin.Parchemins import Parchemin_impregne
 from Jeu.Dialogues.Dialogues_bombe_atomique import REPLIQUES_BOMBE_ATOMIQUE

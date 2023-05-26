@@ -18,7 +18,7 @@ from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
 class Parchemin_purification(Parchemin):
     """Un parchemin qui soigne poisons et maladies."""
     def __init__(self,controleur:Controleur,position:Position=ABSENT):
-        Parchemin.__init__(self,controleur,Purification(),50,position)
+        Parchemin.__init__(self,controleur,Purification(),50,2,position)
 
     def get_description(self,observation=0):
         return ["Un parchemin","Soignera poisons et maladies."]
@@ -100,7 +100,7 @@ class Parchemin_vierge(Parchemin):
 
 class Parchemin_protection(Parchemin):
     def __init__(self,controleur:Controleur,position:Position=ABSENT):
-        Parchemin.__init__(self,controleur,Protection_groupe(500,200),75,position)
+        Parchemin.__init__(self,controleur,Protection_groupe(500,200),75,2,position)
 
     def get_description(self,observation=0):
         return["Un parchemin","Permet de protéger tous ses alliés"]

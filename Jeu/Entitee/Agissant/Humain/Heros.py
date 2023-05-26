@@ -148,7 +148,7 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
         return (self.pv+degats) / self.pv_max <= taux_limite
 
     def debut_tour(self):
-        if self.latence <= 0:
+        if self.action: # /!\ À faire ! /!\
             self.nouvel_ordre = False
         Agissant.debut_tour(self)
         if self.get_etage_courant() > self.highest:
@@ -282,24 +282,23 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
         return Agissant.get_portee_vue(self) + 2 #Petit cadeau, rien que pour le joueur !
 
     def get_impact(self):
-        if self.skill_courant in [Skill_stomp,Skill_attaque]:
-            return Agissant.get_impact(self)
-        elif self.skill_courant == Skill_magie:
-            magie:Magie = self.get_skill_magique().magies[self.magie_courante]
-            if isinstance(magie,Cible_agissant):
-                if isinstance(self.cible_magie,Agissant):
-                    return self.cible_magie.position
-                elif isinstance(self.cible_magie,int):
-                    return self.controleur.agissants[self.cible_magie].position
-            elif isinstance(magie,Cible_case):
-                return self.cible_magie
+        if isinstance(self.action,Action_skill):
+            if self.action.skill in [Skill_stomp,Skill_attaque]:
+                return Agissant.get_impact(self)
+            elif self.action.skill == Skill_magie:
+                assert isinstance(self.action,Magie)
+                if isinstance(self.action,Cible_agissant) and self.action.cible is not None:
+                    return self.action.cible.position
+                elif isinstance(self.action,Cible_case) and self.action.cible is not None:
+                    return self.action.cible
+                return self.position
             return self.position
-        return self.position
 
 # Imports utilisés dans le code:
 from Jeu.Constantes import *
 from Affichage.Skins.Skins import SKIN_TETE_HEROS
 from Jeu.Entitee.Agissant.Agissant import Agissant
+from Jeu.Action.Action_skill import Action_skill
 from Jeu.Systeme.Classe import Skill_stomp, Skill_attaque, Skill_magie, Skill_deplacement, Skill_course, Skill_ramasse, Skill_ramasse_light
 from Jeu.Action.Magie.Magie import Magie, Cible_agissant, Cible_case
 from Jeu.Labyrinthe.Structure_spatiale.Direction import HAUT, DROITE, BAS, GAUCHE

@@ -85,19 +85,6 @@ class Skill_magie(Skill,Skills_magiques):
                     print("Le père Noël s'est trompé...")
             self.niveau+=1
 
-    def ajoute(self,magie):
-        """Focntion qui ajoute une magie. Utilisée lors des montées de niveau ou par le joueur (le joueur peut choisir de nouvelles magies lors de l'évolution de sa classe principale)."""
-        self.magies[magie.nom]=magie #Les magies sont répérées par leur nom
-
-    def utilise(self,nom):
-        if nom in self.magies:
-            magie = self.magies[nom](self.niveau) #Les caractéristiques des magies s'améliorent avec le niveau du skill
-            self.gain_xp = magie.gain_xp + magie.cout_pm*0.1
-            self.xp_new+=self.gain_xp #On gagne de l'xp, mais combien ? 0.1, est-ce assez ? trop ?
-            return magie #On renvoie le temps que prendra l'action, pour savoir combien de temps l'agissant attendra et la magie (il y a plein de types de magies différentes, avec ou sans cible, etc. alors on laisse le controleur et la magie se débrouiller (attention quand même, il y a un risque de misfire ou même de backfire si ces détails de visée et autres ne sont pas réglés à temps)).
-        else:
-            return None
-
 class Skill_essence_magique(Skill):
     """Ce skill permet d'utiliser les PM comme deuxième barre de PV si les PV sont à 0. Inspiré du skill persévérance dans komu desu ga, nanika ? et point de départ de l'une des quatre branches d'évolution du joueur.
        C'est un skill semi-passif, qui s'actionne quand on a des PV négatifs après avoir reçu des dégats (presque comme un sort de soin instantanné automatique)."""
@@ -403,7 +390,7 @@ class Skill_stomp(Skill,Skills_offensifs):
         for i in range(nb_evo):
             self.niveau += 1
 
-    def fait(self,agissant,direction):
+    def fait(self,agissant:Agissant,direction:Direction):
         return Attaque(agissant,latence_stomp[self.niveau-1],self,gain_xp_stomp[self.niveau-1],taux_utilisation_stomp[self.niveau-1],direction,portee_stomp[self.niveau-1])
 
     def utilise(self):

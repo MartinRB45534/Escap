@@ -1218,7 +1218,6 @@ class Esprit :
         if res in ["deplacement","fuite"] and (corp.action is None or corp.action.latence <= 0):
             if len(cases) == 1: #Pas de cases libres à proximité, on va essayer d'attaquer pour s'en sortir
                 res = "bloqué"
-                corp.utilise(None)
                 importance = 0
                 for i in DIRECTIONS:
                     mur:Position|Literal[False] = case.cibles[i][self.resolution]
@@ -1270,7 +1269,6 @@ class Esprit :
         corp.set_statut(res)
 
     def deplace_pnj(self,pnj:PNJ):
-        pnj.utilise(None)
         pnj.statut_pnj = "proximite"
         cible = pnj.position
         if pnj.mouvement == 0: #0 pour aller vers, 1 pour chercher et 2 pour aller au contact
@@ -1376,7 +1374,6 @@ class Esprit :
                     res = "fuite"
                 if len(cases) == 1: #Pas de cases libres à proximité, on va essayer d'attaquer pour s'en sortir
                     res = "bloqué"
-                    pnj.utilise(None)
                     importance = 0
                     for i in DIRECTIONS:
                         mur:Position|Literal[False] = case.cibles[i][self.resolution]

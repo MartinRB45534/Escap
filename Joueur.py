@@ -174,14 +174,10 @@ class Joueur:
 
         #Les agissants méritent leur nom :
         for agissant in self.agissants_courants :
-            while agissant.latence <= 0 and agissant.skill_courant is not None : #Certains peuvent jouer plusieurs fois par tour !
-                self.controleur.fait_agir(agissant)
-                agissant.on_action()
             agissant.on_action() #Pour les magies de parchemins
 
         for item in self.items_courants :
-            while item.hauteur > 0 and item.latence <= 0:
-                self.controleur.fait_voler(item)
+           item.vole()
 
         #On agit sur les actions (principalement des boosts sur les attaques, puis les attaques elles-mêmes sont lancées)
         for agissant in self.agissants_courants :
@@ -294,48 +290,56 @@ class Joueur:
         if "skills" in effets: #La touche est liée à un skill (entre autres)
             skill = touches["skills"].get(mods,{}).get(touche)
             assert isinstance(skill,Type) and issubclass(skill,Skill_intrasec)
-            if skill is not None:
-                self.controleur.joueur.utilise(skill,True)
-                if issubclass(skill,Skills_offensifs): # Les skills qui correspondent à un statut d'attaque
-                    self.controleur.joueur.set_statut("attaque",True)
-                elif issubclass(skill,Skills_projectiles) : # Les skills qui lancent un projectile
-                    projectile_courant = touches["projectiles"].get(touche)
-                    assert isinstance(projectile_courant,Cree_item)
-                    self.controleur.joueur.projectile_courant = projectile_courant
-                    self.controleur.joueur.set_statut("lancer",True)
-                elif issubclass(skill,Skills_magiques) and isinstance(self.controleur.joueur,PJ_mage) : # Les skills qui utilisent de la magie
-                    magie_courante = touches["magies"].get(touche)
-                    assert isinstance(magie_courante,Type) and issubclass(magie_courante,Magie)
-                    self.controleur.joueur.set_magie_courante(magie_courante,True) #self.magie_courante n'est que le nom de la magie
-                    skill_magique = self.controleur.joueur.get_skill_magique()
-                    if not isinstance(skill_magique, skill):
-                        warn("Le skill magique du joueur n'est pas celui attendu.")
-                    magie = skill_magique.magies[self.controleur.joueur.magie_courante](skill_magique.niveau) #Ici on a une magie similaire (juste pour l'initialisation du choix, oubliée après parce que le skill fournira la vrai magie avec utilise())
-                    if isinstance(magie,Magies_offensives):
-                        self.controleur.joueur.set_statut("attaque",True)
-                    #On a éventuellement besoin d'informations supplémentaires sur cette magie
+            kwargs = touches["kwargs"].get(mods,{}).get(touche,{})
+            assert isinstance(kwargs,dict)
+            skill = trouve_skill(self.controleur.joueur.classe_principale,skill)
+            assert isinstance(skill,Actif)
+            action = skill.fait(self.controleur.joueur,**kwargs)
+            self.controleur.joueur.fait(action,True)
+            if isinstance(skill,Skills_offensifs): # Les skills qui correspondent à un statut d'attaque
+                self.controleur.joueur.set_statut("attaque",True)
+            elif isinstance(skill,Skills_projectiles) : # Les skills qui lancent un projectile
+                warn("Les actions de lancer de projectiles ne sont pas encore implémentés")
+                # projectile_courant = touches["projectiles"].get(touche)
+                # assert isinstance(projectile_courant,Cree_item)
+                # self.controleur.joueur.projectile_courant = projectile_courant
+                # self.controleur.joueur.set_statut("lancer",True)
+            elif isinstance(action,Magie) and isinstance(self.controleur.joueur,PJ_mage) : # Les skills qui utilisent de la magie
+                #On a éventuellement besoin d'informations supplémentaires sur cette magie
+                if isinstance(action,Cible_agissant):
                     if self.controleur.joueur.nouvel_ordre:
-                        if isinstance(magie,Cible_agissant):
-                            self.controleur.set_phase(AGISSANT_MAGIE)
-                        if isinstance(magie,Cible_case):
-                            self.controleur.set_phase(CASE_MAGIE)
-                        if isinstance(magie,Magie_cout):
-                            self.controleur.set_phase(COUT_MAGIE)
-                        if isinstance(magie,Magie_dirigee):
-                            self.controleur.set_phase(DIRECTION_MAGIE)
+                        self.controleur.set_phase(AGISSANT_MAGIE)
+                    else:
+                        warn("Occupe-toi des magies répétées !")
+                if isinstance(action,Cible_case):
+                    if self.controleur.joueur.nouvel_ordre:
+                        self.controleur.set_phase(CASE_MAGIE)
+                    else:
+                        warn("Occupe-toi des magies répétées !")
+                if isinstance(action,Magie_cout):
+                    if self.controleur.joueur.nouvel_ordre:
+                        self.controleur.set_phase(COUT_MAGIE)
+                    else:
+                        warn("Occupe-toi des magies répétées !")
+                if isinstance(action,Magie_dirigee):
+                    if self.controleur.joueur.nouvel_ordre:
+                        self.controleur.set_phase(DIRECTION_MAGIE)
+                    else:
+                        warn("Occupe-toi des magies répétées !")
 
     def decontrole(self,touche):
         """Fonction qui désélectionne le skill courant si on en relache la touche"""
         assert self.controleur is not None
 
         if self.controleur.phase == TOUR:
-            if not self.controleur.joueur.nouvel_ordre: #On ne veut pas désélectionner un skill qui n'a pas encore été utilisé au moins une fois
-                for touches_skills in self.controleur.joueur.touches["skills"].values(): #On ne sait pas quels modificateurs étaient actifs lorsque la touche a été pressée
-                    if touches_skills.get(touche) is not None: #La touche relachée est liée à un skill
-                        if touches_skills.get(touche) == self.controleur.joueur.skill_courant: #La touche relachée est celle du skill courant
-                            self.controleur.joueur.set_statut("attente",True)
-                            self.controleur.joueur.utilise(None,True)
-                            self.controleur.joueur.attente = self.parametres["attente"]
+            if isinstance(self.controleur.joueur.action,Action_skill):
+                if not self.controleur.joueur.nouvel_ordre: #On ne veut pas désélectionner un skill qui n'a pas encore été utilisé au moins une fois
+                    for touches_skills in self.controleur.joueur.touches["skills"].values(): #On ne sait pas quels modificateurs étaient actifs lorsque la touche a été pressée
+                        if touches_skills.get(touche) is not None: #La touche relachée est liée à un skill
+                            if touches_skills.get(touche) == self.controleur.joueur.action.skill: #La touche relachée est celle du skill courant
+                                self.controleur.joueur.set_statut("attente",True)
+                                self.controleur.joueur.action.interrompt()
+                                self.controleur.joueur.attente = self.parametres["attente"]
 
     def recontrole(self):
         """La fonction qui réagit aux touches maintenues."""

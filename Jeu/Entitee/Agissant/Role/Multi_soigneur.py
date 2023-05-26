@@ -18,26 +18,34 @@ class Multi_soigneur(Soigneur,Multi_mage):
                 cibles.append([corp.pv,corp])
         if len(cibles) == 1:
             if self.peut_caster():
-                self.utilise(skill)
-                self.set_magie_courante(self.caste())
-                self.cible_magie = cibles[0][-1]
+                new_cibles = sorted(cibles, key=itemgetter(0))
+                skill = self.get_skill_magique()
+                action = skill.fait(self.caste(),self)
+                assert isinstance(action,Cible_agissant)
+                action.cible = new_cibles[0][-1]
+                self.fait(action)
                 defaut = "soin"
                 self.set_statut("soin")
         elif cibles:
             if self.peut_multi_caster():
-                self.utilise(skill)
-                self.set_magie_courante(self.multi_caste())
-                self.cible_magie = [cible[-1] for cible in cibles]
+                skill = self.get_skill_magique()
+                action = skill.fait(self.multi_caste(),self)
+                assert isinstance(action,Cible_agissants)
+                action.cible = [cible[-1] for cible in cibles]
+                self.fait(action)
                 defaut = "soin"
                 self.set_statut("soin")
             elif self.peut_caster():
                 new_cibles = sorted(cibles, key=itemgetter(0))
-                self.utilise(skill)
-                self.set_magie_courante(self.caste())
-                self.cible_magie = new_cibles[0][-1]
+                skill = self.get_skill_magique()
+                action = skill.fait(self.caste(),self)
+                assert isinstance(action,Cible_agissant)
+                action.cible = new_cibles[0][-1]
+                self.fait(action)
                 defaut = "soin"
                 self.set_statut("soin")
         return defaut
 
 # Imports utilisés dans le code
 from operator import itemgetter
+from Jeu.Action.Magie.Magie import Cible_agissant,Cible_agissants

@@ -1078,10 +1078,8 @@ class Affichage_stats_cout_magie(Wrapper_knot, Knot_vertical):
                 self.set_courant(selection)
                 self.cout = selection.cout
             if isinstance(selection, Bouton) and selection.texte == "Confirmer":
-                if self.parchemin:
-                    self.controleur.joueur.cout_magie_parchemin = self.cout
-                else:
-                    self.controleur.joueur.cout_magie = self.cout
+                assert isinstance(self.controleur.joueur.action, Magie_cout)
+                self.controleur.joueur.action.set_cout(self.cout)
                 self.controleur.unset_phase(COUT_MAGIE if self.parchemin else COUT_PARCHEMIN)
             self.set_tailles(self.tailles)
 

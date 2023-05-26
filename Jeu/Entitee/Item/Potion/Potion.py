@@ -16,8 +16,9 @@ from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Potion(Consommable):
     """La classe des consommables qui peuvent se boire (ne requièrent pas de magie pour être activés)."""
-    def __init__(self,controleur:Controleur,effet:Effet,position:Position=ABSENT):
+    def __init__(self,controleur:Controleur,effet:Effet,duree:float=2,position:Position=ABSENT):
         Item.__init__(self,controleur,position)
+        self.duree = duree
         self.effet = effet
 
     # def utilise(self,agissant:Agissant):

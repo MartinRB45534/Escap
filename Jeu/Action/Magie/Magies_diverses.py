@@ -8,14 +8,13 @@ if TYPE_CHECKING:
     from Jeu.Systeme.Classe import Skill_intrasec
 
 # Imports des classes parentes
-from Jeu.Action.Magie.Magie import Magie, Multi_cible, Cible_agissant, Cible_case
+from Jeu.Action.Magie.Magie import Magie, Cible_agissant, Cible_agissants, Cible_cases
 
 class Magie_blizzard(Magie):
     """La magie qui crée un effet de blizzard autour de l'agissant."""
     nom = "magie blizzard"
     def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_blizzard[niveau-1],cout_pm_blizzard[niveau-1],latence_blizzard[niveau-1])
-        self.niveau = niveau
+        Magie.__init__(self,skill,agissant,gain_xp_blizzard[niveau-1],cout_pm_blizzard[niveau-1],latence_blizzard[niveau-1],niveau)
 
     def action(self):
         cases = self.agissant.controleur.get_cases_touches(self.agissant.position,portee_blizzard[self.niveau-1])
@@ -35,8 +34,7 @@ class Magie_obscurite(Magie):
     """La magie qui crée un effet d'obscurite autour de l'agissant."""
     nom = "magie obscurite"
     def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_obscurite[niveau-1],cout_pm_obscurite[niveau-1],latence_obscurite[niveau-1])
-        self.niveau = niveau
+        Magie.__init__(self,skill,agissant,gain_xp_obscurite[niveau-1],cout_pm_obscurite[niveau-1],latence_obscurite[niveau-1],niveau)
 
     def action(self):
         cases = self.agissant.controleur.get_cases_touches(self.agissant.position,portee_obscurite[self.niveau-1])
@@ -55,11 +53,9 @@ class Magie_obscurite(Magie):
 class Magie_instakill(Cible_agissant):
     """La magie qui crée un effet d'instakill sur un agissant."""
     nom = "magie instakill"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_instakill[niveau-1],cout_pm_instakill[niveau-1],latence_instakill[niveau-1])
-        self.niveau = niveau
-        self.cible:Optional[Agissant] = None
-        self.temps = 10000
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,cible:Optional[Agissant]=None):
+        Magie.__init__(self,skill,agissant,gain_xp_instakill[niveau-1],cout_pm_instakill[niveau-1],latence_instakill[niveau-1],niveau)
+        Cible_agissant.__init__(self,cible)
 
     def action(self):
         if self.cible is None:
@@ -76,18 +72,19 @@ class Magie_instakill(Cible_agissant):
     def get_description(self,observation=0):
         return ["Une magie de mort instantannée","Affecte un agissant en vue du lanceur.","L'agissant meurt instantannément. S'il est immortel, ses PVs et ses PMs sont réduits à 0.","Le sort peut échouer si la priorité de l'agissant est trop élevée comparée à celle du lanceur.",f"Coût : {self.cout}",f"Différence de priorité : {superiorite_instakill[self.niveau-1]}",f"Latence : {self.latence}"]
 
-class Magie_protection_sacree(Multi_cible,Cible_agissant):
+class Magie_protection_sacree(Cible_agissants):
     """La magie qui crée un effet de protection sacrée sur des agissants."""
     nom = "magie protection sacrée"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_protection_sacree[niveau-1],cout_pm_protection_sacree[niveau-1],latence_protection_sacree[niveau-1])
-        self.niveau = niveau
-        self.cible:List[Agissant] = []
-        self.temps = 10000
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,cible:List[Agissant],niveau:int):
+        Magie.__init__(self,skill,agissant,gain_xp_protection_sacree[niveau-1],cout_pm_protection_sacree[niveau-1],latence_protection_sacree[niveau-1],niveau)
+        Cible_agissants.__init__(self,cible)
 
     def action(self):
-        for cible in self.cible:
-            cible.effets.append(Protection_sacree(duree_protection_sacree[self.niveau-1],pv_protection_sacree[self.niveau-1])) #Ajouter une direction ?
+        if self.cible == []:
+            self.interrompt()
+        else:
+            for cible in self.cible:
+                cible.effets.append(Protection_sacree(duree_protection_sacree[self.niveau-1],pv_protection_sacree[self.niveau-1])) #Ajouter une direction ?
 
     def get_image(self):
         return SKIN_MAGIE_PROTECTION_SACREE
@@ -98,20 +95,20 @@ class Magie_protection_sacree(Multi_cible,Cible_agissant):
     def get_description(self,observation=0):
         return ["Une magie de protection","Bloque les dégats des attaques entrantes jusqu'à une certaine somme.","Les dégats d'ombre sont plus affectés.",f"Coût : {self.cout}",f"Dégats absorbables : {pv_protection_sacree[self.niveau-1]}",f"Durée : {duree_protection_sacree[self.niveau-1]}",f"Latence : {self.latence}"]
 
-class Magie_teleportation(Multi_cible,Cible_case):
+class Magie_teleportation(Cible_cases):
     """La magie qui téléporte des entitées."""
     nom = "magie téléportation"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_teleportation[niveau-1],cout_pm_teleportation[niveau-1],latence_teleportation[niveau-1])
-        self.niveau = niveau
-        self.niveau = niveau
-        self.cible:List[Position] = []
-        self.temps = 100000
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,cases:List[Position],niveau:int):
+        Magie.__init__(self,skill,agissant,gain_xp_teleportation[niveau-1],cout_pm_teleportation[niveau-1],latence_teleportation[niveau-1],niveau)
+        Cible_cases.__init__(self,cases)
 
     def action(self):
-        for i in range(len(self.cible)):
-            for agissant in self.agissant.controleur.trouve_occupants(self.cible[i]):
-                agissant.effets.append(Teleport(self.cible[i-1]))
+        if self.cible == []:
+            self.interrompt()
+        else:
+            for i in range(len(self.cible)):
+                for agissant in self.agissant.controleur.trouve_occupants(self.cible[i]):
+                    agissant.effets.append(Teleport(self.cible[i-1]))
 
     def get_image(self):
         return SKIN_MAGIE_TELEPORTATION

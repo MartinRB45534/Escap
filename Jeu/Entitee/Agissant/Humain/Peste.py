@@ -12,8 +12,9 @@ from Jeu.Entitee.Agissant.Humain.Humain import Humain
 from Jeu.Entitee.Agissant.PNJ.PNJs import PNJ_mage
 from Jeu.Entitee.Agissant.Role.Multi_soigneur import Multi_soigneur
 from Jeu.Entitee.Agissant.Role.Support_lointain import Support_lointain
+from Jeu.Entitee.Agissant.Role.Attaquant_magique_poing import Attaquant_magique_poing
 
-class Peste(PNJ_mage,Multi_soigneur,Support_lointain,Humain): #La huitième humaine du jeu, à l'étage 7 (une sainte très à cheval sur beaucoup trop de trucs)
+class Peste(PNJ_mage,Multi_soigneur,Attaquant_magique_poing,Support_lointain,Humain): #La huitième humaine du jeu, à l'étage 7 (une sainte très à cheval sur beaucoup trop de trucs)
     """La classe de la peste."""
     def __init__(self,controleur:Controleur,position:Position):
 
@@ -56,15 +57,12 @@ class Peste(PNJ_mage,Multi_soigneur,Support_lointain,Humain): #La huitième huma
 
     def multi_caste(self):
         return "magie multi soin"
-
-    def attaque(self,direction:Direction):
-        #Quelle est sa magie de prédilection ? On lui donne la purification (magie unique qui a plus ou moins un élément de lumière)
-        if self.peut_payer(cout_pm_purification[self.get_skill_magique().niveau-1]):
-            self.utilise(Skill_magie)
-            self.set_magie_courante("magie purification")
-            self.dir_magie = direction
-        else:
-            self.utilise(Skill_stomp)
+    
+    def peut_frapper(self):
+        return self.peut_payer(cout_pm_purification[self.get_skill_magique().niveau-1])
+    
+    def frappe(self):
+        return "magie purification"
 
     def start_dialogue(self): #On commence un nouveau dialogue !
         #On initialise nos attributs
@@ -224,27 +222,6 @@ class Peste(PNJ_mage,Multi_soigneur,Support_lointain,Humain): #La huitième huma
     def get_replique(self,code:str):
         return REPLIQUES_PESTE[code]
 
-    def impregne(self,nom:str):
-
-        skill = self.get_skill_magique()
-        latence,magie = skill.utilise(nom)
-        self.latence += latence
-        cout = magie.cout_pm
-        if self.peut_payer(cout):
-            self.controleur.joueur.inventaire.consomme_parchemin_vierge()
-            self.paye(cout)
-            parch = Parchemin_impregne(self.controleur,magie,cout//2,ABSENT)
-            self.controleur.ajoute_entitee(parch)
-            self.controleur.joueur.inventaire.ajoute(parch)
-            self.replique = "dialogue-1phrase1.3.1"
-            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2"]
-            if self.controleur.joueur.inventaire.a_parchemin_vierge():
-                self.repliques.append("dialogue-1reponse1.3")
-            self.repliques.append("dialogue-1reponse1.4")
-        else:
-            self.replique = "dialogue-1phrase1.3.1echec"
-            self.repliques = ["dialogue-1reponse1.1","dialogue-1reponse1.2","dialogue-1reponse1.3","dialogue-1reponse1.4"]
-
     def get_skin_tete(self):
         return SKIN_TETE_PESTE
 
@@ -253,9 +230,6 @@ class Peste(PNJ_mage,Multi_soigneur,Support_lointain,Humain): #La huitième huma
 
 # Imports utilisés dans le code:
 from Jeu.Constantes import *
-from Jeu.Systeme.Classe import Skill_magie, Skill_stomp
 from Jeu.Systeme.Constantes_magies.Magies import *
 from Affichage.Skins.Skins import SKIN_TETE_PESTE
-from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
-from Jeu.Entitee.Item.Parchemin.Parchemins import Parchemin_impregne
 from Jeu.Dialogues.Dialogues_peste import REPLIQUES_PESTE

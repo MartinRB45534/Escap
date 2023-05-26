@@ -6,9 +6,9 @@ from Affichage.Skins import *
 from Affichage.Skins.Skins import *
 from Jeu.Constantes import *
 from Jeu.Systeme.Constantes_skills.Skills import *
-from Jeu.Action.Action import Action
+from Jeu.Action.Action_skill import Action_skill
 from Jeu.Action.Attaque import Attaque, Attaque_arme
-from Jeu.Action.Deplacement import Marche, Court
+from Jeu.Action.Deplacement import Marche, Cours
 #Les skills sont la base des actions qui ont lieu dans le jeu (action voulues ou automatiques). Les skills intrasecs sont liés à une classe, et montent de niveau quand la classe monte de niveau.
 
 class Skill_intrasec:
@@ -43,13 +43,13 @@ class Skill_intrasec:
     
 class Actif(Skill_intrasec):
     """Les skills qui genèrent les actions"""
-    def fait(self) -> Action:
+    def fait(self,agissant:Agissant) -> Action_skill:
         """Fait l'action"""
         raise NotImplementedError
 
 class Skills_offensifs(Actif):
     """La classe des skills qui produisent une attaque."""
-    def fait(self) -> Attaque:
+    def fait(self,agissant:Agissant) -> Attaque:
         """Fait l'attaque"""
         raise NotImplementedError
 
@@ -76,13 +76,13 @@ class Skills_magiques(Skill_intrasec):
         """Renvoie la liste des magies que le skill peut lancer"""
         raise NotImplementedError
     
-    def fait(self,nom:str,**kwargs) -> Magie:
+    def fait(self,nom:str,agissant:Agissant) -> Magie:
         """Fait la magie nommée nom"""
-        return self.magies[nom](**kwargs)
+        return self.magies[nom](self,agissant,self.niveau)
 
-    def utilise(self,nom:str) -> Magie:
-        """Utilise la magie nommée nom, et renvoie la latence et la magie utilisée"""
-        raise NotImplementedError
+    # def utilise(self,nom:str) -> Magie:
+    #     """Utilise la magie nommée nom, et renvoie la latence et la magie utilisée"""
+    #     raise NotImplementedError
 
 class Skill_debut_tour(Skill_intrasec):
     """La classe des skills appelés au début de chaque tour (principalement les skills d'aura)."""
@@ -106,7 +106,7 @@ class Skill_deplacement(Skill_intrasec):
     def fait(self,agissant,direction,course=False) -> Marche:
         """Fait le déplacement"""
         if course:
-            return Court(agissant,latence_deplacement[self.niveau-1],direction)
+            return Cours(agissant,latence_deplacement[self.niveau-1],direction)
         return Marche(agissant,latence_course[self.niveau-1],direction)
         
     def utilise(self):

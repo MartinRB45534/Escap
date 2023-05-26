@@ -1,7 +1,9 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List, Tuple
 
-# Pas d'imports pour les annotations
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Entitee.Agissant.Agissant import Agissant
 
 # Imports des classes parentes
 from Jeu.Entitee.Agissant.Role.Renforceur import Renforceur
@@ -11,37 +13,44 @@ class Multi_renforceur(Renforceur,Multi_mage):
     """Les agissants qui peuvent booster plusieurs alliés à la fois."""
 
     def agit_en_vue(self,defaut = ""):
-        cibles = []
+        cibles:List[Tuple[float,Agissant]] = []
         skill = type(self.get_skill_magique())
         for corp in self.esprit.corps:
             if corp.statut == "attaque":
-                cibles.append([self.esprit.get_importance(corp.get_impact()),corp])
+                cibles.append((self.esprit.get_importance(corp.get_impact()),corp))
         if len(cibles) == 1:
             if self.peut_caster():
-                self.utilise(skill)
-                self.set_magie_courante(self.caste())
-                self.cible_magie = cibles[0][-1]
-                self.cible_magie.set_statut("attaque boostée")
+                skill = self.get_skill_magique()
+                action = skill.fait(self.caste(),self)
+                assert isinstance(action,Cible_agissant)
+                action.cible = cibles[0][-1]
+                self.fait(action)
+                action.cible.set_statut("attaque boostée")
                 defaut = "soutien"
                 self.set_statut("soutien")
         elif cibles:
             if self.peut_multi_caster():
-                self.utilise(skill)
-                self.set_magie_courante(self.multi_caste())
-                self.cible_magie = [cible[-1] for cible in cibles]
-                for cible in cibles:
-                    cible[-1].set_statut("attaque boostée")
+                skill = self.get_skill_magique()
+                action = skill.fait(self.multi_caste(),self)
+                assert isinstance(action,Cible_agissants)
+                action.cible = [cible[-1] for cible in cibles]
+                self.fait(action)
+                for cible in action.cible:
+                    cible.set_statut("attaque boostée")
                 defaut = "soutien"
                 self.set_statut("soutien")
             elif self.peut_caster():
                 new_cibles = sorted(cibles, key=itemgetter(0))
-                self.utilise(skill)
-                self.set_magie_courante(self.caste())
-                self.cible_magie = new_cibles[0][-1]
-                self.cible_magie.set_statut("attaque boostée")
+                skill = self.get_skill_magique()
+                action = skill.fait(self.caste(),self)
+                assert isinstance(action,Cible_agissant)
+                action.cible = new_cibles[0][-1]
+                self.fait(action)
+                action.cible.set_statut("attaque boostée")
                 defaut = "soutien"
                 self.set_statut("soutien")
         return defaut
 
 # Imports utilisés dans le code
+from Jeu.Action.Magie.Magie import Cible_agissant,Cible_agissants
 from operator import itemgetter

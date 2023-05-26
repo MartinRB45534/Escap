@@ -16,20 +16,22 @@ class Attaquant_magique_case(Mage):
                     cibles.append([self.esprit.ennemis[case.agissant]["importance"],case.case.position])
         if cibles and self.peut_caster():
             new_cibles = sorted(cibles, key=itemgetter(0))
-            self.utilise(Skill_magie)
-            self.set_magie_courante(self.caste())
-            self.cible_magie = new_cibles[-1][-1]
+            skill = self.get_skill_magique()
+            action = skill.fait(self.caste(),self)
+            assert isinstance(action,Cible_case)
+            action.cible = new_cibles[-1][-1]
+            self.fait(action)
             defaut = "attaque"
             self.set_statut("attaque")
         return defaut
 
     def get_impact(self):
-        if self.cible_magie is not None:
-            return self.cible_magie
+        if isinstance(self.action,Cible_case) and self.action.cible is not None:
+            return self.action.cible
         else:
-            return Agissant.get_impact(self)
+            return super().get_impact()
 
 # Imports utilisés dans le code
 from Jeu.Entitee.Agissant.Agissant import Agissant
-from Jeu.Systeme.Classe import Skill_magie
+from Jeu.Action.Magie.Magie import Cible_case
 from operator import itemgetter

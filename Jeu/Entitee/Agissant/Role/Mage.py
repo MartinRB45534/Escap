@@ -16,10 +16,10 @@ class Mage(Agissant):
         return False
 
     def caste(self):
-        return None
+        return ""
     
-    def set_magie_courante(self,magie):
-        self.magie_courante = magie
+    # def set_magie_courante(self,magie):
+    #     self.magie_courante = magie
 
     def get_magies(self):
         return self.get_skill_magique().menu_magie()
@@ -31,7 +31,7 @@ class Mage(Agissant):
 
     def impregne(self,nom:str,parch:Parchemin_vierge):
         skill = self.get_skill_magique()
-        magie = skill.utilise(nom)
+        magie = skill.fait(nom,self)
         if isinstance(parch.action_portee,Impregne) and parch.action_portee.magie is None:
             parch.action_portee.set_magie(magie)
         else:
@@ -49,7 +49,7 @@ class Multi_mage(Mage):
         return False
 
     def multi_caste(self):
-        return None
+        return ""
     
 # Imports utilisés dans le code
 from Jeu.Systeme.Classe import trouve_skill, Skills_magiques

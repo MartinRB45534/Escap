@@ -12,17 +12,8 @@ from Jeu.Action.Magie.Magie import Magie, Enchante_agissant, Enchante_item
 class Magie_enchantement_faiblesse(Enchante_agissant):
     """La magie qui place un enchantement de faiblesse sur un agissant."""
     nom = "magie faiblesse"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_faiblesse[niveau-1],cout_pm_faiblesse[niveau-1],latence_faiblesse[niveau-1])
-        self.niveau = niveau
-        self.cible:Optional[Agissant] = None
-        self.temps = 10000
-
-    def action(self):
-        if self.cible is None:
-            self.interrompt()
-        else:
-            self.cible.effets.append(Enchantement_force(duree_faiblesse[self.niveau-1],gain_force_faiblesse[self.niveau-1]))
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,cible:Optional[Agissant]=None):
+        Enchante_agissant.__init__(self,skill,agissant,gain_xp_faiblesse[niveau-1],cout_pm_faiblesse[niveau-1],latence_faiblesse[niveau-1],Enchantement_force(duree_faiblesse[self.niveau-1],gain_force_faiblesse[self.niveau-1]),cible,niveau)
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_FAIBLESSE
@@ -36,17 +27,8 @@ class Magie_enchantement_faiblesse(Enchante_agissant):
 class Magie_enchantement_cecite(Enchante_agissant):
     """La magie qui place un enchantement de cécité sur un agissant."""
     nom = "magie cecite"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_cecite[niveau-1],cout_pm_cecite[niveau-1],latence_cecite[niveau-1])
-        self.niveau = niveau
-        self.cible:Optional[Agissant] = None
-        self.temps = 10000
-
-    def action(self):
-        if self.cible is None:
-            self.interrompt()
-        else:
-            self.cible.effets.append(Enchantement_vision(duree_cecite[self.niveau-1],gain_vision_cecite[self.niveau-1]))
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,cible:Optional[Agissant]=None):
+        Enchante_agissant.__init__(self,skill,agissant,gain_xp_cecite[niveau-1],cout_pm_cecite[niveau-1],latence_cecite[niveau-1],Enchantement_vision(duree_cecite[self.niveau-1],gain_vision_cecite[self.niveau-1]),cible,niveau)
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_CECITE
@@ -60,17 +42,8 @@ class Magie_enchantement_cecite(Enchante_agissant):
 class Magie_enchantement_perte_de_pv(Enchante_agissant):
     """La magie qui place un enchantement de perte de pv sur un agissant."""
     nom = "magie perte de pv"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_perte_de_pv[niveau-1],cout_pm_perte_de_pv[niveau-1],latence_perte_de_pv[niveau-1])
-        self.niveau = niveau
-        self.cible:Optional[Agissant] = None
-        self.temps = 10000
-
-    def action(self):
-        if self.cible is None:
-            self.interrompt()
-        else:
-            self.cible.effets.append(Enchantement_pv(duree_perte_de_pv[self.niveau-1],gain_pv_perte_de_pv[self.niveau-1]))
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,cible:Optional[Agissant]=None):
+        Enchante_agissant.__init__(self,skill,agissant,gain_xp_perte_de_pv[niveau-1],cout_pm_perte_de_pv[niveau-1],latence_perte_de_pv[niveau-1],Enchantement_pv(duree_perte_de_pv[self.niveau-1],gain_pv_perte_de_pv[self.niveau-1]),cible,niveau)
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_PERTE_DE_PV
@@ -84,17 +57,8 @@ class Magie_enchantement_perte_de_pv(Enchante_agissant):
 class Magie_enchantement_perte_de_pm(Enchante_agissant):
     """La magie qui place un enchantement de perte de pm sur un agissant."""
     nom = "magie perte de pm"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_perte_de_pm[niveau-1],cout_pm_perte_de_pm[niveau-1],latence_perte_de_pm[niveau-1])
-        self.niveau = niveau
-        self.cible:Optional[Agissant] = None
-        self.temps = 10000
-
-    def action(self):
-        if self.cible is None:
-            self.interrompt()
-        else:
-            self.cible.effets.append(Enchantement_pm(duree_perte_de_pm[self.niveau-1],gain_pm_perte_de_pm[self.niveau-1]))
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,cible:Optional[Agissant]=None):
+        Enchante_agissant.__init__(self,skill,agissant,gain_xp_perte_de_pm[niveau-1],cout_pm_perte_de_pm[niveau-1],latence_perte_de_pm[niveau-1],Enchantement_pm(duree_perte_de_pm[self.niveau-1],gain_pm_perte_de_pm[self.niveau-1]),cible,niveau)
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_PERTE_DE_PM
@@ -108,17 +72,8 @@ class Magie_enchantement_perte_de_pm(Enchante_agissant):
 class Magie_enchantement_confusion(Enchante_agissant):
     """La magie qui place un enchantement de confusion sur un agissant."""
     nom = "magie confusion"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_confusion[niveau-1],cout_pm_confusion[niveau-1],latence_confusion[niveau-1])
-        self.niveau = niveau
-        self.cible:Optional[Agissant] = None
-        self.temps = 10000
-
-    def action(self):
-        if self.cible is None:
-            self.interrompt()
-        else:
-            self.cible.effets.append(Enchantement_confusion(duree_confusion[self.niveau-1],taux_erreur_confusion[self.niveau-1]))
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,cible:Optional[Agissant]=None):
+        Enchante_agissant.__init__(self,skill,agissant,gain_xp_confusion[niveau-1],cout_pm_confusion[niveau-1],latence_confusion[niveau-1],Enchantement_confusion(duree_confusion[self.niveau-1],taux_erreur_confusion[self.niveau-1]),cible,niveau)
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_CONFUSION
@@ -132,17 +87,8 @@ class Magie_enchantement_confusion(Enchante_agissant):
 class Magie_enchantement_poches_trouees(Enchante_agissant):
     """La magie qui place un enchantement de poches trouees sur un agissant."""
     nom = "magie poches trouees"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_poches_trouees[niveau-1],cout_pm_poches_trouees[niveau-1],latence_poches_trouees[niveau-1])
-        self.niveau = niveau
-        self.cible:Optional[Agissant] = None
-        self.temps = 10000
-
-    def action(self):
-        if self.cible is None:
-            self.interrompt()
-        else:
-            self.cible.effets.append(Enchantement_poches_trouees(duree_poches_trouees[self.niveau-1],taux_drop_poches_trouees[self.niveau-1]))
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,cible:Optional[Agissant]=None):
+        Enchante_agissant.__init__(self,skill,agissant,gain_xp_poches_trouees[niveau-1],cout_pm_poches_trouees[niveau-1],latence_poches_trouees[niveau-1],Enchantement_poches_trouees(duree_poches_trouees[self.niveau-1],taux_drop_poches_trouees[self.niveau-1]),cible,niveau)
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_POCHES_TROUEES
@@ -156,17 +102,8 @@ class Magie_enchantement_poches_trouees(Enchante_agissant):
 class Magie_enchantement_force(Enchante_agissant):
     """La magie qui place un enchantement de force sur un agissant."""
     nom = "magie force"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_force[niveau-1],cout_pm_force[niveau-1],latence_force[niveau-1])
-        self.niveau = niveau
-        self.cible:Optional[Agissant] = None
-        self.temps = 10000
-
-    def action(self):
-        if self.cible is None:
-            self.interrompt()
-        else:
-            self.cible.effets.append(Enchantement_force(duree_force[self.niveau-1],gain_force[self.niveau-1]))
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,cible:Optional[Agissant]=None):
+        Enchante_agissant.__init__(self,skill,agissant,gain_xp_force[niveau-1],cout_pm_force[niveau-1],latence_force[niveau-1],Enchantement_force(duree_force[self.niveau-1],gain_force[self.niveau-1]),cible,niveau)
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_FORCE
@@ -180,17 +117,8 @@ class Magie_enchantement_force(Enchante_agissant):
 class Magie_enchantement_vision(Enchante_agissant):
     """La magie qui place un enchantement de vision sur un agissant."""
     nom = "magie vision"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_vision[niveau-1],cout_pm_vision[niveau-1],latence_vision[niveau-1])
-        self.niveau = niveau
-        self.cible:Optional[Agissant] = None
-        self.temps = 10000
-
-    def action(self):
-        if self.cible is None:
-            self.interrompt()
-        else:
-            self.cible.effets.append(Enchantement_vision(duree_vision[self.niveau-1],gain_vision[self.niveau-1]))
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,cible:Optional[Agissant]=None):
+        Enchante_agissant.__init__(self,skill,agissant,gain_xp_vision[niveau-1],cout_pm_vision[niveau-1],latence_vision[niveau-1],Enchantement_vision(duree_vision[self.niveau-1],gain_vision[self.niveau-1]),cible,niveau)
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_VISION
@@ -204,17 +132,8 @@ class Magie_enchantement_vision(Enchante_agissant):
 class Magie_enchantement_vitalite(Enchante_agissant):
     """La magie qui place un enchantement de vitalité sur un agissant."""
     nom = "magie vitalite"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_vitalite[niveau-1],cout_pm_vitalite[niveau-1],latence_vitalite[niveau-1])
-        self.niveau = niveau
-        self.cible:Optional[Agissant] = None
-        self.temps = 10000
-
-    def action(self):
-        if self.cible is None:
-            self.interrompt()
-        else:
-            self.cible.effets.append(Enchantement_pv(duree_vitalite[self.niveau-1],gain_pv_vitalite[self.niveau-1]))
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,cible:Optional[Agissant]=None):
+        Enchante_agissant.__init__(self,skill,agissant,gain_xp_vitalite[niveau-1],cout_pm_vitalite[niveau-1],latence_vitalite[niveau-1],Enchantement_pv(duree_vitalite[self.niveau-1],gain_pv_vitalite[self.niveau-1]),cible,niveau)
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_VITALITE
@@ -228,17 +147,8 @@ class Magie_enchantement_vitalite(Enchante_agissant):
 class Magie_enchantement_absorption(Enchante_agissant):
     """La magie qui place un enchantement d'absorption sur un agissant."""
     nom = "magie absorption"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_absorption[niveau-1],cout_pm_absorption[niveau-1],latence_absorption[niveau-1])
-        self.niveau = niveau
-        self.cible:Optional[Agissant] = None
-        self.temps = 10000
-
-    def action(self):
-        if self.cible is None:
-            self.interrompt()
-        else:
-            self.cible.effets.append(Enchantement_pm(duree_absorption[self.niveau-1],gain_pm_absorption[self.niveau-1]))
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,cible:Optional[Agissant]=None):
+        Enchante_agissant.__init__(self,skill,agissant,gain_xp_absorption[niveau-1],cout_pm_absorption[niveau-1],latence_absorption[niveau-1],Enchantement_pm(duree_absorption[self.niveau-1],gain_pm_absorption[self.niveau-1]),cible,niveau)
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_ABSORPTION
@@ -252,17 +162,8 @@ class Magie_enchantement_absorption(Enchante_agissant):
 class Magie_enchantement_celerite(Enchante_agissant):
     """La magie qui place un enchantement de célérité sur un agissant."""
     nom = "magie celerite"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_celerite[niveau-1],cout_pm_celerite[niveau-1],latence_celerite[niveau-1])
-        self.niveau = niveau
-        self.cible:Optional[Agissant] = None
-        self.temps = 10000
-
-    def action(self):
-        if self.cible is None:
-            self.interrompt()
-        else:
-            self.cible.effets.append(Enchantement_vitesse(duree_celerite[self.niveau-1],gain_vitesse_celerite[self.niveau-1]))
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,cible:Optional[Agissant]=None):
+        Enchante_agissant.__init__(self,skill,agissant,gain_xp_celerite[niveau-1],cout_pm_celerite[niveau-1],latence_celerite[niveau-1],Enchantement_vitesse(duree_celerite[self.niveau-1],gain_vitesse_celerite[self.niveau-1]),cible,niveau)
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_CELERITE
@@ -276,17 +177,8 @@ class Magie_enchantement_celerite(Enchante_agissant):
 class Magie_enchantement_immunite(Enchante_agissant):
     """La magie qui place un enchantement d'immunité sur un agissant."""
     nom = "magie immunite"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_immunite[niveau-1],cout_pm_immunite[niveau-1],latence_immunite[niveau-1])
-        self.niveau = niveau
-        self.cible:Optional[Agissant] = None
-        self.temps = 10000
-
-    def action(self):
-        if self.cible is None:
-            self.interrompt()
-        else:
-            self.cible.effets.append(Enchantement_immunite(duree_immunite[self.niveau-1],superiorite_immunite[self.niveau-1]))
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,cible:Optional[Agissant]=None):
+        Enchante_agissant.__init__(self,skill,agissant,gain_xp_immunite[niveau-1],cout_pm_immunite[niveau-1],latence_immunite[niveau-1],Enchantement_immunite(duree_immunite[self.niveau-1],superiorite_immunite[self.niveau-1]),cible,niveau)
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_IMMUNITE
@@ -300,17 +192,8 @@ class Magie_enchantement_immunite(Enchante_agissant):
 class Magie_enchantement_flamme(Enchante_agissant):
     """La magie qui place un enchantement de flamme sur un agissant."""
     nom = "magie flamme"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_flamme[niveau-1],cout_pm_flamme[niveau-1],latence_flamme[niveau-1])
-        self.niveau = niveau
-        self.cible:Optional[Agissant] = None
-        self.temps = 10000
-
-    def action(self):
-        if self.cible is None:
-            self.interrompt()
-        else:
-            self.cible.effets.append(Enchantement_flamme(duree_flamme[self.niveau-1],gain_affinite_flamme[self.niveau-1]))
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,cible:Optional[Agissant]=None):
+        Enchante_agissant.__init__(self,skill,agissant,gain_xp_flamme[niveau-1],cout_pm_flamme[niveau-1],latence_flamme[niveau-1],Enchantement_flamme(duree_flamme[self.niveau-1],gain_affinite_flamme[self.niveau-1]),cible,niveau)
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_FLAMME
@@ -324,17 +207,8 @@ class Magie_enchantement_flamme(Enchante_agissant):
 class Magie_enchantement_neige(Enchante_agissant):
     """La magie qui place un enchantement de neige sur un agissant."""
     nom = "magie neige"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_neige[niveau-1],cout_pm_neige[niveau-1],latence_neige[niveau-1])
-        self.niveau = niveau
-        self.cible:Optional[Agissant] = None
-        self.temps = 10000
-
-    def action(self):
-        if self.cible is None:
-            self.interrompt()
-        else:
-            self.cible.effets.append(Enchantement_neige(duree_neige[self.niveau-1],gain_affinite_neige[self.niveau-1]))
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,cible:Optional[Agissant]=None):
+        Enchante_agissant.__init__(self,skill,agissant,gain_xp_neige[niveau-1],cout_pm_neige[niveau-1],latence_neige[niveau-1],Enchantement_neige(duree_neige[self.niveau-1],gain_affinite_neige[self.niveau-1]),cible,niveau)
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_NEIGE
@@ -348,17 +222,8 @@ class Magie_enchantement_neige(Enchante_agissant):
 class Magie_enchantement_sable(Enchante_agissant):
     """La magie qui place un enchantement de sable sur un agissant."""
     nom = "magie sable"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_sable[niveau-1],cout_pm_sable[niveau-1],latence_sable[niveau-1])
-        self.niveau = niveau
-        self.cible:Optional[Agissant] = None
-        self.temps = 10000
-
-    def action(self):
-        if self.cible is None:
-            self.interrompt()
-        else:
-            self.cible.effets.append(Enchantement_sable(duree_sable[self.niveau-1],gain_affinite_sable[self.niveau-1]))
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,cible:Optional[Agissant]=None):
+        Enchante_agissant.__init__(self,skill,agissant,gain_xp_sable[niveau-1],cout_pm_sable[niveau-1],latence_sable[niveau-1],Enchantement_sable(duree_sable[self.niveau-1],gain_affinite_sable[self.niveau-1]),cible,niveau)
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_SABLE
@@ -372,17 +237,8 @@ class Magie_enchantement_sable(Enchante_agissant):
 class Magie_enchantement_tenebre(Enchante_agissant):
     """La magie qui place un enchantement de ténèbre sur un agissant."""
     nom = "magie tenebre"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_tenebre[niveau-1],cout_pm_tenebre[niveau-1],latence_tenebre[niveau-1])
-        self.niveau = niveau
-        self.cible:Optional[Agissant] = None
-        self.temps = 10000
-
-    def action(self):
-        if self.cible is None:
-            self.interrompt()
-        else:
-            self.cible.effets.append(Enchantement_tenebre(duree_tenebre[self.niveau-1],gain_affinite_tenebre[self.niveau-1]))
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,cible:Optional[Agissant]=None):
+        Enchante_agissant.__init__(self,skill,agissant,gain_xp_tenebre[niveau-1],cout_pm_tenebre[niveau-1],latence_tenebre[niveau-1],Enchantement_tenebre(duree_tenebre[self.niveau-1],gain_affinite_tenebre[self.niveau-1]),cible,niveau)
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_TENEBRE
@@ -396,17 +252,8 @@ class Magie_enchantement_tenebre(Enchante_agissant):
 class Magie_enchantement_rouille(Enchante_item): #Il faudrait cibler un item visible, équippé par un agissant proche
     """La magie qui place un enchantement de rouille sur un item."""
     nom = "magie rouille"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_rouille[niveau-1],cout_pm_rouille[niveau-1],latence_rouille[niveau-1])
-        self.niveau = niveau
-        self.cible:Optional[Item] = None
-        self.temps = 10000
-
-    def action(self):
-        if self.cible is None:
-            self.interrompt()
-        else:
-            self.cible.effets.append(Enchantement_arme(duree_rouille[self.niveau-1],gain_force_rouille[self.niveau-1],gain_portee_rouille[self.niveau-1])) #Comment affecter aussi les autres types d'équippement ?
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,cible:Optional[Item]=None):
+        Enchante_item.__init__(self,skill,agissant,gain_xp_rouille[niveau-1],cout_pm_rouille[niveau-1],latence_rouille[niveau-1],Enchantement_arme(duree_rouille[self.niveau-1],gain_force_rouille[self.niveau-1],gain_portee_rouille[self.niveau-1]),cible,niveau) #Comment affecter aussi les autres types d'équippement ?
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_ROUILLE
@@ -420,17 +267,8 @@ class Magie_enchantement_rouille(Enchante_item): #Il faudrait cibler un item vis
 class Magie_enchantement_renforcement(Enchante_item):
     """La magie qui place un enchantement de renforcement sur un item."""
     nom = "magie renforcement"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_renforcement[niveau-1],cout_pm_renforcement[niveau-1],latence_renforcement[niveau-1])
-        self.niveau = niveau
-        self.cible:Optional[Item] = None
-        self.temps = 10000
-
-    def action(self):
-        if self.cible is None:
-            self.interrompt()
-        else:
-            self.cible.effets.append(Enchantement_arme(duree_renforcement[self.niveau-1],gain_force_renforcement[self.niveau-1],gain_portee_renforcement[self.niveau-1]))
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,cible:Optional[Item]=None):
+        Enchante_item.__init__(self,skill,agissant,gain_xp_renforcement[niveau-1],cout_pm_renforcement[niveau-1],latence_renforcement[niveau-1],Enchantement_arme(duree_renforcement[self.niveau-1],gain_force_renforcement[self.niveau-1],gain_portee_renforcement[self.niveau-1]),cible,niveau)
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_RENFORCEMENT
@@ -444,17 +282,8 @@ class Magie_enchantement_renforcement(Enchante_item):
 class Magie_enchantement_bombe(Enchante_item):
     """La magie qui place un enchantement de bombe sur un item."""
     nom = "magie bombe"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp_bombe[niveau-1],cout_pm_bombe[niveau-1],latence_bombe[niveau-1])
-        self.niveau = niveau
-        self.cible:Optional[Item] = None
-        self.temps = 10000
-
-    def action(self):
-        if self.cible is None:
-            self.interrompt()
-        else:
-            self.cible.effets.append(Enchantement_bombe(duree_bombe[self.niveau-1],On_hit(portee_bombe[self.niveau-1],degats_bombe[self.niveau-1])))
+    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,cible:Optional[Item]=None):
+        Enchante_item.__init__(self,skill,agissant,gain_xp_bombe[niveau-1],cout_pm_bombe[niveau-1],latence_bombe[niveau-1],Enchantement_bombe(duree_bombe[self.niveau-1],On_hit(portee_bombe[self.niveau-1],degats_bombe[self.niveau-1])),cible,niveau)
 
     def get_image(self):
         return SKIN_MAGIE_ENCHANTEMENT_BOMBE
