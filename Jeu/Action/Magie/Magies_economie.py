@@ -13,7 +13,7 @@ from Jeu.Action.Magie.Magies_attaque.Attaques_corps_a_corps import Magie_attaque
 class Magie_reserve(Magie_cout):
     """La magie qui fait une réserve de mana."""
     nom = "magie reserve"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
+    def __init__(self,skill:Actif,agissant:Agissant,niveau:int):
         Magie.__init__(self,skill,agissant,gain_xp_reserve[niveau-1],0,latence_reserve[niveau-1],niveau)
 
     def action(self):
@@ -31,7 +31,7 @@ class Magie_reserve(Magie_cout):
 class Magie_investissement(Magie_cout):
     """La magie qui crée un investissement."""
     nom = "magie investissement"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
+    def __init__(self,skill:Actif,agissant:Agissant,niveau:int):
         Magie.__init__(self,skill,agissant,gain_xp_investissement[niveau-1],0,latence_investissement[niveau-1],niveau)
 
     def action(self):
@@ -49,7 +49,7 @@ class Magie_investissement(Magie_cout):
 class Magie_explosion_de_mana(Magie_cout,Magie_attaque_corp_a_corp):
     """La magie qui crée une explosion de mana."""
     nom = "magie explosion de mana"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
+    def __init__(self,skill:Actif,agissant:Agissant,niveau:int):
         Magie_attaque_corp_a_corp.__init__(self,skill,agissant,gain_xp_explosion_de_mana[niveau-1],0,portee_explosion_de_mana[niveau-1],0,TERRE,"C__S___",latence_explosion_de_mana[niveau-1],niveau)
 
     def set_cout(self,cout:float):

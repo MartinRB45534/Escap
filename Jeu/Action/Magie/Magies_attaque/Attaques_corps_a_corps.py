@@ -14,7 +14,7 @@ from Jeu.Action.Magie.Magie import Magie,Magie_dirigee,Magies_offensives
 
 class Magie_attaque_corp_a_corp(Magies_offensives):
     """Les magies qui créent une attaque au corp à corp."""
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,gain_xp:float,cout_pm:float,portee:float,degats:float,element:int,propagation:str,latence:float,niveau:int):
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,portee:float,degats:float,element:int,propagation:str,latence:float,niveau:int):
         Magie.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau)
         self.portee = portee
         self.degats = degats
@@ -26,7 +26,7 @@ class Magie_attaque_corp_a_corp(Magies_offensives):
             self.agissant.controleur.case_from_position(case).effets.append(Attaque_case(self.agissant,self.degats,self.element,"proximité"))
 
 class Magie_attaque_corp_a_corp_dirigee(Magie_dirigee,Magie_attaque_corp_a_corp):
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,direction:Optional[Direction],gain_xp:float,cout_pm:float,portee:float,degats:float,element:int,propagation:str,latence:float,niveau:int):
+    def __init__(self,skill:Actif,agissant:Agissant,direction:Optional[Direction],gain_xp:float,cout_pm:float,portee:float,degats:float,element:int,propagation:str,latence:float,niveau:int):
         Magie_attaque_corp_a_corp.__init__(self,skill,agissant,gain_xp,cout_pm,portee,degats,element,propagation,latence,niveau)
         self.direction = direction
 
@@ -40,7 +40,7 @@ class Magie_attaque_corp_a_corp_dirigee(Magie_dirigee,Magie_attaque_corp_a_corp)
 class Magie_laser(Magie_attaque_corp_a_corp_dirigee):
     """La magie qui crée une attaque de laser."""
     nom = "magie laser"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,direction:Optional[Direction]=None):
+    def __init__(self,skill:Actif,agissant:Agissant,niveau:int,direction:Optional[Direction]=None):
         Magie_attaque_corp_a_corp_dirigee.__init__(self,skill,agissant,direction,gain_xp_laser[niveau-1],cout_pm_laser[niveau-1],portee_laser[niveau-1],degats_laser[niveau-1],TERRE,"R__T___",latence_laser[niveau-1],niveau)
 
     def get_image(self):
@@ -55,7 +55,7 @@ class Magie_laser(Magie_attaque_corp_a_corp_dirigee):
 class Magie_brasier(Magie_attaque_corp_a_corp):
     """La magie qui crée une attaque de brasier."""
     nom = "magie brasier"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
+    def __init__(self,skill:Actif,agissant:Agissant,niveau:int):
         Magie_attaque_corp_a_corp.__init__(self,skill,agissant,gain_xp_brasier[niveau-1],cout_pm_brasier[niveau-1],portee_brasier[niveau-1],degats_brasier[niveau-1],FEU,"proximité",latence_brasier[niveau-1],niveau)
 
     def get_image(self):
@@ -70,7 +70,7 @@ class Magie_brasier(Magie_attaque_corp_a_corp):
 class Magie_avalanche(Magie_attaque_corp_a_corp_dirigee):
     """La magie qui crée une attaque d'avalanche."""
     nom = "magie avalanche"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,direction:Optional[Direction]=None):
+    def __init__(self,skill:Actif,agissant:Agissant,niveau:int,direction:Optional[Direction]=None):
         Magie_attaque_corp_a_corp_dirigee.__init__(self,skill,agissant,direction,gain_xp_avalanche[niveau-1],cout_pm_avalanche[niveau-1],portee_avalanche[niveau-1],degats_avalanche[niveau-1],TERRE,"S__S_Pb",latence_avalanche[niveau-1],niveau)
 
     def get_image(self):
@@ -85,7 +85,7 @@ class Magie_avalanche(Magie_attaque_corp_a_corp_dirigee):
 class Magie_purification(Magie_attaque_corp_a_corp):
     """La magie qui crée un effet de purification sur un agissant."""
     nom = "magie purification"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
+    def __init__(self,skill:Actif,agissant:Agissant,niveau:int):
         Magie_attaque_corp_a_corp.__init__(self,skill,agissant,gain_xp_purification[niveau-1],cout_pm_purification[niveau-1],portee_purification[niveau-1],degats_purification[niveau-1],-1,"proximité",latence_purification[niveau-1],niveau)
 
     def action(self):

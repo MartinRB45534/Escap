@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 from Jeu.Action.Action import Action_final
 from Jeu.Action.Caste import Caste, Caste_continu, Caste_final, Caste_initial, Caste_fractionnaire
 
-class Consomme(Action_final):
+class Place_effet(Action_final):
     """
     L'action d'utilisation d'un consommable (potion ou parchemin) lorsque celui-ci se contente de placer un effet.
     """
@@ -33,7 +33,7 @@ class Consomme(Action_final):
         """L'action est interrompue."""
         self.item.etat = "intact"
 
-class Boit(Consomme):
+class Boit(Place_effet):
     """
     L'action de boire une potion.
     """
@@ -57,7 +57,7 @@ class Lit(Caste):
     def get_skin(self):
         pass
 
-class Lit_effet(Lit,Consomme):
+class Lit_effet(Lit,Place_effet):
     """
     L'action de caster un parchemin qui place un effet.
     """

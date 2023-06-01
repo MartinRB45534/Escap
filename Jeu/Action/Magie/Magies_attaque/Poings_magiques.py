@@ -12,7 +12,7 @@ from Jeu.Action.Magie.Magie import Magie, Magie_dirigee, Magies_offensives
 
 class Magie_attaque_contact(Magie_dirigee,Magies_offensives):
     """Les magies qui créent une attaque au contact."""
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,direction:Optional[Direction],gain_xp:float,cout_pm:float,portee:float,degats:float,element:int,latence:float,niveau:int):
+    def __init__(self,skill:Actif,agissant:Agissant,direction:Optional[Direction],gain_xp:float,cout_pm:float,portee:float,degats:float,element:int,latence:float,niveau:int):
         Magie.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau)
         self.portee = portee
         self.degats = degats
@@ -29,7 +29,7 @@ class Magie_attaque_contact(Magie_dirigee,Magies_offensives):
 class Magie_poing_magique(Magie_attaque_contact): #À modifier selon l'espèce qui l'utilise
     """La magie qui crée une attaque de poing magique."""
     nom = "magie poing magique"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,direction:Optional[Direction]=None):
+    def __init__(self,skill:Actif,agissant:Agissant,niveau:int,direction:Optional[Direction]=None):
         Magie_attaque_contact.__init__(self,skill,agissant,direction,gain_xp_poing_magique[niveau-1],cout_pm_poing_magique[niveau-1],portee_poing_magique[niveau-1],degats_poing_magique[niveau-1],TERRE,latence_poing_magique[niveau-1],niveau)
 
     def get_image(self):
@@ -44,7 +44,7 @@ class Magie_poing_magique(Magie_attaque_contact): #À modifier selon l'espèce q
 class Magie_poing_ardent(Magie_attaque_contact): #L'attaque de mélée de la bombe atomique
     """La magie qui crée une attaque de poing ardent."""
     nom = "magie poing ardent"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,direction:Optional[Direction]=None):
+    def __init__(self,skill:Actif,agissant:Agissant,niveau:int,direction:Optional[Direction]=None):
         Magie_attaque_contact.__init__(self,skill,agissant,direction,gain_xp_poing_ardent[niveau-1],cout_pm_poing_ardent[niveau-1],portee_poing_ardent[niveau-1],degats_poing_ardent[niveau-1],FEU,latence_poing_ardent[niveau-1],niveau)
 
     def get_image(self):
@@ -59,7 +59,7 @@ class Magie_poing_ardent(Magie_attaque_contact): #L'attaque de mélée de la bom
 class Magie_poing_sombre(Magie_attaque_contact):
     """La magie qui crée une attaque de poing sombre."""
     nom = "magie poing sombre"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,direction:Optional[Direction]=None):
+    def __init__(self,skill:Actif,agissant:Agissant,niveau:int,direction:Optional[Direction]=None):
         Magie_attaque_contact.__init__(self,skill,agissant,direction,gain_xp_poing_sombre[niveau-1],cout_pm_poing_sombre[niveau-1],portee_poing_sombre[niveau-1],degats_poing_sombre[niveau-1],TERRE,latence_poing_sombre[niveau-1],niveau)
 
     def get_image(self):

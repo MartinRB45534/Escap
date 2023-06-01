@@ -14,7 +14,7 @@ from Jeu.Action.Magie.Magie import Invocation_projectile,Cible_case,Portee_limit
 class Magie_boule_de_feu(Invocation_projectile):
     """La magie qui invoque une boule de feu."""
     nom = "magie boule de feu"
-    def __init__(self,niveau:int,skill:Skill_intrasec,agissant:Agissant,direction:Optional[Direction]=None):
+    def __init__(self,niveau:int,skill:Actif,agissant:Agissant,direction:Optional[Direction]=None):
         Invocation_projectile.__init__(self,skill,agissant,gain_xp_boule_de_feu[niveau-1],cout_pm_boule_de_feu[niveau-1],latence_boule_de_feu[niveau-1],Boule_de_feu(self.agissant.controleur,self.niveau,direction or HAUT,self.agissant,self.agissant.position),direction,niveau)
 
     def get_image(self):
@@ -29,7 +29,7 @@ class Magie_boule_de_feu(Invocation_projectile):
 class Magie_fleche_de_glace(Invocation_projectile):
     """La magie qui invoque une flèche de glace."""
     nom = "magie fleche de glace"
-    def __init__(self,niveau:int,skill:Skill_intrasec,agissant:Agissant,direction:Optional[Direction]=None):
+    def __init__(self,niveau:int,skill:Actif,agissant:Agissant,direction:Optional[Direction]=None):
         Invocation_projectile.__init__(self,skill,agissant,gain_xp_fleche_de_glace[niveau-1],cout_pm_fleche_de_glace[niveau-1],latence_fleche_de_glace[niveau-1],Fleche_de_glace(self.agissant.controleur,self.niveau,direction or HAUT,self.agissant,self.agissant.position),direction,niveau)
 
     def get_image(self):
@@ -44,7 +44,7 @@ class Magie_fleche_de_glace(Invocation_projectile):
 class Magie_rocher(Invocation_projectile):
     """La magie qui invoque un rocher."""
     nom = "magie rocher"
-    def __init__(self,niveau:int,skill:Skill_intrasec,agissant:Agissant,direction:Optional[Direction]=None):
+    def __init__(self,niveau:int,skill:Actif,agissant:Agissant,direction:Optional[Direction]=None):
         Invocation_projectile.__init__(self,skill,agissant,gain_xp_rocher[niveau-1],cout_pm_rocher[niveau-1],latence_rocher[niveau-1],Rocher(self.agissant.controleur,self.niveau,direction or HAUT,self.agissant,self.agissant.position),direction,niveau)
 
     def get_image(self):
@@ -59,7 +59,7 @@ class Magie_rocher(Invocation_projectile):
 class Magie_ombre_furtive(Invocation_projectile,Cible_case,Portee_limitee):
     """La magie qui invoque une ombre futive."""
     nom = "magie ombre furtive"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,direction:Optional[Direction]=None,cible:Optional[Position]=None):
+    def __init__(self,skill:Actif,agissant:Agissant,niveau:int,direction:Optional[Direction]=None,cible:Optional[Position]=None):
         Invocation_projectile.__init__(self,skill,agissant,gain_xp_ombre_furtive[niveau-1],cout_pm_ombre_furtive[niveau-1],latence_ombre_furtive[niveau-1],Ombre_furtive(self.agissant.controleur,self.niveau,direction or HAUT,self.agissant,cible or ABSENT),direction,niveau)
         Portee_limitee.__init__(self,portee_ombre_furtive[niveau-1])
         Cible_case.__init__(self,cible)
@@ -76,7 +76,7 @@ class Magie_ombre_furtive(Invocation_projectile,Cible_case,Portee_limitee):
 class Magie_jet_de_mana(Invocation_projectile):
     """La magie qui invoque un jet de mana."""
     nom = "magie jet de mana"
-    def __init__(self,niveau:int,skill:Skill_intrasec,agissant:Agissant,direction:Optional[Direction]=None):
+    def __init__(self,niveau:int,skill:Actif,agissant:Agissant,direction:Optional[Direction]=None):
         Invocation_projectile.__init__(self,skill,agissant,gain_xp_jet_de_mana[niveau-1],cout_pm_jet_de_mana[niveau-1],latence_jet_de_mana[niveau-1],Jet_de_mana(self.agissant.controleur,self.niveau,direction or HAUT,self.agissant,self.agissant.position),direction,niveau)
 
     def get_image(self):
@@ -91,7 +91,7 @@ class Magie_jet_de_mana(Invocation_projectile):
 class Magie_eclair_noir(Invocation_projectile):
     """La magie qui invoque un éclair noir."""
     nom = "magie eclair noir"
-    def __init__(self,niveau:int,skill:Skill_intrasec,agissant:Agissant,direction:Optional[Direction]=None):
+    def __init__(self,niveau:int,skill:Actif,agissant:Agissant,direction:Optional[Direction]=None):
         Invocation_projectile.__init__(self,skill,agissant,gain_xp_eclair_noir[niveau-1],cout_pm_eclair_noir[niveau-1],latence_eclair_noir[niveau-1],Eclair_noir(self.agissant.controleur,self.niveau,direction or HAUT,self.agissant,self.agissant.position),direction,niveau)
 
     def get_image(self):

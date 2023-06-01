@@ -2305,7 +2305,7 @@ class Affichage_replique(Pave):
         self.replique = replique
 
 class Affichage_skill(Cliquable, Pavage_horizontal):
-    def __init__(self, skill:Skill_intrasec, fond=(0, 0, 0)):
+    def __init__(self, skill:Skill, fond=(0, 0, 0)):
         self.objets:List[Affichable] = [] #Il peut quand même avoir des objets 'normaux'
         self.tailles = [0, 0] #La largeur et la hauteur (ou l'inverse ?)
         self.position = [0, 0]

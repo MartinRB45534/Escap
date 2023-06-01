@@ -1,13 +1,10 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, List
 
-from Jeu.Entitee.Agissant.Agissant import Agissant
-from Jeu.Systeme.Skill import Skill_intrasec
-
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from Jeu.Entitee.Agissant.Agissant import Agissant
-    from Jeu.Systeme.Skill import Skill_intrasec
+    from Jeu.Systeme.Skill.Actif import Actif
     from Jeu.Effet.Effets_protection import Protection_bouclier
     from Jeu.Entitee.Item.Item import Item
     from Jeu.Entitee.Item.Equippement.Degainable.Bouclier.Bouclier import Bouclier
@@ -20,7 +17,7 @@ class Action_skill(Action):
     """
     Les actions provoquées par un skill.
     """
-    def __init__(self,agissant:Agissant,latence:float,skill:Skill_intrasec,xp:float):
+    def __init__(self,agissant:Agissant,latence:float,skill:Actif,xp:float):
         super().__init__(agissant,latence)
         self.skill = skill
         self.xp = xp
@@ -29,11 +26,13 @@ class Action_skill(Action):
         """L'action est terminée."""
         self.skill.xp_new += self.xp
 
+
+
 class Ramasse(Action_skill,Action_parcellaire):
     """
     L'action de ramasser les items d'une case.
     """
-    def __init__(self,agissant:Agissant,latences:List[float],skill:Skill_intrasec,xp:float,items:List[Item]):
+    def __init__(self,agissant:Agissant,latences:List[float],skill:Actif,xp:float,items:List[Item]):
         Action_skill.__init__(self,agissant,sum(latences),skill,xp)
         self.latences = latences
         self.items = items
@@ -41,11 +40,24 @@ class Ramasse(Action_skill,Action_parcellaire):
     def action(self):
         self.agissant.inventaire.ajoute(self.items[self.rempli-1])
 
+class Derobe(Action_skill):
+    """
+    L'action de dérober un item.
+    """
+    def __init__(self,agissant:Agissant,latence:float,skill:Actif,xp:float,item:Item,possesseur:Agissant):
+        super().__init__(agissant,latence,skill,xp)
+        self.item = item
+        self.possesseur = possesseur
+
+    def action(self):
+        self.possesseur.inventaire.drop(ABSENT,self.item)
+        self.agissant.inventaire.ajoute(self.item)
+
 class Blocage(Action_skill):
     """
     L'action de bloquer avec un bouclier.
     """
-    def __init__(self, agissant: Agissant, latence: float, skill: Skill_intrasec, xp: float, taux: float, direction: Direction, bouclier: Bouclier):
+    def __init__(self, agissant: Agissant, latence: float, skill: Actif, xp: float, taux: float, direction: Direction, bouclier: Bouclier):
         super().__init__(agissant, latence, skill, xp)
         self.taux = taux
         self.direction = direction
@@ -59,7 +71,7 @@ class Blocage_zone(Blocage):
     """
     L'action de bloquer avec un bouclier sur une zone.
     """
-    def __init__(self, agissant: Agissant, latence: float, skill: Skill_intrasec, xp: float, taux: float, direction: Direction, bouclier: Bouclier, portee: int, propagation:str="C__S___"):
+    def __init__(self, agissant: Agissant, latence: float, skill: Actif, xp: float, taux: float, direction: Direction, bouclier: Bouclier, portee: int, propagation:str="C__S___"):
         super().__init__(agissant, latence, skill, xp, taux, direction, bouclier)
         self.portee = portee
         self.propagation = propagation
@@ -73,3 +85,4 @@ class Blocage_zone(Blocage):
 
 # Imports utilisés dans le code
 from Jeu.Labyrinthe.Structure_spatiale.Direction import DIRECTIONS
+from Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT

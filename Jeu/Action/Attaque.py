@@ -5,8 +5,7 @@ from typing import TYPE_CHECKING, List
 if TYPE_CHECKING:
     from Jeu.Entitee.Agissant.Agissant import Agissant
     from Jeu.Entitee.Item.Equippement.Degainable.Degainable import Arme
-    from Jeu.Systeme.Skill import Skill_intrasec
-    from Jeu.Entitee.Item.Item import Item
+    from Jeu.Systeme.Skill.Actif import Actif
     from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
 
 # Imports des classes parentes
@@ -20,7 +19,7 @@ class Attaque(Action_skill):
     """
     L'action d'attaquer.
     """
-    def __init__(self,agissant:Agissant,latence:float,skill:Skill_intrasec,xp:float,taux:float,direction:Direction,portee:int,element:int=TERRE,propagation:str="C__S___",distance:str="contact"):
+    def __init__(self,agissant:Agissant,latence:float,skill:Actif,xp:float,taux:float,direction:Direction,portee:int,element:int=TERRE,propagation:str="C__S___",distance:str="contact"):
         super().__init__(agissant,latence,skill,xp)
         self.taux = taux
         self.direction = direction
@@ -47,7 +46,7 @@ class Attaque_arme(Attaque):
     """
     L'action d'attaquer avec une arme.
     """
-    def __init__(self,agissant:Agissant,latence:float,skill:Skill_intrasec,xp:float,taux:float,direction:Direction,arme:Arme,propagation:str="C__S___",distance:str="contact"):
+    def __init__(self,agissant:Agissant,latence:float,skill:Actif,xp:float,taux:float,direction:Direction,arme:Arme,propagation:str="C__S___",distance:str="contact"):
         Action_skill.__init__(self,agissant,latence,skill,xp)
         self.taux = taux
         self.direction = direction
@@ -74,7 +73,7 @@ class Attaque_multiple(Action_parcellaire,Attaque_arme): # Les attaques sans arm
     """
     Une attaque complexe avec plusieurs coups.
     """
-    def __init__(self,agissant:Agissant,latences:List[float],skill:Skill_intrasec,xp:float,taux:List[float],directions:List[Direction],arme:Arme,propagations:List[str]=["C__S___"],distance:str="contact"):
+    def __init__(self,agissant:Agissant,latences:List[float],skill:Actif,xp:float,taux:List[float],directions:List[Direction],arme:Arme,propagations:List[str]=["C__S___"],distance:str="contact"):
         Action_skill.__init__(self,agissant,sum(latences),skill,xp)
         self.latences = latences
         self.taux = taux

@@ -2,7 +2,6 @@ from typing import List, Tuple, Type
 from Jeu.Action.Magie.Magie import Magie
 from Jeu.Entitee.Agissant.Agissant import Agissant
 from Jeu.Entitee.Item.Equippement.Degainable.Degainable import Arme
-from Affichage.Skins import *
 from Affichage.Skins.Skins import *
 from Jeu.Constantes import *
 from Jeu.Systeme.Constantes_skills.Skills import *

@@ -15,7 +15,7 @@ from Jeu.Action.Magie.Magie import Magie,Cible_case,Magies_offensives
 
 class Magie_attaque_distance(Cible_case,Magies_offensives):
     """Les magies qui créent une attaque à distance."""
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,cible:Optional[Position],gain_xp:float,cout_pm:float,portee:float,degats:float,element:int,latence:float,niveau:int):
+    def __init__(self,skill:Actif,agissant:Agissant,cible:Optional[Position],gain_xp:float,cout_pm:float,portee:float,degats:float,element:int,latence:float,niveau:int):
         Magie.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau)
         self.cible = cible
         self.effets:List[Attaque_case_delayee] = []
@@ -38,7 +38,7 @@ class Magie_attaque_distance(Cible_case,Magies_offensives):
 class Magie_volcan(Magie_attaque_distance):
     """La magie qui crée une attaque de feu à un autre endroit."""
     nom = "magie volcan"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,cible:Optional[Position]=None):
+    def __init__(self,skill:Actif,agissant:Agissant,niveau:int,cible:Optional[Position]=None):
         Magie_attaque_distance.__init__(self,skill,agissant,cible,gain_xp_volcan[niveau-1],cout_pm_volcan[niveau-1],portee_volcan[niveau-1],degats_volcan[niveau-1],FEU,latence_volcan[niveau-1],niveau)
         
     def get_image(self):
@@ -53,7 +53,7 @@ class Magie_volcan(Magie_attaque_distance):
 class Magie_secousse(Magie_attaque_distance):
     """La magie qui crée une attaque de terre à un autre endroit. Pas très puissant."""
     nom = "magie secousse"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,cible:Optional[Position]=None):
+    def __init__(self,skill:Actif,agissant:Agissant,niveau:int,cible:Optional[Position]=None):
         Magie_attaque_distance.__init__(self,skill,agissant,cible,gain_xp_secousse[niveau-1],cout_pm_secousse[niveau-1],portee_secousse[niveau-1],degats_secousse[niveau-1],TERRE,latence_secousse[niveau-1],niveau)
 
     def get_image(self):
@@ -68,7 +68,7 @@ class Magie_secousse(Magie_attaque_distance):
 class Magie_petite_secousse(Magie_attaque_distance):
     """La magie qui crée une attaque de terre à un autre endroit. Pas très puissant."""
     nom = "magie petite secousse"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,cible:Optional[Position]=None):
+    def __init__(self,skill:Actif,agissant:Agissant,niveau:int,cible:Optional[Position]=None):
         Magie_attaque_distance.__init__(self,skill,agissant,cible,gain_xp_petite_secousse[niveau-1],cout_pm_petite_secousse[niveau-1],portee_petite_secousse[niveau-1],degats_petite_secousse[niveau-1],TERRE,latence_petite_secousse[niveau-1],niveau)
 
     def get_image(self):

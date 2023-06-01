@@ -13,7 +13,7 @@ from Jeu.Action.Magie.Magie import Magie, Cible_agissant, Cible_agissants, Cible
 class Magie_blizzard(Magie):
     """La magie qui crée un effet de blizzard autour de l'agissant."""
     nom = "magie blizzard"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
+    def __init__(self,skill:Actif,agissant:Agissant,niveau:int):
         Magie.__init__(self,skill,agissant,gain_xp_blizzard[niveau-1],cout_pm_blizzard[niveau-1],latence_blizzard[niveau-1],niveau)
 
     def action(self):
@@ -33,7 +33,7 @@ class Magie_blizzard(Magie):
 class Magie_obscurite(Magie):
     """La magie qui crée un effet d'obscurite autour de l'agissant."""
     nom = "magie obscurite"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int):
+    def __init__(self,skill:Actif,agissant:Agissant,niveau:int):
         Magie.__init__(self,skill,agissant,gain_xp_obscurite[niveau-1],cout_pm_obscurite[niveau-1],latence_obscurite[niveau-1],niveau)
 
     def action(self):
@@ -53,7 +53,7 @@ class Magie_obscurite(Magie):
 class Magie_instakill(Cible_agissant):
     """La magie qui crée un effet d'instakill sur un agissant."""
     nom = "magie instakill"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,niveau:int,cible:Optional[Agissant]=None):
+    def __init__(self,skill:Actif,agissant:Agissant,niveau:int,cible:Optional[Agissant]=None):
         Magie.__init__(self,skill,agissant,gain_xp_instakill[niveau-1],cout_pm_instakill[niveau-1],latence_instakill[niveau-1],niveau)
         Cible_agissant.__init__(self,cible)
 
@@ -75,7 +75,7 @@ class Magie_instakill(Cible_agissant):
 class Magie_protection_sacree(Cible_agissants):
     """La magie qui crée un effet de protection sacrée sur des agissants."""
     nom = "magie protection sacrée"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,cible:List[Agissant],niveau:int):
+    def __init__(self,skill:Actif,agissant:Agissant,cible:List[Agissant],niveau:int):
         Magie.__init__(self,skill,agissant,gain_xp_protection_sacree[niveau-1],cout_pm_protection_sacree[niveau-1],latence_protection_sacree[niveau-1],niveau)
         Cible_agissants.__init__(self,cible)
 
@@ -98,7 +98,7 @@ class Magie_protection_sacree(Cible_agissants):
 class Magie_teleportation(Cible_cases):
     """La magie qui téléporte des entitées."""
     nom = "magie téléportation"
-    def __init__(self,skill:Skill_intrasec,agissant:Agissant,cases:List[Position],niveau:int):
+    def __init__(self,skill:Actif,agissant:Agissant,cases:List[Position],niveau:int):
         Magie.__init__(self,skill,agissant,gain_xp_teleportation[niveau-1],cout_pm_teleportation[niveau-1],latence_teleportation[niveau-1],niveau)
         Cible_cases.__init__(self,cases)
 
