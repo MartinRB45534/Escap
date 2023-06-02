@@ -226,6 +226,7 @@ class Porte_altitude(Porte_barriere):
 from Jeu.Entitee.Entitee import Entitee, Fantome
 from Jeu.Entitee.Agissant.Agissant import Agissant
 from Jeu.Entitee.Item.Item import Item
-from Jeu.Systeme.Classe import trouve_skill, Skill_ecrasement
+from Jeu.Systeme.Classe.Classes import trouve_skill
+from Jeu.Systeme.Skill.Skills import Skill_ecrasement
 from Jeu.Entitee.Agissant.Humain.Heros import Heros
 from Affichage.Skins.Skins import SKIN_MUR_CASSE, SKINS_MURS, SKIN_PORTE, SKIN_PORTE_OUVRABLE, SKIN_PORTE_OUVERTE, SKIN_BARRIERE

@@ -1,13 +1,11 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, List
 
-from Jeu.Labyrinthe.Structure_spatiale.Position import Position
-
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from Jeu.Entitee.Agissant.Agissant import Agissant
     from Jeu.Labyrinthe.Structure_spatiale.Position import Position, ABSENT
-    from Jeu.Systeme.Classe import Skill_intrasec
+    from Jeu.Systeme.Skill.Actif import Actif
     from Jeu.Effet.Attaque.Attaque import Attaque_case_delayee
 
 # Imports des classes parentes

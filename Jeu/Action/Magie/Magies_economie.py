@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from Jeu.Entitee.Agissant.Agissant import Agissant
-    from Jeu.Systeme.Classe import Skill_intrasec
+    from Jeu.Systeme.Skill.Actif import Actif
 
 # Imports des classes parentes
 from Jeu.Action.Magie.Magie import Magie, Magie_cout

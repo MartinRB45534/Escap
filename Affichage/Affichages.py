@@ -2338,4 +2338,5 @@ from Jeu.Entitee.Item.Item import *
 from Jeu.Entitee.Agissant.Humain.Humain import Humain
 from Jeu.Effet.Effets_mouvement.Blocages import *
 from Jeu.Effet.Effets import *
-from Jeu.Systeme.Classe import *
+from Jeu.Systeme.Classe.Classes import *
+from Jeu.Systeme.Skill.Skills import *

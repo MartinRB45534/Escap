@@ -226,7 +226,8 @@ class Esprit :
                     if zone not in zones_mod:
                         zones_mod.add(zone)
             elif case.clarte < 0:
-                print("Why !!?")
+                if case.clarte != -1:
+                    print("Why !!?")
         for zone in self.zones_inconnues:
             zone.entrees = set()
             zone.sorties = set()
@@ -509,7 +510,6 @@ class Esprit :
                     libre = False #Arrive par exemple lorsqu'on ouvre une porte à côté d'une case déjà dans une salle
                     if salle not in salles_mod:
                         salles_mod.append(salle) #Si on a ouvert une porte, on veut rajouter cette case aux entrées (sinon on a des problèmes de résolution)
-                    print("Euh... C'est normal ça ?")
                     break
             if libre:
                 salle = Salle(carre)
@@ -538,7 +538,6 @@ class Esprit :
                     libre = False
                     if salle not in salles_mod:
                         salles_mod.append(salle)
-                    print("Euh... C'est normal ça ?")
                     break
             if libre:
                 salle = Salle(carre)
@@ -602,16 +601,15 @@ class Esprit :
                     if case in couloir.cases:
                         break
                 else:
-                    print("Hum... C'est normal ça ?")
                     couloir = Couloir(case.case.position)
                     self.couloirs.add(couloir)
-                    for couloir_ in self.couloirs:
+                    for couloir_ in [*self.couloirs]:
                         if couloir_ != couloir:
                             for dir in DIRECTIONS:
                                 if case.case.position+dir in couloir_.cases and case.cibles[dir][PASSE_ESCALIER] and self.vue.case_from_position(case.case.position+dir).cibles[dir.oppose()][PASSE_ESCALIER]:
                                     couloir = self.fusionne_couloirs(couloir_,couloir)
                                     break
-                    for couloir_ in esprit.couloirs:
+                    for couloir_ in [*esprit.couloirs]:
                         if couloir_ != couloir:
                             for dir in DIRECTIONS:
                                 if case.case.position+dir in couloir_.cases and case.cibles[dir][PASSE_ESCALIER] and self.vue.case_from_position(case.case.position+dir).cibles[dir.oppose()][PASSE_ESCALIER]:

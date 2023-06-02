@@ -81,11 +81,12 @@ class Enchantement_confusion(Enchantement,On_post_decision):
 
     def action(self,agissant:Agissant):
         if self.phase == "en cours":
-            dir_voulue = agissant.dir_regard
-            if random.random() < self.taux_erreur and dir_voulue is not None and agissant.latence <= 0 :
-                dir_possibles = [Direction(i) for i in range(NB_DIRECTIONS)]
-                dir_possibles.remove(dir_voulue)
-                agissant.regarde(dir_possibles[random.randint(0,2)])
+            if isinstance(agissant.action, Deplace) :
+                dir_voulue = agissant.action.direction
+                if random.random() < self.taux_erreur and dir_voulue is not None:
+                    dir_possibles = [Direction(i) for i in range(NB_DIRECTIONS)]
+                    dir_possibles.remove(dir_voulue)
+                    agissant.action.direction = random.choice(dir_possibles)
 
     def execute(self,agissant:Agissant):
         self.temps_restant -= 1
@@ -252,4 +253,6 @@ from Jeu.Systeme.Constantes_magies.Magies import *
 from Jeu.Constantes import *
 import random
 from Jeu.Effet.Sante.Maladies.Maladie import Maladie
-from Jeu.Systeme.Classe import trouve_skill, Skill_vision
+from Jeu.Systeme.Classe.Classes import trouve_skill
+from Jeu.Systeme.Skill.Skills import Skill_vision
+from Jeu.Action.Deplacement import Deplace

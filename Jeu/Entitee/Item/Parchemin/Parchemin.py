@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, Type
 if TYPE_CHECKING:
     from Jeu.Controleur import Controleur
     from Jeu.Labyrinthe.Structure_spatiale.Position import Position
-    from Jeu.Entitee.Agissant.Agissant import Agissant
     from Jeu.Effet.Effet import Effet
     from Jeu.Action.Magie.Magie import Magie
 

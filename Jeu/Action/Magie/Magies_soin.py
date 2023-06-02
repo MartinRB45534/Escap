@@ -5,9 +5,10 @@ from typing import TYPE_CHECKING, List, Optional
 if TYPE_CHECKING:
     from Jeu.Entitee.Agissant.Agissant import Agissant
     from Jeu.Labyrinthe.Structure_spatiale.Position import Position
-    from Jeu.Systeme.Classe import Skill_intrasec
+    from Jeu.Systeme.Skill.Actif import Actif
 
 # Imports des classes parentes
+from Jeu.Action.Action import Non_repetable
 from Jeu.Action.Magie.Magie import Cible_agissant,Cible_case,Portee_limitee,Magie,Cible_agissants
 
 class Magie_soin(Cible_agissant):
@@ -125,7 +126,7 @@ class Magie_auto_soin(Magie):
 
 
 
-class Magie_resurection(Magie):
+class Magie_resurection(Magie, Non_repetable):
     """La magie qui invoque un effet de resurection."""
     nom = "magie resurection"
     def __init__(self,skill:Actif,agissant:Agissant,niveau:int):

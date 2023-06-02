@@ -1,9 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, List, Type
 
-from Jeu.Entitee.Agissant.Agissant import Agissant
-from Jeu.Systeme.Classe import Skill_intrasec
-
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from Jeu.Entitee.Entitee import Entitee
@@ -14,9 +11,10 @@ if TYPE_CHECKING:
     from Jeu.Effet.Effet import Enchantement
     from Jeu.Labyrinthe.Structure_spatiale.Position import Position
     from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
-    from Jeu.Systeme.Classe import Skill_intrasec
+    from Jeu.Systeme.Skill.Actif import Actif
 
 # Imports des classes parentes
+from Jeu.Action.Action import Non_repetable
 from Jeu.Action.Caste import Caste
 from Jeu.Action.Action_skill import Action_skill
 
@@ -47,7 +45,7 @@ class Magie_dirigee(Magie) :
     def __init__(self,direction:Optional[Direction]=None):
         self.direction = direction
 
-class Magie_cout(Magie):
+class Magie_cout(Magie, Non_repetable):
     """La classe des magies dont le coût peut varier."""
 
     def set_cout(self,cout:float):
@@ -127,7 +125,7 @@ class Creation_effet(Magie):
     def get_effet(self):
         return self.effet
 
-class Enchante(Creation_effet,Magie_cible):
+class Enchante(Creation_effet, Magie_cible, Non_repetable):
     """La classe des magies qui créent des enchantements (des effets sur le très, très long terme)."""
     def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,enchantement:Enchantement,niveau:int):
         Magie.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau)
@@ -136,7 +134,7 @@ class Enchante(Creation_effet,Magie_cible):
     def get_enchantement(self):
         return self.enchantement
 
-class Enchante_item(Enchante,Cible_item):
+class Enchante_item(Enchante, Cible_item):
     """La classe des magies qui enchantent un item."""
     def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,enchantement:Enchantement,item:Optional[Item],niveau:int):
         Enchante.__init__(self,skill,agissant,gain_xp,cout_pm,latence,enchantement,niveau)
@@ -148,7 +146,7 @@ class Enchante_item(Enchante,Cible_item):
         else:
             self.cible.effets.append(self.enchantement)
 
-class Enchante_cases(Enchante,Cible_cases):
+class Enchante_cases(Enchante, Cible_cases):
     """La classe des magies qui enchantent des cases."""
     def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,enchantement:Enchantement,cases:List[Position],niveau:int):
         Enchante.__init__(self,skill,agissant,gain_xp,cout_pm,latence,enchantement,niveau)
@@ -161,7 +159,7 @@ class Enchante_cases(Enchante,Cible_cases):
             for case in self.cible:
                 self.agissant.controleur.case_from_position(case).effets.append(self.enchantement)
 
-class Enchante_agissant(Enchante,Cible_agissant):
+class Enchante_agissant(Enchante, Cible_agissant):
     """La classe des magies qui enchantent un agissant."""
     def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,enchantement:Enchantement,cible:Optional[Agissant],niveau:int):
         Enchante.__init__(self,skill,agissant,gain_xp,cout_pm,latence,enchantement,niveau)

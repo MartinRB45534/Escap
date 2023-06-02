@@ -52,5 +52,4 @@ class Ombriul(Dps,Attaquant_magique_poing): #/!\ Retravailler l'ombriul pour uti
 # Imports utilisés dans le code
 from Jeu.Entitee.Agissant.Agissant import Agissant
 from Affichage.Skins.Skins import SKIN_CORPS_OMBRIUL, SKIN_TETE_OMBRIUL, SKIN_CADAVRE
-from Jeu.Systeme.Classe import trouve_skill, Skills_magiques, Skill_magie, Skill_stomp
 from Jeu.Systeme.Constantes_magies.Magies import cout_pm_poing_sombre

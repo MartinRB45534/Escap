@@ -5,9 +5,10 @@ from typing import TYPE_CHECKING, List, Optional
 if TYPE_CHECKING:
     from Jeu.Entitee.Agissant.Agissant import Agissant
     from Jeu.Labyrinthe.Structure_spatiale.Position import Position
-    from Jeu.Systeme.Classe import Skill_intrasec
+    from Jeu.Systeme.Skill.Actif import Actif
 
 # Imports des classes parentes
+from Jeu.Action.Action import Non_repetable
 from Jeu.Action.Magie.Magie import Magie, Cible_agissant, Cible_agissants, Cible_cases
 
 class Magie_blizzard(Magie):
@@ -50,7 +51,7 @@ class Magie_obscurite(Magie):
     def get_description(self,observation=0):
         return ["Une magie d'obscurité","Affecte les cases à proximité du lanceur.","L'obscurité augmente l'opacité des cases, rendant plus difficile de voir au travers.",f"Coût : {self.cout}",f"Portee de la magie : {portee_obscurite[self.niveau-1]}",f"Opacité supplémentaire : {gain_opacite_obscurite[self.niveau-1]}",f"Latence : {self.latence}"]
 
-class Magie_instakill(Cible_agissant):
+class Magie_instakill(Cible_agissant, Non_repetable):
     """La magie qui crée un effet d'instakill sur un agissant."""
     nom = "magie instakill"
     def __init__(self,skill:Actif,agissant:Agissant,niveau:int,cible:Optional[Agissant]=None):
@@ -95,7 +96,7 @@ class Magie_protection_sacree(Cible_agissants):
     def get_description(self,observation=0):
         return ["Une magie de protection","Bloque les dégats des attaques entrantes jusqu'à une certaine somme.","Les dégats d'ombre sont plus affectés.",f"Coût : {self.cout}",f"Dégats absorbables : {pv_protection_sacree[self.niveau-1]}",f"Durée : {duree_protection_sacree[self.niveau-1]}",f"Latence : {self.latence}"]
 
-class Magie_teleportation(Cible_cases):
+class Magie_teleportation(Cible_cases, Non_repetable):
     """La magie qui téléporte des entitées."""
     nom = "magie téléportation"
     def __init__(self,skill:Actif,agissant:Agissant,cases:List[Position],niveau:int):

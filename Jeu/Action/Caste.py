@@ -39,7 +39,7 @@ class Caste_final(Caste):
     def termine(self):
         """L'action est terminée."""
         self.paye()
-        super().termine()
+        return super().termine()
 
 class Caste_initial(Caste):
     """
@@ -68,8 +68,7 @@ class Caste_continu(Caste):
         self.latence += self.get_vitesse()
         self.paye()
         if self.latence >= self.latence_max:
-            self.termine()
-            return True
+            return self.termine()
         return False
     
 class Caste_fractionnaire(Caste):
@@ -94,8 +93,7 @@ class Caste_fractionnaire(Caste):
         self.latence += self.get_vitesse()
         self.paye()
         if self.latence >= self.latence_max:
-            self.termine()
-            return True
+            return self.termine()
         return False
 
 # Imports utilisés dans le code

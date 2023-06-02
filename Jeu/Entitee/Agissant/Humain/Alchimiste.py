@@ -336,7 +336,7 @@ class Alchimiste(PNJ_mage,Attaquant_magique_case,Attaquant_magique_poing,Support
         return(recettes_alchimie[self.get_skill_alchimie().niveau])
 
     def cuisine(self,recette):
-        self.get_skill_alchimie().utilise(recette["xp"])
+        # self.get_skill_alchimie().utilise(recette["xp"])
         return eval(recette["produit"])(None)
     
     def get_skill_alchimie(self):
@@ -352,7 +352,9 @@ class Alchimiste(PNJ_mage,Attaquant_magique_case,Attaquant_magique_poing,Support
 
 # Imports utilisés dans le code:
 from Jeu.Constantes import *
-from Jeu.Systeme.Classe import trouve_skill, Skill_alchimie
+
+from Jeu.Systeme.Classe.Classes import trouve_skill
+from Jeu.Systeme.Skill.Skills import Skill_alchimie
 from Jeu.Systeme.Constantes_skills.Skills import *
 from Jeu.Systeme.Constantes_magies.Magies import *
 from Affichage.Skins.Skins import SKIN_TETE_ALCHIMISTE

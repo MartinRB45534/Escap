@@ -7,8 +7,7 @@ if TYPE_CHECKING:
     from Jeu.Labyrinthe.Structure_spatiale.Position import Position
     from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
     from Jeu.Action.Action import Action
-    from Jeu.Action.Magie.Magie import Magie
-    from Jeu.Systeme.Skill_intrasec import Skill_intrasec
+    from Jeu.Systeme.Skill.Actif import Actif
     from Jeu.Entitee.Item.Projectile.Projectile import Projectile
 
 # Imports des classes parentes
@@ -160,14 +159,15 @@ class PJ(PNJ): #Les PJs sont des PNJs, parce que le mot PNJ est trompeur
         self.action_simule:Optional[Action] = None
         self.dir_regard_simule:Optional[Direction] = None
         self.attente:int = -1
-        self.nouvel_ordre:bool = False
         self.interlocuteur:Optional[Interactif] = None
-        self.touches:Dict[str,Dict[Tuple|Tuple[int],Dict[int,List[str]|Type[Skill_intrasec]|Direction|Type[Projectile]|str]]] = {
+        self.touches:Dict[str,Dict[Tuple|Tuple[int],Dict[int,List[str]|Type[Actif]|Direction|Type[Projectile]|str]|Dict[int,Dict]]] = {
             "effets":{
             },
             "skills":{
             },
             "directions":{
+            },
+            "kwargs":{
             },
             "projectiles":{},
             "magies":{},

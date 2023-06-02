@@ -4,10 +4,10 @@ from typing import TYPE_CHECKING, Optional
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from Jeu.Entitee.Agissant.Agissant import Agissant
-    from Jeu.Systeme.Classe import Skill_intrasec
+    from Jeu.Systeme.Skill.Actif import Actif
 
 # Imports des classes parentes
-from Jeu.Action.Magie.Magie import Magie, Enchante_agissant, Enchante_item
+from Jeu.Action.Magie.Magie import Enchante_agissant, Enchante_item
 
 class Magie_enchantement_faiblesse(Enchante_agissant):
     """La magie qui place un enchantement de faiblesse sur un agissant."""

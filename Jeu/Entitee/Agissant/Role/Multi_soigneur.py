@@ -20,7 +20,7 @@ class Multi_soigneur(Soigneur,Multi_mage):
             if self.peut_caster():
                 new_cibles = sorted(cibles, key=itemgetter(0))
                 skill = self.get_skill_magique()
-                action = skill.fait(self.caste(),self)
+                action = skill.fait(self,self.caste())
                 assert isinstance(action,Cible_agissant)
                 action.cible = new_cibles[0][-1]
                 self.fait(action)
@@ -29,7 +29,7 @@ class Multi_soigneur(Soigneur,Multi_mage):
         elif cibles:
             if self.peut_multi_caster():
                 skill = self.get_skill_magique()
-                action = skill.fait(self.multi_caste(),self)
+                action = skill.fait(self,self.multi_caste())
                 assert isinstance(action,Cible_agissants)
                 action.cible = [cible[-1] for cible in cibles]
                 self.fait(action)
@@ -38,7 +38,7 @@ class Multi_soigneur(Soigneur,Multi_mage):
             elif self.peut_caster():
                 new_cibles = sorted(cibles, key=itemgetter(0))
                 skill = self.get_skill_magique()
-                action = skill.fait(self.caste(),self)
+                action = skill.fait(self,self.caste())
                 assert isinstance(action,Cible_agissant)
                 action.cible = new_cibles[0][-1]
                 self.fait(action)

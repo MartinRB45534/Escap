@@ -5,8 +5,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from Jeu.Controleur import Controleur
     from Jeu.Labyrinthe.Structure_spatiale.Position import Position
-    from Jeu.Entitee.Agissant.Agissant import Agissant
-    from Jeu.Action.Magie.Magie import Magie
     from Jeu.Action.Action import Action
 
 # Imports des classes parentes

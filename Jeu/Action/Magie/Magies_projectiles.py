@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from Jeu.Entitee.Agissant.Agissant import Agissant
     from Jeu.Labyrinthe.Structure_spatiale.Position import Position
     from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
-    from Jeu.Systeme.Classe import Skill_intrasec
+    from Jeu.Systeme.Skill.Actif import Actif
 
 # Imports des classes parentes
 from Jeu.Action.Magie.Magie import Invocation_projectile,Cible_case,Portee_limitee

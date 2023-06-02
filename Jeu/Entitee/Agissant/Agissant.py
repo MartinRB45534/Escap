@@ -6,9 +6,7 @@ if TYPE_CHECKING:
     from Jeu.Controleur import Controleur
     from Jeu.Labyrinthe.Structure_spatiale.Position import Position
     from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
-    from Jeu.Action.Magie.Magie import Magie
-    from Jeu.Systeme.Skill_intrasec import Skill_intrasec
-    from Jeu.Systeme.Classe import Classe_principale
+    from Jeu.Systeme.Classe.Classes import Classe_principale
     from Jeu.Entitee.Agissant.Inventaire import Inventaire
     from Jeu.Esprit.Esprit import Esprit
     from Jeu.Entitee.Item.Item import Item
@@ -120,12 +118,12 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
     # Les actions de l'agissant
     def attaque(self,direction:Direction):
         self.regarde(direction)
-        skill = trouve_skill(self.classe_principale,Skill_attaque)
+        skill = trouve_skill(self.classe_principale,Skill_attaque_arme)
         arme = self.get_arme()
         if skill and arme:
-            self.fait(skill.fait(self,direction,arme))
+            self.fait(skill.fait(self,arme,direction))
         else:
-            skill = trouve_skill(self.classe_principale,Skill_stomp)
+            skill = trouve_skill(self.classe_principale,Skill_attaque)
             assert skill is not None
             self.fait(skill.fait(self,direction))
         self.set_statut("attaque")
@@ -610,7 +608,6 @@ from Jeu.Labyrinthe.Structure_spatiale.Direction import HAUT, DIRECTIONS
 from Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
 from Jeu.Labyrinthe.Vue import Representation_vue
 from Jeu.Esprit.Esprit import NOBODY
-from Jeu.Entitee.Item.Cree_item import Cree_item
 from Jeu.Entitee.Item.Cadavre import Cadavre
 from Jeu.Entitee.Item.Equippement.Role.Elementaires import Tenebreux, Rocheux, Neigeux, Incandescant
 from Jeu.Entitee.Item.Equippement.Role.Defensif.Defensif import Defensif
@@ -621,7 +618,9 @@ from Jeu.Entitee.Item.Equippement.Role.Reparateur_magique.Reparateur_magique imp
 from Jeu.Entitee.Item.Items import *
 from Jeu.Entitee.Agissant.Inventaire import Inventaire
 from Jeu.Entitee.Agissant.Agissants import *
-from Jeu.Systeme.Classe import trouve_skill, Classe_principale, Skills_magiques, Skill_defense, Skill_immortel, Skill_essence_magique, Skill_attaque, Skill_stomp, Skill_deplacement, Skill_magie_infinie, Skill_vision, Skill_aura
+from Jeu.Action.Actions import *
+from Jeu.Systeme.Classe.Classes import *
+from Jeu.Systeme.Skill.Skills import *
 from Jeu.Effet.Effets import *
 from Jeu.Constantes import OMBRE, TERRE, GLACE, FEU
 from Affichage.Skins.Skins import SKIN_AGISSANT, SKIN_STATUT_ATTAQUE, SKIN_STATUT_ATTAQUE_BOOSTEE, SKIN_STATUT_PAIX, SKIN_STATUT_FUITE, SKIN_STATUT_EXPLORATION, SKIN_STATUT_RAPPROCHE, SKIN_STATUT_SOIN, SKIN_STATUT_SOUTIEN, SKINS_CORPS_VUS, SKINS_TETES_VUES, SKIN_VIDE

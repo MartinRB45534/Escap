@@ -95,20 +95,20 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
             },
             "skills":{
                 ():{
-                    pygame.K_z:Skill_deplacement,
-                    pygame.K_d:Skill_deplacement,
-                    pygame.K_s:Skill_deplacement,
-                    pygame.K_q:Skill_deplacement,
-                    pygame.K_x:Skill_stomp,
-                    pygame.K_c:Skill_ramasse_light,
+                    pygame.K_z:Deplacement_joueur,
+                    pygame.K_d:Deplacement_joueur,
+                    pygame.K_s:Deplacement_joueur,
+                    pygame.K_q:Deplacement_joueur,
+                    pygame.K_x:Stomp_humain,
+                    pygame.K_c:Ramasse_joueur,
                 },
                 (pygame.KMOD_LSHIFT,):{
-                    pygame.K_z:Skill_course,
-                    pygame.K_d:Skill_course,
-                    pygame.K_s:Skill_course,
-                    pygame.K_q:Skill_course,
-                    pygame.K_x:Skill_attaque,
-                    pygame.K_c:Skill_ramasse,
+                    pygame.K_z:Deplacement_joueur,
+                    pygame.K_d:Deplacement_joueur,
+                    pygame.K_s:Deplacement_joueur,
+                    pygame.K_q:Deplacement_joueur,
+                    pygame.K_x:Attaque_humain,
+                    pygame.K_c:Ramasse_joueur,
                 },
             },
             "directions":{
@@ -131,6 +131,17 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
                     pygame.K_q:GAUCHE,
                 },
             },
+            "kwargs":{
+                ():{
+                    pygame.K_c:{"light":True},
+                },
+                (pygame.KMOD_LSHIFT,):{
+                    pygame.K_z:{"course":True},
+                    pygame.K_d:{"course":True},
+                    pygame.K_s:{"course":True},
+                    pygame.K_q:{"course":True},
+                },
+            },
             "projectiles":{},
             "magies":{},
         }
@@ -148,8 +159,6 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
         return (self.pv+degats) / self.pv_max <= taux_limite
 
     def debut_tour(self):
-        if self.action: # /!\ À faire ! /!\
-            self.nouvel_ordre = False
         Agissant.debut_tour(self)
         if self.get_etage_courant() > self.highest:
             self.highest = self.get_etage_courant()
@@ -283,9 +292,9 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
 
     def get_impact(self):
         if isinstance(self.action,Action_skill):
-            if self.action.skill in [Skill_stomp,Skill_attaque]:
+            if self.action.skill in [Stomp_humain,Attaque_humain]:
                 return Agissant.get_impact(self)
-            elif self.action.skill == Skill_magie:
+            elif self.action.skill == Magie_humain:
                 assert isinstance(self.action,Magie)
                 if isinstance(self.action,Cible_agissant) and self.action.cible is not None:
                     return self.action.cible.position
@@ -299,7 +308,8 @@ from Jeu.Constantes import *
 from Affichage.Skins.Skins import SKIN_TETE_HEROS
 from Jeu.Entitee.Agissant.Agissant import Agissant
 from Jeu.Action.Action_skill import Action_skill
-from Jeu.Systeme.Classe import Skill_stomp, Skill_attaque, Skill_magie, Skill_deplacement, Skill_course, Skill_ramasse, Skill_ramasse_light
+
+from Jeu.Systeme.Skill.Skills import Stomp_humain, Attaque_humain, Magie_humain, Deplacement_joueur, Ramasse_joueur
 from Jeu.Action.Magie.Magie import Magie, Cible_agissant, Cible_case
 from Jeu.Labyrinthe.Structure_spatiale.Direction import HAUT, DROITE, BAS, GAUCHE
 

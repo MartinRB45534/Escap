@@ -104,8 +104,8 @@ class Enseignement(One_shot,On_fin_tour):
         self.phase = "démarrage"
 
     def action(self,porteur:Agissant):
-        skill = trouve_skill(porteur.classe_principale,Skill_magie)
-        if skill is not None:
+        if isinstance(porteur,Mage):
+            skill = porteur.get_skill_magique()
             skill.ajoute(self.magie)
 
 # class Impregnation(One_shot,On_fin_tour):
@@ -151,5 +151,5 @@ class Instakill(One_shot,On_post_action):
 
 # Imports utilisés dans le code
 from Jeu.Systeme.Constantes_magies.Magies import *
-from Jeu.Systeme.Classe import trouve_skill, Skill_magie
+from Jeu.Entitee.Agissant.Role.Mage import Mage
 from Affichage.Skins.Skins import SKIN_TELEPORTATION, SKIN_DOPAGE

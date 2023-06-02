@@ -22,7 +22,7 @@ class Bouclier(Degainable):
         self.poids = 5
         self.frottements = 1 #En mode frisbee ça volle très bien !
 
-    def intercepte(self,attaque:Attaque):
+    def intercepte(self,attaque:Attaque_case):
         attaque.degats -= self.degats_bloques
         if attaque.degats < 0:
             attaque.degats = 0
@@ -46,5 +46,5 @@ class Bouclier(Degainable):
 
 # Imports utilisés dans le code
 from Affichage.Skins.Skins import SKIN_BOUCLIER
-from Jeu.Effet.Attaque.Attaque import Attaque
+from Jeu.Effet.Attaque.Attaque import Attaque_case
 from Jeu.Entitee.Item.Equippement.Equippement import Equipement

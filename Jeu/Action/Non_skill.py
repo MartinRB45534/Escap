@@ -12,10 +12,10 @@ if TYPE_CHECKING:
     from Jeu.Action.Magie.Magie import Magie
 
 # Imports des classes parentes
-from Jeu.Action.Action import Action_final
+from Jeu.Action.Action import Action_final, Non_repetable
 from Jeu.Action.Caste import Caste, Caste_continu, Caste_final, Caste_initial, Caste_fractionnaire
 
-class Place_effet(Action_final):
+class Place_effet(Action_final, Non_repetable):
     """
     L'action d'utilisation d'un consommable (potion ou parchemin) lorsque celui-ci se contente de placer un effet.
     """
@@ -44,7 +44,7 @@ class Boit(Place_effet):
         pass
         # TODO: Ajouter le get_skin
 
-class Lit(Caste):
+class Lit(Caste, Non_repetable):
     """
     L'action de caster un parchemin.
     """

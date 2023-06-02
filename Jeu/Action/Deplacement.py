@@ -6,9 +6,11 @@ if TYPE_CHECKING:
     from Jeu.Entitee.Agissant.Agissant import Agissant
     from Jeu.Entitee.Item.Item import Item
     from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
+    from Jeu.Systeme.Skill.Actif import Actif
 
 # Imports des classes parentes
 from Jeu.Action.Action import Action, Action_final
+from Jeu.Action.Action_skill import Action_skill
 
 class Deplace(Action):
     """
@@ -36,6 +38,7 @@ class Vole(Deplace,Action_final):
         self.latence_max = latence
         self.taux_vitesse = {}
         self.direction = direction
+        self.repete = True
 
     def action(self):
         lab = self.item.controleur.labs[self.item.position.lab]
@@ -45,21 +48,26 @@ class Vole(Deplace,Action_final):
         """L'action est appelée à chaque tour."""
         self.latence += self.get_vitesse()
         if self.latence >= self.latence_max:
-            self.termine()
+            return self.termine()
 
     def termine(self):
         """Le vol ne se finit pas, il est interrompu."""
         self.action()
         self.latence = 0
+        return super().termine()
         
     def get_skin(self):
         pass
         # TODO: Ajouter le get_skin
 
-class Marche(Deplace,Action_final):
+class Marche(Deplace,Action_skill,Action_final):
     """
     L'action des agissants qui se déplacent.
     """
+    def __init__(self,agissant:Agissant,latence:float,skill:Actif,xp:float,direction:Direction):
+        Action_skill.__init__(self,agissant,latence,skill,xp)
+        self.direction = direction
+
     def get_skin(self):
         pass
         # TODO: Ajouter le get_skin

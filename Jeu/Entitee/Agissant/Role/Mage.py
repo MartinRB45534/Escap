@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
@@ -31,7 +31,7 @@ class Mage(Agissant):
 
     def impregne(self,nom:str,parch:Parchemin_vierge):
         skill = self.get_skill_magique()
-        magie = skill.fait(nom,self)
+        magie = skill.fait(self,nom)
         if isinstance(parch.action_portee,Impregne) and parch.action_portee.magie is None:
             parch.action_portee.set_magie(magie)
         else:
@@ -52,5 +52,7 @@ class Multi_mage(Mage):
         return ""
     
 # Imports utilisés dans le code
-from Jeu.Systeme.Classe import trouve_skill, Skills_magiques
+
+from Jeu.Systeme.Classe.Classes import trouve_skill
+from Jeu.Systeme.Skill.Skills import Skills_magiques
 from Jeu.Action.Non_skill import Impregne

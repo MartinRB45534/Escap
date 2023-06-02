@@ -90,7 +90,9 @@ class Premiere_marche(Escalier):
 # Imports utilisés dans le code
 from Jeu.Labyrinthe.Structure_spatiale.Direction import *
 from Jeu.Labyrinthe.Structure_spatiale.Cote import Cote_position
-from Jeu.Systeme.Classe import trouve_skill, Skill_ecrasement
+
+from Jeu.Systeme.Classe.Classes import trouve_skill
+from Jeu.Systeme.Skill.Skills import Skill_ecrasement
 from Jeu.Entitee.Agissant.Agissant import Agissant
 from Jeu.Entitee.Item.Item import Item
 from Affichage.Skins.Skins import *

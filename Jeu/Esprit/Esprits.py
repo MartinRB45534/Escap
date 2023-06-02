@@ -7,7 +7,8 @@ if TYPE_CHECKING:
     from Jeu.Entitee.Agissant.Agissant import Agissant
     from Jeu.Entitee.Agissant.Humain.Humain import Humain
     from Jeu.Entitee.Agissant.Slime.Slime import Slime
-    from Jeu.Systeme.Classe import Classe_principale
+    
+from Jeu.Systeme.Classe.Classes import Classe_principale
 
 # Imports des classes parentes
 from Jeu.Esprit.Esprit import Esprit
@@ -245,12 +246,12 @@ class Esprit_slime(Esprit):
             if autre_skill is not None:
                 if skill.niveau > autre_skill.niveau or (skill.niveau == autre_skill.niveau and skill.xp > autre_skill.xp):
                     self.classe.skills.remove(autre_skill)
-                    self.classe.skills.append(skill)
+                    self.classe.skills.add(skill)
                 elif skill.niveau == autre_skill.niveau and skill.xp > autre_skill.xp:
                     self.classe.skills.remove(autre_skill)
-                    self.classe.skills.append(skill)
+                    self.classe.skills.add(skill)
             else:
-                self.classe.skills.append(skill)
+                self.classe.skills.add(skill)
 
     def ajoute_corp(self,corp:Slime):
         if not corp in self.corps:
@@ -261,4 +262,5 @@ class Esprit_slime(Esprit):
     #/!\ Faire un processus de décision propre aux slimes, qui prend en compte les capacités (communes heureusement) et la situation de chacun
 
 # Imports utilisés dans le code
-from Jeu.Systeme.Classe import trouve_skill
+
+from Jeu.Systeme.Classe.Classes import trouve_skill

@@ -1,13 +1,12 @@
 from __future__ import annotations
-from Jeu.Effet.Effets import Direction
-from Jeu.Entitee.Agissant.Agissants import Direction
+from typing import TYPE_CHECKING
 
-# Pas d'imports pour les annotations
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
 
 # Imports des classes parentes
 from Jeu.Entitee.Agissant.Role.Mage import Mage
-from Jeu.Entitee.Item.Items import Direction
-from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
 
 class Attaquant_magique_poing(Mage):
     """Les mages qui ont des attaques magiques de corps à corps si nécessaire."""
@@ -21,7 +20,7 @@ class Attaquant_magique_poing(Mage):
     def attaque(self, direction: Direction):
         if self.peut_frapper():
             skill = self.get_skill_magique()
-            action = skill.fait(self.frappe(),self)
+            action = skill.fait(self,self.frappe())
             assert isinstance(action,Magie_attaque_contact)
             action.direction = direction
             self.fait(action)

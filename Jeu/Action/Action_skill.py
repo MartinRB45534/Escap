@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
 
 # Imports des classes parentes
-from Jeu.Action.Action import Action, Action_parcellaire
+from Jeu.Action.Action import Action, Action_parcellaire, Non_repetable
 
 class Action_skill(Action):
     """
@@ -25,10 +25,11 @@ class Action_skill(Action):
     def termine(self):
         """L'action est terminée."""
         self.skill.xp_new += self.xp
+        return super().termine()
 
 
 
-class Ramasse(Action_skill,Action_parcellaire):
+class Ramasse(Action_skill, Action_parcellaire, Non_repetable):
     """
     L'action de ramasser les items d'une case.
     """
@@ -40,7 +41,7 @@ class Ramasse(Action_skill,Action_parcellaire):
     def action(self):
         self.agissant.inventaire.ajoute(self.items[self.rempli-1])
 
-class Derobe(Action_skill):
+class Derobe(Action_skill, Non_repetable):
     """
     L'action de dérober un item.
     """
@@ -82,6 +83,30 @@ class Blocage_zone(Blocage):
         positions_touchees = self.agissant.controleur.get_pos_touches(position,self.portee,self.propagation,self.direction)
         for pos in positions_touchees:
             self.agissant.controleur.case_from_position(pos).effets.append(Protection_bouclier(1,self.bouclier,[dir for dir in DIRECTIONS]))
+
+class Cree_item(Action_skill):
+    """
+    L'action de créer un item.
+    """
+    def __init__(self, agissant: Agissant, latence: float, skill: Actif, xp: float, item: Item):
+        super().__init__(agissant, latence, skill, xp)
+        self.item = item
+
+    def action(self):
+        self.agissant.inventaire.ajoute(self.item)
+
+class Alchimie(Cree_item, Non_repetable):
+    """
+    L'action de créer un item par alchimie.
+    """
+    def __init__(self, agissant: Agissant, latence: float, skill: Actif, xp: float, item: Item, ingredients: List[Item]):
+        super().__init__(agissant, latence, skill, xp, item)
+        self.ingredients = ingredients
+
+    def action(self):
+        for item in self.ingredients:
+            self.agissant.inventaire.drop(ABSENT,item)
+        self.agissant.inventaire.ajoute(self.item)
 
 # Imports utilisés dans le code
 from Jeu.Labyrinthe.Structure_spatiale.Direction import DIRECTIONS

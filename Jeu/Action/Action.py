@@ -16,18 +16,27 @@ class Action:
         self.latence:float = 0 # Le temps écoulé depuis le début de l'action
         self.latence_max = latence # Le temps que l'action doit durer
         self.taux_vitesse = {} # Les taux de vitesse de l'action (impactés par la glace, etc.)
+        self.repete = False # Si l'action doit être répétée
+        self.repetitions = 0 # Le nombre de fois que l'action a été répétée
 
     def execute(self):
         """L'action est appelée à chaque tour."""
         self.latence += self.get_vitesse()
         if self.latence >= self.latence_max:
-            self.termine()
-            return True
+            return self.termine()
         return False
 
     def termine(self):
         """L'action est terminée."""
-        pass
+        if self.repete:
+            self.reinit()
+            return False
+        return True
+
+    def reinit(self):
+        """L'action est réinitialisée."""
+        self.latence = 0
+        self.repetitions += 1
 
     def interrompt(self):
         """L'action est interrompue."""
@@ -43,7 +52,29 @@ class Action:
             vitesse *= taux
         return vitesse
 
+    def set_repete(self):
+        """L'action doit être répétée."""
+        self.repete = True
+
+    def unset_repete(self):
+        """L'action ne doit pas être répétée."""
+        self.repete = False
+        if self.repetitions > 0:
+            self.interrompt()
+            return True
+        return False
+
     # Il faut que l'action soit affichée, comme un skin par-dessus l'agissant
+
+class Non_repetable(Action):
+    """
+    Action qui ne peut pas se répéter (ramasser un objet, rescussiter un allié, etc.)
+    """
+    def set_repete(self):
+        pass
+
+    def unset_repete(self):
+        return False
 
 class Action_final(Action):
     """
@@ -51,8 +82,9 @@ class Action_final(Action):
     """
     def termine(self):
         """L'action est terminée."""
-        super().termine()
+        res = super().termine()
         self.action()
+        return res
 
 class Action_initial(Action):
     """
@@ -73,8 +105,7 @@ class Action_continu(Action):
         self.latence += self.get_vitesse()
         self.action()
         if self.latence >= self.latence_max:
-            self.termine()
-            return True
+            return self.termine()
         return False
     
 class Action_fractionnaire(Action):
@@ -94,9 +125,13 @@ class Action_fractionnaire(Action):
             self.rempli += 1
             self.action()
         if self.latence >= self.latence_max:
-            self.termine()
-            return True
+            return self.termine()
         return False
+    
+    def reinit(self):
+        """L'action est réinitialisée."""
+        self.rempli = 0
+        super().reinit()
     
 class Action_parcellaire(Action):
     """
@@ -114,6 +149,10 @@ class Action_parcellaire(Action):
             self.rempli += 1
             self.action()
         if self.latence >= self.latence_max:
-            self.termine()
-            return True
+            return self.termine()
         return False
+    
+    def reinit(self):
+        """L'action est réinitialisée."""
+        self.rempli = 0
+        super().reinit()

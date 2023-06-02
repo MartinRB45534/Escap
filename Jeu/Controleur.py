@@ -20,8 +20,10 @@ if TYPE_CHECKING:
 # Pas de classe parente
 
 # Valeurs par défaut des paramètres
+from Jeu.Entitee.Agissant.Agissant import NoOne, Agissant
+from Jeu.Entitee.Item.Item import Item
+from Jeu.Entitee.Decors.Decor import Decors
 from Jeu.Effet.Effets_mouvement.Deplacements import Teleport, Escalier
-from Jeu.Entitee.Agissant.Agissant import NoOne
 
 # Constantes
 from Jeu.Constantes import *
@@ -1661,4 +1663,5 @@ from Jeu.Effet.Effets import *
 from Jeu.Entitee.Entitees import *
 from Jeu.Esprit.Esprits import *
 from Jeu.Labyrinthe.Labyrinthes import *
-from Jeu.Systeme.Classe import *
+from Jeu.Systeme.Classe.Classes import *
+from Jeu.Systeme.Skill.Skills import *

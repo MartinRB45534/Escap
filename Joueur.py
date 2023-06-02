@@ -248,7 +248,6 @@ class Joueur:
             elif event.type in [pygame.MOUSEBUTTONDOWN,pygame.MOUSEBUTTONUP,pygame.MOUSEWHEEL,pygame.MOUSEMOTION]:
                 self.affichage.bouge_souris(event)
         self.affichage.survol(pygame.mouse.get_pos()) #On resurvole, au cas où la souris n'a pas bougé
-        self.recontrole()
 
     def controle(self,touche,mods=()):
         assert self.controleur is not None
@@ -274,7 +273,6 @@ class Joueur:
                 #Sinon, c'est qu'on veut controler les actions du perso (comme l'esprit le ferait pour les autres)
                 #Vu qu'on a fait les interractions ainsi que tous les choix depuis l'affichage au-dessus, il ne reste plus que les skills et leurs éventuelles précisions
                 self.controle_joueur(touche,mods)
-                self.controleur.joueur.nouvel_ordre = True
                 self.controleur.joueur.attente = self.parametres["attente"]
 
     def controle_joueur(self,touche,mods):
@@ -295,6 +293,7 @@ class Joueur:
             skill = trouve_skill(self.controleur.joueur.classe_principale,skill)
             assert isinstance(skill,Actif)
             action = skill.fait(self.controleur.joueur,**kwargs)
+            action.set_repete()
             self.controleur.joueur.fait(action,True)
             if isinstance(skill,Skills_offensifs): # Les skills qui correspondent à un statut d'attaque
                 self.controleur.joueur.set_statut("attaque",True)
@@ -307,25 +306,13 @@ class Joueur:
             elif isinstance(action,Magie) and isinstance(self.controleur.joueur,PJ_mage) : # Les skills qui utilisent de la magie
                 #On a éventuellement besoin d'informations supplémentaires sur cette magie
                 if isinstance(action,Cible_agissant):
-                    if self.controleur.joueur.nouvel_ordre:
-                        self.controleur.set_phase(AGISSANT_MAGIE)
-                    else:
-                        warn("Occupe-toi des magies répétées !")
+                    self.controleur.set_phase(AGISSANT_MAGIE)
                 if isinstance(action,Cible_case):
-                    if self.controleur.joueur.nouvel_ordre:
-                        self.controleur.set_phase(CASE_MAGIE)
-                    else:
-                        warn("Occupe-toi des magies répétées !")
+                    self.controleur.set_phase(CASE_MAGIE)
                 if isinstance(action,Magie_cout):
-                    if self.controleur.joueur.nouvel_ordre:
-                        self.controleur.set_phase(COUT_MAGIE)
-                    else:
-                        warn("Occupe-toi des magies répétées !")
+                    self.controleur.set_phase(COUT_MAGIE)
                 if isinstance(action,Magie_dirigee):
-                    if self.controleur.joueur.nouvel_ordre:
-                        self.controleur.set_phase(DIRECTION_MAGIE)
-                    else:
-                        warn("Occupe-toi des magies répétées !")
+                    self.controleur.set_phase(DIRECTION_MAGIE)
 
     def decontrole(self,touche):
         """Fonction qui désélectionne le skill courant si on en relache la touche"""
@@ -333,28 +320,29 @@ class Joueur:
 
         if self.controleur.phase == TOUR:
             if isinstance(self.controleur.joueur.action,Action_skill):
-                if not self.controleur.joueur.nouvel_ordre: #On ne veut pas désélectionner un skill qui n'a pas encore été utilisé au moins une fois
-                    for touches_skills in self.controleur.joueur.touches["skills"].values(): #On ne sait pas quels modificateurs étaient actifs lorsque la touche a été pressée
-                        if touches_skills.get(touche) is not None: #La touche relachée est liée à un skill
-                            if touches_skills.get(touche) == self.controleur.joueur.action.skill: #La touche relachée est celle du skill courant
-                                self.controleur.joueur.set_statut("attente",True)
-                                self.controleur.joueur.action.interrompt()
-                                self.controleur.joueur.attente = self.parametres["attente"]
+                for k, touches_skills in self.controleur.joueur.touches["skills"].items(): #On ne sait pas quels modificateurs étaient actifs lorsque la touche a été pressée
+                    type_skill = touches_skills.get(touche)
+                    if isinstance(type_skill, Type) and issubclass(type_skill, Actif): #La touche relachée est liée à un skill
+                        if isinstance(self.controleur.joueur.action.skill, type_skill): #La touche relachée est celle du skill courant
+                            if self.controleur.joueur.touches["directions"].get(k,{}).get(touche) == self.controleur.joueur.dir_regard: #Si la touche relachée est celle de la direction du joueur
+                                if self.controleur.joueur.action.unset_repete(): #Si l'action n'en est pas à sa première répétition
+                                    self.controleur.joueur.set_statut("attente",True)
+                                    self.controleur.joueur.action = None
+                                    self.controleur.joueur.attente = self.parametres["attente"]
+                                    break
+        self.recontrole()
 
     def recontrole(self):
-        """La fonction qui réagit aux touches maintenues."""
+        """La fonction qui réagit aux touches maintenues lorsqu'une autre touche est relachée"""
         assert self.controleur is not None
-
-        # On ne veut pas interférer avec les touches nouvellement descendues :
-        if not self.controleur.joueur.nouvel_ordre :
-            # On commence par trouver à quelle catégorie appartient la touche :
-            mods = get_modifiers(pygame.key.get_mods())
-            pressees = pygame.key.get_pressed()
-            for key in range(len(pressees)):
-                if pressees[key]:
-                    if self.controleur.joueur.touches["effets"].get(mods,{}).get(key,[]): #La touche est liée à un effet
-                        self.controle_joueur(key,mods)
-                        self.controleur.joueur.attente = self.parametres["attente"]
+        # On commence par trouver à quelle catégorie appartient la touche :
+        mods = get_modifiers(pygame.key.get_mods())
+        pressees = pygame.key.get_pressed()
+        for key in range(len(pressees)):
+            if pressees[key]:
+                if self.controleur.joueur.touches["effets"].get(mods,{}).get(key,[]): #La touche est liée à un effet
+                    self.controle_joueur(key,mods)
+                    self.controleur.joueur.attente = self.parametres["attente"]
 
     def quitte(self):
         """Fonction qui quitte le jeu, en sauvegardant le controleur"""
@@ -502,285 +490,285 @@ class Joueur:
                 return pygame.key.name(key).upper()
         return 0
 
-    def set_parametres(self):
-        #Fonction qui modifie les paramètres.
-        self.parametres = {"cat_touches":{pygame.K_SPACE:"courant",
-                                          pygame.K_BACKSPACE:"pause",
-                                          pygame.K_RETURN:"touches"},
-                           "dir_touches":{pygame.K_UP:HAUT,
-                                          pygame.K_DOWN:BAS,
-                                          pygame.K_LEFT:GAUCHE,
-                                          pygame.K_RIGHT:DROITE},
-                           "skill_touches":{},
-                           "tours_par_seconde":0}
-        #On parcours les paramètres un par un.
-        screen.fill((0,0,0))
-        largeur,hauteur = screen.get_size()
-        marge_haut = int(hauteur//2 - 345)
-        marge_gauche = int(largeur//2 - 675)
+    # def set_parametres(self):
+    #     #Fonction qui modifie les paramètres.
+    #     self.parametres = {"cat_touches":{pygame.K_SPACE:"courant",
+    #                                       pygame.K_BACKSPACE:"pause",
+    #                                       pygame.K_RETURN:"touches"},
+    #                        "dir_touches":{pygame.K_UP:HAUT,
+    #                                       pygame.K_DOWN:BAS,
+    #                                       pygame.K_LEFT:GAUCHE,
+    #                                       pygame.K_RIGHT:DROITE},
+    #                        "skill_touches":{},
+    #                        "tours_par_seconde":0}
+    #     #On parcours les paramètres un par un.
+    #     screen.fill((0,0,0))
+    #     largeur,hauteur = screen.get_size()
+    #     marge_haut = int(hauteur//2 - 345)
+    #     marge_gauche = int(largeur//2 - 675)
 
-        run = True
-        key = None
-        while run:
-            events = pygame.event.get()
-            for event in events:
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_RETURN:
-                        if key is not None:
-                            run = False
-                            self.parametres["cat_touches"][key] = "zone"
-                            self.parametres["dir_touches"][key] = IN
-                    elif not(event.key in self.parametres["cat_touches"]):
-                        key = event.key
-                elif event.type == pygame.QUIT:
-                    self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
-                    return
+    #     run = True
+    #     key = None
+    #     while run:
+    #         events = pygame.event.get()
+    #         for event in events:
+    #             if event.type == pygame.KEYDOWN:
+    #                 if event.key == pygame.K_RETURN:
+    #                     if key is not None:
+    #                         run = False
+    #                         self.parametres["cat_touches"][key] = "zone"
+    #                         self.parametres["dir_touches"][key] = IN
+    #                 elif not(event.key in self.parametres["cat_touches"]):
+    #                     key = event.key
+    #             elif event.type == pygame.QUIT:
+    #                 self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
+    #                 return
 
-            screen.blit(pygame.image.load("RemplacementA.png"),(marge_gauche,marge_haut))
-            if key is not None:
-                screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+140,marge_haut+500))
-            #Rajouter un texte explicatif sur le role de la touche A
+    #         screen.blit(pygame.image.load("RemplacementA.png"),(marge_gauche,marge_haut))
+    #         if key is not None:
+    #             screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+140,marge_haut+500))
+    #         #Rajouter un texte explicatif sur le role de la touche A
 
-        run = True
-        key = None
-        while run:
-            events = pygame.event.get()
-            for event in events:
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_RETURN:
-                        if key is not None:
-                            run = False
-                            self.parametres["cat_touches"][key] = "zone"
-                            self.parametres["dir_touches"][key] = OUT
-                    elif not(event.key in self.parametres["cat_touches"]):
-                        key = event.key
-                elif event.type == pygame.QUIT:
-                    self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
-                    return
+    #     run = True
+    #     key = None
+    #     while run:
+    #         events = pygame.event.get()
+    #         for event in events:
+    #             if event.type == pygame.KEYDOWN:
+    #                 if event.key == pygame.K_RETURN:
+    #                     if key is not None:
+    #                         run = False
+    #                         self.parametres["cat_touches"][key] = "zone"
+    #                         self.parametres["dir_touches"][key] = OUT
+    #                 elif not(event.key in self.parametres["cat_touches"]):
+    #                     key = event.key
+    #             elif event.type == pygame.QUIT:
+    #                 self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
+    #                 return
 
-            screen.blit(pygame.image.load("RemplacementE.png"),(marge_gauche,marge_haut))
-            if key is not None:
-                screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+320,marge_haut+500))
-            #Rajouter un texte explicatif sur le role de la touche E
+    #         screen.blit(pygame.image.load("RemplacementE.png"),(marge_gauche,marge_haut))
+    #         if key is not None:
+    #             screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+320,marge_haut+500))
+    #         #Rajouter un texte explicatif sur le role de la touche E
 
-        run = True
-        key = None
-        while run:
-            events = pygame.event.get()
-            for event in events:
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_RETURN:
-                        if key is not None:
-                            run = False
-                            self.parametres["cat_touches"][key] = "zone"
-                            self.parametres["dir_touches"][key] = HAUT
-                    elif not(event.key in self.parametres["cat_touches"]):
-                        key = event.key
-                elif event.type == pygame.QUIT:
-                    self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
-                    return
+    #     run = True
+    #     key = None
+    #     while run:
+    #         events = pygame.event.get()
+    #         for event in events:
+    #             if event.type == pygame.KEYDOWN:
+    #                 if event.key == pygame.K_RETURN:
+    #                     if key is not None:
+    #                         run = False
+    #                         self.parametres["cat_touches"][key] = "zone"
+    #                         self.parametres["dir_touches"][key] = HAUT
+    #                 elif not(event.key in self.parametres["cat_touches"]):
+    #                     key = event.key
+    #             elif event.type == pygame.QUIT:
+    #                 self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
+    #                 return
 
-            screen.blit(pygame.image.load("RemplacementZ.png"),(marge_gauche,marge_haut))
-            if key is not None:
-                screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+230,marge_haut+500))
-            #Rajouter un texte explicatif sur le role de la touche Z
+    #         screen.blit(pygame.image.load("RemplacementZ.png"),(marge_gauche,marge_haut))
+    #         if key is not None:
+    #             screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+230,marge_haut+500))
+    #         #Rajouter un texte explicatif sur le role de la touche Z
 
-        run = True
-        key = None
-        while run:
-            events = pygame.event.get()
-            for event in events:
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_RETURN:
-                        if key is not None:
-                            run = False
-                            self.parametres["cat_touches"][key] = "zone"
-                            self.parametres["dir_touches"][key] = BAS
-                    elif not(event.key in self.parametres["cat_touches"]):
-                        key = event.key
-                elif event.type == pygame.QUIT:
-                    self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
-                    return
+    #     run = True
+    #     key = None
+    #     while run:
+    #         events = pygame.event.get()
+    #         for event in events:
+    #             if event.type == pygame.KEYDOWN:
+    #                 if event.key == pygame.K_RETURN:
+    #                     if key is not None:
+    #                         run = False
+    #                         self.parametres["cat_touches"][key] = "zone"
+    #                         self.parametres["dir_touches"][key] = BAS
+    #                 elif not(event.key in self.parametres["cat_touches"]):
+    #                     key = event.key
+    #             elif event.type == pygame.QUIT:
+    #                 self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
+    #                 return
 
-            screen.blit(pygame.image.load("RemplacementS.png"),(marge_gauche,marge_haut))
-            if key is not None:
-                screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+255,marge_haut+590))
-            #Rajouter un texte explicatif sur le role de la touche S
+    #         screen.blit(pygame.image.load("RemplacementS.png"),(marge_gauche,marge_haut))
+    #         if key is not None:
+    #             screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+255,marge_haut+590))
+    #         #Rajouter un texte explicatif sur le role de la touche S
 
-        run = True
-        key = None
-        while run:
-            events = pygame.event.get()
-            for event in events:
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_RETURN:
-                        if key is not None:
-                            run = False
-                            self.parametres["cat_touches"][key] = "zone"
-                            self.parametres["dir_touches"][key] = GAUCHE
-                    elif not(event.key in self.parametres["cat_touches"]):
-                        key = event.key
-                elif event.type == pygame.QUIT:
-                    self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
-                    return
+    #     run = True
+    #     key = None
+    #     while run:
+    #         events = pygame.event.get()
+    #         for event in events:
+    #             if event.type == pygame.KEYDOWN:
+    #                 if event.key == pygame.K_RETURN:
+    #                     if key is not None:
+    #                         run = False
+    #                         self.parametres["cat_touches"][key] = "zone"
+    #                         self.parametres["dir_touches"][key] = GAUCHE
+    #                 elif not(event.key in self.parametres["cat_touches"]):
+    #                     key = event.key
+    #             elif event.type == pygame.QUIT:
+    #                 self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
+    #                 return
 
-            screen.blit(pygame.image.load("RemplacementQ.png"),(marge_gauche,marge_haut))
-            if key is not None:
-                screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+165,marge_haut+590))
-            #Rajouter un texte explicatif sur le role de la touche Q
+    #         screen.blit(pygame.image.load("RemplacementQ.png"),(marge_gauche,marge_haut))
+    #         if key is not None:
+    #             screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+165,marge_haut+590))
+    #         #Rajouter un texte explicatif sur le role de la touche Q
 
-        run = True
-        key = None
-        while run:
-            events = pygame.event.get()
-            for event in events:
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_RETURN:
-                        if key is not None:
-                            run = False
-                            self.parametres["cat_touches"][key] = "zone"
-                            self.parametres["dir_touches"][key] = DROITE
-                    elif not(event.key in self.parametres["cat_touches"]):
-                        key = event.key
-                elif event.type == pygame.QUIT:
-                    self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
-                    return
+    #     run = True
+    #     key = None
+    #     while run:
+    #         events = pygame.event.get()
+    #         for event in events:
+    #             if event.type == pygame.KEYDOWN:
+    #                 if event.key == pygame.K_RETURN:
+    #                     if key is not None:
+    #                         run = False
+    #                         self.parametres["cat_touches"][key] = "zone"
+    #                         self.parametres["dir_touches"][key] = DROITE
+    #                 elif not(event.key in self.parametres["cat_touches"]):
+    #                     key = event.key
+    #             elif event.type == pygame.QUIT:
+    #                 self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
+    #                 return
 
-            screen.blit(pygame.image.load("RemplacementD.png"),(marge_gauche,marge_haut))
-            if key is not None:
-                screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+345,marge_haut+590))
-            #Rajouter un texte explicatif sur le role de la touche D
+    #         screen.blit(pygame.image.load("RemplacementD.png"),(marge_gauche,marge_haut))
+    #         if key is not None:
+    #             screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+345,marge_haut+590))
+    #         #Rajouter un texte explicatif sur le role de la touche D
 
-        run = True
-        key = None
-        while run:
-            events = pygame.event.get()
-            for event in events:
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_RETURN:
-                        if key is not None:
-                            run = False
-                            self.parametres["cat_touches"][key] = "skill"
-                            self.parametres["dir_touches"][key] = Skill_deplacement
-                    elif not(event.key in self.parametres["cat_touches"]):
-                        key = event.key
-                elif event.type == pygame.QUIT:
-                    self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
-                    return
+    #     run = True
+    #     key = None
+    #     while run:
+    #         events = pygame.event.get()
+    #         for event in events:
+    #             if event.type == pygame.KEYDOWN:
+    #                 if event.key == pygame.K_RETURN:
+    #                     if key is not None:
+    #                         run = False
+    #                         self.parametres["cat_touches"][key] = "skill"
+    #                         self.parametres["dir_touches"][key] = Skill_deplacement
+    #                 elif not(event.key in self.parametres["cat_touches"]):
+    #                     key = event.key
+    #             elif event.type == pygame.QUIT:
+    #                 self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
+    #                 return
 
-            screen.blit(pygame.image.load("RemplacementW.png"),(marge_gauche,marge_haut))
-            if key is not None:
-                screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+345,marge_haut+590))
-            #Rajouter un texte explicatif sur le role de la touche W
+    #         screen.blit(pygame.image.load("RemplacementW.png"),(marge_gauche,marge_haut))
+    #         if key is not None:
+    #             screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+345,marge_haut+590))
+    #         #Rajouter un texte explicatif sur le role de la touche W
 
-        run = True
-        key = None
-        while run:
-            events = pygame.event.get()
-            for event in events:
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_RETURN:
-                        if key is not None:
-                            run = False
-                            self.parametres["cat_touches"][key] = "skill"
-                            self.parametres["dir_touches"][key] = Skill_course
-                    elif not(event.key in self.parametres["cat_touches"]):
-                        key = event.key
-                elif event.type == pygame.QUIT:
-                    self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
-                    return
+    #     run = True
+    #     key = None
+    #     while run:
+    #         events = pygame.event.get()
+    #         for event in events:
+    #             if event.type == pygame.KEYDOWN:
+    #                 if event.key == pygame.K_RETURN:
+    #                     if key is not None:
+    #                         run = False
+    #                         self.parametres["cat_touches"][key] = "skill"
+    #                         self.parametres["dir_touches"][key] = Skill_course
+    #                 elif not(event.key in self.parametres["cat_touches"]):
+    #                     key = event.key
+    #             elif event.type == pygame.QUIT:
+    #                 self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
+    #                 return
 
-            screen.blit(pygame.image.load("RemplacementR.png"),(marge_gauche,marge_haut))
-            if key is not None:
-                screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+345,marge_haut+590))
-            #Rajouter un texte explicatif sur le role de la touche R
+    #         screen.blit(pygame.image.load("RemplacementR.png"),(marge_gauche,marge_haut))
+    #         if key is not None:
+    #             screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+345,marge_haut+590))
+    #         #Rajouter un texte explicatif sur le role de la touche R
 
-        run = True
-        key = None
-        while run:
-            events = pygame.event.get()
-            for event in events:
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_RETURN:
-                        if key is not None:
-                            run = False
-                            self.parametres["cat_touches"][key] = "skill"
-                            self.parametres["dir_touches"][key] = Skill_ramasse
-                    elif not(event.key in self.parametres["cat_touches"]):
-                        key = event.key
-                elif event.type == pygame.QUIT:
-                    self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
-                    return
+    #     run = True
+    #     key = None
+    #     while run:
+    #         events = pygame.event.get()
+    #         for event in events:
+    #             if event.type == pygame.KEYDOWN:
+    #                 if event.key == pygame.K_RETURN:
+    #                     if key is not None:
+    #                         run = False
+    #                         self.parametres["cat_touches"][key] = "skill"
+    #                         self.parametres["dir_touches"][key] = Skill_ramasse
+    #                 elif not(event.key in self.parametres["cat_touches"]):
+    #                     key = event.key
+    #             elif event.type == pygame.QUIT:
+    #                 self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
+    #                 return
 
-            screen.blit(pygame.image.load("RemplacementM.png"),(marge_gauche,marge_haut))
-            if key is not None:
-                screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+345,marge_haut+590))
-            #Rajouter un texte explicatif sur le role de la touche M
+    #         screen.blit(pygame.image.load("RemplacementM.png"),(marge_gauche,marge_haut))
+    #         if key is not None:
+    #             screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+345,marge_haut+590))
+    #         #Rajouter un texte explicatif sur le role de la touche M
 
-        run = True
-        key = None
-        while run:
-            events = pygame.event.get()
-            for event in events:
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_RETURN:
-                        if key is not None:
-                            run = False
-                            self.parametres["cat_touches"][key] = "skill"
-                            self.parametres["dir_touches"][key] = Skill_stomp
-                    elif not(event.key in self.parametres["cat_touches"]):
-                        key = event.key
-                elif event.type == pygame.QUIT:
-                    self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
-                    return
+    #     run = True
+    #     key = None
+    #     while run:
+    #         events = pygame.event.get()
+    #         for event in events:
+    #             if event.type == pygame.KEYDOWN:
+    #                 if event.key == pygame.K_RETURN:
+    #                     if key is not None:
+    #                         run = False
+    #                         self.parametres["cat_touches"][key] = "skill"
+    #                         self.parametres["dir_touches"][key] = Skill_stomp
+    #                 elif not(event.key in self.parametres["cat_touches"]):
+    #                     key = event.key
+    #             elif event.type == pygame.QUIT:
+    #                 self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
+    #                 return
 
-            screen.blit(pygame.image.load("RemplacementP.png"),(marge_gauche,marge_haut))
-            if key is not None:
-                screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+345,marge_haut+590))
-            #Rajouter un texte explicatif sur le role de la touche P
+    #         screen.blit(pygame.image.load("RemplacementP.png"),(marge_gauche,marge_haut))
+    #         if key is not None:
+    #             screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+345,marge_haut+590))
+    #         #Rajouter un texte explicatif sur le role de la touche P
 
-        run = True
-        key = None
-        while run:
-            events = pygame.event.get()
-            for event in events:
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_RETURN:
-                        if key is not None:
-                            run = False
-                            self.parametres["cat_touches"][key] = "skill"
-                            self.parametres["dir_touches"][key] = Skill_attaque
-                    elif not(event.key in self.parametres["cat_touches"]):
-                        key = event.key
-                elif event.type == pygame.QUIT:
-                    self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
-                    return
+    #     run = True
+    #     key = None
+    #     while run:
+    #         events = pygame.event.get()
+    #         for event in events:
+    #             if event.type == pygame.KEYDOWN:
+    #                 if event.key == pygame.K_RETURN:
+    #                     if key is not None:
+    #                         run = False
+    #                         self.parametres["cat_touches"][key] = "skill"
+    #                         self.parametres["dir_touches"][key] = Skill_attaque
+    #                 elif not(event.key in self.parametres["cat_touches"]):
+    #                     key = event.key
+    #             elif event.type == pygame.QUIT:
+    #                 self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
+    #                 return
 
-            screen.blit(pygame.image.load("RemplacementX.png"),(marge_gauche,marge_haut))
-            if key is not None:
-                screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+345,marge_haut+590))
-            #Rajouter un texte explicatif sur le role de la touche X
+    #         screen.blit(pygame.image.load("RemplacementX.png"),(marge_gauche,marge_haut))
+    #         if key is not None:
+    #             screen.blit(POLICE40.render(f"{pygame.key.name(key).upper()}",True,(255,255,255)),(marge_gauche+345,marge_haut+590))
+    #         #Rajouter un texte explicatif sur le role de la touche X
 
-        run = True
-        while run:
-            events = pygame.event.get()
-            for event in events:
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_RETURN:
-                        if self.parametres["tours_par_seconde"]>0:
-                            run = False
-                    elif event.key == pygame.K_UP:
-                        self.parametres["tours_par_seconde"] += 1
-                    elif event.key == pygame.K_DOWN:
-                        self.parametres["tours_par_seconde"] -= 1
-                elif event.type == pygame.QUIT:
-                    self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
-                    return
+    #     run = True
+    #     while run:
+    #         events = pygame.event.get()
+    #         for event in events:
+    #             if event.type == pygame.KEYDOWN:
+    #                 if event.key == pygame.K_RETURN:
+    #                     if self.parametres["tours_par_seconde"]>0:
+    #                         run = False
+    #                 elif event.key == pygame.K_UP:
+    #                     self.parametres["tours_par_seconde"] += 1
+    #                 elif event.key == pygame.K_DOWN:
+    #                     self.parametres["tours_par_seconde"] -= 1
+    #             elif event.type == pygame.QUIT:
+    #                 self.parametres = {"cat_touches":{pygame.K_UP:"directionelle",pygame.K_DOWN:"directionelle",pygame.K_LEFT:"directionelle",pygame.K_RIGHT:"directionelle",pygame.K_q:"zone",pygame.K_z:"zone",pygame.K_d:"zone", pygame.K_s:"zone",pygame.K_a:"zone",pygame.K_e:"zone", pygame.K_p:"skill",pygame.K_w:"skill",pygame.K_x:"skill",pygame.K_m:"skill",pygame.K_r:"skill",pygame.K_SPACE:"courant",pygame.K_BACKSPACE:"pause",pygame.K_RETURN:"touches"},"dir_touches":{pygame.K_UP:HAUT,pygame.K_DOWN:BAS,pygame.K_LEFT:GAUCHE,pygame.K_RIGHT:DROITE,pygame.K_q:GAUCHE,pygame.K_z:HAUT,pygame.K_d:DROITE,pygame.K_s:BAS,pygame.K_a:IN,pygame.K_e:OUT},"skill_touches":{pygame.K_p:Skill_stomp,pygame.K_m:Skill_ramasse,pygame.K_w:Skill_deplacement,pygame.K_x:Skill_attaque,pygame.K_r:Skill_course},"tours_par_seconde":6}
+    #                 return
 
-            screen.blit(pygame.image.load("Remplacementtours.png"),(marge_gauche,marge_haut))
-            screen.blit(POLICE40.render(f"{self.parametres['tours_par_seconde']}",True,(255,255,255)),(marge_gauche+345,marge_haut+590))
-            #Rajouter un texte explicatif sur les tours par seconde
-        return True
+    #         screen.blit(pygame.image.load("Remplacementtours.png"),(marge_gauche,marge_haut))
+    #         screen.blit(POLICE40.render(f"{self.parametres['tours_par_seconde']}",True,(255,255,255)),(marge_gauche+345,marge_haut+590))
+    #         #Rajouter un texte explicatif sur les tours par seconde
+    #     return True
 
     def clear(self):
         """Fonction qui enlève tous les éléments superflus avant une sauvegarde."""
@@ -836,9 +824,9 @@ class Joueur:
             elif res == "ctrlv":
                 if GLOBALS["controleur"] is not None:
                     self.controleurs.append(copy.deepcopy(GLOBALS["controleur"]))
-            elif res == "ctrl":
-                if not self.set_parametres():
-                    run = False
+            # elif res == "ctrl":
+            #     if not self.set_parametres():
+            #         run = False
             elif isinstance(res,Controleur):
                 boutons = [["Ouvrir",["Reprendre cette partie où vous l'aviez laissée","","La partie sera automatiquement en pause"],"ctrlo"],
                            ["Copier",["Copier cette partie dans le presse-papier,","Pour pouvoir la coller autre-part"],"ctrlc"],

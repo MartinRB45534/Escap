@@ -247,11 +247,11 @@ class Inventaire:
             for item in self.items[classe]:
                 item.debut_tour()
         #On ne manipule pas les cadavres
-        for oeuf in self.oeufs: #Mais les oeufs incubent !
-            hatch:Optional[Hatching] = trouve_skill(oeuf.agissant.classe_principale,Hatching)
-            if hatch is not None:
-                if hatch.utilise(): #Et peuvent même éclore !
-                    self.controleur.fait_eclore(oeuf,self.possesseur)# /!\ À coder !
+        # for oeuf in self.oeufs: #Mais les oeufs incubent !
+        #     hatch:Optional[Hatching] = trouve_skill(oeuf.agissant.classe_principale,Hatching)
+        #     if hatch is not None:
+        #         if hatch.utilise(): #Et peuvent même éclore !
+        #             self.controleur.fait_eclore(oeuf,self.possesseur)# /!\ À coder !
 
     def pseudo_debut_tour(self):
         items:Set[Item] = set()
@@ -303,6 +303,8 @@ from Jeu.Entitee.Item.Item import Ingredient
 from Jeu.Entitee.Item.Cadavre import Cadavre
 from Jeu.Entitee.Item.Oeuf import Oeuf
 from Jeu.Entitee.Item.Parchemin.Parchemins import Parchemin_vierge
-from Jeu.Systeme.Classe import trouve_skill, Hatching
+
+from Jeu.Systeme.Classe.Classes import trouve_skill
+# from Jeu.Systeme.Skill.Skills import Hatching
 from warnings import warn
 import random

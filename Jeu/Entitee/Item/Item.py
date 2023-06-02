@@ -89,7 +89,9 @@ class Item(Mobile):
     def vole(self):
         #On voooole (si on a été lancé)
         if self.action is not None:
-            self.action.execute()
+            if self.action.execute():
+                self.action = None # Ne devrait jamais arriver
+                print("L'item a fini son vol !?!?")
         if self.hauteur <= 0:
             self.atterit()
 

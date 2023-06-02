@@ -17,7 +17,7 @@ class Attaquant_magique_case(Mage):
         if cibles and self.peut_caster():
             new_cibles = sorted(cibles, key=itemgetter(0))
             skill = self.get_skill_magique()
-            action = skill.fait(self.caste(),self)
+            action = skill.fait(self,self.caste())
             assert isinstance(action,Cible_case)
             action.cible = new_cibles[-1][-1]
             self.fait(action)
