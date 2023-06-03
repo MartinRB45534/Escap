@@ -8,8 +8,8 @@ screen = pygame.display.set_mode((1350, 690),pygame.RESIZABLE)
 GLOBALS:Dict = {"controleur":None}
 
 from Modifiers import *
-from Jeu.Controleur import *
-from Affichage.Affichages import *
+from Old_Jeu.Controleur import *
+from Old_Affichage.Affichages import *
 
 SKIN_ESCAP.dessine_toi(screen,(0,0))
 

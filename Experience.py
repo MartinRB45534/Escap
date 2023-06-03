@@ -3,8 +3,8 @@ pygame.init()
 screen = pygame.display.set_mode((1,1))
 import numpy as np
 from Jeu import * #Nécessaire ?
-from Jeu.Général import *
-from Jeu.Constantes import *
+from Old_Jeu.Général import *
+from Old_Jeu.Constantes import *
 
 #Expérience 1 (dispersion spatiale 0.1-0.9 milieu ouvert):
 #Équipe 1 contre équipe 2, l'équipe 1 est désavantagée (shamans à l'avant, sentinelle et guerriers à l'arrière)
