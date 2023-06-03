@@ -287,11 +287,11 @@ class Joueur:
             self.controleur.joueur.regarde(direction,True)
         if "skills" in effets: #La touche est liée à un skill (entre autres)
             skill = touches["skills"].get(mods,{}).get(touche)
-            assert isinstance(skill,Type) and issubclass(skill,Skill_intrasec)
+            assert isinstance(skill,Type) and issubclass(skill,Actif)
             kwargs = touches["kwargs"].get(mods,{}).get(touche,{})
             assert isinstance(kwargs,dict)
             skill = trouve_skill(self.controleur.joueur.classe_principale,skill)
-            assert isinstance(skill,Actif)
+            assert skill is not None
             action = skill.fait(self.controleur.joueur,**kwargs)
             action.set_repete()
             self.controleur.joueur.fait(action,True)
@@ -324,7 +324,7 @@ class Joueur:
                     type_skill = touches_skills.get(touche)
                     if isinstance(type_skill, Type) and issubclass(type_skill, Actif): #La touche relachée est liée à un skill
                         if isinstance(self.controleur.joueur.action.skill, type_skill): #La touche relachée est celle du skill courant
-                            if self.controleur.joueur.touches["directions"].get(k,{}).get(touche) == self.controleur.joueur.dir_regard: #Si la touche relachée est celle de la direction du joueur
+                            if self.controleur.joueur.touches["directions"].get(k,{}).get(touche,self.controleur.joueur.dir_regard) == self.controleur.joueur.dir_regard: #Si la touche relachée est celle de la direction du joueur
                                 if self.controleur.joueur.action.unset_repete(): #Si l'action n'en est pas à sa première répétition
                                     self.controleur.joueur.set_statut("attente",True)
                                     self.controleur.joueur.action = None
