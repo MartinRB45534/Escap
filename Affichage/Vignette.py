@@ -4,7 +4,7 @@ if TYPE_CHECKING:
     from Skin import Skin, Image
 import pygame
 
-from Affichage.Affichable import Affichable
+from .Affichable import Affichable
 
 class Vignette(Affichable):
     """Un élément qui est juste une image."""

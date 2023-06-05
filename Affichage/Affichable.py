@@ -1,5 +1,8 @@
-from typing import List
+from __future__ import annotations
+from typing import List, TYPE_CHECKING
 import pygame
+if TYPE_CHECKING:
+    from Placeholder import Placeheldholder
 
 class Affichable:
     """Un élément qui s'affiche. Apparaît à l'écran."""
@@ -32,7 +35,7 @@ class Affichable:
             res = self
         return res
     
-    def clique_placeholder(self,placeheldholder,droit: bool = False):
+    def clique_placeholder(self,placeheldholder:Placeheldholder,droit: bool = False):
         return False
 
     def survol(self,position):

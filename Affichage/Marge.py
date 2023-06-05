@@ -1,6 +1,6 @@
 import pygame
 
-from Affichage.Affichable import Affichable
+from .Affichable import Affichable
 
 class Marge(Affichable):
     """Un espace vide."""

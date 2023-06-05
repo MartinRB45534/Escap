@@ -1,8 +1,10 @@
 from __future__ import annotations
-from typing import List
+from typing import List, TYPE_CHECKING
 import pygame
+if TYPE_CHECKING:
+    from Placeholder import Placeheldholder
 
-from Affichable import Affichable
+from .Affichable import Affichable
 
 class Parent(Affichable):
     """Un élément de l'affichage. Peut contenir des sous-éléments."""
@@ -38,7 +40,7 @@ class Parent(Affichable):
                 res = res_objet
         return res
     
-    def clique_placeholder(self,placeheldholder,droit: bool = False):
+    def clique_placeholder(self,placeheldholder:Placeheldholder,droit: bool = False):
         res = False
         for objet in self.objets:
             if objet.clique_placeholder(placeheldholder,droit):

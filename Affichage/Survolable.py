@@ -1,4 +1,4 @@
-from Affichage.Affichable import Affichable
+from .Affichable import Affichable
 
 class Survolable(Affichable):
     """Un élément qui réagit au survol"""
