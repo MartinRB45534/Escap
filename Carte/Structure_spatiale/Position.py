@@ -80,4 +80,4 @@ class Nowhere(Position):
 ABSENT = Nowhere()
 
 # Imports utilisés dans le code
-from Old_Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
+from .Decalage import Decalage

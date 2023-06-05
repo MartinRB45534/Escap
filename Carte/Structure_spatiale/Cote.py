@@ -3,9 +3,9 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
+    from .Position import Position
+    from .Decalage import Decalage
+    from .Direction import Direction
 
 # Pas de classe parente
 
@@ -96,5 +96,5 @@ class Cote_position:
         return Cote_position(self.emplacement+self.direction,self.direction.oppose())
     
 # Imports utilisés dans le code
-from Old_Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
+from .Decalage import Decalage
+from .Position import Position

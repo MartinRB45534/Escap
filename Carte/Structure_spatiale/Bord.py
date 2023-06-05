@@ -21,17 +21,16 @@ class Bord:
         if item is None:
             return False
         if isinstance(item,Cote_position|Cote_decalage):
-            if NB_DIRECTIONS == 4:
-                return (item.direction == HAUT and item.emplacement.y == 0 and 0 <= item.emplacement.x < self.emplacement.x) or (item.direction == BAS and item.emplacement.y == self.emplacement.y-1 and 0 <= item.emplacement.x < self.emplacement.x) or (item.direction == GAUCHE and item.emplacement.x == 0 and 0 <= item.emplacement.y < self.emplacement.y) or (item.direction == DROITE and item.emplacement.x == self.emplacement.x-1 and 0 <= item.emplacement.y < self.emplacement.y)
+            return (item.direction == Direction.HAUT and item.emplacement.y == 0 and 0 <= item.emplacement.x < self.emplacement.x) or (item.direction == Direction.BAS and item.emplacement.y == self.emplacement.y-1 and 0 <= item.emplacement.x < self.emplacement.x) or (item.direction == Direction.GAUCHE and item.emplacement.x == 0 and 0 <= item.emplacement.y < self.emplacement.y) or (item.direction == Direction.DROITE and item.emplacement.x == self.emplacement.x-1 and 0 <= item.emplacement.y < self.emplacement.y)
         return NotImplemented
 
     def __iter__(self):
         for i in range(self.emplacement.x):
-            yield Cote_decalage(Decalage(i,0),HAUT)
-            yield Cote_decalage(Decalage(i,self.emplacement.y-1),BAS)
+            yield Cote_decalage(Decalage(i,0),Direction.HAUT)
+            yield Cote_decalage(Decalage(i,self.emplacement.y-1),Direction.BAS)
         for j in range(self.emplacement.y):
-            yield Cote_decalage(Decalage(0,j),GAUCHE)
-            yield Cote_decalage(Decalage(self.emplacement.x-1,j),DROITE)
+            yield Cote_decalage(Decalage(0,j),Direction.GAUCHE)
+            yield Cote_decalage(Decalage(self.emplacement.x-1,j),Direction.DROITE)
 
 class Bord_dec(Bord):
     """Un bord, décalé dans l'espace"""
@@ -44,9 +43,8 @@ class Bord_dec(Bord):
         if item is None:
             return False
         if isinstance(item,Cote_position|Cote_decalage):
-            if NB_DIRECTIONS == 4:
-                item_pat = item-self.position
-                return (Bord.__contains__(self,item_pat) and not item_pat in self.entrees) #/!\ Jamais utilisé !?
+            item_pat = item-self.position
+            return (Bord.__contains__(self,item_pat) and not item_pat in self.entrees) #/!\ Jamais utilisé !?
         return NotImplemented
 
     def __iter__(self) -> Iterator[Cote_position]:
@@ -61,10 +59,9 @@ class Bord_pat(Bord_dec):
         if item is None:
             return False
         if isinstance(item,Cote_position|Cote_decalage):
-            if NB_DIRECTIONS == 4:
-                item_pat = item-self.position
-                item_opp = item_pat.oppose()
-                return (Bord.__contains__(self,item_pat) or Bord.__contains__(self,item_opp)) and not (item_pat in self.entrees or item_opp in self.entrees)
+            item_pat = item-self.position
+            item_opp = item_pat.oppose()
+            return (Bord.__contains__(self,item_pat) or Bord.__contains__(self,item_opp)) and not (item_pat in self.entrees or item_opp in self.entrees)
         return NotImplemented
 
     def __iter__(self):
@@ -111,5 +108,5 @@ class Bord_lab(Bord):
                         yield cote
 
 # Imports utilisés dans le code
-from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import HAUT, BAS, GAUCHE, DROITE
-from Old_Jeu.Labyrinthe.Structure_spatiale.Cote import Cote_decalage, Cote_position
+from .Direction import Direction
+from .Cote import Cote_decalage, Cote_position

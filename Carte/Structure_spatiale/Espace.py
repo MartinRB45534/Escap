@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
+    from .Decalage import Decalage
 
 # Pas de classe parente
 
@@ -43,6 +43,6 @@ class Espace:
             yield self[decalage]
 
 # Imports utilisés dans le code
-from Old_Jeu.Labyrinthe.Structure_spatiale.Bord import Bord
-from Old_Jeu.Labyrinthe.Structure_spatiale.Cote import Cote_decalage
-from Old_Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
+from .Bord import Bord
+from .Cote import Cote_decalage
+from .Decalage import Decalage
