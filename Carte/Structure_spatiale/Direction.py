@@ -5,7 +5,7 @@ import Affichage
 # Imports des classes parentes
 from enum import IntEnum
 
-class Direction(IntEnum,Affichage.Direction):
+class Direction(Affichage.Direction,IntEnum):
     HAUT = 0
     DROITE = 1
     BAS = 2

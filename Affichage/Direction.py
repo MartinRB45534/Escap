@@ -3,7 +3,7 @@ from enum import Enum
 class Direction:
     """La classe utilisée pour les directions (dans l'affichage comme le jeu)"""
 
-class Direction_aff(Enum,Direction):
+class Direction_aff(Direction,Enum):
     """Les directions pour l'affichage"""
     UP = "Up"
     DOWN = "Down"
