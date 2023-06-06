@@ -4,11 +4,10 @@ from typing import List, TYPE_CHECKING
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ..Structure_spatiale.Position import Position
-    from ..Structure_spatiale.Direction import Direction
-    from ..Structure_spatiale.Decalage import Decalage
     from ..Extrait import Extrait
     from ..Labyrinthe import Labyrinthe
     from .Vignette_case import Vignette_case
+    from Affichage import Affichable
 
 # Import des classes parentes
 from .Carte_extrait import Carte_extrait
