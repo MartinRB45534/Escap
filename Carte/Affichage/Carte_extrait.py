@@ -1,12 +1,10 @@
 from __future__ import annotations
 from typing import List, Tuple, TYPE_CHECKING
-from operator import itemgetter
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ..Structure_spatiale.Position import Position
     from ..Structure_spatiale.Direction import Direction
-    from ..Structure_spatiale.Decalage import Decalage
     from ..Extrait import Extrait
     from ..Labyrinthe import Labyrinthe
     from .Vignette_case import Vignette_case
@@ -35,9 +33,8 @@ class Carte_extrait(Parent_noeud, Proportionnel):
             # On a le même étage pour toutes les cases du labyrinthe (sauf l'absente)
             assert len({position.etage for position in self.labyrinthe.position_case if position is not POSITION_ABSENTE}) == 1
             etage = [position.etage for position in self.labyrinthe.position_case if position is not POSITION_ABSENTE][0]
-            visible = [min(position.x for position in self.labyrinthe.position_case), max(position.x for position in self.labyrinthe.position_case), min(position.y for position in self.labyrinthe.position_case), max(position.y for position in self.labyrinthe.position_case)]
-            debut = Position(etage, visible[0], visible[2])
-            nb_cases = max(visible[1]-visible[0], visible[3]-visible[2])+1
+            visible = [min(position.x for position in self.labyrinthe.position_case)-1, max(position.x for position in self.labyrinthe.position_case)+1, min(position.y for position in self.labyrinthe.position_case)-1, max(position.y for position in self.labyrinthe.position_case)+1]
+            nb_cases = max(visible[1]-visible[0], visible[3]-visible[2])+3
             taille_case = int(min(self.tailles) // (nb_cases-1))
             hauteur_exploitee = taille_case * nb_cases
             marge = (min(self.tailles) - hauteur_exploitee) // 2
@@ -46,7 +43,7 @@ class Carte_extrait(Parent_noeud, Proportionnel):
             for j in range(self.nb_cases):
                 marge_gauche = self.position[0]+marge#+taille_case//2
                 for i in range(self.nb_cases):
-                    pos = debut + Decalage(i, j)
+                    pos = Position(etage, visible[0]+i, visible[2]+j)
                     vignette = self.make_vignette((marge_gauche, marge_haut), pos, (taille_case, taille_case))
                     if self.courant and vignette.pos == self.courant.pos:
                         courant = vignette
