@@ -16,6 +16,11 @@ class Labyrinthe(nx.MultiDiGraph): #Rarement Multi, mais ça arrive pour la case
         self.position_case: dict[Position,Case] = {}
         self.add_case(CASE_ABSENTE)
 
+    def __contains__(self, item):
+        if isinstance(item,Position):
+            return item in self.nodes and item is not POSITION_ABSENTE
+        return super().__contains__(item)
+
     def add_case(self, case:Case, **attr):
         self.add_node(case.position, case=case, **attr)
         self.position_case[case.position] = case
@@ -33,13 +38,25 @@ class Labyrinthe(nx.MultiDiGraph): #Rarement Multi, mais ça arrive pour la case
     def get_case(self, position:Position) -> Case:
         return self.position_case[position]
     
-    def get_mur(self, u:Position, v:Position, direction:Direction) -> Mur:
+    def get_mur(self, u:Position, direction:Direction, v:Optional[Position]=None) -> Mur:
+        if v is None:
+            v = self.get_cible(u, direction)
         return self[u][v][direction]['mur']
     
-    def get_mur_oppose(self, u:Position, v:Position, direction:Direction) -> Optional[Mur]:
+    def get_mur_oppose(self, u:Position, direction:Direction, v:Optional[Position]=None) -> Optional[Mur]:
+        if v is None:
+            v = self.get_cible(u, direction)
         # On vérifie que le mur existe, que v n'est pas POSITION_ABSENTE, et qu'il n'y a qu'un seul mur entre v et u
-        if direction in self[u][v] and v != POSITION_ABSENTE and len(self[u][v]) == 1:
+        if direction in self[u][v] and len(self[v][u]) == 1:
             return self[v][u]["mur"]
+        
+    def get_cible(self, position:Position, direction:Direction) -> Position:
+        # Il devrait exister un mur sortant de position dans la direction direction
+        # Il ne mêne pas nécessairement à position+direction
+        for voisin in self[position]:
+            if direction in self[position][voisin]:
+                return voisin
+        raise ValueError(f"La position {position} n'a pas de mur dans la direction {direction}")
         
     def extrait(self, positions:Set[Position]) -> Extrait:
         voisins:Set[Position] = {voisin for position in positions for voisin in self[position] if voisin not in positions}
