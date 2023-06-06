@@ -109,4 +109,5 @@ class Carte_extrait(Parent_noeud, Proportionnel):
                 self.set_courant(None)
         return self
 
+from ..Structure_spatiale.Etage import Etage  #Pour éviter les import circulaires
 from ..Structure_spatiale.Absent import POSITION_ABSENTE
