@@ -1,17 +1,17 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, List
+import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-    from Old_Jeu.Systeme.Skill.Actif import Actif
-    from Old_Jeu.Effet.Effets_protection import Protection_bouclier
-    from Old_Jeu.Entitee.Item.Item import Item
-    from Old_Jeu.Entitee.Item.Equippement.Degainable.Bouclier.Bouclier import Bouclier
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
+    from ..Entitee.Agissant.Agissant import Agissant
+    from ..Systeme.Skill.Actif import Actif
+    from ..Effet.Effets_protection import Protection_bouclier
+    from ..Entitee.Item.Item import Item
+    from ..Entitee.Item.Equippement.Degainable.Bouclier.Bouclier import Bouclier
 
 # Imports des classes parentes
-from Old_Jeu.Action.Action import Action, Action_parcellaire, Non_repetable
+from .Action import Action, Action_parcellaire, Non_repetable
 
 class Action_skill(Action):
     """
@@ -51,14 +51,14 @@ class Derobe(Action_skill, Non_repetable):
         self.possesseur = possesseur
 
     def action(self):
-        self.possesseur.inventaire.drop(ABSENT,self.item)
+        self.possesseur.inventaire.drop(crt.POSITION_ABSENTE,self.item)
         self.agissant.inventaire.ajoute(self.item)
 
 class Blocage(Action_skill):
     """
     L'action de bloquer avec un bouclier.
     """
-    def __init__(self, agissant: Agissant, latence: float, skill: Actif, xp: float, taux: float, direction: Direction, bouclier: Bouclier):
+    def __init__(self, agissant: Agissant, latence: float, skill: Actif, xp: float, taux: float, direction: crt.Direction, bouclier: Bouclier):
         super().__init__(agissant, latence, skill, xp)
         self.taux = taux
         self.direction = direction
@@ -66,13 +66,13 @@ class Blocage(Action_skill):
 
     def action(self):
         self.bouclier.taux_degats = self.taux
-        self.agissant.controleur.case_from_position(self.agissant.position).effets.append(Protection_bouclier(1,self.bouclier,[dir for dir in DIRECTIONS]))
+        self.agissant.controleur.case_from_position(self.agissant.position).effets.append(Protection_bouclier(1,self.bouclier,[dir for dir in crt.Direction]))
 
 class Blocage_zone(Blocage):
     """
     L'action de bloquer avec un bouclier sur une zone.
     """
-    def __init__(self, agissant: Agissant, latence: float, skill: Actif, xp: float, taux: float, direction: Direction, bouclier: Bouclier, portee: int, propagation:str="C__S___"):
+    def __init__(self, agissant: Agissant, latence: float, skill: Actif, xp: float, taux: float, direction: crt.Direction, bouclier: Bouclier, portee: int, propagation:str="C__S___"):
         super().__init__(agissant, latence, skill, xp, taux, direction, bouclier)
         self.portee = portee
         self.propagation = propagation
@@ -82,7 +82,7 @@ class Blocage_zone(Blocage):
         position = self.agissant.position
         positions_touchees = self.agissant.controleur.get_pos_touches(position,self.portee,self.propagation,self.direction)
         for pos in positions_touchees:
-            self.agissant.controleur.case_from_position(pos).effets.append(Protection_bouclier(1,self.bouclier,[dir for dir in DIRECTIONS]))
+            self.agissant.controleur.case_from_position(pos).effets.append(Protection_bouclier(1,self.bouclier,[dir for dir in crt.Direction]))
 
 class Cree_item(Action_skill):
     """
@@ -105,9 +105,5 @@ class Alchimie(Cree_item, Non_repetable):
 
     def action(self):
         for item in self.ingredients:
-            self.agissant.inventaire.drop(ABSENT,item)
+            self.agissant.inventaire.drop(crt.POSITION_ABSENTE,item)
         self.agissant.inventaire.ajoute(self.item)
-
-# Imports utilisés dans le code
-from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import DIRECTIONS
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
