@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Entitee.Item.Parchemin.Parchemins import Parchemin_vierge
+    from ..Entitee.Item.Parchemin.Parchemins import Parchemin_vierge
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Agissant.Agissant import Agissant
+from ..Entitee.Agissant.Agissant import Agissant
 
 class Mage(Agissant):
     """Les agissants qui lancent des sorts.
@@ -53,6 +53,6 @@ class Multi_mage(Mage):
     
 # Imports utilisés dans le code
 
-from Old_Jeu.Systeme.Classe.Classes import trouve_skill
-from Old_Jeu.Systeme.Skill.Skills import Skills_magiques
-from Old_Jeu.Action.Non_skill import Impregne
+from ..Systeme.Classe.Classes import trouve_skill
+from ..Systeme.Skill.Skills import Skills_magiques
+from ..Action.Non_skill import Impregne

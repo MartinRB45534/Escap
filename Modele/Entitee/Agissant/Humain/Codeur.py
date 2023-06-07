@@ -3,12 +3,12 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from ..Controleur import Controleur
+    from ..Labyrinthe.Structure_spatiale.Direction import Direction
+    from ..Labyrinthe.Structure_spatiale.Position import Position
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Agissant.Humain.Humain import Humain
+from ..Entitee.Agissant.Humain.Humain import Humain
 
 class Codeur(Humain): #Le cinquième humain du jeu, à l'étage 4 (répond au nom de Dev, quand Il n'est pas occupé à programmer un autre jeu)
     """Ma classe."""
@@ -127,4 +127,4 @@ class Codeur(Humain): #Le cinquième humain du jeu, à l'étage 4 (répond au no
 
 # Imports utilisés dans le code:
 from Old_Affichage.Skins.Skins import SKIN_CODEUR, SKIN_CODEUR_VUE
-from Old_Jeu.Dialogues.Dialogues_codeur import REPLIQUES_CODEUR
+from ..Dialogues.Dialogues_codeur import REPLIQUES_CODEUR

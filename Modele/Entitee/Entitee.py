@@ -3,15 +3,15 @@ from typing import TYPE_CHECKING, Optional, List
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Action.Action import Action
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
-    from Old_Jeu.Effet.Effet import Effet
+    from ..Controleur import Controleur
+    from ..Action.Action import Action
+    from ..Labyrinthe.Structure_spatiale.Position import Position
+    from ..Effet.Effet import Effet
 
 # Pas de classe parente
 
 # Valeurs par défaut des paramètres
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+from ..Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Entitee:
     """La classe des entitées"""
@@ -76,6 +76,6 @@ class Mobile(Entitee):
             self.action.latence = latence
 
 # Imports utilisés dans le code
-from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import DIRECTIONS
-from Old_Jeu.Constantes import ID_MAX
+from ..Labyrinthe.Structure_spatiale.Direction import DIRECTIONS
+from ..Constantes import ID_MAX
 from Old_Affichage.Skins.Skins import SKIN_MYSTERE

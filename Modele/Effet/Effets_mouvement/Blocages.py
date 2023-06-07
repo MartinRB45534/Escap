@@ -3,12 +3,12 @@ from typing import TYPE_CHECKING, Set
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Entitee.Entitee import Entitee
-    from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-    from Old_Jeu.Labyrinthe.Mur import Mur
+    from ..Entitee.Entitee import Entitee
+    from ..Entitee.Agissant.Agissant import Agissant
+    from ..Labyrinthe.Mur import Mur
 
 # Imports des classes parentes
-from Old_Jeu.Effet.Effet import *
+from ..Effet.Effet import *
 
 class Mur_plein(On_try_through):
     """L'effet qui correspond à la présence d'un mur plein sur le passage de l'entitee."""
@@ -223,10 +223,10 @@ class Porte_altitude(Porte_barriere):
                 self.ferme = False
 
 # Imports utilisés dans le code
-from Old_Jeu.Entitee.Entitee import Entitee, Fantome
-from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-from Old_Jeu.Entitee.Item.Item import Item
-from Old_Jeu.Systeme.Classe.Classes import trouve_skill
-from Old_Jeu.Systeme.Skill.Skills import Skill_ecrasement
-from Old_Jeu.Entitee.Agissant.Humain.Heros import Heros
+from ..Entitee.Entitee import Entitee, Fantome
+from ..Entitee.Agissant.Agissant import Agissant
+from ..Entitee.Item.Item import Item
+from ..Systeme.Classe.Classes import trouve_skill
+from ..Systeme.Skill.Skills import Skill_ecrasement
+from ..Entitee.Agissant.Humain.Heros import Heros
 from Old_Affichage.Skins.Skins import SKIN_MUR_CASSE, SKINS_MURS, SKIN_PORTE, SKIN_PORTE_OUVRABLE, SKIN_PORTE_OUVERTE, SKIN_BARRIERE

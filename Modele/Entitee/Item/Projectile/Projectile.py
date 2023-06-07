@@ -3,15 +3,15 @@ from typing import TYPE_CHECKING, List
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
-    from Old_Jeu.Effet.Effet import Effet
+    from ..Controleur import Controleur
+    from ..Labyrinthe.Structure_spatiale.Position import Position
+    from ..Effet.Effet import Effet
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Item.Item import Item
+from ..Entitee.Item.Item import Item
 
 # Valeurs par défaut des paramètres
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+from ..Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Projectile(Item):
     """La classe des items destinés à être lancés. Possèdent naturellement une vitesse non nulle."""

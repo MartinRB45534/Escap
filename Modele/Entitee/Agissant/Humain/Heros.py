@@ -3,13 +3,13 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from ..Controleur import Controleur
+    from ..Labyrinthe.Structure_spatiale.Position import Position
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Agissant.Humain.Humain import Humain
-from Old_Jeu.Entitee.Agissant.Role.Mage import Multi_mage
-from Old_Jeu.Entitee.Agissant.PNJ.PNJs import PJ
+from ..Entitee.Agissant.Humain.Humain import Humain
+from ..Entitee.Agissant.Role.Mage import Multi_mage
+from ..Entitee.Agissant.PNJ.PNJs import PJ
 
 class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (évidemment, c'est le personnage principal !)
     """La classe du joueur."""
@@ -304,14 +304,14 @@ class Heros(Humain,Multi_mage,PJ): #Le premier humain du jeu, avant l'étage 1 (
             return self.position
 
 # Imports utilisés dans le code:
-from Old_Jeu.Constantes import *
+from ..Constantes import *
 from Old_Affichage.Skins.Skins import SKIN_TETE_HEROS
-from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-from Old_Jeu.Action.Action_skill import Action_skill
+from ..Entitee.Agissant.Agissant import Agissant
+from ..Action.Action_skill import Action_skill
 
-from Old_Jeu.Systeme.Skill.Skills import Stomp_humain, Attaque_humain, Magie_humain, Deplacement_joueur, Ramasse_joueur
-from Old_Jeu.Action.Magie.Magie import Magie, Cible_agissant, Cible_case
-from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import HAUT, DROITE, BAS, GAUCHE
+from ..Systeme.Skill.Skills import Stomp_humain, Attaque_humain, Magie_humain, Deplacement_joueur, Ramasse_joueur
+from ..Action.Magie.Magie import Magie, Cible_agissant, Cible_case
+from ..Labyrinthe.Structure_spatiale.Direction import HAUT, DROITE, BAS, GAUCHE
 
 
 

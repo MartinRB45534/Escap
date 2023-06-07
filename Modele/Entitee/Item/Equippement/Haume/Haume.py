@@ -3,14 +3,14 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from ..Controleur import Controleur
+    from ..Labyrinthe.Structure_spatiale.Position import Position
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Item.Equippement.Equippement import Equipement
+from ..Entitee.Item.Equippement.Equippement import Equipement
 
 # Valeurs par défaut des paramètres
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+from ..Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Haume(Equipement):
     """La classe des équipements de type haume. On ne peut en porter qu'un à la fois."""

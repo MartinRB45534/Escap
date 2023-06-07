@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Effet.Attaque.Attaque import Attaque_particulier
+    from ..Effet.Attaque.Attaque import Attaque_particulier
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Item.Equippement.Equippement import Equipement
+from ..Entitee.Item.Equippement.Equippement import Equipement
 
 class Defensif(Equipement):
     """La classe des équipements défensifs. Réduit les dégats."""

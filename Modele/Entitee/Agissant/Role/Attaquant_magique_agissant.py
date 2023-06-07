@@ -3,7 +3,7 @@ from __future__ import annotations
 # Pas d'imports pour les annotations
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Agissant.Role.Mage import Mage
+from ..Entitee.Agissant.Role.Mage import Mage
 
 class Attaquant_magique_agissant(Mage):
     """Les agissants qui combattent en lançant des attaques magiques de loin sur des agissants."""
@@ -32,6 +32,6 @@ class Attaquant_magique_agissant(Mage):
             return super().get_impact()
 
 # Imports utilisés dans le code
-from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-from Old_Jeu.Action.Magie.Magie import Cible_agissant
+from ..Entitee.Agissant.Agissant import Agissant
+from ..Action.Magie.Magie import Cible_agissant
 from operator import itemgetter

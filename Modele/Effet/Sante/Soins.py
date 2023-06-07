@@ -3,11 +3,11 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-    from Old_Jeu.Labyrinthe.Case import Case
+    from ..Entitee.Agissant.Agissant import Agissant
+    from ..Labyrinthe.Case import Case
 
 # Imports des classes parentes
-from Old_Jeu.Effet.Effet import On_fin_tour, One_shot, On_post_action
+from ..Effet.Effet import On_fin_tour, One_shot, On_post_action
 
 class Antidote(One_shot,On_fin_tour):
     """Effet qui supprime les effets de poison du joueur."""
@@ -90,6 +90,6 @@ class Soin(On_fin_tour):
         return SKIN_SOIN
 
 # Imports utilisés dans le code
-from Old_Jeu.Effet.Sante.Maladies.Maladie import Maladie
-from Old_Jeu.Effet.Sante.Poison import Poison
+from ..Effet.Sante.Maladies.Maladie import Maladie
+from ..Effet.Sante.Poison import Poison
 from Old_Affichage.Skins.Skins import SKIN_SOIN

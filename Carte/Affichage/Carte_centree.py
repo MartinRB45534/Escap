@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import List, TYPE_CHECKING
+import Affichage as af
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
@@ -7,7 +8,6 @@ if TYPE_CHECKING:
     from ..Extrait import Extrait
     from ..Labyrinthe import Labyrinthe
     from .Vignette_case import Vignette_case
-    from Affichage import Affichable
 
 # Import des classes parentes
 from .Carte_extrait import Carte_extrait
@@ -20,7 +20,7 @@ class Carte_Centree(Carte_extrait):
     def update(self):
         assert isinstance(self.courant,Vignette_case|None)
         courant = None
-        self.objets:List[Affichable] = []
+        self.objets:List[af.Affichable] = []
         if len(self.labyrinthe.position_case) > 1: # On a au moins une case plus l'absente
             # On a le même étage pour toutes les cases du labyrinthe (sauf l'absente)
             assert len({position.etage for position in self.labyrinthe.position_case if position is not POSITION_ABSENTE}) == 1

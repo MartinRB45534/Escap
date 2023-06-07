@@ -3,18 +3,18 @@ from typing import TYPE_CHECKING, List, Tuple, Optional, Set, Iterator, Literal,
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Cote import Cote_position,Cote_decalage
-    from Old_Jeu.Labyrinthe.Vue import Representation_case
-    from Old_Jeu.Labyrinthe.Case import Case
-    from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-    from Old_Jeu.Entitee.Item.Item import Item
-    from Old_Jeu.Entitee.Decors.Decor import Decors
+    from ..Labyrinthe.Structure_spatiale.Position import Position
+    from ..Labyrinthe.Structure_spatiale.Decalage import Decalage
+    from ..Labyrinthe.Structure_spatiale.Direction import Direction
+    from ..Labyrinthe.Structure_spatiale.Cote import Cote_position,Cote_decalage
+    from ..Labyrinthe.Vue import Representation_case
+    from ..Labyrinthe.Case import Case
+    from ..Entitee.Agissant.Agissant import Agissant
+    from ..Entitee.Item.Item import Item
+    from ..Entitee.Decors.Decor import Decors
 
 # Import des classes parentes
-from Old_Jeu.Labyrinthe.Structure_spatiale.Espace import Espace
+from ..Labyrinthe.Structure_spatiale.Espace import Espace
 
 class Vue(Espace):
     """Une représentation simplifiée d'un labyrinthe"""
@@ -206,6 +206,6 @@ class Vues(dict[str,Representation_vue]):
         return self[cote.emplacement.lab].mur_from_cote(cote)
     
 # Imports utilisés dans le code
-from Old_Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
-from Old_Jeu.Labyrinthe.Structure_spatiale.Cote import Cote_position, Cote_decalage
+from ..Labyrinthe.Structure_spatiale.Decalage import Decalage
+from ..Labyrinthe.Structure_spatiale.Position import Position
+from ..Labyrinthe.Structure_spatiale.Cote import Cote_position, Cote_decalage

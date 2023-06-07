@@ -3,11 +3,11 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-    from Old_Jeu.Labyrinthe.Case import Case
+    from ..Entitee.Agissant.Agissant import Agissant
+    from ..Labyrinthe.Case import Case
 
 # Imports des classes parentes
-from Old_Jeu.Effet.Effet import Aura, One_shot, On_debut_tour, Evenement
+from ..Effet.Effet import Aura, One_shot, On_debut_tour, Evenement
 
 # On va distinguer 3 types d'aura :
 #   - Les auras naturellement attachées à une case. Ce sont des auras élémentaires. Elles peuvent être temporairement réprimée par une autre aura élémentale.
@@ -242,7 +242,7 @@ class Aura_ombre(One_shot,On_debut_tour):
             case.ajoute_aura(self.effet(porteur,priorite,self.gain_opacite))
 
 # Imports utilisés dans le code
-from Old_Jeu.Systeme.Constantes_skills.Skills import *
-from Old_Jeu.Constantes import *
-from Old_Jeu.Entitee.Agissant.Agissant import NoOne
-from Old_Jeu.Entitee.Item.Item import Item
+from ..Systeme.Constantes_skills.Skills import *
+from ..Constantes import *
+from ..Entitee.Agissant.Agissant import NoOne
+from ..Entitee.Item.Item import Item

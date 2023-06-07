@@ -3,20 +3,20 @@ from typing import TYPE_CHECKING, Optional, Type, List, Tuple, Dict, Set
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
-    from Old_Jeu.Systeme.Classe.Classes import Classe_principale
-    from Old_Jeu.Entitee.Agissant.Inventaire import Inventaire
-    from Old_Jeu.Esprit.Esprit import Esprit
-    from Old_Jeu.Entitee.Item.Item import Item
+    from ..Controleur import Controleur
+    from ..Labyrinthe.Structure_spatiale.Position import Position
+    from ..Labyrinthe.Structure_spatiale.Direction import Direction
+    from ..Systeme.Classe.Classes import Classe_principale
+    from ..Entitee.Agissant.Inventaire import Inventaire
+    from ..Esprit.Esprit import Esprit
+    from ..Entitee.Item.Item import Item
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Entitee import Non_superposable, Mobile
+from ..Entitee.Entitee import Non_superposable, Mobile
 
 # Valeurs par défaut des paramètres
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
-from Old_Jeu.Constantes import TERRE
+from ..Labyrinthe.Structure_spatiale.Position import ABSENT
+from ..Constantes import TERRE
 
 class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cadavre n'agit pas.
     """La classe des entitées animées. Capable de décision, de différentes actions, etc. Les principales caractéristiques sont l'ID, les stats, et la classe principale."""
@@ -102,7 +102,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
     def get_etage_courant(self):
         return int(self.position.lab.split()[1])
 
-    def get_stats_attaque(self,element:int):
+    def get_stats_attaque(self,element:Element):
         force = self.force
         for taux in self.taux_force.values():
             force *= taux
@@ -193,7 +193,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
     def peut_voir(self,direction:Direction):
         return self.controleur.case_from_position(self.position)[direction].peut_voir()
 
-    def get_aff(self,element:int):
+    def get_aff(self,element:Element):
         affinite = 1
         if element == OMBRE :
             affinite = self.aff_o
@@ -601,26 +601,26 @@ class NoOne(Agissant):
             return False
 
 # Imports utilisés dans le code (il y en a beaucoup !!!)
-from Old_Jeu.Action.Attaque import Attaque
-from Old_Jeu.Entitee.Entitee import Entitee
-from Old_Jeu.Systeme.Constantes_stats import CONSTANTES_STATS
-from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import HAUT, DIRECTIONS
-from Old_Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
-from Old_Jeu.Labyrinthe.Vue import Representation_vue
-from Old_Jeu.Esprit.Esprit import NOBODY
-from Old_Jeu.Entitee.Item.Cadavre import Cadavre
-from Old_Jeu.Entitee.Item.Equippement.Role.Elementaires import Tenebreux, Rocheux, Neigeux, Incandescant
-from Old_Jeu.Entitee.Item.Equippement.Role.Defensif.Defensif import Defensif
-from Old_Jeu.Entitee.Item.Equippement.Role.Accelerateur import Accelerateur
-from Old_Jeu.Entitee.Item.Equippement.Role.Anoblisseur import Anoblisseur
-from Old_Jeu.Entitee.Item.Equippement.Role.Reparateur.Reparateur import Reparateur
-from Old_Jeu.Entitee.Item.Equippement.Role.Reparateur_magique.Reparateur_magique import Reparateur_magique
-from Old_Jeu.Entitee.Item.Items import *
-from Old_Jeu.Entitee.Agissant.Inventaire import Inventaire
-from Old_Jeu.Entitee.Agissant.Agissants import *
-from Old_Jeu.Action.Actions import *
-from Old_Jeu.Systeme.Classe.Classes import *
-from Old_Jeu.Systeme.Skill.Skills import *
-from Old_Jeu.Effet.Effets import *
-from Old_Jeu.Constantes import OMBRE, TERRE, GLACE, FEU
+from ..Action.Attaque import Attaque
+from ..Entitee.Entitee import Entitee
+from ..Systeme.Constantes_stats import CONSTANTES_STATS
+from ..Labyrinthe.Structure_spatiale.Direction import HAUT, DIRECTIONS
+from ..Labyrinthe.Structure_spatiale.Decalage import Decalage
+from ..Labyrinthe.Vue import Representation_vue
+from ..Esprit.Esprit import NOBODY
+from ..Entitee.Item.Cadavre import Cadavre
+from ..Entitee.Item.Equippement.Role.Elementaires import Tenebreux, Rocheux, Neigeux, Incandescant
+from ..Entitee.Item.Equippement.Role.Defensif.Defensif import Defensif
+from ..Entitee.Item.Equippement.Role.Accelerateur import Accelerateur
+from ..Entitee.Item.Equippement.Role.Anoblisseur import Anoblisseur
+from ..Entitee.Item.Equippement.Role.Reparateur.Reparateur import Reparateur
+from ..Entitee.Item.Equippement.Role.Reparateur_magique.Reparateur_magique import Reparateur_magique
+from ..Entitee.Item.Items import *
+from ..Entitee.Agissant.Inventaire import Inventaire
+from ..Entitee.Agissant.Agissants import *
+from ..Action.Actions import *
+from ..Systeme.Classe.Classes import *
+from ..Systeme.Skill.Skills import *
+from ..Effet.Effets import *
+from ..Constantes import OMBRE, TERRE, GLACE, FEU
 from Old_Affichage.Skins.Skins import SKIN_AGISSANT, SKIN_STATUT_ATTAQUE, SKIN_STATUT_ATTAQUE_BOOSTEE, SKIN_STATUT_PAIX, SKIN_STATUT_FUITE, SKIN_STATUT_EXPLORATION, SKIN_STATUT_RAPPROCHE, SKIN_STATUT_SOIN, SKIN_STATUT_SOUTIEN, SKINS_CORPS_VUS, SKINS_TETES_VUES, SKIN_VIDE

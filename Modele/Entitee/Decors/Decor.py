@@ -3,14 +3,14 @@ from typing import TYPE_CHECKING, List
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from ..Controleur import Controleur
+    from ..Labyrinthe.Structure_spatiale.Position import Position
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Entitee import Non_superposable, Interactif
+from ..Entitee.Entitee import Non_superposable, Interactif
 
 # Valeurs par défaut des paramètres
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+from ..Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Decors(Non_superposable):
     """La classe des éléments de décors qu'on ne peut pas traverser. On peut interagir avec certains ?"""
@@ -41,4 +41,4 @@ class Ustensile(Decors_interactif):
         return Ustensile
     
 # Imports utilisés dans le code
-from Old_Jeu.Entitee.Entitee import Entitee
+from ..Entitee.Entitee import Entitee

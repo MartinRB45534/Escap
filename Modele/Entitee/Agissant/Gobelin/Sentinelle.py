@@ -3,16 +3,16 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from ..Controleur import Controleur
+    from ..Labyrinthe.Structure_spatiale.Position import Position
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Agissant.Gobelin.Base_gobelin import Base_gobelin
-from Old_Jeu.Entitee.Agissant.Role.Sentinelle import Sentinelle
-from Old_Jeu.Entitee.Agissant.Role.Tank import Tank
+from ..Entitee.Agissant.Gobelin.Base_gobelin import Base_gobelin
+from ..Entitee.Agissant.Role.Sentinelle import Sentinelle
+from ..Entitee.Agissant.Role.Tank import Tank
 
 # Valeurs par défaut des paramètres
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+from ..Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Sentinelle_gobelin(Tank,Base_gobelin,Sentinelle):
     """Un gobelin qui reste sur place tant qu'il ne voit pas d'ennemi. Créé spécifiquement pour les premiers étages et le tutoriel.
@@ -57,4 +57,4 @@ class Troisieme_monstre(Sentinelle_gobelin):
         super().meurt()
 
 # Imports utilises dans le code
-from Old_Jeu.Entitee.Agissant.Humain.Heros import Heros
+from ..Entitee.Agissant.Humain.Heros import Heros

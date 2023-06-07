@@ -1,63 +1,50 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, List, Optional, Set, Dict
+import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Effet.Effet import Effet
-    from Old_Jeu.Effet.Auras import Aura
-    from Old_Jeu.Entitee.Entitee import Entitee, Mobile
-    from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-    from Old_Jeu.Entitee.Item.Item import Item
-    from Old_Jeu.Entitee.Decors.Decor import Decors
-    from Old_Jeu.Labyrinthe.Mur import Mur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
+    from ..Effet.Effet import Effet
+    from ..Effet.Auras import Aura
+    from ..Entitee.Entitee import Entitee, Mobile
+    from ..Entitee.Agissant.Agissant import Agissant
+    from ..Entitee.Item.Item import Item
+    from ..Entitee.Decors.Decor import Decors
+    from .Mur import Mur
 
-# Pas de classe parente
+# Valeurs par défaut des paramètres
+from ..Systeme.Elements import Element
 
-# Valeurs des paramètres par défaut
-from Old_Jeu.Constantes import TERRE
-
-class Case:
-    def __init__(self,controleur:Controleur,position:Position,niveau = 1,element = TERRE,effets:List[Effet] = [],opacite = 1):
+class Case(crt.Case):
+    def __init__(self,position:crt.Position, opacite = 1, niveau = 1, element = Element.TERRE):
         # Par défaut, pas de murs.
         self.position = position
-        self.murs = [Mur(position+direction,niveau) for direction in DIRECTIONS]
         self.opacite = opacite
         self.opacite_bonus:float = 0
+        self.clarte:float = 0
         self.niveau = niveau
         self.element = element
-        self.clarte:float = 0
         self.code = 0
         self.repoussante = False
         self.agissant:Optional[Agissant] = None #On peut avoir un agissant sur la case, qui peut être un monstre, un joueur, etc.
         self.decors:Optional[Decors] = None #On peut avoir un décors (mais pas les deux ? à voir)
         self.items:Set[Item] = set() #On peut avoir des items sur la case
-        self.effets:List[Effet] = [] #Les cases ont aussi des effets ! Les auras, par exemple.
-        self.effets += effets
-        if self.element == TERRE:
-            self.effets.append(Terre_permanente(self.niveau*2))
-        elif self.element == FEU:
-            self.effets.append(Feu_permanent(self.niveau,self.niveau*5))
-        elif self.element == GLACE:
-            self.effets.append(Glace_permanente(self.niveau,self.niveau/10))
-        elif self.element == OMBRE:
-            self.effets.append(Ombre_permanente(self.niveau,self.niveau/2))
-        self.controleur = controleur
-
-    def __getitem__(self,key:Direction) -> Mur:
-        return self.murs[key]
-
-    def __setitem__(self,key:Direction,value:Mur):
-        self.murs[key] = value
+        self.effets:Set[Effet] = set() #Les cases ont aussi des effets ! Les auras, par exemple.
+        self.auras:Set[Aura] = set() #Les auras sont des effets qui s'appliquent à la case, et qui peuvent être de plusieurs types.
+        if self.element == Element.TERRE:
+            self.auras.add(Terre_permanente(self.niveau*2))
+        elif self.element == Element.FEU:
+            self.auras.add(Feu_permanent(self.niveau,self.niveau*5))
+        elif self.element == Element.GLACE:
+            self.auras.add(Glace_permanente(self.niveau,self.niveau/10))
+        elif self.element == Element.OMBRE:
+            self.auras.add(Ombre_permanente(self.niveau,self.niveau/2))
 
     #Découvrons le déroulé d'un tour, avec case-chan :
 
     def debut_tour(self):
         #Un nouveau tour commence, qui s'annonce remplit de bonnes surprises et de nouvelles rencontres ! On commence par activer les effets réguliers :
-        for i in range(len(self.effets)-1,-1,-1) :
-            effet = self.effets[i]
+        for effet in self.effets:
             if isinstance(effet,On_debut_tour):
                 effet.execute(self) #On exécute divers effets
             if isinstance(effet,Time_limited):
@@ -72,14 +59,14 @@ class Case:
         IDmax = 0
         auras:Dict[int,List[Aura_elementale]] = {}
 
-        for effet in self.effets:
-            if isinstance(effet,Aura_elementale):
-                ID = effet.responsable
+        for aura in self.auras:
+            if isinstance(aura,Aura_elementale):
+                ID = aura.responsable
                 if ID in auras : # On a déjà une aura de ce type
-                    auras[ID].append(effet)
+                    auras[ID].append(aura)
                 else:
-                    auras[ID]=[effet]
-                prio = effet.priorite
+                    auras[ID]=[aura]
+                prio = aura.priorite
                 if prio > priorite_max : # On a un nouveau gagnant !
                     IDmax = ID
                     priorite_max = prio
@@ -97,7 +84,7 @@ class Case:
     #Certains agissants particulièrement tapageurs font un concours de celui qui aura la plus grosse aura (comment ça, cette phrase particulièrement compliquée aura juste servi à faire un jeu de mot sur aura ?)
     def ajoute_aura(self,aura:Aura):
         """Fonction qui ajoute un effet d'aura. On décidera de ceux qui s'exécutent plus tard."""
-        self.effets.append(aura)
+        self.auras.add(aura)
         if isinstance(aura,Aura_elementale): #On a besoin de savoir quelle aura prévaudra
             aura.priorite += self.clarte/2 #La clarté vient d'être utilisée pour déterminer la portée de l'aura, et n'est normalement pas encore réinitialisée
             if isinstance(aura,Feu):
@@ -105,12 +92,6 @@ class Case:
                 for aura_bis in self.effets:
                     if isinstance(aura_bis,Feu) and aura_bis.responsable == resp :
                         aura_bis.phase = "terminé"
-
-    #Les agissants prennent des décisions, agissent, se déplacent, les items se déplacent aussi.
-    def veut_passer(self,intrus:Mobile,direction:Direction):
-        """Fonction qui tente de faire passer une entitée.
-           Se réfère au mur compétent, qui gère tout."""
-        self[direction].veut_passer(intrus)
 
     def step_out(self,entitee:Entitee):
         for effet in self.effets:
@@ -126,121 +107,47 @@ class Case:
     def post_action(self):
         self.opacite_bonus = 0 # On reset ça à chaque tour, sinon ça va devenir tout noir
         self.code = 0
-        if len(self.effets) == 1: #On a un seul effet ! L'effet d'aura.
-            if self.element != TERRE: #Les auras de terre sont juste là pour embêter les autres de toute façon
-                self.effets[0].execute(self)
-            else :
-                self.code += 1
-        else:
-            on_attaques:Set[On_attack] = set()
-            attaques:Set[Attaque_case] = set()
-            priorite_max = 0
-            IDmax = 0
-            auras:Dict[int,List[Aura_elementale]] = {}
+        on_attaques:Set[On_attack] = set()
+        attaques:Set[Attaque_case] = set()
+        priorite_max = 0
+        IDmax = 0
+        auras:Dict[int,List[Aura_elementale]] = {}
 
-            for effet in self.effets:
-                if isinstance(effet,Aura_elementale):
-                    ID = effet.responsable
-                    if ID in auras : # On a déjà une aura de ce type
-                        auras[ID].append(effet)
-                    else:
-                        auras[ID]=[effet]
-                    prio = effet.priorite
-                    if prio > priorite_max : # On a un nouveau gagnant !
-                        IDmax = ID
-                        priorite_max = prio
-                elif isinstance(effet,On_attack):
-                    on_attaques.add(effet)
-                elif (isinstance(effet,Attaque_case_delayee) and effet.delai > 0):
-                    effet.execute(self) #On diminue le délai
-                elif isinstance(effet,Attaque_case):
-                    attaques.add(effet)
-                elif isinstance(effet,On_post_action): #Les auras non-élémentales sont aussi des On_post_action
-                    effet.execute(self)
+        for aura in self.auras:
+            if isinstance(aura,Aura_elementale):
+                ID = aura.responsable
+                if ID in auras : # On a déjà une aura de ce type
+                    auras[ID].append(aura)
+                else:
+                    auras[ID]=[aura]
+                prio = aura.priorite
+                if prio > priorite_max : # On a un nouveau gagnant !
+                    IDmax = ID
+                    priorite_max = prio
+        for effet in self.effets:
+            if isinstance(effet,On_attack):
+                on_attaques.add(effet)
+            elif (isinstance(effet,Attaque_case_delayee) and effet.delai > 0):
+                effet.execute(self) #On diminue le délai
+            elif isinstance(effet,Attaque_case):
+                attaques.add(effet)
+            elif isinstance(effet,On_post_action): #Les auras non-élémentales sont aussi des On_post_action
+                effet.execute(self)
 
-            for aura in auras[IDmax]:
-                aura.execute(self)
+        for aura in auras[IDmax]:
+            aura.execute(self)
 
-            for attaque in attaques:
-                for protection in on_attaques:
-                    protection.execute(attaque)
-                attaque.execute(self)
+        for attaque in attaques:
+            for protection in on_attaques:
+                protection.execute(attaque)
+            attaque.execute(self)
 
     def fin_tour(self):
-        for i in range(len(self.effets)-1,-1,-1) :
-            effet = self.effets[i]
+        for effet in self.effets:
             if effet.phase == "terminé":
                 self.effets.remove(effet)
 
     #Le tour se termine gentiment, et on recommence !
-
-#Pour la génération, quand on a pas encore les barrières, portes et compagnie.
-    def nb_murs_pleins(self):
-        """
-        Fonction qui renvoie le nombre de murs pleins dans la case
-        """
-        pleins=0
-
-        for mur in self.murs :
-            if mur.is_ferme() :
-                pleins+=1
-        
-        return pleins
-                
-    def casser_mur(self,direction:Direction):
-        """
-        Fonction qui casse le mur dans la direction indiquée
-        """
-        self[direction].brise()
-
-    def construire_mur(self,direction:Direction):
-        """
-        Fonction qui construit le mur dans la direction indiquée
-        """
-        self[direction].construit()
-
-    def interdire_mur(self,direction:Direction):
-        """
-        Fonction qui construit le mur impassable dans la direction indiquée
-        """
-        self[direction].interdit()
-
-    def mur_plein(self,direction:Direction):
-        """
-        Fonction qui indique si le mur indiquée par la direction est plein ou non
-        """
-        return self[direction].is_ferme()
-
-    def acces(self,direction:Direction,clees:List[str]=[]):
-        return not(self[direction].is_ferme(clees)) and self[direction].get_cible()
-
-    def murs_pleins(self):
-        directions = []
-        for direction in DIRECTIONS:
-            if self.mur_plein(direction):
-                directions.append(direction)
-        return directions
-
-    def get_mur_dir(self,direction:Direction):
-        return self[direction]
-
-    def get_murs(self):
-        return self.murs
-
-    # def get_mur_haut(self):
-    #     return self[0]
-
-    # def get_mur_droit(self):
-    #     return self[1]
-
-    # def get_mur_bas(self):
-    #     return self[2]
-
-    # def get_mur_gauche(self):
-    #     return self[3]
-
-    # def toString(self):
-    #     return "haut "+str(self[0].get_etat())+" droite "+str(self[1].get_etat())+" bas "+str(self[2].get_etat())+" gauche "+str(self[3].get_etat())+"  "
 
     def get_opacite(self):
         return self.opacite + self.opacite_bonus
@@ -251,9 +158,6 @@ class Case:
     def calcule_code(self):#La fonction qui calcule le code correpondant à l'état de la case. De base, 0. Modifié d'après les effets subits par la case.
         return self.code
 
-    def get_cibles_fermes(self,clees:Set[str]):
-        return [self[i].get_cible_ferme(clees) for i in DIRECTIONS]
-
     def get_codes_effets(self) -> List[List[int]]:
         effets=[]
         for effet in self.effets:
@@ -261,16 +165,8 @@ class Case:
                 effets.append([effet.responsable,effet.delai,effet.degats])
         return effets
 
-    # def get_copie(self):
-    #     copie = Case(self.controleur,self.position,self.niveau,self.element,self.effets,self.opacite)
-    #     copie.murs = self.murs
-    #     return copie
-
 # Imports utilisés dans le code
-from Old_Jeu.Labyrinthe.Mur import Mur
-from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import DIRECTIONS
-from Old_Jeu.Labyrinthe.Vue import Representation_case
-from Old_Jeu.Constantes import TERRE, FEU, GLACE, OMBRE
-from Old_Jeu.Effet.Auras import Terre_permanente, Feu_permanent, Glace_permanente, Ombre_permanente, Aura_elementale, Terre, Feu, Glace, Ombre
-from Old_Jeu.Effet.Effet import On_debut_tour, Time_limited, On_attack, On_post_action, On_step_in, On_step_out
-from Old_Jeu.Effet.Attaque.Attaque import Attaque_case, Attaque_case_delayee
+from .Labyrinthe.Vue import Representation_case
+from .Effet.Auras import Terre_permanente, Feu_permanent, Glace_permanente, Ombre_permanente, Aura_elementale, Terre, Feu, Glace, Ombre
+from .Effet.Effet import On_debut_tour, Time_limited, On_attack, On_post_action, On_step_in, On_step_out
+from .Effet.Attaque.Attaque import Attaque_case, Attaque_case_delayee

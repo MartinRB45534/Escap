@@ -3,13 +3,13 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from ..Controleur import Controleur
+    from ..Labyrinthe.Structure_spatiale.Direction import Direction
+    from ..Labyrinthe.Structure_spatiale.Position import Position
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Agissant.Humain.Humain import Humain
-from Old_Jeu.Entitee.Agissant.Role.Dps import Dps
+from ..Entitee.Agissant.Humain.Humain import Humain
+from ..Entitee.Agissant.Role.Dps import Dps
 
 class Marchand(Dps,Humain): #Le dixième humain du jeu, à l'étage 9 (le seul lien avec l'extérieur)
     """La classe du marchand."""
@@ -147,6 +147,6 @@ class Marchand(Dps,Humain): #Le dixième humain du jeu, à l'étage 9 (le seul l
         return [f"Un humain (niveau {self.niveau})",f"ID : {self.ID}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Un marchand perdu dans le labyrinthe. Il peut obtenir des objets de l'extérieur ou en envoyer, mais il ne peut pas sortir lui-même..."]
 
 # Imports utilisés dans le code:
-from Old_Jeu.Constantes import *
+from ..Constantes import *
 from Old_Affichage.Skins.Skins import SKIN_TETE_MARCHAND
-from Old_Jeu.Dialogues.Dialogues_marchand import REPLIQUES_MARCHAND
+from ..Dialogues.Dialogues_marchand import REPLIQUES_MARCHAND

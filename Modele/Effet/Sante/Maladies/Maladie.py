@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Entitee.Agissant.Agissant import Agissant
+    from ..Entitee.Agissant.Agissant import Agissant
 
 # Imports des classes parentes
-from Old_Jeu.Effet.Effet import On_post_decision,On_tick
+from ..Effet.Effet import On_post_decision,On_tick
 
 class Maladie(On_post_decision,On_tick):
     """L'effet de maladie. Applique un déboost à l'agissant. Peut se transmettre aux voisins. Il existe différentes maladies."""
@@ -38,4 +38,4 @@ class Maladie(On_post_decision,On_tick):
 
 # Imports utilisés dans le code
 import random
-from Old_Jeu.Entitee.Agissant.Agissant import NoOne
+from ..Entitee.Agissant.Agissant import NoOne

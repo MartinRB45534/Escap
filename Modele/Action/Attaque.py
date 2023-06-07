@@ -1,25 +1,23 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, List, Optional
+import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-    from Old_Jeu.Entitee.Item.Equippement.Degainable.Degainable import Arme
-    from Old_Jeu.Systeme.Skill.Actif import Actif
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
+    from ..Entitee.Agissant.Agissant import Agissant
+    from ..Entitee.Item.Equippement.Degainable.Degainable import Arme
+    from ..Systeme.Skill.Actif import Actif
+    from ..Systeme.Elements import Element
 
 # Imports des classes parentes
-from Old_Jeu.Action.Action_skill import Action_skill
-from Old_Jeu.Action.Action import Action_final, Action_parcellaire
-
-# Valeurs par défaut des paramètres
-from Old_Jeu.Constantes import TERRE
+from ..Action.Action_skill import Action_skill
+from ..Action.Action import Action_final, Action_parcellaire
 
 class Attaque(Action_skill):
     """
     L'action d'attaquer.
     """
-    def __init__(self,agissant:Agissant,latence:float,skill:Actif,xp:float,taux:float,direction:Direction,portee:int,element:int=TERRE,propagation:str="C__S___",distance:str="contact"):
+    def __init__(self,agissant:Agissant,latence:float,skill:Actif,xp:float,taux:float,direction:crt.Direction,portee:int,element:Element,propagation:str="C__S___",distance:str="contact"):
         super().__init__(agissant,latence,skill,xp)
         self.taux = taux
         self.direction = direction
@@ -46,7 +44,7 @@ class Attaque_arme(Attaque):
     """
     L'action d'attaquer avec une arme.
     """
-    def __init__(self,agissant:Agissant,latence:float,skill:Actif,xp:float,taux:float,direction:Direction,arme:Arme,propagation:str="C__S___",distance:str="contact"):
+    def __init__(self,agissant:Agissant,latence:float,skill:Actif,xp:float,taux:float,direction:crt.Direction,arme:Arme,propagation:str="C__S___",distance:str="contact"):
         Action_skill.__init__(self,agissant,latence,skill,xp)
         self.taux = taux
         self.direction = direction
@@ -73,7 +71,7 @@ class Attaque_multiple(Action_parcellaire,Attaque_arme): # Les attaques sans arm
     """
     Une attaque complexe avec plusieurs coups.
     """
-    def __init__(self,agissant:Agissant,latences:List[float],skill:Actif,xp:float,taux:List[float],directions:List[Direction],arme:Arme,propagations:List[str]=["C__S___"],distance:str="contact"):
+    def __init__(self,agissant:Agissant,latences:List[float],skill:Actif,xp:float,taux:List[float],directions:List[crt.Direction],arme:Arme,propagations:List[str]=["C__S___"],distance:str="contact"):
         Action_skill.__init__(self,agissant,sum(latences),skill,xp)
         self.latences = latences
         self.taux = taux
@@ -92,4 +90,4 @@ class Attaque_multiple(Action_parcellaire,Attaque_arme): # Les attaques sans arm
             self.agissant.controleur.case_from_position(position).effets.append(Attaque_case(self.agissant,degats,element,self.distance,self.directions[self.rempli]))
 
 # Imports utilisés dans le code
-from Old_Jeu.Effet.Attaque.Attaque import Attaque_case
+from ..Effet.Attaque.Attaque import Attaque_case

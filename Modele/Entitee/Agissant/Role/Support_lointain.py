@@ -3,7 +3,7 @@ from __future__ import annotations
 # Pas d'imports pour les annotations
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Agissant.Agissant import Agissant
+from ..Entitee.Agissant.Agissant import Agissant
 
 class Support_lointain(Agissant):
     """Les agissants qui combattent loin de la ligne de front."""

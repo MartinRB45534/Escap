@@ -3,20 +3,20 @@ from typing import TYPE_CHECKING, Optional, Type, List, Tuple, Dict
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
-    from Old_Jeu.Action.Action import Action
-    from Old_Jeu.Systeme.Skill.Actif import Actif
-    from Old_Jeu.Entitee.Item.Projectile.Projectile import Projectile
+    from ..Controleur import Controleur
+    from ..Labyrinthe.Structure_spatiale.Position import Position
+    from ..Labyrinthe.Structure_spatiale.Direction import Direction
+    from ..Action.Action import Action
+    from ..Systeme.Skill.Actif import Actif
+    from ..Entitee.Item.Projectile.Projectile import Projectile
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-from Old_Jeu.Entitee.Entitee import Interactif
-from Old_Jeu.Entitee.Agissant.Role.Mage import Mage
+from ..Entitee.Agissant.Agissant import Agissant
+from ..Entitee.Entitee import Interactif
+from ..Entitee.Agissant.Role.Mage import Mage
 
 # Valeurs par défaut des paramètres
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+from ..Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class PNJ(Agissant, Interactif):
     """
@@ -219,8 +219,8 @@ class PJ_mage(PJ, PNJ_mage):
 
 # Imports utilisés dans le code
 from Old_Affichage.Skins.Skins import SKIN_STATUT_PAUME, SKIN_STATUT_PERDU, SKIN_STATUT_CHERCHE, SKIN_STATUT_CHEMIN, SKIN_STATUT_PROXIMITE
-from Old_Jeu.Action.Non_skill import Impregne
-from Old_Jeu.Constantes import DIALOGUE, RECETTE
-from Old_Jeu.Entitee.Item.Parchemin.Parchemins import Parchemin_vierge
-from Old_Jeu.Entitee.Decors.Decors import Ustensile
-from Old_Jeu.Entitee.Decors.Decor import Decors_interactif
+from ..Action.Non_skill import Impregne
+from ..Constantes import DIALOGUE, RECETTE
+from ..Entitee.Item.Parchemin.Parchemins import Parchemin_vierge
+from ..Entitee.Decors.Decors import Ustensile
+from ..Entitee.Decors.Decor import Decors_interactif

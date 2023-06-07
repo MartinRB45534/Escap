@@ -3,15 +3,15 @@ from typing import TYPE_CHECKING, Optional, List
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-    from Old_Jeu.Entitee.Item.Equippement.Degainable.Bouclier.Bouclier import Bouclier
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
-    from Old_Jeu.Effet.Attaque.Attaque import Attaque_case
+    from ..Controleur import Controleur
+    from ..Entitee.Agissant.Agissant import Agissant
+    from ..Entitee.Item.Equippement.Degainable.Bouclier.Bouclier import Bouclier
+    from ..Labyrinthe.Structure_spatiale.Position import Position
+    from ..Labyrinthe.Structure_spatiale.Direction import Direction
+    from ..Effet.Attaque.Attaque import Attaque_case
 
 # Imports des classes parentes
-from Old_Jeu.Effet.Effet import One_shot, Evenement, Effet, On_post_action, Time_limited, On_attack
+from ..Effet.Effet import One_shot, Evenement, Effet, On_post_action, Time_limited, On_attack
 
 # class Protection_general(Evenement,On_post_action):
 #     """Le joueur qui a utilisé un bouclier 'protège' une zone autour de lui. C'est à dire qu'à chaque tour, d'après sa position, sa direction et les murs, certaines cases reçoivent une protection jusqu'à la fin du tour."""
@@ -120,5 +120,5 @@ class Protection_sacree(Protection_mur):
 
 # Imports utilisés dans le code
 from Old_Affichage.Skins.Skins import SKIN_PROTECTION, SKIN_PROTECTION_SACREE
-from Old_Jeu.Constantes import *
+from ..Constantes import *
 import copy

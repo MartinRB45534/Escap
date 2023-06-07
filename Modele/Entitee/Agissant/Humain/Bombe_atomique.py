@@ -3,15 +3,15 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from ..Controleur import Controleur
+    from ..Labyrinthe.Structure_spatiale.Position import Position
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Agissant.Humain.Humain import Humain
-from Old_Jeu.Entitee.Agissant.PNJ.PNJs import PNJ_mage
-from Old_Jeu.Entitee.Agissant.Role.Attaquant_magique_case import Attaquant_magique_case
-from Old_Jeu.Entitee.Agissant.Role.Attaquant_magique_poing import Attaquant_magique_poing
-from Old_Jeu.Entitee.Agissant.Role.Support import Support
+from ..Entitee.Agissant.Humain.Humain import Humain
+from ..Entitee.Agissant.PNJ.PNJs import PNJ_mage
+from ..Entitee.Agissant.Role.Attaquant_magique_case import Attaquant_magique_case
+from ..Entitee.Agissant.Role.Attaquant_magique_poing import Attaquant_magique_poing
+from ..Entitee.Agissant.Role.Support import Support
 
 class Bombe_atomique(PNJ_mage,Attaquant_magique_case,Attaquant_magique_poing,Support,Humain): #La neuvième humaine du jeu, à l'étage 8 (une magicienne légèrement aguicheuse)
     """La classe de la bombe atomique."""
@@ -219,7 +219,7 @@ class Bombe_atomique(PNJ_mage,Attaquant_magique_case,Attaquant_magique_poing,Sup
         return [f"Une humaine (niveau {self.niveau})",f"ID : {self.ID}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Une aventurière magicienne. Spécialisée dans les sorts de feu."]
 
 # Imports utilisés dans le code:
-from Old_Jeu.Constantes import *
-from Old_Jeu.Systeme.Constantes_magies.Magies import *
+from ..Constantes import *
+from ..Systeme.Constantes_magies.Magies import *
 from Old_Affichage.Skins.Skins import SKIN_TETE_BOMBE_ATOMIQUE
-from Old_Jeu.Dialogues.Dialogues_bombe_atomique import REPLIQUES_BOMBE_ATOMIQUE
+from ..Dialogues.Dialogues_bombe_atomique import REPLIQUES_BOMBE_ATOMIQUE

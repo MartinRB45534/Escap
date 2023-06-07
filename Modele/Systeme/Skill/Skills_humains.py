@@ -3,14 +3,14 @@ from typing import TYPE_CHECKING, Optional
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
-    from Old_Jeu.Entitee.Item.Equippement.Degainable.Degainable import Arme
+    from ..Entitee.Agissant.Agissant import Agissant
+    from ..Labyrinthe.Structure_spatiale.Direction import Direction
+    from ..Entitee.Item.Equippement.Degainable.Degainable import Arme
 
 # Imports des classes parentes
-from Old_Jeu.Systeme.Skill.Skill import Skill, Skill_intrasec, Skill_extra
-from Old_Jeu.Systeme.Skill.Actif import Actif, Skill_deplacement, Skill_ramasse, Skill_attaque, Skill_attaque_arme, Skills_magiques, Skill_alchimie
-from Old_Jeu.Systeme.Skill.Passif import Passif, Skill_vision
+from ..Systeme.Skill.Skill import Skill, Skill_intrasec, Skill_extra
+from ..Systeme.Skill.Actif import Actif, Skill_deplacement, Skill_ramasse, Skill_attaque, Skill_attaque_arme, Skills_magiques, Skill_alchimie
+from ..Systeme.Skill.Passif import Passif, Skill_vision
 
 class Skill_humain(Skill): # Vraiment utile ?
     """Les skills des humains."""
@@ -93,8 +93,8 @@ class Alchimie_humain(Skill_alchimie, Skill_extra, Skill_humain):
     #     return Alchimie(agissant, latence_alchimie[self.niveau-1], self, gain_xp_alchimie[self.niveau-1], recette)
 
 # Imports utilisés dans le code
-from Old_Jeu.Systeme.Constantes_skills.Skills import *
-from Old_Jeu.Action.Deplacement import Marche, Cours
-from Old_Jeu.Action.Action_skill import Alchimie, Ramasse
-from Old_Jeu.Action.Attaque import Attaque_final, Attaque_arme_final
-from Old_Jeu.Entitee.Item.Items import ITEMS_LIGHTS
+from ..Systeme.Constantes_skills.Skills import *
+from ..Action.Deplacement import Marche, Cours
+from ..Action.Action_skill import Alchimie, Ramasse
+from ..Action.Attaque import Attaque_final, Attaque_arme_final
+from ..Entitee.Item.Items import ITEMS_LIGHTS

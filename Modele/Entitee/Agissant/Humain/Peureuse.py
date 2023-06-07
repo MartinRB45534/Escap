@@ -3,15 +3,15 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from ..Controleur import Controleur
+    from ..Labyrinthe.Structure_spatiale.Direction import Direction
+    from ..Labyrinthe.Structure_spatiale.Position import Position
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Agissant.Humain.Humain import Humain
-from Old_Jeu.Entitee.Agissant.PNJ.PNJs import PNJ_mage
-from Old_Jeu.Entitee.Agissant.Role.Multi_renforceur import Multi_renforceur
-from Old_Jeu.Entitee.Agissant.Role.Support_lointain import Support_lointain
+from ..Entitee.Agissant.Humain.Humain import Humain
+from ..Entitee.Agissant.PNJ.PNJs import PNJ_mage
+from ..Entitee.Agissant.Role.Multi_renforceur import Multi_renforceur
+from ..Entitee.Agissant.Role.Support_lointain import Support_lointain
 
 class Peureuse(PNJ_mage,Multi_renforceur,Support_lointain,Humain): #La quatrième humaine du jeu, à l'étage 3 (terrorisée par les monstres)
     """La classe de la peureuse."""
@@ -490,8 +490,8 @@ class Peureuse(PNJ_mage,Multi_renforceur,Support_lointain,Humain): #La quatrièm
         return [f"Une humaine (niveau {self.niveau})",f"ID : {self.ID}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Une humaine terrorisée par les monstres. Elle peut quand-même se rendre utile."]
 
 # Imports utilisés dans le code:
-from Old_Jeu.Constantes import *
-from Old_Jeu.Systeme.Constantes_magies.Magies import *
+from ..Constantes import *
+from ..Systeme.Constantes_magies.Magies import *
 from Old_Affichage.Skins.Skins import SKIN_TETE_PEUREUSE
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
-from Old_Jeu.Dialogues.Dialogues_peureuse import REPLIQUES_PEUREUSE
+from ..Labyrinthe.Structure_spatiale.Position import ABSENT
+from ..Dialogues.Dialogues_peureuse import REPLIQUES_PEUREUSE

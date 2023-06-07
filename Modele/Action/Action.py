@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, List
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Entitee.Agissant.Agissant import Agissant
+    from ..Entitee.Agissant.Agissant import Agissant
 
 # Pas de classe parente
 

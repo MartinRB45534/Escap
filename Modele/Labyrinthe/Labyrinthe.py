@@ -1,188 +1,76 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, List, Tuple, Optional, Set
+import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Cote import Cote_position,Cote_decalage
-    from Old_Jeu.Labyrinthe.Vue import Representation_case
-    from Old_Jeu.Labyrinthe.Pattern import Pattern
-    from Old_Jeu.Labyrinthe.Case import Case
-    from Old_Jeu.Labyrinthe.Mur import Mur
-    from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-    from Old_Jeu.Entitee.Entitee import Mobile
+    from .Vue import Representation_case
+    from .Pattern import Pattern
+    from .Case import Case
+    from .Mur import Mur
+    from ..Entitee.Agissant.Agissant import Agissant
+    from ..Entitee.Entitee import Mobile
 
-# Import des classes parentes
-from Old_Jeu.Labyrinthe.Vue import Vue
+class Labyrinthe(crt.Labyrinthe):
+    def __init__(self):
+        super().__init__()
+        self.position_case: dict[crt.Position,Case] = {}
+        self.add_case(CASE_ABSENTE)
 
-# Valeurs par défaut des paramètres
-from Old_Jeu.Constantes import NB_DIRECTIONS, TERRE
+    def __contains__(self, item):
+        if isinstance(item,crt.Position):
+            return item in self.nodes and item is not crt.POSITION_ABSENTE
+        return super().__contains__(item)
 
-class Labyrinthe(Vue):
-    def __init__(self,controleur:Controleur,ID:str,decalage:Decalage,depart:Position,patterns:List[Pattern]=[],durete = 1,niveau = 1,element = TERRE,proba=0.1,poids:List[int]=[1]*NB_DIRECTIONS):
-        #print("Initialisation du labyrinthe")
-        self.id = ID #Correspond à la clé du labyrinthe. Créer un init différend pour chaque lab ?
-        self.decalage = decalage
-        self.durete = durete
-        self.niveau = niveau #Est-ce que la dureté des murs et le niveau des cases sont une seule et même chose ?
-        self.element = element
+    def add_case(self, case:Case, **attr):
+        self.add_node(case.position, case=case, **attr)
+        self.position_case[case.position] = case
+        for direction in crt.Direction:
+            self.add_mur(case.position, case.position+direction, direction, Mur(case.position+direction, 1))
 
-        self.depart = depart
+    def add_mur(self, u:crt.Position, v:crt.Position, direction:crt.Direction, mur:Mur, **attr):
+        if v not in self.position_case:
+            self.add_case(Case(v))
+        else:
+            if v in self[u] and direction in self[u][v]:
+                raise ValueError(f"Un mur existe déjà entre {u} et {v} dans la direction {direction}")
+        self.add_edge(u, v, key=direction, mur=mur, **attr)
 
-        self.matrice_cases = [[Case(controleur,Position(self.id,j,i),niveau,element) for i in range(decalage.y)]for j in range(decalage.x)]
-        self.bord = Bord_lab(self.decalage,[pattern.bord for pattern in patterns])
-
-        for cote in Bord(self.decalage):
-            self[cote].effets = [Mur_impassable()]
-
-        self.patterns=patterns
-        self.cases_visitees = None
-
-        self.temps_restant = -1 #Devient positif quand le labyrinthe est actif sans entitée supérieure
-        self.controleur = controleur
-
-        self.generation(proba,poids)
-
-    def __contains__(self,item):
-        if item is None:
-            return False
-        elif isinstance(item,Position):
-            return item.lab == self.id and 0<=item.x<self.decalage.x and 0<=item.y<self.decalage.y
-        elif isinstance(item,Decalage):
-            return 0<=item.x<self.decalage.x and 0<=item.y<self.decalage.y
-        elif isinstance(item,Cote_position|Cote_decalage):
-            return item.emplacement in self
-        return NotImplemented
-
-    def __iter__(self):
-        for decalage in self.decalage:
-            yield Position(self.id,0,0) + decalage
-
-    def case_from_tuple(self,tuple:Tuple[int,int]) -> Case:
-        return self.matrice_cases[tuple[0]][tuple[1]]
+    def get_case(self, position:crt.Position) -> Case:
+        return self.position_case[position]
     
-    def mur_from_tuple(self,tuple:Tuple[int,int,Direction]) -> Mur:
-        return self.matrice_cases[tuple[0]][tuple[1]][tuple[2]]
+    def get_mur(self, u:crt.Position, direction:crt.Direction, v:Optional[crt.Position]=None) -> Mur:
+        if v is None:
+            v = self.get_cible(u, direction)
+        return self[u][v][direction]['mur']
     
-    def case_from_position(self,position:Position|Decalage) -> Case:
-        return self.matrice_cases[position.x][position.y]
-
-    def mur_from_cote(self,cote:Cote_position|Cote_decalage) -> Mur:
-        return self.matrice_cases[cote.emplacement.x][cote.emplacement.y][cote.direction]
-
-    def generation(self,proba:float,poids:List[int]):
-        """
-        Fonction qui génère la matrice du labyrinthe
-            Entrées:
-                -Les cases spéciales sous la forme suivante:[coord_case,objet]
-                -L'éventuelle probabilité pour casser des murs
-                -L'éventuel nombre de murs casser
-                -L'éventuelle pourcentage de murs a casser
-            Sorties:
-                rien
-        """        
-        #génération en profondeur via l'objet generateur
-        #print("Génération du labyrinthe")
-        self.generation_en_profondeur(poids)
-
-
-        for pos in self:
-            for mur in self.murs_utilisables(pos,0):
-                if random.random() <= proba:
-                    self.mur_from_cote(mur).brise()
-                    self.mur_from_cote(mur.oppose()).brise()
-
-        for pattern in self.patterns:
-            if pattern.vide:
-                for pos in pattern:
-                    for cote in Bord_dec(pos):
-                        if not cote in self.bord:
-                            self.mur_from_cote(cote).brise()
-                            self.mur_from_cote(cote.oppose()).brise()
-
-            for i in range(len(pattern.entrees)):
-                if i < len(pattern.codes):
-                    self.mur_from_cote(pattern.entrees[i]+pattern.position).cree_porte(pattern.codes[i])
-                    self.mur_from_cote(pattern.entrees[i].oppose()+pattern.position).cree_porte(pattern.codes[i])
-                else:
-                    self.mur_from_cote(pattern.entrees[i]).brise()
-                    self.mur_from_cote(pattern.entrees[i].oppose()).brise()
-
-    def generation_en_profondeur(self,poids:List[int]):
-        """
-        Fonction qui génère la matrice avec la méthode du parcours en profondeur
-        Entrées:Rien
-        Sorties:une matrice de cases générée avec le parcours en profondeur
-        """
-        rdm=random.randrange (1,10**18,1)
-
-        #on définit la seed de notre générateur
-        #cela permet d'avoir le meme résultat
-        #rdm=851353618387733257
-        #print("seed ",rdm)
-        random.seed(rdm)
-
-        #print("Début de la génération")
-        #position dans la matrice
-        position = self.depart
-        #le stack est une liste de positions
-        stack:List[Position]=[position]
-
-        while len(stack) :
-
-            #on récupère les coords de là où l'on est cad la dernière case dans le stack
-            position = stack[len(stack)-1]
-
-            murs_generables = self.murs_utilisables(position)
-
-            if len(murs_generables) > 0 : 
-
-                mur=random.choices(murs_generables,[poids[mur.direction] for mur in murs_generables])[0]
-                mur_opp = mur.oppose()
-
-                self.mur_from_cote(mur).brise()
-                self.mur_from_cote(mur_opp).brise()
-
-                new_pos = mur_opp.emplacement
-                if isinstance(new_pos,Decalage):
-                    raise Exception("Weird, should not happen...")
-                self.case_from_position(new_pos).clarte=1
-                #on ajoute les nouvelles coordonnées de la case au stack
-                stack.append(new_pos)
-            else:
-                #on revient encore en arrière
-                stack.pop()
-
-        #print("Fini")
-
-    def murs_utilisables(self,position:Position,nb_murs=NB_DIRECTIONS) -> List[Cote_position]:
-        """
-        Fonction qui prend en entrées:
-            les voisins de la case
-        et qui renvoie les directions ou les murs sont cassables
-        """
-        murs_utilisables:List[Cote_position]=[]
-
-        for cote in Bord_dec(position):
-            opp = cote.oppose()
-            if not cote in self.bord :
-                if self.case_from_position(opp.emplacement).nb_murs_pleins() >= nb_murs:
-                    murs_utilisables.append(cote)
-        return murs_utilisables
+    def get_mur_oppose(self, u:crt.Position, direction:crt.Direction, v:Optional[crt.Position]=None) -> Optional[Mur]:
+        if v is None:
+            v = self.get_cible(u, direction)
+        # On vérifie que le mur existe, que v n'est pas POSITION_ABSENTE, et qu'il n'y a qu'un seul mur entre v et u
+        if direction in self[u][v] and len(self[v][u]) == 1:
+            return self[v][u]["mur"]
+        
+    def get_cible(self, position:crt.Position, direction:crt.Direction) -> crt.Position:
+        # Il devrait exister un mur sortant de position dans la direction direction
+        # Il ne mêne pas nécessairement à position+direction
+        for voisin in self[position]:
+            if direction in self[position][voisin]:
+                return voisin
+        raise ValueError(f"La position {position} n'a pas de mur dans la direction {direction}")
+        
+    def extrait(self, positions:Set[crt.Position]) -> crt.Extrait:
+        voisins:Set[crt.Position] = {voisin for position in positions for voisin in self[position] if voisin not in positions}
+        subgraph = super().subgraph(positions|voisins)
+        return crt.Extrait(voisins, subgraph)
 
     def veut_passer(self,intrus:Mobile,direction:Direction):
         """Fonction qui tente de faire passer une entitée.
            Se réfère à la case compétente, qui gère tout."""
         position = intrus.get_position()
-        if position is None:
-            raise Exception("L'intrus n'a pas de position")
-        self.case_from_position(position)[direction].veut_passer(intrus)
-
-    # def step(self,coord:Position,entitee:Entitee):
-    #     self[coord].step(entitee)
+        if position is POSITION_ABSENTE:
+            raise Exception("L'entitée n'a pas de position")
+        self.get_mur(position,direction).veut_passer(intrus)
 
     def get_vue(self,agissant:Agissant):
         position = agissant.get_position()
@@ -192,20 +80,11 @@ class Labyrinthe(Vue):
         if matrice is None:
             raise Exception("Pas de retour ?")
         return Representation_vue(self.id,matrice,self.decalage)
-            
-    # def getMatrice_cases(self):
-    #     #on obtient une copie indépendante du labyrinthe
-    #     new_mat = [[self.matrice_cases[j][i].get_copie() for i in range(self.decalage.y)]for j in range(self.decalage.x)]
-    #     return new_mat
-
-    def get_case(self,position:Position):
-        return self.case_from_position(position)
 
     #Découvrons le déroulé d'un tour, avec Labyrinthe-ni :
     def debut_tour(self): #On commence le tour
-        for i in range(self.decalage.x):
-            for j in range(self.decalage.y):
-                self.matrice_cases[i][j].debut_tour()
+        for position in self.nodes:
+            self[position].debut_tour()
 
     def pseudo_debut_tour(self): #On commence le tour
         for i in range(self.decalage.x):
@@ -311,6 +190,106 @@ class Labyrinthe(Vue):
                 matrice_cases.append(collone)
             return matrice_cases
 
+    def generation(self,proba:float,poids:List[int]):
+        """
+        Fonction qui génère la matrice du labyrinthe
+            Entrées:
+                -Les cases spéciales sous la forme suivante:[coord_case,objet]
+                -L'éventuelle probabilité pour casser des murs
+                -L'éventuel nombre de murs casser
+                -L'éventuelle pourcentage de murs a casser
+            Sorties:
+                rien
+        """        
+        #génération en profondeur via l'objet generateur
+        #print("Génération du labyrinthe")
+        self.generation_en_profondeur(poids)
+
+
+        for pos in self:
+            for mur in self.murs_utilisables(pos,0):
+                if random.random() <= proba:
+                    self.mur_from_cote(mur).brise()
+                    self.mur_from_cote(mur.oppose()).brise()
+
+        for pattern in self.patterns:
+            if pattern.vide:
+                for pos in pattern:
+                    for cote in Bord_dec(pos):
+                        if not cote in self.bord:
+                            self.mur_from_cote(cote).brise()
+                            self.mur_from_cote(cote.oppose()).brise()
+
+            for i in range(len(pattern.entrees)):
+                if i < len(pattern.codes):
+                    self.mur_from_cote(pattern.entrees[i]+pattern.position).cree_porte(pattern.codes[i])
+                    self.mur_from_cote(pattern.entrees[i].oppose()+pattern.position).cree_porte(pattern.codes[i])
+                else:
+                    self.mur_from_cote(pattern.entrees[i]).brise()
+                    self.mur_from_cote(pattern.entrees[i].oppose()).brise()
+
+    def generation_en_profondeur(self,poids:List[int]):
+        """
+        Fonction qui génère la matrice avec la méthode du parcours en profondeur
+        Entrées:Rien
+        Sorties:une matrice de cases générée avec le parcours en profondeur
+        """
+        rdm=random.randrange (1,10**18,1)
+
+        #on définit la seed de notre générateur
+        #cela permet d'avoir le meme résultat
+        #rdm=851353618387733257
+        #print("seed ",rdm)
+        random.seed(rdm)
+
+        #print("Début de la génération")
+        #position dans la matrice
+        position = self.depart
+        #le stack est une liste de positions
+        stack:List[Position]=[position]
+
+        while len(stack) :
+
+            #on récupère les coords de là où l'on est cad la dernière case dans le stack
+            position = stack[len(stack)-1]
+
+            murs_generables = self.murs_utilisables(position)
+
+            if len(murs_generables) > 0 : 
+
+                mur=random.choices(murs_generables,[poids[mur.direction] for mur in murs_generables])[0]
+                mur_opp = mur.oppose()
+
+                self.mur_from_cote(mur).brise()
+                self.mur_from_cote(mur_opp).brise()
+
+                new_pos = mur_opp.emplacement
+                if isinstance(new_pos,Decalage):
+                    raise Exception("Weird, should not happen...")
+                self.case_from_position(new_pos).clarte=1
+                #on ajoute les nouvelles coordonnées de la case au stack
+                stack.append(new_pos)
+            else:
+                #on revient encore en arrière
+                stack.pop()
+
+        #print("Fini")
+
+    def murs_utilisables(self,position:Position,nb_murs=NB_DIRECTIONS) -> List[Cote_position]:
+        """
+        Fonction qui prend en entrées:
+            les voisins de la case
+        et qui renvoie les directions ou les murs sont cassables
+        """
+        murs_utilisables:List[Cote_position]=[]
+
+        for cote in Bord_dec(position):
+            opp = cote.oppose()
+            if not cote in self.bord :
+                if self.case_from_position(opp.emplacement).nb_murs_pleins() >= nb_murs:
+                    murs_utilisables.append(cote)
+        return murs_utilisables
+
     def voisins_case(self,data:Tuple):
         """
         Fonction qui prend en entrée:
@@ -409,12 +388,5 @@ class Labyrinthe(Vue):
         return datas_utilisables
 
 # Imports utilisés dans le code
-from Old_Jeu.Effet.Effets_mouvement.Blocages import Mur_impassable
-from Old_Jeu.Labyrinthe.Case import Case
-from Old_Jeu.Labyrinthe.Mur import Mur
-from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import DIRECTIONS, Direction
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
-from Old_Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
-from Old_Jeu.Labyrinthe.Structure_spatiale.Bord import Bord, Bord_dec, Bord_lab
-from Old_Jeu.Labyrinthe.Vue import Representation_vue
+from .Absent import CASE_ABSENTE
 import random

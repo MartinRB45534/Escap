@@ -3,18 +3,18 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
-    from Old_Jeu.Entitee.Agissant.Agissant import Agissant
+    from ..Controleur import Controleur
+    from ..Labyrinthe.Structure_spatiale.Position import Position
+    from ..Labyrinthe.Structure_spatiale.Direction import Direction
+    from ..Entitee.Agissant.Agissant import Agissant
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Item.Projectile.Projectile import Projectile
-from Old_Jeu.Entitee.Item.Item import Item
-from Old_Jeu.Entitee.Entitee import Fantome
+from ..Entitee.Item.Projectile.Projectile import Projectile
+from ..Entitee.Item.Item import Item
+from ..Entitee.Entitee import Fantome
 
 # Valeurs par défaut des paramètres
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+from ..Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Explosif(Projectile):
     """La classe des projectiles qui explosent. Affectés différemment par certains skills."""
@@ -342,7 +342,7 @@ class Eclair_noir(Magie_explosive_percante):
 
 # Imports utilisés dans la code
 from Old_Affichage.Skins.Skins import SKIN_FLECHE_DE_GLACE,SKIN_ROCHER,SKIN_OMBRE_FURTIVE,SKIN_BOULE_DE_FEU,SKIN_EXPLOSE,SKIN_EXPLOSIF,SKIN_FLECHE
-from Old_Jeu.Systeme.Constantes_magies.Magies import *
-from Old_Jeu.Systeme.Constantes_projectiles.Projectiles import *
-from Old_Jeu.Effet.Effets_items import On_hit
-from Old_Jeu.Constantes import OMBRE,FEU,GLACE
+from ..Systeme.Constantes_magies.Magies import *
+from ..Systeme.Constantes_projectiles.Projectiles import *
+from ..Effet.Effets_items import On_hit
+from ..Constantes import OMBRE,FEU,GLACE

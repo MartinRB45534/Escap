@@ -3,12 +3,12 @@ from typing import TYPE_CHECKING, List
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Cote import Cote_position,Cote_decalage
+    from ..Labyrinthe.Structure_spatiale.Position import Position
+    from ..Labyrinthe.Structure_spatiale.Decalage import Decalage
+    from ..Labyrinthe.Structure_spatiale.Cote import Cote_position,Cote_decalage
 
 # Import des classes parentes
-from Old_Jeu.Labyrinthe.Structure_spatiale.Espace import Espace
+from ..Labyrinthe.Structure_spatiale.Espace import Espace
 
 class Pattern(Espace):
     def __init__(self,position:Position,decalage:Decalage,entrees:List[Cote_decalage]=[],codes:List[str]=[],vide=True):
@@ -48,6 +48,6 @@ class Pattern(Espace):
             yield self.position + decalage
 
 # Imports utilisés dans le code
-from Old_Jeu.Labyrinthe.Structure_spatiale.Bord import Bord_pat
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
-from Old_Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
+from ..Labyrinthe.Structure_spatiale.Bord import Bord_pat
+from ..Labyrinthe.Structure_spatiale.Position import Position
+from ..Labyrinthe.Structure_spatiale.Decalage import Decalage

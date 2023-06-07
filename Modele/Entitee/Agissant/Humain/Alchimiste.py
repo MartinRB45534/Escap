@@ -3,16 +3,16 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from ..Controleur import Controleur
+    from ..Labyrinthe.Structure_spatiale.Direction import Direction
+    from ..Labyrinthe.Structure_spatiale.Position import Position
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Agissant.Humain.Humain import Humain
-from Old_Jeu.Entitee.Agissant.PNJ.PNJs import PNJ_mage
-from Old_Jeu.Entitee.Agissant.Role.Attaquant_magique_case import Attaquant_magique_case
-from Old_Jeu.Entitee.Agissant.Role.Attaquant_magique_poing import Attaquant_magique_poing
-from Old_Jeu.Entitee.Agissant.Role.Support import Support
+from ..Entitee.Agissant.Humain.Humain import Humain
+from ..Entitee.Agissant.PNJ.PNJs import PNJ_mage
+from ..Entitee.Agissant.Role.Attaquant_magique_case import Attaquant_magique_case
+from ..Entitee.Agissant.Role.Attaquant_magique_poing import Attaquant_magique_poing
+from ..Entitee.Agissant.Role.Support import Support
 
 class Alchimiste(PNJ_mage,Attaquant_magique_case,Attaquant_magique_poing,Support,Humain): #Le septième humain du jeu, à l'étage 6 (un faiseur de potions aux magies diverses)
     """La classe de l'alchimiste."""
@@ -351,13 +351,13 @@ class Alchimiste(PNJ_mage,Attaquant_magique_case,Attaquant_magique_poing,Support
         return [f"Un humain (niveau {self.niveau})",f"ID : {self.ID}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Un alchimiste."]
 
 # Imports utilisés dans le code:
-from Old_Jeu.Constantes import *
+from ..Constantes import *
 
-from Old_Jeu.Systeme.Classe.Classes import trouve_skill
-from Old_Jeu.Systeme.Skill.Skills import Skill_alchimie
-from Old_Jeu.Systeme.Constantes_skills.Skills import *
-from Old_Jeu.Systeme.Constantes_magies.Magies import *
+from ..Systeme.Classe.Classes import trouve_skill
+from ..Systeme.Skill.Skills import Skill_alchimie
+from ..Systeme.Constantes_skills.Skills import *
+from ..Systeme.Constantes_magies.Magies import *
 from Old_Affichage.Skins.Skins import SKIN_TETE_ALCHIMISTE
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
-from Old_Jeu.Entitee.Item.Parchemin.Parchemins import Parchemin_vierge
-from Old_Jeu.Dialogues.Dialogues_alchimiste import REPLIQUES_ALCHIMISTE
+from ..Labyrinthe.Structure_spatiale.Position import ABSENT
+from ..Entitee.Item.Parchemin.Parchemins import Parchemin_vierge
+from ..Dialogues.Dialogues_alchimiste import REPLIQUES_ALCHIMISTE

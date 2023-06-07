@@ -1,1 +1,1 @@
-from Old_Jeu.Entitee.Agissant.Ombriul.Ombriul import *
+from ..Entitee.Agissant.Ombriul.Ombriul import *

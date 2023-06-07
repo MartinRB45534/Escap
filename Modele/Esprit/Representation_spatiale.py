@@ -3,14 +3,14 @@ from typing import TYPE_CHECKING, Set, Dict, List, Tuple
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Cote import Cote_position
+    from ..Entitee.Agissant.Agissant import Agissant
+    from ..Labyrinthe.Structure_spatiale.Position import Position
+    from ..Labyrinthe.Structure_spatiale.Cote import Cote_position
 
 # Pas de classe parente
 
 # Valeurs par défaut des paramètres
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+from ..Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Espace_schematique:
     def __init__(self):
@@ -106,6 +106,6 @@ class Couloir(Espace_schematique):
         return {*self.cases}|self.entrees
 
 # Imports utilisés dans le code
-from Old_Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
-from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import DIRECTIONS
-from Old_Jeu.Labyrinthe.Structure_spatiale.Cote import Cote_position
+from ..Labyrinthe.Structure_spatiale.Decalage import Decalage
+from ..Labyrinthe.Structure_spatiale.Direction import DIRECTIONS
+from ..Labyrinthe.Structure_spatiale.Cote import Cote_position

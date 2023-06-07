@@ -3,17 +3,17 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
+    from ..Controleur import Controleur
+    from ..Labyrinthe.Structure_spatiale.Position import Position
+    from ..Labyrinthe.Structure_spatiale.Direction import Direction
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Agissant.Role.Mage import Mage
-from Old_Jeu.Entitee.Agissant.Role.Attaquant_magique_poing import Attaquant_magique_poing
-from Old_Jeu.Entitee.Agissant.Role.Dps import Dps
+from ..Entitee.Agissant.Role.Mage import Mage
+from ..Entitee.Agissant.Role.Attaquant_magique_poing import Attaquant_magique_poing
+from ..Entitee.Agissant.Role.Dps import Dps
 
 # Valeurs par défaut des paramètres
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+from ..Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Ombriul(Dps,Attaquant_magique_poing): #/!\ Retravailler l'ombriul pour utiliser les rôles
     """Une créature des ténèbres, non-endémique du labyrinthe."""
@@ -50,6 +50,6 @@ class Ombriul(Dps,Attaquant_magique_poing): #/!\ Retravailler l'ombriul pour uti
         return [f"Un ombriul (niveau {self.niveau})",f"ID : {self.ID}","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Les ombriuls ne font pas partie des espèces endémiques au labyrinthe. Ils y prolifèrent depuis quelques temps grâce à l'ombre, qui est leur élément de prédilection."]
 
 # Imports utilisés dans le code
-from Old_Jeu.Entitee.Agissant.Agissant import Agissant
+from ..Entitee.Agissant.Agissant import Agissant
 from Old_Affichage.Skins.Skins import SKIN_CORPS_OMBRIUL, SKIN_TETE_OMBRIUL, SKIN_CADAVRE
-from Old_Jeu.Systeme.Constantes_magies.Magies import cout_pm_poing_sombre
+from ..Systeme.Constantes_magies.Magies import cout_pm_poing_sombre

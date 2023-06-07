@@ -3,14 +3,14 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from ..Controleur import Controleur
+    from ..Labyrinthe.Structure_spatiale.Position import Position
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Agissant.Agissant import Agissant
+from ..Entitee.Agissant.Agissant import Agissant
 
 # Valeurs par défaut des paramètres
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+from ..Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Base_gobelin(Agissant):
     """Le monstre de base. Faible, souvent en groupe."""
@@ -43,5 +43,5 @@ class Base_gobelin(Agissant):
     #Est-ce qu'il a besoin d'une méthode spécifique ? Pour les offenses peut-être ?
 
 # Imports utilisés dans le code
-from Old_Jeu.Entitee.Agissant.Agissant import Agissant
+from ..Entitee.Agissant.Agissant import Agissant
 from Old_Affichage.Skins.Skins import SKIN_CORPS_GOBELIN, SKIN_TETE_GOBELIN, SKIN_CADAVRE

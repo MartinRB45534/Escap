@@ -3,16 +3,16 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
-    from Old_Jeu.Effet.Effet import Effet
+    from ..Controleur import Controleur
+    from ..Entitee.Agissant.Agissant import Agissant
+    from ..Labyrinthe.Structure_spatiale.Position import Position
+    from ..Effet.Effet import Effet
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Item.Item import Consommable
+from ..Entitee.Item.Item import Consommable
 
 # Valeurs par défaut des paramètres
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+from ..Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Potion(Consommable):
     """La classe des consommables qui peuvent se boire (ne requièrent pas de magie pour être activés)."""
@@ -40,4 +40,4 @@ class Potion(Consommable):
 
 # Imports utilisés dans le code
 from Old_Affichage.Skins.Skins import SKIN_POTION
-from Old_Jeu.Entitee.Item.Item import Item
+from ..Entitee.Item.Item import Item

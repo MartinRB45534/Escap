@@ -3,13 +3,13 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-    from Old_Jeu.Entitee.Item.Projectile.Projectile import Projectile
+    from ..Entitee.Agissant.Agissant import Agissant
+    from ..Entitee.Item.Projectile.Projectile import Projectile
 
 # Pas de classe parente
 
 # Valeurs par défaut des paramètres
-from Old_Jeu.Entitee.Item.Item import Item
+from ..Entitee.Item.Item import Item
 
 class Cree_item:
     """La classe des créateurs d'item."""
@@ -216,7 +216,7 @@ class Cree_charge_etendue_skill(Cree_item):
 
 # Imports utilisés dans le code
 from Old_Affichage.Skins.Skins import SKIN_CREE_CHARGE_DE_BASE, SKIN_CREE_CHARGE_ETENDUE, SKIN_CREE_CHARGE_LOURDE, SKIN_CREE_FLECHE_EXPLOSIVE, SKIN_CREE_FLECHE_LEGERE, SKIN_CREE_FLECHE_LOURDE, SKIN_CREE_FLECHE_DE_BASE, SKIN_CREE_FLECHE_FANTOME
-from Old_Jeu.Entitee.Item.Projectile.Projectiles import Fleche_explosive, Fleche_legere, Fleche_lourde, Charge_de_base, Charge_lourde, Charge_etendue, Fleche_de_base, Fleche_fantome
+from ..Entitee.Item.Projectile.Projectiles import Fleche_explosive, Fleche_legere, Fleche_lourde, Charge_de_base, Charge_lourde, Charge_etendue, Fleche_de_base, Fleche_fantome
 
-from Old_Jeu.Systeme.Classe.Classes import trouve_skill
-from Old_Jeu.Systeme.Skill.Skills import Skill_creation_d_explosifs, Skill_creation_de_fleches
+from ..Systeme.Classe.Classes import trouve_skill
+from ..Systeme.Skill.Skills import Skill_creation_d_explosifs, Skill_creation_de_fleches

@@ -3,15 +3,15 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
-    from Old_Jeu.Action.Action import Action
+    from ..Controleur import Controleur
+    from ..Labyrinthe.Structure_spatiale.Position import Position
+    from ..Action.Action import Action
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Item.Parchemin.Parchemin import Parchemin
+from ..Entitee.Item.Parchemin.Parchemin import Parchemin
 
 # Valeurs par défaut des paramètres
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+from ..Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Parchemin_purification(Parchemin):
     """Un parchemin qui soigne poisons et maladies."""
@@ -104,9 +104,9 @@ class Parchemin_protection(Parchemin):
         return["Un parchemin","Permet de protéger tous ses alliés"]
 
 # Imports utilisés dans le code
-from Old_Jeu.Action.Action import Action
-from Old_Jeu.Action.Non_skill import Impregne
-from Old_Jeu.Effet.Effets_protection import Protection_groupe
-from Old_Jeu.Effet.Sante.Soins import Purification
-from Old_Jeu.Entitee.Item.Item import Item
-from Old_Jeu.Entitee.Agissant.Agissant import NoOne
+from ..Action.Action import Action
+from ..Action.Non_skill import Impregne
+from ..Effet.Effets_protection import Protection_groupe
+from ..Effet.Sante.Soins import Purification
+from ..Entitee.Item.Item import Item
+from ..Entitee.Agissant.Agissant import NoOne

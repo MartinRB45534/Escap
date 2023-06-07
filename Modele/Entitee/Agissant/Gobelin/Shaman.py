@@ -3,16 +3,16 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from ..Controleur import Controleur
+    from ..Labyrinthe.Structure_spatiale.Position import Position
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Agissant.Gobelin.Base_gobelin import Base_gobelin
-from Old_Jeu.Entitee.Agissant.Role.Renforceur import Renforceur
-from Old_Jeu.Entitee.Agissant.Role.Support_lointain import Support_lointain
+from ..Entitee.Agissant.Gobelin.Base_gobelin import Base_gobelin
+from ..Entitee.Agissant.Role.Renforceur import Renforceur
+from ..Entitee.Agissant.Role.Support_lointain import Support_lointain
 
 # Valeurs par défaut des paramètres
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+from ..Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Shaman_gobelin(Renforceur,Support_lointain,Base_gobelin):
     """Un gobelin avec un potentiel magique.
@@ -48,5 +48,5 @@ class Shaman_gobelin(Renforceur,Support_lointain,Base_gobelin):
         return [f"Un shaman gobelin (niveau {self.niveau})",f"ID : {self.ID}","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Caché à l'arrière, loin des combats, le shaman fourni pourtant aux autres gobelins un renforcement non négligeable. Essayez de le tuer en priorité !"]
 
 # Imports utilisés dans le code
-from Old_Jeu.Systeme.Constantes_magies.Magies import cout_pm_boost
-from Old_Jeu.Action.Magie.Magies_attaque.Boosts import Magie_boost
+from ..Systeme.Constantes_magies.Magies import cout_pm_boost
+from ..Action.Magie.Magies_attaque.Boosts import Magie_boost

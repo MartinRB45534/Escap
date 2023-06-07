@@ -3,16 +3,16 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-    from Old_Jeu.Entitee.Item.Item import Item
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from ..Controleur import Controleur
+    from ..Entitee.Agissant.Agissant import Agissant
+    from ..Entitee.Item.Item import Item
+    from ..Labyrinthe.Structure_spatiale.Position import Position
 
 # Imports des classes parentes
-from Old_Jeu.Effet.Effet import One_shot, On_fin_tour, Effet
+from ..Effet.Effet import One_shot, On_fin_tour, Effet
 
 # Valeurs par défaut des paramètres
-from Old_Jeu.Constantes import TERRE
+from ..Constantes import TERRE
 
 class En_sursis(One_shot,On_fin_tour):
     """L'effet de sursis d'un projectile perçant qui a jusqu'à la fin du tour pour tuer l'agissant sur sa case."""
@@ -29,7 +29,7 @@ class En_sursis(One_shot,On_fin_tour):
 
 class On_hit(Effet):
     """La classe des effets qui se déclenchent quand un projectile heurte un agissant ou un mur."""
-    def __init__(self,portee:float,degats:float,element:int = TERRE):
+    def __init__(self,portee:float,degats:float,element:Element = TERRE):
         self.affiche = False
         self.portee = portee
         self.degats = degats
@@ -44,6 +44,6 @@ class On_hit(Effet):
         self.action(lanceur,position,controleur)
 
 # Imports utilisés dans le code
-from Old_Jeu.Effet.Attaque.Attaque import Attaque_case
-from Old_Jeu.Entitee.Item.Projectile.Projectiles import Fragile,Evanescent
-from Old_Jeu.Constantes import *
+from ..Effet.Attaque.Attaque import Attaque_case
+from ..Entitee.Item.Projectile.Projectiles import Fragile,Evanescent
+from ..Constantes import *

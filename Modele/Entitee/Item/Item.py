@@ -3,18 +3,18 @@ from typing import TYPE_CHECKING, Optional
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
-    from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-    from Old_Jeu.Entitee.Entitee import Non_superposable
-    from Old_Jeu.Action.Deplacement import Vole
+    from ..Controleur import Controleur
+    from ..Labyrinthe.Structure_spatiale.Position import Position
+    from ..Labyrinthe.Structure_spatiale.Direction import Direction
+    from ..Entitee.Agissant.Agissant import Agissant
+    from ..Entitee.Entitee import Non_superposable
+    from ..Action.Deplacement import Vole
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Entitee import Mobile
+from ..Entitee.Entitee import Mobile
 
 # Valeurs par défaut des paramètres
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+from ..Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Item(Mobile):
     """La classe des entitées inanimées. Peuvent se situer dans un inventaire. Peuvent être lancés (déconseillé pour les non-projectiles)."""
@@ -134,9 +134,9 @@ class Ingredient(Item):
         return SKIN_INGREDIENT
 
 # Imports utilisés dans le code
-from Old_Jeu.Entitee.Entitee import Entitee
-from Old_Jeu.Entitee.Item.Projectile.Projectiles import Percant, Fragile, Evanescent
-from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import DIRECTIONS
+from ..Entitee.Entitee import Entitee
+from ..Entitee.Item.Projectile.Projectiles import Percant, Fragile, Evanescent
+from ..Labyrinthe.Structure_spatiale.Direction import DIRECTIONS
 from Old_Affichage.Skins.Skins import SKIN_VIDE, SKIN_INGREDIENT, SKINS_ITEMS_VUS
-from Old_Jeu.Effet.Effet import On_debut_tour, On_fin_tour, Time_limited
-from Old_Jeu.Effet.Effets_items import En_sursis, On_hit
+from ..Effet.Effet import On_debut_tour, On_fin_tour, Time_limited
+from ..Effet.Effets_items import En_sursis, On_hit

@@ -3,14 +3,14 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from ..Controleur import Controleur
+    from ..Labyrinthe.Structure_spatiale.Position import Position
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Item.Potion.Potion import Potion
+from ..Entitee.Item.Potion.Potion import Potion
 
 # Valeurs par défaut des paramètres
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+from ..Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Potion_empoisonnee(Potion):
     """Une potion pas très bonne pour la santé."""
@@ -98,9 +98,9 @@ class Potion_vitesse(Potion):
         return ["Une potion","Augmente temporairement la vitesse de l'utilisateur. À utiliser au début d'un échange de coups ou lors d'une fuite."]
 
 # Imports utilisés dans le code
-from Old_Jeu.Effet.Sante.Poison import Poison
-from Old_Jeu.Effet.Sante.Soins import Soin, Antidote, Medicament
-from Old_Jeu.Effet.Enchantements import Enchantement_force, Enchantement_vitesse
-from Old_Jeu.Entitee.Agissant.Agissant import NoOne
-from Old_Jeu.Systeme.Constantes_items.Items import soin_potion_hypokute
+from ..Effet.Sante.Poison import Poison
+from ..Effet.Sante.Soins import Soin, Antidote, Medicament
+from ..Effet.Enchantements import Enchantement_force, Enchantement_vitesse
+from ..Entitee.Agissant.Agissant import NoOne
+from ..Systeme.Constantes_items.Items import soin_potion_hypokute
 from Old_Affichage.Skins.Skins import SKIN_POTION_POISON

@@ -3,7 +3,7 @@ from __future__ import annotations
 # Pas d'imports pour les annotations
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Agissant.Role.Bourrin import Bourrin
+from ..Entitee.Agissant.Role.Bourrin import Bourrin
 
 class Tank(Bourrin):
     """Les agissants avec une bonne défense, supposés prendre les dégats."""

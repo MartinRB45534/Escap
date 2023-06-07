@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING, Set
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Systeme.Skill.Skill import Skill_intrasec, Skill_extra
+    from ..Systeme.Skill.Skill import Skill_intrasec, Skill_extra
 
 # Imports des classes parentes
-from Old_Jeu.Systeme.Classe.Classe import Classe
+from ..Systeme.Classe.Classe import Classe
 
 class Classe_principale(Classe):
     """La classe principale de l'agissant. Le niveau d'un agissant est égal au niveau de sa classe principale. Pour les agissants capables de s'améliorer, l'utilisation de la procédure gagne_xp de la classe principale provoque récursivement l'utilisation de cette procédure sur tous les sous-classe est skills de l'agissant. L'amélioration de la classe principale provoque une amélioration des statistiques de l'agissant.
@@ -317,4 +317,4 @@ class Classe_principale(Classe):
             Classe.vire_xp(self)
 
 # Imports utilisés dans le code
-from Old_Jeu.Systeme.Skill.Skills import *
+from ..Systeme.Skill.Skills import *

@@ -3,11 +3,11 @@ from typing import TYPE_CHECKING, List, Dict, Set, Tuple, Self, Literal
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
-    from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-    from Old_Jeu.Labyrinthe.Vue import Representation_case, Representation_vue
-    from Old_Jeu.Esprit.Representation_spatiale import Espace_schematique
+    from ..Controleur import Controleur
+    from ..Labyrinthe.Structure_spatiale.Position import Position
+    from ..Entitee.Agissant.Agissant import Agissant
+    from ..Labyrinthe.Vue import Representation_case, Representation_vue
+    from ..Esprit.Representation_spatiale import Espace_schematique
 
 # Pas de classe parente
 
@@ -1473,16 +1473,16 @@ class Mindless(Esprit):
 NOBODY = Mindless()
 
 # Imports utilisés dans le code
-from Old_Jeu.Labyrinthe.Vue import Vues
-from Old_Jeu.Esprit.Representation_spatiale import Salle, Couloir, Zone_inconnue
-from Old_Jeu.Systeme.Constantes_stats import add_constantes_temps, incr_compteur_temps, constantes_deplacements
-from Old_Jeu.Constantes import PASSE_ESCALIER, BASIQUE, DIALOGUE
-from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import Direction, DIRECTIONS, HAUT, DROITE, BAS, GAUCHE
-from Old_Jeu.Labyrinthe.Structure_spatiale.Decalage import Decalage
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
-from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-from Old_Jeu.Entitee.Agissant.PNJ.PNJs import PNJ, PJ
-from Old_Jeu.Entitee.Agissant.Role.Sentinelle import Sentinelle
-from Old_Jeu.Entitee.Agissant.Humain.Humain import Humain
+from ..Labyrinthe.Vue import Vues
+from ..Esprit.Representation_spatiale import Salle, Couloir, Zone_inconnue
+from ..Systeme.Constantes_stats import add_constantes_temps, incr_compteur_temps, constantes_deplacements
+from ..Constantes import PASSE_ESCALIER, BASIQUE, DIALOGUE
+from ..Labyrinthe.Structure_spatiale.Direction import Direction, DIRECTIONS, HAUT, DROITE, BAS, GAUCHE
+from ..Labyrinthe.Structure_spatiale.Decalage import Decalage
+from ..Labyrinthe.Structure_spatiale.Position import Position
+from ..Entitee.Agissant.Agissant import Agissant
+from ..Entitee.Agissant.PNJ.PNJs import PNJ, PJ
+from ..Entitee.Agissant.Role.Sentinelle import Sentinelle
+from ..Entitee.Agissant.Humain.Humain import Humain
 import random
 import operator

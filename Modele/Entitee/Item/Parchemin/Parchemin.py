@@ -3,16 +3,16 @@ from typing import TYPE_CHECKING, Type
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
-    from Old_Jeu.Effet.Effet import Effet
-    from Old_Jeu.Action.Magie.Magie import Magie
+    from ..Controleur import Controleur
+    from ..Labyrinthe.Structure_spatiale.Position import Position
+    from ..Effet.Effet import Effet
+    from ..Action.Magie.Magie import Magie
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Item.Item import Consommable
+from ..Entitee.Item.Item import Consommable
 
 # Valeurs par défaut des paramètres
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+from ..Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Parchemin(Consommable):
     """La classe des consommables qui s'activent avec du mana."""
@@ -54,5 +54,5 @@ class Poly_de_cours(Parchemin):
 
 # Imports utilisés dans le code
 from Old_Affichage.Skins.Skins import SKIN_PARCHEMIN
-from Old_Jeu.Effet.Effets_divers import Enseignement
-from Old_Jeu.Entitee.Item.Item import Item
+from ..Effet.Effets_divers import Enseignement
+from ..Entitee.Item.Item import Item

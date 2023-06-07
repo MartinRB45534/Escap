@@ -3,15 +3,15 @@ from typing import TYPE_CHECKING, Optional, Type, List, Dict, Set
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
-    from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-    from Old_Jeu.Entitee.Item.Item import Item
+    from ..Controleur import Controleur
+    from ..Labyrinthe.Structure_spatiale.Position import Position
+    from ..Entitee.Agissant.Agissant import Agissant
+    from ..Entitee.Item.Item import Item
 
 # Pas de classe parente
 
 # Valeurs par défaut des paramètres
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+from ..Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Inventaire:
 
@@ -288,23 +288,23 @@ class Inventaire:
     #     return False
 
 # Imports utilisés dans le code (il y en a beaucoup !!!)
-from Old_Jeu.Action.Non_skill import Impregne
-from Old_Jeu.Entitee.Item.Item import Item
-from Old_Jeu.Entitee.Item.Potion.Potion import Potion
-from Old_Jeu.Entitee.Item.Parchemin.Parchemin import Parchemin
-from Old_Jeu.Entitee.Item.Cle import Cle
-from Old_Jeu.Entitee.Item.Equippement.Degainable.Degainable import Arme
-from Old_Jeu.Entitee.Item.Equippement.Degainable.Bouclier.Bouclier import Bouclier
-from Old_Jeu.Entitee.Item.Equippement.Armure.Armure import Armure
-from Old_Jeu.Entitee.Item.Equippement.Haume.Haume import Haume
-from Old_Jeu.Entitee.Item.Equippement.Anneau.Anneau import Anneau
-from Old_Jeu.Entitee.Item.Projectile.Projectile import Projectile
-from Old_Jeu.Entitee.Item.Item import Ingredient
-from Old_Jeu.Entitee.Item.Cadavre import Cadavre
-from Old_Jeu.Entitee.Item.Oeuf import Oeuf
-from Old_Jeu.Entitee.Item.Parchemin.Parchemins import Parchemin_vierge
+from ..Action.Non_skill import Impregne
+from ..Entitee.Item.Item import Item
+from ..Entitee.Item.Potion.Potion import Potion
+from ..Entitee.Item.Parchemin.Parchemin import Parchemin
+from ..Entitee.Item.Cle import Cle
+from ..Entitee.Item.Equippement.Degainable.Degainable import Arme
+from ..Entitee.Item.Equippement.Degainable.Bouclier.Bouclier import Bouclier
+from ..Entitee.Item.Equippement.Armure.Armure import Armure
+from ..Entitee.Item.Equippement.Haume.Haume import Haume
+from ..Entitee.Item.Equippement.Anneau.Anneau import Anneau
+from ..Entitee.Item.Projectile.Projectile import Projectile
+from ..Entitee.Item.Item import Ingredient
+from ..Entitee.Item.Cadavre import Cadavre
+from ..Entitee.Item.Oeuf import Oeuf
+from ..Entitee.Item.Parchemin.Parchemins import Parchemin_vierge
 
-from Old_Jeu.Systeme.Classe.Classes import trouve_skill
-# from Old_Jeu.Systeme.Skill.Skills import Hatching
+from ..Systeme.Classe.Classes import trouve_skill
+# from ..Systeme.Skill.Skills import Hatching
 from warnings import warn
 import random

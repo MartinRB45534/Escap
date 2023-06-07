@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import List, Tuple, TYPE_CHECKING
+import Affichage as af
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
@@ -9,12 +10,9 @@ if TYPE_CHECKING:
     from ..Labyrinthe import Labyrinthe
     from .Vignette_case import Vignette_case
 
-# Import des classes parentes
-from Affichage import Affichable, Parent_noeud, Proportionnel, Cliquable
-
-class Carte_extrait(Parent_noeud, Proportionnel):
+class Carte_extrait(af.Parent_noeud, af.Proportionnel):
     def __init__(self, extrait:Extrait|Labyrinthe):
-        Parent_noeud.__init__(self)
+        af.Parent_noeud.__init__(self)
 
         self.labyrinthe = extrait
         self.taille_case = 0
@@ -22,13 +20,13 @@ class Carte_extrait(Parent_noeud, Proportionnel):
         self.proportions = [1, 1]
 
     def set_tailles(self, tailles):
-        Proportionnel.set_tailles(self, tailles)
+        af.Proportionnel.set_tailles(self, tailles)
         self.update()
 
     def update(self):
         assert isinstance(self.courant,Vignette_case|None)
         courant = None
-        self.objets:List[Affichable] = []
+        self.objets:List[af.Affichable] = []
         if len(self.labyrinthe.position_case) > 1: # On a au moins une case plus l'absente
             # On a le même étage pour toutes les cases du labyrinthe (sauf l'absente)
             assert len({position.etage for position in self.labyrinthe.position_case if position is not POSITION_ABSENTE}) == 1
@@ -57,7 +55,7 @@ class Carte_extrait(Parent_noeud, Proportionnel):
     def make_vignette(self, position:Tuple[int,int], position_vue:Position, tailles:Tuple[int,int]):
         return Vignette_case(position, self.labyrinthe, position_vue, tailles)
     
-    def select(self, selection:Cliquable, droit:bool=False):
+    def select(self, selection:af.Cliquable, droit:bool=False):
         if not droit:
             if isinstance(selection, Vignette_case):
                 self.set_courant(selection)

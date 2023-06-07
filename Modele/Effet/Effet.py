@@ -4,8 +4,8 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Entitee.Entitee import Entitee
-    from Old_Jeu.Labyrinthe.Mur import Mur
+    from ..Entitee.Entitee import Entitee
+    from ..Labyrinthe.Mur import Mur
 
 # Pas de classe parente
 

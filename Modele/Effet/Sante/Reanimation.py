@@ -3,12 +3,12 @@ from typing import TYPE_CHECKING, Optional
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Entitee.Item.Cadavre import Cadavre
-    from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-    from Old_Jeu.Esprit.Esprit import Esprit
+    from ..Entitee.Item.Cadavre import Cadavre
+    from ..Entitee.Agissant.Agissant import Agissant
+    from ..Esprit.Esprit import Esprit
 
 # Imports des classes parentes
-from Old_Jeu.Effet.Effet import On_fin_tour
+from ..Effet.Effet import On_fin_tour
 
 class Reanimation(On_fin_tour):
     """Un effet de réanimation. Généralement placé sur le cadavre par une magie de réanimation de zone ou un skill de réanimation."""

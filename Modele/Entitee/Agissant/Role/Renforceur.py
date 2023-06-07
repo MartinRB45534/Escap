@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING, List, Tuple
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Entitee.Agissant.Agissant import Agissant
+    from ..Entitee.Agissant.Agissant import Agissant
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Agissant.Role.Mage import Mage
+from ..Entitee.Agissant.Role.Mage import Mage
 
 class Renforceur(Mage):
     """Les agissants qui boostent les attaques de leurs alliés."""
@@ -29,5 +29,5 @@ class Renforceur(Mage):
         return defaut
 
 # Imports utilisés dans le code
-from Old_Jeu.Action.Magie.Magie import Cible_agissant
+from ..Action.Magie.Magie import Cible_agissant
 from operator import itemgetter

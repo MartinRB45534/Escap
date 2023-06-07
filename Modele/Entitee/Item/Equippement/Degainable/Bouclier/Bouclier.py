@@ -3,14 +3,14 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from ..Controleur import Controleur
+    from ..Labyrinthe.Structure_spatiale.Position import Position
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Item.Equippement.Degainable.Degainable import Degainable
+from ..Entitee.Item.Equippement.Degainable.Degainable import Degainable
 
 # Valeurs par défaut des paramètres
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+from ..Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Bouclier(Degainable):
     """La classe des boucliers. Permettent de se protéger des attaques lorsqu'ils sont utilisés."""
@@ -46,5 +46,5 @@ class Bouclier(Degainable):
 
 # Imports utilisés dans le code
 from Old_Affichage.Skins.Skins import SKIN_BOUCLIER
-from Old_Jeu.Effet.Attaque.Attaque import Attaque_case
-from Old_Jeu.Entitee.Item.Equippement.Equippement import Equipement
+from ..Effet.Attaque.Attaque import Attaque_case
+from ..Entitee.Item.Equippement.Equippement import Equipement

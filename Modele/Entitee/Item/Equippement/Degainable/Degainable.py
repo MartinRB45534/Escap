@@ -3,14 +3,14 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from ..Controleur import Controleur
+    from ..Labyrinthe.Structure_spatiale.Position import Position
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Item.Equippement.Equippement import Equipement
+from ..Entitee.Item.Equippement.Equippement import Equipement
 
 # Valeurs par défaut des paramètres
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+from ..Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Degainable(Equipement):
     """La classe des items qui doivent être dégainés. Sont utilisés en complément d'un skill, n'ont pas d'effet le reste du temps."""
@@ -18,7 +18,7 @@ class Degainable(Equipement):
 
 class Arme(Degainable):
     """La classe des équipements qui augmentent la force d'attaque."""
-    def __init__(self,controleur:Controleur,element:int,tranchant:float,portee:int,position:Position=ABSENT):
+    def __init__(self,controleur:Controleur,element:Element,tranchant:float,portee:int,position:Position=ABSENT):
         Equipement.__init__(self,controleur,position)
         self.element = element
         self.tranchant = tranchant

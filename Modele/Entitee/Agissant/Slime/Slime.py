@@ -3,14 +3,14 @@ from typing import TYPE_CHECKING, Optional, Type, List, Tuple, Dict
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from ..Controleur import Controleur
+    from ..Labyrinthe.Structure_spatiale.Position import Position
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Agissant.Role.Dps import Dps
+from ..Entitee.Agissant.Role.Dps import Dps
 
 # Valeurs par défaut des paramètres
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+from ..Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Slime(Dps):
     """Un tas de gelée. Faible, tant qu'il est tout seul et de bas niveau..."""
@@ -41,5 +41,5 @@ class Slime(Dps):
         return [f"Un slime (niveau {self.niveau})",f"ID : {self.ID}","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"'Il faut tuer le slime lorsqu'il est frais !' diront les connaisseurs. Le slime peut se démultiplier, s'unifier à d'autres slimes, et absorbe les cadavres pour s'approprier leurs capacités. Il est aussi capable de se remettre de ses blessures en un temps record."]
 
 # Imports utilisés dans le code
-from Old_Jeu.Entitee.Agissant.Agissant import Agissant
+from ..Entitee.Agissant.Agissant import Agissant
 from Old_Affichage.Skins.Skins import SKIN_VIDE, SKIN_SLIME, SKIN_CADAVRE

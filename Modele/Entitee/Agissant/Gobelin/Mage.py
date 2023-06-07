@@ -3,16 +3,16 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from ..Controleur import Controleur
+    from ..Labyrinthe.Structure_spatiale.Position import Position
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Agissant.Gobelin.Base_gobelin import Base_gobelin
-from Old_Jeu.Entitee.Agissant.Role.Attaquant_magique_case import Attaquant_magique_case
-from Old_Jeu.Entitee.Agissant.Role.Support import Support
+from ..Entitee.Agissant.Gobelin.Base_gobelin import Base_gobelin
+from ..Entitee.Agissant.Role.Attaquant_magique_case import Attaquant_magique_case
+from ..Entitee.Agissant.Role.Support import Support
 
 # Valeurs par défaut des paramètres
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+from ..Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Mage_gobelin(Attaquant_magique_case,Support,Base_gobelin):
     """Un gobelin avec un potentiel magique.
@@ -67,10 +67,10 @@ class Deuxieme_monstre(Mage_gobelin):
         super().meurt()
 
 # Imports utilisés dans le code
-from Old_Jeu.Systeme.Constantes_magies.Magies import cout_pm_petite_secousse, cout_pm_poing_magique
+from ..Systeme.Constantes_magies.Magies import cout_pm_petite_secousse, cout_pm_poing_magique
 
-from Old_Jeu.Systeme.Skill.Skills import Skill_attaque
-from Old_Jeu.Action.Magie.Magies_attaque.Poings_magiques import Magie_poing_magique
-from Old_Jeu.Entitee.Agissant.Humain.Heros import Heros
+from ..Systeme.Skill.Skills import Skill_attaque
+from ..Action.Magie.Magies_attaque.Poings_magiques import Magie_poing_magique
+from ..Entitee.Agissant.Humain.Heros import Heros
 
-from Old_Jeu.Systeme.Classe.Classes import trouve_skill
+from ..Systeme.Classe.Classes import trouve_skill

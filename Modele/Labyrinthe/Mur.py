@@ -1,20 +1,18 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, List, Literal, Optional, Set, Type
 from enum import Enum
+import Carte as crt
+import Affichage as af
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Modele.Effet.Effet import Effet
-    from Modele.Effet.Effets_mouvement.Deplacements import Teleport, Escalier
-    from Modele.Entitee.Entitee import Entitee
-    from Carte import Position
-
-# Import des classes parentes
-from Carte import Mur as Mur_parent
+    from ..Effet.Effet import Effet
+    from ..Effet.Effets_mouvement.Deplacements import Teleport, Escalier
+    from ..Entitee.Entitee import Entitee
 
 # Valeurs par défaut des paramètres
-from Modele.Effet.Effets_mouvement.Deplacements import Teleport, Escalier
-from Modele.Effet.Effets_mouvement.Blocages import Porte
+from ..Effet.Effets_mouvement.Deplacements import Teleport, Escalier
+from ..Effet.Effets_mouvement.Blocages import Porte
 
 class Blocage(Enum):
     """Enumération des types de blocages"""
@@ -28,9 +26,9 @@ class Blocage(Enum):
     AUCUN = "Aucun"
 
 
-class Mur(Mur_parent):
-    def __init__(self,cible:Position,niveau:int):
-        self.teleport: Optional[Teleport] = Teleport(cible) if cible is not POSITION_ABSENTE else None
+class Mur(crt.Mur):
+    def __init__(self,cible:crt.Position,niveau:int):
+        self.teleport: Optional[Teleport] = Teleport(cible) if cible is not crt.POSITION_ABSENTE else None
         self.blocage: Optional[On_try_through] = None
         self.effets: Set[Effet] = set()
         self.niveau = niveau
@@ -106,7 +104,7 @@ class Mur(Mur_parent):
 
     def get_trajet(self):
         if isinstance(self.teleport,Escalier):
-            if self.teleport.sens is Direction_aff.NEXT:
+            if self.teleport.sens is af.Direction_aff.NEXT:
                 return "Escalier montant"
             else:
                 return "Escalier descendant"
@@ -119,9 +117,9 @@ class Mur(Mur_parent):
         if self.teleport is not None:
             return self.teleport.position
         else:
-            return POSITION_ABSENTE
+            return crt.POSITION_ABSENTE
 
-    def get_cible_ferme(self,clees:Set[str]) -> List[Position|Literal[False]]:
+    def get_cible_ferme(self,clees:Set[str]) -> List[crt.Position|Literal[False]]:
         return [self.get_cible_ferme_simple(),self.get_cible_ferme_portes(clees),self.get_cible_ferme_portails(),self.get_cible_ferme_portes_portails(clees),self.get_cible_ferme_escaliers(clees)]
 
     def get_cible_ferme_simple(self):
@@ -184,37 +182,14 @@ class Mur(Mur_parent):
             return False
         return cible
 
-    def set_cible(self,position:Position,surnaturel=False,portail:Type[Teleport]=Teleport):
-        for effet in self.effets:
-            if isinstance(effet,Teleport):
-                self.effets.remove(effet)
-        self.effets.append(portail(position,surnaturel))
+    def set_cible(self,position:crt.Position,surnaturel=False,portail:Type[Teleport]=Teleport):
+        self.teleport = portail(position,surnaturel)
 
-    def set_escalier(self,position:Position,sens:Direction,escalier:Type[Escalier]=Escalier):
-        for effet in self.effets:
-            if isinstance(effet,Teleport):
-                self.effets.remove(effet)
-        self.effets.append(escalier(position,sens))
-
-    def get_mur_oppose(self):
-        if self.controleur is None:
-            raise Exception("Le mur n'est pas dans un controleur")
-        mur_oppose = None
-        cible = self.get_cible()
-        if cible is not None:
-            case_cible = self.controleur.case_from_position(cible)
-            for mur in case_cible.murs :
-                cible_potentielle = mur.get_cible()
-                if cible_potentielle is not None:
-                    case_cible_potentielle = self.controleur.case_from_position(cible_potentielle)
-                    if self in case_cible_potentielle.murs:
-                        mur_oppose = mur
-        return mur_oppose
+    def set_escalier(self,position:crt.Position,sens:af.Direction_aff,escalier:Type[Escalier]=Escalier):
+        self.teleport = escalier(position,sens)
 
 # Imports utilisés dans le code
-from Modele.Effet.Effet import On_try_through, On_through
-from Modele.Effet.Effets_mouvement.Blocages import Mur_impassable, Mur_plein, Porte, Porte_barriere, Barriere
-from Modele.Effet.Effets_mouvement.Deplacements import Teleport
-from Modele.Entitee.Item.Item import Item
-from Carte import POSITION_ABSENTE
-from Affichage import Direction_aff
+from ..Effet.Effet import On_try_through
+from ..Effet.Effets_mouvement.Blocages import Mur_impassable, Mur_plein, Porte, Porte_barriere, Barriere
+from ..Effet.Effets_mouvement.Deplacements import Teleport
+from ..Entitee.Item.Item import Item

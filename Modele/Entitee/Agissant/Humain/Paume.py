@@ -3,14 +3,14 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from ..Controleur import Controleur
+    from ..Labyrinthe.Structure_spatiale.Direction import Direction
+    from ..Labyrinthe.Structure_spatiale.Position import Position
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Agissant.Humain.Humain import Humain
-from Old_Jeu.Entitee.Agissant.Role.Tank import Tank
-from Old_Jeu.Entitee.Agissant.Role.Sentinelle import Sentinelle
+from ..Entitee.Agissant.Humain.Humain import Humain
+from ..Entitee.Agissant.Role.Tank import Tank
+from ..Entitee.Agissant.Role.Sentinelle import Sentinelle
 
 class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2 (complêtement paumé, rejoint le joueur sauf rares exceptions)
     """La classe du mec paumé."""
@@ -355,6 +355,6 @@ class Paume(Tank,Sentinelle,Humain): #Le troisième humain du jeu, à l'étage 2
         return [f"Un humain (niveau {self.niveau})",f"ID : {self.ID}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Un humain terrorisé par les labyrinthes. Il espère pouvoir sortir un jour de cet enfer."]
 
 # Imports utilisés dans le code:
-from Old_Jeu.Constantes import *
+from ..Constantes import *
 from Old_Affichage.Skins.Skins import SKIN_TETE_PAUME, SKIN_CORPS_PAUME
-from Old_Jeu.Dialogues.Dialogues_paume import REPLIQUES_PAUME
+from ..Dialogues.Dialogues_paume import REPLIQUES_PAUME

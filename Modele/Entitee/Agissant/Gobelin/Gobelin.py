@@ -3,15 +3,15 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from ..Controleur import Controleur
+    from ..Labyrinthe.Structure_spatiale.Position import Position
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Agissant.Gobelin.Base_gobelin import Base_gobelin
-from Old_Jeu.Entitee.Agissant.Role.Dps import Dps
+from ..Entitee.Agissant.Gobelin.Base_gobelin import Base_gobelin
+from ..Entitee.Agissant.Role.Dps import Dps
 
 # Valeurs par défaut des paramètres
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+from ..Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Gobelin(Base_gobelin,Dps):
     """Un gobelin qui dirige un groupe.

@@ -3,17 +3,17 @@ from typing import TYPE_CHECKING, Optional, List, Tuple, Type
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
-    from Old_Jeu.Action.Magie.Magie import Magie
-    from Old_Jeu.Entitee.Item.Equippement.Degainable.Degainable import Arme
-    from Old_Jeu.Action.Action_skill import Action_skill, Derobe, Blocage, Ramasse, Alchimie
-    from Old_Jeu.Action.Attaque import Attaque, Attaque_arme
-    from Old_Jeu.Action.Deplacement import Marche
-    from Old_Jeu.Action.Action_skill import Ramasse
+    from ..Entitee.Agissant.Agissant import Agissant
+    from ..Labyrinthe.Structure_spatiale.Direction import Direction
+    from ..Action.Magie.Magie import Magie
+    from ..Entitee.Item.Equippement.Degainable.Degainable import Arme
+    from ..Action.Action_skill import Action_skill, Derobe, Blocage, Ramasse, Alchimie
+    from ..Action.Attaque import Attaque, Attaque_arme
+    from ..Action.Deplacement import Marche
+    from ..Action.Action_skill import Ramasse
 
 # Imports des classes parentes
-from Old_Jeu.Systeme.Skill.Skill import Skill
+from ..Systeme.Skill.Skill import Skill
 
 class Actif(Skill):
     """

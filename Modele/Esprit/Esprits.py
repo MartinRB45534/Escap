@@ -3,15 +3,15 @@ from typing import TYPE_CHECKING, List, Set
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-    from Old_Jeu.Entitee.Agissant.Humain.Humain import Humain
-    from Old_Jeu.Entitee.Agissant.Slime.Slime import Slime
+    from ..Controleur import Controleur
+    from ..Entitee.Agissant.Agissant import Agissant
+    from ..Entitee.Agissant.Humain.Humain import Humain
+    from ..Entitee.Agissant.Slime.Slime import Slime
     
-from Old_Jeu.Systeme.Classe.Classes import Classe_principale
+from ..Systeme.Classe.Classes import Classe_principale
 
 # Imports des classes parentes
-from Old_Jeu.Esprit.Esprit import Esprit
+from ..Esprit.Esprit import Esprit
 
 # class Esprit_type(Esprit):
 #     """Un esprit caricatural, pour les besoins de mes expériences."""
@@ -263,4 +263,4 @@ class Esprit_slime(Esprit):
 
 # Imports utilisés dans le code
 
-from Old_Jeu.Systeme.Classe.Classes import trouve_skill
+from ..Systeme.Classe.Classes import trouve_skill

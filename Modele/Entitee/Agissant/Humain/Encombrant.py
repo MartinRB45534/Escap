@@ -3,13 +3,13 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from ..Controleur import Controleur
+    from ..Labyrinthe.Structure_spatiale.Direction import Direction
+    from ..Labyrinthe.Structure_spatiale.Position import Position
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Agissant.Humain.Humain import Humain
-from Old_Jeu.Entitee.Agissant.Role.Dps import Dps
+from ..Entitee.Agissant.Humain.Humain import Humain
+from ..Entitee.Agissant.Role.Dps import Dps
 
 class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyennement apprèciable, surtout si on essaye de draguer sa copine)
     """La classe de l'encombrant."""
@@ -270,7 +270,7 @@ class Encombrant(Dps,Humain): #Le sixième humain du jeu, à l'étage 5 (moyenne
         return [f"Un humain (niveau {self.niveau})",f"ID : {self.ID}","Nom : ???","Stats :",f"{self.pv}/{self.pv_max} PV",f"{self.pm}/{self.pm_max} PM",self.statut,"Un aventurier épéiste. Il a été capturé par les gobelins."]
 
 # Imports utilisés dans le code:
-from Old_Jeu.Constantes import *
+from ..Constantes import *
 from Old_Affichage.Skins.Skins import SKIN_TETE_ENCOMBRANT
-from Old_Jeu.Dialogues.Dialogues_encombrant import REPLIQUES_ENCOMBRANT
-from Old_Jeu.Labyrinthe.Structure_spatiale.Position import ABSENT
+from ..Dialogues.Dialogues_encombrant import REPLIQUES_ENCOMBRANT
+from ..Labyrinthe.Structure_spatiale.Position import ABSENT

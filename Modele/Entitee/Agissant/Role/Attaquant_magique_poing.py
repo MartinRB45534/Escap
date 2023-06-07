@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
+    from ..Labyrinthe.Structure_spatiale.Direction import Direction
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Agissant.Role.Mage import Mage
+from ..Entitee.Agissant.Role.Mage import Mage
 
 class Attaquant_magique_poing(Mage):
     """Les mages qui ont des attaques magiques de corps à corps si nécessaire."""
@@ -29,5 +29,5 @@ class Attaquant_magique_poing(Mage):
         self.set_statut("attaque")
 
 # Imports utilisés dans le code
-from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-from Old_Jeu.Action.Magie.Magies_attaque.Poings_magiques import Magie_attaque_contact
+from ..Entitee.Agissant.Agissant import Agissant
+from ..Action.Magie.Magies_attaque.Poings_magiques import Magie_attaque_contact

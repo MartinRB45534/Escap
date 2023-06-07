@@ -1,22 +1,21 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, List, Type
+import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Entitee.Entitee import Entitee
-    from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-    from Old_Jeu.Entitee.Item.Projectile.Projectile import Projectile
-    from Old_Jeu.Entitee.Item.Item import Item
-    from Old_Jeu.Effet.Effet import Effet
-    from Old_Jeu.Effet.Effet import Enchantement
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
-    from Old_Jeu.Systeme.Skill.Actif import Actif
+    from ...Entitee.Entitee import Entitee
+    from ...Entitee.Agissant.Agissant import Agissant
+    from ...Entitee.Item.Projectile.Projectile import Projectile
+    from ...Entitee.Item.Item import Item
+    from ...Effet.Effet import Effet
+    from ...Effet.Effet import Enchantement
+    from ...Systeme.Skill.Actif import Actif
 
 # Imports des classes parentes
-from Old_Jeu.Action.Action import Non_repetable
-from Old_Jeu.Action.Caste import Caste
-from Old_Jeu.Action.Action_skill import Action_skill
+from ..Action import Non_repetable
+from ..Caste import Caste
+from ..Action_skill import Action_skill
 
 class Magie(Caste,Action_skill):
     """La classe des magies. Précédemment un effet."""
@@ -31,9 +30,6 @@ class Magie(Caste,Action_skill):
     def get_titre(self,observation=0):
         return f"Magie ({type(self)})"
 
-    def get_skin(self):
-        return SKIN_MAGIE
-
     def get_description(self,observation=0):
         return ["Oopsie... Cette magie n'a pas de description.",f"Peut-être que son nom, {self.nom}, pourra aider."]
 
@@ -42,7 +38,7 @@ class Magies_offensives(Magie):
 
 class Magie_dirigee(Magie) :
     """La classe des magies qui nécessitent une direction."""
-    def __init__(self,direction:Optional[Direction]=None):
+    def __init__(self,direction:Optional[crt.Direction]=None):
         self.direction = direction
 
 class Magie_cout(Magie, Non_repetable):
@@ -87,12 +83,12 @@ class Cible_items(Multi_cible):
 
 class Cible_case(Magie_cible):
     """La classe des magies qui ciblent une case. (Si si, une case. Pour une explosion par exemple, vous n'avez pas envie d'être au centre ! Vraiment !)"""
-    def __init__(self, cible:Optional[Position]):
+    def __init__(self, cible:Optional[crt.Position]):
         self.cible = cible
 
 class Cible_cases(Multi_cible):
     """La classe des magies qui ciblent plusieurs cases."""
-    def __init__(self, cible:List[Position]):
+    def __init__(self, cible:List[crt.Position]):
         self.cible = cible
 
 # Normalement on en a fini avec les magies ciblées
@@ -108,7 +104,7 @@ class Invocation(Magie):
 
 class Invocation_projectile(Invocation,Magie_dirigee):
     """La classe des magies qui créent une entitée avec un attribut direction."""
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,entitee:Projectile,direction:Optional[Direction],niveau:int):
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,entitee:Projectile,direction:Optional[crt.Direction],niveau:int):
         Magie.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau)
         Magie_dirigee.__init__(self,direction)
         self.entitee = entitee
@@ -148,7 +144,7 @@ class Enchante_item(Enchante, Cible_item):
 
 class Enchante_cases(Enchante, Cible_cases):
     """La classe des magies qui enchantent des cases."""
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,enchantement:Enchantement,cases:List[Position],niveau:int):
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,enchantement:Enchantement,cases:List[crt.Position],niveau:int):
         Enchante.__init__(self,skill,agissant,gain_xp,cout_pm,latence,enchantement,niveau)
         Cible_cases.__init__(self,cases)
 
@@ -170,6 +166,3 @@ class Enchante_agissant(Enchante, Cible_agissant):
             self.interrompt()
         else:
             self.cible.effets.append(self.enchantement)
-
-# Imports utilisés dans le code
-from Old_Affichage.Skins.Skins import SKIN_MAGIE

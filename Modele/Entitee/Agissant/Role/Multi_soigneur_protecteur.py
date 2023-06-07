@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING, List, Tuple
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Entitee.Agissant.Agissant import Agissant
+    from ..Entitee.Agissant.Agissant import Agissant
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Agissant.Role.Multi_soigneur import Multi_soigneur
+from ..Entitee.Agissant.Role.Multi_soigneur import Multi_soigneur
 
 class Multi_soigneur_protecteur(Multi_soigneur):
     """Les multi_soigneurs capables de placer un sort de protection lorsqu'il n'y a personne à soigner.""" #Vraiment juste la peste (en fait même pas la peste)
@@ -64,6 +64,6 @@ class Multi_soigneur_protecteur(Multi_soigneur):
         return defaut
 
 # Imports utilisés dans le code
-from Old_Jeu.Effet.Effets_protection import Protection_sacree
-from Old_Jeu.Action.Magie.Magie import Cible_agissant,Cible_agissants
+from ..Effet.Effets_protection import Protection_sacree
+from ..Action.Magie.Magie import Cible_agissant,Cible_agissants
 from operator import itemgetter

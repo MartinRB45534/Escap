@@ -1,11 +1,11 @@
 from __future__ import annotations
-import Affichage
+import Affichage as af
 # Pas d'import pour les annotations
 
 # Imports des classes parentes
 from enum import IntEnum
 
-class Direction(Affichage.Direction,IntEnum):
+class Direction(af.Direction,IntEnum):
     HAUT = 0
     DROITE = 1
     BAS = 2

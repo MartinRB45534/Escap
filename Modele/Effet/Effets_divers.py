@@ -3,15 +3,15 @@ from typing import TYPE_CHECKING, Type
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-    from Old_Jeu.Entitee.Item.Item import Item
-    from Old_Jeu.Labyrinthe.Case import Case
-    from Old_Jeu.Action.Attaque import Attaque
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
-    from Old_Jeu.Action.Magie.Magie import Magie
+    from ..Entitee.Agissant.Agissant import Agissant
+    from ..Entitee.Item.Item import Item
+    from ..Labyrinthe.Case import Case
+    from ..Action.Attaque import Attaque
+    from ..Labyrinthe.Structure_spatiale.Position import Position
+    from ..Action.Magie.Magie import Magie
 
 # Imports des classes parentes
-from Old_Jeu.Effet.Effet import On_need, One_shot, On_debut_tour, Evenement, Time_limited, On_post_action, On_fin_tour
+from ..Effet.Effet import On_need, One_shot, On_debut_tour, Evenement, Time_limited, On_post_action, On_fin_tour
 
 class Investissement_mana(Evenement,On_debut_tour):
     """Le joueur met du mana de côté, et en a plus après !"""
@@ -150,6 +150,6 @@ class Instakill(One_shot,On_post_action):
             self.termine()
 
 # Imports utilisés dans le code
-from Old_Jeu.Systeme.Constantes_magies.Magies import *
-from Old_Jeu.Entitee.Agissant.Role.Mage import Mage
+from ..Systeme.Constantes_magies.Magies import *
+from ..Entitee.Agissant.Role.Mage import Mage
 from Old_Affichage.Skins.Skins import SKIN_TELEPORTATION, SKIN_DOPAGE

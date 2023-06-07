@@ -3,12 +3,12 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Entitee.Entitee import Entitee
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
-    from Old_Jeu.Controleur import Controleur
+    from ..Entitee.Entitee import Entitee
+    from ..Labyrinthe.Structure_spatiale.Position import Position
+    from ..Controleur import Controleur
 
 # Imports des classes parentes
-from Old_Jeu.Effet.Effet import On_through
+from ..Effet.Effet import On_through
 
 
 class Teleport(On_through):
@@ -88,12 +88,12 @@ class Premiere_marche(Escalier):
         Escalier.execute(self,entitee)
 
 # Imports utilisés dans le code
-from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import *
-from Old_Jeu.Labyrinthe.Structure_spatiale.Cote import Cote_position
+from ..Labyrinthe.Structure_spatiale.Direction import *
+from ..Labyrinthe.Structure_spatiale.Cote import Cote_position
 
-from Old_Jeu.Systeme.Classe.Classes import trouve_skill
-from Old_Jeu.Systeme.Skill.Skills import Skill_ecrasement
-from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-from Old_Jeu.Entitee.Item.Item import Item
+from ..Systeme.Classe.Classes import trouve_skill
+from ..Systeme.Skill.Skills import Skill_ecrasement
+from ..Entitee.Agissant.Agissant import Agissant
+from ..Entitee.Item.Item import Item
 from Old_Affichage.Skins.Skins import *
-from Old_Jeu.Entitee.Agissant.Humain.Heros import Heros
+from ..Entitee.Agissant.Humain.Heros import Heros

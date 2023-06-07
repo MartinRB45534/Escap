@@ -1,8 +1,8 @@
-from Affichage import Skin
+import Affichage as af
 
-Skin.path = "Carte/Affichage/assets/"
+af.Skin.path = "Carte/Affichage/assets/"
 
-SKIN_BROUILLARD = Skin("brouillard.png")
-SKIN_MUR_BROUILLARD = Skin("brouillard_mur_transparent.png")
-SKIN_CASE = Skin("case.png")
-SKIN_MUR = Skin("mur.png")
+SKIN_BROUILLARD = af.Skin("brouillard.png")
+SKIN_MUR_BROUILLARD = af.Skin("brouillard_mur_transparent.png")
+SKIN_CASE = af.Skin("case.png")
+SKIN_MUR = af.Skin("mur.png")

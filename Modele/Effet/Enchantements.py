@@ -3,14 +3,14 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-    from Old_Jeu.Entitee.Item.Item import Item
-    from Old_Jeu.Entitee.Item.Equippement.Degainable.Degainable import Arme
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
+    from ..Entitee.Agissant.Agissant import Agissant
+    from ..Entitee.Item.Item import Item
+    from ..Entitee.Item.Equippement.Degainable.Degainable import Arme
+    from ..Labyrinthe.Structure_spatiale.Direction import Direction
 
 # Imports des classes parentes
-from Old_Jeu.Effet.Effet import Enchantement, On_debut_tour, On_post_decision
-from Old_Jeu.Effet.Effets_items import On_hit
+from ..Effet.Effet import Enchantement, On_debut_tour, On_post_decision
+from ..Effet.Effets_items import On_hit
 
 class Enchantement_force(Enchantement,On_debut_tour):
     """Les enchantements qui affectent la force (en positif ou négatif)."""
@@ -249,10 +249,10 @@ class Enchantement_bombe(Enchantement,On_debut_tour):
             item.effets.remove(self.charge)
 
 # Imports utilisés dans le code
-from Old_Jeu.Systeme.Constantes_magies.Magies import *
-from Old_Jeu.Constantes import *
+from ..Systeme.Constantes_magies.Magies import *
+from ..Constantes import *
 import random
-from Old_Jeu.Effet.Sante.Maladies.Maladie import Maladie
-from Old_Jeu.Systeme.Classe.Classes import trouve_skill
-from Old_Jeu.Systeme.Skill.Skills import Skill_vision
-from Old_Jeu.Action.Deplacement import Deplace
+from ..Effet.Sante.Maladies.Maladie import Maladie
+from ..Systeme.Classe.Classes import trouve_skill
+from ..Systeme.Skill.Skills import Skill_vision
+from ..Action.Deplacement import Deplace

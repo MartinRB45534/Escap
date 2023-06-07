@@ -1,22 +1,22 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
+import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-    from Old_Jeu.Entitee.Item.Item import Item
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
-    from Old_Jeu.Systeme.Skill.Actif import Actif
+    from ..Entitee.Agissant.Agissant import Agissant
+    from ..Entitee.Item.Item import Item
+    from ..Systeme.Skill.Actif import Actif
 
 # Imports des classes parentes
-from Old_Jeu.Action.Action import Action, Action_final
-from Old_Jeu.Action.Action_skill import Action_skill
+from .Action import Action, Action_final
+from .Action_skill import Action_skill
 
 class Deplace(Action):
     """
     L'action de déplacement (item ou agissant).
     """
-    def __init__(self,agissant:Agissant,latence:float,direction:Direction):
+    def __init__(self,agissant:Agissant,latence:float,direction:crt.Direction):
         super().__init__(agissant,latence)
         self.direction = direction
 
@@ -24,15 +24,11 @@ class Deplace(Action):
         lab = self.agissant.controleur.labs[self.agissant.position.lab]
         lab.veut_passer(self.agissant,self.direction)
 
-    def get_skin(self):
-        pass
-        # TODO: Ajouter le get_skin
-
 class Vole(Deplace,Action_final):
     """
     L'action des items qui volent.
     """
-    def __init__(self,item:Item,latence:float,direction:Direction):
+    def __init__(self,item:Item,latence:float,direction:crt.Direction):
         self.item = item
         self.latence = 0
         self.latence_max = latence
@@ -64,18 +60,6 @@ class Marche(Deplace,Action_skill,Action_final):
     """
     L'action des agissants qui se déplacent.
     """
-    def __init__(self,agissant:Agissant,latence:float,skill:Actif,xp:float,direction:Direction):
+    def __init__(self,agissant:Agissant,latence:float,skill:Actif,xp:float,direction:crt.Direction):
         Action_skill.__init__(self,agissant,latence,skill,xp)
         self.direction = direction
-
-    def get_skin(self):
-        pass
-        # TODO: Ajouter le get_skin
-
-class Cours(Marche):
-    """
-    Juste un skin différent.
-    """
-    def get_skin(self):
-        pass
-        # TODO: Ajouter le get_skin

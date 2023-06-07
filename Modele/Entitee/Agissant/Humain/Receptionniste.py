@@ -3,13 +3,13 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Controleur import Controleur
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Position import Position
+    from ..Controleur import Controleur
+    from ..Labyrinthe.Structure_spatiale.Direction import Direction
+    from ..Labyrinthe.Structure_spatiale.Position import Position
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Agissant.Humain.Humain import Humain
-from Old_Jeu.Entitee.Agissant.Role.Dps import Dps
+from ..Entitee.Agissant.Humain.Humain import Humain
+from ..Entitee.Agissant.Role.Dps import Dps
 
 class Receptionniste(Dps,Humain): #Le deuxième humain du jeu, à l'étage 1 (engage la conversation après la chute, indique les commandes de base)
     """La classe du récéptionniste."""
@@ -121,4 +121,4 @@ class Receptionniste(Dps,Humain): #Le deuxième humain du jeu, à l'étage 1 (en
 
 # Imports utilisés dans le code:
 from Old_Affichage.Skins.Skins import SKIN_TETE_RECEPTIONNISTE
-from Old_Jeu.Dialogues.Dialogues_receptionniste import REPLIQUES_RECEPTIONNISTE
+from ..Dialogues.Dialogues_receptionniste import REPLIQUES_RECEPTIONNISTE

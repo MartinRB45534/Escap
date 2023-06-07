@@ -1,1 +1,1 @@
-from Old_Jeu.Entitee.Agissant.Slime.Slime import *
+from ..Entitee.Agissant.Slime.Slime import *

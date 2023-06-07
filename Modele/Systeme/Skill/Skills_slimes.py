@@ -3,14 +3,14 @@ from typing import TYPE_CHECKING, Optional
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-    from Old_Jeu.Labyrinthe.Structure_spatiale.Direction import Direction
-    from Old_Jeu.Entitee.Item.Equippement.Degainable.Degainable import Arme
+    from ..Entitee.Agissant.Agissant import Agissant
+    from ..Labyrinthe.Structure_spatiale.Direction import Direction
+    from ..Entitee.Item.Equippement.Degainable.Degainable import Arme
 
 # Imports des classes parentes
-from Old_Jeu.Systeme.Skill.Skill import Skill, Skill_intrasec, Skill_extra
-from Old_Jeu.Systeme.Skill.Actif import Actif, Skill_deplacement, Skill_attaque, Skill_attaque_arme, Skills_magiques, Skill_absorb, Skill_divide, Skill_merge
-from Old_Jeu.Systeme.Skill.Passif import Passif, Skill_vision
+from ..Systeme.Skill.Skill import Skill, Skill_intrasec, Skill_extra
+from ..Systeme.Skill.Actif import Actif, Skill_deplacement, Skill_attaque, Skill_attaque_arme, Skills_magiques, Skill_absorb, Skill_divide, Skill_merge
+from ..Systeme.Skill.Passif import Passif, Skill_vision
 
 class Skill_slime(Skill): # Vraiment utile ?
     """Les skills des slimes."""
@@ -60,6 +60,6 @@ class Merge_slime(Skill_merge, Skill_intrasec, Skill_slime):
     pass
 
 # Imports utilisés dans le code
-from Old_Jeu.Systeme.Constantes_skills.Skills import *
-from Old_Jeu.Action.Deplacement import Marche
-from Old_Jeu.Action.Attaque import Attaque_final, Attaque_arme_final
+from ..Systeme.Constantes_skills.Skills import *
+from ..Action.Deplacement import Marche
+from ..Action.Attaque import Attaque_final, Attaque_arme_final

@@ -3,17 +3,17 @@ from typing import TYPE_CHECKING, Optional
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from Old_Jeu.Entitee.Agissant.Agissant import Agissant
-    from Old_Jeu.Entitee.Item.Item import Consommable
-    from Old_Jeu.Entitee.Item.Potion.Potion import Potion
-    from Old_Jeu.Entitee.Item.Parchemin.Parchemin import Parchemin
-    from Old_Jeu.Entitee.Item.Parchemin.Parchemins import Parchemin_vierge
-    from Old_Jeu.Effet.Effet import Effet
-    from Old_Jeu.Action.Magie.Magie import Magie
+    from ..Entitee.Agissant.Agissant import Agissant
+    from ..Entitee.Item.Item import Consommable
+    from ..Entitee.Item.Potion.Potion import Potion
+    from ..Entitee.Item.Parchemin.Parchemin import Parchemin
+    from ..Entitee.Item.Parchemin.Parchemins import Parchemin_vierge
+    from ..Effet.Effet import Effet
+    from .Magie.Magie import Magie
 
 # Imports des classes parentes
-from Old_Jeu.Action.Action import Action_final, Non_repetable
-from Old_Jeu.Action.Caste import Caste, Caste_continu, Caste_final, Caste_initial, Caste_fractionnaire
+from .Action import Action_final, Non_repetable
+from .Caste import Caste, Caste_continu, Caste_final, Caste_initial, Caste_fractionnaire
 
 class Place_effet(Action_final, Non_repetable):
     """
@@ -81,13 +81,13 @@ class Impregne(Lit,Action_final,Caste_final):
     """
     L'action d'imprégner une magie sur un parchemin.
     """
-    def __init__(self,agissant:Agissant,latence:float,item:Parchemin_vierge):
+    def __init__(self,agissant:Agissant,latence:float,item:Parchemin_vierge,taux_cout_impregne:float,taux_cout_caste:float,taux_latence_impregne:float,taux_latence_caste:float):
         Lit.__init__(self,agissant,latence,item)
         self.item:Parchemin_vierge
-        self.taux_cout_impregne = 0.5
-        self.taux_cout_caste = 0.5
-        self.taux_latence_impregne = 0.1
-        self.taux_latence_caste = 0.9
+        self.taux_cout_impregne = taux_cout_impregne
+        self.taux_cout_caste = taux_cout_caste
+        self.taux_latence_impregne = taux_latence_impregne
+        self.taux_latence_caste = taux_latence_caste
         self.magie:Optional[Magie] = None
 
     def action(self):

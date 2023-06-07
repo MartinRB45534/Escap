@@ -3,7 +3,7 @@ from __future__ import annotations
 # Pas d'import pour les annotations
 
 # Imports des classes parentes
-from Old_Jeu.Entitee.Item.Equippement.Equippement import Equipement
+from ..Entitee.Item.Equippement.Equippement import Equipement
 
 class Rocheux(Equipement):
     """La classe des équipements qui augmentent l'affinité à la terre."""
