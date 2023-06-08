@@ -25,16 +25,15 @@ class Attaque_case(One_shot):
         self.distance = distance
 
     def action(self,case:Case):
-        victimes_potentielles = case.controleur.trouve_agissants_classe_courants(case.position)
-        for victime_potentielle in victimes_potentielles:
-            if not victime_potentielle in self.responsable.esprit.get_corps():
-                if self.autre is None :
-                    victime_potentielle.effets.append(Attaque_particulier(self.responsable,self.degats,self.element,self.distance,self.direction))
-                elif self.autre == "piercing":
-                    if self.taux_autre is not None:
-                        victime_potentielle.effets.append(Attaque_percante(self.responsable,self.degats,self.element,self.distance,self.direction,self.taux_autre))
-                    else:
-                        warn("L'attaque est percante mais le taux de percement n'est pas défini !")
+        victime_potentielle = case.agissant
+        if victime_potentielle is not None and victime_potentielle not in self.responsable.esprit.get_corps():
+            if self.autre is None :
+                victime_potentielle.effets.append(Attaque_particulier(self.responsable,self.degats,self.element,self.distance,self.direction))
+            elif self.autre == "piercing":
+                if self.taux_autre is not None:
+                    victime_potentielle.effets.append(Attaque_percante(self.responsable,self.degats,self.element,self.distance,self.direction,self.taux_autre))
+                else:
+                    warn("L'attaque est percante mais le taux de percement n'est pas défini !")
 
     def execute(self,case):
         if self.phase == "démarrage":
@@ -111,13 +110,12 @@ class Attaque_lumineuse_case(Attaque_case):
         self.degats = degats
 
     def action(self,case:Case):
-        victimes_potentielles = case.controleur.trouve_agissants_classe_courants(case.position)
-        for victime_potentielle in victimes_potentielles:
-            if not victime_potentielle in self.responsable.esprit.get_corps():
-                if self.autre is None :
-                    victime_potentielle.effets.append(Attaque_lumineuse_particulier(self.responsable,self.degats))
-                else:
-                    warn("L'attaque lumineuse n'est pas censée avoir d'effet autre !")
+        victime_potentielle = case.agissant
+        if victime_potentielle is not None and victime_potentielle not in self.responsable.esprit.get_corps():
+            if self.autre is None :
+                victime_potentielle.effets.append(Attaque_lumineuse_particulier(self.responsable,self.degats))
+            else:
+                warn("L'attaque lumineuse n'est pas censée avoir d'effet autre !")
 
     def execute(self,case):
         if self.phase == "démarrage":

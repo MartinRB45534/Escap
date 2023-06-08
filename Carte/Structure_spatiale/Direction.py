@@ -83,7 +83,7 @@ class Direction(af.Direction,IntEnum):
             return NotImplemented
 
     @property
-    def oppose(self):
+    def oppose(self) -> Direction:
         return self+HALF_TURN
 
     def __str__(self):

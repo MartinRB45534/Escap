@@ -7,7 +7,10 @@ if TYPE_CHECKING:
     from ..Labyrinthe.Case import Case
 
 # Imports des classes parentes
-from ..Effet.Effet import Aura, One_shot, On_debut_tour, Evenement
+from .Effet import Aura, One_shot, On_debut_tour, Evenement
+
+# Variables de classe
+from ..Systeme.Elements import Element
 
 # On va distinguer 3 types d'aura :
 #   - Les auras naturellement attachées à une case. Ce sont des auras élémentaires. Elles peuvent être temporairement réprimée par une autre aura élémentale.
@@ -17,6 +20,7 @@ from ..Effet.Effet import Aura, One_shot, On_debut_tour, Evenement
 
 class Aura_elementale(Aura):
     """La classe des effets d'auras élémentales. Attaché à la case."""
+    element:Element
     def __init__(self,priorite:float):
         self.phase = "démarrage"
         self.responsable = 0
@@ -41,7 +45,7 @@ class Aura_temporaire(Aura_elementale):
 
 class Terre(One_shot,Aura_temporaire):
     """L'effet qui applique l'aura de terre à une case. Laissé ici par un agissant."""
-
+    element = Element.TERRE
     def execute(self,case:Case):
         if self.phase == "démarrage":
             self.termine() #Pour l'instant elle ne fait rien. Rien qu'empêcher les autres auras de s'exprimer. Je suppose que ça peut servir quand on visite des étages non-terrestres.
@@ -49,23 +53,21 @@ class Terre(One_shot,Aura_temporaire):
 
 class Terre_permanente(Aura_permanente):
     """L'effet qui applique l'aura de terre à une case. Il a toujours été là, et il n'en bougera pas."""
-
+    element = Element.TERRE
     def execute(self,case:Case):
         case.code += 1 #0 ou 1, selon que la case a une aura de Terre ou non
 
 class Feu(Evenement,Aura_temporaire):
     """L'effet qui applique l'aura de feu à une case. Laissé ici par un agissant."""
-
+    element = Element.FEU
     def __init__(self,responsable:Agissant,priorite:float,duree:float):
         Aura_temporaire.__init__(self,responsable,priorite)
         self.temps_restant = duree
 
     def action(self,case:Case):
-        contr = case.controleur
-        occupants = contr.trouve_agissants_classe_courants(case.position)
-        for occupant in occupants :
-            if occupant.esprit != self.responsable.esprit :
-                occupant.subit(self.responsable,self.temps_restant,"proximité",FEU)
+        occupant = case.agissant
+        if occupant is not None and occupant.esprit != self.responsable.esprit :
+            occupant.subit(self.responsable,self.temps_restant,"proximité",self.element)
         case.code += 2 #0 ou 2, selon que la case a une aura de Feu ou non
 
     def execute(self,case:Case):
@@ -86,29 +88,28 @@ class Feu_permanent(Aura_permanente):
         self.degats = degats
 
     def action(self,case:Case):
-        contr = case.controleur
-        occupants = contr.trouve_agissants_classe_courants(case.position)
-        for occupant in occupants :
-            occupant.subit(NoOne(),self.degats,"distance",FEU)
+        occupant = case.agissant
+        if occupant is not None :
+            occupant.subit(NoOne(),self.degats,"distance",self.element)
         case.code += 2 #0 ou 2, selon que la case a une aura de Feu ou non
 
 class Glace(One_shot,Aura_temporaire):
     """L'effet qui applique l'aura de glace à une case. Laissé ici par un agissant."""
-
-    def __init__(self,responsable:Agissant,priorite:float,gain_latence:float):
+    element = Element.GLACE
+    def __init__(self,responsable:Agissant,priorite:float,ralentissement:float):
         self.phase = "démarrage"
         self.responsable = responsable
         self.priorite = priorite
-        self.gain_latence= gain_latence
+        self.ralentissement = ralentissement
         self.distance = 0
         self.affiche = False
 
     def action(self,case:Case):
-        contr = case.controleur
-        occupants = contr.trouve_mobiles_courants(case.position)
+        occupants = case.items | {case.agissant} if case.agissant is not None else case.items
         for occupant in occupants :
-            if isinstance(occupant,Item) or (isinstance(occupant, Agissant) and occupant.esprit != self.responsable.esprit and GLACE not in occupant.immunites) :
-                occupant.latence += self.gain_latence
+            if isinstance(occupant,Item) or (occupant.esprit != self.responsable.esprit and self.element not in occupant.immunites) :
+                if occupant.action is not None :
+                    occupant.action.taux_vitesse["aura"] = self.ralentissement
         case.code += 4 #0 ou 4, selon que la case a une aura de Glace ou non
 
     def execute(self,case:Case):
@@ -118,25 +119,25 @@ class Glace(One_shot,Aura_temporaire):
 
 class Glace_permanente(Aura_permanente):
     """L'effet qui applique l'aura de glace à une case. Il a toujours été là, et il n'en bougera pas."""
-
-    def __init__(self,priorite:float,gain_latence:float):
+    element = Element.GLACE
+    def __init__(self,priorite:float,ralentissement:float):
         self.phase = "démarrage"
         self.responsable = 0
         self.priorite = priorite
-        self.gain_latence = gain_latence
+        self.ralentissement = ralentissement
         self.affiche = False
 
     def action(self,case:Case):
-        contr = case.controleur
-        occupants = contr.trouve_mobiles_courants(case.position)
+        occupants = case.items | {case.agissant} if case.agissant is not None else case.items
         for occupant in occupants :
-            if  isinstance(occupant,Item) or (isinstance(occupant, Agissant) and GLACE not in occupant.immunites) :
-                occupant.latence += self.gain_latence
+            if  isinstance(occupant,Item) or self.element not in occupant.immunites :
+                if occupant.action is not None :
+                    occupant.action.taux_vitesse["aura"] = self.ralentissement
         case.code += 4 #0 ou 4, selon que la case a une aura de Glace ou non
 
 class Ombre(One_shot,Aura_temporaire):
     """L'effet qui applique l'aura d'ombre à une case. Laissé ici par un agissant."""
-
+    element = Element.OMBRE
     def __init__(self,responsable:Agissant,priorite:float,gain_opacite:float):
         self.phase = "démarrage"
         self.responsable = responsable
@@ -156,7 +157,7 @@ class Ombre(One_shot,Aura_temporaire):
 
 class Ombre_permanente(Aura_permanente):
     """L'effet qui applique l'aura d'ombre à une case. Il a toujours été là, et il n'en bougera pas."""
-
+    element = Element.OMBRE
     def __init__(self,priorite:float,gain_opacite:float):
         self.phase = "démarrage"
         self.responsable = 0
@@ -173,11 +174,11 @@ class Ombre_permanente(Aura_permanente):
 class Aura_terre(One_shot,On_debut_tour):
     """Le centre de l'aura de terre d'un agissant. Attaché à l'agissant, placera les effets voulus sur les cases voisines."""
 
-    def __init__(self,niveau:int):
+    def __init__(self,portee:int,priorite:float,niveau:int):
         self.phase = "démarrage"
         self.niveau = niveau
-        self.portee = portee_aura_terre[self.niveau-1]
-        self.priorite = priorite_aura_terre[self.niveau-1]
+        self.portee = portee
+        self.priorite = priorite
         self.effet = Terre
         self.affiche = False
 
@@ -190,12 +191,12 @@ class Aura_terre(One_shot,On_debut_tour):
 class Aura_feu(One_shot,On_debut_tour):
     """Le centre de l'aura de feu d'un agissant. Attaché à l'agissant, placera les effets voulus sur les cases voisines."""
 
-    def __init__(self,niveau:int):
+    def __init__(self,portee:int,priorite:float,duree:int,niveau:int):
         self.phase = "démarrage"
         self.niveau = niveau
-        self.portee = portee_aura_feu[self.niveau-1]
-        self.priorite = priorite_aura_feu[self.niveau-1]
-        self.duree = duree_aura_feu[self.niveau-1]
+        self.portee = portee
+        self.priorite = priorite
+        self.duree = duree
         self.effet = Feu
         self.affiche = False
 
@@ -208,12 +209,12 @@ class Aura_feu(One_shot,On_debut_tour):
 class Aura_glace(One_shot,On_debut_tour):
     """Le centre de l'aura de glace d'un agissant. Attaché à l'agissant, placera les effets voulus sur les cases voisines."""
 
-    def __init__(self,niveau:int):
+    def __init__(self,portee:int,priorite:float,ralentissement:float,niveau:int):
         self.phase = "démarrage"
         self.niveau = niveau
-        self.portee = portee_aura_glace[self.niveau-1]
-        self.priorite = priorite_aura_glace[self.niveau-1]
-        self.gain_latence = gain_latence_aura_glace[self.niveau-1]
+        self.portee = portee
+        self.priorite = priorite
+        self.ralentissement = ralentissement
         self.effet = Glace
         self.affiche = False
 
@@ -221,17 +222,17 @@ class Aura_glace(One_shot,On_debut_tour):
         cases = porteur.controleur.get_cases_touches(porteur.position,self.portee)
         priorite = porteur.priorite + self.priorite
         for case in cases:
-            case.ajoute_aura(self.effet(porteur,priorite,self.gain_latence))
+            case.ajoute_aura(self.effet(porteur,priorite,self.ralentissement))
 
 class Aura_ombre(One_shot,On_debut_tour):
     """Le centre de l'aura d'ombre d'un agissant. Attaché à l'agissant, placera les effets voulus sur les cases voisines."""
 
-    def __init__(self,niveau:int):
+    def __init__(self,portee:int,priorite:float,gain_opacite:float,niveau:int):
         self.phase = "démarrage"
         self.niveau = niveau
-        self.portee = portee_aura_ombre[self.niveau-1]
-        self.priorite = priorite_aura_ombre[self.niveau-1]
-        self.gain_opacite = gain_opacite_aura_ombre[self.niveau-1]
+        self.portee = portee
+        self.priorite = priorite
+        self.gain_opacite = gain_opacite
         self.effet = Ombre
         self.affiche = False
 
@@ -242,7 +243,5 @@ class Aura_ombre(One_shot,On_debut_tour):
             case.ajoute_aura(self.effet(porteur,priorite,self.gain_opacite))
 
 # Imports utilisés dans le code
-from ..Systeme.Constantes_skills.Skills import *
-from ..Constantes import *
 from ..Entitee.Agissant.Agissant import NoOne
 from ..Entitee.Item.Item import Item

@@ -14,7 +14,7 @@ from ..Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Potion_empoisonnee(Potion):
     """Une potion pas très bonne pour la santé."""
-    def __init__(self,controleur:Controleur,position:Position=ABSENT):
+    def __init__(self,position:crt.Position=crt.POSITION_ABSENTE):
         Potion.__init__(self,controleur,Poison(NoOne(),1,0.0101),2,position)
 
     def get_titre(self,observation=0):
@@ -28,7 +28,7 @@ class Potion_empoisonnee(Potion):
 
 class Potion_antidote(Potion):
     """Une potion qui élimine les poisons."""
-    def __init__(self,controleur:Controleur,position:Position=ABSENT):
+    def __init__(self,position:crt.Position=crt.POSITION_ABSENTE):
         Potion.__init__(self,controleur,Antidote(),2,position)
 
     def get_titre(self,observation=0):
@@ -39,7 +39,7 @@ class Potion_antidote(Potion):
 
 class Potion_medicament(Potion):
     """Une potion qui élimine les maladies."""
-    def __init__(self,controleur:Controleur,position:Position=ABSENT):
+    def __init__(self,position:crt.Position=crt.POSITION_ABSENTE):
         Potion.__init__(self,controleur,Medicament(),2,position)
 
     def get_titre(self,observation=0):
@@ -50,7 +50,7 @@ class Potion_medicament(Potion):
 
 class Potion_soin(Potion):
     """Une potion qui restaure les PVs."""
-    def __init__(self,controleur:Controleur,pv:float,position:Position=ABSENT):
+    def __init__(self,pv:float,position:crt.Position=crt.POSITION_ABSENTE):
         Potion.__init__(self,controleur,Soin(0,pv),2,position)
 
     def get_titre(self,observation=0):
@@ -61,12 +61,12 @@ class Potion_soin(Potion):
 
 class Potion_hypokute(Potion_soin):
     """Une potion qui restaure les PVs."""
-    def __init__(self,controleur:Controleur,position:Position=ABSENT):
+    def __init__(self,position:crt.Position=crt.POSITION_ABSENTE):
         Potion_soin.__init__(self,controleur,soin_potion_hypokute,position)
 
 class Potion_force(Potion):
     """Une potion qui augmente les dégats infligés."""
-    def __init__(self,controleur:Controleur,position:Position=ABSENT):
+    def __init__(self,position:crt.Position=crt.POSITION_ABSENTE):
         Potion.__init__(self,controleur,Enchantement_force(1.5,100),2,position)
 
     def get_titre(self,observation=0):
@@ -88,7 +88,7 @@ class Potion_force(Potion):
 
 class Potion_vitesse(Potion):
     """Une potion qui augmente temporairement la vitesse."""
-    def __init__(self,controleur:Controleur,duree,vitesse,position:Position=ABSENT):
+    def __init__(self,duree,vitesse,position:crt.Position=crt.POSITION_ABSENTE):
         Potion.__init__(self,controleur,Enchantement_vitesse(duree,vitesse),2,position)
 
     def get_titre(self,observation=0):

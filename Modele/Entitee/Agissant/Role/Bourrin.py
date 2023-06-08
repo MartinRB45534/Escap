@@ -3,7 +3,7 @@ from __future__ import annotations
 # Pas d'imports pour les annotations
 
 # Imports des classes parentes
-from ..Entitee.Agissant.Agissant import Agissant
+from ..Agissant import Agissant
 
 class Bourrin(Agissant):
     """Les agissants qui combattent en fonçant dans le tas."""

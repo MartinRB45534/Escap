@@ -16,7 +16,7 @@ from ..Labyrinthe.Structure_spatiale.Position import ABSENT
 
 class Parchemin(Consommable):
     """La classe des consommables qui s'activent avec du mana."""
-    def __init__(self,controleur:Controleur,effet:Effet,cout:float,duree:float=2,position:Position=ABSENT):
+    def __init__(self,effet:Effet,cout:float,duree:float=2,position:crt.Position=crt.POSITION_ABSENTE):
         Item.__init__(self,controleur,position)
         self.effet = effet
         self.duree = duree
@@ -46,7 +46,7 @@ class Parchemin(Consommable):
 
 class Poly_de_cours(Parchemin):
     """Un parchemin qui enseigne une magie."""
-    def __init__(self,controleur:Controleur,magie:Type[Magie],cout:float,duree:float=2,position:Position=ABSENT):
+    def __init__(self,magie:Type[Magie],cout:float,duree:float=2,position:crt.Position=crt.POSITION_ABSENTE):
         Parchemin.__init__(self,controleur,Enseignement(magie),cout,duree,position)
 
     def get_description(self,observation=0):

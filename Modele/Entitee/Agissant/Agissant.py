@@ -1,85 +1,75 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, Type, List, Tuple, Dict, Set
+from typing import TYPE_CHECKING, Optional, List, Tuple, Dict, Set
+import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Controleur import Controleur
-    from ..Labyrinthe.Structure_spatiale.Position import Position
-    from ..Labyrinthe.Structure_spatiale.Direction import Direction
-    from ..Systeme.Classe.Classes import Classe_principale
-    from ..Entitee.Agissant.Inventaire import Inventaire
-    from ..Esprit.Esprit import Esprit
-    from ..Entitee.Item.Item import Item
+    from ...Systeme.Classe.Classe_principale import Classe_principale
+    from ...Entitee.Agissant.Inventaire import Inventaire
+    from ...Esprit.Esprit import Esprit
+    from ...Entitee.Item.Item import Item
+    from ...Labyrinthe.Labyrinthe import Labyrinthe
+    from ...Systeme.Elements import Element
 
 # Imports des classes parentes
-from ..Entitee.Entitee import Non_superposable, Mobile
-
-# Valeurs par défaut des paramètres
-from ..Labyrinthe.Structure_spatiale.Position import ABSENT
-from ..Constantes import TERRE
+from ..Entitee import Non_superposable, Mobile
 
 class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cadavre n'agit pas.
     """La classe des entitées animées. Capable de décision, de différentes actions, etc. Les principales caractéristiques sont l'ID, les stats, et la classe principale."""
-    def __init__(self,controleur:Controleur,identite:str,niveau:int,position:Position=ABSENT,ID: Optional[int]=None):
-        Entitee.__init__(self,controleur,position,ID)
-        self.identite:str = identite
-        stats=CONSTANTES_STATS[identite]
-        self.pv_max:float = stats['pv'][niveau]
-        self.pv:float = self.pv_max
-        self.regen_pv_max:float = stats['regen_pv_max'][niveau]
-        self.regen_pv_min:float = stats['regen_pv_min'][niveau]
-        self.restauration_regen_pv:float = stats['restauration_regen_pv'][niveau]
+    def __init__(self,identite:str,labyrinthe:Labyrinthe,niveau:int,pv_max:float,pv:float,regen_pv_max:float,regen_pv_min:float,restauration_regen_pv:float,pm_max:float,regen_pm:float,force:float,priorite:float,vitesse:float,affinites:Dict[Element,float],especes:List[str],oubli:float,resolution:int,forme:str,forme_tete:str,nb_doigts:int,magies:List[Type[Magie]],items:List[Type[Item]],position:crt.Position,ID: Optional[int]=None):
+        Entitee.__init__(self,position,ID)
+        self.identite = identite
+        self.labyrinthe = labyrinthe
+        self.pv_max = pv_max
+        self.pv = self.pv_max
+        self.regen_pv_max = regen_pv_max
+        self.regen_pv_min = regen_pv_min
+        self.restauration_regen_pv = restauration_regen_pv
         self.regen_pv:float = self.regen_pv_max
         self.taux_regen_pv:Dict[str,float] = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à la régénération des pv. Correspond aux effets passager sur la régénération des pv.
-        self.pm_max:float = stats['pm'][niveau]
+        self.pm_max = pm_max
         self.pm:float = self.pm_max
-        self.regen_pm:float = stats['regen_pm'][niveau]
+        self.regen_pm = regen_pm
         self.taux_regen_pm:Dict[str,float] = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à la régénération des pm. Correspond aux effets passager sur la régénération des pm.
-        self.force:float = stats['force'][niveau]
+        self.force = force
         self.taux_force:Dict[str,float] = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à la force. Correspond aux effets passager sur la force.
-        self.priorite:float = stats['priorite'][niveau]
+        self.priorite = priorite
         self.taux_priorite:Dict[str,float] = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à la priorité. Correspond aux effets passager sur la priorité.
-        self.vitesse:float = stats['vitesse'][niveau]
+        self.vitesse = vitesse
         self.taux_vitesse:Dict[str,float] = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à la vitesse. Correspond aux effets passager sur la vitesse.
-        self.aff_o:float = stats['aff_o'][niveau]
-        self.taux_aff_o:Dict[str,float] = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à l'affinité à l'ombre. Correspond aux effets passager sur l'affinité à l'ombre.
-        self.aff_f:float = stats['aff_f'][niveau]
-        self.taux_aff_f:Dict[str,float] = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à l'affinité au feu. Correspond aux effets passager sur l'affinité au feu.
-        self.aff_t:float = stats['aff_t'][niveau]
-        self.taux_aff_t:Dict[str,float] = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à l'affinité à la terre. Correspond aux effets passager sur l'affinité à la terre.
-        self.aff_g:float = stats['aff_g'][niveau]
-        self.taux_aff_g:Dict[str,float] = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à l'affinité à la glace. Correspond aux effets passager sur l'affinité à la glace.
+        self.affinites = affinites
+        self.taux_affinites:Dict[Element,Dict[str,float]] = {element:{} for element in Element}
         self.taux_stats:Dict[str,float] = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer aux statistiques. Correspond aux effets passager sur les statistiques. (Inclure les regen dans les stats ?)
-        self.immunites:List[int] = [] #La liste des éléments auxquels l'entitée est immunisé (très rare)
-        self.especes:List[str] = stats['especes']
-        self.classe_principale = Classe_principale(identite,niveau)
+        self.immunites:List[Element] = [] #La liste des éléments auxquels l'entitée est immunisé (très rare)
+        self.especes:List[str] = especes
+        self.classe_principale = Classe_principale([])
         self.niveau = self.classe_principale.niveau
-        self.oubli = stats['oubli'][niveau]
-        self.resolution = stats['resolution']
-        self.forme:str = stats['forme']
-        self.forme_tete:str = stats['forme_tete']
+        self.oubli = oubli
+        self.resolution = resolution
+        self.forme = forme
+        self.forme_tete = forme_tete
         self.statut = "attente"
         self.etat = "vivant"
 
         #vue de l'agissant
-        self.vue = Representation_vue(self.position.lab, [], Decalage(0,0))
+        self.vue = #Representation_vue(self.position.lab, [], Decalage(0,0))
 
         self.offenses:List[Tuple[Agissant,float,float]]=[]
         self.esprit:Esprit=NOBODY
 
         #possessions de l'agissant
-        self.inventaire = Inventaire(self,stats['doigts'],controleur)
+        self.inventaire = Inventaire(self,nb_doigts)
 
         #la direction du regard
-        self.dir_regard = HAUT
+        self.dir_regard = crt.Direction.HAUT
         self.action:Optional[Action] = None
 
         #Pour lancer des magies
         self.talent = 1
         
-        self.cadavre = Cadavre(controleur,self)
+        self.cadavre = Cadavre(self)
 
-        if stats['magies']:
+        if magies:
             skill:Optional[Skills_magiques] = trouve_skill(self.classe_principale,Skills_magiques)
             if skill is None:
                 print(self)
@@ -88,19 +78,13 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
                     print(skil.niveau)
                     print(skil)
                 raise ValueError("Pas de skill magique pour l'entitée")
-            for magie in stats['magies']:
-                skill.ajoute(eval(magie))
-        if stats['items']:
+            for magie in magies:
+                skill.ajoute(magie)
+        if items:
             new_items:Set[Item] = set()
-            for item in stats['items']:
-                new_items.add(eval(item)(None,niveau))
-            controleur.ajoute_items(new_items)
+            for item in items:
+                new_items.add(item(labyrinthe,crt.POSITION_ABSENTE))
             self.inventaire.equippe(new_items)
-        if stats['special']:
-            pass
-
-    def get_etage_courant(self):
-        return int(self.position.lab.split()[1])
 
     def get_stats_attaque(self,element:Element):
         force = self.force
@@ -112,11 +96,11 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
             affinite *= taux
         return force,affinite
 
-    def get_impact(self) -> Position:
+    def get_impact(self) -> crt.Position:
         return self.position+self.dir_regard
 
     # Les actions de l'agissant
-    def attaque(self,direction:Direction):
+    def attaque(self,direction:crt.Direction):
         self.regarde(direction)
         skill = trouve_skill(self.classe_principale,Skill_attaque_arme)
         arme = self.get_arme()
@@ -128,7 +112,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
             self.fait(skill.fait(self,direction))
         self.set_statut("attaque")
 
-    def va(self,direction:Direction):
+    def va(self,direction:crt.Direction):
         self.regarde(direction)
         skill = trouve_skill(self.classe_principale,Skill_deplacement)
         assert skill is not None
@@ -150,12 +134,12 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         if self.dir_regard is not None:
             return self.dir_regard
         else:
-            return DIRECTIONS[0]
+            return crt.Direction.HAUT #Par défaut, on regarde vers le haut
 
     def fait(self,action:Action,force:bool=False):
         self.action = action
 
-    def regarde(self,direction:Direction,force:bool=False):
+    def regarde(self,direction:crt.Direction,force:bool=False):
         if direction is not None:
             self.dir_regard = direction
 
@@ -186,45 +170,20 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         offenses = self.offenses
         self.offenses = []
         etat = "vivant" #Rajouter des précisions
-        if self.etat != "vivant" or self.controleur is None:
+        if self.etat != "vivant":
             etat = "incapacite"
         return offenses, etat
 
-    def peut_voir(self,direction:Direction):
-        return self.controleur.case_from_position(self.position)[direction].peut_voir()
+    def peut_voir(self,direction:crt.Direction):
+        return self.labyrinthe.get_mur(self.position,direction).ferme # TODO : revoir ça
 
     def get_aff(self,element:Element):
-        affinite = 1
-        if element == OMBRE :
-            affinite = self.aff_o
-            for taux in self.taux_aff_o.values():
-                affinite *= taux
-            for item in self.inventaire.get_equippement():
-                if isinstance(item,Tenebreux):
-                    affinite *= item.taux_aff_ombre
-        elif element == FEU :
-            affinite = self.aff_f
-            for taux in self.taux_aff_f.values():
-                affinite *= taux
-            for item in self.inventaire.get_equippement():
-                if isinstance(item,Incandescant):
-                    affinite *= item.taux_aff_feu
-        elif element == TERRE :
-            affinite = self.aff_t
-            for taux in self.taux_aff_t.values():
-                affinite *= taux
-            for item in self.inventaire.get_equippement():
-                if isinstance(item,Rocheux):
-                    affinite *= item.taux_aff_terre
-        elif element == GLACE :
-            affinite = self.aff_g
-            for taux in self.taux_aff_g.values():
-                affinite *= taux
-            for item in self.inventaire.get_equippement():
-                if isinstance(item,Neigeux):
-                    affinite *= item.taux_aff_glace
-        else :
-            print(f"{element}... quel est donc cet élément mystérieux ?")
+        affinite = self.affinites[element]
+        for taux in self.taux_affinites[element].values():
+            affinite *= taux
+        for item in self.inventaire.get_equippement():
+            if isinstance(item,Elementaire) and item.element == element:
+                affinite *= item.taux_aff
         return affinite
 
     def peut_payer(self,cout:float):
@@ -308,7 +267,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
                 priorite *= item.augmente_priorite(priorite)
         return priorite
 
-    def subit(self,offenseur:Agissant,degats:float,distance="contact",element=TERRE): #L'ID 0 ne correspond à personne
+    def subit(self,offenseur:Agissant,degats:float,distance="contact",element=Element.TERRE): #L'ID 0 ne correspond à personne
         gravite = degats/self.pv_max
         dangerosite = 0
         if distance == "contact":
@@ -354,13 +313,14 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
             raise ValueError("Un personnage qui n'a pas de position est en train de mourir !")
         self.pv = self.pm = 0
         self.etat = "mort"
-        self.regarde(DIRECTIONS[0])
         self.taux_regen_pv = self.taux_regen_pm = self.taux_force = self.taux_priorite = self.taux_vitesse = self.taux_aff_o = self.taux_aff_f = self.taux_aff_t = self.taux_aff_g = self.taux_stats = {} #/!\ À corriger !
         self.effets = []
-        self.inventaire.drop_all(self.position)
-        self.controleur.items_courants.add(self.cadavre)
+        case = self.labyrinthe.get_case(self.position)
+        self.inventaire.drop_all(case)
+        case.part(self)
+        case.items.add(self.cadavre)
         self.cadavre.position = self.position
-        self.position = ABSENT
+        self.position = crt.POSITION_ABSENTE
 
     def get_esprit(self):
         return self.esprit
@@ -379,11 +339,8 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
             portee = 0
         else :
             portee = skill.utilise()
-            portee *= self.get_aff(OMBRE) #Puisque c'est le manque de lumière qui réduit le champ de vision !
+            portee *= self.get_aff(Element.OMBRE) #Puisque c'est le manque de lumière qui réduit le champ de vision !
         return portee
-
-    def get_skin(self):
-        return SKIN_AGISSANT
 
     def get_skins_statuts(self):
         if self.statut == "paix":
@@ -404,24 +361,6 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
             return [SKIN_STATUT_RAPPROCHE]
         else:
             return [SKIN_VIDE]
-
-    def get_skin_tete(self):
-        return SKIN_VIDE
-
-    def get_skins_vue(self):
-        skins:List[Image] = []
-        if self.inventaire.arme is not None:
-            skins.append(self.inventaire.arme.get_skin_vue(self.forme))
-        skins.append(SKINS_CORPS_VUS[self.forme])
-        if self.inventaire.armure is not None:
-            skins.append(self.inventaire.armure.get_skin_vue(self.forme))
-        skins.append(SKINS_TETES_VUES[self.forme_tete])
-        if self.inventaire.haume is not None:
-            skins.append(self.inventaire.haume.get_skin_vue(self.forme))
-        return skins
-
-    def get_texte_descriptif(self):
-        return ["Un agissant","Pourquoi n'a-t-il pas de description adaptée ?","Voici quelques informations utiles pour corriger l'erreur :",f"ID : {self.ID}",f"Espèces : {self.especes}",f"Class : {type(self)}",f"self : {self}","En espèrant que ça suffise, et désolé pour le dérangement."]
 
     # Découvrons le déroulé d'un tour, avec agissant-san :
     def debut_tour(self):
@@ -575,20 +514,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
             print("Hum, apparemment ce n'est pas si inutile...")
 
     def level_up(self):
-        niveau = self.classe_principale.niveau
-        stats=CONSTANTES_STATS[self.identite]
-        self.pv_max=stats['pv'][niveau]
-        self.regen_pv=stats['regen_pv'][niveau]
-        self.pm_max=stats['pm'][niveau]
-        self.regen_pm=stats['regen_pm'][niveau]
-        self.force=stats['force'][niveau]
-        self.priorite=stats['priorite'][niveau]
-        self.vitesse=stats['vitesse'][niveau]
-        self.aff_o=stats['aff_o'][niveau]
-        self.aff_f=stats['aff_f'][niveau]
-        self.aff_t=stats['aff_t'][niveau]
-        self.aff_g=stats['aff_g'][niveau]
-        self.niveau = self.classe_principale.niveau
+        pass
 
 class NoOne(Agissant):
     def __init__(self):
@@ -601,26 +527,22 @@ class NoOne(Agissant):
             return False
 
 # Imports utilisés dans le code (il y en a beaucoup !!!)
-from ..Action.Attaque import Attaque
-from ..Entitee.Entitee import Entitee
-from ..Systeme.Constantes_stats import CONSTANTES_STATS
-from ..Labyrinthe.Structure_spatiale.Direction import HAUT, DIRECTIONS
-from ..Labyrinthe.Structure_spatiale.Decalage import Decalage
-from ..Labyrinthe.Vue import Representation_vue
-from ..Esprit.Esprit import NOBODY
-from ..Entitee.Item.Cadavre import Cadavre
-from ..Entitee.Item.Equippement.Role.Elementaires import Tenebreux, Rocheux, Neigeux, Incandescant
-from ..Entitee.Item.Equippement.Role.Defensif.Defensif import Defensif
-from ..Entitee.Item.Equippement.Role.Accelerateur import Accelerateur
-from ..Entitee.Item.Equippement.Role.Anoblisseur import Anoblisseur
-from ..Entitee.Item.Equippement.Role.Reparateur.Reparateur import Reparateur
-from ..Entitee.Item.Equippement.Role.Reparateur_magique.Reparateur_magique import Reparateur_magique
-from ..Entitee.Item.Items import *
-from ..Entitee.Agissant.Inventaire import Inventaire
-from ..Entitee.Agissant.Agissants import *
-from ..Action.Actions import *
-from ..Systeme.Classe.Classes import *
-from ..Systeme.Skill.Skills import *
-from ..Effet.Effets import *
-from ..Constantes import OMBRE, TERRE, GLACE, FEU
-from Old_Affichage.Skins.Skins import SKIN_AGISSANT, SKIN_STATUT_ATTAQUE, SKIN_STATUT_ATTAQUE_BOOSTEE, SKIN_STATUT_PAIX, SKIN_STATUT_FUITE, SKIN_STATUT_EXPLORATION, SKIN_STATUT_RAPPROCHE, SKIN_STATUT_SOIN, SKIN_STATUT_SOUTIEN, SKINS_CORPS_VUS, SKINS_TETES_VUES, SKIN_VIDE
+from ...Action.Attaque import Attaque
+from ...Entitee.Entitee import Entitee
+from ...Labyrinthe.Vue import Representation_vue
+from ...Esprit.Esprit import NOBODY
+from ...Entitee.Item.Cadavre import Cadavre
+from ...Entitee.Item.Equippement.Role.Elementaires import Elementaire
+from ...Entitee.Item.Equippement.Role.Defensif.Defensif import Defensif
+from ...Entitee.Item.Equippement.Role.Accelerateur import Accelerateur
+from ...Entitee.Item.Equippement.Role.Anoblisseur import Anoblisseur
+from ...Entitee.Item.Equippement.Role.Reparateur.Reparateur import Reparateur
+from ...Entitee.Item.Equippement.Role.Reparateur_magique.Reparateur_magique import Reparateur_magique
+from ...Entitee.Item.Items import *
+from ...Entitee.Agissant.Inventaire import Inventaire
+from ...Entitee.Agissant.Agissants import *
+from ...Action.Actions import *
+from ...Systeme.Classe.Classes import *
+from ...Systeme.Skill.Skills import *
+from ...Effet.Effets import *
+from Old_Affichage.Skins.Skins import SKIN_STATUT_ATTAQUE, SKIN_STATUT_ATTAQUE_BOOSTEE, SKIN_STATUT_PAIX, SKIN_STATUT_FUITE, SKIN_STATUT_EXPLORATION, SKIN_STATUT_RAPPROCHE, SKIN_STATUT_SOIN, SKIN_STATUT_SOUTIEN, SKIN_VIDE

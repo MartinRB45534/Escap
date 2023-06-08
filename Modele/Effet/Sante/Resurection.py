@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Entitee.Item.Cadavre import Cadavre
+    from ...Entitee.Item.Cadavre import Cadavre
 
 # Imports des classes parentes
-from ..Effet.Effet import On_fin_tour
+from ..Effet import On_fin_tour
 
 class Resurection(On_fin_tour):
     """Un effet de résurection. Généralement placé sur le cadavre par une magie de résurection. Rend tous les pv et ne change pas l'appartenance à un groupe."""

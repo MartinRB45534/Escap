@@ -16,6 +16,6 @@ from ..Constantes import TERRE
 
 class Armure_type(Armure,Defensif_proportion):
     """Une armure type : défend contre les attaques."""
-    def __init__(self,controleur:Controleur,taux_degats:float,position:Position=ABSENT):
+    def __init__(self,taux_degats:float,position:crt.Position=crt.POSITION_ABSENTE):
         Armure.__init__(self,controleur,position)
         Defensif_proportion.__init__(self,taux_degats)

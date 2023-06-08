@@ -1,26 +1,23 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
+import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Controleur import Controleur
-    from ..Labyrinthe.Structure_spatiale.Position import Position
+    from ......Labyrinthe.Labyrinthe import Labyrinthe
 
 # Imports des classes parentes
-from ..Entitee.Item.Equippement.Degainable.Degainable import Degainable
-
-# Valeurs par défaut des paramètres
-from ..Labyrinthe.Structure_spatiale.Position import ABSENT
+from ..Degainable import Degainable
 
 class Bouclier(Degainable):
     """La classe des boucliers. Permettent de se protéger des attaques lorsqu'ils sont utilisés."""
-    def __init__(self,controleur:Controleur,degats_bloques:float,taux_degats:float,position:Position=ABSENT):
-        Equipement.__init__(self,controleur,position)
+    def __init__(self,labyrinthe:Labyrinthe,poids:float,frottements:float,degats_bloques:float,taux_degats:float,position:crt.Position=crt.POSITION_ABSENTE):
+        Equipement.__init__(self,labyrinthe,position)
         self.degats_bloques = degats_bloques
         self.taux_degats = taux_degats
         self.taux_stats = {}
-        self.poids = 5
-        self.frottements = 1 #En mode frisbee ça volle très bien !
+        self.poids = poids
+        self.frottements = frottements
 
     def intercepte(self,attaque:Attaque_case):
         attaque.degats -= self.degats_bloques
@@ -31,20 +28,11 @@ class Bouclier(Degainable):
                 attaque.degats *=  taux
             attaque.degats *= self.taux_degats
 
-    def get_classe(self):
-        return Bouclier
-
-    def get_titre(self,observation=0):
-        return "Bouclier"
-
-    def get_description(self,observation=0):
-        return ["Un frisbee","Ah non, c'est un bouclier !"]
-
     @staticmethod
     def get_image():
         return SKIN_BOUCLIER
 
 # Imports utilisés dans le code
 from Old_Affichage.Skins.Skins import SKIN_BOUCLIER
-from ..Effet.Attaque.Attaque import Attaque_case
-from ..Entitee.Item.Equippement.Equippement import Equipement
+from ......Effet.Attaque.Attaque import Attaque_case
+from ...Equippement import Equipement

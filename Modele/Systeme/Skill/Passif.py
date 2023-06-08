@@ -2,7 +2,7 @@ from __future__ import annotations
 # Pas d'imports pour les annotations 
 
 # Imports des classes parentes
-from ..Systeme.Skill.Skill import Skill
+from .Skill import Skill
 
 class Passif(Skill):
     """

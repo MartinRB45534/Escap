@@ -1,30 +1,21 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, List
+import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Controleur import Controleur
-    from ..Labyrinthe.Structure_spatiale.Position import Position
-    from ..Effet.Effet import Effet
+    from ....Effet.Effet import Effet
+    from ....Labyrinthe.Labyrinthe import Labyrinthe
 
 # Imports des classes parentes
-from ..Entitee.Item.Item import Item
-
-# Valeurs par défaut des paramètres
-from ..Labyrinthe.Structure_spatiale.Position import ABSENT
+from ..Item import Item
 
 class Projectile(Item):
     """La classe des items destinés à être lancés. Possèdent naturellement une vitesse non nulle."""
-    def __init__(self,controleur:Controleur,position:Position=ABSENT,vitesse:float=0,effets:List[Effet]=[]):
-        Item.__init__(self,controleur,position)
+    def __init__(self,labyrinthe:Labyrinthe,vitesse:float=0,effets:List[Effet]=[],position:crt.Position=crt.POSITION_ABSENTE):
+        Item.__init__(self,labyrinthe,position)
         self.vitesse = vitesse
         self.effets = effets #Les effets déclenché lors du choc avec un agissant.
-
-    def get_classe(self):
-        return Projectile
-
-    def get_titre(self,observation=0):
-        return "Projectile"
 
     @staticmethod
     def get_image():

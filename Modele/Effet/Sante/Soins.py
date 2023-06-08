@@ -3,11 +3,11 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Entitee.Agissant.Agissant import Agissant
-    from ..Labyrinthe.Case import Case
+    from ...Entitee.Agissant.Agissant import Agissant
+    from ...Labyrinthe.Case import Case
 
 # Imports des classes parentes
-from ..Effet.Effet import On_fin_tour, One_shot, On_post_action
+from ..Effet import On_fin_tour, One_shot, On_post_action
 
 class Antidote(One_shot,On_fin_tour):
     """Effet qui supprime les effets de poison du joueur."""
@@ -52,8 +52,8 @@ class Soin_case(On_post_action):
         self.affiche = True
 
     def action(self,case:Case):
-        cibles_potentielles = case.controleur.trouve_agissants_courants(case.position)
-        for cible_potentielle in cibles_potentielles:
+        cible_potentielle = case.agissant
+        if cible_potentielle is not None:
             if self.responsable == 0: #Pas de responsable. Sérieusement ?
                 cible_potentielle.effets.append(Soin(self.responsable,self.gain_pv))
             else:
@@ -90,6 +90,6 @@ class Soin(On_fin_tour):
         return SKIN_SOIN
 
 # Imports utilisés dans le code
-from ..Effet.Sante.Maladies.Maladie import Maladie
-from ..Effet.Sante.Poison import Poison
+from .Maladies.Maladie import Maladie
+from .Poison import Poison
 from Old_Affichage.Skins.Skins import SKIN_SOIN

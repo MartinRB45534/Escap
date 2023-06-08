@@ -3,24 +3,29 @@ from __future__ import annotations
 # Pas d'import pour les annotations
 
 # Imports des classes parentes
-from ..Entitee.Item.Equippement.Equippement import Equipement
+from ..Equippement import Equipement
 
-class Rocheux(Equipement):
+# Imports pour les variables de classe
+from .....Systeme.Elements import Element
+
+class Elementaire(Equipement):
+    """La classe des équipements qui augmentent l'affinité à un élément."""
+    element:Element
+    def __init__(self,taux_aff:float):
+        self.taux_aff = taux_aff
+
+class Rocheux(Elementaire):
     """La classe des équipements qui augmentent l'affinité à la terre."""
-    def __init__(self,taux_aff_terre:float):
-        self.taux_aff_terre = taux_aff_terre
+    element = Element.TERRE
 
-class Incandescant(Equipement):
+class Incandescant(Elementaire):
     """La classe des équipements qui augmentent l'affinité au feu."""
-    def __init__(self,taux_aff_feu:float):
-        self.taux_aff_feu = taux_aff_feu
+    element = Element.FEU
 
-class Neigeux(Equipement): #"Neigeux" ? "Glaçant" ? "Glacial" ?
+class Neigeux(Elementaire): #"Neigeux" ? "Glaçant" ? "Glacial" ?
     """La classe des équipements qui augmentent l'affinité à la glace."""
-    def __init__(self,taux_aff_glace:float):
-        self.taux_aff_glace = taux_aff_glace
+    element = Element.GLACE
 
-class Tenebreux(Equipement):
+class Tenebreux(Elementaire):
     """La classe des équipements qui augmentent l'affinité à l'ombre."""
-    def __init__(self,taux_aff_ombre:float):
-        self.taux_aff_ombre = taux_aff_ombre
+    element = Element.OMBRE

@@ -1,12 +1,9 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-
-# Imports utilisés uniquement dans les annotations
-if TYPE_CHECKING:
-    from ..Labyrinthe.Structure_spatiale.Direction import Direction
+import Carte as crt
 
 # Imports des classes parentes
-from ..Entitee.Agissant.Role.Mage import Mage
+from .Mage import Mage
 
 class Attaquant_magique_poing(Mage):
     """Les mages qui ont des attaques magiques de corps à corps si nécessaire."""
@@ -17,7 +14,7 @@ class Attaquant_magique_poing(Mage):
     def frappe(self):
         return ""
 
-    def attaque(self, direction: Direction):
+    def attaque(self, direction: crt.Direction):
         if self.peut_frapper():
             skill = self.get_skill_magique()
             action = skill.fait(self,self.frappe())
@@ -29,5 +26,5 @@ class Attaquant_magique_poing(Mage):
         self.set_statut("attaque")
 
 # Imports utilisés dans le code
-from ..Entitee.Agissant.Agissant import Agissant
-from ..Action.Magie.Magies_attaque.Poings_magiques import Magie_attaque_contact
+from ..Agissant import Agissant
+from ....Action.Magie.Magies_attaque.Poings_magiques import Magie_attaque_contact

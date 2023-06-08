@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Type
+import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
@@ -7,7 +8,6 @@ if TYPE_CHECKING:
     from ..Entitee.Item.Item import Item
     from ..Labyrinthe.Case import Case
     from ..Action.Attaque import Attaque
-    from ..Labyrinthe.Structure_spatiale.Position import Position
     from ..Action.Magie.Magie import Magie
 
 # Imports des classes parentes
@@ -46,11 +46,11 @@ class Reserve_mana(On_need):
 
 class Obscurite(Evenement,On_debut_tour):
     """Evenement d'obscurité."""
-    def __init__(self,niveau:int):
+    def __init__(self,duree:int,gain_opacite:float):
         self.affiche = False
-        self.temps_restant = duree_obscurite[niveau-1]
+        self.temps_restant = duree
         self.phase = "démarrage"
-        self.gain_opacite = gain_opacite_obscurite[niveau-1]
+        self.gain_opacite = gain_opacite
 
     def action(self,case:Case): #La case affectée devient plus impénétrable à la lumière
         if self.phase == "démarrage" :
@@ -60,17 +60,16 @@ class Obscurite(Evenement,On_debut_tour):
 
 class Blizzard(Evenement,On_post_action):
     """Evenement de blizzard."""
-    def __init__(self,niveau:int):
+    def __init__(self,duree:int,gain_latence:float):
         self.affiche = False
-        self.temps_restant = duree_blizzard[niveau]
+        self.temps_restant = duree
         self.phase = "démarrage"
-        self.gain_latence = gain_latence_blizzard[niveau]
+        self.gain_latence = gain_latence
 
     def action(self,case:Case):
         if self.phase == "en cours":
-            occupants = case.controleur.trouve_mobiles_courants(case.position)
+            occupants = case.items | {case.agissant} if case.agissant is not None else case.items
             for occupant in occupants :
-                assert isinstance(occupant,Agissant|Item)
                 if occupant.action is not None:
                     occupant.action.latence -= self.gain_latence
 
@@ -85,7 +84,7 @@ class Blizzard(Evenement,On_post_action):
 
 class Teleportation(One_shot,On_post_action):
     """Effet qui déplace une entitée."""
-    def __init__(self,position:Position):
+    def __init__(self,position:crt.Position):
         self.affiche = True
         self.phase = "démarrage"
         self.position = position
@@ -107,12 +106,6 @@ class Enseignement(One_shot,On_fin_tour):
         if isinstance(porteur,Mage):
             skill = porteur.get_skill_magique()
             skill.ajoute(self.magie)
-
-# class Impregnation(One_shot,On_fin_tour):
-#     """Effet qui impregne le parchemin d'une magie."""
-#     def __init__(self):
-#         self.affiche = False
-#         self.phase = "démarrage"
 
 class Dopage(One_shot,Time_limited):
     """Effet qui "dope" la prochaine attaque du joueur."""
@@ -150,6 +143,5 @@ class Instakill(One_shot,On_post_action):
             self.termine()
 
 # Imports utilisés dans le code
-from ..Systeme.Constantes_magies.Magies import *
 from ..Entitee.Agissant.Role.Mage import Mage
 from Old_Affichage.Skins.Skins import SKIN_TELEPORTATION, SKIN_DOPAGE

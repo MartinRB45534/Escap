@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Effet.Attaque.Attaque import Attaque_particulier
+    from ......Effet.Attaque.Attaque import Attaque_particulier
 
 # Imports des classes parentes
-from ..Entitee.Item.Equippement.Role.Defensif.Defensif import Defensif
+from .Defensif import Defensif
 
 class Defensif_proportion(Defensif):
     def __init__(self,taux_degats:float):

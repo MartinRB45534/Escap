@@ -1,12 +1,12 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
+import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ..Entitee.Agissant.Agissant import Agissant
     from ..Entitee.Item.Item import Item
     from ..Entitee.Item.Equippement.Degainable.Degainable import Arme
-    from ..Labyrinthe.Structure_spatiale.Direction import Direction
 
 # Imports des classes parentes
 from ..Effet.Effet import Enchantement, On_debut_tour, On_post_decision
@@ -84,8 +84,7 @@ class Enchantement_confusion(Enchantement,On_post_decision):
             if isinstance(agissant.action, Deplace) :
                 dir_voulue = agissant.action.direction
                 if random.random() < self.taux_erreur and dir_voulue is not None:
-                    dir_possibles = [Direction(i) for i in range(NB_DIRECTIONS)]
-                    dir_possibles.remove(dir_voulue)
+                    dir_possibles = [dir for dir in crt.Direction if dir is not dir_voulue]
                     agissant.action.direction = random.choice(dir_possibles)
 
     def execute(self,agissant:Agissant):
@@ -108,7 +107,7 @@ class Enchantement_poches_trouees(Enchantement,On_debut_tour):
     def action(self,agissant:Agissant):
         if self.phase == "en cours":
             if random.random() < self.taux_drop :
-                agissant.inventaire.drop_random(agissant.position)
+                agissant.inventaire.drop_random(agissant.labyrinthe.position_case[agissant.position])
 
     def execute(self,agissant:Agissant):
         self.temps_restant -= 1
@@ -249,8 +248,6 @@ class Enchantement_bombe(Enchantement,On_debut_tour):
             item.effets.remove(self.charge)
 
 # Imports utilisés dans le code
-from ..Systeme.Constantes_magies.Magies import *
-from ..Constantes import *
 import random
 from ..Effet.Sante.Maladies.Maladie import Maladie
 from ..Systeme.Classe.Classes import trouve_skill

@@ -6,17 +6,16 @@ import Carte as crt
 if TYPE_CHECKING:
     from ..Effet.Effet import Effet
     from ..Effet.Auras import Aura
-    from ..Entitee.Entitee import Entitee, Mobile
+    from ..Entitee.Entitee import Mobile, Non_superposable
     from ..Entitee.Agissant.Agissant import Agissant
     from ..Entitee.Item.Item import Item
     from ..Entitee.Decors.Decor import Decors
-    from .Mur import Mur
 
 # Valeurs par défaut des paramètres
 from ..Systeme.Elements import Element
 
 class Case(crt.Case):
-    def __init__(self,position:crt.Position, opacite = 1, niveau = 1, element = Element.TERRE):
+    def __init__(self,position:crt.Position, opacite:float = 1, niveau = 1, element = Element.TERRE):
         # Par défaut, pas de murs.
         self.position = position
         self.opacite = opacite
@@ -93,15 +92,44 @@ class Case(crt.Case):
                     if isinstance(aura_bis,Feu) and aura_bis.responsable == resp :
                         aura_bis.phase = "terminé"
 
-    def step_out(self,entitee:Entitee):
-        for effet in self.effets:
-            if isinstance(effet,On_step_out):
-                effet.execute(entitee)
-
-    def step_in(self,entitee:Entitee):
-        for effet in self.effets:
-            if isinstance(effet,On_step_in):
-                effet.execute(entitee) #On agit sur les agissants qui arrivent (pièges, téléportation, etc.)
+    def arrive(self,entitee:Mobile):
+        if isinstance(entitee,Item):
+            entitee.set_position(self.position) #Un item passe quoi qu'il arrive
+            if isinstance(self.agissant,Non_superposable):
+                entitee.heurte_non_superposable(self.agissant) #Mais il heurte les occupants
+            elif isinstance(self.decors,Non_superposable):
+                entitee.heurte_non_superposable(self.decors)
+            self.items.add(entitee)
+            return True
+        elif isinstance(entitee,Agissant):
+            if self.agissant is not None: # On a déjà un agissant sur la case
+                ecrasement = trouve_skill(entitee.classe_principale,Skill_ecrasement) #On peut peut-être l'écraser
+                if ecrasement is not None:
+                    if not ecrasement.utilise(self.agissant.get_priorite(),entitee.get_priorite()):
+                        return False
+                else:
+                    return False
+            elif isinstance(self.decors,Non_superposable):
+                ecrasement = trouve_skill(entitee.classe_principale,Skill_ecrasement) #On peut peut-être l'écraser
+                if ecrasement is not None:
+                    if not ecrasement.utilise(self.decors.get_priorite(),entitee.get_priorite()):
+                        return False
+                else:
+                    return False
+            self.agissant = entitee
+            entitee.set_position(self.position)
+            return True
+        raise TypeError("On ne peut pas ajouter un objet de type "+str(type(entitee))+" sur une case !")
+    
+    def part(self,entitee:Mobile):
+        if isinstance(entitee,Item):
+            self.items.remove(entitee)
+        elif isinstance(entitee,Agissant):
+            if self.agissant is not entitee:
+                raise ValueError("L'entité "+str(entitee)+" n'est pas sur la case "+str(self))
+            self.agissant = None
+            return True
+        raise TypeError("On ne peut pas enlever un objet de type "+str(type(entitee))+" d'une case !")
 
     #Tout le monde a fini de se déplacer.
     def post_action(self):
@@ -152,8 +180,8 @@ class Case(crt.Case):
     def get_opacite(self):
         return self.opacite + self.opacite_bonus
 
-    def get_infos(self,clees:Set[str]): #Est-ce que ce serait plus clair sous forme de dictionnaire ? Ou d'objet ?
-        return Representation_case(self, self.clarte, self.calcule_code(), self.get_cibles_fermes(clees), self.agissant, self.decors, self.items.copy(), self.get_codes_effets(), self.repoussante)
+    # def get_infos(self,clees:Set[str]): #Est-ce que ce serait plus clair sous forme de dictionnaire ? Ou d'objet ?
+    #     return Representation_case(self, self.clarte, self.calcule_code(), self.get_cibles_fermes(clees), self.agissant, self.decors, self.items.copy(), self.get_codes_effets(), self.repoussante)
 
     def calcule_code(self):#La fonction qui calcule le code correpondant à l'état de la case. De base, 0. Modifié d'après les effets subits par la case.
         return self.code
@@ -166,7 +194,9 @@ class Case(crt.Case):
         return effets
 
 # Imports utilisés dans le code
-from .Labyrinthe.Vue import Representation_case
-from .Effet.Auras import Terre_permanente, Feu_permanent, Glace_permanente, Ombre_permanente, Aura_elementale, Terre, Feu, Glace, Ombre
-from .Effet.Effet import On_debut_tour, Time_limited, On_attack, On_post_action, On_step_in, On_step_out
-from .Effet.Attaque.Attaque import Attaque_case, Attaque_case_delayee
+from ..Labyrinthe.Vue import Representation_case
+from ..Effet.Auras import Terre_permanente, Feu_permanent, Glace_permanente, Ombre_permanente, Aura_elementale, Terre, Feu, Glace, Ombre
+from ..Effet.Effet import On_debut_tour, Time_limited, On_attack, On_post_action
+from ..Effet.Attaque.Attaque import Attaque_case, Attaque_case_delayee
+from ..Systeme.Classe.Classes import trouve_skill
+from ..Systeme.Skill.Skills import Skill_ecrasement

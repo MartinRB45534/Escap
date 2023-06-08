@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Entitee.Agissant.Agissant import Agissant
+    from ....Agissant.Agissant import Agissant
 
 # Imports des classes parentes
-from ..Entitee.Item.Equippement.Equippement import Equipement
+from ..Equippement import Equipement
 
 class Equipement_tribal(Equipement):
     def __init__(self,espece:str,taux:float):

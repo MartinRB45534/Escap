@@ -1,30 +1,20 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
+import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Controleur import Controleur
-    from ..Labyrinthe.Structure_spatiale.Position import Position
-    from ..Entitee.Agissant.Agissant import Agissant
+    from ..Agissant.Agissant import Agissant
 
 # Imports des classes parentes
-from ..Entitee.Item.Item import Item
-
-# Valeurs par défaut des paramètres
-from ..Labyrinthe.Structure_spatiale.Position import ABSENT
+from .Item import Item
 
 class Cadavre(Item):
-    def __init__(self,controleur:Controleur,agissant:Agissant,position:Position=ABSENT):
+    def __init__(self,agissant:Agissant,position:crt.Position=crt.POSITION_ABSENTE):
         """Les restes d'un agissant. Peut être ressuscité ou réanimé. Certains monstres se vendent aussi à bon prix."""
-        Item.__init__(self,controleur,position)
+        Item.__init__(self,agissant.labyrinthe,position)
         self.poids = 1
         self.agissant = agissant
-
-    def get_titre(self,observation=0):
-        return "Cadavre"
-
-    def get_description(self,observation=0):
-        return ["Un cadavre","Où as-tu trouvé ça ?"]
 
     @staticmethod
     def get_image():

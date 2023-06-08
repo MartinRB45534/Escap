@@ -1,52 +1,15 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, List
+import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Controleur import Controleur
     from ..Entitee.Agissant.Agissant import Agissant
     from ..Entitee.Item.Equippement.Degainable.Bouclier.Bouclier import Bouclier
-    from ..Labyrinthe.Structure_spatiale.Position import Position
-    from ..Labyrinthe.Structure_spatiale.Direction import Direction
     from ..Effet.Attaque.Attaque import Attaque_case
 
 # Imports des classes parentes
 from ..Effet.Effet import One_shot, Evenement, Effet, On_post_action, Time_limited, On_attack
-
-# class Protection_general(Evenement,On_post_action):
-#     """Le joueur qui a utilisé un bouclier 'protège' une zone autour de lui. C'est à dire qu'à chaque tour, d'après sa position, sa direction et les murs, certaines cases reçoivent une protection jusqu'à la fin du tour."""
-#     def __init__(self,temps_restant:float,bouclier:Bouclier):
-#         self.affiche = False
-#         self.temps_restant = temps_restant
-#         self.phase = "démarrage"
-#         self.bouclier = bouclier #Techniquement c'est le bouclier qui intercepte.
-
-#     def action(self,agissant:Agissant):
-#         cases = agissant.controleur.get_cases_touches(agissant.get_position(),0) #Seule la case de l'agissant est protégée par cette version de la protection.
-#         for case in cases :
-#             case.effets.append(Protection_bouclier(1,self.bouclier,[agissant.dir_regard]))
-
-# class Protection_zone(One_shot,On_post_action):
-#     def __init__(self,protection:Effet,cible:str,position:Position,propagation:str,portee:float,direction:Optional[Direction]=None,traverse="tout"):
-#         self.affiche = False
-#         self.phase = "démarrage"
-#         self.position = position
-#         self.propagation = propagation
-#         self.portee = portee
-#         self.direction = direction
-#         self.traverse = traverse
-#         self.cible = cible
-#         self.protection = protection
-
-#     def action(self,porteur:Agissant):
-#         if self.cible == "case":
-#             cases = porteur.controleur.get_cases_touches(self.position,self.portee,self.propagation,self.direction,self.traverse,porteur)
-#             for case in cases :
-#                 case.effets.append(copy.copy(self.protection))
-#         elif self.cible == "agissant":
-#             agissants = porteur.controleur.get_touches_pos(porteur,self.position,self.portee,self.propagation,self.direction)
-#             for agissant in agissants :
-#                 agissant.effets.append(copy.copy(self.protection))
 
 class Protection_groupe(One_shot,On_post_action):
     def __init__(self,duree:float,degats:float):
@@ -67,7 +30,7 @@ class Protection_groupe(One_shot,On_post_action):
 
 class Protection_bouclier(Time_limited,On_attack):
     """La case protégée par le bouclier est 'entourée' par ce dernier, c'est à dire que pour y rentrer par certains côtés, une attaque doit d'abord être affectée par le bouclier."""
-    def __init__(self,temps_restant:float,bouclier:Bouclier,directions:List[Direction]):
+    def __init__(self,temps_restant:float,bouclier:Bouclier,directions:List[crt.Direction]):
         self.affiche = False
         self.temps_restant = temps_restant
         self.phase = "démarrage"
@@ -104,7 +67,7 @@ class Protection_mur(Time_limited,On_attack):
 class Protection_sacree(Protection_mur):
     """Particulièrement efficace contre les attaques d'ombre."""
     def action(self,attaque:Attaque_case):
-        if attaque.element == OMBRE:
+        if attaque.element == Element.OMBRE:
             if 2*self.PV < attaque.degats:
                 attaque.degats = -2*self.PV
                 self.PV = 0
@@ -120,5 +83,5 @@ class Protection_sacree(Protection_mur):
 
 # Imports utilisés dans le code
 from Old_Affichage.Skins.Skins import SKIN_PROTECTION, SKIN_PROTECTION_SACREE
-from ..Constantes import *
+from ..Systeme.Elements import Element
 import copy

@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Entitee.Agissant.Agissant import Agissant
+    from ....Entitee.Agissant.Agissant import Agissant
 
 # Imports des classes parentes
-from ..Effet.Sante.Maladies.Maladie import Maladie
+from .Maladie import Maladie
 
 class Tirnogose(Maladie):
     """Maladie qui cause une perte progressive de PV. Peut se transmettre aux voisins."""

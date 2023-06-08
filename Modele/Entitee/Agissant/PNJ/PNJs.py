@@ -3,27 +3,21 @@ from typing import TYPE_CHECKING, Optional, Type, List, Tuple, Dict
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Controleur import Controleur
-    from ..Labyrinthe.Structure_spatiale.Position import Position
-    from ..Labyrinthe.Structure_spatiale.Direction import Direction
-    from ..Action.Action import Action
-    from ..Systeme.Skill.Actif import Actif
-    from ..Entitee.Item.Projectile.Projectile import Projectile
+    from ....Action.Action import Action
+    from ....Systeme.Skill.Actif import Actif
+    from ...Item.Projectile.Projectile import Projectile
 
 # Imports des classes parentes
-from ..Entitee.Agissant.Agissant import Agissant
-from ..Entitee.Entitee import Interactif
-from ..Entitee.Agissant.Role.Mage import Mage
-
-# Valeurs par défaut des paramètres
-from ..Labyrinthe.Structure_spatiale.Position import ABSENT
+from ..Agissant import Agissant
+from ...Entitee import Interactif
+from ..Role.Mage import Mage
 
 class PNJ(Agissant, Interactif):
     """
     Un personnage non-jouable (en vrai plutôt non-joué ici, il peut être controlable par un joueur).
     Se distingue par sa capacité à parler, obéir et le fait d'attendre le joueur jusqu'à le rencontrer.
     """
-    def __init__(self, controleur: Controleur, identite: str, niveau: int, ID: Optional[int] = None, position: Position = ABSENT):
+    def __init__(self, identite: str, niveau: int, ID: Optional[int] = None, position: Position = ABSENT):
         Agissant.__init__(self, controleur, identite, niveau, position, ID)
         self.dialogue = -1 #Le dialogue par défaut, celui des ordres
         self.replique = None #La réplique en cours de l'agissant vaut None lorsqu'il n'y a pas de dialogue en cours
@@ -219,8 +213,7 @@ class PJ_mage(PJ, PNJ_mage):
 
 # Imports utilisés dans le code
 from Old_Affichage.Skins.Skins import SKIN_STATUT_PAUME, SKIN_STATUT_PERDU, SKIN_STATUT_CHERCHE, SKIN_STATUT_CHEMIN, SKIN_STATUT_PROXIMITE
-from ..Action.Non_skill import Impregne
-from ..Constantes import DIALOGUE, RECETTE
-from ..Entitee.Item.Parchemin.Parchemins import Parchemin_vierge
-from ..Entitee.Decors.Decors import Ustensile
-from ..Entitee.Decors.Decor import Decors_interactif
+from ....Action.Non_skill import Impregne
+from ...Item.Parchemin.Parchemins import Parchemin_vierge
+from ...Decors.Decors import Ustensile
+from ...Decors.Decor import Decors_interactif

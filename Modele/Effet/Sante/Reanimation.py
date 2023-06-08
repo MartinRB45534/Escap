@@ -1,14 +1,14 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
+import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Entitee.Item.Cadavre import Cadavre
-    from ..Entitee.Agissant.Agissant import Agissant
-    from ..Esprit.Esprit import Esprit
+    from ...Entitee.Item.Cadavre import Cadavre
+    from ...Esprit.Esprit import Esprit
 
 # Imports des classes parentes
-from ..Effet.Effet import On_fin_tour
+from ..Effet import On_fin_tour
 
 class Reanimation(On_fin_tour):
     """Un effet de réanimation. Généralement placé sur le cadavre par une magie de réanimation de zone ou un skill de réanimation."""
@@ -23,6 +23,9 @@ class Reanimation(On_fin_tour):
         agissant.pv = agissant.pv_max*self.taux
         agissant.etat = "vivant"
         porteur.etat = "brise"
+        porteur.labyrinthe.position_case[porteur.position].agissant = agissant
+        agissant.position = porteur.position
+        porteur.position = crt.POSITION_ABSENTE
         if self.esprit is not None:
             if agissant.esprit is not None:
                 agissant.esprit.retire_corp(agissant)

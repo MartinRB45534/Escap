@@ -3,150 +3,25 @@ from typing import TYPE_CHECKING, List, Set
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Controleur import Controleur
     from ..Entitee.Agissant.Agissant import Agissant
-    from ..Entitee.Agissant.Humain.Humain import Humain
-    from ..Entitee.Agissant.Slime.Slime import Slime
     
 from ..Systeme.Classe.Classes import Classe_principale
 
 # Imports des classes parentes
 from ..Esprit.Esprit import Esprit
 
-# class Esprit_type(Esprit):
-#     """Un esprit caricatural, pour les besoins de mes expériences."""
-#     def __init__(self,nom:str,niveau:int,controleur:Controleur,position:Position):
-#         self.nom = nom
-#         self.controleur = controleur
-#         self.oubli = niveau
-#         self.ennemis = {}
-#         self.dispersion_spatiale = 0.9 #La décroissance de l'importance dans l'espace. Tester plusieurs options pour l'optimiser
-#         self.prejuges = []
-#         self.pardon = 0.9 #La décroissance de l'importance avec le temps. Peut être supérieure à 1 pour s'en prendre en priorité aux ennemis ancestraux.
-#         self.resolution = 0
-#         self.vue = Vues()
-#         self.corps = {}
-#         corps:List[Agissant] = []
-#         if niveau == 1:
-#             corps = [Tank(position,1),Dps(position,1),Dps(position,1)]
-#         if niveau == 2:
-#             corps = [Tank(position,2),Tank(position,1),Dps(position,2),Dps(position,2),Soigneur(position,1)]
-#         controleur.ajoute_entitees(corps)
-#         IDs = [corp for corp in corps]
-#         self.ajoute_corps(IDs)
-#         i = 0
-#         random.shuffle(corps)
-#         for corp in corps:
-#             corp.position = position+i*BAS
-#             i+=1
-
-# class Esprit_sans_scrupule(Esprit_type):
-#     """Un esprit qui s'en prend principalement aux soigneurs et aux soutiens."""
-
-#     def antagonise_supports(self,offense:tuple[int,float]):
-#         offenseur = self.controleur[offense[0]]
-#         for effet in offenseur.effets:
-#             if isinstance(effet,Dopage):
-#                 ID = effet.responsable
-#                 if ID != offense[0] and effet.phase == "affiche":
-#                     responsabilite = (effet.taux_degats-1)*offense[1]
-#                     if ID in self.ennemis:
-#                         self.ennemis[ID]["importance"] += responsabilite
-#                     else:
-#                         self.ennemis[ID] = {"importance":responsabilite,"dangerosite":0}
-#             elif isinstance(effet,Soin):
-#                 ID = effet.responsable
-#                 if ID != offense[0] and effet.phase == "affiche":
-#                     responsabilite = (effet.gain_pv/offenseur.pv)*offense[1]
-#                     if ID in self.ennemis:
-#                         self.ennemis[ID]["importance"] += responsabilite
-#                     else:
-#                         self.ennemis[ID] = {"importance":responsabilite,"dangerosite":0}
-
-# class Esprit_bourrin(Esprit_type): #À supprimer, plus nécessaire
-#     """Un esprit sans soigneurs ni soutiens."""
-#     def __init__(self,nom:str,niveau:int,controleur:Controleur,position:Position):
-#         # Tout le monde spawn au même endroit, changer ça !
-#         self.nom = nom
-#         self.controleur = controleur
-#         self.oubli = niveau
-#         self.ennemis = {}
-#         self.dispersion_spatiale = 0.9 #La décroissance de l'importance dans l'espace. Tester plusieurs options pour l'optimiser
-#         self.prejuges = []
-#         self.pardon = 0.9 #La décroissance de l'importance avec le temps. Peut être supérieure à 1 pour s'en prendre en priorité aux ennemis ancestraux.
-#         self.resolution = 0
-#         self.vue = Vues()
-#         self.corps = {}
-#         corps:List[Agissant] = []
-#         if niveau == 1:
-#             corps = [Dps(position,1),Dps(position,1),Dps(position,1)]
-#         if niveau == 2:
-#             corps = [Dps(position,2),Dps(position,2),Dps(position,2),Dps(position,1),Dps(position,1)]
-#         controleur.ajoute_entitees(corps)
-#         IDs = [corp.ID for corp in corps]
-#         self.ajoute_corps(IDs)
-#         i = 0
-#         random.shuffle(corps)
-#         for corp in corps:
-#             corp.position = position+i*BAS
-#             i+=1
-
-# class Esprit_defensif(Esprit_type): #À supprimer, plus nécessaire
-#     """Un esprit sans soigneurs ni soutiens."""
-#     def __init__(self,nom:str,niveau:int,controleur:Controleur,position,Position):
-#         # Tout le monde spawn au même endroit, changer ça !
-#         self.nom = nom
-#         self.controleur = controleur
-#         self.oubli = niveau
-#         self.ennemis = {}
-#         self.dispersion_spatiale = 0.9 #La décroissance de l'importance dans l'espace. Tester plusieurs options pour l'optimiser
-#         self.prejuges = []
-#         self.pardon = 0.9 #La décroissance de l'importance avec le temps. Peut être supérieure à 1 pour s'en prendre en priorité aux ennemis ancestraux.
-#         self.resolution = 0
-#         self.vue = Vues()
-#         self.corps = {}
-#         corps:List[Agissant] = []
-#         if niveau == 1:
-#             corps = [Tank(position,1),Tank(position,1),Dps(position,1)]
-#         if niveau == 2:
-#             corps = [Tank(position,2),Tank(position,2),Dps(position,2),Tank(position,1),Dps(position,1)]
-#         controleur.ajoute_entitees(corps)
-#         IDs = [corp.ID for corp in corps]
-#         self.ajoute_corps(IDs)
-#         i = 0
-#         random.shuffle(corps)
-#         for corp in corps:
-#             corp.position = position+i*BAS
-#             i+=1
-
-# class Esprit_solitaire(Esprit_type):
-#     """Un esprit avec un unique corp."""
-#     def __init__(self,nom:str,corp:int,controleur:Controleur):
-#         self.nom = nom
-#         self.controleur = controleur
-#         self.oubli = 5
-#         self.ennemis = {}
-#         self.dispersion_spatiale = 0.9 #La décroissance de l'importance dans l'espace. Tester plusieurs options pour l'optimiser
-#         self.prejuges = []
-#         self.pardon = 0.9 #La décroissance de l'importance avec le temps. Peut être supérieure à 1 pour s'en prendre en priorité aux ennemis ancestraux.
-#         self.resolution = 0
-#         self.vue = Vues()
-#         self.corps = {}
-#         self.ajoute_corp(corp)
-
 class Esprit_simple(Esprit):
     """Un esprit avec les corps qu'on lui donne."""
-    def __init__(self,nom:str,corps:List[Agissant],prejuges:List[str],controleur:Controleur):
-        Esprit.__init__(self,controleur,nom)
+    def __init__(self,nom:str,corps:List[Agissant],prejuges:List[str]):
+        Esprit.__init__(self,nom)
         self.oubli = 5
         self.prejuges = prejuges
         self.ajoute_corps(corps)
 
 class Esprit_humain(Esprit_simple):
     """Un esprit qui dirige un ou plusieurs humains. Peut interragir avec d'autres esprits humains."""
-    def __init__(self,corp:Humain,controleur:Controleur): #Les humains commencent tous séparément, donc ils ont leur propre esprit au début
-        Esprit.__init__(self,controleur,corp.identite)
-        self.controleur = controleur
+    def __init__(self,corp:Humain): #Les humains commencent tous séparément, donc ils ont leur propre esprit au début
+        Esprit.__init__(self,corp.identite)
         self.ajoute_corp(corp)
         self.chef = corp #Les humains ne peuvent pas s'empêcher d'avoir des chefs
 
@@ -203,8 +78,8 @@ class Esprit_humain(Esprit_simple):
 
 class Esprit_slime(Esprit):
     """Un esprit qui dirige un ou plusieurs slimes. Peut interragir avec d'autres esprits slimes."""
-    def __init__(self,corp:Slime,controleur:Controleur): #Les slimes commencent tous séparément, donc ils ont leur propre esprit au début
-        Esprit.__init__(self,controleur,"esprit_slime_"+str(corp))
+    def __init__(self,corp:Slime): #Les slimes commencent tous séparément, donc ils ont leur propre esprit au début
+        Esprit.__init__(self,"esprit_slime_"+str(corp))
         self.oubli = 5 #Faire dépendre des skills
         self.dispersion_spatiale = 0.9 #La décroissance de l'importance dans l'espace. Tester plusieurs options pour l'optimiser
         self.prejuges = ["humain"] #Vraiment ?

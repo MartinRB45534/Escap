@@ -6,6 +6,7 @@ import networkx as nx
 if TYPE_CHECKING:
     from .Structure_spatiale.Position import Position
     from .Structure_spatiale.Direction import Direction
+    from .Structure_spatiale.Etage import Etage
     from .Case import Case
     from .Mur import Mur
     from .Extrait import Extrait
@@ -14,6 +15,7 @@ class Labyrinthe(nx.MultiDiGraph): #Rarement Multi, mais ça arrive pour la case
     def __init__(self):
         super().__init__()
         self.position_case: dict[Position,Case] = {}
+        self.etages: dict[Etage,nx.Graph] = {}
         self.add_case(CASE_ABSENTE)
 
     def __contains__(self, item):
@@ -26,6 +28,12 @@ class Labyrinthe(nx.MultiDiGraph): #Rarement Multi, mais ça arrive pour la case
         self.position_case[case.position] = case
         for direction in Direction:
             self.add_mur(case.position, case.position+direction, direction, Mur())
+        if case.position.etage not in self.etages:
+            self.etages[case.position.etage] = nx.Graph()
+        self.etages[case.position.etage].add_node(case.position)
+        for direction in Direction:
+            if case.position+direction in case.position.etage:
+                self.etages[case.position.etage].add_edge(case.position, case.position+direction, key=direction)
 
     def add_mur(self, u:Position, v:Position, direction:Direction, mur:Mur, **attr):
         if v not in self.position_case:

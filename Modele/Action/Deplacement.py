@@ -21,8 +21,7 @@ class Deplace(Action):
         self.direction = direction
 
     def action(self):
-        lab = self.agissant.controleur.labs[self.agissant.position.lab]
-        lab.veut_passer(self.agissant,self.direction)
+        self.agissant.labyrinthe.veut_passer(self.agissant,self.direction)
 
 class Vole(Deplace,Action_final):
     """
@@ -37,8 +36,7 @@ class Vole(Deplace,Action_final):
         self.repete = True
 
     def action(self):
-        lab = self.item.controleur.labs[self.item.position.lab]
-        lab.veut_passer(self.item,self.direction)
+        self.item.labyrinthe.veut_passer(self.item,self.direction)
 
     def execute(self):
         """L'action est appelée à chaque tour."""

@@ -3,7 +3,7 @@ from __future__ import annotations
 # Pas d'import pour les annotations
 
 # Imports des classes parentes
-from ..Entitee.Item.Equippement.Role.Reparateur.Reparateur import Reparateur
+from .Reparateur import Reparateur
 
 class Pompe_a_pv(Reparateur): #Régénère une quantité fixe de pm
     def __init__(self,pv:float):

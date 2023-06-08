@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Entitee.Agissant.Agissant import Agissant
+    from ...Entitee.Agissant.Agissant import Agissant
 
 # Imports des classes parentes
-from ..Effet.Effet import On_debut_tour,On_tick
+from ..Effet import On_debut_tour,On_tick
 
 class Poison(On_debut_tour,On_tick):
     """La classe des effets d'empoisonnement."""

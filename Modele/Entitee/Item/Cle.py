@@ -1,38 +1,22 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, Set
+import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Controleur import Controleur
-    from ..Labyrinthe.Structure_spatiale.Position import Position
-    from ..Entitee.Agissant.Agissant import Agissant
+    from ...Labyrinthe.Labyrinthe import Labyrinthe
 
 # Imports des classes parentes
-from ..Entitee.Item.Item import Item
-
-# Valeurs par défaut des paramètres
-from ..Labyrinthe.Structure_spatiale.Position import ABSENT
+from .Item import Item
 
 class Cle(Item):
     """La classe des items qui ouvrent les portes (et les coffres ?)."""
-    def __init__(self,controleur:Controleur,codes:List[str],position:Position=ABSENT):
-        Item.__init__(self,controleur,position)
+    def __init__(self,labyrinthe:Labyrinthe,codes:Set[str],position:crt.Position=crt.POSITION_ABSENTE):
+        Item.__init__(self,labyrinthe,position)
         self.codes = codes
 
     def get_codes(self):
         return self.codes
-
-    def get_classe(self):
-        return Cle
-
-    def get_titre(self,observation=0):
-        return "Clé"
-
-    def get_description(self,observation=0):
-        return ["Une clé","Je suppose qu'elle ouvre une porte."]
-
-    def get_skin(self):
-        return SKIN_CLE
 
     @staticmethod
     def get_image():

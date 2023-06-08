@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING, List, Tuple
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Entitee.Agissant.Agissant import Agissant
+    from ..Agissant import Agissant
 
 # Imports des classes parentes
-from ..Entitee.Agissant.Role.Multi_soigneur import Multi_soigneur
+from .Multi_soigneur import Multi_soigneur
 
 class Multi_soigneur_protecteur(Multi_soigneur):
     """Les multi_soigneurs capables de placer un sort de protection lorsqu'il n'y a personne à soigner.""" #Vraiment juste la peste (en fait même pas la peste)
@@ -55,7 +55,7 @@ class Multi_soigneur_protecteur(Multi_soigneur):
                         cibles_.append(corp)
             if cibles_:
                 skill = self.get_skill_magique()
-                action = skill.fait("magie protection sacrée",self)
+                action = skill.fait(self,"magie protection sacrée")
                 assert isinstance(action,Cible_agissants)
                 action.cible = cibles_
                 self.fait(action)
@@ -64,6 +64,6 @@ class Multi_soigneur_protecteur(Multi_soigneur):
         return defaut
 
 # Imports utilisés dans le code
-from ..Effet.Effets_protection import Protection_sacree
-from ..Action.Magie.Magie import Cible_agissant,Cible_agissants
+from ....Effet.Effets_protection import Protection_sacree
+from ....Action.Magie.Magie import Cible_agissant,Cible_agissants
 from operator import itemgetter

@@ -1,21 +1,18 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type, List, Dict, Set
+import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Controleur import Controleur
-    from ..Labyrinthe.Structure_spatiale.Position import Position
-    from ..Entitee.Agissant.Agissant import Agissant
-    from ..Entitee.Item.Item import Item
+    from .Agissant import Agissant
+    from ..Item.Item import Item
+    from ...Labyrinthe.Case import Case
 
 # Pas de classe parente
 
-# Valeurs par défaut des paramètres
-from ..Labyrinthe.Structure_spatiale.Position import ABSENT
-
 class Inventaire:
 
-    def __init__(self,possesseur:Agissant,nb_doigts:int,controleur:Controleur):
+    def __init__(self,possesseur:Agissant,nb_doigts:int):
         self.possesseur = possesseur #On classe les possessions d'un agissant selon les usages qu'il peut en faire :
 
         self.potions:Set[Potion] = set() #Les potions peuvent se boire
@@ -52,14 +49,16 @@ class Inventaire:
         self.haume:Optional[Haume] = None #Le haume équipé
         self.anneau:List[Anneau] = [] #Les anneaux équipés
         self.doigts = nb_doigts #Le nombre d'anneaux que l'on peut équiper
-        self.controleur = controleur
 
     def ajoute(self,item:Item):
         #Comme la précédente, mais c'est l'item et non son ID qui est passé en paramètre
-        item.position = ABSENT
-        classe = item.get_classe()
-        if classe in self.items:
-            self.items[classe].add(item)
+        if item.position != crt.POSITION_ABSENTE:
+            item.labyrinthe.position_case[item.position].items.remove(item)
+            item.position = crt.POSITION_ABSENTE
+        for classe in self.items:
+            if isinstance(item,classe):
+                self.items[classe].add(item)
+                return
 
     def peut_fournir(self,items:Dict[Type[Ingredient],int]):
         for item in items:
@@ -202,7 +201,7 @@ class Inventaire:
         for classe in self.items:
             for item in self.items[classe]:
                 assert isinstance(item,classe)
-                if item.position != ABSENT or item.etat == "brisé": #S'il a été lancé ou n'est plus en état
+                if item.position != crt.POSITION_ABSENTE or item.etat == "brisé": #S'il a été lancé ou n'est plus en état
                     self.items[classe].remove(item)
                     if self.arme is item :
                         self.arme = None
@@ -215,16 +214,16 @@ class Inventaire:
                     elif item in self.anneau :
                         self.anneau.remove(item)
 
-    def drop_all(self,position:Position):
+    def drop_all(self,case:Case):
         for classe in self.items:
             for item in self.items[classe]:
-                self.drop(position,item)
+                self.drop(case,item)
 
-    def drop(self,position:Position,item:Item):
+    def drop(self,case:Case,item:Item):
         for cat_item in self.items:
             if item in self.items[cat_item]:
-                self.controleur.items_courants.add(item)
-                item.position = position
+                item.position = case.position
+                case.items.add(item)
                 self.items[cat_item].remove(item)
                 if self.arme is item :
                     self.arme = None
@@ -237,10 +236,10 @@ class Inventaire:
                 elif item in self.anneau :
                     self.anneau.remove(item)                    
 
-    def drop_random(self,position:Position):
+    def drop_random(self,case:Case):
         items = self.get_items()
         item = random.choice(list(items))
-        self.drop(position,item)
+        self.drop(case,item)
 
     def debut_tour(self):
         for classe in self.items:
@@ -280,31 +279,23 @@ class Inventaire:
                 return parchemin
         return None
 
-    # def consomme_parchemin_vierge(self):
-    #     for parchemin in self.items[Parchemin]:
-    #         if isinstance(parchemin,Parchemin_vierge):
-    #             parchemin.etat = "brisé"
-    #             return True
-    #     return False
 
 # Imports utilisés dans le code (il y en a beaucoup !!!)
-from ..Action.Non_skill import Impregne
-from ..Entitee.Item.Item import Item
-from ..Entitee.Item.Potion.Potion import Potion
-from ..Entitee.Item.Parchemin.Parchemin import Parchemin
-from ..Entitee.Item.Cle import Cle
-from ..Entitee.Item.Equippement.Degainable.Degainable import Arme
-from ..Entitee.Item.Equippement.Degainable.Bouclier.Bouclier import Bouclier
-from ..Entitee.Item.Equippement.Armure.Armure import Armure
-from ..Entitee.Item.Equippement.Haume.Haume import Haume
-from ..Entitee.Item.Equippement.Anneau.Anneau import Anneau
-from ..Entitee.Item.Projectile.Projectile import Projectile
-from ..Entitee.Item.Item import Ingredient
-from ..Entitee.Item.Cadavre import Cadavre
-from ..Entitee.Item.Oeuf import Oeuf
-from ..Entitee.Item.Parchemin.Parchemins import Parchemin_vierge
+from ...Action.Non_skill import Impregne
+from ..Item.Item import Item
+from ..Item.Potion.Potion import Potion
+from ..Item.Parchemin.Parchemin import Parchemin
+from ..Item.Cle import Cle
+from ..Item.Equippement.Degainable.Degainable import Arme
+from ..Item.Equippement.Degainable.Bouclier.Bouclier import Bouclier
+from ..Item.Equippement.Armure.Armure import Armure
+from ..Item.Equippement.Haume.Haume import Haume
+from ..Item.Equippement.Anneau.Anneau import Anneau
+from ..Item.Projectile.Projectile import Projectile
+from ..Item.Item import Ingredient
+from ..Item.Cadavre import Cadavre
+from ..Item.Oeuf import Oeuf
+from ..Item.Parchemin.Parchemins import Parchemin_vierge
 
-from ..Systeme.Classe.Classes import trouve_skill
-# from ..Systeme.Skill.Skills import Hatching
 from warnings import warn
 import random

@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING, TypeVar, Optional, Type
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Systeme.Skill.Skill import Skill
+    from ..Skill.Skill import Skill
 
 # Imports des classes parentes
-from ..Systeme.Classe.Classe import Classe
+from .Classe import Classe
 
 # class Artificier(Classe):
 #     """La classe des utilisateurs d'explosifs de haut niveau. Le skill de création d'explosif peut lui être transféré. La classe apporte des bonus lors de l'utilisation d'explosifs."""
@@ -359,4 +359,4 @@ def trouve_skill(classe:Classe,type_skill:Type[T]) -> Optional[T]:
         if trouve_bis is not None:
             return trouve_bis
 
-from ..Systeme.Classe.Classe_principale import *
+from .Classe_principale import *

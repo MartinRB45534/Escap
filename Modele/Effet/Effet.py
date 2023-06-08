@@ -1,5 +1,4 @@
 from __future__ import annotations
-from warnings import warn
 from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations

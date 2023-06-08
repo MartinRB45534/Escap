@@ -1,10 +1,9 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, List, Dict, Set, Tuple, Self, Literal
+import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Controleur import Controleur
-    from ..Labyrinthe.Structure_spatiale.Position import Position
     from ..Entitee.Agissant.Agissant import Agissant
     from ..Labyrinthe.Vue import Representation_case, Representation_vue
     from ..Esprit.Representation_spatiale import Espace_schematique
@@ -13,7 +12,7 @@ if TYPE_CHECKING:
 
 class Esprit :
     """La classe des esprits, qui manipulent les agisants."""
-    def __init__(self,controleur:Controleur,nom:str): #On identifie les esprits par des noms (en fait on s'en fout, vu qu'on ne fait pas d'opérations dessus on pourrait avoir des labs, des entitees et des esprits nommés avec des str, des int, des float, des bool, etc.)
+    def __init__(self,nom:str): #On identifie les esprits par des noms (en fait on s'en fout, vu qu'on ne fait pas d'opérations dessus on pourrait avoir des labs, des entitees et des esprits nommés avec des str, des int, des float, des bool, etc.)
         self.corps:Dict[Agissant,str] = {}
         self.vue = Vues()
         self.salles:Set[Salle] = set()
@@ -27,7 +26,6 @@ class Esprit :
         self.oubli = 0
         self.resolution = 0 #0 pour se déplacer normalement, 1 pour passer les portes dont on a les clés, 2 pour traverser les portails, 3 pour passer les portes et les portails, 4 pour passer partout (portes, portails, changer d'étage)
         self.nom = nom
-        self.controleur:Controleur = controleur
 
     def ajoute_corp(self,corp:Agissant):
         if not corp in self.corps:
@@ -359,10 +357,10 @@ class Esprit :
                     if case in couloir.cases: #Cette case appartenait à un couloir. Ce n'est plus le cas car des murs ont été ouverts (portes, écrasement, etc.)
                         couloirs_mod |= self.scinde_couloir(couloir,case)
                         break
-            if case.case.position.lab == "Étage 3 : combat":
-                if case.case.position.x in range(2,5) and case.case.position.y in range(7,10):
-                    print("Bad check")
-                    print(case.case.position.x, case.case.position.y)
+            # if case.case.position.lab == "Étage 3 : combat":
+            #     if case.case.position.x in range(2,5) and case.case.position.y in range(7,10):
+            #         print("Bad check")
+            #         print(case.case.position.x, case.case.position.y)
         for couloir in [*couloirs_mod]:
             if couloir in self.couloirs:
                 couloir.entrees = set()
@@ -1234,12 +1232,12 @@ class Esprit :
                     res = "exploration"
                     if len(dirs)>1: #On peut se permettre de choisir
                         if corp.dir_regard is not None: #L'agissant regarde quelque part
-                            dir_back = corp.dir_regard.oppose()
+                            dir_back = corp.dir_regard.oppose
                             if dir_back in dirs: #On ne veut pas y retourner
                                 dirs.remove(dir_back)
                     corp.va(dirs[random.randint(0,len(dirs)-1)]) #/!\ Ne pas retourner sur ses pas, c'est bien ! Aller vers les endroits inconnus, ce serait mieux. /!\
-                    if corp.ID == 4: # /!\ Ne pas nettoyer, c'est très utile par moment
-                        constantes_deplacements.append([self.controleur.nb_tours,"cherche",corp.dir_regard,cases])
+                    # if corp.ID == 4: # /!\ Ne pas nettoyer, c'est très utile par moment
+                    #     constantes_deplacements.append([self.controleur.nb_tours,"cherche",corp.dir_regard,cases])
             else:
                 if repoussante: #On ne veut pas rester en place
                     cases.pop(0)
@@ -1248,20 +1246,20 @@ class Esprit :
                     res = "approche"
                     if new_cases[-1]["direction"]: #La dernière case (i.e. les valeurs les plus élevées) n'est pas celle où l'on est
                         direction = new_cases[-1]["direction"]
-                        assert isinstance(direction,Direction)
+                        assert isinstance(direction,crt.Direction)
                         corp.va(direction)
-                        if corp.ID == 4:
-                            constantes_deplacements.append([self.controleur.nb_tours,"deplacement",corp.dir_regard,new_cases])
+                        # if corp.ID == 4:
+                        #     constantes_deplacements.append([self.controleur.nb_tours,"deplacement",corp.dir_regard,new_cases])
                     else:
                         res = corp.agit_en_vue()
                 elif res == "fuite":
                     new_cases = sorted(cases,key=operator.itemgetter("dangerosite","importance")) #2 pour le chemin d'accès indirect, 3 pour le chemin d'accès direct
                     if new_cases[-1]["direction"]: #La première case (i.e. les valeurs les moins élevées) n'est pas celle où l'on est
                         direction = new_cases[-1]["direction"]
-                        assert isinstance(direction,Direction)
+                        assert isinstance(direction,crt.Direction)
                         corp.va(direction)
-                        if corp.ID == 4:
-                            constantes_deplacements.append([self.controleur.nb_tours,"fuite",corp.dir_regard,new_cases])
+                        # if corp.ID == 4:
+                        #     constantes_deplacements.append([self.controleur.nb_tours,"fuite",corp.dir_regard,new_cases])
                     else:
                         res = corp.agit_en_vue()
         corp.set_statut(res)
@@ -1373,8 +1371,8 @@ class Esprit :
                 if len(cases) == 1: #Pas de cases libres à proximité, on va essayer d'attaquer pour s'en sortir
                     res = "bloqué"
                     importance = 0
-                    for i in DIRECTIONS:
-                        mur:Position|Literal[False] = case.cibles[i][self.resolution]
+                    for dir in crt.Direction:
+                        mur:crt.Position|Literal[False] = case.cibles[i][self.resolution]
                         if mur:
                             if mur.lab in self.vue:
                                 case_pot = self.vue.case_from_position(mur)
@@ -1390,7 +1388,7 @@ class Esprit :
                         res = "exploration"
                         if len(dirs)>1: #On peut se permettre de choisir
                             if pnj.dir_regard is not None: #L'agissant regarde quelque part
-                                dir_back = pnj.dir_regard.oppose()
+                                dir_back = pnj.dir_regard.oppose
                                 if dir_back in dirs: #On ne veut pas y retourner
                                     dirs.remove(dir_back)
                         pnj.va(dirs[random.randint(0,len(dirs)-1)]) #/!\ Ne pas retourner sur ses pas, c'est bien ! Aller vers les endroits inconnus, ce serait mieux. /!\
@@ -1400,7 +1398,7 @@ class Esprit :
                         res = "exploration"
                         if len(dirs)>1: #On peut se permettre de choisir
                             if pnj.dir_regard is not None: #L'agissant regarde quelque part
-                                dir_back = pnj.dir_regard.oppose()
+                                dir_back = pnj.dir_regard.oppose
                                 if dir_back in dirs: #On ne veut pas y retourner
                                     dirs.remove(dir_back)
                         pnj.va(dirs[random.randint(0,len(dirs)-1)]) #/!\ Ne pas retourner sur ses pas, c'est bien ! Aller vers les endroits inconnus, ce serait mieux. /!\
@@ -1412,20 +1410,20 @@ class Esprit :
                         res = "approche"
                         if new_cases[-1]["direction"]: #La dernière case (i.e. les valeurs les plus élevées) n'est pas celle où l'on est
                             direction = new_cases[-1]["direction"]
-                            assert isinstance(direction,Direction)
+                            assert isinstance(direction,crt.Direction)
                             pnj.va(direction)
-                            if pnj.ID == 4:
-                                constantes_deplacements.append([self.controleur.nb_tours,"deplacement loin",pnj.dir_regard,new_cases])
+                            # if pnj.ID == 4:
+                            #     constantes_deplacements.append([self.controleur.nb_tours,"deplacement loin",pnj.dir_regard,new_cases])
                         else:
                             res = pnj.agit_en_vue()
                     elif res == "fuite":
                         new_cases = sorted(cases,key=operator.itemgetter("dangerosite","importance")) #2 pour le chemin d'accès indirect, 3 pour le chemin d'accès direct
                         if new_cases[-1]["direction"]: #La première case (i.e. les valeurs les moins élevées) n'est pas celle où l'on est
                             direction = new_cases[-1]["direction"]
-                            assert isinstance(direction,Direction)
+                            assert isinstance(direction,crt.Direction)
                             pnj.va(direction)
-                            if pnj.ID == 4:
-                                constantes_deplacements.append([self.controleur.nb_tours,"fuite loin",pnj.dir_regard,new_cases])
+                            # if pnj.ID == 4:
+                            #     constantes_deplacements.append([self.controleur.nb_tours,"fuite loin",pnj.dir_regard,new_cases])
                         else:
                             res = pnj.agit_en_vue()
             pnj.set_statut(res)
@@ -1443,19 +1441,13 @@ class Esprit :
     def debut_tour(self):
         #On va faire plein de choses pendant ce tour (est-ce vraiment nécessaire de prendre des décisions si aucun des corps ne va jouer à ce tour ?
         self.get_offenses() #On s'insurge à grands cris (s'il y a lieu)
-        add_constantes_temps("offenses")
         self.trouve_strateges()
-        add_constantes_temps("strateges")
 
 
         # La suite est très lente, comment faire pour l'accélérer ?
         self.refait_vue() #On prend connaissance de son environnement
         #Il faudra éventuellement définir une stratégie
-        add_constantes_temps("vue") # 12
         self.calcule_trajets() #On dresse les plans de bataille (s'il y a lieu)
-        add_constantes_temps("trajets") # 10
-        self.decide() #On donne les ordres
-        add_constantes_temps("decisions") # 7
 
     def pseudo_debut_tour(self):
         pass
@@ -1475,14 +1467,8 @@ NOBODY = Mindless()
 # Imports utilisés dans le code
 from ..Labyrinthe.Vue import Vues
 from ..Esprit.Representation_spatiale import Salle, Couloir, Zone_inconnue
-from ..Systeme.Constantes_stats import add_constantes_temps, incr_compteur_temps, constantes_deplacements
-from ..Constantes import PASSE_ESCALIER, BASIQUE, DIALOGUE
-from ..Labyrinthe.Structure_spatiale.Direction import Direction, DIRECTIONS, HAUT, DROITE, BAS, GAUCHE
-from ..Labyrinthe.Structure_spatiale.Decalage import Decalage
-from ..Labyrinthe.Structure_spatiale.Position import Position
 from ..Entitee.Agissant.Agissant import Agissant
 from ..Entitee.Agissant.PNJ.PNJs import PNJ, PJ
 from ..Entitee.Agissant.Role.Sentinelle import Sentinelle
-from ..Entitee.Agissant.Humain.Humain import Humain
 import random
 import operator

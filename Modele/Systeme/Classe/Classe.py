@@ -3,9 +3,9 @@ from typing import TYPE_CHECKING, Set
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Systeme.Skill.Skill import Skill_intrasec, Skill_extra
-    from ..Systeme.Skill.Actif import Actif
-    from ..Systeme.Skill.Passif import Skill_debut_tour
+    from ..Skill.Skill import Skill_intrasec, Skill_extra
+    from ..Skill.Actif import Actif
+    from ..Skill.Passif import Skill_debut_tour
 
 # Pas de classe parente
 
@@ -91,5 +91,5 @@ class Classe:
     
 # Imports utilisés dans le code
 from Old_Affichage.Skins.Skins import SKIN_MYSTERE
-from ..Systeme.Skill.Actif import Actif
-from ..Systeme.Skill.Passif import Skill_debut_tour
+from ..Skill.Actif import Actif
+from ..Skill.Passif import Skill_debut_tour

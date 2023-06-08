@@ -1,19 +1,19 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, List, Tuple, Type
+import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Entitee.Agissant.Agissant import Agissant
-    from ..Labyrinthe.Structure_spatiale.Direction import Direction
-    from ..Action.Magie.Magie import Magie
-    from ..Entitee.Item.Equippement.Degainable.Degainable import Arme
-    from ..Action.Action_skill import Action_skill, Derobe, Blocage, Ramasse, Alchimie
-    from ..Action.Attaque import Attaque, Attaque_arme
-    from ..Action.Deplacement import Marche
-    from ..Action.Action_skill import Ramasse
+    from ...Entitee.Agissant.Agissant import Agissant
+    from ...Action.Magie.Magie import Magie
+    from ...Entitee.Item.Equippement.Degainable.Degainable import Arme
+    from ...Action.Action_skill import Action_skill, Derobe, Blocage, Ramasse, Alchimie
+    from ...Action.Attaque import Attaque, Attaque_arme
+    from ...Action.Deplacement import Marche
+    from ...Action.Action_skill import Ramasse
 
 # Imports des classes parentes
-from ..Systeme.Skill.Skill import Skill
+from .Skill import Skill
 
 class Actif(Skill):
     """
@@ -83,7 +83,7 @@ class Skill_deplacement(Actif):
             self.niveau+=1 #Le niveau augmente
             #Pas d'autre cadeau
 
-    def fait(self,agissant:Agissant,direction:Optional[Direction]=None,course:bool=False) -> Marche:
+    def fait(self,agissant:Agissant,direction:Optional[crt.Direction]=None,course:bool=False) -> Marche:
         """Fait le déplacement"""
         raise NotImplementedError
 
@@ -130,7 +130,7 @@ class Skill_attaque(Skills_offensifs):
         Skills_offensifs.__init__(self)
         self.nom = "Attaque"
 
-    def fait(self,agissant:Agissant, direction:Optional[Direction] = None) -> Attaque:
+    def fait(self,agissant:Agissant, direction:Optional[crt.Direction] = None) -> Attaque:
         """Fait l'attaque"""
         raise NotImplementedError
     
@@ -140,7 +140,7 @@ class Skill_attaque_arme(Skills_offensifs):
         Skills_offensifs.__init__(self)
         self.nom = "Attaque avec arme"
 
-    def fait(self,agissant:Agissant, arme:Optional[Arme]=None, direction:Optional[Direction] = None) -> Attaque_arme:
+    def fait(self,agissant:Agissant, arme:Optional[Arme]=None, direction:Optional[crt.Direction] = None) -> Attaque_arme:
         """Fait l'attaque"""
         raise NotImplementedError
 

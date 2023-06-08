@@ -83,7 +83,7 @@ class Representation_case:
     def __init__(self,case:Case,clarte:float,code:int,cibles:List[List[Position|Literal[False]]],agissant:Optional[Agissant],decors:Optional[Decors],items:Set[Item],effets:List[List[int]],repoussante:bool):
         self.case = case #La position de la case
         self.clarte = clarte #La clarté, qui vient d'être calculée pour l'agissant
-        self.oubli = 0 #Pour le décompte de l'oubli
+        self.oubli:float = 0 #Pour le décompte de l'oubli
         self.trajets = {"dangerosite":[],"importance":[]}
         self.visitee = False #Pour savoir si la case a déjà été visitée
         self.code = code #Le code correspondant aux auras et autres effets
@@ -94,7 +94,7 @@ class Representation_case:
         self.effets = effets #Pour stocker les effets (attaques delayées)
         self.repoussante = repoussante #Si la case est repoussante
 
-    def oublie(self, oubli:int):
+    def oublie(self, oubli:float):
         """Pour oublier les cases visitées il y a trop longtemps"""
         self.trajets = {"dangerosite":[],"importance":[]}
         self.effets = []

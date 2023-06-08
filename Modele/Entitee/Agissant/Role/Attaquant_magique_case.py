@@ -3,7 +3,7 @@ from __future__ import annotations
 # Pas d'imports pour les annotations
 
 # Imports des classes parentes
-from ..Entitee.Agissant.Role.Mage import Mage
+from .Mage import Mage
 
 class Attaquant_magique_case(Mage):
     """Les agissants qui combattent en lançant des attaques magiques de loin sur des cases."""
@@ -32,6 +32,6 @@ class Attaquant_magique_case(Mage):
             return super().get_impact()
 
 # Imports utilisés dans le code
-from ..Entitee.Agissant.Agissant import Agissant
-from ..Action.Magie.Magie import Cible_case
+from ..Agissant import Agissant
+from ....Action.Magie.Magie import Cible_case
 from operator import itemgetter

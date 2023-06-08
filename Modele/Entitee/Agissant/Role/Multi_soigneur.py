@@ -4,8 +4,8 @@ from typing import TYPE_CHECKING
 # Pas d'imports pour les annotations
 
 # Imports des classes parentes
-from ..Entitee.Agissant.Role.Soigneur import Soigneur
-from ..Entitee.Agissant.Role.Mage import Multi_mage
+from .Soigneur import Soigneur
+from .Mage import Multi_mage
 
 class Multi_soigneur(Soigneur,Multi_mage):
     """Les soigneurs capables de soigner plusieurs agissants à la fois."""
@@ -48,4 +48,4 @@ class Multi_soigneur(Soigneur,Multi_mage):
 
 # Imports utilisés dans le code
 from operator import itemgetter
-from ..Action.Magie.Magie import Cible_agissant,Cible_agissants
+from ....Action.Magie.Magie import Cible_agissant,Cible_agissants
