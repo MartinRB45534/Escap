@@ -17,22 +17,24 @@ class Attaque(Action_skill):
     """
     L'action d'attaquer.
     """
-    def __init__(self,agissant:Agissant,latence:float,skill:Actif,xp:float,taux:float,direction:crt.Direction,portee:int,element:Element,propagation:str="C__S___",distance:str="contact"):
+    def __init__(self,agissant:Agissant,latence:float,skill:Actif,xp:float,taux:float,direction:crt.Direction,portee:int,element:Element,deplacement:Deplacement,forme:Forme,passage:Passage,distance:str="contact"):
         super().__init__(agissant,latence,skill,xp)
         self.taux = taux
         self.direction = direction
         self.portee = portee
         self.element = element
-        self.propagation = propagation
+        self.deplacement = deplacement
+        self.forme = forme
+        self.passage = passage
         self.distance = distance
 
     def action(self):
         force,affinite = self.agissant.get_stats_attaque(self.element)
         degats = force*self.taux*affinite
         position = self.agissant.position
-        positions_touchees = self.agissant.controleur.get_pos_touches(position,self.portee,self.propagation,self.direction,"alliés",self.agissant)
-        for position in positions_touchees:
-            self.agissant.controleur.case_from_position(position).effets.append(Attaque_case(self.agissant,degats,self.element,self.distance,self.direction))
+        zone = self.agissant.labyrinthe.a_portee(position,self.portee,self.deplacement,self.forme,self.passage,self.direction)
+        for position in zone:
+            self.agissant.labyrinthe.get_case(position).effets.add(Attaque_case(self.agissant,degats,self.element,self.distance,self.direction))
 
 class Attaque_final(Action_final,Attaque):
     """
@@ -44,12 +46,8 @@ class Attaque_arme(Attaque):
     """
     L'action d'attaquer avec une arme.
     """
-    def __init__(self,agissant:Agissant,latence:float,skill:Actif,xp:float,taux:float,direction:crt.Direction,arme:Arme,propagation:str="C__S___",distance:str="contact"):
-        Action_skill.__init__(self,agissant,latence,skill,xp)
-        self.taux = taux
-        self.direction = direction
-        self.propagation = propagation
-        self.distance = distance
+    def __init__(self,agissant:Agissant,latence:float,skill:Actif,xp:float,taux:float,direction:crt.Direction,arme:Arme,deplacement:Deplacement,forme:Forme,passage:Passage,distance:str="contact"):
+        Attaque.__init__(self,agissant,latence,skill,xp,taux,direction,arme.portee,arme.element,deplacement,forme,passage,distance)
         self.arme = arme
 
     def action(self):
@@ -57,9 +55,9 @@ class Attaque_arme(Attaque):
         force,affinite = self.agissant.get_stats_attaque(element)
         degats = force*self.taux*affinite*tranchant
         position = self.agissant.position
-        positions_touchees = self.agissant.controleur.get_pos_touches(position,portee,self.propagation,self.direction,"alliés",self.agissant)
-        for position in positions_touchees:
-            self.agissant.controleur.case_from_position(position).effets.append(Attaque_case(self.agissant,degats,element,self.distance,self.direction))
+        zone = self.agissant.labyrinthe.a_portee(position,portee,self.deplacement,self.forme,self.passage,self.direction)
+        for position in zone:
+            self.agissant.labyrinthe.get_case(position).effets.add(Attaque_case(self.agissant,degats,element,self.distance,self.direction))
 
 class Attaque_arme_final(Action_final,Attaque_arme):
     """
@@ -71,12 +69,14 @@ class Attaque_multiple(Action_parcellaire,Attaque_arme): # Les attaques sans arm
     """
     Une attaque complexe avec plusieurs coups.
     """
-    def __init__(self,agissant:Agissant,latences:List[float],skill:Actif,xp:float,taux:List[float],directions:List[crt.Direction],arme:Arme,propagations:List[str]=["C__S___"],distance:str="contact"):
+    def __init__(self,agissant:Agissant,latences:List[float],skill:Actif,xp:float,taux:List[float],directions:List[crt.Direction],arme:Arme,deplacement:Deplacement,formes:List[Forme],passage:Passage,distance:str="contact"):
         Action_skill.__init__(self,agissant,sum(latences),skill,xp)
         self.latences = latences
         self.taux = taux
         self.directions = directions
-        self.propagations = propagations
+        self.deplacement = deplacement
+        self.formes = formes
+        self.passage = passage
         self.distance = distance
         self.arme = arme
 
@@ -85,9 +85,12 @@ class Attaque_multiple(Action_parcellaire,Attaque_arme): # Les attaques sans arm
         force,affinite = self.agissant.get_stats_attaque(element)
         degats = force*self.taux[self.rempli]*affinite*tranchant
         position = self.agissant.position
-        positions_touchees = self.agissant.controleur.get_pos_touches(position,portee,self.propagations[self.rempli],self.directions[self.rempli],"alliés",self.agissant)
-        for position in positions_touchees:
-            self.agissant.controleur.case_from_position(position).effets.append(Attaque_case(self.agissant,degats,element,self.distance,self.directions[self.rempli]))
+        zone = self.agissant.labyrinthe.a_portee(position,portee,self.deplacement,self.formes[self.rempli],self.passage,self.directions[self.rempli])
+        for position in zone:
+            self.agissant.labyrinthe.get_case(position).effets.add(Attaque_case(self.agissant,degats,element,self.distance,self.directions[self.rempli]))
 
 # Imports utilisés dans le code
 from ..Effet.Attaque.Attaque import Attaque_case
+from ..Labyrinthe.Deplacement import Deplacement
+from ..Labyrinthe.Forme import Forme
+from ..Labyrinthe.Passage import Passage

@@ -84,7 +84,6 @@ class Pavage_vertical(Pavage):
         return super().set_contenu(contenu, repartition)
 
     def set_tailles(self,tailles):
-        # print("Pavage_vertical.set_tailles")
         libre = tailles[1] - sum(self.repartition[i] if self.repartition[i]>0 else self.contenu[i].get_tailles(tailles)[1] if not(self.repartition[i]) else 0 for i in range(len(self.repartition)))
         if libre < 0:
             if tailles == (0,0):

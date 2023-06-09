@@ -20,13 +20,15 @@ class Maladie(On_post_decision,On_tick):
         self.immunite = 0
 
     def action(self,malade:Agissant):
-        print("À surdéfinir !")
+        raise NotImplementedError
 
     def contagion(self,malade:Agissant): #Méthode propre aux maladies
-        voisins = malade.controleur.get_touches_neutre(NoOne(), malade.position,self.distance)
-        for voisin in voisins :
-            if random.random() < self.contagiosite and (type(self) != type(effet) for effet in voisin.effets): #On ne tombe pas deux fois malade de la même maladie
-                voisin.effets.append(type(self)(self.contagiosite,self.distance,self.persistence,self.virulence)) #Nid à problèmes très potentiel !
+        zone = malade.labyrinthe.a_portee(malade.position,self.distance,Deplacement.SPATIAL,Forme.CERCLE,Passage(False,False,False,True,False))
+        for position in zone :
+            agissant = malade.labyrinthe.get_case(position).agissant
+            if agissant != None:
+                if random.random() < self.contagiosite and (type(self) != type(effet) for effet in agissant.effets): #On ne tombe pas deux fois malade de la même maladie
+                    agissant.effets.append(type(self)(self.contagiosite,self.distance,self.persistence,self.virulence)) #Nid à problèmes très potentiel !
 
     def execute(self,malade:Agissant):
         if self.phase == "démarrage" :
@@ -39,3 +41,6 @@ class Maladie(On_post_decision,On_tick):
 # Imports utilisés dans le code
 import random
 from ....Entitee.Agissant.Agissant import NoOne
+from ....Labyrinthe.Deplacement import Deplacement
+from ....Labyrinthe.Forme import Forme
+from ....Labyrinthe.Passage import Passage

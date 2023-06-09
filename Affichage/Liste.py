@@ -201,8 +201,6 @@ class Liste_horizontale(Liste):
             self.decalage += decalage
 
     def get_tailles(self,tailles):
-        # print("<get l h>")
-        # print(tailles)
         return [tailles[0],max(contenu.get_tailles(tailles)[1] for contenu in self.contenu)]#[min(tailles[0],sum(self.repartition[i] if self.repartition[i] else self.contenu[i].get_tailles(tailles)[0] for i in range(len(self.repartition)))),max(contenu.get_tailles(tailles)[1] for contenu in self.contenu)]
 
     def scroll(self,position,x,y):
@@ -282,7 +280,7 @@ class Liste_menu(Wrapper_noeud):
         longueur_ligne=5
         for i in range(len(self.contenu)):
             if self.contenu[i].get_tailles(self.tailles)[0] + 10 >tailles[0]:
-                print(f"Je n'ai même pas la place d'afficher {self.contenu[i]} !")
+                warn(f"Je n'ai même pas la place d'afficher {self.contenu[i]} !")
                 break
             elif longueur_ligne + self.contenu[i].get_tailles(self.tailles)[0] + 5 > tailles[0]:
                 liste = Liste_horizontale()

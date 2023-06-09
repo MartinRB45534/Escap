@@ -26,10 +26,14 @@ class Magie_attaque_distance(Cible_case,Magies_offensives):
         if self.cible is None:
             self.interrompt()
         elif self.effets == []:
-            for case in self.agissant.controleur.get_pos_touches(self.cible,self.portee,responsable=self.agissant):
+            for position in self.agissant.labyrinthe.a_portee(self.cible,self.portee,Deplacement.MAGIQUE,Forme.CERCLE,Passage(True,True,True,False,True)):
                 effet = Attaque_case_delayee(self.agissant,self.degats,self.element,"distance")
-                self.agissant.controleur.case_from_position(case).effets.append(effet)
+                self.agissant.labyrinthe.get_case(position).effets.add(effet)
                 self.effets.append(effet)
         else:
             for effet in self.effets:
                 effet.phase = "en cours"
+
+from ....Labyrinthe.Deplacement import Deplacement
+from ....Labyrinthe.Forme import Forme
+from ....Labyrinthe.Passage import Passage

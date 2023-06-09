@@ -66,7 +66,7 @@ class Blocage(Action_skill):
 
     def action(self):
         self.bouclier.taux_degats = self.taux
-        self.agissant.controleur.case_from_position(self.agissant.position).effets.append(Protection_bouclier(1,self.bouclier,[dir for dir in crt.Direction]))
+        self.agissant.labyrinthe.get_case(self.agissant.position).effets.append(Protection_bouclier(1,self.bouclier,[dir for dir in crt.Direction]))
 
 class Blocage_zone(Blocage):
     """
@@ -82,7 +82,7 @@ class Blocage_zone(Blocage):
         position = self.agissant.position
         positions_touchees = self.agissant.controleur.get_pos_touches(position,self.portee,self.propagation,self.direction)
         for pos in positions_touchees:
-            self.agissant.controleur.case_from_position(pos).effets.append(Protection_bouclier(1,self.bouclier,[dir for dir in crt.Direction]))
+            self.agissant.labyrinthe.get_case(pos).effets.append(Protection_bouclier(1,self.bouclier,[dir for dir in crt.Direction]))
 
 class Cree_item(Action_skill):
     """

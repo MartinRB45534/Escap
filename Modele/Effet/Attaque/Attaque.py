@@ -50,9 +50,7 @@ class Attaque_case(One_shot):
         elif self.element == Element.OMBRE:
             return SKIN_ATTAQUE_OMBRE
         else:
-            print("Euh, quel est cet élément ?")
-            print(self.element)
-            return SKIN_VIDE
+            raise ValueError(f"L'élément {self.element} n'a pas de skin associé !")
 
 class Attaque_case_delayee(Attaque_case,Delaye):
     def __init__(self,responsable:Agissant,degats:float,element:Element,distance:str="distance",direction:Optional[crt.Direction] = None,autre:Optional[str]=None,taux_autre:Optional[float]=None):

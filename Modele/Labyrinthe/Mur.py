@@ -1,10 +1,12 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Type, Callable
 import Carte as crt
+from Modele.Labyrinthe.Passage import Passage
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ..Entitee.Entitee import Entitee
+    from .Passage import Passage
 
 class Mur(crt.Mur):
     def __init__(self,niveau:int):
@@ -18,6 +20,9 @@ class Mur(crt.Mur):
         if not self.ferme :
             return True
         return False
+    
+    def passage(self,passage:Passage):
+        raise NotImplementedError("La méthode passage n'est pas implémentée pour cette classe")
 
 class Mur_impassable(Mur):
     def __init__(self,niveau:int):
@@ -28,6 +33,9 @@ class Mur_impassable(Mur):
         raise Exception("Impossible de casser un mur impassable")
 
     def peut_passer(self,entitee:Entitee):
+        return False
+    
+    def passage(self,passage:Passage):
         return False
 
 class Mur_plein(Mur):
@@ -58,6 +66,9 @@ class Mur_plein(Mur):
                 return passage
             else :
                 return False
+    
+    def passage(self,passage:Passage):
+        return passage.mur or not self.ferme
 
 class Porte(Mur_plein):
     def __init__(self,niveau:int,code:str):
@@ -81,6 +92,9 @@ class Porte(Mur_plein):
         if self.code in agissant.get_clees():
             self.ouvert = False
 
+    def passage(self, passage: Passage):
+        return passage.mur or passage.porte or not self.ferme or self.code in passage.codes
+
 class Mur_ouvert(Mur):
     def __init__(self,niveau:int):
         super().__init__(niveau)
@@ -94,6 +108,9 @@ class Mur_ouvert(Mur):
 
     def peut_passer(self,entitee:Entitee):
         return True
+    
+    def passage(self,passage:Passage):
+        return True
 
 class Barriere(Mur_ouvert):
     def __init__(self,niveau:int,condition:Callable[[Entitee],bool]):
@@ -103,9 +120,15 @@ class Barriere(Mur_ouvert):
     def peut_passer(self,entitee:Entitee):
         return self.condition(entitee) # Si la condition est remplie, on peut passer
     
+    def passage(self,passage:Passage):
+        return passage.barriere
+    
 class Teleporteur(Mur_ouvert): # La seule différence avec un mur ouvert est que les téléporteurs sont affichés différemment
     def __init__(self,niveau:int):
         super().__init__(niveau)
+
+    def passage(self,passage:Passage):
+        return passage.teleporteur
 
 # Quelques murs pas symétriques
 
@@ -162,6 +185,9 @@ class Escalier(Mur_asymétrique, Mur_ouvert):
         else :
             self.autre_mur = autre_mur(niveau,self,mur,not(haut))
         self.haut = haut
+
+    def passage(self, passage: Passage):
+        return passage.escalier
 
 # Imports utilisés dans le code
 from ..Entitee.Entitee import Fantome

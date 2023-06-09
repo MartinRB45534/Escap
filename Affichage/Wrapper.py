@@ -1,6 +1,8 @@
 from __future__ import annotations
 from typing import List, Optional, Tuple, TYPE_CHECKING
+from warnings import warn
 import pygame
+
 if TYPE_CHECKING:
     from Placeholder import Placeheldholder
 
@@ -34,7 +36,7 @@ class Wrapper(Conteneur):
 
     def get_tailles(self,tailles:Tuple[int,int]):
         if self.contenu is None:
-            print(f"{self} n'a pas de contenu !")
+            warn(f"{self} n'a pas de contenu !")
             return (0,0)
         return self.contenu.get_tailles(tailles)
 

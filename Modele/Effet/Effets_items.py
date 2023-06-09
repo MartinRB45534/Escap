@@ -26,16 +26,16 @@ class En_sursis(One_shot,On_fin_tour):
 
 class On_hit(Effet):
     """La classe des effets qui se déclenchent quand un projectile heurte un agissant ou un mur."""
-    def __init__(self,portee:float,degats:float,element:Element):
+    def __init__(self,portee:float,degats:float,element:Element=Element.TERRE):
         self.affiche = False
         self.portee = portee
         self.degats = degats
         self.element = element
 
     def action(self,item:Item):
-        positions_touches = controleur.get_pos_touches(item.position,self.portee)
-        for position_touche in positions_touches:
-            controleur.case_from_position(position_touche).effets.append(Attaque_case(item.lanceur or NoOne(),self.degats,self.element,"distance"))
+        zone = item.labyrinthe.a_portee(item.position,self.portee,Deplacement.SPATIAL,Forme.CERCLE,Passage(False,False,False,True,False))
+        for position in zone.nodes:
+            item.labyrinthe.get_case(position).effets.add(Attaque_case(item.lanceur or NoOne(),self.degats,self.element,"distance"))
 
     def execute(self,item:Item):
         self.action(item)
@@ -44,3 +44,6 @@ class On_hit(Effet):
 from ..Effet.Attaque.Attaque import Attaque_case
 from ..Entitee.Item.Projectile.Projectiles import Fragile,Evanescent
 from ..Entitee.Agissant.Agissant import NoOne
+from ..Labyrinthe.Deplacement import Deplacement
+from ..Labyrinthe.Passage import Passage
+from ..Labyrinthe.Forme import Forme

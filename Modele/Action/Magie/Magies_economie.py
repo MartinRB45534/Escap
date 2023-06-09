@@ -36,7 +36,7 @@ class Magie_explosion_de_mana(Magie_cout,Magie_attaque_corp_a_corp):
     """La magie qui crée une explosion de mana."""
     nom = "magie explosion de mana"
     def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,latence:float,taux_degats:float,portee:float,element:Element,niveau:int):
-        Magie_attaque_corp_a_corp.__init__(self,skill,agissant,gain_xp,0,portee,0,element,"C__S___",latence,niveau)
+        Magie_attaque_corp_a_corp.__init__(self,skill,agissant,gain_xp,0,portee,0,element,Deplacement.MAGIQUE,Forme.CERCLE,Passage(False, True, True, False, True),latence,niveau)
         self.taux_degats = taux_degats
 
     def set_cout(self,cout:float):
@@ -45,3 +45,6 @@ class Magie_explosion_de_mana(Magie_cout,Magie_attaque_corp_a_corp):
 
 # Imports utilisés dans le code
 from ...Effet.Effets_divers import Reserve_mana,Investissement_mana
+from ...Labyrinthe.Deplacement import Deplacement
+from ...Labyrinthe.Forme import Forme
+from ...Labyrinthe.Passage import Passage

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Set, Optional
+from typing import TYPE_CHECKING, Set, Optional, Iterator
 import networkx as nx
 
 # Imports utilisés uniquement dans les annotations
@@ -26,6 +26,9 @@ class Extrait(nx.MultiDiGraph):
         if isinstance(item,Position):
             return item in self.nodes and item not in self.exterieur and item is not POSITION_ABSENTE
         return super().__contains__(item)
+    
+    def __iter__(self) -> Iterator[Position]:
+        return iter(self.nodes - self.exterieur)
     
     def get_case(self, position:Position) -> Case:
         return self.position_case[position]

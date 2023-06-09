@@ -16,7 +16,7 @@ class Effet :
 
     def action(self,*args):
         """La fonction qui exécute l'action de l'effet. En général, renvoie des valeurs que le controleur traitera."""
-        print("a surdéfinir")
+        raise NotImplementedError
 
     def execute(self,*args):
         """La fonction qui est appelée par le controleur. Détermine, d'après les informations transmises par le controleur, si l'action doit être effectuée ou pas. Vérifie si l'effet doit encore exister ou non."""
@@ -47,10 +47,6 @@ class On_debut_tour(On_tick):
 
 class On_post_decision(On_tick):
     """La classe des effets appelés après la phase de décision."""
-    pass
-
-class On_action(On_tick):
-    """La classe des effets appelés après un action."""
     pass
 
 class On_post_action(On_tick):

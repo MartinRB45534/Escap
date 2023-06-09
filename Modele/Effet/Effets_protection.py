@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, List
+from warnings import warn
 import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
@@ -39,7 +40,7 @@ class Protection_bouclier(Time_limited,On_attack):
 
     def action(self,attaque):
         if attaque.direction is None:
-            print("ATTENTION : attaque sans direction ! Je n'intercepte pas.")
+            warn("L'attaque n'a pas de direction, elle ne peut donc pas être interceptée par le bouclier.")
         elif attaque.oppose() in self.directions:
             self.bouclier.intercepte(attaque)
 

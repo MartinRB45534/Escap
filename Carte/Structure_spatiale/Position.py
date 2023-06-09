@@ -1,5 +1,6 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
+from warnings import warn
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
@@ -13,37 +14,37 @@ class Position:
         self.x=x
         self.y=y
 
-    def __add__(self,other):
+    def __add__(self,other:Any):
         if isinstance(other,Decalage):
             return New_pos(self.etage,self.x+other.x,self.y+other.y)
         return NotImplemented
 
-    def __radd__(self,other):
+    def __radd__(self,other:Any):
         if isinstance(other,Decalage):
             return New_pos(self.etage,other.x+self.x,other.y+self.y)
         return NotImplemented
 
-    def __sub__(self,other):
+    def __sub__(self,other:Any):
         if isinstance(other,Position):
             if other in self:
                 return Decalage(self.x-other.x,self.y-other.y)
             else:
-                print(f"On ne peut pas soustraire {other} à {self} car les étages diffèrent.")
+                warn(f"On ne peut pas soustraire {other} à {self} car les étages diffèrent.")
                 return NotImplemented
         elif isinstance(other,Decalage):
             return New_pos(self.etage,self.x-other.x,self.y-other.y)
         return NotImplemented
 
-    def __rsub__(self,other):
+    def __rsub__(self,other:Any):
         if isinstance(other,Position): #Ne devrait pas pouvoir arriver
             if other in self:
                 return Decalage(other.x-self.x,other.y-self.y)
             else:
-                print(f"On ne peut pas soustraire {self} à {other} car les étages diffèrent.")
+                warn(f"On ne peut pas soustraire {self} à {other} car les étages diffèrent.")
                 return NotImplemented
         return NotImplemented
 
-    def __eq__(self,other):
+    def __eq__(self,other:Any):
         if isinstance(other,Position):
             return self.etage == other.etage and self.x == other.x and self.y == other.y
         return False
@@ -52,7 +53,7 @@ class Position:
         return hash((self.etage, self.x, self.y))
 
 
-    def __contains__(self,item): #Ce n'est pas exactement l'usage normal de in, mais en l'occurence pos1 in pos2 est vrai si les deux positions sont au même étage
+    def __contains__(self,item:Any): #Ce n'est pas exactement l'usage normal de in, mais en l'occurence pos1 in pos2 est vrai si les deux positions sont au même étage
         return isinstance(item,Position) and item in self.etage
 
     def __str__(self):

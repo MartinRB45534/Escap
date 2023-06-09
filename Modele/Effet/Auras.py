@@ -183,10 +183,10 @@ class Aura_terre(One_shot,On_debut_tour):
         self.affiche = False
 
     def action(self,porteur:Agissant):
-        cases = porteur.controleur.get_cases_touches(porteur.position,self.portee)
+        zone = porteur.labyrinthe.a_portee(porteur.position,self.portee,Deplacement.SPATIAL,Forme.CERCLE,Passage(True, True, True, True, True))
         priorite = porteur.priorite + self.priorite
-        for case in cases:
-            case.ajoute_aura(self.effet(porteur,priorite))
+        for position in zone:
+            porteur.labyrinthe.get_case(position).ajoute_aura(self.effet(porteur,priorite))
 
 class Aura_feu(One_shot,On_debut_tour):
     """Le centre de l'aura de feu d'un agissant. Attaché à l'agissant, placera les effets voulus sur les cases voisines."""
@@ -201,10 +201,10 @@ class Aura_feu(One_shot,On_debut_tour):
         self.affiche = False
 
     def action(self,porteur:Agissant):
-        cases = porteur.controleur.get_cases_touches(porteur.position,self.portee)
+        zone = porteur.labyrinthe.a_portee(porteur.position,self.portee,Deplacement.SPATIAL,Forme.CERCLE,Passage(True, True, True, True, True))
         priorite = porteur.priorite + self.priorite
-        for case in cases:
-            case.ajoute_aura(self.effet(porteur,priorite,self.duree))
+        for position in zone:
+            porteur.labyrinthe.get_case(position).ajoute_aura(self.effet(porteur,priorite,self.duree))
 
 class Aura_glace(One_shot,On_debut_tour):
     """Le centre de l'aura de glace d'un agissant. Attaché à l'agissant, placera les effets voulus sur les cases voisines."""
@@ -219,10 +219,10 @@ class Aura_glace(One_shot,On_debut_tour):
         self.affiche = False
 
     def action(self,porteur:Agissant):
-        cases = porteur.controleur.get_cases_touches(porteur.position,self.portee)
+        zone = porteur.labyrinthe.a_portee(porteur.position,self.portee,Deplacement.SPATIAL,Forme.CERCLE,Passage(True, True, True, True, True))
         priorite = porteur.priorite + self.priorite
-        for case in cases:
-            case.ajoute_aura(self.effet(porteur,priorite,self.ralentissement))
+        for position in zone:
+            porteur.labyrinthe.get_case(position).ajoute_aura(self.effet(porteur,priorite,self.ralentissement))
 
 class Aura_ombre(One_shot,On_debut_tour):
     """Le centre de l'aura d'ombre d'un agissant. Attaché à l'agissant, placera les effets voulus sur les cases voisines."""
@@ -237,11 +237,14 @@ class Aura_ombre(One_shot,On_debut_tour):
         self.affiche = False
 
     def action(self,porteur:Agissant):
-        cases = porteur.controleur.get_cases_touches(porteur.position,self.portee)
+        zone = porteur.labyrinthe.a_portee(porteur.position,self.portee,Deplacement.SPATIAL,Forme.CERCLE,Passage(True, True, True, True, True))
         priorite = porteur.priorite + self.priorite
-        for case in cases:
-            case.ajoute_aura(self.effet(porteur,priorite,self.gain_opacite))
+        for position in zone:
+            porteur.labyrinthe.get_case(position).ajoute_aura(self.effet(porteur,priorite,self.gain_opacite))
 
 # Imports utilisés dans le code
 from ..Entitee.Agissant.Agissant import NoOne
 from ..Entitee.Item.Item import Item
+from ..Labyrinthe.Deplacement import Deplacement
+from ..Labyrinthe.Forme import Forme
+from ..Labyrinthe.Passage import Passage

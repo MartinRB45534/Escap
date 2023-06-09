@@ -16,7 +16,7 @@ from ..Entitee import Non_superposable, Mobile
 
 class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cadavre n'agit pas.
     """La classe des entitées animées. Capable de décision, de différentes actions, etc. Les principales caractéristiques sont l'ID, les stats, et la classe principale."""
-    def __init__(self,identite:str,labyrinthe:Labyrinthe,niveau:int,pv_max:float,pv:float,regen_pv_max:float,regen_pv_min:float,restauration_regen_pv:float,pm_max:float,regen_pm:float,force:float,priorite:float,vitesse:float,affinites:Dict[Element,float],especes:List[str],oubli:float,resolution:int,forme:str,forme_tete:str,nb_doigts:int,magies:List[Type[Magie]],items:List[Type[Item]],position:crt.Position,ID: Optional[int]=None):
+    def __init__(self,identite:str,labyrinthe:Labyrinthe,cond_evo:List,skills_intrasecs:Set[Skill_intrasec],skills:Set[Skill_extra],niveau:int,pv_max:float,pv:float,regen_pv_max:float,regen_pv_min:float,restauration_regen_pv:float,pm_max:float,regen_pm:float,force:float,priorite:float,vitesse:float,affinites:Dict[Element,float],especes:List[str],oubli:float,resolution:int,forme:str,forme_tete:str,nb_doigts:int,magies:List[Type[Magie]],items:List[Type[Item]],position:crt.Position,ID: Optional[int]=None):
         Entitee.__init__(self,position,ID)
         self.identite = identite
         self.labyrinthe = labyrinthe
@@ -42,7 +42,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         self.taux_stats:Dict[str,float] = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer aux statistiques. Correspond aux effets passager sur les statistiques. (Inclure les regen dans les stats ?)
         self.immunites:List[Element] = [] #La liste des éléments auxquels l'entitée est immunisé (très rare)
         self.especes:List[str] = especes
-        self.classe_principale = Classe_principale([])
+        self.classe_principale = Classe_principale(cond_evo,skills_intrasecs,skills,niveau)
         self.niveau = self.classe_principale.niveau
         self.oubli = oubli
         self.resolution = resolution
@@ -52,7 +52,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         self.etat = "vivant"
 
         #vue de l'agissant
-        self.vue = #Representation_vue(self.position.lab, [], Decalage(0,0))
+        self.vue = labyrinthe.extrait({self.position})
 
         self.offenses:List[Tuple[Agissant,float,float]]=[]
         self.esprit:Esprit=NOBODY
@@ -72,11 +72,6 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         if magies:
             skill:Optional[Skills_magiques] = trouve_skill(self.classe_principale,Skills_magiques)
             if skill is None:
-                print(self)
-                print(self.classe_principale)
-                for skil in self.classe_principale.skills:
-                    print(skil.niveau)
-                    print(skil)
                 raise ValueError("Pas de skill magique pour l'entitée")
             for magie in magies:
                 skill.ajoute(magie)
@@ -334,9 +329,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
     def get_portee_vue(self):
         skill = trouve_skill(self.classe_principale,Skill_vision)
         if skill is None:
-            print("Oups, je n'ai pas de skill vision ! Pourquoi ?")
-            print(self)
-            portee = 0
+            raise ValueError("Un agissant n'a pas de skill de vision !")
         else :
             portee = skill.utilise()
             portee *= self.get_aff(Element.OMBRE) #Puisque c'est le manque de lumière qui réduit le champ de vision !
@@ -394,13 +387,13 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
                 if effet.phase == "affichage": #L'affichage se fait en fin de tour
                     self.effets.remove(effet)
         else:
-            print("Oups, je ne suis pas vivant, je ne peux pas débuter mon tour !")
+            raise ValueError("Oups, je ne suis pas vivant, je ne peux pas débuter mon tour !")
 
     def pseudo_debut_tour(self): #Not sure why I wanted that to exist, honestly...
         if self.etat == "vivant":
             self.inventaire.pseudo_debut_tour()
         else:
-            print("Oups, je ne suis pas vivant, je ne peux pas pseudo_débuter mon tour !")
+            raise ValueError("Oups, je ne suis pas vivant, je ne peux pas débuter mon tour !")
 
     # Les esprits gambergent, tergiversent et hésitent.
 
@@ -415,9 +408,6 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         if self.action is not None:
             if self.action.execute():
                 self.action = None
-        for effet in self.effets:
-            if isinstance(effet,On_action):
-                effet.execute(self) #Principalement les lancements de magies
 
     def post_action(self):
         #Le controleur nous a encore forcé à agir ! Quel rabat-joie, avec ses cout de mana, ses latences, ses "Vous ne pouvez pas utiliser un skill que vous n'avez pas." !
@@ -477,7 +467,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
                     self.effets.remove(effet)
             #Il est temps de voir si on peut encore recoller les morceaux.
         else:
-            print("Oups, je ne suis pas vivant, je ne peux pas finir mon tour !")
+            raise ValueError("Oups, je ne suis pas vivant, je ne peux pas finir mon tour !")
         if self.etat == "vivant":
             if self.pv <= 0 :
                 immortel:Optional[Skill_immortel] = trouve_skill(self.classe_principale,Skill_immortel)
@@ -505,13 +495,9 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
                 if self.classe_principale.evolutif:
                     self.level_up()
                 else:
-                    print("Quelqu'un d'autre que le joueur a une incohérence entre son niveau et le niveau de sa classe principale !")
-                    print(self)
-                    print(self.niveau)
-                    print(self.niveau)
-                    print(self.classe_principale.niveau)
+                    raise ValueError(f"Le niveau de {self} est {self.niveau} alors que celui de sa classe est {self.classe_principale.niveau} !")
         else:
-            print("Hum, apparemment ce n'est pas si inutile...")
+            raise ValueError("Oups, je ne suis pas vivant, je ne peux pas finir mon tour !")
 
     def level_up(self):
         pass

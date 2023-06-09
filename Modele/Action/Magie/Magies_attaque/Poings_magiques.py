@@ -24,8 +24,11 @@ class Magie_attaque_contact(Magie_dirigee,Magies_offensives):
         if self.direction is None:
             self.interrompt()
         else:
-            for case in self.agissant.controleur.get_pos_touches(self.agissant.position,self.portee,"Sd_T___",self.direction,responsable=self.agissant):
-                self.agissant.controleur.case_from_position(case).effets.append(Attaque_case(self.agissant,self.degats,self.element,"contact",self.direction))
+            for position in self.agissant.labyrinthe.a_portee(self.agissant.position,self.portee,Deplacement.SPATIAL,Forme.DEMI_CERCLE,Passage(False,False,False,False,False)):
+                self.agissant.labyrinthe.get_case(position).effets.add(Attaque_case(self.agissant,self.degats,self.element,"contact",self.direction))
 
 # Imports utilisés dans le code
 from ....Effet.Attaque.Attaque import Attaque_case
+from ....Labyrinthe.Deplacement import Deplacement
+from ....Labyrinthe.Forme import Forme
+from ....Labyrinthe.Passage import Passage

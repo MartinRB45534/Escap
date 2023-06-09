@@ -50,9 +50,9 @@ class Magie_soin_de_zone(Cible_case):
         if self.cible is None:
             self.interrompt()
         else:
-            poss = lanceur.controleur.get_pos_touches(self.cible,self.portee)
+            poss = lanceur.labyrinthe.a_portee(self.cible,self.portee,Deplacement.SPATIAL,Forme.CERCLE,Passage(True, False, False, True, True))
             for pos in poss:
-                lanceur.controleur.case_from_position(pos).effets.append(Soin_case(self.gain_pv,lanceur))
+                lanceur.labyrinthe.get_case(pos).effets.add(Soin_case(self.gain_pv,lanceur))
 
 class Magie_auto_soin(Magie):
     """La magie qui invoque un effet de soin sur son lanceur."""
@@ -71,7 +71,7 @@ class Magie_resurection(Magie, Non_repetable):
     def action(self,lanceur:Agissant):
         cadavre = lanceur.inventaire.get_item_courant() # TODO : la notion d'item courant n'existe plus
         if isinstance(cadavre,Cadavre):
-            lanceur.inventaire.drop(lanceur.position,cadavre)
+            lanceur.inventaire.drop(lanceur.labyrinthe.get_case(lanceur.position),cadavre)
             cadavre.effets.append(Resurection())
 
 class Magie_reanimation_de_zone(Cible_case,Portee_limitee):
@@ -89,13 +89,18 @@ class Magie_reanimation_de_zone(Cible_case,Portee_limitee):
         if self.cible is None:
             self.interrompt()
         else:
-            cadavres = self.agissant.controleur.get_cadavres_touches(self.cible,self.portee)
-            for cadavre in cadavres:
-                if cadavre.get_priorite()+self.superiorite < self.agissant.get_priorite():
-                    cadavre.effets.append(Reanimation(self.taux_pv,self.agissant.esprit))
+            zone = self.agissant.labyrinthe.a_portee(self.cible,self.portee,Deplacement.SPATIAL,Forme.CERCLE,Passage(True, False, False, True, True))
+            for position in zone:
+                for item in self.agissant.labyrinthe.get_case(position).items:
+                    if isinstance(item,Cadavre):
+                        if item.get_priorite()+self.superiorite < self.agissant.get_priorite():
+                            item.effets.append(Reanimation(self.taux_pv,self.agissant.esprit))
 
 # Imports utilisés dans le code
 from ...Entitee.Item.Cadavre import Cadavre
 from ...Effet.Sante.Reanimation import Reanimation
 from ...Effet.Sante.Resurection import Resurection
 from ...Effet.Sante.Soins import Soin, Soin_case
+from ...Labyrinthe.Deplacement import Deplacement
+from ...Labyrinthe.Forme import Forme
+from ...Labyrinthe.Passage import Passage

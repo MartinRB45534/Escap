@@ -153,7 +153,7 @@ class Enchante_cases(Enchante, Cible_cases):
             self.interrompt()
         else:
             for case in self.cible:
-                self.agissant.controleur.case_from_position(case).effets.append(self.enchantement)
+                self.agissant.labyrinthe.get_case(case).effets.add(self.enchantement)
 
 class Enchante_agissant(Enchante, Cible_agissant):
     """La classe des magies qui enchantent un agissant."""

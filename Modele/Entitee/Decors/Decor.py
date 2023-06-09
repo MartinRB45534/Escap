@@ -25,7 +25,7 @@ class Ustensile(Decors_interactif):
         return self.recettes
 
     def cuisine(self,recette:dict):
-        return eval(recette["produit"])(crt.POSITION_ABSENTE) # TODO : purger le code des eval !!!
+        return recette["produit"](crt.POSITION_ABSENTE)
     
 # Imports utilisés dans le code
 from ..Entitee import Entitee

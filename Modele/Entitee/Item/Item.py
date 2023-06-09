@@ -88,7 +88,7 @@ class Item(Mobile):
         if self.action is not None:
             if self.action.execute():
                 self.action = None # Ne devrait jamais arriver
-                print("L'item a fini son vol !?!?")
+                raise ValueError("L'item a fini son vol ?! C'est pas normal !")
         if self.hauteur <= 0:
             self.atterit()
 
