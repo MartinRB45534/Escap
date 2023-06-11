@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Type, Callable
+import Affichage as af
 import Carte as crt
-from Modele.Labyrinthe.Passage import Passage
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
@@ -178,13 +178,13 @@ class Porte_a_loquet(Mur_asymétrique, Porte):
 
 class Escalier(Mur_asymétrique, Mur_ouvert):
     """Un téléporteur avec une notion graphique de haut et de bas"""
-    def __init__(self, niveau: int, autre_mur: Escalier | Type[Escalier], mur: Mur_ouvert, haut: bool = False):
+    def __init__(self, niveau: int, autre_mur: Escalier | Type[Escalier], mur: Mur_ouvert, direction: af.Direction_aff = af.Direction_aff.NEXT):
         self.mur = mur
-        if isinstance(autre_mur,Mur_asymétrique):
+        if isinstance(autre_mur,Escalier):
             self.autre_mur = autre_mur
         else :
-            self.autre_mur = autre_mur(niveau,self,mur,not(haut))
-        self.haut = haut
+            self.autre_mur = autre_mur(niveau,self,mur,direction.oppose)
+        self.direction = direction
 
     def passage(self, passage: Passage):
         return passage.escalier

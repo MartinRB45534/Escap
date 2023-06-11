@@ -47,7 +47,7 @@ class Position:
     def __eq__(self,other:Any):
         if isinstance(other,Position):
             return self.etage == other.etage and self.x == other.x and self.y == other.y
-        return False
+        return NotImplemented
 
     def __hash__(self):
         return hash((self.etage, self.x, self.y))

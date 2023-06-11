@@ -16,28 +16,25 @@ from ..Systeme.Elements import Element
 
 class Case(crt.Case):
     def __init__(self,position:crt.Position, opacite:float = 1, niveau = 1, element = Element.TERRE):
-        # Par défaut, pas de murs.
         self.position = position
         self.opacite = opacite
         self.opacite_bonus:float = 0
         self.clarte:float = 0
         self.niveau = niveau
-        self.element = element
-        self.code = 0
         self.repoussante = False
         self.agissant:Optional[Agissant] = None #On peut avoir un agissant sur la case, qui peut être un monstre, un joueur, etc.
         self.decors:Optional[Decors] = None #On peut avoir un décors (mais pas les deux ? à voir)
         self.items:Set[Item] = set() #On peut avoir des items sur la case
         self.effets:Set[Effet] = set() #Les cases ont aussi des effets ! Les auras, par exemple.
         self.auras:Set[Aura] = set() #Les auras sont des effets qui s'appliquent à la case, et qui peuvent être de plusieurs types.
-        if self.element == Element.TERRE:
-            self.auras.add(Terre_permanente(self.niveau*2))
-        elif self.element == Element.FEU:
-            self.auras.add(Feu_permanent(self.niveau,self.niveau*5))
-        elif self.element == Element.GLACE:
-            self.auras.add(Glace_permanente(self.niveau,self.niveau/10))
-        elif self.element == Element.OMBRE:
-            self.auras.add(Ombre_permanente(self.niveau,self.niveau/2))
+        if element == Element.TERRE:
+            self.aura_elementale = Terre_permanente(self.niveau*2) # TODO : Retravailler tous ces bidouillages de niveaux...
+        elif element == Element.FEU:
+            self.aura_elementale = Feu_permanent(self.niveau,self.niveau*5)
+        elif element == Element.GLACE:
+            self.aura_elementale = Glace_permanente(self.niveau,self.niveau/10)
+        elif element == Element.OMBRE:
+            self.aura_elementale = Ombre_permanente(self.niveau,self.niveau/2)
 
     #Découvrons le déroulé d'un tour, avec case-chan :
 
@@ -53,44 +50,17 @@ class Case(crt.Case):
                 
 
     def pseudo_debut_tour(self):
-        self.code = 0
-        priorite_max = 0
-        IDmax = 0
-        auras:Dict[int,List[Aura_elementale]] = {}
-
-        for aura in self.auras:
-            if isinstance(aura,Aura_elementale):
-                ID = aura.responsable
-                if ID in auras : # On a déjà une aura de ce type
-                    auras[ID].append(aura)
-                else:
-                    auras[ID]=[aura]
-                prio = aura.priorite
-                if prio > priorite_max : # On a un nouveau gagnant !
-                    IDmax = ID
-                    priorite_max = prio
-
-        for aura in auras[IDmax]:
-            if isinstance(aura,(Terre,Terre_permanente)):
-                self.code += 1
-            elif isinstance(aura,(Feu,Feu_permanent)):
-                self.code += 2
-            elif isinstance(aura,(Glace,Glace_permanente)):
-                self.code += 4
-            elif isinstance(aura,(Ombre,Ombre_permanente)):
-                self.code += 8
+        pass
 
     #Certains agissants particulièrement tapageurs font un concours de celui qui aura la plus grosse aura (comment ça, cette phrase particulièrement compliquée aura juste servi à faire un jeu de mot sur aura ?)
-    def ajoute_aura(self,aura:Aura):
+    def ajoute_aura(self,auras:Set[Aura],auras_elementales:Set[Aura_elementale]):
         """Fonction qui ajoute un effet d'aura. On décidera de ceux qui s'exécutent plus tard."""
-        self.auras.add(aura)
-        if isinstance(aura,Aura_elementale): #On a besoin de savoir quelle aura prévaudra
-            aura.priorite += self.clarte/2 #La clarté vient d'être utilisée pour déterminer la portée de l'aura, et n'est normalement pas encore réinitialisée
-            if isinstance(aura,Feu):
-                resp = aura.responsable
-                for aura_bis in self.effets:
-                    if isinstance(aura_bis,Feu) and aura_bis.responsable == resp :
-                        aura_bis.phase = "terminé"
+        # Les auras non élémentales s'appliquent si personne n'a d'aura élémentale sur la case (même si l'aura de base de la case a plus de priorité)
+        if {aura for aura in self.auras if isinstance(aura, Aura_elementale)} == {self.aura_elementale}:
+            self.auras.update(auras)
+        # Les auras élémentales s'appliquent si la priorité de la plus importante est supérieure à la priorité de l'aura élémentale en place la plus importante
+        if max({aura.priorite for aura in auras_elementales}) > max({aura.priorite for aura in self.auras if isinstance(aura, Aura_elementale)}):
+            self.auras = auras | auras_elementales # On vire aussi les auras non élémentales qui appartiennent à d'autres gens
 
     def arrive(self,entitee:Mobile):
         if isinstance(entitee,Item):
@@ -134,24 +104,9 @@ class Case(crt.Case):
     #Tout le monde a fini de se déplacer.
     def post_action(self):
         self.opacite_bonus = 0 # On reset ça à chaque tour, sinon ça va devenir tout noir
-        self.code = 0
         on_attaques:Set[On_attack] = set()
         attaques:Set[Attaque_case] = set()
-        priorite_max = 0
-        IDmax = 0
-        auras:Dict[int,List[Aura_elementale]] = {}
 
-        for aura in self.auras:
-            if isinstance(aura,Aura_elementale):
-                ID = aura.responsable
-                if ID in auras : # On a déjà une aura de ce type
-                    auras[ID].append(aura)
-                else:
-                    auras[ID]=[aura]
-                prio = aura.priorite
-                if prio > priorite_max : # On a un nouveau gagnant !
-                    IDmax = ID
-                    priorite_max = prio
         for effet in self.effets:
             if isinstance(effet,On_attack):
                 on_attaques.add(effet)
@@ -162,7 +117,7 @@ class Case(crt.Case):
             elif isinstance(effet,On_post_action): #Les auras non-élémentales sont aussi des On_post_action
                 effet.execute(self)
 
-        for aura in auras[IDmax]:
+        for aura in self.auras:
             aura.execute(self)
 
         for attaque in attaques:
@@ -171,9 +126,11 @@ class Case(crt.Case):
             attaque.execute(self)
 
     def fin_tour(self):
-        for effet in self.effets:
+        for effet in self.effets | self.auras:
             if effet.phase == "terminé":
                 self.effets.remove(effet)
+        if {aura for aura in self.auras if isinstance(aura, Aura_elementale)} == set() or max({aura.priorite for aura in self.auras if isinstance(aura, Aura_elementale)}) < self.aura_elementale.priorite: # Les auras de feu durent plusieurs tours, mais peuvent aussi être arrivée juste grâce à l'aide d'une aura de terre
+            self.auras = {self.aura_elementale} # On remet l'aura de base pour le tour suivant
 
     #Le tour se termine gentiment, et on recommence !
 
@@ -183,18 +140,17 @@ class Case(crt.Case):
     # def get_infos(self,clees:Set[str]): #Est-ce que ce serait plus clair sous forme de dictionnaire ? Ou d'objet ?
     #     return Representation_case(self, self.clarte, self.calcule_code(), self.get_cibles_fermes(clees), self.agissant, self.decors, self.items.copy(), self.get_codes_effets(), self.repoussante)
 
-    def calcule_code(self):#La fonction qui calcule le code correpondant à l'état de la case. De base, 0. Modifié d'après les effets subits par la case.
-        return self.code
+    # def calcule_code(self):#La fonction qui calcule le code correpondant à l'état de la case. De base, 0. Modifié d'après les effets subits par la case.
+    #     return self.code
 
-    def get_codes_effets(self) -> List[List[int]]:
-        effets=[]
-        for effet in self.effets:
-            if isinstance(effet,Attaque_case_delayee):
-                effets.append([effet.responsable,effet.delai,effet.degats])
-        return effets
+    # def get_codes_effets(self) -> List[List[int]]:
+    #     effets=[]
+    #     for effet in self.effets:
+    #         if isinstance(effet,Attaque_case_delayee):
+    #             effets.append([effet.responsable,effet.delai,effet.degats])
+    #     return effets
 
 # Imports utilisés dans le code
-from ..Labyrinthe.Vue import Representation_case
 from ..Effet.Auras import Terre_permanente, Feu_permanent, Glace_permanente, Ombre_permanente, Aura_elementale, Terre, Feu, Glace, Ombre
 from ..Effet.Effet import On_debut_tour, Time_limited, On_attack, On_post_action
 from ..Effet.Attaque.Attaque import Attaque_case, Attaque_case_delayee

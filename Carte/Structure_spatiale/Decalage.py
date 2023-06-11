@@ -45,10 +45,9 @@ class Decalage:
             return NotImplemented
 
     def __eq__(self,other):
-        if isinstance(other,Decalage): #Il vaudrait mieux additionner -1*self...
+        if isinstance(other,Decalage):
             return self.x==other.x and self.y==other.y
-        else:
-            return NotImplemented
+        return NotImplemented
 
     def __str__(self):
         return f"Decalage : {self.x}, {self.y}"

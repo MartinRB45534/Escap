@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from ...Entitee.Item.Item import Item
     from ...Labyrinthe.Labyrinthe import Labyrinthe
     from ...Systeme.Elements import Element
+    from .Vue.Vue import Vue
 
 # Imports des classes parentes
 from ..Entitee import Non_superposable, Mobile
@@ -25,10 +26,10 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         self.regen_pv_max = regen_pv_max
         self.regen_pv_min = regen_pv_min
         self.restauration_regen_pv = restauration_regen_pv
-        self.regen_pv:float = self.regen_pv_max
+        self.regen_pv = self.regen_pv_max
         self.taux_regen_pv:Dict[str,float] = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à la régénération des pv. Correspond aux effets passager sur la régénération des pv.
         self.pm_max = pm_max
-        self.pm:float = self.pm_max
+        self.pm = self.pm_max
         self.regen_pm = regen_pm
         self.taux_regen_pm:Dict[str,float] = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à la régénération des pm. Correspond aux effets passager sur la régénération des pm.
         self.force = force
@@ -52,7 +53,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         self.etat = "vivant"
 
         #vue de l'agissant
-        self.vue = labyrinthe.extrait({self.position})
+        self.vue:Vue = voit_vue(labyrinthe.extrait({self.position}))
 
         self.offenses:List[Tuple[Agissant,float,float]]=[]
         self.esprit:Esprit=NOBODY
@@ -515,7 +516,7 @@ class NoOne(Agissant):
 # Imports utilisés dans le code (il y en a beaucoup !!!)
 from ...Action.Attaque import Attaque
 from ...Entitee.Entitee import Entitee
-from ...Labyrinthe.Vue import Representation_vue
+from .Vue.Vue import voit_vue
 from ...Esprit.Esprit import NOBODY
 from ...Entitee.Item.Cadavre import Cadavre
 from ...Entitee.Item.Equippement.Role.Elementaires import Elementaire

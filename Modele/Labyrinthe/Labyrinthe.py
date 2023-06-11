@@ -5,7 +5,6 @@ import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from .Vue import Representation_case
     from .Case import Case
     from .Mur import Mur, Mur_impassable
     from ..Entitee.Entitee import Mobile
@@ -13,6 +12,7 @@ if TYPE_CHECKING:
     from .Deplacement import Deplacement
     from .Forme import Forme
     from .Passage import Passage
+    from .Extrait import Extrait
 
 class Labyrinthe(crt.Labyrinthe):
     def __init__(self):
@@ -68,10 +68,10 @@ class Labyrinthe(crt.Labyrinthe):
                 return voisin
         raise ValueError(f"La position {position} n'a pas de mur dans la direction {direction}")
 
-    def extrait(self, positions:Set[crt.Position]) -> crt.Extrait:
+    def extrait(self, positions:Set[crt.Position]) -> Extrait:
         voisins:Set[crt.Position] = {voisin for position in positions for voisin in self[position] if voisin not in positions}
         subgraph = super().subgraph(positions|voisins)
-        return crt.Extrait(voisins, subgraph)
+        return Extrait(voisins, subgraph)
 
     def veut_passer(self,intrus:Mobile,direction:crt.Direction):
         """Fonction qui tente de faire passer une entitée.
@@ -139,3 +139,4 @@ class Labyrinthe(crt.Labyrinthe):
 
 # Imports utilisés dans le code
 from .Absent import CASE_ABSENTE
+from .Extrait import Extrait

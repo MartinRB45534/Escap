@@ -39,7 +39,7 @@ class Cote_decalage:
     def __eq__(self,other):
         if isinstance(other,Cote_decalage):
             return self.emplacement == other.emplacement and self.direction == other.direction
-        return False
+        return NotImplemented
     
     def __hash__(self):
         return hash((self.emplacement,self.direction))
@@ -51,7 +51,7 @@ class Cote_decalage:
         return f"Coté : {self.emplacement}, {self.direction}"
 
     def oppose(self):
-        return Cote_decalage(self.emplacement+self.direction,self.direction.oppose())
+        return Cote_decalage(self.emplacement+self.direction,self.direction.oppose)
     
 class Cote_position:
     def __init__(self,emplacement: Position,direction:Direction):
@@ -81,7 +81,7 @@ class Cote_position:
     def __eq__(self,other):
         if isinstance(other,Cote_position|Cote_decalage):
             return self.emplacement == other.emplacement and self.direction == other.direction
-        return False
+        return NotImplemented
     
     def __hash__(self):
         return hash((self.emplacement,self.direction))
@@ -93,7 +93,7 @@ class Cote_position:
         return f"Coté : {self.emplacement}, {self.direction}"
 
     def oppose(self):
-        return Cote_position(self.emplacement+self.direction,self.direction.oppose())
+        return Cote_position(self.emplacement+self.direction,self.direction.oppose)
     
 # Imports utilisés dans le code
 from .Decalage import Decalage
