@@ -25,6 +25,9 @@ class Case_vue(crt.Case):
         self.effets = effets
         self.auras = auras
 
+class Case_pas_vue(crt.Case):
+    pass
+
 def voit_case(case:Case) -> Case_vue:
     return Case_vue(
         case.position, 

@@ -12,7 +12,8 @@ if TYPE_CHECKING:
 from ....Systeme.Elements import Element
 
 class Agissant_vu:
-    def __init__(self, identite:str, pv_max:float, pv:float, pm_max:float, pm:float, force:float, priorite:float, vitesse:float, affinites:Dict[Element,float], immunites:List[Element], especes:List[str], classe:Classe_principale, niveau:int, inventaire:Inventaire, dir_regard:crt.Direction):
+    def __init__(self, ID:int, identite:str, pv_max:float, pv:float, pm_max:float, pm:float, force:float, priorite:float, vitesse:float, affinites:Dict[Element,float], immunites:List[Element], especes:List[str], classe:Classe_principale, niveau:int, inventaire:Inventaire, dir_regard:crt.Direction):
+        self.ID = ID
         self.identite = identite
         self.pv_max = pv_max
         self.pv = pv
@@ -31,6 +32,7 @@ class Agissant_vu:
 
 def voit_agissant(agissant:Agissant) -> Agissant_vu:
     return Agissant_vu(
+        agissant.ID,
         agissant.identite,
         agissant.pv_max,
         agissant.pv,

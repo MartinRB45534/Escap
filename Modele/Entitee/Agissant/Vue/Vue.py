@@ -5,7 +5,7 @@ import networkx as nx
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from .Case import Case_vue
+    from .Case import Case_vue, Case_pas_vue
     from .Mur import Mur_vu
 
 # Import de la classe parente
@@ -35,14 +35,17 @@ class Vue(Extrait):
 
 def voit_vue(extrait: Extrait) -> Vue:
     subgraph = nx.MultiDiGraph(extrait)
-    for position in subgraph.nodes:
-        subgraph.nodes[position]['case'] = voit_case(subgraph.nodes[position]['case'])
+    position_case = {position: voit_case(case) for position, case in extrait.position_case.items()}
+    for position in extrait:
+        subgraph.nodes[position]['case'] = position_case[position]
+    for position in extrait.exterieur:
+        subgraph.nodes[position]['case'] = Case_pas_vue(position)
     for u,v, direction in subgraph.edges:
         subgraph[u][v][direction]['mur'] = voit_mur(subgraph[u][v][direction]['mur'])
     return Vue(
         extrait.exterieur,
         subgraph,
-        {position: voit_case(case) for position, case in extrait.position_case.items()}
+        position_case,
     )
 
 from .Case import voit_case

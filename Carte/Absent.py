@@ -8,7 +8,7 @@ from .Case import Case
 class Case_absent(Case):
     """Classe représentant l'étage de la position absente."""
     def __init__(self):
-        super().__init__(POSITION_ABSENTE,0)
+        super().__init__(POSITION_ABSENTE)
 
 from .Structure_spatiale.Absent import POSITION_ABSENTE
 
