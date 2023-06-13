@@ -15,14 +15,15 @@ class Vision_agissant:
         self.labyrinthe = labyrinthe
         self.position:crt.Position|Vision_position = POSITION_INCONNUE
         # Autres infos
-        self.dangerosite:float = 0 # Le risque qu'on prend à s'approcher de cet agissant
-        self.importance:float = 0 # L'importance d'attaquer cet agissant
-        # Une importance élevée malgré une dangerosité faible indique que l'agissant est plutôt un support
-        # Une dangerosité élevée malgré une importance faible indique que l'agissant reçoit beaucoup de soutien (buff etc.)
-
-    def antagonise(self, dangerosite:float, importance:float):
-        self.dangerosite += dangerosite
-        self.importance += importance
+        self.DPS_contact:Optional[float] = None # Dégâts par seconde en contact
+        self.DPS_distance:Optional[float] = None # Dégâts par seconde à distance
+        self.portee:Optional[int] = None # Distance à laquelle il peut attaquer à distance
+        self.resilience:Optional[float] = None # Résilience aux dégâts (comment la calculer ?)
+        self.mobilite:Optional[float] = None # Mobilité (comment la calculer ?)
+        self.degats:Optional[float] = None # Dégâts en propre (en distinguant le boosteur du boosté par exemple)
+        self.defense:Optional[float] = None # Capacite à défendre les autres (comment la calculer ?)
+        self.interference:Optional[float] = None # Capacité à gêner (comment la calculer ?)
+        self.appreciabilite:Optional[float] = None # Critères arbitraires
 
     def voit(self, agissant:Agissant_vu, tour: int):
         for tour_vu in self.agissants:

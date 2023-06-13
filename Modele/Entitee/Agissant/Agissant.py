@@ -50,7 +50,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         self.forme = forme
         self.forme_tete = forme_tete
         self.statut = "attente"
-        self.etat = "vivant"
+        self.etat = Etats_agissants.VIVANT
 
         #vue de l'agissant
         self.vue:Vue = voit_vue(labyrinthe.extrait({self.position}))
@@ -162,13 +162,10 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         if offenseur:
             self.offenses.append((offenseur,gravite,dangerosite))
 
-    def get_offenses(self) -> Tuple[List[Tuple[Agissant,float,float]],str]:
+    def get_offenses(self) -> List[Tuple[Agissant,float,float]]:
         offenses = self.offenses
         self.offenses = []
-        etat = "vivant" #Rajouter des précisions
-        if self.etat != "vivant":
-            etat = "incapacite"
-        return offenses, etat
+        return offenses
 
     def peut_voir(self,direction:crt.Direction):
         return self.labyrinthe.get_mur(self.position,direction).ferme # TODO : revoir ça
@@ -308,7 +305,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         if self.position is None:
             raise ValueError("Un personnage qui n'a pas de position est en train de mourir !")
         self.pv = self.pm = 0
-        self.etat = "mort"
+        self.etat = Etats_agissants.MORT
         self.taux_regen_pv = self.taux_regen_pm = self.taux_force = self.taux_priorite = self.taux_vitesse = self.taux_aff_o = self.taux_aff_f = self.taux_aff_t = self.taux_aff_g = self.taux_stats = {} #/!\ À corriger !
         self.effets = []
         case = self.labyrinthe.get_case(self.position)
@@ -358,7 +355,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
 
     # Découvrons le déroulé d'un tour, avec agissant-san :
     def debut_tour(self):
-        if self.etat == "vivant":
+        if self.etat == Etats_agissants.VIVANT:
             #Un nouveau tour commence, qui s'annonce remplit de bonnes surprises et de nouvelles rencontres ! Pour partir du bon pied, on a quelques trucs à faire :
             #La régénération ! Plein de nouveaux pm et pv à gaspiller ! C'est pas beau la vie ?
             self.pv += self.get_total_regen_pv()
@@ -391,7 +388,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
             raise ValueError("Oups, je ne suis pas vivant, je ne peux pas débuter mon tour !")
 
     def pseudo_debut_tour(self): #Not sure why I wanted that to exist, honestly...
-        if self.etat == "vivant":
+        if self.etat == Etats_agissants.VIVANT:
             self.inventaire.pseudo_debut_tour()
         else:
             raise ValueError("Oups, je ne suis pas vivant, je ne peux pas débuter mon tour !")
@@ -456,7 +453,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
     # Les autres subissent aussi des attaques.
 
     def fin_tour(self):
-        if self.etat == "vivant":
+        if self.etat == Etats_agissants.VIVANT:
             #Quelques effets avant la fin du tour (maladie, soin, tout ça tout ça...)
             for i in range(len(self.effets)-1,-1,-1) :
                 effet = self.effets[i]
@@ -469,7 +466,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
             #Il est temps de voir si on peut encore recoller les morceaux.
         else:
             raise ValueError("Oups, je ne suis pas vivant, je ne peux pas finir mon tour !")
-        if self.etat == "vivant":
+        if self.etat == Etats_agissants.VIVANT:
             if self.pv <= 0 :
                 immortel:Optional[Skill_immortel] = trouve_skill(self.classe_principale,Skill_immortel)
                 if immortel is not None :
@@ -517,6 +514,7 @@ class NoOne(Agissant):
 from ...Action.Attaque import Attaque
 from ...Entitee.Entitee import Entitee
 from .Vue.Vue import voit_vue
+from .Etats import Etats_agissants
 from ...Esprit.Esprit import NOBODY
 from ...Entitee.Item.Cadavre import Cadavre
 from ...Entitee.Item.Equippement.Role.Elementaires import Elementaire

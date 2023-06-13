@@ -123,3 +123,34 @@ Les builds classiques s'inscrivent plus dans un groupe. La plupart des builds or
 Bref.
 
 Pour que le groupe survive, il faut déterminer efficacement les zones de sécurité et de danger (en prenant en compte les éventuels tanks) et éliminer les menaces (chercher un contournement dans les étages où c'est possible).
+
+Donc caractériser les ennemis par :
+ - leur capacité à infliger des dégats ;
+ - la distance à laquelle ils peuvent attaquer ;
+ - l'impact de les occuper/tuer ;
+ - peut-être aussi leur propension à occuper nos propres corps ?
+
+Je peux probablement faire plusieurs types d'esprits qui stockent des informations différentes ? Ou tout le monde stocke tout parce que la façon de calculer la stratégie peut changer selon les corps (retour des stratèges) ?
+
+Je vais faire simple pour l'instant.
+
+Stocker une liste des conséquences observées des actions ? (Par exemple, pas d'identification des supports avec un niveau d'observation normal, car pas d'observation des effets.)
+
+À réfléchir en fonction des stratégies des esprits...
+
+## Stratégies
+
+Stratégie optimale (il me semble) :
+ - placer les tanks entre les DPS cac ennemis et nos corps fragiles (supports, dans une moindre mesure DPS distance, et même DPS cac et tanks s'ils ont pris trop de dégats) ;
+ - frapper les ennemis importants en priorité (avec les DPS distance si à portée ou en faisant passer les DPS cac).
+
+On doit donc distinguer parmi les ennemis les DPS cac (bloquables par un tank), les DPS distance (probablement fragile au coprs à corps donc bonne cible pour nos DPS cac), les autres (qu'on peut ignorer s'ils ne sont pas importants).
+
+On veut profiter que nos DPS cac ont une meilleure mobilité pour chasser les DPS distance ennemis. On veut utiliser les compétences des tank (CC ou provocation) pour garder les DPS cac ennemis sous contrôle.
+
+On va mesurer :
+ - les capacités de combat au corps-à-corps (capacité à infliger des dégats, capacité à encaisser des dégats, mobilité) ;
+ - les capacités d'attaque à distance (capacité à infliger des dégats à distance et portée d'attaque) ;
+ - les capacités globales de nuisance (capacité à ingliger des dégâts par soi-même, capacité à augmenter les dégâts infligés par d'autres, capacité à maintenir les autres en vie, capacité à interférer avec nos actions) ;
+ - l'appréciabilité (critères irrationnels d'envies de meurtre).
+

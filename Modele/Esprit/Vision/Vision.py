@@ -60,25 +60,6 @@ class Vision(Extrait):
             else:
                 self.neutres[agissant.ID] = Vision_agissant(agissant, tour, self)
 
-    def antagonise(self, id:int, importance:float, dangerosite:float):
-        if id in self.neutres:
-            self.ennemis[id] = self.neutres.pop(id)
-        if id not in self.ennemis:
-            self.ennemis[id] = Vision_agissant(None, 0, self)
-        self.ennemis[id].antagonise(importance, dangerosite)
-
-    def get_importance(self, position:crt.Position) -> float:
-        for agissant in self.ennemis.values():
-            if agissant.position == position:
-                return agissant.importance
-        return 0
-    
-    def get_dangerosite(self, position:crt.Position) -> float:
-        for agissant in self.ennemis.values():
-            if agissant.position == position:
-                return agissant.dangerosite
-        return 0
-
     def get_case(self, position:crt.Position) -> Vision_case:
         return self.position_case[position]
     

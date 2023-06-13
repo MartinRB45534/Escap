@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 class Esprit :
     """La classe des esprits, qui manipulent les agisants."""
     def __init__(self,nom:str): #On identifie les esprits par des noms (en fait on s'en fout, vu qu'on ne fait pas d'opérations dessus on pourrait avoir des labs, des entitees et des esprits nommés avec des str, des int, des float, des bool, etc.)
-        self.corps:Dict[Agissant,str] = {}
+        self.corps:Set[Agissant] = set()
         self.vision = Vision(set(),0)
         self.tour = 0 # Chaque esprit a son horloge interne
         self.ennemis:Dict[Agissant,Dict[str,float]] = {}
@@ -26,65 +26,24 @@ class Esprit :
         self.nom = nom
 
     def ajoute_corp(self,corp:Agissant):
-        if not corp in self.corps:
-            self.corps[corp] = "incapacite"
-            corp.rejoint(self)
+        self.corps.add(corp)
 
-    def ajoute_corps(self,corps:List[Agissant]):
-        for corp in corps:
-            self.ajoute_corp(corp)
+    def ajoute_corps(self,corps:Set[Agissant]):
+        self.corps.update(corps)
 
     def retire_corp(self,corp:Agissant):
-        if corp in self.corps:
-            self.corps.pop(corp)
+        self.corps.remove(corp)
 
-    def retire_corps(self,corps:List[Agissant]):
-        for corp in corps:
-            self.retire_corp(corp)
+    def retire_corps(self,corps:Set[Agissant]):
+        self.corps.difference_update(corps)
 
-    def get_corps(self):
-        return {*self.corps.keys()}
-
-    def get_ennemis(self):
-        return {*self.ennemis.keys()}
-
-    # def get_importance(self,position:crt.Position) -> float:
-    #     importance = 0
-    #     if position in self.vue:
-    #         case = self.vue.case_from_position(position)
-    #         if case.agissant is not None:
-    #             if case.agissant in self.ennemis:
-    #                 new_importance = self.ennemis[case.agissant]["importance"]
-    #                 if new_importance > importance:
-    #                     importance = new_importance
-    #     return importance
-
-    # def trouve_agissants(self) -> Set[Agissant]:
-    #     agissants = set()
-    #     for case in self.vue:
-    #         agissants.add(case.agissant) if case.agissant is not None else None
-    #     return agissants
-
-    # def get_corps_vus(self) -> Set[Agissant]:
-    #     return {corp for corp in self.trouve_agissants() if corp in self.corps}
-
-    # def get_ennemis_vus(self) -> Set[Agissant]:
-    #     return {ennemi for ennemi in self.trouve_agissants() if ennemi in self.ennemis}
-
-    # def get_neutres_vus(self) -> Set[Agissant]:
-    #     return {neutre for neutre in self.trouve_agissants() if neutre not in self.corps and neutre not in self.ennemis}
-
-    # def oublie_agissants(self,agissants:Set[Agissant]):
-    #     for case in self.vue:
-    #         if case.agissant in agissants:
-    #             case.agissant = None
-    #     for zone in self.zones_inconnues:
-    #         zone.occupants -= agissants
+    def __contains__(self,corp:Agissant):
+        return corp in self.corps
 
     def refait_vue(self):
         vues:Set[Vue] = set()
         for corp in self.corps:
-            if self.corps[corp] != "incapacite":
+            if corp.etat == Etats_agissants.VIVANT:
                 vues.add(corp.vue)
         self.vision.voit(vues, self.tour)
         # TODO : préjugés & zones
@@ -686,8 +645,7 @@ class Esprit :
 
     def get_offenses(self):
         for corp in self.corps: #On vérifie si quelqu'un nous a offensé
-            offenses,etat = corp.get_offenses()
-            self.corps[corp] = etat
+            offenses = corp.get_offenses()
             for offense in offenses:
                 self.antagonise_attaquant(offense)
                 self.antagonise_supports(offense)
@@ -709,7 +667,7 @@ class Esprit :
     def get_pos_vues(self):
         positions = []
         for corp in self.corps:
-            if self.corps[corp] != "incapacite":
+            if corp.etat == Etats_agissants.VIVANT:
                 positions.append(corp.position)
         return positions
 
@@ -1032,7 +990,7 @@ class Esprit :
             if corps not in self.corps:
                 if corps in self.ennemis:
                     self.ennemis.pop(corps)
-                self.corps[corps] = esprit.corps[corps]
+                self.corps.add(corps)
                 corps.rejoint(self)
 
     def merge_enemies(self,esprit:Self):
@@ -1373,6 +1331,7 @@ NOBODY = Mindless()
 # from ..Esprit.Representation_spatiale import Salle, Couloir, Zone_inconnue
 from .Vision.Vision import Vision
 from ..Entitee.Agissant.Agissant import Agissant
+from ..Entitee.Agissant.Etats import Etats_agissants
 from ..Entitee.Agissant.PNJ.PNJs import PNJ, PJ
 from ..Entitee.Agissant.Role.Sentinelle import Sentinelle
 import random
