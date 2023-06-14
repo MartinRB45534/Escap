@@ -158,15 +158,6 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
     #         projectile = self.projectile_courant.cree_item(self) #Le 'self.projectile_courant' est un créateur de projectile
     #     return projectile
 
-    def insurge(self,offenseur:Agissant,gravite:float,dangerosite:float):
-        if offenseur:
-            self.offenses.append((offenseur,gravite,dangerosite))
-
-    def get_offenses(self) -> List[Tuple[Agissant,float,float]]:
-        offenses = self.offenses
-        self.offenses = []
-        return offenses
-
     def peut_voir(self,direction:crt.Direction):
         return self.labyrinthe.get_mur(self.position,direction).ferme # TODO : revoir ça
 
@@ -261,26 +252,9 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         return priorite
 
     def subit(self,offenseur:Agissant,degats:float,distance="contact",element=Element.TERRE): #L'ID 0 ne correspond à personne
-        gravite = degats/self.pv_max
-        dangerosite = 0
-        if distance == "contact":
-            dangerosite = degats*2
-        elif distance == "proximité":
-            dangerosite = degats
-        elif distance == "distance":
-            dangerosite = degats*0.2
-        if gravite > 1: #Si c'est de l'overkill, ce n'est pas la faute de l'attaquant non plus !
-            gravite = 1
-        if self.pv <= self.pv_max//3: #Frapper un blessé, ça ne se fait pas !
-            gravite += 0.2
-        if self.pv <= self.pv_max//9: #Et un mourrant, encore moins !!
-            gravite += 0.3
         if element not in self.immunites :
             self.pv -= degats/self.get_aff(element)
             self.regen_pv = self.regen_pv_min
-        if self.pv <= 0: #Alors tuer les gens, je ne vous en parle pas !!!
-            gravite += 0.5
-        self.insurge(offenseur,gravite,dangerosite)
 
     def instakill(self,responsable:Agissant):
         immortel = trouve_skill(self.classe_principale,Skill_immortel)
@@ -289,9 +263,6 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
                 self.pv = 0 #Et ça s'arrète là
         else:
             self.meurt()
-
-    def echape_instakill(self,responsable:Agissant):
-        self.insurge(responsable,1,self.pv)
 
     def soigne(self,soin:float):
         self.pv += soin
