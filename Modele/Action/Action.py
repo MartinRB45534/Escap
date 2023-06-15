@@ -15,7 +15,6 @@ class Action:
         self.agissant = agissant # Pour ne pas avoir à repasser l'agissant en paramètre à chaque fois
         self.latence:float = 0 # Le temps écoulé depuis le début de l'action
         self.latence_max = latence # Le temps que l'action doit durer
-        self.taux_vitesse = {} # Les taux de vitesse de l'action (impactés par la glace, etc.)
         self.repete = False # Si l'action doit être répétée
         self.repetitions = 0 # Le nombre de fois que l'action a été répétée
 
@@ -47,10 +46,7 @@ class Action:
         pass
 
     def get_vitesse(self):
-        vitesse = 1
-        for taux in self.taux_vitesse.values() :
-            vitesse *= taux
-        return vitesse
+        return self.agissant.vitesse
 
     def set_repete(self):
         """L'action doit être répétée."""

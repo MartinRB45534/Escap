@@ -80,9 +80,6 @@ class Inventaire:
             if isinstance(item,classe) and item.etat == "intact":
                 item.etat = "brisé"
                 break
-    
-    def get_item_courant(self) -> Item:
-        raise NotImplementedError
 
     def get_items_visibles(self) -> Set[Item]:
         items_visibles:Set[Item] = set()

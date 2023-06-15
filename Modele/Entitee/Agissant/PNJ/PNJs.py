@@ -62,20 +62,6 @@ class PNJ(Agissant, Interactif):
     def veut_fuir(self,degats:float=0):
         return self.comportement_corps_a_corps == 2 or self.fuite(degats)
 
-    def get_offenses(self):
-        for offense in self.offenses:
-            if offense[0] == 2: #/!\ Comment gérer des dialogues différents avec chaque autre humain ? Pour l'instant, on ne va pas y toucher
-                self.dialogue = 0
-        offenses = self.offenses
-        self.offenses = []
-        if self.etat != "vivant" or self.controleur is None:
-            etat = "incapacite"
-        elif self.fuite():
-            etat = "fuite"
-        else:
-            etat = "PNJ" #Les PNJs ont des comportements inutilement alambiqués...
-        return offenses, etat
-
     def set_case_dialogue(self,position):
         self.mouvement = 0
         self.cible_deplacement = position

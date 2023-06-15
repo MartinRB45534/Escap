@@ -25,18 +25,6 @@ class Esprit_humain(Esprit_simple):
         self.ajoute_corp(corp)
         self.chef = corp #Les humains ne peuvent pas s'empêcher d'avoir des chefs
 
-    def get_offenses(self):
-        for corp in self.corps: #On vérifie si quelqu'un nous a offensé
-            offenses,etat = corp.get_offenses()
-            self.corps[corp] = etat
-            for offense in offenses:
-                self.antagonise_attaquant(offense)
-                self.antagonise_supports(offense)
-                if True:# self.peureuse():
-                    for coennemi in offense[0].esprit.corps:
-                        if not coennemi in self.ennemis:
-                            self.ennemis[coennemi] = {"importance":0.01,"dangerosite":0}
-
     def merge(self,esprit:Esprit_humain): #Regroupe deux esprits, lorsque des humains forment un groupe
         Esprit.merge(self,esprit)
         self.elit()

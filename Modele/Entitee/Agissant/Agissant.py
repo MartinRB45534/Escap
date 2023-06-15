@@ -5,9 +5,10 @@ import Carte as crt
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ...Systeme.Classe.Classe_principale import Classe_principale
-    from ...Entitee.Agissant.Inventaire import Inventaire
+    from .Inventaire import Inventaire
+    from .Statistiques import Statistiques
     from ...Esprit.Esprit import Esprit
-    from ...Entitee.Item.Item import Item
+    from ..Item.Item import Item
     from ...Labyrinthe.Labyrinthe import Labyrinthe
     from ...Systeme.Elements import Element
     from .Vue.Vue import Vue
@@ -17,31 +18,11 @@ from ..Entitee import Non_superposable, Mobile
 
 class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cadavre n'agit pas.
     """La classe des entitées animées. Capable de décision, de différentes actions, etc. Les principales caractéristiques sont l'ID, les stats, et la classe principale."""
-    def __init__(self,identite:str,labyrinthe:Labyrinthe,cond_evo:List,skills_intrasecs:Set[Skill_intrasec],skills:Set[Skill_extra],niveau:int,pv_max:float,pv:float,regen_pv_max:float,regen_pv_min:float,restauration_regen_pv:float,pm_max:float,regen_pm:float,force:float,priorite:float,vitesse:float,affinites:Dict[Element,float],especes:List[str],oubli:float,resolution:int,forme:str,forme_tete:str,nb_doigts:int,magies:List[Type[Magie]],items:List[Type[Item]],position:crt.Position,ID: Optional[int]=None):
+    def __init__(self,identite:str,labyrinthe:Labyrinthe,cond_evo:List,skills_intrasecs:Set[Skill_intrasec],skills:Set[Skill_extra],niveau:int,pv_max:float,regen_pv_max:float,regen_pv_min:float,restauration_regen_pv:float,pm_max:float,regen_pm:float,force:float,priorite:float,vitesse:float,affinites:Dict[Element,float],immunites:Set[Element],especes:List[str],oubli:float,resolution:int,forme:str,forme_tete:str,nb_doigts:int,magies:List[Type[Magie]],items:List[Type[Item]],position:crt.Position,ID: Optional[int]=None):
         Entitee.__init__(self,position,ID)
         self.identite = identite
         self.labyrinthe = labyrinthe
-        self.pv_max = pv_max
-        self.pv = self.pv_max
-        self.regen_pv_max = regen_pv_max
-        self.regen_pv_min = regen_pv_min
-        self.restauration_regen_pv = restauration_regen_pv
-        self.regen_pv = self.regen_pv_max
-        self.taux_regen_pv:Dict[str,float] = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à la régénération des pv. Correspond aux effets passager sur la régénération des pv.
-        self.pm_max = pm_max
-        self.pm = self.pm_max
-        self.regen_pm = regen_pm
-        self.taux_regen_pm:Dict[str,float] = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à la régénération des pm. Correspond aux effets passager sur la régénération des pm.
-        self.force = force
-        self.taux_force:Dict[str,float] = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à la force. Correspond aux effets passager sur la force.
-        self.priorite = priorite
-        self.taux_priorite:Dict[str,float] = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à la priorité. Correspond aux effets passager sur la priorité.
-        self.vitesse = vitesse
-        self.taux_vitesse:Dict[str,float] = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer à la vitesse. Correspond aux effets passager sur la vitesse.
-        self.affinites = affinites
-        self.taux_affinites:Dict[Element,Dict[str,float]] = {element:{} for element in Element}
-        self.taux_stats:Dict[str,float] = {} #Le dictionnaire qui contient tous les multiplicateurs à appliquer aux statistiques. Correspond aux effets passager sur les statistiques. (Inclure les regen dans les stats ?)
-        self.immunites:List[Element] = [] #La liste des éléments auxquels l'entitée est immunisé (très rare)
+        self.statistiques = Statistiques(self,priorite,vitesse,force,pv_max,regen_pv_max,regen_pv_min,restauration_regen_pv,pm_max,regen_pm,affinites,immunites)
         self.especes:List[str] = especes
         self.classe_principale = Classe_principale(cond_evo,skills_intrasecs,skills,niveau)
         self.niveau = self.classe_principale.niveau
@@ -55,7 +36,6 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         #vue de l'agissant
         self.vue:Vue = voit_vue(labyrinthe.extrait({self.position}))
 
-        self.offenses:List[Tuple[Agissant,float,float]]=[]
         self.esprit:Esprit=NOBODY
 
         #possessions de l'agissant
@@ -81,6 +61,10 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
             for item in items:
                 new_items.add(item(labyrinthe,crt.POSITION_ABSENTE))
             self.inventaire.equippe(new_items)
+
+    @property
+    def equipement(self):
+        return self.inventaire.get_equippement()
 
     def get_stats_attaque(self,element:Element):
         force = self.force
@@ -139,29 +123,22 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         if direction is not None:
             self.dir_regard = direction
 
-    def set_statut(self,statut:str,force:bool=False):
-        self.statut = statut
-
-    def get_arme(self):
+    @property
+    def arme(self):
         return self.inventaire.get_arme()
 
-    def get_bouclier(self):
+    @property
+    def bouclier(self):
         return self.inventaire.get_bouclier()
 
-    def get_clees(self):
+    @property
+    def clees(self):
         return self.inventaire.get_clees()
-
-    # def get_item_lancer(self):
-    #     if self.projectile_courant is None : #On lance l'item courant
-    #         projectile = self.inventaire.get_item_courant()
-    #     else : #On lance un item qu'on crée
-    #         projectile = self.projectile_courant.cree_item(self) #Le 'self.projectile_courant' est un créateur de projectile
-    #     return projectile
 
     def peut_voir(self,direction:crt.Direction):
         return self.labyrinthe.get_mur(self.position,direction).ferme # TODO : revoir ça
 
-    def get_aff(self,element:Element):
+    def affinite(self,element:Element):
         affinite = self.affinites[element]
         for taux in self.taux_affinites[element].values():
             affinite *= taux
@@ -206,52 +183,15 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
                 total += effet.mana
         return total
 
-    def get_total_regen_pv(self):
-        regen_pv = self.regen_pv
-        for taux in self.taux_regen_pv.values() :
-            regen_pv *= taux
-        for taux in self.taux_stats.values() :
-            regen_pv *= taux
-        # /!\ Rajouter les effets négatifs du skill de magie infinie /!\
-        for item in self.inventaire.get_equippement():
-            if isinstance(item,Reparateur):
-                regen_pv = item.regen_pv(regen_pv)
-        return regen_pv
+    @property
+    def vitesse(self):
+        return self.statistiques.get_vitesse()
 
-    def get_total_regen_pm(self):
-        regen_pm = self.regen_pm
-        for taux in self.taux_regen_pm.values() :
-            regen_pm *= taux
-        for taux in self.taux_stats.values() :
-            regen_pm *= taux
-        for item in self.inventaire.get_equippement():
-            if isinstance(item,Reparateur_magique):
-                regen_pm = item.regen_pm(regen_pm)
-        return regen_pm
+    @property
+    def priorite(self):
+        return self.statistiques.get_priorite()
 
-    def get_vitesse(self):
-        vitesse = self.vitesse
-        for taux in self.taux_vitesse.values() :
-            vitesse *= taux
-        for taux in self.taux_stats.values() :
-            vitesse *= taux
-        for item in self.inventaire.get_equippement():
-            if isinstance(item,Accelerateur):
-                vitesse = item.augmente_vitesse(vitesse)
-        return vitesse
-
-    def get_priorite(self):
-        priorite = self.priorite
-        for taux in self.taux_priorite.values() :
-            priorite *= taux
-        for taux in self.taux_stats.values() :
-            priorite *= taux
-        for item in self.inventaire.get_equippement():
-            if isinstance(item,Anoblisseur):
-                priorite *= item.augmente_priorite(priorite)
-        return priorite
-
-    def subit(self,offenseur:Agissant,degats:float,distance="contact",element=Element.TERRE): #L'ID 0 ne correspond à personne
+    def subit(self,degats:float,element=Element.TERRE):
         if element not in self.immunites :
             self.pv -= degats/self.get_aff(element)
             self.regen_pv = self.regen_pv_min
@@ -295,14 +235,11 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
     def get_description(self,observation=0):
             return ["Un agissant","Qu'est-ce qu'il fait dans un inventaire ?"]
 
-    def get_portee_vue(self):
+    def get_skill_vision(self) -> Skill_vision:
         skill = trouve_skill(self.classe_principale,Skill_vision)
         if skill is None:
             raise ValueError("Un agissant n'a pas de skill de vision !")
-        else :
-            portee = skill.utilise()
-            portee *= self.get_aff(Element.OMBRE) #Puisque c'est le manque de lumière qui réduit le champ de vision !
-        return portee
+        return skill
 
     def get_skins_statuts(self):
         if self.statut == "paix":

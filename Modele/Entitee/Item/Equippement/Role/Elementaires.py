@@ -14,6 +14,10 @@ class Elementaire(Equipement):
     def __init__(self,taux_aff:float):
         self.taux_aff = taux_aff
 
+    def augmente_affinite(self, affinite:float) -> float:
+        """Augmente l'affinité à l'élément."""
+        return affinite*self.taux_aff
+
 class Rocheux(Elementaire):
     """La classe des équipements qui augmentent l'affinité à la terre."""
     element = Element.TERRE

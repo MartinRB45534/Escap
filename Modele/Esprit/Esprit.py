@@ -643,27 +643,6 @@ class Esprit :
     #                 self.entrees.pop(entree) #On la supprime
     #         # /!\ Regarder avec attention ce qui se passe pour les entrées
 
-    def get_offenses(self):
-        for corp in self.corps: #On vérifie si quelqu'un nous a offensé
-            offenses = corp.get_offenses()
-            for offense in offenses:
-                self.antagonise_attaquant(offense)
-                self.antagonise_supports(offense)
-        
-    def antagonise_attaquant(self,offense:Tuple[Agissant,float,float]):
-        ID_offenseur = offense[0]
-        gravite = offense[1]
-        degats = offense[2]
-        if ID_offenseur in self.ennemis:
-            self.ennemis[ID_offenseur]["importance"] += gravite
-            if self.ennemis[ID_offenseur]["dangerosite"] < degats:
-                self.ennemis[ID_offenseur]["dangerosite"] = degats
-        else:
-            self.ennemis[ID_offenseur] = {"importance":gravite,"dangerosite":degats}
-
-    def antagonise_supports(self,offense:Tuple[Agissant,float,float]):
-        pass
-
     def get_pos_vues(self):
         positions = []
         for corp in self.corps:
@@ -1303,7 +1282,6 @@ class Esprit :
     #Découvront le déroulé d'un tour avec esprit-sensei :
     def debut_tour(self):
         #On va faire plein de choses pendant ce tour (est-ce vraiment nécessaire de prendre des décisions si aucun des corps ne va jouer à ce tour ?
-        self.get_offenses() #On s'insurge à grands cris (s'il y a lieu)
         self.trouve_strateges()
 
 
