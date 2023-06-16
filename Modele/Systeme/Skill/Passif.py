@@ -21,6 +21,7 @@ class Skill_vision(Passif):
     def __init__(self): #Pour l'instant le skill est générique, identique pour tous
         Passif.__init__(self)
         self.nom="Vision"
+        self.portee:float
 
     def utilise(self): #Le skill ne fait que donner des infos, il ne peut pas manipuler d'objet labyrinthe ou autres
         raise NotImplementedError

@@ -8,16 +8,16 @@ if TYPE_CHECKING:
     from .....Systeme.Elements import Element
 
 # Imports des classes parentes
-from ..Equippement import Equipement
+from ..Equippement import Equippement
 
-class Degainable(Equipement):
+class Degainable(Equippement):
     """La classe des items qui doivent être dégainés. Sont utilisés en complément d'un skill, n'ont pas d'effet le reste du temps."""
     pass
 
 class Arme(Degainable):
     """La classe des équipements qui augmentent la force d'attaque."""
     def __init__(self,labyrinthe:Labyrinthe,poids:float,frottements:float,element:Element,tranchant:float,portee:int,position:crt.Position=crt.POSITION_ABSENTE):
-        Equipement.__init__(self,labyrinthe,position)
+        Equippement.__init__(self,labyrinthe,position)
         self.element = element
         self.tranchant = tranchant
         self.taux_tranchant = {}

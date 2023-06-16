@@ -1,6 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, Type, List, Dict, Set
-import Carte as crt
+from typing import TYPE_CHECKING, Dict, Set
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
@@ -23,6 +22,7 @@ class Statistiques:
         self.pv = pv #Points de vie
         self.regen_pv_max = regen_pv_max #Régénération de points de vie quand on a pas pris de dégâts depuis longtemps
         self.regen_pv_min = regen_pv_min #Régénération de points de vie quand on a pris des dégâts récemment
+        self.regen_pv = regen_pv_max #Régénération de points de vie actuelle
         self.restauration_regen_pv = restauration_regen_pv #Restauration de la régénération de points de vie
         self.pm_max = pm #Points de magie max
         self.pm = pm #Points de magie
@@ -67,10 +67,54 @@ class Statistiques:
     
     def get_vision(self) -> float:
         skill = self.possesseur.get_skill_vision()
-        vision = skill.vision
+        vision = skill.portee
+        vision *= self.possesseur.affinite(Element.OMBRE) # La vision est augmentée par l'affinité à l'ombre
+        for effet in self.possesseur.effets:
+            if isinstance(effet, Effet_vision):
+                vision = effet.modifie_vision(vision)
+        return vision
+    
+    def get_regen_pv(self) -> float:
+        regen_pv = self.regen_pv
+        for item in self.possesseur.equipement:
+            if isinstance(item, Reparateur):
+                regen_pv = item.regen_pv(regen_pv)
+        for effet in self.possesseur.effets:
+            if isinstance(effet, Effet_pv):
+                regen_pv = effet.modifie_pv(regen_pv)
+        return regen_pv
+    
+    def get_regen_pm(self) -> float:
+        regen_pm = self.regen_pm
+        for item in self.possesseur.equipement:
+            if isinstance(item, Reparateur_magique):
+                regen_pm = item.regen_pm(regen_pm)
+        for effet in self.possesseur.effets:
+            if isinstance(effet, Effet_pm):
+                regen_pm = effet.modifie_pm(regen_pm)
+        return regen_pm
+
+    def soigne(self, pv:float):
+        self.pv += pv
+        self.pv = min(self.pv, self.pv_max)
+
+    def blesse(self, pv:float):
+        self.pv -= pv
+        self.pv = max(self.pv, 0)
+        self.regen_pv = self.regen_pv_min
+
+    def debut_tour(self):
+        self.pv += self.regen_pv
+        self.pv = min(self.pv, self.pv_max)
+        self.regen_pv += self.restauration_regen_pv
+        self.regen_pv = min(self.regen_pv, self.regen_pv_max)
+        self.pm += self.regen_pm
+        self.pm = min(self.pm, self.pm_max)
+
+    def depense_pm(self, pm:float):
+        self.pm -= pm
 
 from ..Item.Equippement.Role.Elementaires import Elementaire
-from ..Item.Equippement.Role.Defensif.Defensif import Defensif
 from ..Item.Equippement.Role.Accelerateur import Accelerateur
 from ..Item.Equippement.Role.Anoblisseur import Anoblisseur
 from ..Item.Equippement.Role.Reparateur.Reparateur import Reparateur

@@ -15,50 +15,80 @@ class Inventaire:
     def __init__(self,possesseur:Agissant,nb_doigts:int):
         self.possesseur = possesseur #On classe les possessions d'un agissant selon les usages qu'il peut en faire :
 
-        self.potions:Set[Potion] = set() #Les potions peuvent se boire
-        self.parchemins:Set[Parchemin] = set() #Les parchemins peuvent s'activer avec du mana
-        self.cles:Set[Cle] = set() #Les clés ouvrent les portes
-        self.armes:Set[Arme] = set() #Les armes s'équippent et sont utilisées pour attaquer
-        self.boucliers:Set[Bouclier] = set() #Les boucliers s'équippent et sont utilisés pour se défendre
-        self.armures:Set[Armure] = set() #Les armures s'équippent et ont des effets passifs
-        self.haumes:Set[Haume] = set() #Les haumes s'équippent et ont des effets passifs
-        self.anneaux:Set[Anneau] = set() #Les anneaux s'équippent et ont des effets passifs
-        self.projectiles:Set[Projectile] = set() #Les projectiles se lancent (on peut lancer n'importe quoi, techniquement...)
-        self.ingredients:Set[Ingredient] = set() #Les ingrédients sont utilisés pour les recettes
-        self.cadavres:Set[Cadavre] = set() #Oui, on peut récupérer des cadavres, et alors, circluez, ya rien à voir...
-        self.oeufs:Set[Oeuf] = set() #Vous allez quand même pas me dire que c'est l'oeuf qui vous choque ! Il y a marqué cadavre juste au dessus !
+        self.items:Set[Item] = set()
 
-        self.items:Dict[Type[Potion|Parchemin|Cle|Arme|Bouclier|Armure|Haume|Anneau|Projectile|Ingredient|Cadavre|Oeuf],Set] = {
-            Potion:self.potions,
-            Parchemin:self.parchemins,
-            Cle:self.cles,
-            Arme:self.armes,
-            Bouclier:self.boucliers,
-            Armure:self.armures,
-            Haume:self.haumes,
-            Anneau:self.anneaux,
-            Projectile:self.projectiles,
-            Ingredient:self.ingredients,
-            Cadavre:self.cadavres,
-            Oeuf:self.oeufs,
-        }
-        # self.kiiz:List[Type[Potion|Parchemin|Cle|Arme|Bouclier|Armure|Haume|Anneau|Projectile|Ingredient|Cadavre|Oeuf]] = [Potion,Parchemin,Cle,Arme,Bouclier,Armure,Haume,Anneau,Projectile,Ingredient,Cadavre,Oeuf]
         self.arme:Optional[Arme] = None #L'arme équipée
         self.bouclier:Optional[Bouclier] = None #Le bouclier équipé
         self.armure:Optional[Armure] = None #L'armure équipée
-        self.haume:Optional[Haume] = None #Le haume équipé
+        self.heaume:Optional[Heaume] = None #Le heaume équipé
         self.anneau:List[Anneau] = [] #Les anneaux équipés
         self.doigts = nb_doigts #Le nombre d'anneaux que l'on peut équiper
+
+    # Les items peuvent être de plusieurs catégories :
+
+    @property
+    def consommables(self) -> Set[Item]: # Les consommables regroupent les potions et les parchemins
+        return {item for item in self.items if isinstance(item,Consommable)}
+    
+    @property
+    def potions(self) -> Set[Potion]: # Les potions peuvent se boire (sans coût de mana)
+        print("I'm not useless !! !!!")
+        return {item for item in self.items if isinstance(item,Potion)}
+    
+    @property
+    def parchemins(self) -> Set[Parchemin]: # Les parchemins peuvent s'activer avec du mana
+        return {item for item in self.items if isinstance(item,Parchemin)}
+    
+    @property
+    def cles(self) -> Set[Cle]: # Les clés ouvrent ou ferment les portes
+        return {item for item in self.items if isinstance(item,Cle)}
+    
+    @property
+    def equippements(self) -> Set[Item]: # L'équipement regroupe les armes, les boucliers, les armures, les heaumes et les anneaux
+        return {item for item in self.items if isinstance(item,Equippement)}
+    
+    @property
+    def armes(self) -> Set[Arme]: # Les armes sont utilisées pour attaquer
+        return {item for item in self.items if isinstance(item,Arme)}
+
+    @property
+    def boucliers(self) -> Set[Bouclier]: # Les boucliers sont utilisés pour se défendre
+        return {item for item in self.items if isinstance(item,Bouclier)}
+    
+    @property
+    def armures(self) -> Set[Armure]: # Les armures ont des effets passifs
+        return {item for item in self.items if isinstance(item,Armure)}
+    
+    @property
+    def heaumes(self) -> Set[Heaume]: # Les heaumes ont des effets passifs
+        return {item for item in self.items if isinstance(item,Heaume)}
+    
+    @property
+    def anneaux(self) -> Set[Anneau]: # Les anneaux ont des effets passifs
+        return {item for item in self.items if isinstance(item,Anneau)}
+    
+    @property
+    def projectiles(self) -> Set[Projectile]: # Les projectiles se lancent (on peut lancer n'importe quoi, techniquement...)
+        return {item for item in self.items if isinstance(item,Projectile)}
+    
+    @property
+    def ingredients(self) -> Set[Ingredient]: # Les ingrédients sont utilisés pour l'alchimie
+        return {item for item in self.items if isinstance(item,Ingredient)}
+    
+    @property
+    def cadavres(self) -> Set[Cadavre]: # Oui, on peut récupérer des cadavres, et alors, circulez, y'a rien à voir...
+        return {item for item in self.items if isinstance(item,Cadavre)}
+    
+    @property
+    def oeufs(self) -> Set[Oeuf]: # Vous n'allez quand même pas me dire que c'est l'oeuf qui vous choque ! Il y a marqué cadavre juste au dessus !
+        return {item for item in self.items if isinstance(item,Oeuf)}
 
     def ajoute(self,item:Item):
         #Comme la précédente, mais c'est l'item et non son ID qui est passé en paramètre
         if item.position != crt.POSITION_ABSENTE:
             item.labyrinthe.position_case[item.position].items.remove(item)
             item.position = crt.POSITION_ABSENTE
-        for classe in self.items:
-            if isinstance(item,classe):
-                self.items[classe].add(item)
-                return
+        self.items.add(item)
 
     def peut_fournir(self,items:Dict[Type[Ingredient],int]):
         for item in items:
@@ -70,15 +100,15 @@ class Inventaire:
         """Indique la quantité d'items correspondants à une classe voulue.""" #Pour les ingrédients des recettes
         res=0
         for item in self.ingredients:
-            if isinstance(item,classe) and item.etat == "intact":
+            if isinstance(item,classe) and item.etat == Etats_items.INTACT:
                 res+=1
         return res
 
     def consomme(self,classe:Type[Ingredient]):
         """Consomme un ingrédient lors d'une opération d'alchimie.""" #/!\ Rien à voir avec les consommables !
         for item in self.ingredients:
-            if isinstance(item,classe) and item.etat == "intact":
-                item.etat = "brisé"
+            if isinstance(item,classe) and item.etat == Etats_items.INTACT:
+                item.etat = Etats_items.BRISE
                 break
 
     def get_items_visibles(self) -> Set[Item]:
@@ -89,8 +119,8 @@ class Inventaire:
             items_visibles.add(self.bouclier)
         if self.armure is not None:
             items_visibles.add(self.armure)
-        if self.haume is not None:
-            items_visibles.add(self.haume)
+        if self.heaume is not None:
+            items_visibles.add(self.heaume)
         return items_visibles
 
     def get_arme(self) -> Optional[Arme]:
@@ -111,11 +141,11 @@ class Inventaire:
     def set_armure(self,armure:Armure):
         self.armure = armure
 
-    def get_haume(self) -> Optional[Haume]:
-        return self.haume
+    def get_heaume(self) -> Optional[Heaume]:
+        return self.heaume
 
-    def set_haume(self,haume:Haume):
-        self.haume = haume
+    def set_heaume(self,heaume:Heaume):
+        self.heaume = heaume
 
     def get_anneau(self) -> Set[Anneau]:
         return {*self.anneau}
@@ -136,45 +166,36 @@ class Inventaire:
             equippement.add(self.bouclier)
         if self.armure is not None:
             equippement.add(self.armure)
-        if self.haume is not None:
-            equippement.add(self.haume)
+        if self.heaume is not None:
+            equippement.add(self.heaume)
         return equippement
 
     def equippe(self,equippement:Set[Item]):
         for item in equippement:
+            self.items.add(item)
             if isinstance(item,Arme):
-                self.armes.add(item)
                 self.set_arme(item)
             elif isinstance(item,Bouclier):
-                self.boucliers.add(item)
                 self.set_bouclier(item)
             elif isinstance(item,Armure):
-                self.armures.add(item)
                 self.set_armure(item)
-            elif isinstance(item,Haume):
-                self.haumes.add(item)
-                self.set_haume(item)
+            elif isinstance(item,Heaume):
+                self.set_heaume(item)
             elif isinstance(item,Anneau):
-                self.anneaux.add(item)
                 self.set_anneau(item)
 
     def desequippe(self,equippement:List[Item]):
         for item in equippement:
-            if isinstance(item,Arme):
-                if item is self.arme:
-                    self.arme = None
-            elif isinstance(item,Bouclier):
-                if item is self.bouclier:
-                    self.bouclier = None
-            elif isinstance(item,Armure):
-                if item is self.armure:
-                    self.armure = None
-            elif isinstance(item,Haume):
-                if item is self.haume:
-                    self.haume = None
-            elif isinstance(item,Anneau):
-                if item in self.anneau:
-                    self.anneau.remove(item)
+            if item is self.arme:
+                self.arme = None
+            elif item is self.bouclier:
+                self.bouclier = None
+            elif item is self.armure:
+                self.armure = None
+            elif item is self.heaume:
+                self.heaume = None
+            elif item in self.anneau:
+                self.anneau.remove(item)
 
     def get_clees(self) -> Set[str]:
         clees:Set[str] = set()
@@ -188,60 +209,49 @@ class Inventaire:
             if code in cle.codes:
                 return cle
 
-    def get_items(self):
-        items:Set[Item] = set()
-        for item_set in self.items.values():
-            items|=item_set            
-        return items
-
     def nettoie_item(self): #Méthode appelée à chaque fin de tour pour supprimer les items retirés ou utilisés.
-        for classe in self.items:
-            for item in self.items[classe]:
-                assert isinstance(item,classe)
-                if item.position != crt.POSITION_ABSENTE or item.etat == "brisé": #S'il a été lancé ou n'est plus en état
-                    self.items[classe].remove(item)
-                    if self.arme is item :
-                        self.arme = None
-                    elif self.bouclier is item :
-                        self.bouclier = None
-                    elif self.armure is item :
-                        self.armure = None
-                    elif self.haume is item :
-                        self.haume = None
-                    elif item in self.anneau :
-                        self.anneau.remove(item)
-
-    def drop_all(self,case:Case):
-        for classe in self.items:
-            for item in self.items[classe]:
-                self.drop(case,item)
-
-    def drop(self,case:Case,item:Item):
-        for cat_item in self.items:
-            if item in self.items[cat_item]:
-                item.position = case.position
-                case.items.add(item)
-                self.items[cat_item].remove(item)
+        for item in self.items:
+            if item.position != crt.POSITION_ABSENTE or item.etat == Etats_items.BRISE: #S'il a été lancé ou n'est plus en état
+                self.items.remove(item)
                 if self.arme is item :
                     self.arme = None
                 elif self.bouclier is item :
                     self.bouclier = None
-                elif self.armure is item : 
+                elif self.armure is item :
                     self.armure = None
-                elif self.haume is item :
-                    self.haume = None
+                elif self.heaume is item :
+                    self.heaume = None
                 elif item in self.anneau :
-                    self.anneau.remove(item)                    
+                    self.anneau.remove(item)
+
+    def drop_all(self,case:Case):
+        for item in self.items:
+            self.drop(case,item)
+
+    def drop(self,case:Case,item:Item):
+        for item in self.items:
+            
+            item.position = case.position
+            case.items.add(item)
+            self.items.remove(item)
+            if self.arme is item :
+                self.arme = None
+            elif self.bouclier is item :
+                self.bouclier = None
+            elif self.armure is item : 
+                self.armure = None
+            elif self.heaume is item :
+                self.heaume = None
+            elif item in self.anneau :
+                self.anneau.remove(item)                    
 
     def drop_random(self,case:Case):
-        items = self.get_items()
-        item = random.choice(list(items))
+        item = random.choice(list(self.items))
         self.drop(case,item)
 
     def debut_tour(self):
-        for classe in self.items:
-            for item in self.items[classe]:
-                item.debut_tour()
+        for item in self.items:
+            item.debut_tour()
         #On ne manipule pas les cadavres
         # for oeuf in self.oeufs: #Mais les oeufs incubent !
         #     hatch:Optional[Hatching] = trouve_skill(oeuf.agissant.classe_principale,Hatching)
@@ -250,43 +260,41 @@ class Inventaire:
         #             self.controleur.fait_eclore(oeuf,self.possesseur)# /!\ À coder !
 
     def pseudo_debut_tour(self):
-        items:Set[Item] = set()
-        for cat_item in [Potion,Parchemin,Cle,Arme,Bouclier,Armure,Haume,Anneau,Projectile,Ingredient] : #On sépare les 'vrais' items des faux.
-            items |= self.items[cat_item]
-        for item in items :
+        for item in self.items :
             item.pseudo_debut_tour()
 
     def fin_tour(self):
-        items:Set[Item] = set()
-        for item in [Potion,Parchemin,Cle,Arme,Bouclier,Armure,Haume,Anneau,Projectile,Ingredient] : #On sépare les 'vrais' items des faux.
-            items |= self.items[item]
-        for item in items :
+        for item in self.items :
             item.fin_tour() #Moins de choses à faire à la fin du tour.
         self.nettoie_item()
 
     def a_parchemin_vierge(self):
-        for parchemin in self.items[Parchemin]:
-            if isinstance(parchemin,Parchemin_vierge) and isinstance(parchemin.action_portee,Impregne) and parchemin.action_portee.magie is None:
-                return True
+        for parchemin in self.parchemins:
+            if isinstance(parchemin,Parchemin_vierge):
+                if isinstance(parchemin.action_portee,Impregne) and parchemin.action_portee.magie is None:
+                    return True
         return False
     
     def get_parchemin_vierge(self):
-        for parchemin in self.items[Parchemin]:
-            if isinstance(parchemin,Parchemin_vierge) and isinstance(parchemin.action_portee,Impregne) and parchemin.action_portee.magie is None:
-                return parchemin
+        for parchemin in self.parchemins:
+            if isinstance(parchemin,Parchemin_vierge):
+                if isinstance(parchemin.action_portee,Impregne) and parchemin.action_portee.magie is None:
+                    return parchemin
         return None
 
 
 # Imports utilisés dans le code (il y en a beaucoup !!!)
 from ...Action.Non_skill import Impregne
-from ..Item.Item import Item
+from ..Item.Item import Item, Consommable
+from ..Item.Etats import Etats_items
 from ..Item.Potion.Potion import Potion
 from ..Item.Parchemin.Parchemin import Parchemin
 from ..Item.Cle import Cle
+from ..Item.Equippement.Equippement import Equippement
 from ..Item.Equippement.Degainable.Degainable import Arme
 from ..Item.Equippement.Degainable.Bouclier.Bouclier import Bouclier
 from ..Item.Equippement.Armure.Armure import Armure
-from ..Item.Equippement.Haume.Haume import Haume
+from ..Item.Equippement.Heaume.Heaume import Heaume
 from ..Item.Equippement.Anneau.Anneau import Anneau
 from ..Item.Projectile.Projectile import Projectile
 from ..Item.Item import Ingredient

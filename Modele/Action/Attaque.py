@@ -29,8 +29,7 @@ class Attaque(Action_skill):
         self.distance = distance
 
     def action(self):
-        force,affinite = self.agissant.get_stats_attaque(self.element)
-        degats = force*self.taux*affinite
+        degats = self.agissant.force*self.taux*self.agissant.affinite(self.element)
         position = self.agissant.position
         zone = self.agissant.labyrinthe.a_portee(position,self.portee,self.deplacement,self.forme,self.passage,self.direction)
         for position in zone:
@@ -52,8 +51,7 @@ class Attaque_arme(Attaque):
 
     def action(self):
         element,tranchant,portee = self.arme.get_stats_attaque()
-        force,affinite = self.agissant.get_stats_attaque(element)
-        degats = force*self.taux*affinite*tranchant
+        degats = self.agissant.force*self.taux*self.agissant.affinite(element)*tranchant
         position = self.agissant.position
         zone = self.agissant.labyrinthe.a_portee(position,portee,self.deplacement,self.forme,self.passage,self.direction)
         for position in zone:
@@ -82,8 +80,7 @@ class Attaque_multiple(Action_parcellaire,Attaque_arme): # Les attaques sans arm
 
     def action(self):
         element,tranchant,portee = self.arme.get_stats_attaque()
-        force,affinite = self.agissant.get_stats_attaque(element)
-        degats = force*self.taux[self.rempli]*affinite*tranchant
+        degats = self.agissant.force*self.taux[self.rempli]*self.agissant.affinite(element)*tranchant
         position = self.agissant.position
         zone = self.agissant.labyrinthe.a_portee(position,portee,self.deplacement,self.formes[self.rempli],self.passage,self.directions[self.rempli])
         for position in zone:

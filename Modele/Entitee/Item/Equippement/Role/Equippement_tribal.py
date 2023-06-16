@@ -4,15 +4,16 @@ from typing import TYPE_CHECKING
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ....Agissant.Agissant import Agissant
+    from ....Agissant.Espece import Espece
 
 # Imports des classes parentes
-from ..Equippement import Equipement
+from ..Equippement import Equippement
 
-class Equipement_tribal(Equipement):
-    def __init__(self,espece:str,taux:float):
+class Equippement_tribal(Equippement):
+    def __init__(self,espece:Espece,taux:float):
         self.espece = espece
         self.taux = taux
 
     def equippe(self,agissant:Agissant):
-        if not self.espece in agissant.especes :
+        if not self.espece in agissant.espece :
             self.taux_stats["incompatibilité porteur"] = self.taux

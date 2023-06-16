@@ -3,9 +3,9 @@ from __future__ import annotations
 # Pas d'import pour les annotations
 
 # Imports des classes parentes
-from ..Equippement import Equipement
+from ..Equippement import Equippement
 
-class Accelerateur(Equipement):
+class Accelerateur(Equippement):
     """La classe des équipements qui augmentent la vitesse."""
     def __init__(self,taux_vitesse:float):
         self.taux_vitesse = taux_vitesse

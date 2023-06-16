@@ -7,12 +7,12 @@ if TYPE_CHECKING:
     from .....Labyrinthe.Labyrinthe import Labyrinthe
 
 # Imports des classes parentes
-from ..Equippement import Equipement
+from ..Equippement import Equippement
 
-class Anneau(Equipement):
+class Anneau(Equippement):
     """La classe des équipements de type anneau. Le nombre d'anneaux qu'on peut porter dépend de l'espèce. Les anneaux peuvent avoir des effets très différends (magiques pour la plupart)."""
     def __init__(self,labyrinthe:Labyrinthe,poids:float,frottements:float,position:crt.Position=crt.POSITION_ABSENTE):
-        Equipement.__init__(self,labyrinthe,position)
+        Equippement.__init__(self,labyrinthe,position)
         self.poids = poids
         self.frottement = frottements
 

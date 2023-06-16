@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 # Imports des classes parentes
 from ..Item import Item
 
-class Equipement(Item):
+class Equippement(Item):
     """La classe des items qui peuvent être portés. Sont toujours actifs tant qu'ils sont portés."""
     def __init__(self,labyrinthe:Labyrinthe,position:crt.Position=crt.POSITION_ABSENTE):
         Item.__init__(self,labyrinthe,position)

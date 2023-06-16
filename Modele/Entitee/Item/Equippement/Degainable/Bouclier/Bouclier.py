@@ -12,7 +12,7 @@ from ..Degainable import Degainable
 class Bouclier(Degainable):
     """La classe des boucliers. Permettent de se protéger des attaques lorsqu'ils sont utilisés."""
     def __init__(self,labyrinthe:Labyrinthe,poids:float,frottements:float,degats_bloques:float,taux_degats:float,position:crt.Position=crt.POSITION_ABSENTE):
-        Equipement.__init__(self,labyrinthe,position)
+        Equippement.__init__(self,labyrinthe,position)
         self.degats_bloques = degats_bloques
         self.taux_degats = taux_degats
         self.taux_stats = {}
@@ -35,4 +35,4 @@ class Bouclier(Degainable):
 # Imports utilisés dans le code
 from Old_Affichage.Skins.Skins import SKIN_BOUCLIER
 from ......Effet.Attaque.Attaque import Attaque_case
-from ...Equippement import Equipement
+from ...Equippement import Equippement

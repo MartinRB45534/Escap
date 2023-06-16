@@ -6,9 +6,9 @@ if TYPE_CHECKING:
     from ......Effet.Attaque.Attaque import Attaque_particulier
 
 # Imports des classes parentes
-from ...Equippement import Equipement
+from ...Equippement import Equippement
 
-class Defensif(Equipement):
+class Defensif(Equippement):
     """La classe des équipements défensifs. Réduit les dégats."""
 
     def intercepte(self,attaque:Attaque_particulier):

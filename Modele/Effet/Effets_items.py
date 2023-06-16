@@ -20,7 +20,7 @@ class En_sursis(One_shot,On_fin_tour):
     def action(self,item:Item):
         if item.labyrinthe.position_case[item.position].agissant is not None:
             if isinstance(item,(Fragile,Evanescent)):
-                item.etat = "brisé"
+                item.etat = Etats_items.BRISE
             else :
                 item.arret()
 
@@ -43,6 +43,7 @@ class On_hit(Effet):
 # Imports utilisés dans le code
 from ..Effet.Attaque.Attaque import Attaque_case
 from ..Entitee.Item.Projectile.Projectiles import Fragile,Evanescent
+from ..Entitee.Item.Etats import Etats_items
 from ..Entitee.Agissant.Agissant import NoOne
 from ..Labyrinthe.Deplacement import Deplacement
 from ..Labyrinthe.Passage import Passage

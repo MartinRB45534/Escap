@@ -1,10 +1,11 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, List, Tuple, Dict, Set
+from typing import TYPE_CHECKING, Optional, List, Type, Dict, Set
 import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ...Systeme.Classe.Classe_principale import Classe_principale
+    from .Espece import Espece
     from .Inventaire import Inventaire
     from .Statistiques import Statistiques
     from ...Esprit.Esprit import Esprit
@@ -18,12 +19,12 @@ from ..Entitee import Non_superposable, Mobile
 
 class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cadavre n'agit pas.
     """La classe des entitées animées. Capable de décision, de différentes actions, etc. Les principales caractéristiques sont l'ID, les stats, et la classe principale."""
-    def __init__(self,identite:str,labyrinthe:Labyrinthe,cond_evo:List,skills_intrasecs:Set[Skill_intrasec],skills:Set[Skill_extra],niveau:int,pv_max:float,regen_pv_max:float,regen_pv_min:float,restauration_regen_pv:float,pm_max:float,regen_pm:float,force:float,priorite:float,vitesse:float,affinites:Dict[Element,float],immunites:Set[Element],especes:List[str],oubli:float,resolution:int,forme:str,forme_tete:str,nb_doigts:int,magies:List[Type[Magie]],items:List[Type[Item]],position:crt.Position,ID: Optional[int]=None):
+    def __init__(self,identite:str,labyrinthe:Labyrinthe,cond_evo:List,skills_intrasecs:Set[Skill_intrasec],skills:Set[Skill_extra],niveau:int,pv_max:float,regen_pv_max:float,regen_pv_min:float,restauration_regen_pv:float,pm_max:float,regen_pm:float,force:float,priorite:float,vitesse:float,affinites:Dict[Element,float],immunites:Set[Element],espece:Espece,oubli:float,resolution:int,forme:str,forme_tete:str,nb_doigts:int,magies:List[Type[Magie]],items:List[Type[Item]],position:crt.Position,ID: Optional[int]=None):
         Entitee.__init__(self,position,ID)
         self.identite = identite
         self.labyrinthe = labyrinthe
         self.statistiques = Statistiques(self,priorite,vitesse,force,pv_max,regen_pv_max,regen_pv_min,restauration_regen_pv,pm_max,regen_pm,affinites,immunites)
-        self.especes:List[str] = especes
+        self.espece = espece
         self.classe_principale = Classe_principale(cond_evo,skills_intrasecs,skills,niveau)
         self.niveau = self.classe_principale.niveau
         self.oubli = oubli
@@ -66,16 +67,6 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
     def equipement(self):
         return self.inventaire.get_equippement()
 
-    def get_stats_attaque(self,element:Element):
-        force = self.force
-        for taux in self.taux_force.values():
-            force *= taux
-        affinite = self.get_aff(element)
-        for taux in self.taux_stats.values():
-            force *= taux
-            affinite *= taux
-        return force,affinite
-
     def get_impact(self) -> crt.Position:
         return self.position+self.dir_regard
 
@@ -83,14 +74,13 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
     def attaque(self,direction:crt.Direction):
         self.regarde(direction)
         skill = trouve_skill(self.classe_principale,Skill_attaque_arme)
-        arme = self.get_arme()
+        arme = self.arme
         if skill and arme:
             self.fait(skill.fait(self,arme,direction))
         else:
             skill = trouve_skill(self.classe_principale,Skill_attaque)
             assert skill is not None
             self.fait(skill.fait(self,direction))
-        self.set_statut("attaque")
 
     def va(self,direction:crt.Direction):
         self.regarde(direction)
@@ -139,13 +129,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         return self.labyrinthe.get_mur(self.position,direction).ferme # TODO : revoir ça
 
     def affinite(self,element:Element):
-        affinite = self.affinites[element]
-        for taux in self.taux_affinites[element].values():
-            affinite *= taux
-        for item in self.inventaire.get_equippement():
-            if isinstance(item,Elementaire) and item.element == element:
-                affinite *= item.taux_aff
-        return affinite
+        return self.statistiques.get_affinite(element)
 
     def peut_payer(self,cout:float):
         skill = trouve_skill(self.classe_principale,Skill_magie_infinie)
@@ -182,6 +166,10 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
             if isinstance(effet,Reserve_mana):
                 total += effet.mana
         return total
+    
+    @property
+    def force(self):
+        return self.statistiques.get_force()
 
     @property
     def vitesse(self):
@@ -192,9 +180,9 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         return self.statistiques.get_priorite()
 
     def subit(self,degats:float,element=Element.TERRE):
-        if element not in self.immunites :
-            self.pv -= degats/self.get_aff(element)
-            self.regen_pv = self.regen_pv_min
+        if element not in self.statistiques.immunites:
+            degats /= self.statistiques.get_affinite(element)
+            self.statistiques.blesse(degats)
 
     def instakill(self,responsable:Agissant):
         immortel = trouve_skill(self.classe_principale,Skill_immortel)
@@ -205,9 +193,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
             self.meurt()
 
     def soigne(self,soin:float):
-        self.pv += soin
-        if self.pv >= self.pv_max:
-            self.pv = self.pv_max
+        self.statistiques.soigne(soin)
 
     def rejoint(self,esprit:Esprit):
         self.esprit = esprit
@@ -228,9 +214,6 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
 
     def get_esprit(self):
         return self.esprit
-
-    def get_especes(self):
-        return self.especes
 
     def get_description(self,observation=0):
             return ["Un agissant","Qu'est-ce qu'il fait dans un inventaire ?"]
@@ -266,15 +249,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         if self.etat == Etats_agissants.VIVANT:
             #Un nouveau tour commence, qui s'annonce remplit de bonnes surprises et de nouvelles rencontres ! Pour partir du bon pied, on a quelques trucs à faire :
             #La régénération ! Plein de nouveaux pm et pv à gaspiller ! C'est pas beau la vie ?
-            self.pv += self.get_total_regen_pv()
-            self.regen_pv += self.restauration_regen_pv
-            self.pm += self.get_total_regen_pm() #Et oui, les pm après, désolé...
-            if self.pv > self.pv_max:
-                self.pv = self.pv_max
-            if self.regen_pv > self.regen_pv_max:
-                self.regen_pv = self.regen_pv_max
-            if self.pm > self.pm_max:
-                self.pm = self.pm_max
+            self.statistiques.debut_tour()
             self.inventaire.debut_tour()
             # Partie auras à retravailler         /!\ Qu'est-ce que je voulais retravailler là ?
             skills = self.classe_principale.debut_tour()
@@ -420,22 +395,15 @@ class NoOne(Agissant):
 
 # Imports utilisés dans le code (il y en a beaucoup !!!)
 from ...Action.Attaque import Attaque
-from ...Entitee.Entitee import Entitee
+from ..Entitee import Entitee
 from .Vue.Vue import voit_vue
 from .Etats import Etats_agissants
+from ...Action.Action import Action
 from ...Esprit.Esprit import NOBODY
-from ...Entitee.Item.Cadavre import Cadavre
-from ...Entitee.Item.Equippement.Role.Elementaires import Elementaire
-from ...Entitee.Item.Equippement.Role.Defensif.Defensif import Defensif
-from ...Entitee.Item.Equippement.Role.Accelerateur import Accelerateur
-from ...Entitee.Item.Equippement.Role.Anoblisseur import Anoblisseur
-from ...Entitee.Item.Equippement.Role.Reparateur.Reparateur import Reparateur
-from ...Entitee.Item.Equippement.Role.Reparateur_magique.Reparateur_magique import Reparateur_magique
-from ...Entitee.Item.Items import *
-from ...Entitee.Agissant.Inventaire import Inventaire
-from ...Entitee.Agissant.Agissants import *
-from ...Action.Actions import *
-from ...Systeme.Classe.Classes import *
-from ...Systeme.Skill.Skills import *
-from ...Effet.Effets import *
+from ..Item.Cadavre import Cadavre
+from ..Item.Equippement.Role.Defensif.Defensif import Defensif
+from .Inventaire import Inventaire
+from ...Systeme.Skill.Skills import Skill_intrasec, Skill_extra, Skill_attaque_arme, Skill_attaque, Skill_deplacement, Skill_magie_infinie, Skill_defense, Skill_immortel, Skill_essence_magique, Skill_vision, Skill_aura, Skills_magiques
+from ...Systeme.Classe.Classes import trouve_skill
+from ...Effet.Effets import On_attack, On_fin_tour, Maladie, Dopage, Attaque_particulier, Magie, Reserve_mana, On_debut_tour, On_post_decision, On_post_action, Time_limited
 from Old_Affichage.Skins.Skins import SKIN_STATUT_ATTAQUE, SKIN_STATUT_ATTAQUE_BOOSTEE, SKIN_STATUT_PAIX, SKIN_STATUT_FUITE, SKIN_STATUT_EXPLORATION, SKIN_STATUT_RAPPROCHE, SKIN_STATUT_SOIN, SKIN_STATUT_SOUTIEN, SKIN_VIDE

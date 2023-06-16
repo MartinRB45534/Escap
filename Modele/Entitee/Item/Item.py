@@ -17,7 +17,7 @@ class Item(Mobile):
     def __init__(self,labyrinthe:Labyrinthe,position:crt.Position, ID: Optional[int]=None):
         Entitee.__init__(self,position,ID)
         self.labyrinthe = labyrinthe
-        self.etat = "intact" #Le niveau l'évacuera s'il n'est plus intact.
+        self.etat = Etats_items.INTACT #Le niveau l'évacuera s'il n'est plus intact.
         self.priorite = 0 #Pour avoir le droit de la ramasser.
         self.action:Optional[Vole] = None #Utile uniquement quand l'item est lancé. Les items ne peuvent que voler
         self.lanceur:Optional[Agissant] = None
@@ -40,7 +40,7 @@ class Item(Mobile):
         if isinstance(non_superposable,Agissant) and isinstance(self,Percant) :
             self.ajoute_effet(En_sursis())
         elif isinstance(self,(Fragile,Evanescent)):
-            self.etat = "brisé"
+            self.etat = Etats_items.BRISE
             self.arret()
         else :
             self.arret()
@@ -50,7 +50,7 @@ class Item(Mobile):
             if isinstance(effet,On_hit):
                 effet.execute(self)
         if isinstance(self,(Fragile,Evanescent)):
-            self.etat = "brisé"
+            self.etat = Etats_items.BRISE
             self.arret()
         else :
             self.arret()
@@ -60,7 +60,7 @@ class Item(Mobile):
             if isinstance(effet,On_hit) :
                 effet.execute(self)
         if isinstance(self,Evanescent):
-            self.etat = "brisé"
+            self.etat = Etats_items.BRISE
             self.arret()
         else :
             self.arret()
@@ -118,6 +118,7 @@ class Ingredient(Item):
 # Imports utilisés dans le code
 from ..Entitee import Entitee
 from .Projectile.Projectiles import Percant, Fragile, Evanescent
+from .Etats import Etats_items
 from Old_Affichage.Skins.Skins import SKIN_VIDE, SKIN_INGREDIENT # TODO : retirer la mention "Old"
 from ...Effet.Effet import On_debut_tour, On_fin_tour, Time_limited
 from ...Effet.Effets_items import En_sursis, On_hit

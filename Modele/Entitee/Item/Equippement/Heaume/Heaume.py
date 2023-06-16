@@ -7,12 +7,12 @@ if TYPE_CHECKING:
     from .....Labyrinthe.Labyrinthe import Labyrinthe
 
 # Imports des classes parentes
-from ..Equippement import Equipement
+from ..Equippement import Equippement
 
-class Haume(Equipement):
-    """La classe des équipements de type haume. On ne peut en porter qu'un à la fois."""
+class Heaume(Equippement):
+    """La classe des équipements de type heaume. On ne peut en porter qu'un à la fois."""
     def __init__(self,labyrinthe:Labyrinthe,poids:float,frottements:float,position:crt.Position=crt.POSITION_ABSENTE):
-        Equipement.__init__(self,labyrinthe,position)
+        Equippement.__init__(self,labyrinthe,position)
 
     @staticmethod
     def get_image():

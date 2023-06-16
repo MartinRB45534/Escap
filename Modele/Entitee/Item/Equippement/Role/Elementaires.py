@@ -3,12 +3,12 @@ from __future__ import annotations
 # Pas d'import pour les annotations
 
 # Imports des classes parentes
-from ..Equippement import Equipement
+from ..Equippement import Equippement
 
 # Imports pour les variables de classe
 from .....Systeme.Elements import Element
 
-class Elementaire(Equipement):
+class Elementaire(Equippement):
     """La classe des équipements qui augmentent l'affinité à un élément."""
     element:Element
     def __init__(self,taux_aff:float):

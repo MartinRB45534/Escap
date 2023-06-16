@@ -22,16 +22,16 @@ class Place_effet(Action_final, Non_repetable):
     def __init__(self,agissant:Agissant,latence:float,item:Consommable,effet:Effet):
         super().__init__(agissant,latence)
         self.item = item
-        self.item.etat = "utilise"
+        self.item.etat = Etats_items.UTILISE
         self.effet = effet
 
     def action(self):
         self.agissant.effets.append(self.effet)
-        self.item.etat = "brisé"
+        self.item.etat = Etats_items.BRISE
 
     def interrompt(self):
         """L'action est interrompue."""
-        self.item.etat = "intact"
+        self.item.etat = Etats_items.BRISE
 
 class Boit(Place_effet):
     """
@@ -94,13 +94,13 @@ class Impregne(Lit,Action_final,Caste_final):
         """L'action est terminée."""
         if self.magie is not None:
             self.item.action_portee = self.magie # Le parchemin est imprégné de la magie
-            self.item.etat = "intact"
+            self.item.etat = Etats_items.INTACT
         else:
             self.interrompt()
 
     def interrompt(self):
         """L'action est interrompue."""
-        self.item.etat = "intact"
+        self.item.etat = Etats_items.INTACT
         self.magie = None
 
     def set_magie(self,magie:Magie):
@@ -110,3 +110,5 @@ class Impregne(Lit,Action_final,Caste_final):
         self.latence = magie.latence*self.taux_latence_impregne
         self.magie.cout*=self.taux_cout_caste
         self.magie.latence*=self.taux_latence_caste
+
+from ..Entitee.Item.Etats import Etats_items

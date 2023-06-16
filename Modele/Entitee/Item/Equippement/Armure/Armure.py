@@ -7,12 +7,12 @@ if TYPE_CHECKING:
     from .....Labyrinthe.Labyrinthe import Labyrinthe
 
 # Imports des classes parentes
-from ..Equippement import Equipement
+from ..Equippement import Equippement
 
-class Armure(Equipement):
+class Armure(Equippement):
     """La classe des équipements de type armure. On ne peut en porter qu'une à la fois."""
     def __init__(self,labyrinthe:Labyrinthe,position:crt.Position=crt.POSITION_ABSENTE):
-        Equipement.__init__(self,labyrinthe,position)
+        Equippement.__init__(self,labyrinthe,position)
         self.poids = 10 #C'est lourd !
         self.frottements = 8 #Il y a pire.
 

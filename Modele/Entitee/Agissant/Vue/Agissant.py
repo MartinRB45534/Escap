@@ -6,27 +6,16 @@ import Carte as crt
 if TYPE_CHECKING:
     from ....Systeme.Classe.Classe_principale import Classe_principale
     from .Inventaire import Inventaire_vu
+    from .Statistiques import Statistiques_vues
     from ..Agissant import Agissant
-
-# Valeurs par défaut des paramètres
-from ....Systeme.Elements import Element
+    from ..Espece import Espece
 
 class Agissant_vu:
-    def __init__(self, ID:int, identite:str, pv_max:Optional[float], pv:Optional[float], proportion_pv:Optional[float], pm_max:Optional[float], pm:Optional[float], proportion_pm:Optional[float], force:Optional[float], priorite:Optional[float], vitesse:Optional[float], affinites:Dict[Element,float], immunites:Dict[Element,float], especes:Set[str], classe_principale:Classe_principale, niveau:int, inventaire:Inventaire_vu, dir_regard:Optional[crt.Dir] = None):
+    def __init__(self, ID:int, identite:Optional[str], statistiques:Statistiques_vues, espece: Espece, niveau:int, inventaire:Inventaire_vu, dir_regard:crt.Direction, classe_principale:Optional[Classe_principale]=None):
         self.ID = ID
         self.identite = identite
-        self.pv_max = pv_max
-        self.pv = pv
-        self.proportion_pv = proportion_pv
-        self.pm_max = pm_max
-        self.pm = pm
-        self.proportion_pm = proportion_pm
-        self.force = force
-        self.priorite = priorite
-        self.vitesse = vitesse
-        self.affinites = affinites
-        self.immunites = immunites
-        self.especes = especes
+        self.statistiques = statistiques
+        self.espece = espece
         self.classe_principale = classe_principale
         self.niveau = niveau
         self.inventaire = inventaire
@@ -36,19 +25,12 @@ def voit_agissant(agissant:Agissant) -> Agissant_vu:
     return Agissant_vu(
         agissant.ID,
         agissant.identite,
-        agissant.pv_max,
-        agissant.pv,
-        agissant.pm_max,
-        agissant.pm,
-        agissant.force,
-        agissant.priorite,
-        agissant.vitesse,
-        agissant.affinites,
-        agissant.immunites,
-        agissant.especes,
-        agissant.classe_principale,
+        voit_statistiques(agissant.statistiques),
+        agissant.espece,
         agissant.niveau,
-        agissant.inventaire,
+        voit_inventaire(agissant.inventaire),
         agissant.dir_regard
         )
 
+from .Inventaire import voit_inventaire
+from .Statistiques import voit_statistiques

@@ -21,7 +21,7 @@ class Explosif(Projectile):
 class Charge(Explosif):
     def __init__(self,labyrinthe:Labyrinthe,niveau:int,vitesse:float=0,poids:float=0,frottements:float=0,portee:float=0,degats:float=0,position:crt.Position=crt.POSITION_ABSENTE):
         Item.__init__(self,labyrinthe,position)
-        self.etat = "intact" #Le niveau l'évacuera s'il n'est plus intact.
+        self.etat = Etats_items.INTACT #Le niveau l'évacuera s'il n'est plus intact.
         self.priorite = 0
         self.porteur = None
         self.lanceur = None
@@ -43,7 +43,7 @@ class Fleche(Percant):
     """La classe des projectiles de type flèche. Affectés différemment par certains skills."""
     def __init__(self,labyrinthe:Labyrinthe,niveau:int,vitesse:float=0,poids:float=0,frottements:float=0,degats:float=0,position:crt.Position=crt.POSITION_ABSENTE):
         Item.__init__(self,labyrinthe,position)
-        self.etat = "intact"
+        self.etat = Etats_items.INTACT
         self.priorite = 0 #Faire dépendre du niveau ?
         self.porteur = None
         self.lanceur = None
@@ -61,7 +61,7 @@ class Fleche_fantome(Fleche,Fantome):
     """Une flèche qui peut traverser les murs. Est-ce l'âme d'une flèche décédée ?"""
     def __init__(self,labyrinthe:Labyrinthe,niveau:int,vitesse:float=0,poids:float=0,frottements:float=0,degats:float=0,position:crt.Position=crt.POSITION_ABSENTE):
         Item.__init__(self,labyrinthe,position)
-        self.etat = "intact"
+        self.etat = Etats_items.INTACT
         self.priorite = 0 #Faire dépendre du niveau ?
         self.porteur = None
         self.lanceur = None
@@ -79,7 +79,7 @@ class Fleche_explosive(Fleche,Explosif):
     """Une flèche explosive. C'est une flèche ou un explosif ? Mieux vaut rester loin en tous cas..."""
     def __init__(self,labyrinthe:Labyrinthe,niveau:int,vitesse:float=0,poids:float=0,frottements:float=0,portee:float=0,degats:float=0,position:crt.Position=crt.POSITION_ABSENTE):
         Item.__init__(self,labyrinthe,position)
-        self.etat = "intact"
+        self.etat = Etats_items.INTACT
         self.priorite = 0 #Faire dépendre du niveau ?
         self.porteur = None
         self.lanceur = None
@@ -108,7 +108,7 @@ class Projectile_magique(Projectile,Evanescent):
     """La classe des projectiles créés par magie."""
     def __init__(self,labyrinthe:Labyrinthe,niveau:int,vitesse:float=0,poids:float=0,frottements:float=0,degats:float=0,element:Element=Element.TERRE,position:crt.Position=crt.POSITION_ABSENTE):
         Item.__init__(self,labyrinthe,position)
-        self.etat = "intact"
+        self.etat = Etats_items.INTACT
         self.priorite = 0 #Faire dépendre du niveau ?
         self.porteur = None
         self.lanceur = None
@@ -126,7 +126,7 @@ class Magie_explosive(Explosif,Projectile_magique):
     """La classe des projectiles explosifs créés par magie."""
     def __init__(self,labyrinthe:Labyrinthe,niveau:int,vitesse:float=0,poids:float=0,frottements:float=0,portee:float=0,degats:float=0,element:Element=Element.TERRE,position:crt.Position=crt.POSITION_ABSENTE):
         Item.__init__(self,labyrinthe,position)
-        self.etat = "intact" #Le niveau l'évacuera s'il n'est plus intact.
+        self.etat = Etats_items.INTACT #Le niveau l'évacuera s'il n'est plus intact.
         self.priorite = 0
         self.porteur = None
         self.lanceur = None
@@ -158,3 +158,4 @@ class Magie_explosive_percante(Magie_explosive,Percant):
 # Imports utilisés dans le code
 from ....Effet.Effets_items import On_hit
 from ....Systeme.Elements import Element
+from ..Etats import Etats_items
