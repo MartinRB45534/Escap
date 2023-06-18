@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Set, Optional, Dict
+from typing import TYPE_CHECKING, Set, Optional, Dict, Self
 import Carte as crt
 import networkx as nx
 
@@ -77,6 +77,8 @@ class Vision(Extrait):
         if direction in self[u][v] and len(self[v][u]) == 1:
             return self[v][u]["mur"]
 
+    def merge(self, vision:Self):
+        pass # TODO
 
 # Imports utilisés dans le code
 from .Agissant import Vision_agissant

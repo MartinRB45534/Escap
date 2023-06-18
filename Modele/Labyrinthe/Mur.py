@@ -85,11 +85,11 @@ class Porte(Mur_plein):
         self.casse = True
 
     def ouvrir(self, agissant:Agissant):
-        if self.code in agissant.get_clees():
+        if self.code in agissant.clees:
             self.ouvert = True
 
     def fermer(self, agissant:Agissant):
-        if self.code in agissant.get_clees():
+        if self.code in agissant.clees:
             self.ouvert = False
 
     def passage(self, passage: Passage):
@@ -193,4 +193,4 @@ class Escalier(Mur_asymétrique, Mur_ouvert):
 from ..Entitee.Entitee import Fantome
 from ..Entitee.Agissant.Agissant import Agissant
 from ..Systeme.Classe.Classes import trouve_skill
-from ..Systeme.Skill.Skills import Skill_ecrasement
+from ..Systeme.Skill.Passif import Skill_ecrasement
