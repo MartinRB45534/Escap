@@ -179,7 +179,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
     def priorite(self):
         return self.statistiques.get_priorite()
 
-    def subit(self,degats:float,element=Element.TERRE):
+    def subit(self,degats:float,element:Element):
         if element not in self.statistiques.immunites:
             degats /= self.statistiques.get_affinite(element)
             self.statistiques.blesse(degats)
@@ -223,26 +223,6 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         if skill is None:
             raise ValueError("Un agissant n'a pas de skill de vision !")
         return skill
-
-    def get_skins_statuts(self):
-        if self.statut == "paix":
-            return [SKIN_STATUT_PAIX]
-        elif self.statut == "exploration":
-            return [SKIN_STATUT_EXPLORATION]
-        elif self.statut == "fuite":
-            return [SKIN_STATUT_FUITE]
-        elif self.statut == "soutien":
-            return [SKIN_STATUT_SOUTIEN]
-        elif self.statut == "soin":
-            return [SKIN_STATUT_SOIN]
-        elif self.statut == "attaque":
-            return [SKIN_STATUT_ATTAQUE]
-        elif self.statut == "attaque boostée":
-            return [SKIN_STATUT_ATTAQUE_BOOSTEE]
-        elif self.statut == "rapproche":
-            return [SKIN_STATUT_RAPPROCHE]
-        else:
-            return [SKIN_VIDE]
 
     # Découvrons le déroulé d'un tour, avec agissant-san :
     def debut_tour(self):
@@ -399,11 +379,16 @@ from ..Entitee import Entitee
 from .Vue.Vue import voit_vue
 from .Etats import Etats_agissants
 from ...Action.Action import Action
+from ...Action.Magie.Magie import Magie
 from ...Esprit.Esprit import NOBODY
 from ..Item.Cadavre import Cadavre
 from ..Item.Equippement.Role.Defensif.Defensif import Defensif
 from .Inventaire import Inventaire
-from ...Systeme.Skill.Skills import Skill_intrasec, Skill_extra, Skill_attaque_arme, Skill_attaque, Skill_deplacement, Skill_magie_infinie, Skill_defense, Skill_immortel, Skill_essence_magique, Skill_vision, Skill_aura, Skills_magiques
+from ...Systeme.Skill.Skill import Skill_intrasec, Skill_extra
+from ...Systeme.Skill.Actif import Skill_attaque_arme, Skill_attaque, Skill_deplacement, Skills_magiques
+from ...Systeme.Skill.Passif import Skill_magie_infinie, Skill_defense, Skill_immortel, Skill_essence_magique, Skill_vision, Skill_aura
 from ...Systeme.Classe.Classes import trouve_skill
-from ...Effet.Effets import On_attack, On_fin_tour, Maladie, Dopage, Attaque_particulier, Magie, Reserve_mana, On_debut_tour, On_post_decision, On_post_action, Time_limited
-from Old_Affichage.Skins.Skins import SKIN_STATUT_ATTAQUE, SKIN_STATUT_ATTAQUE_BOOSTEE, SKIN_STATUT_PAIX, SKIN_STATUT_FUITE, SKIN_STATUT_EXPLORATION, SKIN_STATUT_RAPPROCHE, SKIN_STATUT_SOIN, SKIN_STATUT_SOUTIEN, SKIN_VIDE
+from ...Effet.Effet import On_attack, On_fin_tour, On_debut_tour, On_post_decision, On_post_action, Time_limited
+from ...Effet.Sante.Maladies.Maladie import Maladie
+from ...Effet.Attaque.Attaque import Attaque_particulier
+from ...Effet.Effets_divers import Dopage, Reserve_mana

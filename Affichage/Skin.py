@@ -3,11 +3,12 @@ from warnings import warn
 
 class Illustration:
     path = "Affichage/assets/"
+    default = 'Affichage/assets/vide.png'
     def __init__(self,nom_fichier):
         try:
             self.image = pygame.image.load(self.path+nom_fichier).convert_alpha()
         except FileNotFoundError:
-            self.image = pygame.image.load(self.path+"/vide.png").convert_alpha()
+            self.image = pygame.image.load(self.default).convert_alpha()
             warn(f"N'a pas pu charger {nom_fichier}, remplacé par vide.png")
         except pygame.error as message:
             warn("N'oubliez pas d'initialiser pygame avant d'importer l'affichage !")

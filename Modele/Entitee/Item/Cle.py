@@ -23,4 +23,4 @@ class Cle(Item):
         return SKIN_CLE
 
 # Imports utilisés dans le code
-from Old_Affichage.Skins.Skins import SKIN_CLE
+from ...Affichage.Skins import SKIN_CLE

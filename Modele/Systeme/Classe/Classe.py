@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Set
+import Affichage as af
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
@@ -87,9 +88,8 @@ class Classe:
         return skills
 
     def get_skin(self):
-        return SKIN_MYSTERE
+        return af.SKIN_MYSTERE
     
 # Imports utilisés dans le code
-from Old_Affichage.Skins.Skins import SKIN_MYSTERE
 from ..Skill.Actif import Actif
 from ..Skill.Passif import Skill_debut_tour

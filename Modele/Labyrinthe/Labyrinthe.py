@@ -8,7 +8,6 @@ if TYPE_CHECKING:
     from .Case import Case
     from .Mur import Mur, Mur_impassable
     from ..Entitee.Entitee import Mobile
-    from ..Entitee.Agissant.Agissant import Agissant
     from .Deplacement import Deplacement
     from .Forme import Forme
     from .Passage import Passage

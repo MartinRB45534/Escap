@@ -1020,7 +1020,3 @@ NOBODY = Mindless()
 from .Vision.Vision import Vision
 from ..Entitee.Agissant.Agissant import Agissant
 from ..Entitee.Agissant.Etats import Etats_agissants
-from ..Entitee.Agissant.PNJ.PNJs import PNJ, PJ
-from ..Entitee.Agissant.Role.Sentinelle import Sentinelle
-import random
-import operator

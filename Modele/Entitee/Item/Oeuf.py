@@ -21,4 +21,4 @@ class Oeuf(Item):
         return SKIN_OEUF
     
 # Imports utilisés dans le code
-from Old_Affichage.Skins.Skins import SKIN_OEUF
+from ...Affichage.Skins import SKIN_OEUF

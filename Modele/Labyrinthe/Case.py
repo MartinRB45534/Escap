@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from ..Entitee.Entitee import Mobile, Non_superposable
     from ..Entitee.Agissant.Agissant import Agissant
     from ..Entitee.Item.Item import Item
-    from ..Entitee.Decors.Decor import Decors
+    from ..Entitee.Decors.Decors import Decors
 
 # Valeurs par défaut des paramètres
 from ..Systeme.Elements import Element
@@ -53,7 +53,7 @@ class Case(crt.Case):
         pass
 
     #Certains agissants particulièrement tapageurs font un concours de celui qui aura la plus grosse aura (comment ça, cette phrase particulièrement compliquée aura juste servi à faire un jeu de mot sur aura ?)
-    def ajoute_aura(self,auras:Set[Aura],auras_elementales:Set[Aura_elementale]):
+    def ajoute_aura(self,auras:Set[Aura]=set(),auras_elementales:Set[Aura_elementale]=set()):
         """Fonction qui ajoute un effet d'aura. On décidera de ceux qui s'exécutent plus tard."""
         # Les auras non élémentales s'appliquent si personne n'a d'aura élémentale sur la case (même si l'aura de base de la case a plus de priorité)
         if {aura for aura in self.auras if isinstance(aura, Aura_elementale)} == {self.aura_elementale}:
@@ -155,4 +155,4 @@ from ..Effet.Auras import Terre_permanente, Feu_permanent, Glace_permanente, Omb
 from ..Effet.Effet import On_debut_tour, Time_limited, On_attack, On_post_action
 from ..Effet.Attaque.Attaque import Attaque_case, Attaque_case_delayee
 from ..Systeme.Classe.Classes import trouve_skill
-from ..Systeme.Skill.Skills import Skill_ecrasement
+from ..Systeme.Skill.Passif import Skill_ecrasement

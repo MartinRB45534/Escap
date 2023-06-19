@@ -6,7 +6,8 @@ if TYPE_CHECKING:
     from .Agissant import Agissant
     from ...Systeme.Elements import Element
 
-# Pas de classe parente
+# Imports des valeurs par défaut des paramètres
+from ...Systeme.Elements import Element
 
 class Statistiques:
 

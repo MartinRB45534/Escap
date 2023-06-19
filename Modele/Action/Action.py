@@ -15,6 +15,7 @@ class Action:
         self.agissant = agissant # Pour ne pas avoir à repasser l'agissant en paramètre à chaque fois
         self.latence:float = 0 # Le temps écoulé depuis le début de l'action
         self.latence_max = latence # Le temps que l'action doit durer
+        self.taux_vitesse = {}
         self.repete = False # Si l'action doit être répétée
         self.repetitions = 0 # Le nombre de fois que l'action a été répétée
 

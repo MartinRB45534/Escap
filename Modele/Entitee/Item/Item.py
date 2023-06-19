@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
 import Carte as crt
+import Affichage as af
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
@@ -100,7 +101,7 @@ class Item(Mobile):
 
     @staticmethod
     def get_image():
-        return SKIN_VIDE
+        return af.SKIN_VIDE
 
 class Consommable(Item):
     """La classe des items qui peuvent être consommés. Ajoute à l'agissant un effet. Disparait après usage."""
@@ -119,6 +120,6 @@ class Ingredient(Item):
 from ..Entitee import Entitee
 from .Projectile.Projectiles import Percant, Fragile, Evanescent
 from .Etats import Etats_items
-from Old_Affichage.Skins.Skins import SKIN_VIDE, SKIN_INGREDIENT # TODO : retirer la mention "Old"
+from ...Affichage.Skins import SKIN_INGREDIENT
 from ...Effet.Effet import On_debut_tour, On_fin_tour, Time_limited
 from ...Effet.Effets_items import En_sursis, On_hit

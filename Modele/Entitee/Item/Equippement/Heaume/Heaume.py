@@ -16,7 +16,7 @@ class Heaume(Equippement):
 
     @staticmethod
     def get_image():
-        return SKIN_CASQUE
+        return SKIN_HEAUME
 
 # Imports utilisés dans le code
-from Old_Affichage.Skins.Skins import SKIN_CASQUE
+from .....Affichage.Skins import SKIN_HEAUME

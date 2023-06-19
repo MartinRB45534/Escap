@@ -21,4 +21,4 @@ class Anneau(Equippement):
         return SKIN_ANNEAU
 
 # Imports utilisés dans le code
-from Old_Affichage.Skins.Skins import SKIN_ANNEAU
+from .....Affichage.Skins import SKIN_ANNEAU

@@ -1,11 +1,9 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, List
 import Carte as crt
-from Modele.Labyrinthe.Labyrinthe import Labyrinthe
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...Agissant.Agissant import Agissant
     from ....Labyrinthe.Labyrinthe import Labyrinthe
     from ....Systeme.Elements import Element
 
@@ -13,6 +11,9 @@ if TYPE_CHECKING:
 from .Projectile import Projectile
 from ..Item import Item
 from ...Entitee import Fantome
+
+# Imports des valeurs par défaut des paramètres
+from ....Systeme.Elements import Element
 
 class Explosif(Projectile):
     """La classe des projectiles qui explosent. Affectés différemment par certains skills."""

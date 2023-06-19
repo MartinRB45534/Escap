@@ -21,4 +21,4 @@ class Cadavre(Item):
         return SKIN_CADAVRE
 
 # Imports utilisés dans le code
-from Old_Affichage.Skins.Skins import SKIN_CADAVRE
+from ...Affichage.Skins import SKIN_CADAVRE

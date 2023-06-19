@@ -7,12 +7,14 @@ if TYPE_CHECKING:
     from ..Entitee.Agissant.Agissant import Agissant
     from ..Entitee.Item.Item import Item
     from ..Entitee.Item.Equippement.Degainable.Degainable import Arme
-    from ..Systeme.Elements import Element
 
 # Imports des classes parentes
 from .Effet import Enchantement, On_debut_tour, On_post_decision
 from .Effets_items import On_hit
 from .Effets_agissants import Effet_force, Effet_vision, Effet_pv, Effet_pm, Effet_vitesse, Effet_affinite
+
+# Imports des valeurs par défaut des paramètres
+from ..Systeme.Elements import Element
 
 class Enchantement_force(Enchantement,On_debut_tour,Effet_force):
     """Les enchantements qui affectent la force (en positif ou négatif)."""

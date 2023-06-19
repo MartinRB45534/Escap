@@ -42,4 +42,4 @@ class Arme(Degainable):
         return SKIN_ARME
     
 # Imports utilisés dans le code
-from Old_Affichage.Skins.Skins import SKIN_ARME
+from .....Affichage.Skins import SKIN_ARME

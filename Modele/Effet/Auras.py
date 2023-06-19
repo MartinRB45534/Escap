@@ -49,13 +49,12 @@ class Terre(One_shot,Aura_temporaire):
     def execute(self,case:Case):
         if self.phase == "démarrage":
             self.termine() #Pour l'instant elle ne fait rien. Rien qu'empêcher les autres auras de s'exprimer. Je suppose que ça peut servir quand on visite des étages non-terrestres.
-        case.code += 1 #0 ou 1, selon que la case a une aura de Terre ou non
 
 class Terre_permanente(Aura_permanente):
     """L'effet qui applique l'aura de terre à une case. Il a toujours été là, et il n'en bougera pas."""
     element = Element.TERRE
     def execute(self,case:Case):
-        case.code += 1 #0 ou 1, selon que la case a une aura de Terre ou non
+        pass
 
 class Feu(Evenement,Aura_temporaire):
     """L'effet qui applique l'aura de feu à une case. Laissé ici par un agissant."""
@@ -67,8 +66,7 @@ class Feu(Evenement,Aura_temporaire):
     def action(self,case:Case):
         occupant = case.agissant
         if occupant is not None and occupant.esprit != self.responsable.esprit :
-            occupant.subit(self.responsable,self.temps_restant,"proximité",self.element)
-        case.code += 2 #0 ou 2, selon que la case a une aura de Feu ou non
+            occupant.subit(self.temps_restant,self.element)
 
     def execute(self,case:Case):
         self.temps_restant -= 1
@@ -90,8 +88,7 @@ class Feu_permanent(Aura_permanente):
     def action(self,case:Case):
         occupant = case.agissant
         if occupant is not None :
-            occupant.subit(NoOne(),self.degats,"distance",self.element)
-        case.code += 2 #0 ou 2, selon que la case a une aura de Feu ou non
+            occupant.subit(self.degats,self.element)
 
 class Glace(One_shot,Aura_temporaire):
     """L'effet qui applique l'aura de glace à une case. Laissé ici par un agissant."""
@@ -107,10 +104,10 @@ class Glace(One_shot,Aura_temporaire):
     def action(self,case:Case):
         occupants = case.items | {case.agissant} if case.agissant is not None else case.items
         for occupant in occupants :
-            if isinstance(occupant,Item) or (occupant.esprit != self.responsable.esprit and self.element not in occupant.immunites) :
+            if isinstance(occupant,Item) or (occupant.esprit != self.responsable.esprit and self.element not in occupant.statistiques.immunites) :
                 if occupant.action is not None :
                     occupant.action.taux_vitesse["aura"] = self.ralentissement
-        case.code += 4 #0 ou 4, selon que la case a une aura de Glace ou non
+        # TODO : retravailler l'aura de glace
 
     def execute(self,case:Case):
         if self.phase == "démarrage":
@@ -130,10 +127,9 @@ class Glace_permanente(Aura_permanente):
     def action(self,case:Case):
         occupants = case.items | {case.agissant} if case.agissant is not None else case.items
         for occupant in occupants :
-            if  isinstance(occupant,Item) or self.element not in occupant.immunites :
+            if  isinstance(occupant,Item) or self.element not in occupant.statistiques.immunites :
                 if occupant.action is not None :
                     occupant.action.taux_vitesse["aura"] = self.ralentissement
-        case.code += 4 #0 ou 4, selon que la case a une aura de Glace ou non
 
 class Ombre(One_shot,Aura_temporaire):
     """L'effet qui applique l'aura d'ombre à une case. Laissé ici par un agissant."""
@@ -148,7 +144,6 @@ class Ombre(One_shot,Aura_temporaire):
 
     def action(self,case:Case):
         case.opacite_bonus = self.gain_opacite
-        case.code += 8 #0 ou 8, selon que la case a une aura d'Ombre ou non. Comme l'ombre et le reste sont incompatibles, les codes 9 à 15 sont libres. Le code maximum pour la partie élémentaire est 8
 
     def execute(self,case:Case):
         if self.phase == "démarrage":
@@ -167,7 +162,6 @@ class Ombre_permanente(Aura_permanente):
 
     def action(self,case:Case):
         case.opacite_bonus = self.gain_opacite
-        case.code += 8 #0 ou 8, selon que la case a une aura d'Ombre ou non. Comme l'ombre et le reste sont incompatibles, les codes 9 à 15 sont libres. Le code maximum pour la partie élémentaire est 8
 
 # Voilà maintenant les auras au niveau de l'agissant :
 
@@ -186,7 +180,7 @@ class Aura_terre(One_shot,On_debut_tour):
         zone = porteur.labyrinthe.a_portee(porteur.position,self.portee,Deplacement.SPATIAL,Forme.CERCLE,Passage(True, True, True, True, True))
         priorite = porteur.priorite + self.priorite
         for position in zone:
-            porteur.labyrinthe.get_case(position).ajoute_aura(self.effet(porteur,priorite))
+            porteur.labyrinthe.get_case(position).ajoute_aura(auras_elementales={self.effet(porteur,priorite)})
 
 class Aura_feu(One_shot,On_debut_tour):
     """Le centre de l'aura de feu d'un agissant. Attaché à l'agissant, placera les effets voulus sur les cases voisines."""
@@ -204,7 +198,7 @@ class Aura_feu(One_shot,On_debut_tour):
         zone = porteur.labyrinthe.a_portee(porteur.position,self.portee,Deplacement.SPATIAL,Forme.CERCLE,Passage(True, True, True, True, True))
         priorite = porteur.priorite + self.priorite
         for position in zone:
-            porteur.labyrinthe.get_case(position).ajoute_aura(self.effet(porteur,priorite,self.duree))
+            porteur.labyrinthe.get_case(position).ajoute_aura(auras_elementales={self.effet(porteur,priorite,self.duree)})
 
 class Aura_glace(One_shot,On_debut_tour):
     """Le centre de l'aura de glace d'un agissant. Attaché à l'agissant, placera les effets voulus sur les cases voisines."""
@@ -222,7 +216,7 @@ class Aura_glace(One_shot,On_debut_tour):
         zone = porteur.labyrinthe.a_portee(porteur.position,self.portee,Deplacement.SPATIAL,Forme.CERCLE,Passage(True, True, True, True, True))
         priorite = porteur.priorite + self.priorite
         for position in zone:
-            porteur.labyrinthe.get_case(position).ajoute_aura(self.effet(porteur,priorite,self.ralentissement))
+            porteur.labyrinthe.get_case(position).ajoute_aura(auras_elementales={self.effet(porteur,priorite,self.ralentissement)})
 
 class Aura_ombre(One_shot,On_debut_tour):
     """Le centre de l'aura d'ombre d'un agissant. Attaché à l'agissant, placera les effets voulus sur les cases voisines."""
@@ -240,10 +234,9 @@ class Aura_ombre(One_shot,On_debut_tour):
         zone = porteur.labyrinthe.a_portee(porteur.position,self.portee,Deplacement.SPATIAL,Forme.CERCLE,Passage(True, True, True, True, True))
         priorite = porteur.priorite + self.priorite
         for position in zone:
-            porteur.labyrinthe.get_case(position).ajoute_aura(self.effet(porteur,priorite,self.gain_opacite))
+            porteur.labyrinthe.get_case(position).ajoute_aura(auras_elementales={self.effet(porteur,priorite,self.gain_opacite)})
 
 # Imports utilisés dans le code
-from ..Entitee.Agissant.Agissant import NoOne
 from ..Entitee.Item.Item import Item
 from ..Labyrinthe.Deplacement import Deplacement
 from ..Labyrinthe.Forme import Forme

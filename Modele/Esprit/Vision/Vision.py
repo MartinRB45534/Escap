@@ -5,7 +5,6 @@ import networkx as nx
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...Labyrinthe.Extrait import Extrait
     from ...Entitee.Agissant.Agissant import Agissant
     from ...Entitee.Agissant.Vue.Vue import Vue
     from ...Entitee.Agissant.Vue.Case import Case_vue, Case_pas_vue
@@ -13,6 +12,9 @@ if TYPE_CHECKING:
     from .Agissant import Vision_agissant
     from .Case import Vision_case
     from .Mur import Vision_mur
+
+# Import des classes parentes
+from ...Labyrinthe.Extrait import Extrait
 
 class Vision(Extrait):
     def __init__(self, vues:Set[Vue], tour:int):

@@ -22,4 +22,4 @@ class Projectile(Item):
         return SKIN_PROJECTILE
 
 # Imports utilisés dans le code
-from Old_Affichage.Skins.Skins import SKIN_PROJECTILE
+from ....Affichage.Skins import SKIN_PROJECTILE

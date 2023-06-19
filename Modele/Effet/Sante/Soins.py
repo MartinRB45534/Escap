@@ -60,9 +60,9 @@ class Soin_case(On_post_action):
                 esprit = self.responsable.esprit
                 if esprit is None: #Pas d'esprit ? Sérieusement ?
                     cible_potentielle.effets.append(Soin(self.responsable,self.gain_pv))
-                elif self.cible == "alliés" and cible_potentielle in esprit.get_corps():
+                elif self.cible == "alliés" and cible_potentielle in esprit.corps:
                     cible_potentielle.effets.append(Soin(self.responsable,self.gain_pv))
-                elif self.cible == "neutres" and not cible_potentielle in esprit.get_ennemis():
+                elif self.cible == "neutres" and not cible_potentielle in esprit.corps:
                     cible_potentielle.effets.append(Soin(self.responsable,self.gain_pv))
 
     def execute(self,case:Case):
@@ -86,10 +86,6 @@ class Soin(On_fin_tour):
             self.action(porteur)
             self.termine()
 
-    def get_skin(self):
-        return SKIN_SOIN
-
 # Imports utilisés dans le code
 from .Maladies.Maladie import Maladie
 from .Poison import Poison
-from Old_Affichage.Skins.Skins import SKIN_SOIN

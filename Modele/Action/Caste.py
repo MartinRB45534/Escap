@@ -27,7 +27,7 @@ class Caste(Action):
 
     def interrompt(self):
         """L'action est interrompue. Le sort missfire."""
-        self.agissant.subit(NoOne(), self.mana) # Est-ce que c'est une punition trop dure pour les interruptions ?
+        self.agissant.subit(self.mana, Element.TERRE) # Est-ce que c'est une punition trop dure pour les interruptions ?
         
     def get_skin(self):
         pass
@@ -97,4 +97,5 @@ class Caste_fractionnaire(Caste):
         return False
 
 # Imports utilisés dans le code
-from ..Entitee.Agissant.Agissant import Agissant, NoOne
+from ..Entitee.Agissant.Agissant import Agissant
+from ..Systeme.Elements import Element

@@ -11,6 +11,9 @@ if TYPE_CHECKING:
 # Imports des classes parentes
 from ..Effet.Effet import One_shot, On_fin_tour, Effet
 
+# Imports des valeurs par défaut des paramètres
+from ..Systeme.Elements import Element
+
 class En_sursis(One_shot,On_fin_tour):
     """L'effet de sursis d'un projectile perçant qui a jusqu'à la fin du tour pour tuer l'agissant sur sa case."""
     def __init__(self):

@@ -26,7 +26,7 @@ class Attaque_case(One_shot):
 
     def action(self,case:Case):
         victime_potentielle = case.agissant
-        if victime_potentielle is not None and victime_potentielle not in self.responsable.esprit.get_corps():
+        if victime_potentielle is not None and victime_potentielle not in self.responsable.esprit.corps:
             if self.autre is None :
                 victime_potentielle.effets.append(Attaque_particulier(self.responsable,self.degats,self.element,self.distance,self.direction))
             elif self.autre == "piercing":
@@ -39,18 +39,6 @@ class Attaque_case(One_shot):
         if self.phase == "démarrage":
             self.action(case)
             self.termine()
-
-    def get_skin(self):
-        if self.element == Element.TERRE:
-            return SKIN_ATTAQUE_TERRE
-        elif self.element == Element.FEU:
-            return SKIN_ATTAQUE_FEU
-        elif self.element == Element.GLACE:
-            return SKIN_ATTAQUE_GLACE
-        elif self.element == Element.OMBRE:
-            return SKIN_ATTAQUE_OMBRE
-        else:
-            raise ValueError(f"L'élément {self.element} n'a pas de skin associé !")
 
 class Attaque_case_delayee(Attaque_case,Delaye):
     def __init__(self,responsable:Agissant,degats:float,element:Element,distance:str="distance",direction:Optional[crt.Direction] = None,autre:Optional[str]=None,taux_autre:Optional[float]=None):
@@ -77,10 +65,7 @@ class Attaque_particulier(One_shot):
         self.distance = distance
 
     def action(self,victime:Agissant):
-        victime.subit(self.responsable,self.degats,self.distance,self.element)
-
-    def get_skin(self):
-        return SKIN_BLESSURE
+        victime.subit(self.degats,self.element)
 
 class Attaque_percante(Attaque_particulier): #Attention ! Perçant pour une attaque signifie qu'elle traverse les defenses. C'est totalement différend pour un item !
     """L'effet d'attaque dans sa version particulière. Créée par une attaque (version générale), chargé d'infligé les dégats, en passant d'abord les défenses de la case puis celles de l'agissant. Attachée à la victime. En prime, une partie de ses dégats ne sont pas bloquables."""
@@ -96,7 +81,7 @@ class Attaque_percante(Attaque_particulier): #Attention ! Perçant pour une atta
 
     def action(self,victime:Agissant):
         self.degats += self.degats_imbloquables
-        victime.subit(self.responsable,self.degats,self.distance,self.element)
+        victime.subit(self.degats,self.element)
 
 class Attaque_lumineuse_case(Attaque_case):
     """L'effet de purification. Une attaque de 'lumière'."""
@@ -109,7 +94,7 @@ class Attaque_lumineuse_case(Attaque_case):
 
     def action(self,case:Case):
         victime_potentielle = case.agissant
-        if victime_potentielle is not None and victime_potentielle not in self.responsable.esprit.get_corps():
+        if victime_potentielle is not None and victime_potentielle not in self.responsable.esprit.corps:
             if self.autre is None :
                 victime_potentielle.effets.append(Attaque_lumineuse_particulier(self.responsable,self.degats))
             else:
@@ -120,10 +105,6 @@ class Attaque_lumineuse_case(Attaque_case):
             self.action(case)
             self.termine()
 
-    def get_skin(self):
-        return SKIN_VIDE
-        # Créer le skin de l'attaque lumineuse
-
 class Attaque_lumineuse_particulier(Attaque_particulier):
     """L'effet d'attaque dans sa version particulière. Créée par une attaque (version intermèdiaire), chargé d'infligé les dégats, en passant d'abord les défenses de l'agissant. Attachée à la victime."""
     def __init__(self,responsable:Agissant,degats:float):
@@ -133,11 +114,7 @@ class Attaque_lumineuse_particulier(Attaque_particulier):
         self.degats = degats
 
     def action(self,victime:Agissant):
-        victime.subit(self.responsable,self.degats*victime.get_aff(Element.OMBRE)**2,"proximité",Element.OMBRE)
-
-    def get_skin(self):
-        return SKIN_BLESSURE
+        victime.subit(self.degats*victime.affinite(Element.OMBRE)**2,Element.OMBRE)
 
 # Imports utilisés dans le code
-from Old_Affichage.Skins.Skins import SKIN_BLESSURE, SKIN_ATTAQUE_TERRE, SKIN_ATTAQUE_FEU, SKIN_ATTAQUE_GLACE, SKIN_ATTAQUE_OMBRE, SKIN_VIDE
 from warnings import warn

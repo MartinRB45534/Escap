@@ -54,5 +54,5 @@ class Multi_mage(Mage):
 # Imports utilisés dans le code
 
 from ....Systeme.Classe.Classes import trouve_skill
-from ....Systeme.Skill.Skills import Skills_magiques
+from ....Systeme.Skill.Actif import Skills_magiques
 from ....Action.Non_skill import Impregne

@@ -35,5 +35,5 @@ class Parchemin(Consommable):
         return SKIN_PARCHEMIN
 
 # Imports utilisés dans le code
-from Old_Affichage.Skins.Skins import SKIN_PARCHEMIN
+from ....Affichage.Skins import SKIN_PARCHEMIN
 from ..Item import Item

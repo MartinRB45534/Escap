@@ -22,7 +22,7 @@ class Protection_groupe(One_shot,On_post_action):
     def action(self,porteur:Agissant):
         cibles = []
         if porteur.esprit is not None:
-            cibles = porteur.esprit.get_corps()
+            cibles = porteur.esprit.corps
         else:
             cibles = [porteur]
         for cible in cibles:
@@ -62,9 +62,6 @@ class Protection_mur(Time_limited,On_attack):
             attaque.degats = 0 #Une attaque perçante peut quand même passer
             self.PV -= attaque.degats
 
-    def get_skin(self):
-        return SKIN_PROTECTION
-
 class Protection_sacree(Protection_mur):
     """Particulièrement efficace contre les attaques d'ombre."""
     def action(self,attaque:Attaque_case):
@@ -79,10 +76,6 @@ class Protection_sacree(Protection_mur):
         else:
             Protection_mur.action(self,attaque)
 
-    def get_skin(self):
-        return SKIN_PROTECTION_SACREE
-
 # Imports utilisés dans le code
-from Old_Affichage.Skins.Skins import SKIN_PROTECTION, SKIN_PROTECTION_SACREE
 from ..Systeme.Elements import Element
 import copy

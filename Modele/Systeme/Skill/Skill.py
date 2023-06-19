@@ -1,4 +1,5 @@
 from __future__ import annotations
+import Affichage as af
 
 # Pas d'import utilisés uniquement dans les annotations
 
@@ -24,7 +25,7 @@ class Skill:
             self.niveau+=1
 
     def get_skin(self):
-        return SKIN_MYSTERE
+        return af.SKIN_MYSTERE
     
 class Skill_intrasec(Skill):
     """
@@ -59,6 +60,3 @@ class Skill_extra(Skill):
         """fonction qui vérifie que les conditions d'évolution sont vérifiées"""
         if self.niveau<len(self.cond_evo) and self.cond_evo[self.niveau]>0 and self.xp>=self.cond_evo[self.niveau]:
             self.evo()
-
-# Imports utilisés dans le code
-from Old_Affichage.Skins.Skins import SKIN_MYSTERE

@@ -75,9 +75,6 @@ class Skill_deplacement(Actif):
         Actif.__init__(self)
         self.nom="Deplacement"
 
-    def get_skin(self):
-        return SKIN_SKILL_DEPLACEMENT
-
     def evo(self,nb_evo=1):
         for i in range(nb_evo):
             self.niveau+=1 #Le niveau augmente
@@ -94,9 +91,6 @@ class Skill_ramasse(Actif):
     def __init__(self):
         Actif.__init__(self)
         self.nom="Ramassage"
-
-    def get_skin(self):
-        return SKIN_SKILL_RAMASSE
 
     def fait(self, agissant: Agissant) -> Ramasse:
         """Fait le ramassage"""
@@ -173,6 +167,3 @@ class Skill_alchimie(Actif):
     def fait(self,agissant:Agissant,recette:str) -> Alchimie:
         """Fait l'alchimie"""
         raise NotImplementedError
-
-# Imports utilisés dans le code
-from Old_Affichage.Skins.Skins import SKIN_SKILL_DEPLACEMENT, SKIN_SKILL_RAMASSE

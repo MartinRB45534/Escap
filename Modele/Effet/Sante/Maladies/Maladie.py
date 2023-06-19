@@ -40,7 +40,6 @@ class Maladie(On_post_decision,On_tick):
 
 # Imports utilisés dans le code
 import random
-from ....Entitee.Agissant.Agissant import NoOne
 from ....Labyrinthe.Deplacement import Deplacement
 from ....Labyrinthe.Forme import Forme
 from ....Labyrinthe.Passage import Passage

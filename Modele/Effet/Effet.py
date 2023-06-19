@@ -29,9 +29,6 @@ class Effet :
         else:
             self.phase = "terminé"
 
-    def get_skin(self):
-        return SKIN_EFFET
-
 #On distingue les effets par circonstances d'appel.
 class On_need(Effet) :
     """Classe des effets appelés lors de circonstances particulières. Ils n'ont pas besoin d'être mis à jour, pris en compte ou quoique ce soit le reste du temps."""
@@ -150,6 +147,3 @@ class On_try_through(Effet):
 class Aura(On_tick):
     """La classe des auras (attachées à la case)."""
     pass #Ne doit pas être instanciée
-
-# Imports utilisés dans le code
-from Old_Affichage.Skins.Skins import SKIN_EFFET

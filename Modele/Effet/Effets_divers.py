@@ -24,7 +24,7 @@ class Investissement_mana(Evenement,On_debut_tour):
 
     def action(self,agissant:Agissant):
         if self.phase == "terminé":
-            agissant.pm += self.mana
+            agissant.statistiques.pm += self.mana
 
 class Reserve_mana(On_need):
     """Effet qui correspond à une réserve de mana pour le joueur qui peut piocher dedans lorsqu'il en a besoin, mais ce mana n'est pas compté dans le calcul de son mana max."""
@@ -92,9 +92,6 @@ class Teleportation(One_shot,On_post_action):
     def action(self,porteur:Agissant|Item):
         porteur.position = self.position
 
-    def get_skin(self):
-        return SKIN_TELEPORTATION
-
 class Enseignement(One_shot,On_fin_tour):
     """Effet qui enseigne une magie au joueur."""
     def __init__(self,magie:Type[Magie]):
@@ -120,9 +117,6 @@ class Dopage(One_shot,Time_limited):
         if self.phase == "démarrage" :
             attaque.taux *= self.taux_degats
 
-    def get_skin(self):
-        return SKIN_DOPAGE
-
 class Instakill(One_shot,On_post_action):
     """L'effet d'instakill. S'il réussit, la victime voit ses PV descendre à 0. Sinon, rien.""" #Comment retirer aussi les PM, si la victime a la persévérance (essence magique) ?
     def __init__(self,responsable:Agissant,priorite:float):
@@ -135,7 +129,8 @@ class Instakill(One_shot,On_post_action):
         if porteur.priorite < self.priorite :
             porteur.instakill(self.responsable)
         else :
-            porteur.echape_instakill(self.responsable)
+            pass
+            # porteur.echape_instakill(self.responsable)
 
     def execute(self,porteur:Agissant):
         if self.phase == "démarrage" :
@@ -144,4 +139,3 @@ class Instakill(One_shot,On_post_action):
 
 # Imports utilisés dans le code
 from ..Entitee.Agissant.Role.Mage import Mage
-from Old_Affichage.Skins.Skins import SKIN_TELEPORTATION, SKIN_DOPAGE
