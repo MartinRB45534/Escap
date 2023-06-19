@@ -13,7 +13,7 @@ class Noeud(Cliquable):
         self.marque_survol = False #Est-ce que la souris est dessus ?
         self.marque_actif = False #Est-ce que c'est l'élément actif  de la hiérarchie ?
         self.marque_courant = False #Est-ce que c'est l'élément courant de l'élément actif ?
-        self.est_courant = False #Est-ce que c'est l'élément courant de son élément parent ? #TODO : à renseigner par l'élément parent (comment ?)
+        self.est_courant = False #Est-ce que c'est l'élément courant de son élément parent ?
         self.actif = False #Est-ce que l'élément est actif ?
         self.courant = None #Quel est l'élément suivant dans la hiérarchie ?
 

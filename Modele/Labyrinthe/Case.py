@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, List, Optional, Set, Dict
+from typing import TYPE_CHECKING, Optional, Set, Type
 import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
@@ -11,14 +11,10 @@ if TYPE_CHECKING:
     from ..Entitee.Item.Item import Item
     from ..Entitee.Decors.Decors import Decors
 
-# Valeurs par défaut des paramètres
-from ..Systeme.Elements import Element
-
 class Case(crt.Case):
-    def __init__(self,position:crt.Position, opacite:float = 1, niveau = 1, element = Element.TERRE):
+    def __init__(self,position:crt.Position, aura_elementale: Type[Aura_permanente], opacite:float = 1, niveau:int = 1):
         self.position = position
         self.opacite = opacite
-        self.opacite_bonus:float = 0
         self.clarte:float = 0
         self.niveau = niveau
         self.repoussante = False
@@ -27,15 +23,7 @@ class Case(crt.Case):
         self.items:Set[Item] = set() #On peut avoir des items sur la case
         self.effets:Set[Effet] = set() #Les cases ont aussi des effets ! Les auras, par exemple.
         self.auras:Set[Aura] = set() #Les auras sont des effets qui s'appliquent à la case, et qui peuvent être de plusieurs types.
-        if element == Element.TERRE:
-            self.aura_elementale = Terre_permanente(self.niveau*2) # TODO : Retravailler tous ces bidouillages de niveaux...
-        elif element == Element.FEU:
-            self.aura_elementale = Feu_permanent(self.niveau,self.niveau*5)
-        elif element == Element.GLACE:
-            self.aura_elementale = Glace_permanente(self.niveau,self.niveau/10)
-        elif element == Element.OMBRE:
-            self.aura_elementale = Ombre_permanente(self.niveau,self.niveau/2)
-
+        self.aura_elementale = aura_elementale(self.niveau) #L'aura élémentale est une aura particulière, qui s'applique à la case et qui peut être de plusieurs types.
     #Découvrons le déroulé d'un tour, avec case-chan :
 
     def debut_tour(self):
@@ -103,7 +91,6 @@ class Case(crt.Case):
 
     #Tout le monde a fini de se déplacer.
     def post_action(self):
-        self.opacite_bonus = 0 # On reset ça à chaque tour, sinon ça va devenir tout noir
         on_attaques:Set[On_attack] = set()
         attaques:Set[Attaque_case] = set()
 
@@ -135,7 +122,11 @@ class Case(crt.Case):
     #Le tour se termine gentiment, et on recommence !
 
     def get_opacite(self):
-        return self.opacite + self.opacite_bonus
+        opacite = self.opacite
+        for aura in self.auras:
+            if isinstance(aura, Modification_opacite):
+                opacite *= aura.coef_opacite
+        return opacite
 
     # def get_infos(self,clees:Set[str]): #Est-ce que ce serait plus clair sous forme de dictionnaire ? Ou d'objet ?
     #     return Representation_case(self, self.clarte, self.calcule_code(), self.get_cibles_fermes(clees), self.agissant, self.decors, self.items.copy(), self.get_codes_effets(), self.repoussante)
@@ -151,7 +142,7 @@ class Case(crt.Case):
     #     return effets
 
 # Imports utilisés dans le code
-from ..Effet.Auras import Terre_permanente, Feu_permanent, Glace_permanente, Ombre_permanente, Aura_elementale, Terre, Feu, Glace, Ombre
+from ..Effet.Auras import Aura_elementale, Aura_permanente, Modification_opacite
 from ..Effet.Effet import On_debut_tour, Time_limited, On_attack, On_post_action
 from ..Effet.Attaque.Attaque import Attaque_case, Attaque_case_delayee
 from ..Systeme.Classe.Classes import trouve_skill

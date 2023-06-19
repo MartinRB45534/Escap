@@ -38,7 +38,7 @@ class On_hit(Effet):
     def action(self,item:Item):
         zone = item.labyrinthe.a_portee(item.position,self.portee,Deplacement.SPATIAL,Forme.CERCLE,Passage(False,False,False,True,False))
         for position in zone.nodes:
-            item.labyrinthe.get_case(position).effets.add(Attaque_case(item.lanceur or NoOne(),self.degats,self.element,"distance"))
+            item.labyrinthe.get_case(position).effets.add(Attaque_case(item.lanceur or NOONE,self.degats,self.element,"distance"))
 
     def execute(self,item:Item):
         self.action(item)
@@ -47,7 +47,7 @@ class On_hit(Effet):
 from ..Effet.Attaque.Attaque import Attaque_case
 from ..Entitee.Item.Projectile.Projectiles import Fragile,Evanescent
 from ..Entitee.Item.Etats import Etats_items
-from ..Entitee.Agissant.Agissant import NoOne
+from ..Entitee.Agissant.Agissant import NOONE
 from ..Labyrinthe.Deplacement import Deplacement
 from ..Labyrinthe.Passage import Passage
 from ..Labyrinthe.Forme import Forme

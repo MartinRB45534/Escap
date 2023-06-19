@@ -21,7 +21,7 @@ class Mur(crt.Mur):
             return True
         return False
     
-    def passage(self,passage:Passage):
+    def passage(self,passage:Passage) -> bool:
         raise NotImplementedError("La méthode passage n'est pas implémentée pour cette classe")
 
 class Mur_impassable(Mur):
@@ -106,10 +106,10 @@ class Mur_ouvert(Mur):
     def casser(self):
         pass
 
-    def peut_passer(self,entitee:Entitee):
+    def peut_passer(self,entitee:Entitee) -> bool:
         return True
     
-    def passage(self,passage:Passage):
+    def passage(self,passage:Passage) -> bool:
         return True
 
 class Barriere(Mur_ouvert):

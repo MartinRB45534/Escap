@@ -125,8 +125,8 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
     def clees(self):
         return self.inventaire.get_clees()
 
-    def peut_voir(self,direction:crt.Direction):
-        return self.labyrinthe.get_mur(self.position,direction).ferme # TODO : revoir ça
+    # def peut_voir(self,direction:crt.Direction):
+    #     return self.vue.get_mur(self.position,direction).ferme
 
     def affinite(self,element:Element):
         return self.statistiques.get_affinite(element)
@@ -365,13 +365,15 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
 
 class NoOne(Agissant):
     def __init__(self):
-        pass
+        self.esprit = NOBODY
 
     def __equal__(self, other):
         if isinstance(other,NoOne):
             return True
         else:
             return False
+        
+NOONE = NoOne()
 
 # Imports utilisés dans le code (il y en a beaucoup !!!)
 from ...Action.Attaque import Attaque

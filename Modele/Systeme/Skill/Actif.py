@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, List, Tuple, Type
+from typing import TYPE_CHECKING, Optional, List, Tuple, Type, Dict
 import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
@@ -45,7 +45,7 @@ class Skills_magiques(Actif):
     Un skill qui permet de lancer des magies.
     """
     def __init__(self): #On précise les magies directement disponibles. D'autres peuvent être acquisent en cours de jeu dans le cas du joueur. magies est un dictionnaire, les clées sont les noms des magies.
-        self.magies={}
+        self.magies:Dict[str,Type[Magie]]={}
         self.latence = 0 #La latence dépend du sort utilisé
         self.gain_xp = 0 #L'xp dépend du sort utilisé et du mana dépensé
 
@@ -55,10 +55,10 @@ class Skills_magiques(Actif):
 
     def menu_magie(self) -> List[Magie]:
         """Renvoie la liste des magies que le skill peut lancer"""
-        res = []
+        res:List[Magie] = []
         for nom in self.magies:
             type_magie = self.magies[nom]
-            magie = type_magie(self.niveau)
+            magie = type_magie(self.niveau) # Qu'est-ce que je voulais faire là ?
             res.append(magie)
         return res
     

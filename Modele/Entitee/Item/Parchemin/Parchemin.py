@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Type
+from typing import TYPE_CHECKING
 import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
@@ -18,17 +18,8 @@ class Parchemin(Consommable):
         self.duree = duree
         self.cout = cout
 
-    def get_titre(self,observation=0):
-        return "Parchemin"
-
-    def get_description(self,observation=0):
-        return ["Un parchemin","C'est quoi ces gribouillis ?"]
-
     def get_classe(self):
         return Parchemin
-
-    def get_skin(self):
-        return SKIN_PARCHEMIN
 
     @staticmethod
     def get_image():

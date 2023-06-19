@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 # Imports des classes parentes
 from ..Action import Non_repetable
-from .Magie import Cible_agissant,Cible_case,Portee_limitee,Magie,Cible_agissants
+from .Magie import Cible_agissant,Cible_case,Cible_item,Portee_limitee,Magie,Cible_agissants
 
 class Magie_soin(Cible_agissant):
     """La magie qui invoque un effet de soin sur un agissant ciblé."""
@@ -62,17 +62,19 @@ class Magie_auto_soin(Magie):
         self.gain_pv = gain_pv
         self.niveau = niveau
 
-class Magie_resurection(Magie, Non_repetable):
+class Magie_resurection(Cible_item, Non_repetable):
     """La magie qui invoque un effet de resurection."""
     nom = "magie resurection"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,niveau:int):
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,niveau:int,item:Optional[Cadavre]=None):
         Magie.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau)
+        Cible_item.__init__(self,item)
 
     def action(self,lanceur:Agissant):
-        cadavre = lanceur.inventaire.get_item_courant() # TODO : la notion d'item courant n'existe plus
-        if isinstance(cadavre,Cadavre):
-            lanceur.inventaire.drop(lanceur.labyrinthe.get_case(lanceur.position),cadavre)
-            cadavre.effets.append(Resurection())
+        if self.cible is None:
+            self.interrompt()
+        else:
+            assert isinstance(self.cible, Cadavre)
+            self.cible.effets.append(Resurection())
 
 class Magie_reanimation_de_zone(Cible_case,Portee_limitee):
     """La magie qui invoque un effet de reanimation sur tous les cadavres d'une zone."""

@@ -1,6 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
-import Carte as crt
+from typing import TYPE_CHECKING, Dict
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
@@ -8,7 +7,7 @@ if TYPE_CHECKING:
 
 class Vision_case:
     def __init__(self, case:Case_vue, tour:int):
-        self.cases = {}
+        self.cases:Dict[int, Case_vue] = {}
         self.voit(case, tour)
 
     def voit(self, case:Case_vue, tour: int):

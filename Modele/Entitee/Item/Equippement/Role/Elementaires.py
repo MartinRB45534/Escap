@@ -17,19 +17,3 @@ class Elementaire(Equippement):
     def augmente_affinite(self, affinite:float) -> float:
         """Augmente l'affinité à l'élément."""
         return affinite*self.taux_aff
-
-class Rocheux(Elementaire):
-    """La classe des équipements qui augmentent l'affinité à la terre."""
-    element = Element.TERRE
-
-class Incandescant(Elementaire):
-    """La classe des équipements qui augmentent l'affinité au feu."""
-    element = Element.FEU
-
-class Neigeux(Elementaire): #"Neigeux" ? "Glaçant" ? "Glacial" ?
-    """La classe des équipements qui augmentent l'affinité à la glace."""
-    element = Element.GLACE
-
-class Tenebreux(Elementaire):
-    """La classe des équipements qui augmentent l'affinité à l'ombre."""
-    element = Element.OMBRE

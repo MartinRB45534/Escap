@@ -17,8 +17,5 @@ class Parchemin_vierge(Parchemin):
         Item.__init__(self,labyrinthe,position)
         self.action_portee:Impregne|Magie = impregne
 
-    def get_description(self,observation=0):
-        return ["Un parchemin vierge","On peut y appliquer une magie."]
-
 # Imports utilisés dans le code
 from ....Entitee.Item.Item import Item

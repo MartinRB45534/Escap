@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, List, Dict, Set, Tuple, Self, Literal
+from typing import TYPE_CHECKING, List, Dict, Set, Self
 import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
@@ -644,7 +644,7 @@ class Esprit :
     #         # /!\ Regarder avec attention ce qui se passe pour les entrées
 
     def get_pos_vues(self):
-        positions = []
+        positions:List[crt.Position] = []
         for corp in self.corps:
             if corp.etat == Etats_agissants.VIVANT:
                 positions.append(corp.position)

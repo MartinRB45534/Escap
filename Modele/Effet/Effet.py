@@ -14,7 +14,7 @@ class Effet :
         self.phase = "démarrage"
         self.affiche = False
 
-    def action(self,*args):
+    def action(self,*args) -> None:
         """La fonction qui exécute l'action de l'effet. En général, renvoie des valeurs que le controleur traitera."""
         raise NotImplementedError
 
@@ -68,7 +68,7 @@ class One_shot(Effet):
 
 class Delaye(One_shot):
     """Classe des effets qui s'exécutent avec du retard."""
-    def __init__(self,delai):
+    def __init__(self,delai:float):
         self.delai = delai
 
     def execute(self,*args):
@@ -81,7 +81,7 @@ class Delaye(One_shot):
 
 class Evenement(On_tick):
     """La classe des effets limités par le temps, appelés une seule fois par tour."""
-    def __init__(self,temps_restant):
+    def __init__(self,temps_restant:float):
         self.affiche = False
         self.temps_restant=temps_restant
         self.phase = "démarrage"
@@ -97,7 +97,7 @@ class Evenement(On_tick):
 
 class Time_limited(Effet):
     """Classe des effets limités par le temps, qu'on ne peut pas considérer comme des événements car leur appel est irrégulier."""
-    def __init__(self,temps_restant):
+    def __init__(self,temps_restant:float):
         self.affiche = False
         self.phase = "démarrage"
         self.temps_restant = temps_restant
@@ -115,7 +115,7 @@ class On_attack(Effet):
 
 class Enchantement(Evenement) :
     """Des effets avec un temps très long ! Leur classe à part permet de les affecter différement."""
-    def __init__(self,temps_restant):
+    def __init__(self,temps_restant:float):
         self.affiche = False
         self.temps_restant=temps_restant
         self.phase = "démarrage"

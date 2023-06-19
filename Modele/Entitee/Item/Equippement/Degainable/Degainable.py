@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict
 import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
@@ -20,10 +20,10 @@ class Arme(Degainable):
         Equippement.__init__(self,labyrinthe,position)
         self.element = element
         self.tranchant = tranchant
-        self.taux_tranchant = {}
+        self.taux_tranchant:Dict[str, float] = {}
         self.portee = portee
-        self.taux_portee = {}
-        self.taux_stats = {}
+        self.taux_portee:Dict[str, float] = {}
+        self.taux_stats:Dict[str, float] = {}
 
     def get_stats_attaque(self):
         tranchant = self.tranchant

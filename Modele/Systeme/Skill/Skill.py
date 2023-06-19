@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import List
 import Affichage as af
 
 # Pas d'import utilisés uniquement dans les annotations
@@ -19,9 +20,9 @@ class Skill:
         self.xp_new=0
         return res
 
-    def evo(self,nb_evo=1):
+    def evo(self,nb_evo:int=1):
         """fonction qui procède à l'évolution"""
-        for i in range(nb_evo):
+        for _ in range(nb_evo):
             self.niveau+=1
 
     def get_skin(self):
@@ -41,7 +42,7 @@ class Skill_extra(Skill):
     """
     Les skills extrinsèques sont indépendants de la classe. Ils évoluent selon leur propre utilisation, et peuvent changer de classe.
     """
-    def __init__(self,conditions_evo=[0,10,20,30,40,50,60,70,80,90]):
+    def __init__(self,conditions_evo:List[float]=[0,10,20,30,40,50,60,70,80,90]):
         super().__init__()
         self.cond_evo=conditions_evo
         self.xp=0 #L'xp commence à 0, évidemment

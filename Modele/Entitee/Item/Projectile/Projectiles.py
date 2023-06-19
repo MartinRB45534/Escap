@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING
 import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
@@ -107,7 +107,7 @@ class Evanescent(Item):
 
 class Projectile_magique(Projectile,Evanescent):
     """La classe des projectiles créés par magie."""
-    def __init__(self,labyrinthe:Labyrinthe,niveau:int,vitesse:float=0,poids:float=0,frottements:float=0,degats:float=0,element:Element=Element.TERRE,position:crt.Position=crt.POSITION_ABSENTE):
+    def __init__(self,labyrinthe:Labyrinthe,niveau:int,vitesse:float,poids:float,frottements:float,degats:float,element:Element,position:crt.Position=crt.POSITION_ABSENTE):
         Item.__init__(self,labyrinthe,position)
         self.etat = Etats_items.INTACT
         self.priorite = 0 #Faire dépendre du niveau ?
@@ -125,7 +125,7 @@ class Projectile_magique(Projectile,Evanescent):
 
 class Magie_explosive(Explosif,Projectile_magique):
     """La classe des projectiles explosifs créés par magie."""
-    def __init__(self,labyrinthe:Labyrinthe,niveau:int,vitesse:float=0,poids:float=0,frottements:float=0,portee:float=0,degats:float=0,element:Element=Element.TERRE,position:crt.Position=crt.POSITION_ABSENTE):
+    def __init__(self,labyrinthe:Labyrinthe,niveau:int,vitesse:float,poids:float,frottements:float,portee:float,degats:float,element:Element,position:crt.Position=crt.POSITION_ABSENTE):
         Item.__init__(self,labyrinthe,position)
         self.etat = Etats_items.INTACT #Le niveau l'évacuera s'il n'est plus intact.
         self.priorite = 0
@@ -143,17 +143,17 @@ class Magie_explosive(Explosif,Projectile_magique):
 
 class Fleche_magique(Fleche,Projectile_magique):
     """La classe des flèches créées par magie."""
-    def __init__(self, labyrinthe: Labyrinthe, niveau: int, vitesse: float = 0, poids: float = 0, frottements: float = 0, degats: float = 0, element: Element = Element.TERRE, position: crt.Position = crt.POSITION_ABSENTE):
+    def __init__(self, labyrinthe: Labyrinthe, niveau: int, vitesse: float, poids: float, frottements: float, degats: float, element: Element, position: crt.Position = crt.POSITION_ABSENTE):
         Projectile_magique.__init__(self,labyrinthe,niveau,vitesse,poids,frottements,degats,element,position)
 
 class Perce_armure_magique(Perce_armure,Projectile_magique):
     """La classe des projectiles perce_armures créés par magie."""
-    def __init__(self, labyrinthe: Labyrinthe, niveau: int, vitesse: float = 0, poids: float = 0, frottements: float = 0, degats: float = 0, element: Element = Element.TERRE, position: crt.Position = crt.POSITION_ABSENTE):
+    def __init__(self, labyrinthe: Labyrinthe, niveau: int, vitesse: float, poids: float, frottements: float, degats: float, element: Element, position: crt.Position = crt.POSITION_ABSENTE):
         Projectile_magique.__init__(self,labyrinthe,niveau,vitesse,poids,frottements,degats,element,position)
 
 class Magie_explosive_percante(Magie_explosive,Percant):
     """La classe des projectiles explosifs perçant créés par magie."""
-    def __init__(self, labyrinthe: Labyrinthe, niveau: int, vitesse: float = 0, poids: float = 0, frottements: float = 0, portee: float = 0, degats: float = 0, element: Element = Element.TERRE, position: crt.Position = crt.POSITION_ABSENTE):
+    def __init__(self, labyrinthe: Labyrinthe, niveau: int, vitesse: float, poids: float, frottements: float, portee: float, degats: float, element: Element, position: crt.Position = crt.POSITION_ABSENTE):
         Magie_explosive.__init__(self,labyrinthe,niveau,vitesse,poids,frottements,portee,degats,element,position)
 
 # Imports utilisés dans le code

@@ -11,16 +11,17 @@ if TYPE_CHECKING:
 
 class Entitee:
     """La classe des entitées"""
-    ID_MAX = 10 # Les 10 premières ID sont réservées
+    ID_max = 10 # Les 10 premières ID sont réservées
     def __init__(self, position: crt.Position=crt.POSITION_ABSENTE, ID: Optional[int]=None):
         self.position:crt.Position = position
         self.priorite:float = 0
         self.effets:List[Effet] = []
         if ID is None:
-            self.ID = Entitee.ID_MAX
-            Entitee.ID_MAX += 1
+            id = Entitee.ID_max
+            Entitee.ID_max += 1
         else:
-            self.ID = ID
+            id = ID
+        self.ID = id
 
     def set_position(self,position: crt.Position):
         self.position = position
@@ -34,7 +35,7 @@ class Entitee:
     def get_priorite(self):
         return self.priorite
 
-    def get_direction(self):
+    def get_direction(self) -> crt.Direction:
         return crt.Direction.HAUT # Direction par défaut
 
 class Entitee_superieure(Entitee):

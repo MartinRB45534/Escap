@@ -49,10 +49,6 @@ class Vole(Deplace,Action_final):
         self.action()
         self.latence = 0
         return super().termine()
-        
-    def get_skin(self):
-        pass
-        # TODO: Ajouter le get_skin
 
 class Marche(Deplace,Action_skill,Action_final):
     """

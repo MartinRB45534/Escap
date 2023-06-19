@@ -39,10 +39,6 @@ class Boit(Place_effet):
     """
     def __init__(self,agissant:Agissant,latence:float,item:Potion,effet:Effet):
         super().__init__(agissant,latence,item,effet)
-        
-    def get_skin(self):
-        pass
-        # TODO: Ajouter le get_skin
 
 class Lit(Caste, Non_repetable):
     """
