@@ -1,10 +1,8 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any
+from typing import Any
 import Carte as crt
 
-# Imports utilisés uniquement dans les annotations
-if TYPE_CHECKING:
-    from ...Entitee.Agissant.Vue.Mur import Mur_vu
+# Pas d'import utilisé uniquement dans les annotations
 
 class Vision_position:
     """
@@ -53,6 +51,7 @@ class Position_espace(Vision_position):
     def __eq__(self,other:Any):
         if isinstance(other,Position_espace):
             return bool(self.espace & other.espace) # On est égal à une autre position d'espace si les deux espaces se croisent
+        return NotImplemented
     
     def __hash__(self):
         return hash((self.espace))
