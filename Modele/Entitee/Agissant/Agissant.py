@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, List, Type, Dict, Set
+from typing import TYPE_CHECKING, Optional, List, Type, Dict, Set, Any
 import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
@@ -19,7 +19,7 @@ from ..Entitee import Non_superposable, Mobile
 
 class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cadavre n'agit pas.
     """La classe des entitées animées. Capable de décision, de différentes actions, etc. Les principales caractéristiques sont l'ID, les stats, et la classe principale."""
-    def __init__(self,identite:str,labyrinthe:Labyrinthe,cond_evo:List,skills_intrasecs:Set[Skill_intrasec],skills:Set[Skill_extra],niveau:int,pv_max:float,regen_pv_max:float,regen_pv_min:float,restauration_regen_pv:float,pm_max:float,regen_pm:float,force:float,priorite:float,vitesse:float,affinites:Dict[Element,float],immunites:Set[Element],espece:Espece,oubli:float,resolution:int,forme:str,forme_tete:str,nb_doigts:int,magies:List[Type[Magie]],items:List[Type[Item]],position:crt.Position,ID: Optional[int]=None):
+    def __init__(self,identite:str,labyrinthe:Labyrinthe,cond_evo:List[float],skills_intrasecs:Set[Skill_intrasec],skills:Set[Skill_extra],niveau:int,pv_max:float,regen_pv_max:float,regen_pv_min:float,restauration_regen_pv:float,pm_max:float,regen_pm:float,force:float,priorite:float,vitesse:float,affinites:Dict[Element,float],immunites:Set[Element],espece:Espece,oubli:float,resolution:int,forme:str,forme_tete:str,nb_doigts:int,magies:List[Type[Magie]],items:List[Type[Item]],position:crt.Position,ID: Optional[int]=None):
         Entitee.__init__(self,position,ID)
         self.identite = identite
         self.labyrinthe = labyrinthe
@@ -88,30 +88,26 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         assert skill is not None
         self.fait(skill.fait(self,direction))
 
-    def agit_en_vue(self,defaut = ""): #Par défaut, on n'a pas d'action à distance
+    def agit_en_vue(self,defaut:str = ""): #Par défaut, on n'a pas d'action à distance
         return defaut
 
-    def comporte_distance(self,degats:float):
+    def comporte_distance(self,degats:float) -> int:
         return 0
 
-    def veut_attaquer(self,degats:float=0):
-        pass
+    def veut_attaquer(self,degats:float=0) -> bool:
+        return False
 
-    def veut_fuir(self,degats:float=0):
-        pass
+    def veut_fuir(self,degats:float=0) -> bool:
+        return False
 
     def get_direction(self):
-        if self.dir_regard is not None:
-            return self.dir_regard
-        else:
-            return crt.Direction.HAUT #Par défaut, on regarde vers le haut
+        return self.dir_regard
 
     def fait(self,action:Action,force:bool=False):
         self.action = action
 
     def regarde(self,direction:crt.Direction,force:bool=False):
-        if direction is not None:
-            self.dir_regard = direction
+        self.dir_regard = direction
 
     @property
     def arme(self):
@@ -176,7 +172,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         return self.statistiques.get_vitesse()
 
     @property
-    def priorite(self):
+    def priorite(self) -> float:
         return self.statistiques.get_priorite()
 
     def subit(self,degats:float,element:Element):
@@ -187,8 +183,8 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
     def instakill(self,responsable:Agissant):
         immortel = trouve_skill(self.classe_principale,Skill_immortel)
         if immortel is not None:
-            if self.pv > 0:
-                self.pv = 0 #Et ça s'arrète là
+            if self.statistiques.pv > 0:
+                self.statistiques.pv = 0 #Et ça s'arrète là
         else:
             self.meurt()
 
@@ -199,11 +195,7 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         self.esprit = esprit
 
     def meurt(self):
-        if self.position is None:
-            raise ValueError("Un personnage qui n'a pas de position est en train de mourir !")
-        self.pv = self.pm = 0
         self.etat = Etats_agissants.MORT
-        self.taux_regen_pv = self.taux_regen_pm = self.taux_force = self.taux_priorite = self.taux_vitesse = self.taux_aff_o = self.taux_aff_f = self.taux_aff_t = self.taux_aff_g = self.taux_stats = {} #/!\ À corriger !
         self.effets = []
         case = self.labyrinthe.get_case(self.position)
         self.inventaire.drop_all(case)
@@ -214,9 +206,6 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
 
     def get_esprit(self):
         return self.esprit
-
-    def get_description(self,observation=0):
-            return ["Un agissant","Qu'est-ce qu'il fait dans un inventaire ?"]
 
     def get_skill_vision(self) -> Skill_vision:
         skill = trouve_skill(self.classe_principale,Skill_vision)
@@ -330,26 +319,21 @@ class Agissant(Non_superposable,Mobile): #Tout agissant est un cadavre, tout cad
         else:
             raise ValueError("Oups, je ne suis pas vivant, je ne peux pas finir mon tour !")
         if self.etat == Etats_agissants.VIVANT:
-            if self.pv <= 0 :
+            if self.statistiques.pv <= 0 :
                 immortel:Optional[Skill_immortel] = trouve_skill(self.classe_principale,Skill_immortel)
                 if immortel is not None :
-                    self.taux_stats["immortalité"] = immortel.utilise()
+                    immortel.utilise()
                 else :
                     essence:Optional[Skill_essence_magique] = trouve_skill(self.classe_principale,Skill_essence_magique)
                     if essence is not None :
-                        cout = essence.utilise(self.pv)
+                        cout = essence.utilise(self.statistiques.pv)
                         if self.peut_payer(cout):
                             self.paye(cout)
-                            self.pv = 0
+                            self.statistiques.pv = 1
                         else :
                             self.meurt()
                     else :
                         self.meurt()
-            else :
-                immortel:Optional[Skill_immortel] = trouve_skill(self.classe_principale,Skill_immortel)
-                if immortel is not None :
-                    if "immortalité" in self.taux_stats:
-                        self.taux_stats.pop("immortalité")
             self.inventaire.fin_tour()
             self.classe_principale.gagne_xp()
             if self.niveau != self.classe_principale.niveau : #On a gagné un niveau
@@ -367,7 +351,7 @@ class NoOne(Agissant):
     def __init__(self):
         self.esprit = NOBODY
 
-    def __equal__(self, other):
+    def __equal__(self, other:Any):
         if isinstance(other,NoOne):
             return True
         else:

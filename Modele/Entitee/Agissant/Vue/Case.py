@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from ....Effet.Auras import Aura
     from .Agissant import Agissant_vu
     from .Item import Item_vu
-    from ...Decors.Decor import Decors
+    from ...Decors.Decors import Decors
 
 # Import de la classe parente
 from ....Labyrinthe.Case import Case

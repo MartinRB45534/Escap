@@ -14,8 +14,8 @@ class Multi_soigneur(Soigneur,Multi_mage):
         cibles = []
         skill = type(self.get_skill_magique())
         for corp in self.esprit.corps:
-            if corp.etat == "vivant" and corp.pv < corp.pv_max:
-                cibles.append([corp.pv,corp])
+            if corp.etat == "vivant" and corp.statistiques.pv < corp.statistiques.pv_max:
+                cibles.append([corp.statistiques.pv,corp])
         if len(cibles) == 1:
             if self.peut_caster():
                 new_cibles = sorted(cibles, key=itemgetter(0))

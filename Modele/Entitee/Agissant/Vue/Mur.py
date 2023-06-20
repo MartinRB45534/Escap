@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Type, Callable
+from typing import TYPE_CHECKING, Callable
 import Affichage as af
 import Carte as crt
 
@@ -73,4 +73,4 @@ def voit_mur(mur:Mur) -> Mur_vu:
         raise TypeError(f"Le type {type(mur)} n'est pas reconnu comme un mur.")
 
 
-from ....Labyrinthe.Mur import Mur, Mur_plein, Mur_ouvert, Porte, Barriere, Teleporteur, Mur_asymétrique, Porte_a_loquet, Escalier
+from ....Labyrinthe.Mur import Mur, Mur_plein, Mur_ouvert, Porte, Barriere, Teleporteur, Porte_a_loquet, Escalier

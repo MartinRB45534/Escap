@@ -1,4 +1,7 @@
 from enum import Enum
 
 class Element(Enum):
-    pass
+    TERRE = "Terre"
+    FEU = "Feu"
+    GLACE = "Glace"
+    OMBRE = "Ombre"

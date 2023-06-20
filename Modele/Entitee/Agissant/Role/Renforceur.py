@@ -11,7 +11,7 @@ from .Mage import Mage
 class Renforceur(Mage):
     """Les agissants qui boostent les attaques de leurs alliés."""
 
-    def agit_en_vue(self,defaut = ""):
+    def agit_en_vue(self,defaut:str = ""):
         cibles: List[Tuple[float,Agissant]] = []
         for corp in self.esprit.corps:
             if corp.statut == "attaque":
@@ -23,9 +23,7 @@ class Renforceur(Mage):
             assert isinstance(action,Cible_agissant)
             action.cible = new_cibles[-1][-1]
             self.fait(action)
-            action.cible.set_statut("attaque boostée")
             defaut = "soutien"
-            self.set_statut("soutien")
         return defaut
 
 # Imports utilisés dans le code

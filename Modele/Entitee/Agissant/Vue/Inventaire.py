@@ -1,6 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, List, Dict, Set, Type, Optional
-import Carte as crt
+from typing import TYPE_CHECKING, Set
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:

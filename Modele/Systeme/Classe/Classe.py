@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Set
+from typing import TYPE_CHECKING, Set, List
 import Affichage as af
 
 # Imports utilisés uniquement dans les annotations
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 class Classe:
     """!!! Classe != class !!! Correspond aux classes avec des niveaux, qui évoluent, contiennent des skills, etc."""
-    def __init__(self,conditions_evo=[0,10,20,30,40,50,60,70,80,90],skills_intrasecs:Set[Skill_intrasec]=set(),skills:Set[Skill_extra]=set()):
+    def __init__(self,conditions_evo:List[float]=[0,10,20,30,40,50,60,70,80,90],skills_intrasecs:Set[Skill_intrasec]=set(),skills:Set[Skill_extra]=set()):
         """conditions_evo : les conditions d'évolution de la classe au niveau supérieur ; si c'est un nombre, indique l'xp nécessaire à l'évolution, si c'est une chaine de caractère, indique la fonction capable d'évaluer la condition
            skills_intrasecs : les skills obtenus automatiquement avec la classe
            cadeux_evo : les récompenses d'évolution ; peuvent être des skills, des classes ou de l'xp""" #Plus vraiment, en fait... À rafraichir
@@ -61,9 +61,9 @@ class Classe:
         if self.niveau<len(self.cond_evo) and self.cond_evo[self.niveau]>0 and self.xp>=self.cond_evo[self.niveau]:
             self.evo()
 
-    def evo(self,nb_evo=1):
+    def evo(self,nb_evo:int=1):
         """fonction qui procède à l'évolution"""
-        for i in range(nb_evo):
+        for _ in range(nb_evo):
             self.niveau+=1
             for skill in self.skills_intrasecs:
                 skill.evo()

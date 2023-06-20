@@ -7,10 +7,10 @@ from .Reparateur import Reparateur
 
 class Pompe_a_pv(Reparateur): #Régénère une quantité fixe de pm
     def __init__(self,pv:float):
-        self.pv = pv
+        self.statistiques.pv = pv
 
     def regen_pv(self,regen_pv:float):
-        pv = self.pv
+        pv = self.statistiques.pv
         for taux in self.taux_stats.values():
             pv *= taux
         return regen_pv + pv
