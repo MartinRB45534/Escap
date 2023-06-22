@@ -50,10 +50,6 @@ class On_post_action(On_tick):
     """La classe des effets appelés après la phase d'action."""
     pass
 
-class On_pre_attack(On_tick):
-    """La classe des effets appelés avant les attaques."""
-    pass
-
 class On_fin_tour(On_tick):
     """La classe des effets appelés à la fin du tour."""
     pass
@@ -119,30 +115,6 @@ class Enchantement(Evenement) :
         self.affiche = False
         self.temps_restant=temps_restant
         self.phase = "démarrage"
-
-class On_through(Effet):
-    """La classe des effets déclenchés quand on traverse un mur."""
-    def execute(self, entitee:Entitee):
-        """L'action à effectuer quand on traverse un mur."""
-        self.action(entitee)
-
-    def action(self, entitee:Entitee):
-        """L'action à effectuer quand on traverse un mur."""
-        pass
-
-class On_step_in(Effet):
-    """La classe des effets déclenchés lorsqu'on marche sur une case."""
-    pass
-
-class On_step_out(Effet):
-    """La classe des effets déclenchés quand on quitte une case."""
-    pass
-
-class On_try_through(Effet):
-    """La classe des effets déclenchés quand on essaye de traverser un mur."""
-    def action(self,mur:Mur,entitee:Entitee):
-        """L'action à effectuer quand on essaye de traverser un mur."""
-        pass
 
 class Aura(On_tick):
     """La classe des auras (attachées à la case)."""

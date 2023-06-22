@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from ..Labyrinthe.Case import Case
 
 # Imports des classes parentes
-from .Effet import Aura, One_shot, On_debut_tour, Evenement
+from .Effet import Aura, Evenement
 
 # Variables de classe
 from ..Systeme.Elements import Element

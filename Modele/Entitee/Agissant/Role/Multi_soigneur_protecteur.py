@@ -11,10 +11,10 @@ from .Multi_soigneur import Multi_soigneur
 class Multi_soigneur_protecteur(Multi_soigneur):
     """Les multi_soigneurs capables de placer un sort de protection lorsqu'il n'y a personne à soigner.""" #Vraiment juste la peste (en fait même pas la peste)
 
-    def agit_en_vue(self,defaut = ""):
+    def agit_en_vue(self,defaut:str = ""):
         cibles:List[Tuple[float,Agissant]] = []
         for corp in self.esprit.corps:
-            if corp.etat == "vivant" and corp.statistiques.pv < corp.statistiques.pv_max:
+            if corp.etat == Etats_agissants.VIVANT and corp.statistiques.pv < corp.statistiques.pv_max:
                 cibles.append((corp.statistiques.pv,corp))
         if len(cibles) == 1:
             if self.peut_caster():
@@ -24,7 +24,6 @@ class Multi_soigneur_protecteur(Multi_soigneur):
                 action.cible = cibles[0][-1]
                 self.fait(action)
                 defaut = "soin"
-                self.set_statut("soin")
         elif cibles:
             if self.peut_multi_caster():
                 skill = self.get_skill_magique()
@@ -33,7 +32,6 @@ class Multi_soigneur_protecteur(Multi_soigneur):
                 action.cible = [cible[-1] for cible in cibles]
                 self.fait(action)
                 defaut = "soin"
-                self.set_statut("soin")
             elif self.peut_caster():
                 new_cibles = sorted(cibles, key=itemgetter(0))
                 skill = self.get_skill_magique()
@@ -42,11 +40,10 @@ class Multi_soigneur_protecteur(Multi_soigneur):
                 action.cible = new_cibles[0][-1]
                 self.fait(action)
                 defaut = "soin"
-                self.set_statut("soin")
-        elif self.pm == self.pm_max: #On ne l'utilise que rarement... parce qu'il est cher
+        elif self.pm == self.statistiques.pm_max: #On ne l'utilise que rarement... parce qu'il est cher
             cibles_:List[Agissant] = []
             for corp in self.esprit.corps:
-                if corp.etat == "vivant":
+                if corp.etat == Etats_agissants.VIVANT:
                     libre = True
                     for effet in corp.effets:
                         if isinstance(effet,Protection_sacree): #On ne peut pas avoir deux protections sacrées en même temps
@@ -60,10 +57,10 @@ class Multi_soigneur_protecteur(Multi_soigneur):
                 action.cible = cibles_
                 self.fait(action)
                 defaut = "soin"
-                self.set_statut("soin")
         return defaut
 
 # Imports utilisés dans le code
 from ....Effet.Effets_protection import Protection_sacree
 from ....Action.Magie.Magie import Cible_agissant,Cible_agissants
+from ..Etats import Etats_agissants
 from operator import itemgetter

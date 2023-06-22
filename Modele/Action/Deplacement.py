@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
@@ -43,6 +43,7 @@ class Vole(Deplace,Action_final):
         self.latence += self.get_vitesse()
         if self.latence >= self.latence_max:
             return self.termine()
+        return False
 
     def termine(self):
         """Le vol ne se finit pas, il est interrompu."""

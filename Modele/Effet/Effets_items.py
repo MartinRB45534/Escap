@@ -1,10 +1,8 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Entitee.Agissant.Agissant import Agissant
     from ..Entitee.Item.Item import Item
     from ..Systeme.Elements import Element
 
@@ -37,7 +35,7 @@ class On_hit(Effet):
 
     def action(self,item:Item):
         zone = item.labyrinthe.a_portee(item.position,self.portee,Deplacement.SPATIAL,Forme.CERCLE,Passage(False,False,False,True,False))
-        for position in zone.nodes:
+        for position in zone:
             item.labyrinthe.get_case(position).effets.add(Attaque_case(item.lanceur or NOONE,self.degats,self.element,"distance"))
 
     def execute(self,item:Item):

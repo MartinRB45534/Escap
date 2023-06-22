@@ -20,14 +20,17 @@ class Poison(On_debut_tour,On_tick):
 
     def action(self,victime:Agissant):
         if self.phase == "en cours" :
-            victime.pv -= self.degats
+            victime.statistiques.pv -= self.degats
             if self.degats < self.degats_max:
                 self.degats += self.progression
 
     def execute(self,victime:Agissant):
         if self.phase == "démarrage" :
             self.phase = "en cours"
-        elif victime.etat == "mort" :
+        elif victime.etat == Etats_agissants.MORT :
             self.termine()
         else :
             self.action(victime)
+
+# Imports utilisés dans le code
+from ...Entitee.Agissant.Etats import Etats_agissants

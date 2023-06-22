@@ -10,7 +10,7 @@ from ...Effet import On_post_decision,On_tick
 
 class Maladie(On_post_decision,On_tick):
     """L'effet de maladie. Applique un déboost à l'agissant. Peut se transmettre aux voisins. Il existe différentes maladies."""
-    def __init__(self,contagiosite,distance,persistence,virulence):
+    def __init__(self,contagiosite:float,distance:float,persistence:float,virulence:float):
         self.affiche = False
         self.phase = "démarrage"
         self.contagiosite = contagiosite
@@ -19,7 +19,7 @@ class Maladie(On_post_decision,On_tick):
         self.virulence = virulence
         self.immunite = 0
 
-    def action(self,malade:Agissant):
+    def action(self,malade:Agissant) -> None:
         raise NotImplementedError
 
     def contagion(self,malade:Agissant): #Méthode propre aux maladies

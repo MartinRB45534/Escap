@@ -35,7 +35,7 @@ class Attaque_case(One_shot):
                 else:
                     warn("L'attaque est percante mais le taux de percement n'est pas défini !")
 
-    def execute(self,case):
+    def execute(self,case:Case):
         if self.phase == "démarrage":
             self.action(case)
             self.termine()
@@ -100,7 +100,7 @@ class Attaque_lumineuse_case(Attaque_case):
             else:
                 warn("L'attaque lumineuse n'est pas censée avoir d'effet autre !")
 
-    def execute(self,case):
+    def execute(self,case:Case):
         if self.phase == "démarrage":
             self.action(case)
             self.termine()

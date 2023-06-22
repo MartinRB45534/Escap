@@ -9,6 +9,9 @@ if TYPE_CHECKING:
     from ..Effet.Effets_protection import Protection_bouclier
     from ..Entitee.Item.Item import Item
     from ..Entitee.Item.Equippement.Degainable.Bouclier.Bouclier import Bouclier
+    from ..Labyrinthe.Deplacement import Deplacement
+    from ..Labyrinthe.Forme import Forme
+    from ..Labyrinthe.Passage import Passage
 
 # Imports des classes parentes
 from .Action import Action, Action_parcellaire, Non_repetable
@@ -51,7 +54,7 @@ class Derobe(Action_skill, Non_repetable):
         self.possesseur = possesseur
 
     def action(self):
-        self.possesseur.inventaire.drop(crt.POSITION_ABSENTE,self.item)
+        self.possesseur.inventaire.drop(CASE_ABSENTE,self.item)
         self.agissant.inventaire.ajoute(self.item)
 
 class Blocage(Action_skill):
@@ -66,23 +69,25 @@ class Blocage(Action_skill):
 
     def action(self):
         self.bouclier.taux_degats = self.taux
-        self.agissant.labyrinthe.get_case(self.agissant.position).effets.append(Protection_bouclier(1,self.bouclier,[dir for dir in crt.Direction]))
+        self.agissant.labyrinthe.get_case(self.agissant.position).effets.add(Protection_bouclier(1,self.bouclier,[dir for dir in crt.Direction]))
 
 class Blocage_zone(Blocage):
     """
     L'action de bloquer avec un bouclier sur une zone.
     """
-    def __init__(self, agissant: Agissant, latence: float, skill: Actif, xp: float, taux: float, direction: crt.Direction, bouclier: Bouclier, portee: int, propagation:str="C__S___"):
+    def __init__(self, agissant: Agissant, latence: float, skill: Actif, xp: float, taux: float, direction: crt.Direction, bouclier: Bouclier, portee: int, deplacement: Deplacement, forme: Forme, passage: Passage):
         super().__init__(agissant, latence, skill, xp, taux, direction, bouclier)
         self.portee = portee
-        self.propagation = propagation
+        self.deplacement = deplacement
+        self.forme = forme
+        self.passage = passage
 
     def action(self):
         self.bouclier.taux_degats = self.taux
         position = self.agissant.position
-        positions_touchees = self.agissant.controleur.get_pos_touches(position,self.portee,self.propagation,self.direction)
-        for pos in positions_touchees:
-            self.agissant.labyrinthe.get_case(pos).effets.append(Protection_bouclier(1,self.bouclier,[dir for dir in crt.Direction]))
+        zone = self.agissant.labyrinthe.a_portee(position,self.portee,self.deplacement,self.forme,self.passage)
+        for pos in zone:
+            self.agissant.labyrinthe.get_case(pos).effets.add(Protection_bouclier(1,self.bouclier,[dir for dir in crt.Direction]))
 
 class Cree_item(Action_skill):
     """
@@ -105,5 +110,8 @@ class Alchimie(Cree_item, Non_repetable):
 
     def action(self):
         for item in self.ingredients:
-            self.agissant.inventaire.drop(crt.POSITION_ABSENTE,item)
+            self.agissant.inventaire.drop(CASE_ABSENTE,item)
         self.agissant.inventaire.ajoute(self.item)
+
+# Imports utilisés dans le code
+from ..Labyrinthe.Absent import CASE_ABSENTE

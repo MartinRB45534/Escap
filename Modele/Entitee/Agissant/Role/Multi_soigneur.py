@@ -1,7 +1,9 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List,Tuple
 
-# Pas d'imports pour les annotations
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from ..Agissant import Agissant
 
 # Imports des classes parentes
 from .Soigneur import Soigneur
@@ -10,12 +12,12 @@ from .Mage import Multi_mage
 class Multi_soigneur(Soigneur,Multi_mage):
     """Les soigneurs capables de soigner plusieurs agissants à la fois."""
 
-    def agit_en_vue(self,defaut = ""):
-        cibles = []
+    def agit_en_vue(self,defaut:str = ""):
+        cibles:List[Tuple[float,Agissant]] = []
         skill = type(self.get_skill_magique())
         for corp in self.esprit.corps:
-            if corp.etat == "vivant" and corp.statistiques.pv < corp.statistiques.pv_max:
-                cibles.append([corp.statistiques.pv,corp])
+            if corp.etat == Etats_agissants.VIVANT and corp.statistiques.pv < corp.statistiques.pv_max:
+                cibles.append((corp.statistiques.pv,corp))
         if len(cibles) == 1:
             if self.peut_caster():
                 new_cibles = sorted(cibles, key=itemgetter(0))
@@ -25,7 +27,6 @@ class Multi_soigneur(Soigneur,Multi_mage):
                 action.cible = new_cibles[0][-1]
                 self.fait(action)
                 defaut = "soin"
-                self.set_statut("soin")
         elif cibles:
             if self.peut_multi_caster():
                 skill = self.get_skill_magique()
@@ -34,7 +35,6 @@ class Multi_soigneur(Soigneur,Multi_mage):
                 action.cible = [cible[-1] for cible in cibles]
                 self.fait(action)
                 defaut = "soin"
-                self.set_statut("soin")
             elif self.peut_caster():
                 new_cibles = sorted(cibles, key=itemgetter(0))
                 skill = self.get_skill_magique()
@@ -43,9 +43,9 @@ class Multi_soigneur(Soigneur,Multi_mage):
                 action.cible = new_cibles[0][-1]
                 self.fait(action)
                 defaut = "soin"
-                self.set_statut("soin")
         return defaut
 
 # Imports utilisés dans le code
 from operator import itemgetter
 from ....Action.Magie.Magie import Cible_agissant,Cible_agissants
+from ..Etats import Etats_agissants

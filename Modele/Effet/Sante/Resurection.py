@@ -16,11 +16,15 @@ class Resurection(On_fin_tour):
 
     def action(self,porteur:Cadavre):
         agissant = porteur.agissant
-        agissant.pv = agissant.pv_max
-        agissant.etat = "vivant"
-        porteur.etat = "brise"
+        agissant.statistiques.pv = agissant.statistiques.pv_max
+        agissant.etat = Etats_agissants.VIVANT
+        porteur.etat = Etats_items.BRISE
 
     def execute(self,porteur:Cadavre):
         if self.phase == "démarrage" :
             self.action(porteur)
             self.termine()
+
+# Imports utilisés dans le code
+from ...Entitee.Agissant.Etats import Etats_agissants
+from ...Entitee.Item.Etats import Etats_items

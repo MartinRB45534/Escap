@@ -21,7 +21,7 @@ class Tirnogose(Maladie):
 
     def action(self,malade:Agissant):
         if self.phase == "en cours" :
-            malade.pv -= self.virulence
+            malade.statistiques.pv -= self.virulence
             self.immunite += 1
 
 class Fibaluse(Maladie):
@@ -36,12 +36,8 @@ class Fibaluse(Maladie):
         self.virulence = virulence
 
     def action(self,malade:Agissant):
-        if self.phase == "démarrage" and "maladf" not in malade.taux_stats :
-            malade.taux_stats["maladf"] = self.virulence
-        elif self.phase == "en cours" :
+        if self.phase == "en cours" :
             self.immunite += 1
-        elif self.phase == "terminé" :
-            malade.taux_stats.pop("maladf")
 
     def execute(self,malade:Agissant):
         if self.phase == "démarrage" :

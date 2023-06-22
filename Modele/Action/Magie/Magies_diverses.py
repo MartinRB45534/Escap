@@ -5,7 +5,6 @@ import Carte as crt
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ...Entitee.Agissant.Agissant import Agissant
-    from ...Entitee.Decors.Decor import Decors
     from ...Entitee.Item.Item import Item
     from ...Systeme.Skill.Actif import Actif
     from ...Labyrinthe.Case import Case

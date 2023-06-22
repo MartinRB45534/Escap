@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, List
+from typing import TYPE_CHECKING, List
 from warnings import warn
 import Carte as crt
 
@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from ..Effet.Attaque.Attaque import Attaque_case
 
 # Imports des classes parentes
-from ..Effet.Effet import One_shot, Evenement, Effet, On_post_action, Time_limited, On_attack
+from ..Effet.Effet import One_shot, On_post_action, Time_limited, On_attack
 
 class Protection_groupe(One_shot,On_post_action):
     def __init__(self,duree:float,degats:float):
@@ -21,12 +21,12 @@ class Protection_groupe(One_shot,On_post_action):
 
     def action(self,porteur:Agissant):
         cibles = []
-        if porteur.esprit is not None:
+        if porteur.esprit != NOBODY:
             cibles = porteur.esprit.corps
         else:
             cibles = [porteur]
         for cible in cibles:
-            if cible.etat == "vivant":
+            if cible.etat == Etats_agissants.VIVANT:
                 cible.effets.append(Protection_mur(self.duree,self.degats))
 
 class Protection_bouclier(Time_limited,On_attack):
@@ -54,28 +54,29 @@ class Protection_mur(Time_limited,On_attack):
         self.PV_max = PV #Pour afficher les PVs de la protection
 
     def action(self,attaque:Attaque_case):
-        if self.PV < attaque.degats:
-            attaque.degats = -self.PV
-            self.PV = 0
+        if self.pv < attaque.degats:
+            attaque.degats = -self.pv
+            self.pv = 0
             self.termine()
         else:
             attaque.degats = 0 #Une attaque perçante peut quand même passer
-            self.PV -= attaque.degats
+            self.pv -= attaque.degats
 
 class Protection_sacree(Protection_mur):
     """Particulièrement efficace contre les attaques d'ombre."""
     def action(self,attaque:Attaque_case):
         if attaque.element == Element.OMBRE:
-            if 2*self.PV < attaque.degats:
-                attaque.degats = -2*self.PV
-                self.PV = 0
+            if 2*self.pv < attaque.degats:
+                attaque.degats = -2*self.pv
+                self.pv = 0
                 self.termine()
             else:
                 attaque.degats = 0 #Une attaque perçante peut quand même passer
-                self.PV -= attaque.degats//2
+                self.pv -= attaque.degats//2
         else:
             Protection_mur.action(self,attaque)
 
 # Imports utilisés dans le code
 from ..Systeme.Elements import Element
-import copy
+from ..Entitee.Agissant.Etats import Etats_agissants
+from ..Esprit.Esprit import NOBODY

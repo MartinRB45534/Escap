@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, List, Type
+from typing import TYPE_CHECKING, Optional, List
 import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
@@ -26,12 +26,6 @@ class Magie(Caste,Action_skill):
         self.gain_xp = gain_xp
         self.cout = cout_pm
         self.niveau = niveau
-
-    def get_titre(self,observation=0):
-        return f"Magie ({type(self)})"
-
-    def get_description(self,observation=0):
-        return ["Oopsie... Cette magie n'a pas de description.",f"Peut-être que son nom, {self.nom}, pourra aider."]
 
 class Magies_offensives(Magie):
     """Les magies qui produisent un effet d'attaque"""

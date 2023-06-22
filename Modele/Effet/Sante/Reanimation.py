@@ -20,14 +20,14 @@ class Reanimation(On_fin_tour):
 
     def action(self,porteur:Cadavre):
         agissant = porteur.agissant
-        agissant.pv = agissant.pv_max*self.taux
-        agissant.etat = "vivant"
-        porteur.etat = "brise"
+        agissant.statistiques.pv = agissant.statistiques.pv_max*self.taux
+        agissant.etat = Etats_agissants.VIVANT
+        porteur.etat = Etats_items.BRISE
         porteur.labyrinthe.position_case[porteur.position].agissant = agissant
         agissant.position = porteur.position
         porteur.position = crt.POSITION_ABSENTE
         if self.esprit is not None:
-            if agissant.esprit is not None:
+            if agissant.esprit == NOBODY:
                 agissant.esprit.retire_corp(agissant)
             self.esprit.ajoute_corp(agissant)
 
@@ -35,3 +35,8 @@ class Reanimation(On_fin_tour):
         if self.phase == "démarrage" :
             self.action(porteur)
             self.termine()
+
+# Imports utilisés dans le code
+from ...Entitee.Agissant.Etats import Etats_agissants
+from ...Entitee.Item.Etats import Etats_items
+from ...Esprit.Esprit import NOBODY

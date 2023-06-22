@@ -1,6 +1,9 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING, List, Tuple
 
-# Pas d'imports pour les annotations
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from ..Agissant import Agissant
 
 # Imports des classes parentes
 from .Mage import Mage
@@ -8,12 +11,13 @@ from .Mage import Mage
 class Attaquant_magique_agissant(Mage):
     """Les agissants qui combattent en lançant des attaques magiques de loin sur des agissants."""
 
-    def agit_en_vue(self,defaut = ""):
-        cibles = []
+    def agit_en_vue(self,defaut:str = ""):
+        cibles:List[Tuple[float,Agissant]] = []
         #On cherche l'ennemi le plus puissant en vue
-        for case in self.vue:
-            if case.agissant is not None and case.agissant in self.esprit.ennemis:
-                    cibles.append([self.esprit.ennemis[case.agissant]["importance"],case.agissant])
+        for pos in self.vue:
+            case = self.vue.get_case(pos)
+            if case.agissant is not None and case.agissant.ID in [ennemi.ID for ennemi in self.esprit.ennemis]:
+                cibles.append((self.esprit.ennemis[case.agissant]["importance"],case.agissant))
         if cibles and self.peut_caster():
             new_cibles = sorted(cibles, key=itemgetter(0))
             skill = self.get_skill_magique()
@@ -22,7 +26,6 @@ class Attaquant_magique_agissant(Mage):
             action.cible = new_cibles[-1][-1]
             self.fait(action)
             defaut = "attaque"
-            self.set_statut("attaque")
         return defaut
 
     def get_impact(self):

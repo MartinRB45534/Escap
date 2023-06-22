@@ -45,9 +45,6 @@ class Magie_purification(Magie_attaque_corp_a_corp):
         for case in self.agissant.labyrinthe.a_portee(self.agissant.position,self.portee,self.deplacement,self.forme,self.passage):
             self.agissant.labyrinthe.get_case(case).effets.add(Attaque_lumineuse_case(self.agissant,self.degats))
 
-    def get_titre(self,observation=0):
-        return f"Magie de purification (niveau {self.niveau})"
-
 # Imports utilisés dans le code
 from ....Effet.Attaque.Attaque import Attaque_case,Attaque_lumineuse_case
 from ....Labyrinthe.Deplacement import Deplacement

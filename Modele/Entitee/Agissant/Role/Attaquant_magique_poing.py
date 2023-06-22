@@ -1,5 +1,4 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
 import Carte as crt
 
 # Imports des classes parentes
@@ -23,7 +22,6 @@ class Attaquant_magique_poing(Mage):
             self.fait(action)
         else:
             Agissant.attaque(self,direction)
-        self.set_statut("attaque")
 
 # Imports utilisés dans le code
 from ..Agissant import Agissant

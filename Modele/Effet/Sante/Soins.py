@@ -44,7 +44,7 @@ class Purification(One_shot,On_fin_tour):
 
 class Soin_case(On_post_action):
     """Un effet de soin. À répercuter sur les occupants éventuels de la case."""
-    def __init__(self,gain_pv,responsable:Agissant,cible="alliés"):
+    def __init__(self,gain_pv:float,responsable:Agissant,cible:str="alliés"):
         self.phase = "démarrage"
         self.gain_pv = gain_pv
         self.responsable = responsable
@@ -54,11 +54,11 @@ class Soin_case(On_post_action):
     def action(self,case:Case):
         cible_potentielle = case.agissant
         if cible_potentielle is not None:
-            if self.responsable == 0: #Pas de responsable. Sérieusement ?
+            if self.responsable == NOONE: #Pas de responsable. Sérieusement ?
                 cible_potentielle.effets.append(Soin(self.responsable,self.gain_pv))
             else:
                 esprit = self.responsable.esprit
-                if esprit is None: #Pas d'esprit ? Sérieusement ?
+                if esprit == NOBODY: #Pas d'esprit ? Sérieusement ?
                     cible_potentielle.effets.append(Soin(self.responsable,self.gain_pv))
                 elif self.cible == "alliés" and cible_potentielle in esprit.corps:
                     cible_potentielle.effets.append(Soin(self.responsable,self.gain_pv))
@@ -72,7 +72,7 @@ class Soin_case(On_post_action):
 
 class Soin(On_fin_tour):
     """Un effet de soin. Généralement placé sur l'agissant par une magie de soin, de soin de zone, ou d'auto-soin."""
-    def __init__(self,responsable,gain_pv):
+    def __init__(self,responsable:Agissant,gain_pv:float):
         self.phase = "démarrage"
         self.responsable = responsable
         self.gain_pv = gain_pv
@@ -89,3 +89,5 @@ class Soin(On_fin_tour):
 # Imports utilisés dans le code
 from .Maladies.Maladie import Maladie
 from .Poison import Poison
+from ...Entitee.Agissant.Agissant import NOONE
+from ...Esprit.Esprit import NOBODY
