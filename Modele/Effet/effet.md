@@ -1,6 +1,6 @@
 # Effets
 
-Que faire des effets ?
+## Que faire des effets ?
 
 Problème :
 Le type-checking strict n'aime pas les effets et leurs méthodes `execute` et `action` dont le type d'argument varie.
@@ -14,7 +14,7 @@ Par contre, il y a les `Enchantements` qui englobent des effets sur beaucoup d'�
 D'autres exemples ?
 Les `Evenements`, `One_shot`, etc. peuvent être présents sur des choses très différentes.
 
-Listons les effets actuels.
+## Listons les effets actuels.
 
 Par temps d'appel :
  - `On_need` (spécialement créé pour les réserves de mana, 1 agissant) ;
@@ -43,3 +43,23 @@ Par source :
    - attaques (une attaque sur la case cause une attaque sur son occupant, s'il y en a un) ;
    - maladies (se propagent par contagion) ;
  - automatique (sursis par exemple, pour les items).
+
+## Comment les séparer ?
+
+Séparer les enchantements du reste n'est probablement pas nécessaire : les boosts peuvent être appliqués directement sur la magie associée.
+
+Pour les attaques, magies, blocages, etc. je pourrais inclure l'action qui l'a généré en attribut (comme les actions ont leur agissant en attribut).
+
+Distinguer les effets plus précisément selon ce qu'ils impactent : placer les effets de statistiques sur l'objet `Statistiques`.
+
+La classe `Effet` est-elle nécessaire ?
+Et la mécanique `execute()` et `action()` ?
+
+L'objet de `execute()` et `action()` est de séparer l'appel régulier à l'effet (`execute()`, appelé à chaque tour) de ce que l'effet fait (`action()`, appelé par `execute()` quand il le faut, selon la classe).
+`execute()` sert entre autres à comptabiliser le temps d'application de l'effet pour ceux qui durent plusieurs tours mais n'ont rien besoin de faire à part au début et à la fin.
+
+Le modèle `execute()` - `action()` est repris dans la classe `Action`, est-ce que c'était vraiment une bonne idée ?
+
+Comment gérer d'une part le décompte du temps et d'autre part les actions intermittente ?
+
+C'est pratique d'avoir un compteur de temps qui vérifie au passage s'il faut réaliser une action.
