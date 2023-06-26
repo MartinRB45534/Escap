@@ -5,12 +5,12 @@ import Carte as crt
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ...Entitee.Agissant.Agissant import Agissant
-    from ...Action.Magie.Magie import Magie
+    from ...Effet.Action.Magie.Magie import Magie
     from ...Entitee.Item.Equippement.Degainable.Degainable import Arme
-    from ...Action.Action_skill import Action_skill, Derobe, Blocage, Ramasse, Alchimie
-    from ...Action.Attaque import Attaque, Attaque_arme
-    from ...Action.Deplacement import Marche
-    from ...Action.Action_skill import Ramasse
+    from ...Effet.Action.Action_skill import Action_skill, Derobe, Blocage, Ramasse, Alchimie
+    from ...Effet.Action.Attaque import Attaque, Attaque_arme
+    from ...Effet.Action.Deplacement import Marche
+    from ...Effet.Action.Action_skill import Ramasse
 
 # Imports des classes parentes
 from .Skill import Skill
@@ -75,8 +75,8 @@ class Skill_deplacement(Actif):
         Actif.__init__(self)
         self.nom="Deplacement"
 
-    def evo(self,nb_evo=1):
-        for i in range(nb_evo):
+    def evo(self,nb_evo:int=1):
+        for _ in range(nb_evo):
             self.niveau+=1 #Le niveau augmente
             #Pas d'autre cadeau
 

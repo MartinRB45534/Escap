@@ -360,12 +360,12 @@ class NoOne(Agissant):
 NOONE = NoOne()
 
 # Imports utilisés dans le code (il y en a beaucoup !!!)
-from ...Action.Attaque import Attaque
+from ...Effet.Action.Attaque import Attaque
 from ..Entitee import Entitee
 from .Vue.Vue import voit_vue
 from .Etats import Etats_agissants
-from ...Action.Action import Action
-from ...Action.Magie.Magie import Magie
+from ...Effet.Action.Action import Action
+from ...Effet.Action.Magie.Magie import Magie
 from ...Esprit.Esprit import NOBODY
 from ..Item.Cadavre import Cadavre
 from ..Item.Equippement.Role.Defensif.Defensif import Defensif
@@ -374,7 +374,6 @@ from ...Systeme.Skill.Skill import Skill_intrasec, Skill_extra
 from ...Systeme.Skill.Actif import Skill_attaque_arme, Skill_attaque, Skill_deplacement, Skills_magiques
 from ...Systeme.Skill.Passif import Skill_magie_infinie, Skill_defense, Skill_immortel, Skill_essence_magique, Skill_vision, Skill_aura
 from ...Systeme.Classe.Classes import trouve_skill
-from ...Effet.Effet import On_attack, On_fin_tour, On_debut_tour, On_post_decision, On_post_action, Time_limited
 from ...Effet.Sante.Maladies.Maladie import Maladie
 from ...Effet.Attaque.Attaque import Attaque_particulier
 from ...Effet.Effets_divers import Dopage, Reserve_mana

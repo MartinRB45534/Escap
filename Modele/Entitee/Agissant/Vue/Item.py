@@ -5,7 +5,7 @@ import Carte as crt
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from .Agissant import Agissant_vu
-    from ....Action.Action import Action
+    from ....Effet.Action.Action import Action
     from ...Item.Item import Item
     from ...Item.Etats import Etats_items
 

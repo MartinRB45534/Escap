@@ -45,5 +45,5 @@ class Multi_renforceur(Renforceur,Multi_mage):
         return defaut
 
 # Imports utilisés dans le code
-from ....Action.Magie.Magie import Cible_agissant,Cible_agissants
+from ....Effet.Action.Magie.Magie import Cible_agissant,Cible_agissants
 from operator import itemgetter

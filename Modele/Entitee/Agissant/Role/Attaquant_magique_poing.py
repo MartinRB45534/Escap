@@ -25,4 +25,4 @@ class Attaquant_magique_poing(Mage):
 
 # Imports utilisés dans le code
 from ..Agissant import Agissant
-from ....Action.Magie.Magies_attaque.Poings_magiques import Magie_attaque_contact
+from ....Effet.Action.Magie.Magies_attaque.Poings_magiques import Magie_attaque_contact

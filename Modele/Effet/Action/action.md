@@ -11,7 +11,7 @@ Dans le cas d'un parchemin de magie, il faut une seule action.
 
 
 Au final, une magie c'est :
- - > Un effet (pas Effet) lorsqu'elle est lancée. Voire même plusieurs (attaque délayée par exemple) à des moments distincts.
+ - > Un effet (pas `Effet`) lorsqu'elle est lancée. Voire même plusieurs (attaque délayée par exemple) à des moments distincts.
  - > Un coût en mana (déjà partiellement payé dans le cas d'un parchemin imprégné).
  - > Une latence (peut-être différente dans le cas d'un parchemin imprégné).
  - > Un skill a qui rendre de l'xp (sauf peut-être pour les parchemins).

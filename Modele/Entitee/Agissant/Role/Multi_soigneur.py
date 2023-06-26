@@ -47,5 +47,5 @@ class Multi_soigneur(Soigneur,Multi_mage):
 
 # Imports utilisés dans le code
 from operator import itemgetter
-from ....Action.Magie.Magie import Cible_agissant,Cible_agissants
+from ....Effet.Action.Magie.Magie import Cible_agissant,Cible_agissants
 from ..Etats import Etats_agissants

@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING, List, Optional
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ....Entitee.Agissant.Agissant import Agissant
-    from ....Systeme.Skill.Actif import Actif
+    from .....Entitee.Agissant.Agissant import Agissant
+    from .....Systeme.Skill.Actif import Actif
 
 # Imports des classes parentes
 from ...Magie.Magie import Magie, Cible_agissant, Multi_cible
@@ -48,4 +48,4 @@ class Magie_multi_boost(Cible_agissant,Multi_cible):
         for cible in self.cible:
             cible.effets.append(Dopage(self.agissant,self.taux,self.duree))
 
-from ....Effet.Effets_divers import Dopage
+from ....Effets_divers import Dopage

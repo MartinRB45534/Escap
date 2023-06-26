@@ -32,5 +32,5 @@ class Attaquant_magique_case(Mage):
             return super().get_impact()
 
 # Imports utilisés dans le code
-from ....Action.Magie.Magie import Cible_case
+from ....Effet.Action.Magie.Magie import Cible_case
 from operator import itemgetter

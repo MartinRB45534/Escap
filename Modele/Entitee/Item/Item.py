@@ -7,7 +7,7 @@ import Affichage as af
 if TYPE_CHECKING:
     from ..Agissant.Agissant import Agissant
     from ..Entitee import Non_superposable
-    from ...Action.Deplacement import Vole
+    from ...Effet.Action.Deplacement import Vole
     from ...Labyrinthe.Labyrinthe import Labyrinthe
 
 # Imports des classes parentes

@@ -4,8 +4,8 @@ import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ....Action.Non_skill import Impregne
-    from ....Action.Magie.Magie import Magie
+    from ....Effet.Action.Non_skill import Impregne
+    from ....Effet.Action.Magie.Magie import Magie
     from ....Labyrinthe.Labyrinthe import Labyrinthe
 
 # Imports des classes parentes

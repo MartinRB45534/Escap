@@ -4,10 +4,10 @@ import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...Entitee.Agissant.Agissant import Agissant
-    from ...Entitee.Item.Item import Item
-    from ...Systeme.Skill.Actif import Actif
-    from ...Labyrinthe.Case import Case
+    from ....Entitee.Agissant.Agissant import Agissant
+    from ....Entitee.Item.Item import Item
+    from ....Systeme.Skill.Actif import Actif
+    from ....Labyrinthe.Case import Case
 
 # Imports des classes parentes
 from ..Action import Non_repetable
@@ -104,8 +104,8 @@ class Magie_teleportation(Cible_cases, Non_repetable):
                     item.position = cases[i-1].position
 
 # Imports utilisés dans le code
-from ...Effet.Effets_divers import Instakill, Blizzard, Obscurite
-from ...Effet.Effets_protection import Protection_sacree
-from ...Labyrinthe.Deplacement import Deplacement
-from ...Labyrinthe.Forme import Forme
-from ...Labyrinthe.Passage import Passage
+from ...Effets_divers import Instakill, Blizzard, Obscurite
+from ...Effets_protection import Protection_sacree
+from ....Labyrinthe.Deplacement import Deplacement
+from ....Labyrinthe.Forme import Forme
+from ....Labyrinthe.Passage import Passage

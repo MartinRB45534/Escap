@@ -4,9 +4,9 @@ import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...Entitee.Agissant.Agissant import Agissant
-    from ...Entitee.Item.Projectile.Projectile import Projectile
-    from ...Systeme.Skill.Actif import Actif
+    from ....Entitee.Agissant.Agissant import Agissant
+    from ....Entitee.Item.Projectile.Projectile import Projectile
+    from ....Systeme.Skill.Actif import Actif
 
 # Imports des classes parentes
 from .Magie import Invocation_projectile,Cible_case,Portee_limitee

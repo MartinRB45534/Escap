@@ -255,4 +255,4 @@ class Enchantement_bombe(Enchantement,On_debut_tour):
 # Imports utilisés dans le code
 import random
 from ..Effet.Sante.Maladies.Maladie import Maladie
-from ..Action.Deplacement import Deplace
+from .Action.Deplacement import Deplace

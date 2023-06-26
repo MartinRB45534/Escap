@@ -4,9 +4,9 @@ import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ....Entitee.Agissant.Agissant import Agissant
-    from ....Systeme.Skill.Actif import Actif
-    from ....Systeme.Elements import Element
+    from .....Entitee.Agissant.Agissant import Agissant
+    from .....Systeme.Skill.Actif import Actif
+    from .....Systeme.Elements import Element
 
 # Imports des classes parentes
 from ...Magie.Magie import Magie,Magie_dirigee,Magies_offensives
@@ -46,7 +46,7 @@ class Magie_purification(Magie_attaque_corp_a_corp):
             self.agissant.labyrinthe.get_case(case).effets.add(Attaque_lumineuse_case(self.agissant,self.degats))
 
 # Imports utilisés dans le code
-from ....Effet.Attaque.Attaque import Attaque_case,Attaque_lumineuse_case
-from ....Labyrinthe.Deplacement import Deplacement
-from ....Labyrinthe.Forme import Forme
-from ....Labyrinthe.Passage import Passage
+from ....Attaque.Attaque import Attaque_case,Attaque_lumineuse_case
+from .....Labyrinthe.Deplacement import Deplacement
+from .....Labyrinthe.Forme import Forme
+from .....Labyrinthe.Passage import Passage

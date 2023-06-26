@@ -4,14 +4,14 @@ import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Entitee.Agissant.Agissant import Agissant
-    from ..Systeme.Skill.Actif import Actif
-    from ..Effet.Effets_protection import Protection_bouclier
-    from ..Entitee.Item.Item import Item
-    from ..Entitee.Item.Equippement.Degainable.Bouclier.Bouclier import Bouclier
-    from ..Labyrinthe.Deplacement import Deplacement
-    from ..Labyrinthe.Forme import Forme
-    from ..Labyrinthe.Passage import Passage
+    from ...Entitee.Agissant.Agissant import Agissant
+    from ...Systeme.Skill.Actif import Actif
+    from ..Effets_protection import Protection_bouclier
+    from ...Entitee.Item.Item import Item
+    from ...Entitee.Item.Equippement.Degainable.Bouclier.Bouclier import Bouclier
+    from ...Labyrinthe.Deplacement import Deplacement
+    from ...Labyrinthe.Forme import Forme
+    from ...Labyrinthe.Passage import Passage
 
 # Imports des classes parentes
 from .Action import Action, Action_parcellaire, Non_repetable
@@ -114,4 +114,4 @@ class Alchimie(Cree_item, Non_repetable):
         self.agissant.inventaire.ajoute(self.item)
 
 # Imports utilisés dans le code
-from ..Labyrinthe.Absent import CASE_ABSENTE
+from ...Labyrinthe.Absent import CASE_ABSENTE

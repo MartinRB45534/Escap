@@ -61,6 +61,6 @@ class Multi_soigneur_protecteur(Multi_soigneur):
 
 # Imports utilisés dans le code
 from ....Effet.Effets_protection import Protection_sacree
-from ....Action.Magie.Magie import Cible_agissant,Cible_agissants
+from ....Effet.Action.Magie.Magie import Cible_agissant,Cible_agissants
 from ..Etats import Etats_agissants
 from operator import itemgetter

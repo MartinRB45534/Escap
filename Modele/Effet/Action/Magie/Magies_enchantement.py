@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING, Optional
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...Entitee.Agissant.Agissant import Agissant
-    from ...Systeme.Skill.Actif import Actif
+    from ....Entitee.Agissant.Agissant import Agissant
+    from ....Systeme.Skill.Actif import Actif
 
 # Imports des classes parentes
 from .Magie import Enchante_agissant, Enchante_item
@@ -94,5 +94,5 @@ class Magie_enchantement_bombe(Enchante_item):
         Enchante_item.__init__(self,skill,agissant,gain_xp,cout_pm,latence,Enchantement_bombe(duree,On_hit(portee,degats)),cible,niveau)
 
 # Imports utilisés dans le code
-from ...Effet.Enchantements import *
-from ...Effet.Effets_items import On_hit
+from ...Enchantements import *
+from ...Item.Item import On_hit

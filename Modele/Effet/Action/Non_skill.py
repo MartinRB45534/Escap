@@ -3,12 +3,12 @@ from typing import TYPE_CHECKING, Optional
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Entitee.Agissant.Agissant import Agissant
-    from ..Entitee.Item.Item import Consommable
-    from ..Entitee.Item.Potion.Potion import Potion
-    from ..Entitee.Item.Parchemin.Parchemin import Parchemin
-    from ..Entitee.Item.Parchemin.Parchemins import Parchemin_vierge
-    from ..Effet.Effet import Effet
+    from ...Entitee.Agissant.Agissant import Agissant
+    from ...Entitee.Item.Item import Consommable
+    from ...Entitee.Item.Potion.Potion import Potion
+    from ...Entitee.Item.Parchemin.Parchemin import Parchemin
+    from ...Entitee.Item.Parchemin.Parchemins import Parchemin_vierge
+    from ..Effet import Effet
     from .Magie.Magie import Magie
 
 # Imports des classes parentes
@@ -107,4 +107,4 @@ class Impregne(Lit,Action_final,Caste_final):
         self.magie.cout*=self.taux_cout_caste
         self.magie.latence*=self.taux_latence_caste
 
-from ..Entitee.Item.Etats import Etats_items
+from ...Entitee.Item.Etats import Etats_items

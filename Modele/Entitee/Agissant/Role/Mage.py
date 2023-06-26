@@ -55,4 +55,4 @@ class Multi_mage(Mage):
 
 from ....Systeme.Classe.Classes import trouve_skill
 from ....Systeme.Skill.Actif import Skills_magiques
-from ....Action.Non_skill import Impregne
+from ....Effet.Action.Non_skill import Impregne

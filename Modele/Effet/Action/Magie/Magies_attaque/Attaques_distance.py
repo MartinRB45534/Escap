@@ -4,10 +4,10 @@ import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ....Entitee.Agissant.Agissant import Agissant
-    from ....Systeme.Skill.Actif import Actif
-    from ....Effet.Attaque.Attaque import Attaque_case_delayee
-    from ....Systeme.Elements import Element
+    from .....Entitee.Agissant.Agissant import Agissant
+    from .....Systeme.Skill.Actif import Actif
+    from ....Attaque.Attaque import Attaque_case_delayee
+    from .....Systeme.Elements import Element
 
 # Imports des classes parentes
 from ...Magie.Magie import Magie,Cible_case,Magies_offensives
@@ -34,6 +34,6 @@ class Magie_attaque_distance(Cible_case,Magies_offensives):
             for effet in self.effets:
                 effet.phase = "en cours"
 
-from ....Labyrinthe.Deplacement import Deplacement
-from ....Labyrinthe.Forme import Forme
-from ....Labyrinthe.Passage import Passage
+from .....Labyrinthe.Deplacement import Deplacement
+from .....Labyrinthe.Forme import Forme
+from .....Labyrinthe.Passage import Passage

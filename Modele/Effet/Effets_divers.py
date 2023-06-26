@@ -7,8 +7,8 @@ if TYPE_CHECKING:
     from ..Entitee.Agissant.Agissant import Agissant
     from ..Entitee.Item.Item import Item
     from ..Labyrinthe.Case import Case
-    from ..Action.Attaque import Attaque
-    from ..Action.Magie.Magie import Magie
+    from .Action.Attaque import Attaque
+    from .Action.Magie.Magie import Magie
 
 # Imports des classes parentes
 from ..Effet.Effet import On_need, One_shot, On_debut_tour, Evenement, Time_limited, On_post_action, On_fin_tour

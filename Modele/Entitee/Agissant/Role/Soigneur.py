@@ -30,5 +30,5 @@ class Soigneur(Mage):
 # Imports utilisés dans le code
 from ..Agissant import Agissant
 from ..Etats import Etats_agissants
-from ....Action.Magie.Magie import Cible_agissant
+from ....Effet.Action.Magie.Magie import Cible_agissant
 from operator import itemgetter

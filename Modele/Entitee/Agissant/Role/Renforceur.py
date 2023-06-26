@@ -27,5 +27,5 @@ class Renforceur(Mage):
         return defaut
 
 # Imports utilisés dans le code
-from ....Action.Magie.Magie import Cible_agissant
+from ....Effet.Action.Magie.Magie import Cible_agissant
 from operator import itemgetter

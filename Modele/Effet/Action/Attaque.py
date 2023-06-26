@@ -4,10 +4,10 @@ import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Entitee.Agissant.Agissant import Agissant
-    from ..Entitee.Item.Equippement.Degainable.Degainable import Arme
-    from ..Systeme.Skill.Actif import Actif
-    from ..Systeme.Elements import Element
+    from ...Entitee.Agissant.Agissant import Agissant
+    from ...Entitee.Item.Equippement.Degainable.Degainable import Arme
+    from ...Systeme.Skill.Actif import Actif
+    from ...Systeme.Elements import Element
 
 # Imports des classes parentes
 from ..Action.Action_skill import Action_skill
@@ -87,7 +87,7 @@ class Attaque_multiple(Action_parcellaire,Attaque_arme): # Les attaques sans arm
             self.agissant.labyrinthe.get_case(position).effets.add(Attaque_case(self.agissant,degats,element,self.distance,self.directions[self.rempli]))
 
 # Imports utilisés dans le code
-from ..Effet.Attaque.Attaque import Attaque_case
-from ..Labyrinthe.Deplacement import Deplacement
-from ..Labyrinthe.Forme import Forme
-from ..Labyrinthe.Passage import Passage
+from ..Attaque.Attaque import Attaque_case
+from ...Labyrinthe.Deplacement import Deplacement
+from ...Labyrinthe.Forme import Forme
+from ...Labyrinthe.Passage import Passage

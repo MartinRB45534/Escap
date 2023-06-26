@@ -63,3 +63,45 @@ Le modèle `execute()` - `action()` est repris dans la classe `Action`, est-ce q
 Comment gérer d'une part le décompte du temps et d'autre part les actions intermittente ?
 
 C'est pratique d'avoir un compteur de temps qui vérifie au passage s'il faut réaliser une action.
+
+## Idées
+
+Donner à l'effet la case, l'agissant ou l'item qu'il affecte (comme les `Action` actuellement). Plus besoin de les passer en paramètre, donc possibilité de fonctions `execute()` ou `action()` uniformes.
+
+Redonner à tous les effets l'héritage de la classe `Effet`.
+
+Revoir la nécessité des phases : l'affichage se fera entièrement à partir de la vue, qui incluera des vues d'effets si possible.
+
+## Affichage
+
+Actuellement, les effets peuvent passer en phase d'affichage avant de terminer (en particulier ceux qui sont placés et retirés au même tour, sans affichage entre temps).
+
+Pour les afficher sans utiliser les phases, il faudrait les laisser plus longtemps (les placer un tour avant de les activer, ou nettoyer les effets terminés après la vision).
+
+## Phases
+
+Actuellement, les différentes phases sont :
+ - `"Démarrage"` (vient d'être créé, `execute()` n'a jamais été appelé) ;
+ - `"En cours"` (`execute()` doit être appelé selon les besoins) ;
+ - `"Affichage"` (`execute()` ne doit plus être appelé, mais l'effet doit rester pour les besoins de l'affichage) ;
+ - `"Terminé"` (l'effet sera nettoyé à la première occasion).
+
+On a déjà dévié de ça pour les `Action`, avec le système de latence. Les `Evenement` ont à la fois un temps restant (similaire à la latence), et une phase.
+
+Le passage de `"Démarrage"` à `"En cours"` est surtout utile pour les effets qui font une action au début (et parfois une action inverse à la fin), comme les enchantements avec des effets sur les stats. Ces mécaniques ont déjà été retirées.
+
+Si on retire les effets terminés juste après la vision, on n'a plus besoin de la phase `"Affichage"`.
+
+Il suffit d'un moyen (par exemple une méthode) pour savoir si l'effet est terminé, et les phases n'ont plus de raison d'être.
+
+## `action()` et `execute()`
+
+Ces deux fonctions pourraient n'être conservées que pour les effets à appeler à chaque tour (actuellement `On_tick`). Les réserves de mana par exemple n'en ont pas besoin. À renommer peut-être.
+
+## Effets uniques
+
+Certains effets ne peuvent avoir qu'un représentant par support, comme les actions (une seule action à la fois), les maladies (on n'est pas deux fois malade de la même maladie), etc.
+
+On pourrait ajouter un effet de feu (l'agissant ou l'item est en feu), qui se propage comme les maladies mais en épargnant les alliés de son responsable (friendly fire off).
+
+Pour les actions, certains agissants pourraient en faire plusieurs à la fois : je pense en particulier à Kumoko dont les parallel minds peuvent utiliser des magies, recueillir de l'information, ou utiliser certains skills pendant que le corps accompli une autre action. C'est probablement un problème pour plus tard.

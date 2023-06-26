@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Entitee.Agissant.Agissant import Agissant
+    from ...Entitee.Agissant.Agissant import Agissant
 
 # Imports des classes parentes
 from .Action import Action
@@ -97,5 +97,5 @@ class Caste_fractionnaire(Caste):
         return False
 
 # Imports utilisés dans le code
-from ..Entitee.Agissant.Agissant import Agissant
-from ..Systeme.Elements import Element
+from ...Entitee.Agissant.Agissant import Agissant
+from ...Systeme.Elements import Element

@@ -4,7 +4,7 @@ import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Action.Action import Action
+    from ..Effet.Action.Action import Action
     from ..Effet.Effet import Effet
 
 # Pas de classe parente

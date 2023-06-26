@@ -284,7 +284,7 @@ class Inventaire:
 
 
 # Imports utilisés dans le code (il y en a beaucoup !!!)
-from ...Action.Non_skill import Impregne
+from ...Effet.Action.Non_skill import Impregne
 from ..Item.Item import Item, Consommable
 from ..Item.Etats import Etats_items
 from ..Item.Potion.Potion import Potion

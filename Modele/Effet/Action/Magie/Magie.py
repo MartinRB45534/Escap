@@ -4,13 +4,13 @@ import Carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...Entitee.Entitee import Entitee
-    from ...Entitee.Agissant.Agissant import Agissant
-    from ...Entitee.Item.Projectile.Projectile import Projectile
-    from ...Entitee.Item.Item import Item
-    from ...Effet.Effet import Effet
-    from ...Effet.Effet import Enchantement
-    from ...Systeme.Skill.Actif import Actif
+    from ....Entitee.Entitee import Entitee
+    from ....Entitee.Agissant.Agissant import Agissant
+    from ....Entitee.Item.Projectile.Projectile import Projectile
+    from ....Entitee.Item.Item import Item
+    from ...Effet import Effet
+    from ...Effet import Enchantement
+    from ....Systeme.Skill.Actif import Actif
 
 # Imports des classes parentes
 from ..Action import Non_repetable

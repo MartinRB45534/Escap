@@ -36,5 +36,5 @@ class Attaquant_magique_agissant(Mage):
 
 # Imports utilisés dans le code
 from ..Agissant import Agissant
-from ....Action.Magie.Magie import Cible_agissant
+from ....Effet.Action.Magie.Magie import Cible_agissant
 from operator import itemgetter
