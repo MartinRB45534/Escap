@@ -23,6 +23,9 @@ class On_tick(Effet) :
 class One_shot(Effet):
     """Classe des effets qui n'ont à être appelés qu'une seule fois."""
 
+    def execute(self): # Vraiment nécessaire ?
+        self.action()
+
     def action(self) -> None:
         """action() est appelée une seule fois."""
         raise NotImplementedError

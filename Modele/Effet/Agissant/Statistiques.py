@@ -38,3 +38,8 @@ class Effet_affinite(Effet_agissant):
     element:Element
     def modifie_affinite(self, affinite:float) -> float:
         raise NotImplementedError
+    
+class Effet_stats(Effet_agissant):
+    """Effet qui modifie toutes les statistiques."""
+    def modifie_stats(self, stat:float) -> float:
+        raise NotImplementedError
