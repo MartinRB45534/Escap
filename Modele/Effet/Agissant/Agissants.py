@@ -4,8 +4,6 @@ from typing import TYPE_CHECKING, Type
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ...Entitee.Agissant.Agissant import Agissant
-    from ...Entitee.Agissant.Agissant import Agissant
-    from ..Action.Attaque import Attaque, Attaque_multiple
     from ..Action.Magie.Magie import Magie
 
 
@@ -54,3 +52,4 @@ class Instakill(Effet_agissant,One_shot):
 
 # Imports utilisés dans le code
 from ...Entitee.Agissant.Role.Mage import Mage
+from ..Action.Attaque import Attaque, Attaque_multiple

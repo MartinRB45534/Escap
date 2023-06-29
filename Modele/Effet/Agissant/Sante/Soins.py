@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from ....Labyrinthe.Case import Case
 
 # Imports des classes parentes
-from ...Effet import One_shot
+from ...Effet import One_shot, On_tick
 from ..Agissant import Effet_agissant
 from ...Case.Case import Effet_case
 
@@ -72,6 +72,18 @@ class Soin(One_shot, Effet_agissant):
 
     def action(self):
         self.agissant.soigne(self.gain_pv)
+
+class Immunite(On_tick, Effet_agissant):
+    """Enchantement qui confère une immunité aux maladies, à condition de disposer de suffisamment de priorité."""
+    def __init__(self,agissant:Agissant,superiorite:float):
+        self.agissant = agissant
+        self.superiorite = superiorite
+
+    def action(self):
+        for effet in self.agissant.effets :
+            if isinstance(effet,Maladie):
+                if effet.virulence + self.superiorite < self.agissant.priorite :
+                    self.agissant.effets.remove(effet)
 
 # Imports utilisés dans le code
 from .Maladies.Maladie import Maladie
