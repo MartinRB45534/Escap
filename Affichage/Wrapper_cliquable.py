@@ -1,23 +1,28 @@
+"""
+Contient la classe WrapperCliquable
+"""
+
 from __future__ import annotations
-from typing import List, Optional
+from typing import Tuple, Literal, TYPE_CHECKING
 import pygame
 
-from .Affichable import Affichable
-from .Cliquable import Cliquable
-from .Wrapper import Wrapper
+from .cliquable import Cliquable
+from .wrapper import Wrapper
 
-class Wrapper_cliquable(Wrapper,Cliquable):
+from ._ensure_pygame import transparency_flag
+
+if TYPE_CHECKING:
+    from .survolable import Survolable
+
+class WrapperCliquable(Wrapper,Cliquable):
     """Un wrapper qui peut être cliqué"""
     def __init__(self):
         Cliquable.__init__(self)
-
-        self.objets:List[Affichable] = []
-        self.contenu:Optional[Affichable] = None #L'objet qu'il 'contient'
-        self.fond = (0,0,0,0)
+        Wrapper.__init__(self)
 
     def affiche(self,screen:pygame.Surface,frame:int=1,frame_par_tour:int=1):
         assert self.contenu is not None
-        surf = pygame.Surface(self.tailles,pygame.SRCALPHA)
+        surf = pygame.Surface(self.tailles,transparency_flag)
         # On ajoute un contour
         if self.marque_survol:
             self.marque_survol = False
@@ -45,7 +50,7 @@ class Wrapper_cliquable(Wrapper,Cliquable):
         for objet in self.objets:
             objet.affiche(screen,frame,frame_par_tour)
 
-    def clique(self,position:List[int],droit:bool=False):
+    def clique(self,position:Tuple[int,int],droit:bool=False) -> Cliquable|Literal[False]:
         clique = Wrapper.clique(self,position,droit)
         if clique is self:
             self.set_actif()
@@ -55,7 +60,7 @@ class Wrapper_cliquable(Wrapper,Cliquable):
             return self
         return False
 
-    def survol(self,position):
+    def survol(self,position:Tuple[int,int]) -> Survolable|Literal[False]:
         survol = Wrapper.survol(self,position)
         if survol is self:
             self.marque_survol = True

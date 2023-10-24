@@ -1,14 +1,14 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ....Effet.Effet import Effet
-    from ....Labyrinthe.Labyrinthe import Labyrinthe
+    from ....effet.effet import Effet
+    from ....labyrinthe.labyrinthe import Labyrinthe
 
 # Imports des classes parentes
-from ..Item import Consommable
+from ..item import Consommable
 
 class Parchemin(Consommable):
     """La classe des consommables qui s'activent avec du mana."""
@@ -26,5 +26,5 @@ class Parchemin(Consommable):
         return SKIN_PARCHEMIN
 
 # Imports utilisés dans le code
-from ....Affichage.Skins import SKIN_PARCHEMIN
-from ..Item import Item
+from ....Affichage.skins import SKIN_PARCHEMIN
+from ..item import Item

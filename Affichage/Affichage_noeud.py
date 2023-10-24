@@ -1,21 +1,32 @@
+"""
+Contient la classe ParentNoeud, qui est un noeud qui peut contenir des objets
+"""
+
 from __future__ import annotations
-from typing import List, TYPE_CHECKING
+from typing import List, Tuple, Literal, TYPE_CHECKING
+
+from .affichable import Affichable
+from .cliquable import Cliquable
+from .noeud import Noeud
+
 if TYPE_CHECKING:
-    from Placeholder import Placeheldholder
+    from placeholder import Placeheldholder
 
-from .Affichable import Affichable
-from .Parent import Parent
-from .Cliquable import Cliquable
-from .Noeud import Noeud
-
-class Parent_noeud(Parent,Noeud):
+class ParentNoeud(Noeud):
+    """Un noeud qui peut contenir des objets"""
     def __init__(self):
         Noeud.__init__(self)
         
         self.objets:List[Affichable] = [] #La liste des objets à afficher
 
-    def clique(self,position:List[int],droit:bool=False):
-        clique = Parent.clique(self,position,droit)
+    def clique(self,position:Tuple[int,int],droit:bool=False):
+        clique = False
+        if self.touche(position):
+            clique = self
+        for objet in self.objets:
+            res = objet.clique(position,droit)
+            if res:
+                clique = res
         if clique is self:
             self.set_actif()
         elif isinstance(clique, Placeheldholder):
@@ -33,15 +44,21 @@ class Parent_noeud(Parent,Noeud):
             return self
         return False
 
-    def clique_placeholder(self,placeheldholder:Placeheldholder,droit:bool=False):
+    def clique_placeholder(self,placeheldholder:Placeheldholder,droit:bool=False) -> Cliquable|Literal[False]:
         res = Affichable.clique_placeholder(self,placeheldholder,droit)
         if res:
             self.select(res,droit)
             return self
         return False
 
-    def survol(self,position):
-        survol = Parent.survol(self,position)
+    def survol(self,position:Tuple[int,int]):
+        survol = False
+        if self.touche(position):
+            survol = self
+        for objet in self.objets:
+            res = objet.survol(position)
+            if res:
+                survol = res
         if survol is self:
             self.marque_survol = True
         else:
@@ -54,5 +71,5 @@ class Parent_noeud(Parent,Noeud):
         if isinstance(selection,Noeud) and not droit:
             self.set_courant(selection)
 
-from .Wrapper_noeud import Wrapper_noeud #Pour éviter les import circulaires
-from .Placeholder import Placeheldholder
+#Pour éviter les import circulaires
+from .placeholder import Placeheldholder

@@ -1,2 +1,2 @@
-from .Agissant import *
-from .Statistiques import *
+from .agissant import *
+from .statistiques import *

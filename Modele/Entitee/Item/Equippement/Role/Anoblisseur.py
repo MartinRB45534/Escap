@@ -3,7 +3,7 @@ from __future__ import annotations
 # Pas d'import pour les annotations
 
 # Imports des classes parentes
-from ..Equippement import Equippement
+from ..equippement import Equippement
 
 class Anoblisseur(Equippement):
     """La classe des équipements qui augmentent la priorité."""

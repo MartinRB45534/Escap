@@ -1,13 +1,13 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, List, Dict, Set, Self
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Entitee.Agissant.Agissant import Agissant
-    from ..Entitee.Agissant.Vue.Vue import Vue
-    from .Vision.Vision import Vision
-    # from ..Esprit.Representation_spatiale import Espace_schematique
+    from ..entitee.agissant.agissant import Agissant
+    from ..entitee.agissant.vue.vue import Vue
+    from .vision.vision import Vision
+    # from ..esprit.representation_spatiale import Espace_schematique
 
 # Pas de classe parente
 
@@ -43,7 +43,7 @@ class Esprit :
     def refait_vue(self):
         vues:Set[Vue] = set()
         for corp in self.corps:
-            if corp.etat == Etats_agissants.VIVANT:
+            if corp.etat == EtatsAgissants.VIVANT:
                 vues.add(corp.vue)
         self.vision.voit(vues, self.tour)
         # TODO : préjugés & zones
@@ -646,7 +646,7 @@ class Esprit :
     def get_pos_vues(self):
         positions:List[crt.Position] = []
         for corp in self.corps:
-            if corp.etat == Etats_agissants.VIVANT:
+            if corp.etat == EtatsAgissants.VIVANT:
                 positions.append(corp.position)
         return positions
 
@@ -986,7 +986,7 @@ class Esprit :
 
     def fuite_utile(self,fuyard:Agissant): #TODO inclure l'accessibilité
         for corp in self.corps:
-            if corp != fuyard and corp.etat == Etats_agissants.VIVANT:
+            if corp != fuyard and corp.etat == EtatsAgissants.VIVANT:
                 return True
         return False
 
@@ -1016,7 +1016,7 @@ class Mindless(Esprit):
 NOBODY = Mindless()
 
 # Imports utilisés dans le code
-# from ..Esprit.Representation_spatiale import Salle, Couloir, Zone_inconnue
-from .Vision.Vision import Vision
-from ..Entitee.Agissant.Agissant import Agissant
-from ..Entitee.Agissant.Etats import Etats_agissants
+# from ..esprit.representation_spatiale import Salle, Couloir, Zone_inconnue
+from .vision.vision import Vision
+from ..entitee.agissant.agissant import Agissant
+from ..entitee.agissant.etats import EtatsAgissants

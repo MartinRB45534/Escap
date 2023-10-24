@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING, List, Tuple
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Agissant import Agissant
+    from ..agissant import Agissant
 
 # Imports des classes parentes
-from .Multi_soigneur import Multi_soigneur
+from .multi_soigneur import Multi_soigneur
 
 class Multi_soigneur_protecteur(Multi_soigneur):
     """Les multi_soigneurs capables de placer un sort de protection lorsqu'il n'y a personne à soigner.""" #Vraiment juste la peste (en fait même pas la peste)
@@ -14,7 +14,7 @@ class Multi_soigneur_protecteur(Multi_soigneur):
     def agit_en_vue(self,defaut:str = ""):
         cibles:List[Tuple[float,Agissant]] = []
         for corp in self.esprit.corps:
-            if corp.etat == Etats_agissants.VIVANT and corp.statistiques.pv < corp.statistiques.pv_max:
+            if corp.etat == EtatsAgissants.VIVANT and corp.statistiques.pv < corp.statistiques.pv_max:
                 cibles.append((corp.statistiques.pv,corp))
         if len(cibles) == 1:
             if self.peut_caster():
@@ -43,10 +43,10 @@ class Multi_soigneur_protecteur(Multi_soigneur):
         elif self.pm == self.statistiques.pm_max: #On ne l'utilise que rarement... parce qu'il est cher
             cibles_:List[Agissant] = []
             for corp in self.esprit.corps:
-                if corp.etat == Etats_agissants.VIVANT:
+                if corp.etat == EtatsAgissants.VIVANT:
                     libre = True
                     for effet in corp.effets:
-                        if isinstance(effet,Protection_sacree): #On ne peut pas avoir deux protections sacrées en même temps
+                        if isinstance(effet,ProtectionSacree): #On ne peut pas avoir deux protections sacrées en même temps
                             libre = False
                     if libre:
                         cibles_.append(corp)
@@ -60,7 +60,7 @@ class Multi_soigneur_protecteur(Multi_soigneur):
         return defaut
 
 # Imports utilisés dans le code
-from ....Effet.Effets_protection import Protection_sacree
-from ....Effet.Action.Magie.Magie import Cible_agissant,Cible_agissants
-from ..Etats import Etats_agissants
+from ....effet.effets_protection import ProtectionSacree
+from ....effet.action.magie.magie import Cible_agissant,Cible_agissants
+from ..etats import EtatsAgissants
 from operator import itemgetter

@@ -1,4 +1,9 @@
+"""
+Un étage est une zone de la carte qui peut contenir des positions.
+"""
+
 from __future__ import annotations
+from typing import Any
 
 # Pas d'import pour les annotations
 
@@ -12,7 +17,7 @@ class Etage:
         self.hauteur = hauteur
         self.positions = {Position(self, x, y) for x in range(largeur) for y in range(hauteur)}
 
-    def __contains__(self, item):
+    def __contains__(self, item: Any):
         if isinstance(item,Position):
             return item in self.positions
         return False
@@ -29,5 +34,5 @@ class Etage:
     def __str__(self):
         return self.nom
     
-from .Position import Position
-from .Absent import POSITION_ABSENTE
+from .position import Position
+from .absent import POSITION_ABSENTE

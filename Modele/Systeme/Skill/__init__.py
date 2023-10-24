@@ -1,3 +1,3 @@
-from .Actif import *
-from .Passif import *
-from .Skill import *
+from .actif import *
+from .passif import *
+from .skill import *

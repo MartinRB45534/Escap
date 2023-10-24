@@ -1,11 +1,11 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, List
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Effet.Action.Action import Action
-    from ..Effet.Effet import Effet
+    from ..effet.action.action import Action
+    from ..effet.effet import Effet
 
 # Pas de classe parente
 
@@ -40,19 +40,15 @@ class Entitee:
 
 class Entitee_superieure(Entitee):
     """La classe des entitées qui font bouger le labyrinthe autour d'eux."""
-    pass
 
 class Fantome(Entitee):
     """La classe des entitées qui traversent les murs."""
-    pass
 
 class Interactif(Entitee):
     """La classe des entitées avec lesquelles on peut interagir. Les humains, principalement, et quelques éléments de décors."""
-    pass
 
-class Non_superposable(Entitee):
+class NonSuperposable(Entitee):
     """La classe des entitées qui 'occupent' une place, donc qu'on ne peut pas superposer (aux fantômes près)."""
-    pass
 
 class Mobile(Entitee):
     """La classe des entitées qui peuvent se déplacer (par elles-mêmes pour les agissants, en étant lancées pour les items)."""

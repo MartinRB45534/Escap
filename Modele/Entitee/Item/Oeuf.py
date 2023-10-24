@@ -1,13 +1,13 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...Entitee.Agissant.Agissant import Agissant
+    from ...entitee.agissant.agissant import Agissant
 
 # Imports des classes parentes
-from .Item import Item
+from .item import Item
 
 class Oeuf(Item):
     def __init__(self,agissant:Agissant,position:crt.Position=crt.POSITION_ABSENTE):
@@ -21,4 +21,4 @@ class Oeuf(Item):
         return SKIN_OEUF
     
 # Imports utilisés dans le code
-from ...Affichage.Skins import SKIN_OEUF
+from ...affichage.skins import SKIN_OEUF

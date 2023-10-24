@@ -3,11 +3,11 @@ from typing import TYPE_CHECKING, List, Tuple
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Agissant import Agissant
+    from ..agissant import Agissant
 
 # Imports des classes parentes
-from .Renforceur import Renforceur
-from .Mage import Multi_mage
+from .renforceur import Renforceur
+from .mage import Multi_mage
 
 class Multi_renforceur(Renforceur,Multi_mage):
     """Les agissants qui peuvent booster plusieurs alliés à la fois."""
@@ -45,5 +45,5 @@ class Multi_renforceur(Renforceur,Multi_mage):
         return defaut
 
 # Imports utilisés dans le code
-from ....Effet.Action.Magie.Magie import Cible_agissant,Cible_agissants
+from ....effet.action.magie.magie import Cible_agissant,Cible_agissants
 from operator import itemgetter

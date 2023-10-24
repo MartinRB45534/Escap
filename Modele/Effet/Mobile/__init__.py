@@ -1,2 +1,2 @@
-from .Mobile import *
-from .Teleportation import *
+from .mobile import *
+from .teleportation import *

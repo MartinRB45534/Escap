@@ -1,27 +1,32 @@
+"""
+Ce fichier contient la classe Position, qui représente une position sur la carte.
+"""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 from warnings import warn
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from .Etage import Etage
+    from .etage import Etage
 
 # Pas de classe parente
 
 class Position:
+    """Classe représentant une position sur la carte."""
     def __init__(self,etage:Etage,x:int,y:int):
-        self.etage=etage #Doit être un chaine de caractères
+        self.etage=etage
         self.x=x
         self.y=y
 
     def __add__(self,other:Any):
         if isinstance(other,Decalage):
-            return New_pos(self.etage,self.x+other.x,self.y+other.y)
+            return new_pos(self.etage,self.x+other.x,self.y+other.y)
         return NotImplemented
 
     def __radd__(self,other:Any):
         if isinstance(other,Decalage):
-            return New_pos(self.etage,other.x+self.x,other.y+self.y)
+            return new_pos(self.etage,other.x+self.x,other.y+self.y)
         return NotImplemented
 
     def __sub__(self,other:Any):
@@ -32,7 +37,7 @@ class Position:
                 warn(f"On ne peut pas soustraire {other} à {self} car les étages diffèrent.")
                 return NotImplemented
         elif isinstance(other,Decalage):
-            return New_pos(self.etage,self.x-other.x,self.y-other.y)
+            return new_pos(self.etage,self.x-other.x,self.y-other.y)
         return NotImplemented
 
     def __rsub__(self,other:Any):
@@ -65,13 +70,15 @@ class Position:
     def __iter__(self):
         for i in range(self.y):
             for j in range(self.x):
-                yield New_pos(self.etage,j,i)
+                yield new_pos(self.etage,j,i)
 
     def to_decalage(self):
+        """Renvoie le décalage correspondant à la position."""
         return Decalage(self.x,self.y)
-    
-def New_pos(etage:Etage,x:int,y:int) -> Position:
+
+def new_pos(etage:Etage,x:int,y:int) -> Position:
+    """Renvoie la position de coordonnées (x,y) sur l'étage etage."""
     return etage.get_pos(x,y)
 
 # Imports utilisés dans le code
-from .Decalage import Decalage
+from .decalage import Decalage

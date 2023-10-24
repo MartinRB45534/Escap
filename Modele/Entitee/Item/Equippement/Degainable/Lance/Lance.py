@@ -1,14 +1,14 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ......Labyrinthe.Labyrinthe import Labyrinthe
-    from ......Systeme.Elements import Element
+    from ......labyrinthe.labyrinthe import Labyrinthe
+    from ......systeme.elements import Element
 
 # Imports des classes parentes
-from ..Degainable import Arme
+from ..degainable import Arme
 
 class Lance(Arme):
     """La classe des armes de type lance. Permettent de porter des coups rectilignes devant l'agissant."""

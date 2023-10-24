@@ -1,2 +1,2 @@
-from .Maladie import *
-from .Maladies import *
+from .maladie import *
+from .maladies import *

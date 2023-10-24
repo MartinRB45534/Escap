@@ -3,11 +3,11 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...Labyrinthe.Case import Case
+    from ...labyrinthe.case import Case
 
 # Imports des classes parentes
-from ...Effet import Evenement
-from .Case import Effet_case
+from ...effet import Evenement
+from .case import Effet_case
 
 class Obscurite(Evenement, Effet_case):
     """Evenement d'obscurité."""

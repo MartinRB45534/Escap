@@ -1,2 +1,2 @@
-from .Reparateur import *
-from .Reparateurs import *
+from .reparateur import *
+from .reparateurs import *

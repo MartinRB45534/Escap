@@ -3,11 +3,11 @@ from typing import TYPE_CHECKING, Dict, Set
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from .Agissant import Agissant
-    from ...Systeme.Elements import Element
+    from .agissant import Agissant
+    from ...systeme.elements import Element
 
 # Imports des valeurs par défaut des paramètres
-from ...Systeme.Elements import Element
+from ...systeme.elements import Element
 
 class Statistiques:
 
@@ -38,14 +38,14 @@ class Statistiques:
             if isinstance(item, Accelerateur):
                 vitesse = item.augmente_vitesse(vitesse) # Les modifications peuvent être additives ou multiplicatives ou quoi que ce soit d'autre, ce n'est pas notre problème
         for effet in self.possesseur.effets:
-            if isinstance(effet, Effet_vitesse):
+            if isinstance(effet, EffetVitesse):
                 vitesse = effet.modifie_vitesse(vitesse)
         return vitesse
     
     def get_force(self) -> float:
         force = self.force
         for effet in self.possesseur.effets:
-            if isinstance(effet, Effet_force):
+            if isinstance(effet, EffetForce):
                 force = effet.modifie_force(force)
         return force
     
@@ -55,7 +55,7 @@ class Statistiques:
             if isinstance(item, Elementaire) and item.element == element:
                 affinite = item.augmente_affinite(affinite)
         for effet in self.possesseur.effets:
-            if isinstance(effet, Effet_affinite) and effet.element == element:
+            if isinstance(effet, EffetAffinite) and effet.element == element:
                 affinite = effet.modifie_affinite(affinite)
         return affinite
     
@@ -71,7 +71,7 @@ class Statistiques:
         vision = skill.portee
         vision *= self.possesseur.affinite(Element.OMBRE) # La vision est augmentée par l'affinité à l'ombre
         for effet in self.possesseur.effets:
-            if isinstance(effet, Effet_vision):
+            if isinstance(effet, EffetVision):
                 vision = effet.modifie_vision(vision)
         return vision
     
@@ -81,7 +81,7 @@ class Statistiques:
             if isinstance(item, Reparateur):
                 regen_pv = item.regen_pv(regen_pv)
         for effet in self.possesseur.effets:
-            if isinstance(effet, Effet_pv):
+            if isinstance(effet, EffetPv):
                 regen_pv = effet.modifie_pv(regen_pv)
         return regen_pv
     
@@ -91,7 +91,7 @@ class Statistiques:
             if isinstance(item, Reparateur_magique):
                 regen_pm = item.regen_pm(regen_pm)
         for effet in self.possesseur.effets:
-            if isinstance(effet, Effet_pm):
+            if isinstance(effet, EffetPm):
                 regen_pm = effet.modifie_pm(regen_pm)
         return regen_pm
 
@@ -115,14 +115,14 @@ class Statistiques:
     def depense_pm(self, pm:float):
         self.pm -= pm
 
-from ..Item.Equippement.Role.Elementaires import Elementaire
-from ..Item.Equippement.Role.Accelerateur import Accelerateur
-from ..Item.Equippement.Role.Anoblisseur import Anoblisseur
-from ..Item.Equippement.Role.Reparateur.Reparateur import Reparateur
-from ..Item.Equippement.Role.Reparateur_magique.Reparateur_magique import Reparateur_magique
-from ...Effet.Effets_agissants import Effet_force
-from ...Effet.Effets_agissants import Effet_affinite
-from ...Effet.Effets_agissants import Effet_vision
-from ...Effet.Effets_agissants import Effet_pv
-from ...Effet.Effets_agissants import Effet_pm
-from ...Effet.Effets_agissants import Effet_vitesse
+from ..item.equippement.role.Elementaires import Elementaire
+from ..item.equippement.role.Accelerateur import Accelerateur
+from ..item.equippement.role.Anoblisseur import Anoblisseur
+from ..item.equippement.role.reparateur.reparateur import Reparateur
+from ..item.equippement.role.reparateur_magique.reparateur_magique import Reparateur_magique
+from ...effet.effets_agissants import EffetForce
+from ...effet.effets_agissants import EffetAffinite
+from ...effet.effets_agissants import EffetVision
+from ...effet.effets_agissants import EffetPv
+from ...effet.effets_agissants import EffetPm
+from ...effet.effets_agissants import EffetVitesse

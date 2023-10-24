@@ -1,10 +1,14 @@
+"""
+La Position vue par l'esprit.
+"""
+
 from __future__ import annotations
 from typing import Any
-import Carte as crt
+import carte as crt
 
 # Pas d'import utilisé uniquement dans les annotations
 
-class Vision_position:
+class VisionPosition:
     """
     Quelques positions que la classe crt.Position ne peut pas représenter :
     - les positions inconnues (différentes de la position absente)
@@ -13,7 +17,7 @@ class Vision_position:
     """
     # Ces positions ne permettent pas l'accès aux propriétés habituelles de Position
 
-class Position_inconnue(Vision_position):
+class PositionInconnue(VisionPosition):
     """
     On sait que l'entitée est quelque part, mais on n'a pas la moindre idée où.
     """
@@ -21,27 +25,27 @@ class Position_inconnue(Vision_position):
         pass
 
     def __eq__(self,other:Any):
-        if isinstance(other,crt.Position|Vision_position):
+        if isinstance(other,crt.Position|VisionPosition):
             return False # On n'est même pas égal à une autre position inconnue
         return NotImplemented
-    
+
     def __hash__(self):
-        return hash("Position_inconnue")
-    
+        return hash("PositionInconnue")
+
     def __contains__(self,item:Any):
-        if isinstance(item,crt.Position|Vision_position):
+        if isinstance(item,crt.Position|VisionPosition):
             return False # On ne peut pas être contenu dans une position connue
         return False
-    
+
     def __str__(self):
         return "Position inconnue"
-    
-    def __repr__(self):
-        return "Position_inconnue()"
-    
-POSITION_INCONNUE = Position_inconnue() # On ne crée qu'une seule instance de Position_inconnue
 
-class Position_espace(Vision_position):
+    def __repr__(self):
+        return "PositionInconnue()"
+
+POSITION_INCONNUE = PositionInconnue() # On ne crée qu'une seule instance de PositionInconnue
+
+class PositionEspace(VisionPosition):
     """
     On sait que l'entitée est dans un ensemble de cases donné.
     """
@@ -49,31 +53,31 @@ class Position_espace(Vision_position):
         self.espace = espace
 
     def __eq__(self,other:Any):
-        if isinstance(other,Position_espace):
+        if isinstance(other,PositionEspace):
             return bool(self.espace & other.espace) # On est égal à une autre position d'espace si les deux espaces se croisent
         return NotImplemented
-    
+
     def __hash__(self):
         return hash((self.espace))
-    
+
     def __contains__(self,item:Any):
         if isinstance(item,crt.Position):
             return item in self.espace or any(item in position for position in self.espace)
-        elif isinstance(item,Position_espace):
+        elif isinstance(item,PositionEspace):
             return bool(self.espace & item.espace)
-        elif isinstance(item,Position_multiple):
+        elif isinstance(item,PositionMultiple):
             return any(position in self for position in item.positions)
-    
+
     def __str__(self):
         return f"Position espace : {self.espace}"
-    
+
     def __repr__(self):
-        return f"Position_espace({self.espace})"
-    
+        return f"PositionEspace({self.espace})"
+
     def __iter__(self):
         return iter(self.espace)
     
-class Position_multiple(Vision_position):
+class PositionMultiple(VisionPosition):
     """
     On sait que l'entitée est sur l'une de plusieurs positions possibles.
     """
@@ -82,18 +86,18 @@ class Position_multiple(Vision_position):
 
     def __eq__(self,other:Any):
         return False
-    
+
     def __hash__(self):
         return hash((self.positions))
-    
+
     def __contains__(self,item:Any):
         return any(item in position for position in self.positions)
-    
+
     def __str__(self):
         return f"Position multiple : {self.positions}"
-    
+
     def __repr__(self):
-        return f"Position_multiple({self.positions})"
-    
+        return f"PositionMultiple({self.positions})"
+
     def __iter__(self):
         return iter(self.positions)

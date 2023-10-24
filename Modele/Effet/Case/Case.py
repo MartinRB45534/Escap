@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...Labyrinthe.Case import Case
+    from ...labyrinthe.case import Case
 
 # Imports des classes parentes
-from ..Effet import Effet
+from ..effet import Effet
 
 class Effet_case(Effet):
     """Effet qui est placé sur une case."""

@@ -1,44 +1,44 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Callable
-import Affichage as af
-import Carte as crt
+import affichage as af
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...Entitee import Entitee
+    from ...entitee import Entitee
 
-class Mur_vu(crt.Mur):
+class MurVu(crt.Mur):
     def __init__(self,niveau:int):
         self.niveau = niveau
         self.ferme = False
 
-class Mur_impassable_vu(Mur_vu):
+class MurImpassable_vu(MurVu):
     def __init__(self,niveau:int):
         super().__init__(niveau)
         self.ferme = True
 
-class Mur_plein_vu(Mur_vu):
+class MurPlein_vu(MurVu):
     def __init__(self,niveau:int):
         super().__init__(niveau)
         self.casse = False
 
-class Porte_vue(Mur_plein_vu):
+class Porte_vue(MurPlein_vu):
     def __init__(self,niveau:int,code:str):
         super().__init__(niveau)
         self.code = code
         self.ouvert = False
         self.casse = False
 
-class Mur_ouvert_vu(Mur_vu):
+class MurOuvert_vu(MurVu):
     def __init__(self,niveau:int):
         super().__init__(niveau)
 
-class Barriere_vue(Mur_ouvert_vu):
+class Barriere_vue(MurOuvert_vu):
     def __init__(self,niveau:int,condition:Callable[[Entitee],bool]):
         super().__init__(niveau)
         self.condition = condition
 
-class Teleporteur_vu(Mur_ouvert_vu): # La seule différence avec un mur ouvert est que les téléporteurs sont affichés différemment
+class Teleporteur_vu(MurOuvert_vu): # La seule différence avec un mur ouvert est que les téléporteurs sont affichés différemment
     def __init__(self,niveau:int):
         super().__init__(niveau)
 
@@ -48,13 +48,13 @@ class Porte_a_loquet_vue(Porte_vue):
     def __init__(self, niveau: int, code: str):
         super().__init__(niveau, code)
 
-class Escalier_vu(Mur_ouvert_vu):
+class Escalier_vu(MurOuvert_vu):
     """Un téléporteur avec une notion graphique de haut et de bas"""
-    def __init__(self, niveau: int, direction: af.Direction_aff):
+    def __init__(self, niveau: int, direction: af.DirectionAff):
         super().__init__(niveau)
         self.direction = direction
 
-def voit_mur(mur:Mur) -> Mur_vu:
+def voit_mur(mur:Mur) -> MurVu:
     if isinstance(mur,Escalier):
         return Escalier_vu(mur.niveau,mur.direction)
     elif isinstance(mur,Porte_a_loquet) and mur.loquet:
@@ -65,12 +65,12 @@ def voit_mur(mur:Mur) -> Mur_vu:
         return Barriere_vue(mur.niveau,mur.condition)
     elif isinstance(mur,Teleporteur):
         return Teleporteur_vu(mur.niveau)
-    elif isinstance(mur,Mur_plein):
-        return Mur_plein_vu(mur.niveau)
-    elif isinstance(mur,Mur_ouvert):
-        return Mur_ouvert_vu(mur.niveau)
+    elif isinstance(mur,MurPlein):
+        return MurPlein_vu(mur.niveau)
+    elif isinstance(mur,MurOuvert):
+        return MurOuvert_vu(mur.niveau)
     else:
         raise TypeError(f"Le type {type(mur)} n'est pas reconnu comme un mur.")
 
 
-from ....Labyrinthe.Mur import Mur, Mur_plein, Mur_ouvert, Porte, Barriere, Teleporteur, Porte_a_loquet, Escalier
+from ....labyrinthe.mur import Mur, MurPlein, MurOuvert, Porte, Barriere, Teleporteur, Porte_a_loquet, Escalier

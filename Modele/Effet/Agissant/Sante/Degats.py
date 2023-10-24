@@ -3,14 +3,14 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ....Entitee.Agissant.Agissant import Agissant
-    from ....Systeme.Elements import Element
+    from ....entitee.agissant.agissant import Agissant
+    from ....systeme.elements import Element
 
 # Imports des classes parentes
-from ...Effet import On_tick, One_shot
-from ..Agissant import Effet_agissant
+from ...effet import OnTick, OneShot
+from ..agissant import Effet_agissant
 
-class Degats(One_shot, Effet_agissant):
+class Degats(OneShot, Effet_agissant):
     """La classe des effets de dégats."""
     def __init__(self,agissant:Agissant,responsable:Agissant,element:Element,degats:float):
         self.agissant = agissant
@@ -21,7 +21,7 @@ class Degats(One_shot, Effet_agissant):
     def action(self):
         pass
 
-class Combustion(On_tick, Effet_agissant):
+class Combustion(OnTick, Effet_agissant):
     """La classe des effets de combustion (brulure)."""
     def __init__(self,agissant:Agissant,responsable:Agissant,element:Element,degats:float,reduction:float):
         self.agissant = agissant

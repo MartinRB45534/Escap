@@ -1,4 +1,8 @@
-from .Entitee import *
-from .Agissant import *
-from .Item import *
-from .Decors import *
+"""
+Ce module contient les entitées du jeu.
+"""
+
+from .entitee import *
+from .agissant import *
+from .item import *
+from .decors import *

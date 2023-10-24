@@ -1,15 +1,15 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ....Entitee.Agissant.Agissant import Agissant
-    from ....Entitee.Item.Projectile.Projectile import Projectile
-    from ....Systeme.Skill.Actif import Actif
+    from ....entitee.agissant.agissant import Agissant
+    from ....entitee.item.projectile.projectile import Projectile
+    from ....systeme.skill.actif import Actif
 
 # Imports des classes parentes
-from .Magie import Invocation_projectile,Cible_case,Portee_limitee
+from .magie import Invocation_projectile,Cible_case,Portee_limitee
 
 class Magie_projectile_decentre(Invocation_projectile,Cible_case,Portee_limitee):
     """La magie qui invoque une ombre futive."""

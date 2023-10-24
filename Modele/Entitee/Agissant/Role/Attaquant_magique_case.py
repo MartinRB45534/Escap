@@ -1,9 +1,9 @@
 from __future__ import annotations
 from typing import List, Tuple
-import Carte as crt
+import carte as crt
 
 # Imports des classes parentes
-from .Mage import Mage
+from .mage import Mage
 
 class Attaquant_magique_case(Mage):
     """Les agissants qui combattent en lançant des attaques magiques de loin sur des cases."""
@@ -32,5 +32,5 @@ class Attaquant_magique_case(Mage):
             return super().get_impact()
 
 # Imports utilisés dans le code
-from ....Effet.Action.Magie.Magie import Cible_case
+from ....effet.action.magie.magie import Cible_case
 from operator import itemgetter

@@ -1,18 +1,18 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import random
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...Entitee.Agissant.Agissant import Agissant
+    from ...entitee.agissant.agissant import Agissant
 
 
 # Imports des classes parentes
-from .Agissant import Effet_agissant
-from ..Effet import On_tick
+from .agissant import Effet_agissant
+from ..effet import OnTick
 
-class Confusion(On_tick, Effet_agissant):
+class Confusion(OnTick, Effet_agissant):
     """Les enchantements qui provoque des erreurs de direction."""
     def __init__(self,agissant:Agissant,taux_erreur:float):
         self.agissant = agissant
@@ -25,7 +25,7 @@ class Confusion(On_tick, Effet_agissant):
                 dir_possibles = [dir for dir in crt.Direction if dir is not dir_voulue]
                 self.agissant.action.direction = random.choice(dir_possibles)
 
-class Enchantement_poches_trouees(On_tick, Effet_agissant):
+class EnchantementPochesTrouees(OnTick, Effet_agissant):
     """Les enchantements qui fait droper des items involontairement."""
     def __init__(self,agissant:Agissant,taux_drop:float):
         self.agissant = agissant
@@ -35,4 +35,4 @@ class Enchantement_poches_trouees(On_tick, Effet_agissant):
         if random.random() < self.taux_drop :
             self.agissant.inventaire.drop_random(self.agissant.labyrinthe.position_case[self.agissant.position])
 
-from ..Action.Deplacement import Deplace
+from ..action.deplacement import Deplace

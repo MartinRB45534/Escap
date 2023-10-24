@@ -3,13 +3,13 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ....Entitee.Agissant.Agissant import Agissant
+    from ....entitee.agissant.agissant import Agissant
 
 # Imports des classes parentes
-from ...Effet import On_tick
-from ..Agissant import Effet_agissant
+from ...effet import OnTick
+from ..agissant import Effet_agissant
 
-class Poison(On_tick, Effet_agissant):
+class Poison(OnTick, Effet_agissant):
     """La classe des effets d'empoisonnement."""
     def __init__(self,agissant:Agissant,responsable:Agissant,degats_max:float,progression:float):
         self.agissant = agissant
@@ -27,7 +27,7 @@ class Poison(On_tick, Effet_agissant):
         self.action()
 
     def termine(self) -> bool:
-        return self.agissant.etat == Etats_agissants.MORT
+        return self.agissant.etat == EtatsAgissants.MORT
 
 # Imports utilisés dans le code
-from ....Entitee.Agissant.Etats import Etats_agissants
+from ....entitee.agissant.etats import EtatsAgissants

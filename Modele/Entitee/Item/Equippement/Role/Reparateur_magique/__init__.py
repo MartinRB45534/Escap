@@ -1,2 +1,2 @@
-from .Reparateur_magique import *
-from .Reparateurs_magiques import *
+from .reparateur_magique import *
+from .reparateurs_magiques import *

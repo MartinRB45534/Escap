@@ -1,16 +1,14 @@
+"""Module contenant la classe Case_absent."""
+
 from __future__ import annotations
 
-# Pas d'import pour les annotations
+from .case import Case
+from .structure_spatiale.absent import POSITION_ABSENTE
 
-# Imports des classes parentes
-from .Case import Case
-
-class Case_absent(Case):
+class CaseAbsent(Case):
     """Classe représentant l'étage de la position absente."""
     def __init__(self):
         super().__init__(POSITION_ABSENTE)
 
-from .Structure_spatiale.Absent import POSITION_ABSENTE
-
-CASE_ABSENTE = Case_absent()
+CASE_ABSENTE = CaseAbsent()
         

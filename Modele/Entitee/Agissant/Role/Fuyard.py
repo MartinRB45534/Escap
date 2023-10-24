@@ -3,7 +3,7 @@ from __future__ import annotations
 # Pas d'imports pour les annotations
 
 # Imports des classes parentes
-from ..Agissant import Agissant
+from ..agissant import Agissant
 
 class Fuyard(Agissant):
     """Des agissants qui ne font que fuire ? À quoi bon ?"""

@@ -1,6 +1,6 @@
 from enum import Enum
 
-class Etats_items(Enum):
+class EtatsItems(Enum):
     INTACT = "intact"
     BRISE = "brisé"
     UTILISE = "utilisé"

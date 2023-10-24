@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ......Effet.Attaque.Attaque import Attaque_particulier
+    from ......effet.attaque.attaque import Attaque_particulier
 
 # Imports des classes parentes
 from .Defensif import Defensif

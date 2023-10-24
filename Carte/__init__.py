@@ -1,7 +1,11 @@
-from .Affichage import *
-from .Structure_spatiale import *
-from .Absent import *
-from .Case import *
-from .Extrait import *
-from .Labyrinthe import *
-from .Mur import *
+"""
+Ce module sert à représenter la carte du labyrinthe.
+"""
+
+from .affichage import *
+from .structure_spatiale import *
+from .absent import *
+from .case import *
+from .extrait import *
+from .labyrinthe import *
+from .mur import *

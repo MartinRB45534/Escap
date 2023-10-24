@@ -1,17 +1,17 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...Entitee.Agissant.Agissant import Agissant
-    from ...Labyrinthe.Case import Case
-    from ...Systeme.Elements import Element
+    from ...entitee.agissant.agissant import Agissant
+    from ...labyrinthe.case import Case
+    from ...systeme.elements import Element
 
 # Imports des classes parentes
-from ..Effet import One_shot, Delaye
+from ..effet import OneShot, Delaye
 
-class Attaque_case(One_shot):
+class AttaqueCase(OneShot):
     """L'effet d'attaque dans sa version intermédiaire. Créée par une attaque (version générale), chargé d'attacher une attaque particulière aux agissants de la case, en passant d'abord les défenses de la case. Attachée à la case."""
     def __init__(self,responsable:Agissant,degats:float,element:Element,distance:str="contact",direction:Optional[crt.Direction] = None,autre:Optional[str]=None,taux_autre:Optional[float]=None):
         self.affiche = True
@@ -40,9 +40,9 @@ class Attaque_case(One_shot):
             self.action(case)
             self.termine()
 
-class Attaque_case_delayee(Attaque_case,Delaye):
+class AttaqueCase_delayee(AttaqueCase,Delaye):
     def __init__(self,responsable:Agissant,degats:float,element:Element,distance:str="distance",direction:Optional[crt.Direction] = None,autre:Optional[str]=None,taux_autre:Optional[float]=None):
-        Attaque_case.__init__(self,responsable,degats,element,distance,direction,autre,taux_autre)
+        AttaqueCase.__init__(self,responsable,degats,element,distance,direction,autre,taux_autre)
         self.affiche = False
 
     def execute(self,case:Case):
@@ -53,7 +53,7 @@ class Attaque_case_delayee(Attaque_case,Delaye):
             self.action(case)
             self.termine()
 
-class Attaque_particulier(One_shot):
+class Attaque_particulier(OneShot):
     """L'effet d'attaque dans sa version particulière. Créée par une attaque (version intermèdiaire), chargé d'infligé les dégats, en passant d'abord les défenses de l'agissant. Attachée à la victime."""
     def __init__(self,responsable:Agissant,degats:float,element:Element,distance:str="contact",direction:Optional[crt.Direction] = None):
         self.affiche = True
@@ -83,7 +83,7 @@ class Attaque_percante(Attaque_particulier): #Attention ! Perçant pour une atta
         self.degats += self.degats_imbloquables
         victime.subit(self.degats,self.element)
 
-class Attaque_lumineuse_case(Attaque_case):
+class Attaque_lumineuse_case(AttaqueCase):
     """L'effet de purification. Une attaque de 'lumière'."""
     """L'effet d'attaque dans sa version intermédiaire. Créée par une attaque (version générale), chargé d'attacher une attaque particulière aux agissants de la case, en passant d'abord les défenses de la case. Attachée à la case."""
     def __init__(self,responsable:Agissant,degats:float):

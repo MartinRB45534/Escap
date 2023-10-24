@@ -3,13 +3,13 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...Entitee.Agissant.Vue.Mur import Mur_vu
+    from ...entitee.agissant.vue.mur import MurVu
 
-class Vision_mur:
-    def __init__(self, murs:dict[int,Mur_vu]):
+class VisionMur:
+    def __init__(self, murs:dict[int,MurVu]):
         self.murs = murs
 
-    def voit(self, mur:Mur_vu, tour: int):
+    def voit(self, mur:MurVu, tour: int):
         for tour_vu in self.murs:
             if tour_vu <= tour:
                 # On retire les visions obsolètes

@@ -113,13 +113,13 @@ class Joueur:
             "tours_par_seconde":6,
             "attente":10, #Le nombre de tours à attendre après une action avant que le pilotage automatique ne reprenne
         }
-        self.controleurs = []
+        self.controleurs:List[Controleur] = []
         self.controleur:Optional[Controleur] = None
         self.affichage:Optional[Affichage_principal] = None
-        self.agissants_courants = []
-        self.items_courants = []
-        self.labs_courants = []
-        self.esprits_courants = []
+        self.agissants_courants:Set[Agissant] = set()
+        self.items_courants:Set[Item] = set()
+        self.labs_courants:Set[Labyrinthe] = set()
+        self.esprits_courants:Set[Esprit] = set()
         self.run = False
 
     def debut_tour(self):
@@ -218,11 +218,11 @@ class Joueur:
     # def evenement(self):
     #     self.controleur.joueur.evenement()
 
-    def affiche(self,frame,frame_par_tour):
+    def affiche(self,frame:int,frame_par_tour:int):
         pygame.display.flip()
         self.patiente(frame_par_tour)
 
-    def patiente(self,frame_par_tour):
+    def patiente(self,frame_par_tour:int):
         assert self.controleur is not None
         assert self.clock is not None
         self.clock.tick(self.controleur.tour_par_seconde*frame_par_tour)
@@ -295,9 +295,9 @@ class Joueur:
             action = skill.fait(self.controleur.joueur,**kwargs)
             action.set_repete()
             self.controleur.joueur.fait(action,True)
-            if isinstance(skill,Skills_offensifs): # Les skills qui correspondent à un statut d'attaque
+            if isinstance(skill,SkillsOffensifs): # Les skills qui correspondent à un statut d'attaque
                 self.controleur.joueur.set_statut("attaque",True)
-            elif isinstance(skill,Skills_projectiles) : # Les skills qui lancent un projectile
+            elif isinstance(skill,SkillsProjectiles) : # Les skills qui lancent un projectile
                 warn("Les actions de lancer de projectiles ne sont pas encore implémentés")
                 # projectile_courant = touches["projectiles"].get(touche)
                 # assert isinstance(projectile_courant,Cree_item)
@@ -338,8 +338,8 @@ class Joueur:
         # On commence par trouver à quelle catégorie appartient la touche :
         mods = get_modifiers(pygame.key.get_mods())
         pressees = pygame.key.get_pressed()
-        for key in range(len(pressees)):
-            if pressees[key]:
+        for key, val in enumerate(pressees):
+            if val:
                 if self.controleur.joueur.touches["effets"].get(mods,{}).get(key,[]): #La touche est liée à un effet
                     self.controle_joueur(key,mods)
                     self.controleur.joueur.attente = self.parametres["attente"]
@@ -782,7 +782,7 @@ class Joueur:
         self.labs_courants = []
         self.esprits_courants = []
 
-    def charge(self,screen):
+    def charge(self,screen:pygame.Surface):
         self.screen = screen
         self.clock = pygame.time.Clock()
         # for controleur in self.controleurs:

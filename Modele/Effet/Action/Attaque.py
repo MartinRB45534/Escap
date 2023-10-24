@@ -1,17 +1,17 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, List
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...Entitee.Agissant.Agissant import Agissant
-    from ...Entitee.Item.Equippement.Degainable.Degainable import Arme
-    from ...Systeme.Skill.Actif import Actif
-    from ...Systeme.Elements import Element
+    from ...entitee.agissant.agissant import Agissant
+    from ...entitee.item.equippement.degainable.degainable import Arme
+    from ...systeme.skill.actif import Actif
+    from ...systeme.elements import Element
 
 # Imports des classes parentes
-from ..Action.Action_skill import Action_skill
-from ..Action.Action import Action_final, Action_parcellaire
+from ..action.action_skill import Action_skill
+from ..action.action import Action_final, Action_parcellaire
 
 class Attaque(Action_skill):
     """
@@ -33,7 +33,7 @@ class Attaque(Action_skill):
         position = self.agissant.position
         zone = self.agissant.labyrinthe.a_portee(position,self.portee,self.deplacement,self.forme,self.passage,self.direction)
         for position in zone:
-            self.agissant.labyrinthe.get_case(position).effets.add(Attaque_case(self.agissant,degats,self.element,self.distance,self.direction))
+            self.agissant.labyrinthe.get_case(position).effets.add(AttaqueCase(self.agissant,degats,self.element,self.distance,self.direction))
 
 class Attaque_final(Action_final,Attaque):
     """
@@ -41,7 +41,7 @@ class Attaque_final(Action_final,Attaque):
     """
     # L'attaque la plus courante, correspond aussi au stomp
 
-class Attaque_arme(Attaque):
+class AttaqueArme(Attaque):
     """
     L'action d'attaquer avec une arme.
     """
@@ -55,15 +55,15 @@ class Attaque_arme(Attaque):
         position = self.agissant.position
         zone = self.agissant.labyrinthe.a_portee(position,portee,self.deplacement,self.forme,self.passage,self.direction)
         for position in zone:
-            self.agissant.labyrinthe.get_case(position).effets.add(Attaque_case(self.agissant,degats,element,self.distance,self.direction))
+            self.agissant.labyrinthe.get_case(position).effets.add(AttaqueCase(self.agissant,degats,element,self.distance,self.direction))
 
-class Attaque_arme_final(Action_final,Attaque_arme):
+class AttaqueArme_final(Action_final,AttaqueArme):
     """
     Une attaque avec une arme qui se fait à la fin de la latence.
     """
     # L'attaque avec une arme la plus courante (correspond aux attaques de base à l'épée et la lance)
 
-class Attaque_multiple(Action_parcellaire,Attaque_arme): # Les attaques sans arme ne peuvent pas être multiples
+class Attaque_multiple(Action_parcellaire,AttaqueArme): # Les attaques sans arme ne peuvent pas être multiples
     """
     Une attaque complexe avec plusieurs coups.
     """
@@ -84,10 +84,10 @@ class Attaque_multiple(Action_parcellaire,Attaque_arme): # Les attaques sans arm
         position = self.agissant.position
         zone = self.agissant.labyrinthe.a_portee(position,portee,self.deplacement,self.formes[self.rempli],self.passage,self.directions[self.rempli])
         for position in zone:
-            self.agissant.labyrinthe.get_case(position).effets.add(Attaque_case(self.agissant,degats,element,self.distance,self.directions[self.rempli]))
+            self.agissant.labyrinthe.get_case(position).effets.add(AttaqueCase(self.agissant,degats,element,self.distance,self.directions[self.rempli]))
 
 # Imports utilisés dans le code
-from ..Attaque.Attaque import Attaque_case
-from ...Labyrinthe.Deplacement import Deplacement
-from ...Labyrinthe.Forme import Forme
-from ...Labyrinthe.Passage import Passage
+from ..attaque.attaque import AttaqueCase
+from ...labyrinthe.deplacement import Deplacement
+from ...labyrinthe.forme import Forme
+from ...labyrinthe.passage import Passage

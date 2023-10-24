@@ -1,21 +1,21 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, List
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ....Entitee.Entitee import Entitee
-    from ....Entitee.Agissant.Agissant import Agissant
-    from ....Entitee.Item.Projectile.Projectile import Projectile
-    from ....Entitee.Item.Item import Item
-    from ...Effet import Effet
-    from ...Effet import Enchantement
-    from ....Systeme.Skill.Actif import Actif
+    from ....entitee.entitee import Entitee
+    from ....entitee.agissant.agissant import Agissant
+    from ....entitee.item.projectile.projectile import Projectile
+    from ....entitee.item.item import Item
+    from ...effet import Effet
+    from ...enchantements import Enchantement
+    from ....systeme.skill.actif import Actif
 
 # Imports des classes parentes
-from ..Action import Non_repetable
-from ..Caste import Caste
-from ..Action_skill import Action_skill
+from ..action import Non_repetable
+from ..caste import Caste
+from ..action_skill import Action_skill
 
 class Magie(Caste,Action_skill):
     """La classe des magies. Précédemment un effet."""

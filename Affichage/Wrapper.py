@@ -1,31 +1,39 @@
+"""
+Conteneur avec un unique élément
+"""
+
 from __future__ import annotations
-from typing import List, Optional, Tuple, TYPE_CHECKING
+from typing import Optional, Tuple, List, Literal, TYPE_CHECKING
 from warnings import warn
 import pygame
 
+from .affichable import Affichable
+
+from ._ensure_pygame import transparency_flag
+
 if TYPE_CHECKING:
-    from Placeholder import Placeheldholder
+    from .placeholder import Placeheldholder
+    from .cliquable import Cliquable
+    from .survolable import Survolable
 
-from .Affichable import Affichable
-from .Conteneur import Conteneur
-
-class Wrapper(Conteneur):
+class Wrapper(Affichable):
     """Un conteneur avec un unique élément"""
     def __init__(self):
-        self.objets:List[Affichable] = [] #Il peut quand même avoir des objets 'normaux'
+        super().__init__()
+        self.objets:List[Affichable] = []
         self.contenu:Optional[Affichable] = None #L'objet qu'il 'contient'
-        self.fond = (0,0,0,0)
-        self.tailles = (0,0) #La largeur et la hauteur (ou l'inverse ?)
-        self.position = (0,0)
-    
+        self.fond:Tuple[int,int,int,int]|Tuple[int,int,int] = (0,0,0,0)
+
     def set_contenu(self,contenu:Optional[Affichable]):
+        """Change le contenu du conteneur."""
         self.contenu = contenu
 
     def set_fond(self,fond:Tuple[int,int,int,int]|Tuple[int,int,int]):
+        """Change le fond du conteneur."""
         self.fond = fond
 
     def decale(self,decalage:Tuple[int,int]):
-        self.position = [self.position[0] + decalage[0],self.position[1] + decalage[1]]
+        self.position = (self.position[0] + decalage[0],self.position[1] + decalage[1])
         for objet in self.objets:
             objet.decale(decalage)
 
@@ -42,23 +50,23 @@ class Wrapper(Conteneur):
 
     def affiche(self,screen:pygame.Surface,frame:int=1,frame_par_tour:int=1):
         assert self.contenu is not None
-        surf = pygame.Surface(self.tailles,pygame.SRCALPHA)
+        surf = pygame.Surface(self.tailles,transparency_flag)
         surf.fill(self.fond)
         self.contenu.affiche(surf,frame,frame_par_tour)
         screen.blit(surf,self.position)
         for objet in self.objets:
             objet.affiche(screen,frame,frame_par_tour)
 
-    def clique(self,position:List[int],droit:bool=False):
-        assert self.contenu is not None
-        #Trouve l'élément survolé par la souris et le renvoie
+    def clique(self,position:Tuple[int,int],droit:bool=False) -> Cliquable|Literal[False]:
         res = False
         if self.touche(position):
-            res = self #La plupart des trucs qu'on veut pouvoir cliquer sont les Wrapper, pas les listes et pavages intermédiaires
-            pos_rel = [position[0]-self.position[0],position[1]-self.position[1]]
-            res_contenu = self.contenu.clique(pos_rel,droit)
-            if res_contenu:
-                res = res_contenu
+            if isinstance(self,Cliquable):
+                res = self
+            if self.contenu:
+                pos_rel = (position[0]-self.position[0],position[1]-self.position[1])
+                res_contenu = self.contenu.clique(pos_rel,droit)
+                if res_contenu:
+                    res = res_contenu
         for objet in self.objets:
             res_objet = objet.clique(position,droit)
             if res_objet:
@@ -66,38 +74,38 @@ class Wrapper(Conteneur):
         return res
     
     def clique_placeholder(self,placeheldholder:Placeheldholder,droit:bool=False):
-        assert self.contenu is not None
         res = False
-        res_contenu = self.contenu.clique_placeholder(placeheldholder,droit)
-        if res_contenu:
-            res = res_contenu
+        if self.contenu:
+            res_contenu = self.contenu.clique_placeholder(placeheldholder,droit)
+            if res_contenu:
+                res = res_contenu
         for objet in self.objets:
             res_objet = objet.clique_placeholder(placeheldholder,droit)
             if res_objet:
                 res = res_objet
         return res
 
-    def survol(self,position):
-        assert self.contenu is not None
-        #Trouve l'élément survolé par la souris et le renvoie
+    def survol(self,position:Tuple[int,int]) -> Survolable|Literal[False]:
         res = False
         if self.touche(position):
-            res = self
-            pos_rel = [position[0]-self.position[0],position[1]-self.position[1]]
-            res_contenu = self.contenu.survol(pos_rel)
-            if res_contenu:
-                res = res_contenu
+            if isinstance(self,Survolable):
+                res = self
+            if self.contenu:
+                pos_rel = (position[0]-self.position[0],position[1]-self.position[1])
+                res_contenu = self.contenu.survol(pos_rel)
+                if res_contenu:
+                    res = res_contenu
         for objet in self.objets:
             res_objet = objet.survol(position)
             if res_objet:
                 res = res_objet
         return res
 
-    def scroll(self,position,x,y):
+    def scroll(self,position:Tuple[int,int],x:int,y:int):
         assert self.contenu is not None
         res = False
         if self.touche(position):
-            pos_rel = [position[0]-self.position[0],position[1]-self.position[1]]
+            pos_rel = (position[0]-self.position[0],position[1]-self.position[1])
             if self.contenu.scroll(pos_rel,x,y):
                 res = True
         for objet in self.objets:

@@ -1,14 +1,14 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from .....Labyrinthe.Labyrinthe import Labyrinthe
+    from .....labyrinthe.labyrinthe import Labyrinthe
 
 # Imports des classes parentes
 from .Heaume import Heaume
-from ..Role.Defensif.Defensifs import Defensif_proportion
+from ..role.Defensif.Defensifs import Defensif_proportion
 
 class Heaume_type(Heaume,Defensif_proportion):
     """Un heaume type : défend contre les attaques."""

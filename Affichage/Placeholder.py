@@ -1,16 +1,18 @@
+"""Contient les classes Placeholder et Placeheldholder."""
+
 from __future__ import annotations
-from typing import Optional, List
+from typing import Optional, Tuple
 
-from .Affichable import Affichable
-from .Direction import Direction
-from .Cliquable import Cliquable
-from .Wrapper import Wrapper
-from .Noeud import Noeud
-from .Wrapper_noeud import Wrapper_noeud
+from .affichable import Affichable
+from .direction import Direction
+from .cliquable import Cliquable
+from .wrapper import Wrapper
+from .noeud import Noeud
+from .wrapper_noeud import WrapperNoeud
 
-class Placeheldholder(Wrapper_noeud):
+class Placeheldholder(WrapperNoeud):
     """L'élément où le placeheld du placeholder est placé."""
-    def clique(self,position, droit:bool=False):
+    def clique(self,position:Tuple[int,int], droit:bool=False):
         clique = Wrapper.clique(self,position,droit)
         if clique is self:
             self.set_actif()
@@ -70,14 +72,15 @@ class Placeholder(Noeud):
         self.marque_actif = True
         self.courant.trouve_actif()
 
-    def clique(self, position: List[int], droit:bool=False):
+    def clique(self, position: Tuple[int,int], droit:bool=False):
         return Cliquable.clique(self, position, droit) # On ne veut pas que le clique soit propagé
 
-    def clique_placeholder(self,placeheldholder:Placeheldholder, droit:bool=False):
+    def clique_placeholder(self,placeheldholder:Placeheldholder, _droit:bool=False):
         if placeheldholder is self.placeheldholder and self.courant is placeheldholder.contenu:
             return self
+        return False
 
-    def survol(self, position: List[int]):
+    def survol(self, position: Tuple[int,int]):
         return Cliquable.survol(self, position)
     
     def navigue(self, direction: Direction):

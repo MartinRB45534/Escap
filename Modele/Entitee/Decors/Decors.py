@@ -1,16 +1,16 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, List, Dict, Type
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Item.Item import Item
-    from ...Labyrinthe.Labyrinthe import Labyrinthe
+    from ..item.item import Item
+    from ...labyrinthe.labyrinthe import Labyrinthe
 
 # Imports des classes parentes
-from ..Entitee import Non_superposable, Interactif
+from ..entitee import NonSuperposable, Interactif
 
-class Decors(Non_superposable):
+class Decors(NonSuperposable):
     """La classe des éléments de décors qu'on ne peut pas traverser. On peut interagir avec certains ?"""
     def __init__(self,position:crt.Position=crt.POSITION_ABSENTE):
         Entitee.__init__(self,position)
@@ -33,4 +33,4 @@ class Ustensile(Decors_interactif):
         return [produit(labyrinthe,crt.POSITION_ABSENTE) for produit in recette["produit"] for _ in range(recette["produit"][produit])]
     
 # Imports utilisés dans le code
-from ..Entitee import Entitee
+from ..entitee import Entitee

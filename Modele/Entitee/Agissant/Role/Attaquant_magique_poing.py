@@ -1,8 +1,8 @@
 from __future__ import annotations
-import Carte as crt
+import carte as crt
 
 # Imports des classes parentes
-from .Mage import Mage
+from .mage import Mage
 
 class Attaquant_magique_poing(Mage):
     """Les mages qui ont des attaques magiques de corps à corps si nécessaire."""
@@ -24,5 +24,5 @@ class Attaquant_magique_poing(Mage):
             Agissant.attaque(self,direction)
 
 # Imports utilisés dans le code
-from ..Agissant import Agissant
-from ....Effet.Action.Magie.Magies_attaque.Poings_magiques import Magie_attaque_contact
+from ..agissant import Agissant
+from ....effet.action.magie.magies_attaque.Poings_magiques import Magie_attaque_contact

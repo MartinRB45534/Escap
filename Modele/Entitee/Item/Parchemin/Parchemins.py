@@ -1,12 +1,12 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ....Effet.Action.Non_skill import Impregne
-    from ....Effet.Action.Magie.Magie import Magie
-    from ....Labyrinthe.Labyrinthe import Labyrinthe
+    from ....effet.action.non_skill import Impregne
+    from ....effet.action.magie.magie import Magie
+    from ....labyrinthe.labyrinthe import Labyrinthe
 
 # Imports des classes parentes
 from .Parchemin import Parchemin
@@ -18,4 +18,4 @@ class Parchemin_vierge(Parchemin):
         self.action_portee:Impregne|Magie = impregne
 
 # Imports utilisés dans le code
-from ....Entitee.Item.Item import Item
+from ....entitee.item.item import Item

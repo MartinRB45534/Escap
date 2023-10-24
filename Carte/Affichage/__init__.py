@@ -1,4 +1,8 @@
-from .Carte_centree import *
-from .Carte_extrait import *
-from .Skins import *
-from .Vignette_case import *
+"""
+L'affichage spécifique à la carte.
+"""
+
+from .carte_centree import *
+from .carte_extrait import *
+from .skins import *
+from .vignette_case import *

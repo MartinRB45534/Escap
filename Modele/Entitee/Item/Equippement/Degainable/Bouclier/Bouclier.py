@@ -1,13 +1,13 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ......Labyrinthe.Labyrinthe import Labyrinthe
+    from ......labyrinthe.labyrinthe import Labyrinthe
 
 # Imports des classes parentes
-from ..Degainable import Degainable
+from ..degainable import Degainable
 
 class Bouclier(Degainable):
     """La classe des boucliers. Permettent de se protéger des attaques lorsqu'ils sont utilisés."""
@@ -19,7 +19,7 @@ class Bouclier(Degainable):
         self.poids = poids
         self.frottements = frottements
 
-    def intercepte(self,attaque:Attaque_case):
+    def intercepte(self,attaque:AttaqueCase):
         attaque.degats -= self.degats_bloques
         if attaque.degats < 0:
             attaque.degats = 0
@@ -33,6 +33,6 @@ class Bouclier(Degainable):
         return SKIN_BOUCLIER
 
 # Imports utilisés dans le code
-from ......Affichage.Skins import SKIN_BOUCLIER
-from ......Effet.Attaque.Attaque import Attaque_case
-from ...Equippement import Equippement
+from ......Affichage.skins import SKIN_BOUCLIER
+from ......effet.attaque.attaque import AttaqueCase
+from ...equippement import Equippement

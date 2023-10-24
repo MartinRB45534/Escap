@@ -1,4 +1,4 @@
-import Affichage as af
+import affichage as af
 
 af.Skin.path = "Carte/Affichage/assets/"
 

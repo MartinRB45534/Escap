@@ -1,16 +1,18 @@
 from __future__ import annotations
 from typing import List, Tuple, TYPE_CHECKING
-import Affichage as af
+import affichage as af
+
+from ..structure_spatiale.direction import Direction
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Structure_spatiale.Position import Position
-    from ..Structure_spatiale.Direction import Direction
-    from ..Extrait import Extrait
-    from ..Labyrinthe import Labyrinthe
+    from ..structure_spatiale.position import Position
+    from ..extrait import Extrait
+    from ..labyrinthe import Labyrinthe
 
-class Vignette_case(af.Vignette_composee):
-    def __init__(self,position:Tuple[int,int],vue:Extrait|Labyrinthe,pos:Position,taille:Tuple[int,int]):
+class VignetteCase(af.VignetteComposee):
+    """Vignette représentant une case."""
+    def __init__(self,position:Tuple[int,int],vue:Extrait|Labyrinthe,pos:Position,taille:int):
         self.pos = pos
         vignettes:List[af.Affichable] = []
         if pos in vue:
@@ -21,11 +23,11 @@ class Vignette_case(af.Vignette_composee):
         elif isinstance(vue,Extrait) and pos in vue.exterieur:
             vignettes.append(af.Vignette(position,taille,SKIN_BROUILLARD))
             for direction in Direction:
-                if not(vue.get_mur(pos,direction).ferme):
+                if not vue.get_mur(pos,direction).ferme :
                     vignettes.append(af.Vignette(position,taille,SKIN_MUR_BROUILLARD,direction))
         else:
             vignettes.append(af.Vignette(position,taille,SKIN_BROUILLARD))
 
-        af.Vignette_composee.__init__(self,vignettes,taille)
+        af.VignetteComposee.__init__(self,vignettes,taille)
 
-from .Skins import *
+from .skins import SKIN_CASE, SKIN_MUR, SKIN_BROUILLARD, SKIN_MUR_BROUILLARD

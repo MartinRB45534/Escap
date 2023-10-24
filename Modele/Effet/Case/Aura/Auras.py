@@ -3,15 +3,15 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ....Entitee.Agissant.Agissant import Agissant
-    from ....Labyrinthe.Case import Case
+    from ....entitee.agissant.agissant import Agissant
+    from ....labyrinthe.case import Case
 
 # Imports des classes parentes
-from .Aura import Aura
-from ...Effet import Evenement
+from .aura import Aura
+from ...effet import Evenement
 
 # Variables de classe
-from ....Systeme.Elements import Element
+from ....systeme.elements import Element
 
 # On va distinguer 3 types d'aura :
 #   - Les auras naturellement attachées à une case. Ce sont des auras élémentaires. Elles peuvent être temporairement réprimée par une autre aura élémentale.

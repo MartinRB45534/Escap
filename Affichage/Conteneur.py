@@ -1,10 +1,19 @@
-from __future__ import annotations
-from typing import List, TYPE_CHECKING
-import pygame
-if TYPE_CHECKING:
-    from Placeholder import Placeheldholder
+"""
+Ce module contient la classe Conteneur, qui est un élément qui peut en contenir d'autres.
+"""
 
-from .Affichable import Affichable
+from __future__ import annotations
+from typing import List, Tuple, Literal, TYPE_CHECKING
+import pygame
+
+from .affichable import Affichable
+
+from ._ensure_pygame import transparency_flag
+
+if TYPE_CHECKING:
+    from .placeholder import Placeheldholder
+    from .cliquable import Cliquable
+    from .survolable import Survolable
 
 class Conteneur(Affichable):
     """Un élément qui peut en 'contenir' d'autres, c'est-à-dire qu'il va les afficher 'à l'interieur' et ils ne pourront pas déborder."""
@@ -12,22 +21,24 @@ class Conteneur(Affichable):
         self.objets:List[Affichable] = [] #Il peut quand même avoir des objets 'normaux'
         self.contenu:List[Affichable] = [] #Les objets qu'il 'contient'
         self.fond = (0,0,0,0)
-        self.tailles = (0,0) #La largeur et la hauteur (ou l'inverse ?)
-        self.position = (0,0)
+        super().__init__()
     
-    def set_contenu(self,contenu):
+    def set_contenu(self,contenu:List[Affichable]):
+        """Change le contenu du conteneur."""
         self.contenu = contenu
 
-    def set_fond(self,fond):
+    def set_fond(self,fond:tuple[int,int,int,int]):
+        """Change le fond du conteneur."""
         self.fond = fond
 
-    def decale(self,decalage):
-        self.position = [self.position[0] + decalage[0],self.position[1] + decalage[1]]
+    def decale(self,decalage:Tuple[int,int]):
+        """Décale l'élément et ses objets."""
+        super().decale(decalage)
         for objet in self.objets:
             objet.decale(decalage)
     
     def affiche(self,screen:pygame.Surface,frame:int=1,frame_par_tour:int=1):
-        surf = pygame.Surface(self.tailles,pygame.SRCALPHA)
+        surf = pygame.Surface(self.tailles, transparency_flag)
         surf.fill(self.fond)
         for contenu in self.contenu:
             contenu.affiche(surf,frame,frame_par_tour)
@@ -35,11 +46,11 @@ class Conteneur(Affichable):
         for objet in self.objets:
             objet.affiche(screen,frame,frame_par_tour)
 
-    def clique(self,position:List[int],droit:bool=False):
+    def clique(self,position:Tuple[int,int],droit:bool=False) -> Cliquable|Literal[False]:
         #Trouve l'élément survolé par la souris et le renvoie
         res = False
         if self.touche(position):
-            pos_rel = [position[0]-self.position[0],position[1]-self.position[1]]
+            pos_rel = (position[0]-self.position[0],position[1]-self.position[1])
             for contenu in self.contenu:
                 res_contenu = contenu.clique(pos_rel,droit)
                 if res_contenu:
@@ -62,11 +73,11 @@ class Conteneur(Affichable):
                 res = res_objet
         return res
 
-    def survol(self,position):
+    def survol(self,position:Tuple[int,int]) -> Survolable|Literal[False]:
         #Trouve l'élément survolé par la souris et le renvoie
         res = False
         if self.touche(position):
-            pos_rel = [position[0]-self.position[0],position[1]-self.position[1]]
+            pos_rel = (position[0]-self.position[0],position[1]-self.position[1])
             for contenu in self.contenu:
                 res_contenu = contenu.survol(pos_rel)
                 if res_contenu:
@@ -77,10 +88,10 @@ class Conteneur(Affichable):
                 res = res_objet
         return res
 
-    def scroll(self,position,x,y):
+    def scroll(self,position:Tuple[int,int],x:int,y:int):
         res = False
         if self.touche(position):
-            pos_rel = [position[0]-self.position[0],position[1]-self.position[1]]
+            pos_rel = (position[0]-self.position[0],position[1]-self.position[1])
             for contenu in self.contenu:
                 if contenu.scroll(pos_rel,x,y):
                     res = True

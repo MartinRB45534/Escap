@@ -3,10 +3,10 @@ from __future__ import annotations
 # Pas d'import pour les annotations
 
 # Imports des classes parentes
-from ..Equippement import Equippement
+from ..equippement import Equippement
 
 # Imports pour les variables de classe
-from .....Systeme.Elements import Element
+from .....systeme.elements import Element
 
 class Elementaire(Equippement):
     """La classe des équipements qui augmentent l'affinité à un élément."""

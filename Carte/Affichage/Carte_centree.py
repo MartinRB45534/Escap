@@ -1,24 +1,27 @@
+"""
+Affiche la carte centrée sur une case.
+"""
+
 from __future__ import annotations
 from typing import List, TYPE_CHECKING
-import Affichage as af
+import affichage as af
 
-# Imports utilisés uniquement dans les annotations
+from .carte_extrait import CarteExtrait
+from ..structure_spatiale.position import Position
+from .vignette_case import VignetteCase
+
 if TYPE_CHECKING:
-    from ..Structure_spatiale.Position import Position
-    from ..Extrait import Extrait
-    from ..Labyrinthe import Labyrinthe
-    from .Vignette_case import Vignette_case
+    from ..extrait import Extrait
+    from ..labyrinthe import Labyrinthe
 
-# Import des classes parentes
-from .Carte_extrait import Carte_extrait
-
-class Carte_Centree(Carte_extrait):
+class CarteCentree(CarteExtrait):
+    """Un affichage de la carte centrée sur une case."""
     def __init__(self, extrait:Extrait|Labyrinthe, centre:Position):
-        Carte_extrait.__init__(self, extrait)
+        CarteExtrait.__init__(self, extrait)
         self.centre = centre
 
     def update(self):
-        assert isinstance(self.courant,Vignette_case|None)
+        assert isinstance(self.courant,VignetteCase|None)
         courant = None
         self.objets:List[af.Affichable] = []
         if len(self.labyrinthe.position_case) > 1: # On a au moins une case plus l'absente
@@ -38,7 +41,7 @@ class Carte_Centree(Carte_extrait):
                 marge_gauche = self.position[0]+marge#+taille_case//2
                 for i in range(self.nb_cases):
                     pos = Position(etage, visible[0]+i, visible[2]+j)
-                    vignette = self.make_vignette((marge_gauche, marge_haut), pos, (taille_case, taille_case))
+                    vignette = self.make_vignette((marge_gauche, marge_haut), pos, taille_case)
                     if self.courant and vignette.pos == self.courant.pos:
                         courant = vignette
                         if self.courant.actif:
@@ -48,4 +51,4 @@ class Carte_Centree(Carte_extrait):
                 marge_haut += taille_case
         self.set_courant(courant)
 
-from ..Structure_spatiale.Absent import POSITION_ABSENTE
+from ..structure_spatiale.absent import POSITION_ABSENTE

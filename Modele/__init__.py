@@ -1,7 +1,11 @@
-from .Action import *
-from .Affichage import *
-from .Effet import *
-from .Entitee import *
-from .Esprit import *
-from .Labyrinthe import *
-from .Systeme import *
+"""
+Le module Modele contient plus ou moins le moteur du jeu.
+Il est destiné à être utilisé par l'éditeur de labyrinthe et par le jeu lui-même.
+"""
+
+from .affichage import *
+from .effet import *
+from .entitee import *
+from .esprit import *
+from .labyrinthe import *
+from .systeme import *

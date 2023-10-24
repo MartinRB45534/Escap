@@ -12,25 +12,25 @@ Il n'y a pas d'effet qui puisse se placer à la fois sur un agissant et un item,
 Par contre, il y a les `Enchantements` qui englobent des effets sur beaucoup d'éléments différents.
 
 D'autres exemples ?
-Les `Evenements`, `One_shot`, etc. peuvent être présents sur des choses très différentes.
+Les `Evenements`, `OneShot`, etc. peuvent être présents sur des choses très différentes.
 
 ## Listons les effets actuels.
 
 Par temps d'appel :
  - `On_need` (spécialement créé pour les réserves de mana, 1 agissant) ;
- - `On_tick` (à chaque tour, sans plus de précision) :
-   - `On_debut_tour` (beaucoup d'enchantements, poison, obscurité, investissement, 2 items, 1 case, 13 agissants) ;
-   - `On_post_decision` (maladie, confusion, 2 agissants) ;
-   - `On_post_action` (blizzard, téléportation, instakill, protection, soin, 2 cases, 3 agissants) ;
+ - `OnTick` (à chaque tour, sans plus de précision) :
+   - `OnDebutTour` (beaucoup d'enchantements, poison, obscurité, investissement, 2 items, 1 case, 13 agissants) ;
+   - `OnPostDecision` (maladie, confusion, 2 agissants) ;
+   - `OnPostAction` (blizzard, téléportation, instakill, protection, soin, 2 cases, 3 agissants) ;
    - `On_fin_tour` (enseignement, sursis, réanimation, résurection, antidote, médicament, purification, soin, 3 items, 5 agissants) ;
- - `On_attack` (appelé sur les attaques, protections, 1 agissant, 1 case).
+ - `OnAttack` (appelé sur les attaques, protections, 1 agissant, 1 case).
 
 Par durée d'appel :
- - `One_shot` (9 agissants, 1 item) ;
- - `Delaye` (comme `One_shot`, avec un délai, 1 case) ;
- - `Evenement` (sur plusieurs tours et hérite de `On_tick` (appelé à chaque tour), blizzard, obscurité, investissement, aura, 3 cases, 1 agissant) ;
+ - `OneShot` (9 agissants, 1 item) ;
+ - `Delaye` (comme `OneShot`, avec un délai, 1 case) ;
+ - `Evenement` (sur plusieurs tours et hérite de `OnTick` (appelé à chaque tour), blizzard, obscurité, investissement, aura, 3 cases, 1 agissant) ;
  - `Enchantement` (hérite de `Evenement`, cas particulier, 12 agissants, 2 items) ;
- - `Time_limited` (sur plusieurs tours mais appelé irrégulièrement, dopage, protections, 2 agissants, 1 case).
+ - `TimeLimited` (sur plusieurs tours mais appelé irrégulièrement, dopage, protections, 2 agissants, 1 case).
 
 Par source :
  - action (donc souvent skill actif) :
@@ -96,7 +96,7 @@ Il suffit d'un moyen (par exemple une méthode) pour savoir si l'effet est termi
 
 ## `action()` et `execute()`
 
-Ces deux fonctions pourraient n'être conservées que pour les effets à appeler à chaque tour (actuellement `On_tick`). Les réserves de mana par exemple n'en ont pas besoin. À renommer peut-être.
+Ces deux fonctions pourraient n'être conservées que pour les effets à appeler à chaque tour (actuellement `OnTick`). Les réserves de mana par exemple n'en ont pas besoin. À renommer peut-être.
 
 ## Effets uniques
 

@@ -1,67 +1,85 @@
+"""
+This module contains the base class for all GUI elements, Affichable,
+and its subclasses Taille_variable and Proportionnel.
+"""
+
 from __future__ import annotations
-from typing import List, TYPE_CHECKING
+from typing import TYPE_CHECKING, Tuple, Literal
 import pygame
 if TYPE_CHECKING:
-    from Placeholder import Placeheldholder
+    from .placeholder import Placeheldholder
+    from .cliquable import Cliquable
+    from .survolable import Survolable
 
 class Affichable:
     """Un élément qui s'affiche. Apparaît à l'écran."""
     def __init__(self):
-        self.tailles = (0,0) #La largeur et la hauteur (ou l'inverse ?)
-        self.position = (0,0)
+        self.tailles:Tuple[int,int] = (0,0) #La largeur et la hauteur (ou l'inverse ?)
+        self.position:Tuple[int,int] = (0,0)
 
-    def set_tailles(self,tailles):
+    def set_tailles(self,tailles:Tuple[int,int]):
+        """Change les tailles de l'élément."""
         self.tailles = tailles
 
-    def get_tailles(self,tailles): #Certains utilisent les tailles en entrée ici
+    def get_tailles(self,_tailles:Tuple[int,int]): #Certains utilisent les tailles en entrée ici
+        """Renvoie les tailles de l'élément."""
         return self.tailles
 
-    def set_position(self,position):
+    def set_position(self,position:Tuple[int,int]):
+        """Change la position de l'élément."""
         self.position = position
 
-    def decale(self,decalage):
-        self.position = [self.position[0] + decalage[0],self.position[1] + decalage[1]]
+    def decale(self,decalage:Tuple[int,int]):
+        """Décale l'élément (différent de set_position pour certaines classes filles)."""
+        self.position = (self.position[0] + decalage[0],self.position[1] + decalage[1])
 
     def affiche(self,screen:pygame.Surface,frame:int=1,frame_par_tour:int=1):
-        pass
+        """Affiche l'élément à l'écran."""
 
-    def touche(self,position):
+    def touche(self,position:Tuple[int,int]):
+        """Renvoie True si la position est dans l'élément, False sinon."""
         return position[0]>=self.position[0] and position[1]>=self.position[1] and position[0]<self.position[0]+self.tailles[0] and position[1]<self.position[1]+self.tailles[1]
 
-    def clique(self,position: List[int], droit: bool = False):
-        #Trouve l'élément survolé par la souris et le renvoie
-        res = False
-        if self.touche(position):
-            res = self
-        return res
-    
-    def clique_placeholder(self,placeheldholder:Placeheldholder,droit: bool = False):
+    def survol(self,_position:Tuple[int,int]) -> Survolable|Literal[False]:
+        """Renvoie l'élément survolé, ou False sinon."""
         return False
 
-    def survol(self,position):
-        #Trouve l'élément survolé par la souris et le renvoie
-        res = False
-        if self.touche(position):
-            res = self
-        return res
+    def clique(self,_position:Tuple[int,int],_droit:bool=False) -> Cliquable|Literal[False]:
+        """Renvoie l'élément cliqué, ou False sinon."""
+        return False
 
-    def scroll(self,position,x,y):
+    def clique_placeholder(self,_placeheldholder:Placeheldholder,_droit: bool = False) -> Cliquable|Literal[False] :
+        """Renvoie le placeholder, ou False sinon."""
+        return False
+
+    def scroll(self,_position:Tuple[int,int],_x:int,_y:int) -> bool:
+        """Renvoie l'élément scrollé, ou False sinon."""
         return False
 
     def update(self):
-        pass
+        """Met à jour l'affichage de l'élément."""
 
-class Taille_variable(Affichable):
+class TailleVariable(Affichable):
     """Les éléments dont la taille réelle dépend de la taille qu'on leur attribut, de façon compliquée."""
 
 class Proportionnel(Affichable):
-    def __init__(self,proportions):
-        self.tailles = (0,0)
-        self.position = (0,0)
+    """Les éléments dont les tailles sont proportionnelles."""
+    def __init__(self,proportions:Tuple[int,int]):
+        super().__init__()
         self.proportions = proportions
 
-    def get_tailles(self,tailles):
-        return [min(tailles[0]//self.proportions[0],tailles[1]//self.proportions[1])*self.proportions[0],min(tailles[0]//self.proportions[0],tailles[1]//self.proportions[1])*self.proportions[1]]
+    def get_tailles(self,tailles:Tuple[int,int]):
+        return (min(tailles[0]//self.proportions[0],
+                    tailles[1]//self.proportions[1])
+                *self.proportions[0],
+                min(tailles[0]//self.proportions[0],
+                    tailles[1]//self.proportions[1])
+                *self.proportions[1])
 
-    def set_tailles(self,tailles):
-        self.tailles = [min(tailles[0]//self.proportions[0],tailles[1]//self.proportions[1])*self.proportions[0],min(tailles[0]//self.proportions[0],tailles[1]//self.proportions[1])*self.proportions[1]]
+    def set_tailles(self,tailles:Tuple[int,int]):
+        self.tailles = (min(tailles[0]//self.proportions[0],
+                            tailles[1]//self.proportions[1])
+                        *self.proportions[0],
+                        min(tailles[0]//self.proportions[0],
+                            tailles[1]//self.proportions[1])
+                        *self.proportions[1])

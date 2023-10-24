@@ -1,16 +1,16 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...Entitee.Agissant.Agissant import Agissant
-    from ...Entitee.Item.Item import Item
-    from ...Systeme.Skill.Actif import Actif
+    from ...entitee.agissant.agissant import Agissant
+    from ...entitee.item.item import Item
+    from ...systeme.skill.actif import Actif
 
 # Imports des classes parentes
-from .Action import Action, Action_final
-from .Action_skill import Action_skill
+from .action import Action, Action_final
+from .action_skill import Action_skill
 
 class Deplace(Action):
     """

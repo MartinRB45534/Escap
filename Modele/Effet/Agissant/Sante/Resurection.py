@@ -3,26 +3,26 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ....Entitee.Item.Cadavre import Cadavre
+    from ....entitee.item.Cadavre import Cadavre
 
 # Imports des classes parentes
-from ...Effet import One_shot
-from ...Item.Item import Effet_item
+from ...effet import OneShot
+from ...item.item import EffetItem
 
-class Resurection(One_shot, Effet_item):
+class Resurection(OneShot, EffetItem):
     """Un effet de résurection. Généralement placé sur le cadavre par une magie de résurection. Rend tous les pv et ne change pas l'appartenance à un groupe."""
     def __init__(self,cadavre:Cadavre):
-        self.cadavre = cadavre
+        self.magie = cadavre
 
     def action(self):
-        agissant = self.cadavre.agissant
+        agissant = self.magie.agissant
         agissant.statistiques.pv = agissant.statistiques.pv_max
-        agissant.etat = Etats_agissants.VIVANT
-        self.cadavre.etat = Etats_items.BRISE
+        agissant.etat = EtatsAgissants.VIVANT
+        self.magie.etat = EtatsItems.BRISE
 
     def execute(self):
         self.action()
 
 # Imports utilisés dans le code
-from ....Entitee.Agissant.Etats import Etats_agissants
-from ....Entitee.Item.Etats import Etats_items
+from ....entitee.agissant.etats import EtatsAgissants
+from ....entitee.item.etats import EtatsItems

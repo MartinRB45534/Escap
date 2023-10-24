@@ -1,13 +1,13 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Set
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...Labyrinthe.Labyrinthe import Labyrinthe
+    from ...labyrinthe.labyrinthe import Labyrinthe
 
 # Imports des classes parentes
-from .Item import Item
+from .item import Item
 
 class Cle(Item):
     """La classe des items qui ouvrent les portes (et les coffres ?)."""
@@ -23,4 +23,4 @@ class Cle(Item):
         return SKIN_CLE
 
 # Imports utilisés dans le code
-from ...Affichage.Skins import SKIN_CLE
+from ...Affichage.skins import SKIN_CLE

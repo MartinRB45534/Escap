@@ -1,10 +1,14 @@
 from __future__ import annotations
+from typing import Literal, Optional, TYPE_CHECKING
 
-from .Affichable import Affichable
-from .Direction import Direction, Direction_aff
-from .Noeud import Noeud
+from .affichable import Affichable
+from .direction import Direction, DirectionAff
+from .noeud import Noeud
 
-class Noeud_vertical(Noeud):
+if TYPE_CHECKING:
+    from .cliquable import Cliquable
+
+class NoeudVertical(Noeud):
     """Un élément dont le contenu est disposé verticalement (donc next et previous correspondent à haut et bas)."""
     def through_previous(self):
         assert self.courant is not None
@@ -21,7 +25,7 @@ class Noeud_vertical(Noeud):
         self.courant.set_actif()
         return res
 
-class Noeud_vertical_profondeur_agnostique(Noeud):
+class NoeudVerticalProfondeurAgnostique(Noeud):
     """Un knot_vertical qui ne fait pas de différence entre in et through (pour haut et bas)."""
     def through_up(self):
         assert self.courant is not None
@@ -37,7 +41,7 @@ class Noeud_vertical_profondeur_agnostique(Noeud):
         self.courant.set_actif()
         return res
     
-class Noeud_horizontal(Noeud):
+class NoeudHorizontal(Noeud):
     """Un élément dont le contenu est disposé horizontalement (donc next et previous correspondent à gauche et droite)."""
     def through_previous(self):
         assert self.courant is not None
@@ -53,7 +57,7 @@ class Noeud_horizontal(Noeud):
         self.courant.set_actif()
         return res
     
-class Noeud_horizontal_profondeur_agnostique(Noeud):
+class NoeudHorizontalProfondeur_Agnostique(Noeud):
     """Un knot_horizontal qui ne fait pas de différence entre in et through (pour gauche et droite)."""
     def through_left(self):
         assert self.courant is not None
@@ -69,7 +73,7 @@ class Noeud_horizontal_profondeur_agnostique(Noeud):
         self.courant.set_actif()
         return res
 
-class Noeud_hierarchique_sinistre(Noeud):
+class NoeudHierarchiqueSinistre(Noeud):
     """Un élément dont le contenu est hiérarchique de gauche à droite (donc gauche et droite correspondent à out et in)."""
     def in_left(self):
         return self.in_out()
@@ -80,7 +84,7 @@ class Noeud_hierarchique_sinistre(Noeud):
     def in_right(self):
         return self.in_in()
     
-class Noeud_hierarchique_sinistre_sommet(Noeud):
+class NoeudHierarchiqueSinistreSommet(Noeud):
     """Au sommet de la hiérarchie (donc il n'y a rien à gauche)"""
     def through_left(self):
         return self.through_out()
@@ -88,12 +92,12 @@ class Noeud_hierarchique_sinistre_sommet(Noeud):
     def in_right(self):
         return self.in_in()
     
-class Noeud_hierarchique_sinistre_base(Noeud):
+class NoeudHierarchiqueSinistreBase(Noeud):
     """En bas de la hiérarchie (donc il n'y a rien à droite)"""
     def in_left(self):
         return self.in_out()
     
-class Noeud_hierarchique_dextre(Noeud):
+class NoeudHierarchiqueDextre(Noeud):
     """Un élément dont le contenu est hiérarchique de droite à gauche (donc gauche et droite correspondent à in et out)."""
     def in_left(self):
         return self.in_in()
@@ -104,7 +108,7 @@ class Noeud_hierarchique_dextre(Noeud):
     def in_right(self):
         return self.in_out()
     
-class Noeud_hierarchique_dextre_sommet(Noeud):
+class NoeudHierarchiqueDextreSommet(Noeud):
     """Au sommet de la hiérarchie (donc il n'y a rien à droite)"""
     def through_right(self):
         return self.through_out()
@@ -112,40 +116,39 @@ class Noeud_hierarchique_dextre_sommet(Noeud):
     def in_left(self):
         return self.in_in()
     
-class Noeud_hierarchique_dextre_base(Noeud):
+class NoeudHierarchiqueDextreBase(Noeud):
     """En bas de la hiérarchie (donc il n'y a rien à gauche)"""
     def in_right(self):
         return self.in_out()
 
-class Noeud_bloque(Noeud):
+class NoeudBloque(Noeud):
     """Un élément bloqué (pas de navigation, ni d'effets pour les clics)."""
-    def navigue(self, direction: Direction):
+    def navigue(self, direction: Direction) -> Optional[Cliquable]|Literal[False]:
         if self.actif:
-            if direction == Direction_aff.IN:
+            if direction == DirectionAff.IN:
                 if self.courant is None:
                     raise(NotImplementedError("Un Noeud_bloque doit avoir un élément courant."))
-                else:
-                    self.unset_actif()
-                    self.courant.set_actif()
-                    return self
-            elif direction == Direction_aff.OUT:
+                self.unset_actif()
+                self.courant.set_actif()
+                return self
+            if direction == DirectionAff.OUT:
                 self.unset_actif()
                 return False
-            elif direction == Direction_aff.PREVIOUS:
+            if direction == DirectionAff.PREVIOUS:
                 self.unset_actif()
                 return False
-            elif direction == Direction_aff.NEXT:
+            if direction == DirectionAff.NEXT:
                 self.unset_actif()
                 return False
         elif self.courant is None:
-            raise(NotImplementedError("Un Wrapper_bloque doit avoir un élément courant."))
+            raise NotImplementedError("Un Wrapper_bloque doit avoir un élément courant.")
         else:
             nav = self.courant.navigue(direction)
             if nav:
                 self.select(nav)
                 return self
             else:
-                if direction == Direction_aff.OUT:
+                if direction == DirectionAff.OUT:
                     self.set_actif()
                     return self
             return self

@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING, TypeVar, Optional, Type
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Skill.Skill import Skill
+    from ..skill.skill import Skill
 
 # Imports des classes parentes
-from .Classe import Classe
+from .classe import Classe
 
 # class Artificier(Classe):
 #     """La classe des utilisateurs d'explosifs de haut niveau. Le skill de création d'explosif peut lui être transféré. La classe apporte des bonus lors de l'utilisation d'explosifs."""
@@ -330,8 +330,8 @@ from .Classe import Classe
 #     def __init__(self):
 #         cond_evo = [0,10,20,30,40,50,60,70,80,90]
 
-#         vol = Skill_vol()
-#         vol_priorite = Skill_vol_de_priorite() #Rajouter les autres skills de vols s'ils ne sont pas inclus dans ceux là.
+#         vol = SkillVol()
+#         vol_priorite = SkillVol_de_priorite() #Rajouter les autres skills de vols s'ils ne sont pas inclus dans ceux là.
 
 #         skills:List[Skill] = [vol,vol_priorite]
 
@@ -348,6 +348,7 @@ if TYPE_CHECKING:
     T = TypeVar('T', bound=Skill)
 
 def trouve_skill(classe:Classe,type_skill:Type[T]) -> Optional[T]:
+    """Fonction qui renvoie le skill de la classe de type type_skill, ou None si il n'y en a pas."""
     for skill in classe.skills:
         if isinstance(skill,type_skill) and skill.niveau > 0: #On ne devrait pas avoir de skill a 0 mais on ne sait jamais.
             return skill
@@ -358,5 +359,3 @@ def trouve_skill(classe:Classe,type_skill:Type[T]) -> Optional[T]:
         trouve_bis = trouve_skill(sous_classe,type_skill)
         if trouve_bis is not None:
             return trouve_bis
-
-from .Classe_principale import *

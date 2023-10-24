@@ -1,13 +1,13 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from .....Labyrinthe.Labyrinthe import Labyrinthe
+    from .....labyrinthe.labyrinthe import Labyrinthe
 
 # Imports des classes parentes
-from ..Equippement import Equippement
+from ..equippement import Equippement
 
 class Anneau(Equippement):
     """La classe des équipements de type anneau. Le nombre d'anneaux qu'on peut porter dépend de l'espèce. Les anneaux peuvent avoir des effets très différends (magiques pour la plupart)."""
@@ -21,4 +21,4 @@ class Anneau(Equippement):
         return SKIN_ANNEAU
 
 # Imports utilisés dans le code
-from .....Affichage.Skins import SKIN_ANNEAU
+from .....Affichage.skins import SKIN_ANNEAU

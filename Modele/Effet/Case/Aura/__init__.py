@@ -1,2 +1,2 @@
-from .Aura import *
-from .Auras import *
+from .aura import *
+from .auras import *

@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...Entitee.Agissant.Agissant import Agissant
+    from ...entitee.agissant.agissant import Agissant
 
 # Imports des classes parentes
-from ..Effet import Effet
+from ..effet import Effet
 
 class Effet_agissant(Effet):
     """Effet qui est placé sur un agissant."""

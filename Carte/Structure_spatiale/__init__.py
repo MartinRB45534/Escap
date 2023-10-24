@@ -1,10 +1,10 @@
-from .Etage import * # Pour éviter les imports circulaires
+from .etage import * # Pour éviter les imports circulaires
 
-from .Absent import *
-from .Angle import *
-from .Bord import *
-from .Cote import *
-from .Decalage import *
-from .Direction import *
-from .Espace import *
-from .Position import *
+from .absent import *
+from .angle import *
+from .bord import *
+from .cote import *
+from .decalage import *
+from .direction import *
+from .espace import *
+from .position import *

@@ -1,13 +1,13 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Agissant.Agissant import Agissant
+    from ..agissant.agissant import Agissant
 
 # Imports des classes parentes
-from .Item import Item
+from .item import Item
 
 class Cadavre(Item):
     def __init__(self,agissant:Agissant,position:crt.Position=crt.POSITION_ABSENTE):
@@ -21,4 +21,4 @@ class Cadavre(Item):
         return SKIN_CADAVRE
 
 # Imports utilisés dans le code
-from ...Affichage.Skins import SKIN_CADAVRE
+from ...Affichage.skins import SKIN_CADAVRE

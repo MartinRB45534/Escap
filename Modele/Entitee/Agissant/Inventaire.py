@@ -1,12 +1,12 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type, List, Dict, Set
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from .Agissant import Agissant
-    from ..Item.Item import Item
-    from ...Labyrinthe.Case import Case
+    from .agissant import Agissant
+    from ..item.item import Item
+    from ...labyrinthe.case import Case
 
 # Pas de classe parente
 
@@ -100,15 +100,15 @@ class Inventaire:
         """Indique la quantité d'items correspondants à une classe voulue.""" #Pour les ingrédients des recettes
         res=0
         for item in self.ingredients:
-            if isinstance(item,classe) and item.etat == Etats_items.INTACT:
+            if isinstance(item,classe) and item.etat == EtatsItems.INTACT:
                 res+=1
         return res
 
     def consomme(self,classe:Type[Ingredient]):
         """Consomme un ingrédient lors d'une opération d'alchimie.""" #/!\ Rien à voir avec les consommables !
         for item in self.ingredients:
-            if isinstance(item,classe) and item.etat == Etats_items.INTACT:
-                item.etat = Etats_items.BRISE
+            if isinstance(item,classe) and item.etat == EtatsItems.INTACT:
+                item.etat = EtatsItems.BRISE
                 break
 
     def get_items_visibles(self) -> Set[Item]:
@@ -211,7 +211,7 @@ class Inventaire:
 
     def nettoie_item(self): #Méthode appelée à chaque fin de tour pour supprimer les items retirés ou utilisés.
         for item in self.items:
-            if item.position != crt.POSITION_ABSENTE or item.etat == Etats_items.BRISE: #S'il a été lancé ou n'est plus en état
+            if item.position != crt.POSITION_ABSENTE or item.etat == EtatsItems.BRISE: #S'il a été lancé ou n'est plus en état
                 self.items.remove(item)
                 if self.arme is item :
                     self.arme = None
@@ -284,23 +284,23 @@ class Inventaire:
 
 
 # Imports utilisés dans le code (il y en a beaucoup !!!)
-from ...Effet.Action.Non_skill import Impregne
-from ..Item.Item import Item, Consommable
-from ..Item.Etats import Etats_items
-from ..Item.Potion.Potion import Potion
-from ..Item.Parchemin.Parchemin import Parchemin
-from ..Item.Cle import Cle
-from ..Item.Equippement.Equippement import Equippement
-from ..Item.Equippement.Degainable.Degainable import Arme
-from ..Item.Equippement.Degainable.Bouclier.Bouclier import Bouclier
-from ..Item.Equippement.Armure.Armure import Armure
-from ..Item.Equippement.Heaume.Heaume import Heaume
-from ..Item.Equippement.Anneau.Anneau import Anneau
-from ..Item.Projectile.Projectile import Projectile
-from ..Item.Item import Ingredient
-from ..Item.Cadavre import Cadavre
-from ..Item.Oeuf import Oeuf
-from ..Item.Parchemin.Parchemins import Parchemin_vierge
+from ...effet.action.non_skill import Impregne
+from ..item.item import Item, Consommable
+from ..item.etats import EtatsItems
+from ..item.Potion.Potion import Potion
+from ..item.Parchemin.Parchemin import Parchemin
+from ..item.Cle import Cle
+from ..item.equippement.equippement import Equippement
+from ..item.equippement.degainable.degainable import Arme
+from ..item.equippement.degainable.bouclier.bouclier import Bouclier
+from ..item.equippement.Armure.Armure import Armure
+from ..item.equippement.Heaume.Heaume import Heaume
+from ..item.equippement.Anneau.Anneau import Anneau
+from ..item.projectile.projectile import Projectile
+from ..item.item import Ingredient
+from ..item.Cadavre import Cadavre
+from ..item.Oeuf import Oeuf
+from ..item.Parchemin.Parchemins import Parchemin_vierge
 
 from warnings import warn
 import random

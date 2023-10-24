@@ -1,1 +1,1 @@
-from .Attaque import *
+from .attaque import *

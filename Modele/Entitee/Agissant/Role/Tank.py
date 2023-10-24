@@ -3,7 +3,7 @@ from __future__ import annotations
 # Pas d'imports pour les annotations
 
 # Imports des classes parentes
-from .Bourrin import Bourrin
+from .bourrin import Bourrin
 
 class Tank(Bourrin):
     """Les agissants avec une bonne défense, supposés prendre les dégats."""

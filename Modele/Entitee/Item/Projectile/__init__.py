@@ -1,2 +1,2 @@
-from .Projectile import *
-from .Projectiles import *
+from .projectile import *
+from .projectiles import *

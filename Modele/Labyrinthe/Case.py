@@ -1,19 +1,20 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Set, Type
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Effet.Effet import Effet
-    from ..Effet.Auras import Aura
-    from ..Entitee.Entitee import Mobile, Non_superposable
-    from ..Entitee.Agissant.Agissant import Agissant
-    from ..Entitee.Item.Item import Item
-    from ..Entitee.Decors.Decors import Decors
+    from ..effet.effet import Effet
+    from ..effet.auras import Aura
+    from ..entitee.entitee import Mobile, NonSuperposable
+    from ..entitee.agissant.agissant import Agissant
+    from ..entitee.item.item import Item
+    from ..entitee.decors.decors import Decors
 
-class Case(crt.Case):
-    def __init__(self,position:crt.Position, aura_elementale: Type[Aura_permanente], opacite:float = 1, niveau:int = 1):
-        self.position = position
+class Case(crt.case):
+    """Une case du labyrinthe. Elle peut contenir un agissant, un décors, des items, des effets, des auras, et une aura élémentale."""
+    def __init__(self,position:crt.Position, aura_elementale: Type[AuraPermanente], opacite:float = 1, niveau:int = 1):
+        super().__init__(position)
         self.opacite = opacite
         self.clarte:float = 0
         self.niveau = niveau
@@ -29,46 +30,45 @@ class Case(crt.Case):
     def debut_tour(self):
         #Un nouveau tour commence, qui s'annonce remplit de bonnes surprises et de nouvelles rencontres ! On commence par activer les effets réguliers :
         for effet in self.effets:
-            if isinstance(effet,On_debut_tour):
+            if isinstance(effet,OnDebutTour):
                 effet.execute(self) #On exécute divers effets
-            if isinstance(effet,Time_limited):
+            if isinstance(effet,TimeLimited):
                 effet.wait()
             if effet.phase == "affichage":
                 self.effets.remove(effet)
-                
 
     def pseudo_debut_tour(self):
         pass
 
     #Certains agissants particulièrement tapageurs font un concours de celui qui aura la plus grosse aura (comment ça, cette phrase particulièrement compliquée aura juste servi à faire un jeu de mot sur aura ?)
-    def ajoute_aura(self,auras:Set[Aura]=set(),auras_elementales:Set[Aura_elementale]=set()):
+    def ajoute_aura(self,auras:Set[Aura]=set(),auras_elementales:Set[AuraElementale]=set()):
         """Fonction qui ajoute un effet d'aura. On décidera de ceux qui s'exécutent plus tard."""
         # Les auras non élémentales s'appliquent si personne n'a d'aura élémentale sur la case (même si l'aura de base de la case a plus de priorité)
-        if {aura for aura in self.auras if isinstance(aura, Aura_elementale)} == {self.aura_elementale}:
+        if {aura for aura in self.auras if isinstance(aura, AuraElementale)} == {self.aura_elementale}:
             self.auras.update(auras)
         # Les auras élémentales s'appliquent si la priorité de la plus importante est supérieure à la priorité de l'aura élémentale en place la plus importante
-        if max({aura.priorite for aura in auras_elementales}) > max({aura.priorite for aura in self.auras if isinstance(aura, Aura_elementale)}):
+        if max({aura.priorite for aura in auras_elementales}) > max({aura.priorite for aura in self.auras if isinstance(aura, AuraElementale)}):
             self.auras = auras | auras_elementales # On vire aussi les auras non élémentales qui appartiennent à d'autres gens
 
     def arrive(self,entitee:Mobile):
         if isinstance(entitee,Item):
             entitee.set_position(self.position) #Un item passe quoi qu'il arrive
-            if isinstance(self.agissant,Non_superposable):
+            if isinstance(self.agissant,NonSuperposable):
                 entitee.heurte_non_superposable(self.agissant) #Mais il heurte les occupants
-            elif isinstance(self.decors,Non_superposable):
+            elif isinstance(self.decors,NonSuperposable):
                 entitee.heurte_non_superposable(self.decors)
             self.items.add(entitee)
             return True
         elif isinstance(entitee,Agissant):
             if self.agissant is not None: # On a déjà un agissant sur la case
-                ecrasement = trouve_skill(entitee.classe_principale,Skill_ecrasement) #On peut peut-être l'écraser
+                ecrasement = trouve_skill(entitee.classe_principale,SkillEcrasement) #On peut peut-être l'écraser
                 if ecrasement is not None:
                     if not ecrasement.utilise(self.agissant.get_priorite(),entitee.get_priorite()):
                         return False
                 else:
                     return False
-            elif isinstance(self.decors,Non_superposable):
-                ecrasement = trouve_skill(entitee.classe_principale,Skill_ecrasement) #On peut peut-être l'écraser
+            elif isinstance(self.decors,NonSuperposable):
+                ecrasement = trouve_skill(entitee.classe_principale,SkillEcrasement) #On peut peut-être l'écraser
                 if ecrasement is not None:
                     if not ecrasement.utilise(self.decors.get_priorite(),entitee.get_priorite()):
                         return False
@@ -78,7 +78,7 @@ class Case(crt.Case):
             entitee.set_position(self.position)
             return True
         raise TypeError("On ne peut pas ajouter un objet de type "+str(type(entitee))+" sur une case !")
-    
+
     def part(self,entitee:Mobile):
         if isinstance(entitee,Item):
             self.items.remove(entitee)
@@ -91,17 +91,17 @@ class Case(crt.Case):
 
     #Tout le monde a fini de se déplacer.
     def post_action(self):
-        on_attaques:Set[On_attack] = set()
-        attaques:Set[Attaque_case] = set()
+        on_attaques:Set[OnAttack] = set()
+        attaques:Set[AttaqueCase] = set()
 
         for effet in self.effets:
-            if isinstance(effet,On_attack):
+            if isinstance(effet,OnAttack):
                 on_attaques.add(effet)
-            elif (isinstance(effet,Attaque_case_delayee) and effet.delai > 0):
+            elif (isinstance(effet,AttaqueCaseDelayee) and effet.delai > 0):
                 effet.execute(self) #On diminue le délai
-            elif isinstance(effet,Attaque_case):
+            elif isinstance(effet,AttaqueCase):
                 attaques.add(effet)
-            elif isinstance(effet,On_post_action): #Les auras non-élémentales sont aussi des On_post_action
+            elif isinstance(effet,OnPostAction): #Les auras non-élémentales sont aussi des OnPostAction
                 effet.execute(self)
 
         for aura in self.auras:
@@ -116,7 +116,7 @@ class Case(crt.Case):
         for effet in self.effets | self.auras:
             if effet.phase == "terminé":
                 self.effets.remove(effet)
-        if {aura for aura in self.auras if isinstance(aura, Aura_elementale)} == set() or max({aura.priorite for aura in self.auras if isinstance(aura, Aura_elementale)}) < self.aura_elementale.priorite: # Les auras de feu durent plusieurs tours, mais peuvent aussi être arrivée juste grâce à l'aide d'une aura de terre
+        if {aura for aura in self.auras if isinstance(aura, AuraElementale)} == set() or max({aura.priorite for aura in self.auras if isinstance(aura, AuraElementale)}) < self.aura_elementale.priorite: # Les auras de feu durent plusieurs tours, mais peuvent aussi être arrivée juste grâce à l'aide d'une aura de terre
             self.auras = {self.aura_elementale} # On remet l'aura de base pour le tour suivant
 
     #Le tour se termine gentiment, et on recommence !
@@ -124,7 +124,7 @@ class Case(crt.Case):
     def get_opacite(self):
         opacite = self.opacite
         for aura in self.auras:
-            if isinstance(aura, Modification_opacite):
+            if isinstance(aura, ModificationOpacite):
                 opacite *= aura.coef_opacite
         return opacite
 
@@ -137,13 +137,13 @@ class Case(crt.Case):
     # def get_codes_effets(self) -> List[List[int]]:
     #     effets=[]
     #     for effet in self.effets:
-    #         if isinstance(effet,Attaque_case_delayee):
+    #         if isinstance(effet,AttaqueCase_delayee):
     #             effets.append([effet.responsable,effet.delai,effet.degats])
     #     return effets
 
 # Imports utilisés dans le code
-from ..Effet.Auras import Aura_elementale, Aura_permanente, Modification_opacite
-from ..Effet.Effet import On_debut_tour, Time_limited, On_attack, On_post_action
-from ..Effet.Attaque.Attaque import Attaque_case, Attaque_case_delayee
-from ..Systeme.Classe.Classes import trouve_skill
-from ..Systeme.Skill.Passif import Skill_ecrasement
+from ..effet.auras import AuraElementale, AuraPermanente, ModificationOpacite
+from ..effet.effet import OnDebutTour, TimeLimited, OnAttack, OnPostAction
+from ..effet.attaque.attaque import AttaqueCase, AttaqueCaseDelayee
+from ..systeme.classe.classes import trouve_skill
+from ..systeme.skill.passif import SkillEcrasement

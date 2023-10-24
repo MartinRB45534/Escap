@@ -1,19 +1,19 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...Entitee.Agissant.Vue.Agissant import Agissant_vu
-    from .Position import Vision_position
+    from ...entitee.agissant.vue.agissant import AgissantVu
+    from .Position import VisionPosition
     from .Vision import Vision
 
-class Vision_agissant:
-    def __init__(self, agissant:Optional[Agissant_vu],tour:int,labyrinthe:Vision):
+class VisionAgissant:
+    def __init__(self, agissant:Optional[AgissantVu],tour:int,labyrinthe:Vision):
         self.agissants = {tour:agissant} if agissant is not None else {} # Les agissants sont stockés par tour
         # Résumé des infos (à mettre à jour à chaque nouvelle vision)
         self.labyrinthe = labyrinthe
-        self.position:crt.Position|Vision_position = POSITION_INCONNUE
+        self.position:crt.Position|VisionPosition = POSITION_INCONNUE
         # Autres infos
         self.DPS_contact:Optional[float] = None # Dégâts par seconde en contact
         self.DPS_distance:Optional[float] = None # Dégâts par seconde à distance
@@ -25,7 +25,7 @@ class Vision_agissant:
         self.interference:Optional[float] = None # Capacité à gêner (comment la calculer ?)
         self.appreciabilite:Optional[float] = None # Critères arbitraires
 
-    def voit(self, agissant:Agissant_vu, tour: int):
+    def voit(self, agissant:AgissantVu, tour: int):
         for tour_vu in self.agissants:
             if tour_vu <= tour:
                 # On retire les visions obsolètes

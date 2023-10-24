@@ -1,30 +1,27 @@
 from __future__ import annotations
+from typing import Set, Any
 
 # Pas d'import pour les annotations
 
 # Imports des classes parentes
-from .Position import Position
-from .Etage import Etage
+from .position import Position
+from .etage import Etage
 
-class Etage_absent(Etage):
+class EtageAbsent(Etage):
     """Classe représentant l'étage de la position absente."""
     def __init__(self):
-        self.nom = "Absent"
-        self.largeur = -1
-        self.hauteur = -1
-        self.positions = set()
+        super().__init__("Absent", -1, -1)
+        self.positions:Set[Position] = set()
 
-    def __contains__(self, item):
+    def __contains__(self, item:Any):
         return item is POSITION_ABSENTE
 
-ETAGE_ABSENT = Etage_absent()
+ETAGE_ABSENT = EtageAbsent()
 
-class Position_absent(Position):
+class PositionAbsent(Position):
     """Classe représentant la position de ce qui n'est pas sur la carte."""
     def __init__(self):
-        self.etage=ETAGE_ABSENT
-        self.x=-1
-        self.y=-1
+        super().__init__(ETAGE_ABSENT, -1, -1)
         self.etage.positions.add(self)
 
-POSITION_ABSENTE = Position_absent()
+POSITION_ABSENTE = PositionAbsent()

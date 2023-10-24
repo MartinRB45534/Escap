@@ -1,15 +1,15 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from .....Entitee.Agissant.Agissant import Agissant
-    from .....Systeme.Skill.Actif import Actif
-    from .....Systeme.Elements import Element
+    from .....entitee.agissant.agissant import Agissant
+    from .....systeme.skill.actif import Actif
+    from .....systeme.elements import Element
 
 # Imports des classes parentes
-from ...Magie.Magie import Magie,Magie_dirigee,Magies_offensives
+from ...magie.magie import Magie,Magie_dirigee,Magies_offensives
 
 class Magie_attaque_corp_a_corp(Magies_offensives):
     """Les magies qui créent une attaque au corp à corp."""
@@ -24,7 +24,7 @@ class Magie_attaque_corp_a_corp(Magies_offensives):
 
     def action(self):
         for case in self.agissant.labyrinthe.a_portee(self.agissant.position,self.portee,self.deplacement,self.forme,self.passage):
-            self.agissant.labyrinthe.get_case(case).effets.add(Attaque_case(self.agissant,self.degats,self.element,"proximité"))
+            self.agissant.labyrinthe.get_case(case).effets.add(AttaqueCase(self.agissant,self.degats,self.element,"proximité"))
 
 class Magie_attaque_corp_a_corp_dirigee(Magie_dirigee,Magie_attaque_corp_a_corp):
     def __init__(self,skill:Actif,agissant:Agissant,direction:Optional[crt.Direction],gain_xp:float,cout_pm:float,portee:float,degats:float,element:Element,deplacement:Deplacement,forme:Forme,passage:Passage,propagation:str,latence:float,niveau:int):
@@ -36,7 +36,7 @@ class Magie_attaque_corp_a_corp_dirigee(Magie_dirigee,Magie_attaque_corp_a_corp)
             self.interrompt()
         else:
             for case in self.agissant.labyrinthe.a_portee(self.agissant.position,self.portee,self.deplacement,self.forme,self.passage,self.direction):
-                self.agissant.labyrinthe.get_case(case).effets.add(Attaque_case(self.agissant,self.degats,self.element,"proximité",self.direction))
+                self.agissant.labyrinthe.get_case(case).effets.add(AttaqueCase(self.agissant,self.degats,self.element,"proximité",self.direction))
 
 class Magie_purification(Magie_attaque_corp_a_corp):
     """La magie qui crée un effet de purification sur un agissant."""
@@ -46,7 +46,7 @@ class Magie_purification(Magie_attaque_corp_a_corp):
             self.agissant.labyrinthe.get_case(case).effets.add(Attaque_lumineuse_case(self.agissant,self.degats))
 
 # Imports utilisés dans le code
-from ....Attaque.Attaque import Attaque_case,Attaque_lumineuse_case
-from .....Labyrinthe.Deplacement import Deplacement
-from .....Labyrinthe.Forme import Forme
-from .....Labyrinthe.Passage import Passage
+from ....attaque.attaque import AttaqueCase,Attaque_lumineuse_case
+from .....labyrinthe.deplacement import Deplacement
+from .....labyrinthe.forme import Forme
+from .....labyrinthe.passage import Passage

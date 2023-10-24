@@ -1,36 +1,29 @@
+"""
+Ce module contient les classes Marge, qui sont les espaces vides dans les pavages.
+"""
+
+from __future__ import annotations
+from typing import Tuple
 import pygame
 
-from .Affichable import Affichable
+from .affichable import Affichable
 
 class Marge(Affichable):
     """Un espace vide."""
-    def __init__(self):
-        self.tailles = (0,0) #La largeur et la hauteur (ou l'inverse ?)
-        self.position = (0,0)
-
-    def set_tailles(self,tailles):
-        self.tailles = tailles
-
-    def get_tailles(self,tailles):
-        return tailles
-
-    def set_position(self,position):
-        self.position = position
-
-    def touche(self,position):
+    def touche(self,position:Tuple[int,int]):
         return False
 
     def affiche(self,screen:pygame.Surface,frame:int=1,frame_par_tour:int=1):
         pass
 
-class Marge_verticale(Marge):
+class MargeVerticale(Marge):
     """Un espace vide, placé verticalement."""
 
-    def get_tailles(self,tailles):
-        return [tailles[0],0]
+    def get_tailles(self,tailles:Tuple[int,int]):
+        return (tailles[0],0)
 
-class Marge_horizontale(Marge):
+class MargeHorizontale(Marge):
     """Un espace vide, placé verticalement."""
 
-    def get_tailles(self,tailles):
-        return [0,tailles[1]]
+    def get_tailles(self,tailles:Tuple[int,int]):
+        return (0,tailles[1])

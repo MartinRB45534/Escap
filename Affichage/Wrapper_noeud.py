@@ -1,24 +1,26 @@
+"""
+Contient les classes Wrapper_noeud et Wrapper_noeud_bloque
+"""
+
 from __future__ import annotations
-from typing import List, Optional, Tuple, TYPE_CHECKING
+from typing import Tuple, Literal, TYPE_CHECKING
+
+from .noeud import Noeud
+from .noeuds import NoeudBloque
+from .wrapper import Wrapper
+from .wrapper_cliquable import WrapperCliquable
+
 if TYPE_CHECKING:
-    from Placeholder import Placeheldholder
+    from placeholder import Placeheldholder
+    from .cliquable import Cliquable
 
-from .Affichable import Affichable
-from .Noeud import Noeud
-from .Noeuds import Noeud_bloque
-from .Wrapper import Wrapper
-from .Wrapper_cliquable import Wrapper_cliquable
-
-class Wrapper_noeud(Wrapper_cliquable,Noeud):
+class WrapperNoeud(Noeud,WrapperCliquable):
     """Un wrapper_cliquable qui a des enfants""" #Constitue la majorité de mon affichage
     def __init__(self):
         Noeud.__init__(self)
+        WrapperCliquable.__init__(self)
 
-        self.objets:List[Affichable] = []
-        self.contenu:Optional[Affichable] = None #L'objet qu'il 'contient'
-        self.fond:Tuple = (0,0,0,0)
-
-    def clique(self,position, droit:bool=False):
+    def clique(self,position:Tuple[int,int], droit:bool=False) -> Cliquable|Literal[False]:
         clique = Wrapper.clique(self,position,droit)
         if clique is self:
             self.set_actif()
@@ -36,14 +38,14 @@ class Wrapper_noeud(Wrapper_cliquable,Noeud):
             return self
         return False
     
-    def clique_placeholder(self,placeheldholder: Placeheldholder, droit:bool=False):
+    def clique_placeholder(self,placeheldholder: Placeheldholder, droit:bool=False) -> Cliquable|Literal[False]:
         res = Wrapper.clique_placeholder(self,placeheldholder, droit)
         if res:
             self.select(res, droit)
             return self
         return False
 
-class Wrapper_noeud_bloque(Noeud_bloque,Wrapper_noeud):
-    pass
+class WrapperNoeudBloque(NoeudBloque,WrapperNoeud):
+    """Un wrapper_noeud qui est bloqué"""
 
-from .Placeholder import Placeheldholder
+from .placeholder import Placeheldholder

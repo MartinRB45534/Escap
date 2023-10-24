@@ -1,8 +1,12 @@
-from .Absent import *
-from .Case import *
-from .Deplacement import *
-from .Extrait import *
-from .Forme import *
-from .Labyrinthe import *
-from .Mur import *
-from .Passage import *
+"""
+Le module labyrinthe contient les classes qui définissent les murs et les passages du labyrinthe.
+"""
+
+from .absent import *
+from .case import *
+from .deplacement import *
+from .extrait import *
+from .forme import *
+from .labyrinthe import *
+from .mur import *
+from .passage import *

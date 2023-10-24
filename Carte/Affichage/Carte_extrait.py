@@ -1,30 +1,38 @@
+"""
+Affiche un extrait de labyrinthe.
+"""
+
 from __future__ import annotations
 from typing import List, Tuple, TYPE_CHECKING
-import Affichage as af
+import affichage as af
+
+from ..structure_spatiale.absent import POSITION_ABSENTE
+
+from ..structure_spatiale.direction import Direction
+from ..structure_spatiale.position import Position
+from .vignette_case import VignetteCase
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Structure_spatiale.Position import Position
-    from ..Structure_spatiale.Direction import Direction
-    from ..Extrait import Extrait
-    from ..Labyrinthe import Labyrinthe
-    from .Vignette_case import Vignette_case
+    from ..extrait import Extrait
+    from ..labyrinthe import Labyrinthe
 
-class Carte_extrait(af.Parent_noeud, af.Proportionnel):
+class CarteExtrait(af.ParentNoeud, af.Proportionnel):
+    """Affiche une carte centrée sur une case."""
     def __init__(self, extrait:Extrait|Labyrinthe):
-        af.Parent_noeud.__init__(self)
+        super().__init__()
 
         self.labyrinthe = extrait
         self.taille_case = 0
         self.nb_cases = 0
         self.proportions = [1, 1]
 
-    def set_tailles(self, tailles):
+    def set_tailles(self, tailles:Tuple[int,int]):
         af.Proportionnel.set_tailles(self, tailles)
         self.update()
 
     def update(self):
-        assert isinstance(self.courant,Vignette_case|None)
+        assert isinstance(self.courant,VignetteCase|None)
         courant = None
         self.objets:List[af.Affichable] = []
         if len(self.labyrinthe.position_case) > 1: # On a au moins une case plus l'absente
@@ -42,7 +50,7 @@ class Carte_extrait(af.Parent_noeud, af.Proportionnel):
                 marge_gauche = self.position[0]+marge#+taille_case//2
                 for i in range(self.nb_cases):
                     pos = Position(etage, visible[0]+i, visible[2]+j)
-                    vignette = self.make_vignette((marge_gauche, marge_haut), pos, (taille_case, taille_case))
+                    vignette = self.make_vignette((marge_gauche, marge_haut), pos, taille_case)
                     if self.courant and vignette.pos == self.courant.pos:
                         courant = vignette
                         if self.courant.actif:
@@ -52,59 +60,58 @@ class Carte_extrait(af.Parent_noeud, af.Proportionnel):
                 marge_haut += taille_case
         self.set_courant(courant)
 
-    def make_vignette(self, position:Tuple[int,int], position_vue:Position, tailles:Tuple[int,int]):
-        return Vignette_case(position, self.labyrinthe, position_vue, tailles)
-    
+    def make_vignette(self, position:Tuple[int,int], position_vue:Position, taille:int):
+        """Crée une vignette à partir d'une position et d'une taille."""
+        return VignetteCase(position, self.labyrinthe, position_vue, taille)
+
     def select(self, selection:af.Cliquable, droit:bool=False):
         if not droit:
-            if isinstance(selection, Vignette_case):
+            if isinstance(selection, VignetteCase):
                 self.set_courant(selection)
 
     def set_default_courant(self):
-        vignettes = [vignette for vignette in self.objets if isinstance(vignette, Vignette_case) and vignette.pos != POSITION_ABSENTE]
+        vignettes = [vignette for vignette in self.objets if isinstance(vignette, VignetteCase) and vignette.pos != POSITION_ABSENTE]
         if vignettes:
             self.set_courant(vignettes[0])
         else:
             self.set_courant(None)
 
     def in_up(self):
-        if isinstance(self.courant, Vignette_case):
+        if isinstance(self.courant, VignetteCase):
             up = self.courant.pos + Direction.HAUT
-            vignettes = [vignette for vignette in self.objets if isinstance(vignette, Vignette_case) and vignette.pos == up]
-            if vignettes:
-                self.set_courant(vignettes[0])
-            else:
-                self.set_courant(None)
-        return self
-    
-    def in_down(self):
-        if isinstance(self.courant, Vignette_case):
-            down = self.courant.pos + Direction.BAS
-            vignettes = [vignette for vignette in self.objets if isinstance(vignette, Vignette_case) and vignette.pos == down]
-            if vignettes:
-                self.set_courant(vignettes[0])
-            else:
-                self.set_courant(None)
-        return self
-    
-    def in_left(self):
-        if isinstance(self.courant, Vignette_case):
-            left = self.courant.pos + Direction.GAUCHE
-            vignettes = [vignette for vignette in self.objets if isinstance(vignette, Vignette_case) and vignette.pos == left]
-            if vignettes:
-                self.set_courant(vignettes[0])
-            else:
-                self.set_courant(None)
-        return self
-    
-    def in_right(self):
-        if isinstance(self.courant, Vignette_case):
-            right = self.courant.pos + Direction.DROITE
-            vignettes = [vignette for vignette in self.objets if isinstance(vignette, Vignette_case) and vignette.pos == right]
+            vignettes = [vignette for vignette in self.objets if isinstance(vignette, VignetteCase) and vignette.pos == up]
             if vignettes:
                 self.set_courant(vignettes[0])
             else:
                 self.set_courant(None)
         return self
 
-from ..Structure_spatiale.Absent import POSITION_ABSENTE
+    def in_down(self):
+        if isinstance(self.courant, VignetteCase):
+            down = self.courant.pos + Direction.BAS
+            vignettes = [vignette for vignette in self.objets if isinstance(vignette, VignetteCase) and vignette.pos == down]
+            if vignettes:
+                self.set_courant(vignettes[0])
+            else:
+                self.set_courant(None)
+        return self
+
+    def in_left(self):
+        if isinstance(self.courant, VignetteCase):
+            left = self.courant.pos + Direction.GAUCHE
+            vignettes = [vignette for vignette in self.objets if isinstance(vignette, VignetteCase) and vignette.pos == left]
+            if vignettes:
+                self.set_courant(vignettes[0])
+            else:
+                self.set_courant(None)
+        return self
+
+    def in_right(self):
+        if isinstance(self.courant, VignetteCase):
+            right = self.courant.pos + Direction.DROITE
+            vignettes = [vignette for vignette in self.objets if isinstance(vignette, VignetteCase) and vignette.pos == right]
+            if vignettes:
+                self.set_courant(vignettes[0])
+            else:
+                self.set_courant(None)
+        return self

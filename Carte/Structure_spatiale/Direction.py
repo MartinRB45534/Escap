@@ -1,11 +1,12 @@
-from __future__ import annotations
-import Affichage as af
-# Pas d'import pour les annotations
+"""Contient la classe Direction, qui permet de représenter les directions sur une grille."""
 
-# Imports des classes parentes
+from __future__ import annotations
+from typing import Any
 from enum import IntEnum
+import affichage as af
 
 class Direction(af.Direction,IntEnum):
+    """Classe représentant une direction sur la carte."""
     HAUT = 0
     DROITE = 1
     BAS = 2
@@ -13,6 +14,7 @@ class Direction(af.Direction,IntEnum):
 
     @property
     def angle(self):
+        """L'angle de cette direction, en degrés par rapport à la verticale, dans le sens horaire."""
         return self.value*90
 
     def __index__(self):
@@ -20,9 +22,10 @@ class Direction(af.Direction,IntEnum):
     
     @property
     def decalage(self):
+        """Le décalage correspondant à un déplacement d'une case dans cette direction"""
         return Decalage([0,1,0,-1][self],[-1,0,1,0][self])
 
-    def __add__(self,other):
+    def __add__(self,other:Any):
         if isinstance(other,Direction):
             return self.decalage+other
         elif isinstance(other,Angle):
@@ -34,7 +37,7 @@ class Direction(af.Direction,IntEnum):
         else:
             return NotImplemented #Vraiment une bonne idée ?
 
-    def __radd__(self,other):
+    def __radd__(self,other:Any):
         if isinstance(other,Direction): #Ne devrait pas pouvoir arriver
             return other+self.decalage
         elif isinstance(other,Angle):
@@ -46,7 +49,7 @@ class Direction(af.Direction,IntEnum):
         else:
             return NotImplemented #Vraiment une bonne idée ?
 
-    def __sub__(self,other):
+    def __sub__(self,other:Any):
         if isinstance(other,Direction): #Ne devrait théoriquement pas être utilisé
             return self.decalage-other
         elif isinstance(other,Angle):
@@ -58,7 +61,7 @@ class Direction(af.Direction,IntEnum):
         else:
             return NotImplemented #Vraiment une bonne idée ?
 
-    def __rsub__(self,other):
+    def __rsub__(self,other:Any):
         if isinstance(other,Direction): #Ne devrait pas pouvoir arriver
             return other-self.decalage
         elif isinstance(other,Angle):
@@ -70,13 +73,13 @@ class Direction(af.Direction,IntEnum):
         else:
             return NotImplemented #Vraiment une bonne idée ?
 
-    def __mul__(self,other):
+    def __mul__(self,other:Any):
         if isinstance(other,int):
             return self.decalage*other
         else:
             return NotImplemented
 
-    def __rmul__(self,other):
+    def __rmul__(self,other:Any):
         if isinstance(other,int):
             return other*self.decalage
         else:
@@ -84,6 +87,7 @@ class Direction(af.Direction,IntEnum):
 
     @property
     def oppose(self) -> Direction:
+        """La direction opposée à cette direction."""
         return self+HALF_TURN
 
     def __str__(self):
@@ -93,7 +97,6 @@ class Direction(af.Direction,IntEnum):
         return f"Direction : {self.name}"
 
 # Imports utilisés dans le code
-from .Position import Position
-from .Decalage import Decalage
-from .Direction import Direction
-from .Angle import Angle, HALF_TURN
+from .position import Position
+from .decalage import Decalage
+from .angle import Angle, HALF_TURN

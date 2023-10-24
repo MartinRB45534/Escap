@@ -3,11 +3,11 @@ from typing import TYPE_CHECKING, List,Tuple
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Agissant import Agissant
+    from ..agissant import Agissant
 
 # Imports des classes parentes
-from .Soigneur import Soigneur
-from .Mage import Multi_mage
+from .soigneur import Soigneur
+from .mage import Multi_mage
 
 class Multi_soigneur(Soigneur,Multi_mage):
     """Les soigneurs capables de soigner plusieurs agissants à la fois."""
@@ -16,7 +16,7 @@ class Multi_soigneur(Soigneur,Multi_mage):
         cibles:List[Tuple[float,Agissant]] = []
         skill = type(self.get_skill_magique())
         for corp in self.esprit.corps:
-            if corp.etat == Etats_agissants.VIVANT and corp.statistiques.pv < corp.statistiques.pv_max:
+            if corp.etat == EtatsAgissants.VIVANT and corp.statistiques.pv < corp.statistiques.pv_max:
                 cibles.append((corp.statistiques.pv,corp))
         if len(cibles) == 1:
             if self.peut_caster():
@@ -47,5 +47,5 @@ class Multi_soigneur(Soigneur,Multi_mage):
 
 # Imports utilisés dans le code
 from operator import itemgetter
-from ....Effet.Action.Magie.Magie import Cible_agissant,Cible_agissants
-from ..Etats import Etats_agissants
+from ....effet.action.magie.magie import Cible_agissant,Cible_agissants
+from ..etats import EtatsAgissants

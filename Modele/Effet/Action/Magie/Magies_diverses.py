@@ -1,17 +1,17 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, List, Optional, Set
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ....Entitee.Agissant.Agissant import Agissant
-    from ....Entitee.Item.Item import Item
-    from ....Systeme.Skill.Actif import Actif
-    from ....Labyrinthe.Case import Case
+    from ....entitee.agissant.agissant import Agissant
+    from ....entitee.item.item import Item
+    from ....systeme.skill.actif import Actif
+    from ....labyrinthe.case import Case
 
 # Imports des classes parentes
-from ..Action import Non_repetable
-from .Magie import Magie, Cible_agissant, Cible_agissants, Cible_cases
+from ..action import Non_repetable
+from .magie import Magie, Cible_agissant, Cible_agissants, Cible_cases
 
 class Magie_blizzard(Magie):
     """La magie qui crée un effet de blizzard autour de l'agissant."""
@@ -67,7 +67,7 @@ class Magie_protection_sacree(Cible_agissants):
             self.interrompt()
         else:
             for cible in self.cible:
-                cible.effets.append(Protection_sacree(self.duree,self.pv)) #Ajouter une direction ?
+                cible.effets.append(ProtectionSacree(self.duree,self.pv)) #Ajouter une direction ?
 
 class Magie_teleportation(Cible_cases, Non_repetable):
     """La magie qui téléporte des entitées."""
@@ -104,8 +104,8 @@ class Magie_teleportation(Cible_cases, Non_repetable):
                     item.position = cases[i-1].position
 
 # Imports utilisés dans le code
-from ...Effets_divers import Instakill, Blizzard, Obscurite
-from ...Effets_protection import Protection_sacree
-from ....Labyrinthe.Deplacement import Deplacement
-from ....Labyrinthe.Forme import Forme
-from ....Labyrinthe.Passage import Passage
+from ...effets_divers import Instakill, Blizzard, Obscurite
+from ...effets_protection import ProtectionSacree
+from ....labyrinthe.deplacement import Deplacement
+from ....labyrinthe.forme import Forme
+from ....labyrinthe.passage import Passage

@@ -3,8 +3,8 @@ from __future__ import annotations
 # Pas d'imports utilisés uniquement dans les annotations
 
 # Imports des classes parentes
-from .Maladie import Maladie
-from ...Statistiques import Effet_stats
+from .maladie import Maladie
+from ...statistiques import Effet_stats
 
 class Tirnogose(Maladie):
     """Maladie qui cause une perte progressive de PV. Peut se transmettre aux voisins."""

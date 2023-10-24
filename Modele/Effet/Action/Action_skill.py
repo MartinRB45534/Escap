@@ -1,20 +1,20 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, List
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...Entitee.Agissant.Agissant import Agissant
-    from ...Systeme.Skill.Actif import Actif
-    from ..Effets_protection import Protection_bouclier
-    from ...Entitee.Item.Item import Item
-    from ...Entitee.Item.Equippement.Degainable.Bouclier.Bouclier import Bouclier
-    from ...Labyrinthe.Deplacement import Deplacement
-    from ...Labyrinthe.Forme import Forme
-    from ...Labyrinthe.Passage import Passage
+    from ...entitee.agissant.agissant import Agissant
+    from ...systeme.skill.actif import Actif
+    from ..effets_protection import ProtectionBouclier
+    from ...entitee.item.item import Item
+    from ...entitee.item.equippement.degainable.bouclier.bouclier import Bouclier
+    from ...labyrinthe.deplacement import Deplacement
+    from ...labyrinthe.forme import Forme
+    from ...labyrinthe.passage import Passage
 
 # Imports des classes parentes
-from .Action import Action, Action_parcellaire, Non_repetable
+from .action import Action, Action_parcellaire, Non_repetable
 
 class Action_skill(Action):
     """
@@ -69,7 +69,7 @@ class Blocage(Action_skill):
 
     def action(self):
         self.bouclier.taux_degats = self.taux
-        self.agissant.labyrinthe.get_case(self.agissant.position).effets.add(Protection_bouclier(1,self.bouclier,[dir for dir in crt.Direction]))
+        self.agissant.labyrinthe.get_case(self.agissant.position).effets.add(ProtectionBouclier(1,self.bouclier,[dir for dir in crt.Direction]))
 
 class Blocage_zone(Blocage):
     """
@@ -87,7 +87,7 @@ class Blocage_zone(Blocage):
         position = self.agissant.position
         zone = self.agissant.labyrinthe.a_portee(position,self.portee,self.deplacement,self.forme,self.passage)
         for pos in zone:
-            self.agissant.labyrinthe.get_case(pos).effets.add(Protection_bouclier(1,self.bouclier,[dir for dir in crt.Direction]))
+            self.agissant.labyrinthe.get_case(pos).effets.add(ProtectionBouclier(1,self.bouclier,[dir for dir in crt.Direction]))
 
 class Cree_item(Action_skill):
     """
@@ -114,4 +114,4 @@ class Alchimie(Cree_item, Non_repetable):
         self.agissant.inventaire.ajoute(self.item)
 
 # Imports utilisés dans le code
-from ...Labyrinthe.Absent import CASE_ABSENTE
+from ...labyrinthe.Absent import CASE_ABSENTE

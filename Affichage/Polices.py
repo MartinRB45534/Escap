@@ -1,8 +1,7 @@
-import pygame
-from warnings import warn
+"""
+Ce fichier contient les polices utilisées dans le jeu.
+"""
 
-try:
-    POLICE20 = pygame.font.SysFont("Arial",20)
-except pygame.error as message:
-    warn("N'oubliez pas d'initialiser pygame avant d'importer l'affichage !")
-    raise message
+import pygame
+
+POLICE20 = pygame.font.SysFont("Arial",20)

@@ -1,14 +1,14 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Dict
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from .....Labyrinthe.Labyrinthe import Labyrinthe
-    from .....Systeme.Elements import Element
+    from .....labyrinthe.labyrinthe import Labyrinthe
+    from .....systeme.elements import Element
 
 # Imports des classes parentes
-from ..Equippement import Equippement
+from ..equippement import Equippement
 
 class Degainable(Equippement):
     """La classe des items qui doivent être dégainés. Sont utilisés en complément d'un skill, n'ont pas d'effet le reste du temps."""
@@ -42,4 +42,4 @@ class Arme(Degainable):
         return SKIN_ARME
     
 # Imports utilisés dans le code
-from .....Affichage.Skins import SKIN_ARME
+from .....Affichage.skins import SKIN_ARME

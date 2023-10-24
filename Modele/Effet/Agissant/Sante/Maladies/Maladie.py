@@ -3,13 +3,13 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from .....Entitee.Agissant.Agissant import Agissant
+    from .....entitee.agissant.agissant import Agissant
 
 # Imports des classes parentes
-from ....Effet import On_tick
-from ...Agissant import Effet_agissant
+from ....effet import OnTick
+from ...agissant import Effet_agissant
 
-class Maladie(On_tick, Effet_agissant):
+class Maladie(OnTick, Effet_agissant):
     """L'effet de maladie. Applique un déboost à l'agissant. Peut se transmettre aux voisins. Il existe différentes maladies."""
     def __init__(self,agissant:Agissant,contagiosite:float,distance:float,persistence:float,virulence:float):
         self.agissant = agissant
@@ -38,6 +38,6 @@ class Maladie(On_tick, Effet_agissant):
 
 # Imports utilisés dans le code
 import random
-from .....Labyrinthe.Deplacement import Deplacement
-from .....Labyrinthe.Forme import Forme
-from .....Labyrinthe.Passage import Passage
+from .....labyrinthe.deplacement import Deplacement
+from .....labyrinthe.forme import Forme
+from .....labyrinthe.passage import Passage

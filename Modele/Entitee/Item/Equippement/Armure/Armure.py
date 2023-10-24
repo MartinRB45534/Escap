@@ -1,13 +1,13 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from .....Labyrinthe.Labyrinthe import Labyrinthe
+    from .....labyrinthe.labyrinthe import Labyrinthe
 
 # Imports des classes parentes
-from ..Equippement import Equippement
+from ..equippement import Equippement
 
 class Armure(Equippement):
     """La classe des équipements de type armure. On ne peut en porter qu'une à la fois."""
@@ -21,4 +21,4 @@ class Armure(Equippement):
         return SKIN_ARMURE
 
 # Imports utilisés dans le code
-from .....Affichage.Skins import SKIN_ARMURE
+from .....Affichage.skins import SKIN_ARMURE

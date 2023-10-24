@@ -3,17 +3,17 @@ from typing import TYPE_CHECKING, Optional
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...Entitee.Agissant.Agissant import Agissant
-    from ...Entitee.Item.Item import Consommable
-    from ...Entitee.Item.Potion.Potion import Potion
-    from ...Entitee.Item.Parchemin.Parchemin import Parchemin
-    from ...Entitee.Item.Parchemin.Parchemins import Parchemin_vierge
-    from ..Effet import Effet
-    from .Magie.Magie import Magie
+    from ...entitee.agissant.agissant import Agissant
+    from ...entitee.item.item import Consommable
+    from ...entitee.item.Potion.Potion import Potion
+    from ...entitee.item.Parchemin.Parchemin import Parchemin
+    from ...entitee.item.Parchemin.Parchemins import Parchemin_vierge
+    from ..effet import Effet
+    from .magie.magie import Magie
 
 # Imports des classes parentes
-from .Action import Action_final, Non_repetable
-from .Caste import Caste, Caste_continu, Caste_final, Caste_initial, Caste_fractionnaire
+from .action import Action_final, Non_repetable
+from .caste import Caste, Caste_continu, Caste_final, Caste_initial, Caste_fractionnaire
 
 class Place_effet(Action_final, Non_repetable):
     """
@@ -22,16 +22,16 @@ class Place_effet(Action_final, Non_repetable):
     def __init__(self,agissant:Agissant,latence:float,item:Consommable,effet:Effet):
         super().__init__(agissant,latence)
         self.item = item
-        self.item.etat = Etats_items.UTILISE
+        self.item.etat = EtatsItems.UTILISE
         self.effet = effet
 
     def action(self):
         self.agissant.effets.append(self.effet)
-        self.item.etat = Etats_items.BRISE
+        self.item.etat = EtatsItems.BRISE
 
     def interrompt(self):
         """L'action est interrompue."""
-        self.item.etat = Etats_items.BRISE
+        self.item.etat = EtatsItems.BRISE
 
 class Boit(Place_effet):
     """
@@ -90,13 +90,13 @@ class Impregne(Lit,Action_final,Caste_final):
         """L'action est terminée."""
         if self.magie is not None:
             self.item.action_portee = self.magie # Le parchemin est imprégné de la magie
-            self.item.etat = Etats_items.INTACT
+            self.item.etat = EtatsItems.INTACT
         else:
             self.interrompt()
 
     def interrompt(self):
         """L'action est interrompue."""
-        self.item.etat = Etats_items.INTACT
+        self.item.etat = EtatsItems.INTACT
         self.magie = None
 
     def set_magie(self,magie:Magie):
@@ -107,4 +107,4 @@ class Impregne(Lit,Action_final,Caste_final):
         self.magie.cout*=self.taux_cout_caste
         self.magie.latence*=self.taux_latence_caste
 
-from ...Entitee.Item.Etats import Etats_items
+from ...entitee.item.etats import EtatsItems

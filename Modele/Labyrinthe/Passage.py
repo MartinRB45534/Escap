@@ -1,6 +1,9 @@
+"""Passage"""
+
 from typing import List
 
 class Passage:
+    """Classe qui contient les informations sur le passage d'une case à une autre"""
     def __init__(self,mur:bool,teleporteur:bool,escalier:bool,barriere:bool,porte:bool,codes:List[str]=[]): # Constructeur
         self.mur = mur # True si on passe au travers des murs
         self.teleporteur = teleporteur # True si on passe par les teleporteurs

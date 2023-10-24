@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING, List, Tuple
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Agissant import Agissant
+    from ..agissant import Agissant
 
 # Imports des classes parentes
-from .Mage import Mage
+from .mage import Mage
 
 class Attaquant_magique_agissant(Mage):
     """Les agissants qui combattent en lançant des attaques magiques de loin sur des agissants."""
@@ -35,6 +35,6 @@ class Attaquant_magique_agissant(Mage):
             return super().get_impact()
 
 # Imports utilisés dans le code
-from ..Agissant import Agissant
-from ....Effet.Action.Magie.Magie import Cible_agissant
+from ..agissant import Agissant
+from ....effet.action.magie.magie import Cible_agissant
 from operator import itemgetter

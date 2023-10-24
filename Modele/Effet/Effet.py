@@ -1,3 +1,5 @@
+"""Contient la classe Effet et ses sous-classes."""
+
 from __future__ import annotations
 
 # Pas d'imports utilisés uniquement dans les annotations
@@ -10,7 +12,7 @@ class Effet :
         """Idique si l'effet est terminé."""
         return True
 
-class On_tick(Effet) :
+class OnTick(Effet) :
     """La classe des effets appelés à chaque tour."""
     def execute(self) -> None:
         """execute() est appelée à chaque tour."""
@@ -20,17 +22,18 @@ class On_tick(Effet) :
         """action() est appelée par execute() lorsque c'est approprié."""
         raise NotImplementedError
 
-class One_shot(Effet):
+class OneShot(Effet):
     """Classe des effets qui n'ont à être appelés qu'une seule fois."""
 
     def execute(self): # Vraiment nécessaire ?
+        """execute() est appelée une seule fois."""
         self.action()
 
     def action(self) -> None:
         """action() est appelée une seule fois."""
         raise NotImplementedError
 
-class Evenement(On_tick):
+class Evenement(OnTick):
     """La classe des effets limités par le temps, appelés une seule fois par tour."""
     def __init__(self,temps_restant:float):
         self.temps_restant=temps_restant

@@ -1,19 +1,20 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Set
 import networkx as nx
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from .Case import Case
-    from .Mur import Mur, Mur_impassable
-    from ..Entitee.Entitee import Mobile
-    from .Deplacement import Deplacement
-    from .Forme import Forme
-    from .Passage import Passage
-    from .Extrait import Extrait
+    from .case import Case
+    from .mur import Mur, MurImpassable
+    from ..entitee.entitee import Mobile
+    from .deplacement import Deplacement
+    from .forme import Forme
+    from .passage import Passage
+    from .extrait import Extrait
 
 class Labyrinthe(crt.Labyrinthe):
+    """Le labyrinthe"""
     def __init__(self):
         super().__init__()
         self.position_case: dict[crt.Position,Case] = {}
@@ -28,7 +29,7 @@ class Labyrinthe(crt.Labyrinthe):
         self.add_node(case.position, case=case, **attr)
         self.position_case[case.position] = case
         for direction in crt.Direction:
-            self.add_mur(case.position, case.position+direction, direction, Mur_impassable(1))
+            self.add_mur(case.position, case.position+direction, direction, MurImpassable(1))
         if case.position.etage not in self.etages: # Représente les étages physiques (pour tout ce qui ignore les murs et les téléporteurs)
             self.etages[case.position.etage] = nx.Graph()
         self.etages[case.position.etage].add_node(case.position)
@@ -137,5 +138,5 @@ class Labyrinthe(crt.Labyrinthe):
         return self.extrait(nx.ego_graph(graphe,position,int(portee), distance="poids" if obscurite else None).nodes)
 
 # Imports utilisés dans le code
-from .Absent import CASE_ABSENTE
-from .Extrait import Extrait
+from .absent import CASE_ABSENTE
+from .extrait import Extrait

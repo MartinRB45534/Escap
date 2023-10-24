@@ -1,16 +1,16 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ....Systeme.Classe.Classe_principale import Classe_principale
-    from .Inventaire import Inventaire_vu
-    from .Statistiques import Statistiques_vues
-    from ..Agissant import Agissant
-    from ..Espece import Espece
+    from ....systeme.classe.classe_principale import Classe_principale
+    from .inventaire import Inventaire_vu
+    from .statistiques import Statistiques_vues
+    from ..agissant import Agissant
+    from ..espece import Espece
 
-class Agissant_vu:
+class AgissantVu:
     def __init__(self, ID:int, identite:Optional[str], statistiques:Statistiques_vues, espece: Espece, niveau:int, inventaire:Inventaire_vu, dir_regard:crt.Direction, classe_principale:Optional[Classe_principale]=None):
         self.ID = ID
         self.identite = identite
@@ -21,8 +21,8 @@ class Agissant_vu:
         self.inventaire = inventaire
         self.dir_regard = dir_regard
 
-def voit_agissant(agissant:Agissant) -> Agissant_vu:
-    return Agissant_vu(
+def voit_agissant(agissant:Agissant) -> AgissantVu:
+    return AgissantVu(
         agissant.ID,
         agissant.identite,
         voit_statistiques(agissant.statistiques),
@@ -32,5 +32,5 @@ def voit_agissant(agissant:Agissant) -> Agissant_vu:
         agissant.dir_regard
         )
 
-from .Inventaire import voit_inventaire
-from .Statistiques import voit_statistiques
+from .inventaire import voit_inventaire
+from .statistiques import voit_statistiques

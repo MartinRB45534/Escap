@@ -1,31 +1,31 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ....Entitee.Item.Cadavre import Cadavre
-    from ....Esprit.Esprit import Esprit
+    from ....entitee.item.Cadavre import Cadavre
+    from ....esprit.esprit import Esprit
 
 # Imports des classes parentes
-from ...Effet import One_shot
-from ...Item.Item import Effet_item
+from ...effet import OneShot
+from ...item.item import EffetItem
 
-class Reanimation(One_shot, Effet_item):
+class Reanimation(OneShot, EffetItem):
     """Un effet de réanimation. Généralement placé sur le cadavre par une magie de réanimation de zone ou un skill de réanimation."""
     def __init__(self,cadavre:Cadavre,taux:float,esprit:Optional[Esprit]):
-        self.cadavre = cadavre
+        self.magie = cadavre
         self.taux = taux
         self.esprit = esprit
 
     def action(self):
-        agissant = self.cadavre.agissant
+        agissant = self.magie.agissant
         agissant.statistiques.pv = agissant.statistiques.pv_max*self.taux
-        agissant.etat = Etats_agissants.VIVANT
-        self.cadavre.etat = Etats_items.BRISE
-        self.cadavre.labyrinthe.position_case[self.cadavre.position].agissant = agissant
-        agissant.position = self.cadavre.position
-        self.cadavre.position = crt.POSITION_ABSENTE
+        agissant.etat = EtatsAgissants.VIVANT
+        self.magie.etat = EtatsItems.BRISE
+        self.magie.labyrinthe.position_case[self.magie.position].agissant = agissant
+        agissant.position = self.magie.position
+        self.magie.position = crt.POSITION_ABSENTE
         if self.esprit is not None:
             if agissant.esprit == NOBODY:
                 agissant.esprit.retire_corp(agissant)
@@ -35,6 +35,6 @@ class Reanimation(One_shot, Effet_item):
         self.action()
 
 # Imports utilisés dans le code
-from ....Entitee.Agissant.Etats import Etats_agissants
-from ....Entitee.Item.Etats import Etats_items
-from ....Esprit.Esprit import NOBODY
+from ....entitee.agissant.etats import EtatsAgissants
+from ....entitee.item.etats import EtatsItems
+from ....esprit.esprit import NOBODY

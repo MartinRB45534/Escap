@@ -5,13 +5,11 @@ import pygame
 import pickle
 import os
 
-pygame.init()
-
-screen = pygame.display.set_mode((1350, 690),pygame.RESIZABLE)
+screen = pygame.display.set_mode((1350, 690), pygame.RESIZABLE)
 
 from Joueur import *
 
-SKIN_ESCAP.dessine_toi(screen,(0,0))
+SKIN_ESCAP.dessine_toi(screen,(0,0), frame=1, frame_par_tour=1)
 pygame.display.flip()
 
 class Main():

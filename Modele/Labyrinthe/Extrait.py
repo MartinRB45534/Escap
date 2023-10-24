@@ -1,16 +1,17 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Set, Optional, Iterator
-import Carte as crt
+from typing import TYPE_CHECKING, Set, Optional, Iterator, Any
+import carte as crt
 import networkx as nx
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from .Case import Case
-    from .Mur import Mur
+    from .case import Case
+    from .mur import Mur
 
 # Pas de classe parente
 
 class Extrait(crt.Extrait):
+    """Un extrait du labyrinthe"""
     def __init__(self, exterieur:Set[crt.Position], subgraph:nx.MultiDiGraph):
         nx.MultiDiGraph.__init__(self)
         self.add_nodes_from(subgraph.nodes(data=True))
@@ -21,7 +22,7 @@ class Extrait(crt.Extrait):
             if position not in self.exterieur:
                 self.position_case[position] = self.nodes[position]['case']
 
-    def __contains__(self, item):
+    def __contains__(self, item:Any):
         if isinstance(item,crt.Position):
             return item in self.nodes and item not in self.exterieur and item is not crt.POSITION_ABSENTE
         return super().__contains__(item)

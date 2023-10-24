@@ -1,15 +1,15 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from .....Entitee.Agissant.Agissant import Agissant
-    from .....Systeme.Skill.Actif import Actif
-    from .....Systeme.Elements import Element
+    from .....entitee.agissant.agissant import Agissant
+    from .....systeme.skill.actif import Actif
+    from .....systeme.elements import Element
 
 # Imports des classes parentes
-from ...Magie.Magie import Magie, Magie_dirigee, Magies_offensives
+from ...magie.magie import Magie, Magie_dirigee, Magies_offensives
 
 class Magie_attaque_contact(Magie_dirigee,Magies_offensives):
     """Les magies qui créent une attaque au contact."""
@@ -25,10 +25,10 @@ class Magie_attaque_contact(Magie_dirigee,Magies_offensives):
             self.interrompt()
         else:
             for position in self.agissant.labyrinthe.a_portee(self.agissant.position,self.portee,Deplacement.SPATIAL,Forme.DEMI_CERCLE,Passage(False,False,False,False,False)):
-                self.agissant.labyrinthe.get_case(position).effets.add(Attaque_case(self.agissant,self.degats,self.element,"contact",self.direction))
+                self.agissant.labyrinthe.get_case(position).effets.add(AttaqueCase(self.agissant,self.degats,self.element,"contact",self.direction))
 
 # Imports utilisés dans le code
-from ....Attaque.Attaque import Attaque_case
-from .....Labyrinthe.Deplacement import Deplacement
-from .....Labyrinthe.Forme import Forme
-from .....Labyrinthe.Passage import Passage
+from ....attaque.attaque import AttaqueCase
+from .....labyrinthe.deplacement import Deplacement
+from .....labyrinthe.forme import Forme
+from .....labyrinthe.passage import Passage

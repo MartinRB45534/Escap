@@ -3,11 +3,11 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...Entitee.Agissant.Agissant import Agissant
+    from ...entitee.agissant.agissant import Agissant
 
 # Imports des classes parentes
-from .Agissant import Effet_agissant
-from ..Effet import Evenement
+from .agissant import Effet_agissant
+from ..effet import Evenement
 
 class Investissement_mana(Evenement,Effet_agissant):
     """Le joueur met du mana de côté, et en a plus après !"""

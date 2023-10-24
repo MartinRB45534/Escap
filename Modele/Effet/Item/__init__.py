@@ -1,2 +1,2 @@
-from .Item import *
-from .Items import *
+from .item import *
+from .items import *

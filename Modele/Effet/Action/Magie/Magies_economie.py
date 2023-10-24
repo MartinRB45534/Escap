@@ -3,13 +3,13 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ....Entitee.Agissant.Agissant import Agissant
-    from ....Systeme.Skill.Actif import Actif
-    from ....Systeme.Elements import Element
+    from ....entitee.agissant.agissant import Agissant
+    from ....systeme.skill.actif import Actif
+    from ....systeme.elements import Element
 
 # Imports des classes parentes
-from .Magie import Magie, Magie_cout
-from .Magies_attaque.Attaques_corps_a_corps import Magie_attaque_corp_a_corp
+from .magie import Magie, Magie_cout
+from .magies_attaque.attaques_corps_a_corps import Magie_attaque_corp_a_corp
 
 class Magie_reserve(Magie_cout):
     """La magie qui fait une réserve de mana."""
@@ -44,7 +44,7 @@ class Magie_explosion_de_mana(Magie_cout,Magie_attaque_corp_a_corp):
         self.degats = cout*self.taux_degats
 
 # Imports utilisés dans le code
-from ...Effets_divers import Reserve_mana,Investissement_mana
-from ....Labyrinthe.Deplacement import Deplacement
-from ....Labyrinthe.Forme import Forme
-from ....Labyrinthe.Passage import Passage
+from ...effets_divers import Reserve_mana,Investissement_mana
+from ....labyrinthe.deplacement import Deplacement
+from ....labyrinthe.forme import Forme
+from ....labyrinthe.passage import Passage

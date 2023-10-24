@@ -1,14 +1,14 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ....Labyrinthe.Labyrinthe import Labyrinthe
-    from ....Effet.Effet import Effet
+    from ....labyrinthe.labyrinthe import Labyrinthe
+    from ....effet.effet import Effet
 
 # Imports des classes parentes
-from ..Item import Consommable
+from ..item import Consommable
 
 class Potion(Consommable):
     """La classe des consommables qui peuvent se boire (ne requièrent pas de magie pour être activés)."""
@@ -22,5 +22,5 @@ class Potion(Consommable):
         return SKIN_POTION
 
 # Imports utilisés dans le code
-from ....Affichage.Skins import SKIN_POTION
-from ..Item import Item
+from ....Affichage.skins import SKIN_POTION
+from ..item import Item

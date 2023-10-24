@@ -1,15 +1,15 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from .....Labyrinthe.Labyrinthe import Labyrinthe
+    from .....labyrinthe.labyrinthe import Labyrinthe
 
 # Imports des classes parentes
 from .Anneau import Anneau
-from ..Role.Reparateur.Reparateurs import Renforce_regen_pv
-from ..Role.Reparateur_magique.Reparateurs_magiques import Renforce_regen_pm
+from ..role.reparateur.reparateurs import Renforce_regen_pv
+from ..role.reparateur_magique.reparateurs_magiques import Renforce_regen_pm
 
 class Anneau_magique(Anneau,Renforce_regen_pm):
     """Un anneau magique : augmente la régénération des pm."""
@@ -28,4 +28,4 @@ class Anneau_de_vitalite(Anneau,Renforce_regen_pv):
         self.frottements = frottements
 
 # Imports utilisés dans le code
-from ...Equippement.Equippement import Equippement
+from ...equippement.equippement import Equippement

@@ -1,3 +1,3 @@
-from .Classe_principale import *
-from .Classe import *
-from .Classes import *
+from .classe_principale import *
+from .classe import *
+from .classes import *

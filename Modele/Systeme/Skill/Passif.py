@@ -3,14 +3,14 @@ from typing import TYPE_CHECKING, Type
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...Effet.Effet import Aura
+    from ...effet import Aura
 
 # Imports des classes parentes
-from .Skill import Skill
+from .skill import Skill
 
 # Variables de classe
-from ...Systeme.Elements import Element
-from ...Entitee.Item.Equippement.Degainable.Degainable import Arme
+from ...systeme.elements import Element
+from ...entitee.item.equippement.degainable.degainable import Arme
 
 class Passif(Skill):
     """
@@ -20,10 +20,10 @@ class Passif(Skill):
         """En général, accumule l'xp"""
         raise NotImplementedError
 
-class Skill_debut_tour(Passif):
+class SkillDebutTour(Passif):
     """La classe des skills appelés au début de chaque tour (principalement les skills d'aura)."""
 
-class Skill_vision(Passif):
+class SkillVision(Passif):
     """Le skill utilisé pour observer son environnement. Lorsqu'il augmente de niveau, on peut voir plus loin. C'est un skill intrasec à la classe principale. !!!Ne pas confondre avec observation, qui permet d'obtenir des informations sur ce que l'on voit.!!!
        C'est un skill semi-passif, qui s'actionne à chaque tour."""
     def __init__(self): #Pour l'instant le skill est générique, identique pour tous
@@ -34,7 +34,7 @@ class Skill_vision(Passif):
     def utilise(self) -> None: #Le skill ne fait que donner des infos, il ne peut pas manipuler d'objet labyrinthe ou autres
         raise NotImplementedError
 
-class Skill_aura(Skill_debut_tour): #Toutes les auras ne sont pas des skills intrasecs, mais par rapport aux méthodes c'est plus logique comme ça.
+class SkillAura(Skill_debut_tour): #Toutes les auras ne sont pas des skills intrasecs, mais par rapport aux méthodes c'est plus logique comme ça.
     """Offre une aura qui se matérialise autour de l'agissant. Les effets de l'aura diffèrent selon l'aura. Skill aura est une classe parente et ne doit pas être instanciée.
        Les auras sont des skills passifs, qui s'actionne à chaque tour."""
     def __init__(self,effet:Type[Aura]):
@@ -47,7 +47,7 @@ class Skill_aura(Skill_debut_tour): #Toutes les auras ne sont pas des skills int
         self.xp_new+=self.gain_xp
         return self.effet(self.niveau)
 
-class Skill_essence_magique(Passif):
+class SkillEssenceMagique(Passif):
     """Ce skill permet d'utiliser les PM comme deuxième barre de PV si les PV sont à 0. Inspiré du skill persévérance dans komu desu ga, nanika ? et point de départ de l'une des quatre branches d'évolution du joueur.
        C'est un skill semi-passif, qui s'actionne quand on a des PV négatifs après avoir reçu des dégats (presque comme un sort de soin instantanné automatique)."""
     def __init__(self, taux:float, gain_xp:float): #Seul le joueur et un boss peuvent posséder ce skill, donc il n'y a pas besoin d'en prévoir différentes versions
@@ -67,7 +67,7 @@ class Skill_essence_magique(Passif):
         self.xp_new-=pm*0.1 #Plus on dépense de PM, plus le niveau augmente vite, donc le processus ralentit tout seul quand les niveaux augmentent. Peut-être ajuster quand même ?
         return pm #Le controleur veut juste savoir combien de PM il retire, et donc s'il doit tuer l'agissant.
 
-class Skill_immortel(Passif):
+class SkillImmortel(Passif):
     """ 'évolution' du skill précédent essence magique. Permet de survivre avec - de 0 PV, sans perdre de PM, mais avec une réduction de toutes les stats (possibilité de choisir entre les deux skills ?).
        C'est un skill semi-passif, qui s'actionne quand on a des PV négatifs à la fin du tour (la présence du skill suffit au controleur, mais il sera quand même "utilisé" pour qu'il puisse gagner son xp) (son coefficient sera extrait directement, sans procédure, pour éviter de lui faire gagner des xp à chaque fois qu'une valeur est utilisée)."""
     def __init__(self): #Seul le joueur peut avoir ce skill (?), donc il n'y a qu'une version
@@ -85,7 +85,7 @@ class Skill_immortel(Passif):
         self.xp_new+=self.gain_xp
         return self.coef #Peut-être garder un multiplicateur dans les stats, et ne pas aller chercher l'attribut coef à chaque fois ?
 
-class Skill_magie_infinie(Passif):
+class SkillMagieInfinie(Passif):
     """L'opposé de l'essence magique, permet de consommer plus de mana qu'on en possède, avec des PM qui deviennent négatifs. Pour chaque PM en dessous de 0, la régénération des PV est réduite d'autant, elle peut devenir négative.
        C'est un skill semi-passif, qui s'actionne quand l'agissant a des PM négatifs à la fin du tour (la présence du skill suffit au controleur pour autoriser des sorts même s'il n'y a pas assez de mana, le skill n'est "utilisé" que pour calculer la régén des PV une fois par tour)."""
     def __init__(self, taux:float, gain_xp:float):
@@ -103,7 +103,7 @@ class Skill_magie_infinie(Passif):
         self.xp_new+=self.gain_xp #Peut-être faire entrer les PM en dessous de 0 dans l'équation ?
         return pm*self.taux
 
-class Skill_manipulation_arme(Passif):
+class SkillManipulationArme(Passif):
     """
     Renforce les attaques réalisées à l'aide d'armes. Il y a un skill par type d'arme, et on peut en avoir plusieurs. Les skills sont cumulatifs, mais ne s'appliquent qu'à une seule arme à la fois.
     """
@@ -123,7 +123,7 @@ class Skill_manipulation_arme(Passif):
         self.xp_new+=self.gain_xp
         return self.boost_degats
 
-class Skill_manipulation_bouclier(Passif):
+class SkillManipulationBouclier(Passif):
     """Renforce la défense des items de type bouclier. Quand le niveau augmente, les dégats bloqués avec un bouclier, la portée des boucliers (pour un bouclier, la portée permet de protéger une plus grande zone), la vitesse d'utilisation des boucliers, la priorité des boucliers, etc. peuvent être améliorée (juste les dégats pour l'instant).
        C'est un skill semi-passif, qui s'actionne à chaque fois que le skill de bloquage d'attaque est utilisé."""
     def __init__(self, boost_defense:float, duree_protection:int, gain_xp:float):
@@ -143,7 +143,7 @@ class Skill_manipulation_bouclier(Passif):
         self.xp_new+=self.gain_xp
         return self.duree_protection,self.boost_defense
 
-class Skill_ecrasement(Passif):
+class SkillEcrasement(Passif):
     """Permet d'écraser (détruire) d'autres agissants ou des murs sur son chemin. Plus le niveau est élevé, moins la différence de priorité entre l'écrseur et l'écrasé doit être élevée pour permettre l'écrasement.
        C'est un skill semi-passif, qui s'actionne quand il y a collision entre l'agissant et un autre agissant ou un mur."""
     def __init__(self):
@@ -163,7 +163,7 @@ class Skill_ecrasement(Passif):
             self.xp_new+=self.gain_xp #est-ce que tous ces skills (déplacement, écrasement, etc.) ne gagnent de l'xp que quand ils fonctionnent ? Harmoniser !
         return fonctionne
 
-class Skill_observation(Passif):
+class SkillObservation(Passif):
     """Complément du skill de vision. Permet d'afficher des informations sur ce que voit le skill de vision (PV d'un ennemi ou priorité d'un mur par exemple). Peut aussi rendre visible (certains sorts, objets ou ennemis furtifs par exemple) ou révéler la vraie forme (certains ennemis portent plusieurs couches de déguisements, et le skill d'observation peut donc révéler une fausse forme différente de la forme affichée sans le skill).
        C'est un skill passif, qui s'actionne à chaque tour, après le skill vision. Il renvoit uniquement son niveau, et tous les objets ont différentes informations à afficher selon le niveau de l'observation (faire intervenir la priorité dans le calcul !)."""
     def __init__(self):
@@ -179,7 +179,7 @@ class Skill_observation(Passif):
         self.xp_new += self.gain_xp
         return self.niveau
 
-class Skill_defense(Passif):
+class SkillDefense(Passif):
     """Absorbe une partie des dégats infligés à l'agissant. La proportion de dégats bloqués augmente avec le niveau.
        C'est un skill semi-passif, il est activé à chaque fois que des dégats sont infligés à l'agissant."""
     def __init__(self):
@@ -197,11 +197,11 @@ class Skill_defense(Passif):
         self.xp_new += self.gain_xp #Faire dépendre des dégats bloqués ?
         return self.taux
 
-class Skill_aura_elementale(Skill_aura,Skill):
+class SkillAuraElementale(Skill_aura,Skill):
     """La classe des skills d'aura élémentales. Les auras élémentales de deux agissants différents sont incompatibles."""
     pass # Ne doit pas être instanciée
 
-class Skill_affinite_elementale(Passif):
+class SkillAffiniteElementale(Passif):
     """Augmente l'affinité avec un élément. Une affinité élevée augmente les dégats infligés et diminue les dégats subits par le biais d'attaques de cet élément, réduit les coups de mana et les temps de latence des sorts de cet élément, etc. et une affinité faible a l'effet inverse. Les quatre stats d'affinité sont très légèrement affectées par les actions du joueur tout au long du jeu, et grandement affectées par les skills d'affinité.
        C'est un skill-passif (il est appelé une fois par tour pour déterminer les affinités effectives du joueur pour le tour."""
     element:Element

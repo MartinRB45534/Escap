@@ -1,16 +1,21 @@
+"""Contient la classe Bouton, qui est un bouton cliquable avec un texte et une vignette"""
+
 from __future__ import annotations
-from typing import List
+from typing import Tuple, Optional
 import pygame
 
-from .Wrapper_cliquable import Wrapper_cliquable
-from .Pavage import Pavage_vertical, Pavage_horizontal
-from .Marge import Marge_verticale, Marge_horizontale
-from .Texte import Texte
-from .Vignette import Vignette
+from .wrapper_cliquable import WrapperCliquable
+from .pavage import PavageVertical, PavageHorizontal
+from .marge import MargeVerticale, MargeHorizontale
+from .texte import Texte
+from .vignette import Vignette
+from .skins import Skin
 
-class Bouton(Wrapper_cliquable):
-    def __init__(self, skin, texte, fond=(255,255,255), fond_marque_survol=(200,200,200), fond_marque_actif=None, fond_marque_courant=None, fond_est_courant=None, fond_actif=None):
-        Wrapper_cliquable.__init__(self)
+from ._ensure_pygame import transparency_flag
+
+class Bouton(WrapperCliquable):
+    def __init__(self, skin:Skin, texte:str, fond:Tuple[int,int,int]=(255,255,255), fond_marque_survol:Tuple[int,int,int]=(200,200,200), fond_marque_actif:Optional[Tuple[int,int,int]]=None, fond_marque_courant:Optional[Tuple[int,int,int]]=None, fond_est_courant:Optional[Tuple[int,int,int]]=None, fond_actif:Optional[Tuple[int,int,int]]=None):
+        WrapperCliquable.__init__(self)
 
         self.fond = fond
         self.fond_marque_survol = fond_marque_survol if fond_marque_survol else self.fond
@@ -24,13 +29,15 @@ class Bouton(Wrapper_cliquable):
         self.init()
 
     def init(self):
-        contenu = Pavage_vertical()
-        triptique = Pavage_horizontal()
-        triptique.set_contenu([Marge_verticale(),Vignette((0,0),20,self.skin),Marge_verticale(),Texte(self.texte),Marge_verticale()],[5,0,5,0,5])
-        contenu.set_contenu([Marge_horizontale(),triptique,Marge_horizontale()],[5,0,5])
+        """Initialise le bouton"""
+        contenu = PavageVertical()
+        triptique = PavageHorizontal()
+        triptique.set_contenu([MargeVerticale(),Vignette((0,0),20,self.skin),MargeVerticale(),Texte(self.texte),MargeVerticale()],[5,0,5,0,5])
+        contenu.set_contenu([MargeHorizontale(),triptique,MargeHorizontale()],[5,0,5])
         self.set_contenu(contenu)
 
     def get_fond(self):
+        """Renvoie le fond du bouton en fonction de son état"""
         if self.marque_survol:
             return self.fond_marque_survol
         elif self.marque_actif:
@@ -46,7 +53,7 @@ class Bouton(Wrapper_cliquable):
 
     def affiche(self,screen:pygame.Surface,frame:int=1,frame_par_tour:int=1):
         assert self.contenu is not None
-        surf = pygame.Surface(self.tailles,pygame.SRCALPHA)
+        surf = pygame.Surface(self.tailles,transparency_flag)
         surf.fill(self.get_fond())
         self.contenu.affiche(surf,frame,frame_par_tour)
         screen.blit(surf,self.position)

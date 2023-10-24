@@ -3,32 +3,32 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...Entitee.Item.Item import Item
-    from ...Entitee.Item.Equippement.Degainable import Arme
-    from .Item import On_hit
+    from ...entitee.item.item import Item
+    from ...entitee.item.equippement.degainable import Arme
+    from .item import OnHit
 
 # Imports des classes parentes
-from ...Effet import On_tick
-from .Item import Effet_item
+from ...effet import OnTick
+from .item import EffetItem
 
-class Effet_arme(Effet_item):
+class Effet_arme(EffetItem):
     """Effet qui est placé sur une arme."""
     def __init__(self, item:Arme):
         self.item = item
 
-class Effet_tranchant(On_tick, Effet_arme):
+class Effet_tranchant(OnTick, Effet_arme):
     """Effet qui modifie le tranchant d'une arme (en positif ou négatif)."""
     def modifie_tranchant(self, tranchant:float) -> float:
         raise NotImplementedError
 
-class Effet_portee(On_tick, Effet_arme):
+class Effet_portee(OnTick, Effet_arme):
     """Effet qui modifie la portée d'une arme (en positif ou négatif)."""
     def modifie_portee(self, portee:float) -> float:
         raise NotImplementedError
 
-class Effet_bombe(On_tick, Effet_item):
+class Effet_bombe(OnTick, EffetItem):
     """Enchantement qui confère des propriétés explosives à un item."""
-    def __init__(self,item:Item,effet:On_hit):
+    def __init__(self,item:Item,effet:OnHit):
         self.item = item
         self.effet = effet
         self.item.effets.append(self.effet)

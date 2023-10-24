@@ -1,19 +1,19 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, List, Tuple, Type, Dict
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...Entitee.Agissant.Agissant import Agissant
-    from ...Effet.Action.Magie.Magie import Magie
-    from ...Entitee.Item.Equippement.Degainable.Degainable import Arme
-    from ...Effet.Action.Action_skill import Action_skill, Derobe, Blocage, Ramasse, Alchimie
-    from ...Effet.Action.Attaque import Attaque, Attaque_arme
-    from ...Effet.Action.Deplacement import Marche
-    from ...Effet.Action.Action_skill import Ramasse
+    from ...entitee.agissant.agissant import Agissant
+    from ...effet.action.magie.magie import Magie
+    from ...entitee.item.equippement.degainable.degainable import Arme
+    from ...effet.action.action_skill import Action_skill, Derobe, Blocage, Ramasse, Alchimie
+    from ...effet.action.attaque import Attaque, AttaqueArme
+    from ...effet.action.deplacement import Marche
+    from ...effet.action.action_skill import Ramasse
 
 # Imports des classes parentes
-from .Skill import Skill
+from .skill import Skill
 
 class Actif(Skill):
     """
@@ -23,7 +23,7 @@ class Actif(Skill):
         """Fait l'action"""
         raise NotImplementedError
 
-class Skills_offensifs(Actif):
+class SkillsOffensifs(Actif):
     """
     Un skill qui genère une attaque (hors attaque magique).
     """
@@ -31,7 +31,7 @@ class Skills_offensifs(Actif):
         """Fait l'attaque"""
         raise NotImplementedError
 
-class Skills_projectiles(Actif): #/!\ Retravailler un jour
+class SkillsProjectiles(Actif): #/!\ Retravailler un jour
     """
     Un skill qui lance un objet.
     """
@@ -40,7 +40,7 @@ class Skills_projectiles(Actif): #/!\ Retravailler un jour
         """Utilise le skill, et renvoie l'objet lancé"""
         raise NotImplementedError
 
-class Skills_magiques(Actif):
+class SkillsMagiques(Actif):
     """
     Un skill qui permet de lancer des magies.
     """
@@ -66,7 +66,7 @@ class Skills_magiques(Actif):
         """Fait la magie nommée nom"""
         return self.magies[nom](self,agissant,self.niveau)
 
-class Skill_deplacement(Actif):
+class SkillDeplacement(Actif):
     """
     Un skill qui permet de se déplacer vers une case adjacente.
     """
@@ -84,7 +84,7 @@ class Skill_deplacement(Actif):
         """Fait le déplacement"""
         raise NotImplementedError
 
-class Skill_ramasse(Actif):
+class SkillRamasse(Actif):
     """
     Un skill qui permet de ramasser des objets sur sa case.
     """
@@ -96,7 +96,7 @@ class Skill_ramasse(Actif):
         """Fait le ramassage"""
         raise NotImplementedError
 
-class Skill_merge(Actif):
+class SkillMerge(Actif):
     """
     Un skill qui permet à deux groupes de fusionner. Unique aux slimes.
     """
@@ -106,39 +106,39 @@ class Skill_merge(Actif):
 
     # /!\ À compléter
 
-class Skill_absorb(Actif):
+class SkillAbsorb(Actif):
     """Un skill qui permet d'absorber un cadavre (le ramasser et récupérer un skill). Unique aux slimes."""
     def __init__(self):
         Actif.__init__(self)
         self.nom="Absorption de cadavre"
 
-class Skill_divide(Actif):
+class SkillDivide(Actif):
     """Un skill qui permet à un agissant de se séparer en deux. Unique aux slimes."""
     def __init__(self):
         Actif.__init__(self)
         self.nom="Division"
 
-class Skill_attaque(Skills_offensifs):
+class SkillAttaque(SkillsOffensifs):
     """Un skill qui permet d'attaquer."""
     def __init__(self):
-        Skills_offensifs.__init__(self)
+        SkillsOffensifs.__init__(self)
         self.nom = "Attaque"
 
     def fait(self,agissant:Agissant, direction:Optional[crt.Direction] = None) -> Attaque:
         """Fait l'attaque"""
         raise NotImplementedError
     
-class Skill_attaque_arme(Skills_offensifs):
+class SkillAttaqueArme(SkillsOffensifs):
     """Un skill qui permet d'attaquer avec une arme."""
     def __init__(self):
-        Skills_offensifs.__init__(self)
+        SkillsOffensifs.__init__(self)
         self.nom = "Attaque avec arme"
 
-    def fait(self,agissant:Agissant, arme:Optional[Arme]=None, direction:Optional[crt.Direction] = None) -> Attaque_arme:
+    def fait(self,agissant:Agissant, arme:Optional[Arme]=None, direction:Optional[crt.Direction] = None) -> AttaqueArme:
         """Fait l'attaque"""
         raise NotImplementedError
 
-class Skill_vol(Actif):
+class SkillVol(Actif):
     """Permet de dérober les drops d'un ennemi (sans devoir le tuer ni même le combattre). Nécessite le skill d'observation pour savoir ce qu'on peut voler.""" #Evolue vers les autres skills de vol ? Les offre au fur et à mesure de sa montée de niveau ? Les inclus à partir de certains niveaux ?
     def __init__(self):
         Actif.__init__(self)
@@ -148,7 +148,7 @@ class Skill_vol(Actif):
         """Fait le vol"""
         raise NotImplementedError
 
-class Skill_blocage(Actif):
+class SkillBlocage(Actif):
     """Permet de se cacher derrière son bouclier."""
     def __init__(self):
         Skill.__init__(self)
@@ -158,7 +158,7 @@ class Skill_blocage(Actif):
         """Fait le blocage"""
         raise NotImplementedError
 
-class Skill_alchimie(Actif):
+class SkillAlchimie(Actif):
     """Permet de créer divers items. C'est un skill semi-passif au sens où son utilisation ne prend pas de temps."""
     def __init__(self):
         Skill.__init__(self)

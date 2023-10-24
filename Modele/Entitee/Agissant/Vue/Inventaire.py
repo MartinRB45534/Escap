@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING, Set
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Inventaire import Inventaire
-    from .Item import Item_vu
+    from ..inventaire import Inventaire
+    from .item import Item_vu
 
 class Inventaire_vu:
     def __init__(self, items:Set[Item_vu], equippement:Set[Item_vu]):
@@ -17,4 +17,4 @@ def voit_inventaire(inventaire:Inventaire) -> Inventaire_vu:
         equippement={voit_item(item) for item in inventaire.equippements},
     )
 
-from .Item import voit_item
+from .item import voit_item

@@ -1,46 +1,51 @@
+"""
+Ce module contient les classes CoteDecalage et CotePosition.
+"""
+
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from .Position import Position
-    from .Decalage import Decalage
-    from .Direction import Direction
+    from .position import Position
+    from .decalage import Decalage
+    from .direction import Direction
 
 # Pas de classe parente
 
-class Cote_decalage:
+class CoteDecalage:
+    """Un décalage et une direction, pour représenter un côté de case."""
     def __init__(self,emplacement: Decalage,direction:Direction):
         self.emplacement = emplacement
         self.direction=direction
 
-    def __sub__(self,other):
+    def __sub__(self,other:Any):
         emplacement = self.emplacement - other
         if isinstance(emplacement,Decalage):
-            return Cote_decalage(emplacement,self.direction)
+            return CoteDecalage(emplacement,self.direction)
         return NotImplemented
 
-    def __add__(self,other):
+    def __add__(self,other:Any):
         emplacement = self.emplacement + other
         if isinstance(emplacement,Decalage):
-            return Cote_decalage(emplacement,self.direction)
+            return CoteDecalage(emplacement,self.direction)
         elif isinstance(emplacement,Position):
-            return Cote_position(emplacement,self.direction)
+            return CotePosition(emplacement,self.direction)
         return NotImplemented
 
-    def __radd__(self,other):
+    def __radd__(self,other:Any):
         emplacement = other + self.emplacement
         if isinstance(emplacement,Decalage):
-            return Cote_decalage(emplacement,self.direction)
+            return CoteDecalage(emplacement,self.direction)
         elif isinstance(emplacement,Position):
-            return Cote_position(emplacement,self.direction)
+            return CotePosition(emplacement,self.direction)
         return NotImplemented
 
-    def __eq__(self,other):
-        if isinstance(other,Cote_decalage):
+    def __eq__(self,other:Any):
+        if isinstance(other,CoteDecalage):
             return self.emplacement == other.emplacement and self.direction == other.direction
         return NotImplemented
-    
+
     def __hash__(self):
         return hash((self.emplacement,self.direction))
 
@@ -51,38 +56,40 @@ class Cote_decalage:
         return f"Coté : {self.emplacement}, {self.direction}"
 
     def oppose(self):
-        return Cote_decalage(self.emplacement+self.direction,self.direction.oppose)
-    
-class Cote_position:
+        """Le mur opposé à ce mur (sur la case voisine, dans la direction opposée)."""
+        return CoteDecalage(self.emplacement+self.direction,self.direction.oppose)
+
+class CotePosition:
+    """Une position et une direction, pour représenter un côté de case."""
     def __init__(self,emplacement: Position,direction:Direction):
         self.emplacement = emplacement
         self.direction=direction
 
-    def __sub__(self,other):
+    def __sub__(self,other:Any):
         emplacement = self.emplacement - other
         if isinstance(emplacement,Decalage):
-            return Cote_decalage(emplacement,self.direction)
+            return CoteDecalage(emplacement,self.direction)
         elif isinstance(emplacement,Position):
-            return Cote_position(emplacement,self.direction)
+            return CotePosition(emplacement,self.direction)
         return NotImplemented
 
-    def __add__(self,other):
+    def __add__(self,other:Any):
         emplacement = self.emplacement + other
         if isinstance(emplacement,Position):
-            return Cote_position(emplacement,self.direction)
+            return CotePosition(emplacement,self.direction)
         return NotImplemented
 
-    def __radd__(self,other):
+    def __radd__(self,other:Any):
         emplacement = other + self.emplacement
         if isinstance(emplacement,Position):
-            return Cote_position(emplacement,self.direction)
+            return CotePosition(emplacement,self.direction)
         return NotImplemented
 
-    def __eq__(self,other):
-        if isinstance(other,Cote_position|Cote_decalage):
+    def __eq__(self,other:Any):
+        if isinstance(other,CotePosition|CoteDecalage):
             return self.emplacement == other.emplacement and self.direction == other.direction
         return NotImplemented
-    
+
     def __hash__(self):
         return hash((self.emplacement,self.direction))
 
@@ -93,8 +100,9 @@ class Cote_position:
         return f"Coté : {self.emplacement}, {self.direction}"
 
     def oppose(self):
-        return Cote_position(self.emplacement+self.direction,self.direction.oppose)
-    
+        """Le mur opposé à ce mur (sur la case voisine, dans la direction opposée)."""
+        return CotePosition(self.emplacement+self.direction,self.direction.oppose)
+
 # Imports utilisés dans le code
-from .Decalage import Decalage
-from .Position import Position
+from .decalage import Decalage
+from .position import Position

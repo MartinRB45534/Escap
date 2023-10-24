@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...Item.Parchemin.Parchemins import Parchemin_vierge
+    from ...item.Parchemin.Parchemins import Parchemin_vierge
 
 # Imports des classes parentes
-from ..Agissant import Agissant
+from ..agissant import Agissant
 
 class Mage(Agissant):
     """Les agissants qui lancent des sorts.
@@ -24,8 +24,8 @@ class Mage(Agissant):
     def get_magies(self):
         return self.get_skill_magique().menu_magie()
 
-    def get_skill_magique(self) -> Skills_magiques:
-        skill = trouve_skill(self.classe_principale,Skills_magiques)
+    def get_skill_magique(self) -> SkillsMagiques:
+        skill = trouve_skill(self.classe_principale,SkillsMagiques)
         assert skill is not None
         return skill
 
@@ -53,6 +53,6 @@ class Multi_mage(Mage):
     
 # Imports utilisés dans le code
 
-from ....Systeme.Classe.Classes import trouve_skill
-from ....Systeme.Skill.Actif import Skills_magiques
-from ....Effet.Action.Non_skill import Impregne
+from ....systeme.classe.classes import trouve_skill
+from ....systeme.skill.actif import SkillsMagiques
+from ....effet.action.non_skill import Impregne

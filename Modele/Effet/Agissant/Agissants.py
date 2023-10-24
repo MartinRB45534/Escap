@@ -3,15 +3,15 @@ from typing import TYPE_CHECKING, Type
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...Entitee.Agissant.Agissant import Agissant
-    from ..Action.Magie.Magie import Magie
+    from ...entitee.agissant.agissant import Agissant
+    from ..action.magie.magie import Magie
 
 
 # Imports des classes parentes
-from .Agissant import Effet_agissant
-from ..Effet import One_shot
+from .agissant import Effet_agissant
+from ..effet import OneShot
 
-class Enseignement(Effet_agissant,One_shot):
+class Enseignement(Effet_agissant,OneShot):
     """Effet qui enseigne une magie au joueur."""
     def __init__(self,agissant:Agissant,magie:Type[Magie]):
         self.agissant = agissant
@@ -22,7 +22,7 @@ class Enseignement(Effet_agissant,One_shot):
             skill = self.agissant.get_skill_magique()
             skill.ajoute(self.magie)
 
-class Dopage(Effet_agissant,One_shot):
+class Dopage(Effet_agissant,OneShot):
     """Effet qui "dope" la prochaine attaque du joueur."""
     def __init__(self,agissant:Agissant,responsable:Agissant,taux_degats:float):
         self.agissant = agissant
@@ -36,7 +36,7 @@ class Dopage(Effet_agissant,One_shot):
             else:
                 self.agissant.action.taux *= self.taux_degats
 
-class Instakill(Effet_agissant,One_shot):
+class Instakill(Effet_agissant,OneShot):
     """L'effet d'instakill. S'il réussit, la victime voit ses PV descendre à 0. Sinon, rien.""" #Comment retirer aussi les PM, si la victime a la persévérance (essence magique) ?
     def __init__(self,agissant:Agissant,responsable:Agissant,priorite:float):
         self.agissant = agissant
@@ -51,5 +51,5 @@ class Instakill(Effet_agissant,One_shot):
             # porteur.echape_instakill(self.responsable)
 
 # Imports utilisés dans le code
-from ...Entitee.Agissant.Role.Mage import Mage
-from ..Action.Attaque import Attaque, Attaque_multiple
+from ...entitee.agissant.role.mage import Mage
+from ..action.attaque import Attaque, Attaque_multiple

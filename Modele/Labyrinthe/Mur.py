@@ -1,17 +1,18 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Type, Callable
-import Affichage as af
-import Carte as crt
+import affichage as af
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..Entitee.Entitee import Entitee
-    from .Passage import Passage
+    from ..entitee.entitee import Entitee
+    from .passage import Passage
 
 class Mur(crt.Mur):
+    """Les murs des cases du labyrinthe. Ils peuvent être cassés, ouverts, fermés, etc."""
     def __init__(self,niveau:int):
+        super().__init__()
         self.niveau = niveau
-        self.ferme = False
 
     def casser(self):
         pass
@@ -24,7 +25,7 @@ class Mur(crt.Mur):
     def passage(self,passage:Passage) -> bool:
         raise NotImplementedError("La méthode passage n'est pas implémentée pour cette classe")
 
-class Mur_impassable(Mur):
+class MurImpassable(Mur):
     def __init__(self,niveau:int):
         super().__init__(niveau)
         self.ferme = True
@@ -38,7 +39,7 @@ class Mur_impassable(Mur):
     def passage(self,passage:Passage):
         return False
 
-class Mur_plein(Mur):
+class MurPlein(Mur):
     def __init__(self,niveau:int):
         super().__init__(niveau)
         self.casse = False
@@ -58,7 +59,7 @@ class Mur_plein(Mur):
         else :
             ecrasement = None
             if isinstance(entitee,Agissant):
-                ecrasement = trouve_skill(entitee.classe_principale,Skill_ecrasement)   # ou l'écraser.
+                ecrasement = trouve_skill(entitee.classe_principale,SkillEcrasement)   # ou l'écraser.
             if ecrasement is not None :
                 passage = ecrasement.utilise(self.niveau,entitee.get_priorite())
                 if passage :
@@ -70,7 +71,7 @@ class Mur_plein(Mur):
     def passage(self,passage:Passage):
         return passage.mur or not self.ferme
 
-class Porte(Mur_plein):
+class Porte(MurPlein):
     def __init__(self,niveau:int,code:str):
         super().__init__(niveau)
         self.code = code
@@ -95,7 +96,7 @@ class Porte(Mur_plein):
     def passage(self, passage: Passage):
         return passage.mur or passage.porte or not self.ferme or self.code in passage.codes
 
-class Mur_ouvert(Mur):
+class MurOuvert(Mur):
     def __init__(self,niveau:int):
         super().__init__(niveau)
 
@@ -112,7 +113,7 @@ class Mur_ouvert(Mur):
     def passage(self,passage:Passage) -> bool:
         return True
 
-class Barriere(Mur_ouvert):
+class Barriere(MurOuvert):
     def __init__(self,niveau:int,condition:Callable[[Entitee],bool]):
         super().__init__(niveau)
         self.condition = condition
@@ -123,7 +124,7 @@ class Barriere(Mur_ouvert):
     def passage(self,passage:Passage):
         return passage.barriere
     
-class Teleporteur(Mur_ouvert): # La seule différence avec un mur ouvert est que les téléporteurs sont affichés différemment
+class Teleporteur(MurOuvert): # La seule différence avec un mur ouvert est que les téléporteurs sont affichés différemment
     def __init__(self,niveau:int):
         super().__init__(niveau)
 
@@ -132,10 +133,10 @@ class Teleporteur(Mur_ouvert): # La seule différence avec un mur ouvert est que
 
 # Quelques murs pas symétriques
 
-class Mur_asymétrique(Mur): # Hérite vraiment ?
-    def __init__(self,niveau:int,autre_mur:Mur_asymétrique|Type[Mur_asymétrique],mur:Mur):
+class MurAsymétrique(Mur): # Hérite vraiment ?
+    def __init__(self,niveau:int,autre_mur:MurAsymétrique|Type[MurAsymétrique],mur:Mur):
         self.mur = mur
-        if isinstance(autre_mur,Mur_asymétrique):
+        if isinstance(autre_mur,MurAsymétrique):
             self.autre_mur = autre_mur
         else :
             self.autre_mur = autre_mur(niveau,self,mur)
@@ -150,11 +151,11 @@ class Mur_asymétrique(Mur): # Hérite vraiment ?
     def peut_passer(self,entitee:Entitee):
         return self.mur.peut_passer(entitee)
     
-class Porte_a_loquet(Mur_asymétrique, Porte):
+class PorteALoquet(MurAsymétrique, Porte):
     """Une porte qui peut s'ouvrir sans clé de l'autre côté"""
-    def __init__(self, niveau: int, autre_mur: Porte_a_loquet | Type[Porte_a_loquet], mur: Porte, loquet: bool = False):
+    def __init__(self, niveau: int, autre_mur: PorteALoquet | Type[PorteALoquet], mur: Porte, loquet: bool = False):
         self.mur = mur
-        if isinstance(autre_mur,Porte_a_loquet):
+        if isinstance(autre_mur,PorteALoquet):
             self.autre_mur = autre_mur
         else :
             self.autre_mur = autre_mur(niveau,self,mur,not(loquet))
@@ -176,9 +177,9 @@ class Porte_a_loquet(Mur_asymétrique, Porte):
         else :
             self.mur.fermer(agissant)
 
-class Escalier(Mur_asymétrique, Mur_ouvert):
+class Escalier(MurAsymétrique, MurOuvert):
     """Un téléporteur avec une notion graphique de haut et de bas"""
-    def __init__(self, niveau: int, autre_mur: Escalier | Type[Escalier], mur: Mur_ouvert, direction: af.Direction_aff = af.Direction_aff.NEXT):
+    def __init__(self, niveau: int, autre_mur: Escalier | Type[Escalier], mur: MurOuvert, direction: af.DirectionAff = af.DirectionAff.NEXT):
         self.mur = mur
         if isinstance(autre_mur,Escalier):
             self.autre_mur = autre_mur
@@ -190,7 +191,7 @@ class Escalier(Mur_asymétrique, Mur_ouvert):
         return passage.escalier
 
 # Imports utilisés dans le code
-from ..Entitee.Entitee import Fantome
-from ..Entitee.Agissant.Agissant import Agissant
-from ..Systeme.Classe.Classes import trouve_skill
-from ..Systeme.Skill.Passif import Skill_ecrasement
+from ..entitee.entitee import Fantome
+from ..entitee.agissant.agissant import Agissant
+from ..systeme.classe.classes import trouve_skill
+from ..systeme.skill.passif import SkillEcrasement

@@ -1,9 +1,13 @@
-from .Equippement import *
-from .Parchemin import *
-from .Potion import *
-from .Projectile import *
-from .Cadavre import *
-from .Cle import *
-from .Etats import *
-from .Item import *
-from .Oeuf import *
+"""
+Les items sont des entitées qui ne se meuvent pas de leur propre chef.
+"""
+
+from .equippement import *
+from .parchemin import *
+from .potion import *
+from .projectile import *
+from .magie import *
+from .cle import *
+from .etats import *
+from .item import *
+from .oeuf import *

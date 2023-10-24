@@ -1,4 +1,6 @@
-import Affichage as af
+"""Contient les skins des classes d'items de l'inventaire."""
+
+import affichage as af
 
 af.Skin.path = "Modele/Affichage/assets/"
 

@@ -1,15 +1,15 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, List, Optional
-import Carte as crt
+import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ....Entitee.Agissant.Agissant import Agissant
-    from ....Systeme.Skill.Actif import Actif
+    from ....entitee.agissant.agissant import Agissant
+    from ....systeme.skill.actif import Actif
 
 # Imports des classes parentes
-from ..Action import Non_repetable
-from .Magie import Cible_agissant,Cible_case,Cible_item,Portee_limitee,Magie,Cible_agissants
+from ..action import Non_repetable
+from .magie import Cible_agissant,Cible_case,Cible_item,Portee_limitee,Magie,Cible_agissants
 
 class Magie_soin(Cible_agissant):
     """La magie qui invoque un effet de soin sur un agissant ciblé."""
@@ -99,10 +99,10 @@ class Magie_reanimation_de_zone(Cible_case,Portee_limitee):
                             item.effets.append(Reanimation(self.taux_pv,self.agissant.esprit))
 
 # Imports utilisés dans le code
-from ....Entitee.Item.Cadavre import Cadavre
-from ...Sante.Reanimation import Reanimation
-from ...Sante.Resurection import Resurection
-from ...Sante.Soins import Soin, Soin_case
-from ....Labyrinthe.Deplacement import Deplacement
-from ....Labyrinthe.Forme import Forme
-from ....Labyrinthe.Passage import Passage
+from ....entitee.item.Cadavre import Cadavre
+from ...sante.reanimation import Reanimation
+from ...sante.resurection import Resurection
+from ...sante.soins import Soin, Soin_case
+from ....labyrinthe.deplacement import Deplacement
+from ....labyrinthe.forme import Forme
+from ....labyrinthe.passage import Passage
