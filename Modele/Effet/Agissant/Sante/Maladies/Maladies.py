@@ -1,34 +1,34 @@
+"""
+Contient les classes des maladies.
+"""
+
 from __future__ import annotations
+import random
+
+from modele.entitee.agissant.agissant import Agissant
 
 # Pas d'imports utilisés uniquement dans les annotations
 
 # Imports des classes parentes
 from .maladie import Maladie
-from ...statistiques import Effet_stats
+from ...statistiques import EffetStats
+from ....timings import OnDebutTourAgissant
 
-class Tirnogose(Maladie):
+class Tirnogose(Maladie, OnDebutTourAgissant):
     """Maladie qui cause une perte progressive de PV. Peut se transmettre aux voisins."""
 
-    def action(self):
-        self.agissant.statistiques.pv -= self.virulence
-        self.immunite += 1
+    def debut_tour(self, agissant: Agissant):
+        agissant.statistiques.pv -= self.virulence
 
-class Fibaluse(Maladie, Effet_stats):
+class Fibaluse(Maladie, EffetStats):
     """Maladie qui réduit les statistiques. Peut se transmettre aux voisins."""
-
-    def action(self):
-        self.immunite += 1
 
     def modifie_stats(self, stat:float) -> float:
         return stat * (self.virulence)
 
-class Ibsutiomialgie(Maladie):
+class Ibsutiomialgie(Maladie, OnDebutTourAgissant):
     """Maladie qui peut causer une mort subite. Peut se transmettre aux voisins."""
 
-    def action(self):
+    def debut_tour(self, agissant: Agissant):
         if self.immunite == 0 and random.random() < self.virulence :
-            self.agissant.meurt()
-        self.immunite += 1
-
-# Imports utilisés dans le code
-import random
+            agissant.meurt()

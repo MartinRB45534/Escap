@@ -2,21 +2,23 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, List
 import carte as crt
 
+# Imports des classes parentes
+from .action import Action, ActionParcellaire, NonRepetable
+
+# Imports utilisés dans le code
+from ..effet import ProtectionCaseBouclier
+
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...entitee.agissant.agissant import Agissant
-    from ...systeme.skill.actif import Actif
-    from ..effets_protection import ProtectionBouclier
-    from ...entitee.item.item import Item
-    from ...entitee.item.equippement.degainable.bouclier.bouclier import Bouclier
-    from ...labyrinthe.deplacement import Deplacement
-    from ...labyrinthe.forme import Forme
-    from ...labyrinthe.passage import Passage
+    from ..entitee.agissant.agissant import Agissant
+    from ..systeme.skill.actif import Actif
+    from ..entitee.item.item import Item
+    from ..entitee.item.equippement.degainable.bouclier.bouclier import Bouclier
+    from ..commons import Deplacement
+    from ..commons import Forme
+    from ..commons import Passage
 
-# Imports des classes parentes
-from .action import Action, Action_parcellaire, Non_repetable
-
-class Action_skill(Action):
+class ActionSkill(Action):
     """
     Les actions provoquées par un skill.
     """
@@ -32,19 +34,20 @@ class Action_skill(Action):
 
 
 
-class Ramasse(Action_skill, Action_parcellaire, Non_repetable):
+class Ramasse(ActionSkill, ActionParcellaire, NonRepetable):
     """
     L'action de ramasser les items d'une case.
     """
     def __init__(self,agissant:Agissant,latences:List[float],skill:Actif,xp:float,items:List[Item]):
-        Action_skill.__init__(self,agissant,sum(latences),skill,xp)
-        self.latences = latences
+        ActionSkill.__init__(self,agissant,sum(latences),skill,xp)
+        ActionParcellaire.__init__(self,agissant,latences)
+        NonRepetable.__init__(self,agissant,sum(latences))
         self.items = items
 
     def action(self):
         self.agissant.inventaire.ajoute(self.items[self.rempli-1])
 
-class Derobe(Action_skill, Non_repetable):
+class Derobe(ActionSkill, NonRepetable):
     """
     L'action de dérober un item.
     """
@@ -54,10 +57,10 @@ class Derobe(Action_skill, Non_repetable):
         self.possesseur = possesseur
 
     def action(self):
-        self.possesseur.inventaire.drop(CASE_ABSENTE,self.item)
+        self.possesseur.inventaire.drop(self.item)
         self.agissant.inventaire.ajoute(self.item)
 
-class Blocage(Action_skill):
+class Blocage(ActionSkill):
     """
     L'action de bloquer avec un bouclier.
     """
@@ -69,9 +72,9 @@ class Blocage(Action_skill):
 
     def action(self):
         self.bouclier.taux_degats = self.taux
-        self.agissant.labyrinthe.get_case(self.agissant.position).effets.add(ProtectionBouclier(1,self.bouclier,[dir for dir in crt.Direction]))
+        self.agissant.labyrinthe.get_case(self.agissant.position).effets.add(ProtectionCaseBouclier(1,self.bouclier,[dir for dir in crt.Direction]))
 
-class Blocage_zone(Blocage):
+class BlocageZone(Blocage):
     """
     L'action de bloquer avec un bouclier sur une zone.
     """
@@ -87,9 +90,9 @@ class Blocage_zone(Blocage):
         position = self.agissant.position
         zone = self.agissant.labyrinthe.a_portee(position,self.portee,self.deplacement,self.forme,self.passage)
         for pos in zone:
-            self.agissant.labyrinthe.get_case(pos).effets.add(ProtectionBouclier(1,self.bouclier,[dir for dir in crt.Direction]))
+            self.agissant.labyrinthe.get_case(pos).effets.add(ProtectionCaseBouclier(1,self.bouclier,[dir for dir in crt.Direction]))
 
-class Cree_item(Action_skill):
+class CreeItem(ActionSkill):
     """
     L'action de créer un item.
     """
@@ -100,7 +103,7 @@ class Cree_item(Action_skill):
     def action(self):
         self.agissant.inventaire.ajoute(self.item)
 
-class Alchimie(Cree_item, Non_repetable):
+class Alchimie(CreeItem, NonRepetable):
     """
     L'action de créer un item par alchimie.
     """
@@ -110,8 +113,5 @@ class Alchimie(Cree_item, Non_repetable):
 
     def action(self):
         for item in self.ingredients:
-            self.agissant.inventaire.drop(CASE_ABSENTE,item)
+            self.agissant.inventaire.drop(item)
         self.agissant.inventaire.ajoute(self.item)
-
-# Imports utilisés dans le code
-from ...labyrinthe.Absent import CASE_ABSENTE

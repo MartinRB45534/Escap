@@ -1,16 +1,16 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Type
 
-# Imports utilisés uniquement dans les annotations
-if TYPE_CHECKING:
-    from ...effet import Aura
-
 # Imports des classes parentes
 from .skill import Skill
 
 # Variables de classe
-from ...systeme.elements import Element
+from ...commons.elements import Element
 from ...entitee.item.equippement.degainable.degainable import Arme
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from ...effet import Aura
 
 class Passif(Skill):
     """
@@ -197,7 +197,7 @@ class SkillDefense(Passif):
         self.xp_new += self.gain_xp #Faire dépendre des dégats bloqués ?
         return self.taux
 
-class SkillAuraElementale(Skill_aura,Skill):
+class SkillAuraElementale(SkillAura,Skill):
     """La classe des skills d'aura élémentales. Les auras élémentales de deux agissants différents sont incompatibles."""
     pass # Ne doit pas être instanciée
 

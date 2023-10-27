@@ -5,19 +5,19 @@ import carte as crt
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ....labyrinthe.labyrinthe import Labyrinthe
-    from ....systeme.elements import Element
+    from ....commons.elements import Element
 
 # Imports des classes parentes
 from .projectile import Projectile
 from ..item import Item
 from ...entitee import Fantome
+from ....effet.item.items import OnHit, Sursis
 
 # Imports des valeurs par défaut des paramètres
-from ....systeme.elements import Element
+from ....commons.elements import Element
 
 class Explosif(Projectile):
     """La classe des projectiles qui explosent. Affectés différemment par certains skills."""
-    pass
 
 class Charge(Explosif):
     def __init__(self,labyrinthe:Labyrinthe,niveau:int,vitesse:float=0,poids:float=0,frottements:float=0,portee:float=0,degats:float=0,position:crt.Position=crt.POSITION_ABSENTE):
@@ -38,7 +38,9 @@ class Charge(Explosif):
 
 class Percant(Projectile):
     """La classe des projectiles qui peuvent transpercer un ennemi."""
-    pass
+    def heurte_agissant(self):
+        self.frappe()
+        self.ajoute_effet(Sursis())
 
 class Fleche(Percant):
     """La classe des projectiles de type flèche. Affectés différemment par certains skills."""
@@ -99,11 +101,15 @@ class Perce_armure(Item):
 
 class Fragile(Item):
     """La classe des items qui se brisent lors d'un choc."""
-    pass
+    def heurte(self):
+        self.etat = EtatsItems.BRISE
+        self.arret()
 
 class Evanescent(Item):
     """La classe des items qui disparaissent s'ils ne sont pas en mouvement (les sorts de projectiles, par exemple, qui sont des items...)."""
-    pass
+    def arret(self):
+        self.etat = EtatsItems.BRISE
+        super().arret()
 
 class Projectile_magique(Projectile,Evanescent):
     """La classe des projectiles créés par magie."""
@@ -157,6 +163,5 @@ class Magie_explosive_percante(Magie_explosive,Percant):
         Magie_explosive.__init__(self,labyrinthe,niveau,vitesse,poids,frottements,portee,degats,element,position)
 
 # Imports utilisés dans le code
-from ....effet.effets_items import OnHit
-from ....systeme.elements import Element
-from ..etats import EtatsItems
+from ....commons.elements import Element
+from ....commons.etats_item import EtatsItems

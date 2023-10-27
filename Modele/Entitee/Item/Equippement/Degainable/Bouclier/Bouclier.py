@@ -33,6 +33,6 @@ class Bouclier(Degainable):
         return SKIN_BOUCLIER
 
 # Imports utilisés dans le code
-from ......Affichage.skins import SKIN_BOUCLIER
+from ......affichage.skins import SKIN_BOUCLIER
 from ......effet.attaque.attaque import AttaqueCase
 from ...equippement import Equippement

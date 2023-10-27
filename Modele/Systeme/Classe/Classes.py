@@ -19,7 +19,7 @@ from .classe import Classe
 
 #         boosts = Skill_boost_explosifs()
 
-#         skills_intrasecs:List[Skill_intrasec] = [boosts]
+#         skills_intrasecs:List[SkillIntrasec] = [boosts]
 
 #         cad_evo = [[],[],[],[],[],[],[],[],[],[]] #Rajouter des explosifs
 
@@ -38,7 +38,7 @@ from .classe import Classe
 
 #         boosts = Skill_boost_fleches()
 
-#         skills_intrasecs:List[Skill_intrasec] = [boosts]
+#         skills_intrasecs:List[SkillIntrasec] = [boosts]
 
 #         cad_evo = [[],[],[],[],[],[],[],[],[],[]] #Rajouter des flèches
 
@@ -57,7 +57,7 @@ from .classe import Classe
 
 #         boosts = Skill_boost_fleches_sniper()
 
-#         skills_intrasecs:List[Skill_intrasec] = [boosts]
+#         skills_intrasecs:List[SkillIntrasec] = [boosts]
 
 #         cad_evo = [[],[],[],[],[],[],[],[],[],[]] #Rajouter des flèches
 
@@ -76,7 +76,7 @@ from .classe import Classe
 
 #         boosts = Skill_boost_epee()
 
-#         skills_intrasecs:List[Skill_intrasec] = [boosts]
+#         skills_intrasecs:List[SkillIntrasec] = [boosts]
 
 #         Classe.__init__(self,cond_evo,skills_intrasecs,skills)
 
@@ -93,7 +93,7 @@ from .classe import Classe
 
 #         boosts = Skill_boost_lance()
 
-#         skills_intrasecs:List[Skill_intrasec] = [boosts]
+#         skills_intrasecs:List[SkillIntrasec] = [boosts]
 
 #         Classe.__init__(self,cond_evo,skills_intrasecs,skills)
 
@@ -110,7 +110,7 @@ from .classe import Classe
 
 #         boosts = Skill_boost_bouclier()
 
-#         skills_intrasecs:List[Skill_intrasec] = [boosts]
+#         skills_intrasecs:List[SkillIntrasec] = [boosts]
 
 #         Classe.__init__(self,cond_evo,skills_intrasecs,skills)
 
@@ -129,7 +129,7 @@ from .classe import Classe
 
 #         boosts = Skill_boost_armes()
 
-#         skills_intrasecs:List[Skill_intrasec] = [boosts]
+#         skills_intrasecs:List[SkillIntrasec] = [boosts]
 
 #         Classe.__init__(self,cond_evo,skills_intrasecs,skills)
 
@@ -142,7 +142,7 @@ from .classe import Classe
 
 #         boosts = Skill_boost_enchantements()
 
-#         skills_intrasecs:List[Skill_intrasec] = [boosts]
+#         skills_intrasecs:List[SkillIntrasec] = [boosts]
 
 #         Classe.__init__(self,cond_evo,skills_intrasecs)
 
@@ -155,7 +155,7 @@ from .classe import Classe
 
 #         boosts = Skill_boost_soutien()
 
-#         skills_intrasecs:List[Skill_intrasec] = [boosts]
+#         skills_intrasecs:List[SkillIntrasec] = [boosts]
 
 #         Classe.__init__(self,cond_evo,skills_intrasecs)
 
@@ -169,9 +169,9 @@ from .classe import Classe
 #         boost = Skill_boost_ange()
 #         soin = Skill_soin()
 #         regen_MP = Skill_regeneration_MP()
-#         aura = Skill_aura_divine(None) #/*\ À adapter /*\
+#         aura = SkillAura_divine(None) #/*\ À adapter /*\
 
-#         skills_intrasecs:List[Skill_intrasec] = [boost,soin,regen_MP,aura]
+#         skills_intrasecs:List[SkillIntrasec] = [boost,soin,regen_MP,aura]
 
 #         Classe.__init__(self,cond_evo,skills_intrasecs)
 
@@ -184,12 +184,12 @@ from .classe import Classe
 
 #         skills:List[Skill] = []
 #         for element in []: #remplacer par les éléments quand je les aurai créés, ainsi que les effets
-#             skills.append(Skill_aura_elementale(element))
+#             skills.append(SkillAura_elementale(element))
 #             skills.append(Skill_affinite_elementale(element))
 
 #         boosts = Skill_boost_elementaliste()
 
-#         skills_intrasecs:List[Skill_intrasec] = [boosts]
+#         skills_intrasecs:List[SkillIntrasec] = [boosts]
 
 #         Classe.__init__(self,cond_evo,skills_intrasecs,skills)
 
@@ -208,7 +208,7 @@ from .classe import Classe
 
 #         boosts = Skill_boost_elemental_terre()
 
-#         skills_intrasecs:List[Skill_intrasec] = [boosts]
+#         skills_intrasecs:List[SkillIntrasec] = [boosts]
 
 #         Classe.__init__(self,cond_evo,skills_intrasecs,skills)
 
@@ -223,7 +223,7 @@ from .classe import Classe
 
 #         boosts = Skill_boost_elemental_feu()
 
-#         skills_intrasecs:List[Skill_intrasec] = [boosts]
+#         skills_intrasecs:List[SkillIntrasec] = [boosts]
 
 #         Classe.__init__(self,cond_evo,skills_intrasecs,skills)
 
@@ -238,7 +238,7 @@ from .classe import Classe
 
 #         boosts = Skill_boost_elemental_glace()
 
-#         skills_intrasecs:List[Skill_intrasec] = [boosts]
+#         skills_intrasecs:List[SkillIntrasec] = [boosts]
 
 #         Classe.__init__(self,cond_evo,skills_intrasecs,skills)
 
@@ -253,7 +253,7 @@ from .classe import Classe
 
 #         boosts = Skill_boost_elemental_ombre()
 
-#         skills_intrasecs:List[Skill_intrasec] = [boosts]
+#         skills_intrasecs:List[SkillIntrasec] = [boosts]
 
 #         Classe.__init__(self,cond_evo,skills_intrasecs,skills)
 
@@ -270,7 +270,7 @@ from .classe import Classe
 
 #         boosts = Skill_boost_magicien()
 
-#         skills_intrasecs:List[Skill_intrasec] = [boosts]
+#         skills_intrasecs:List[SkillIntrasec] = [boosts]
 
 #         Classe.__init__(self,cond_evo,skills_intrasecs,skills)
 
@@ -281,14 +281,14 @@ from .classe import Classe
 #     def __init__(self):
 #         cond_evo = [0,10,20,30,40,50,60,70,80,90] #Mettre des conditions sur le nombre de morts vivants qui suivent le nécromancien ou le nombre de réanimations pratiquées ?
 
-#         immortalite = Skill_immortel() #Les nécromanciens autres que le joueur ne possèdent pas ce skill, et ne peuvent donc pas le transférer.
+#         immortalite = SkillImmortel() #Les nécromanciens autres que le joueur ne possèdent pas ce skill, et ne peuvent donc pas le transférer.
 
 #         skills:List[Skill] = [immortalite]
 
 #         boosts = Skill_boost_necromancien()
 #         reanimation = Skill_reanimation()
 
-#         skills_intrasecs:List[Skill_intrasec] = [boosts,reanimation]
+#         skills_intrasecs:List[SkillIntrasec] = [boosts,reanimation]
 
 #         Classe.__init__(self,cond_evo,skills_intrasecs,skills)
 
@@ -299,14 +299,14 @@ from .classe import Classe
 #     def __init__(self):
 #         cond_evo = [0,10,20,30,40,50,60,70,80,90] #Mettre des conditions sur le nombre de morts vivants qui suivent le nécromancien ou le nombre de réanimations pratiquées ?
 
-#         immortalite = Skill_immortel() #Seul le joueur peut obtenir cette classe. Il possède forcément le skill immortel pour en arriver là.
+#         immortalite = SkillImmortel() #Seul le joueur peut obtenir cette classe. Il possède forcément le skill immortel pour en arriver là.
 
 #         skills:List[Skill] = [immortalite]
 
 #         boosts = Skill_boost_maitre_de_la_mort()
 #         reanimation = Skill_reanimation_renforcee() #Les skills du maitre de la mort sont plus puissants que ceux du nécromancien
 
-#         skills_intrasecs:List[Skill_intrasec] = [boosts,reanimation]
+#         skills_intrasecs:List[SkillIntrasec] = [boosts,reanimation]
 
 #         Classe.__init__(self,cond_evo,skills_intrasecs,skills)
 
@@ -319,7 +319,7 @@ from .classe import Classe
 
 #         boosts = Skill_boost_instakill()
 
-#         skills_intrasecs:List[Skill_intrasec] = [boosts]
+#         skills_intrasecs:List[SkillIntrasec] = [boosts]
 
 #         Classe.__init__(self,cond_evo,skills_intrasecs)
 
@@ -337,7 +337,7 @@ from .classe import Classe
 
 #         boosts = Skill_boost_vol()
 
-#         skills_intrasecs:List[Skill_intrasec] = [boosts]
+#         skills_intrasecs:List[SkillIntrasec] = [boosts]
 
 #         Classe.__init__(self,cond_evo,skills_intrasecs,skills)
 

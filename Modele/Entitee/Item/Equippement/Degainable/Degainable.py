@@ -5,7 +5,7 @@ import carte as crt
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from .....labyrinthe.labyrinthe import Labyrinthe
-    from .....systeme.elements import Element
+    from .....commons.elements import Element
 
 # Imports des classes parentes
 from ..equippement import Equippement
@@ -42,4 +42,4 @@ class Arme(Degainable):
         return SKIN_ARME
     
 # Imports utilisés dans le code
-from .....Affichage.skins import SKIN_ARME
+from .....affichage.skins import SKIN_ARME

@@ -22,5 +22,5 @@ class Potion(Consommable):
         return SKIN_POTION
 
 # Imports utilisés dans le code
-from ....Affichage.skins import SKIN_POTION
+from ....affichage.skins import SKIN_POTION
 from ..item import Item

@@ -1,36 +1,33 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
+# Imports des classes parentes
+from .agissant import EffetAgissant, TimeLimitedAgissant
+from ..timings import OnDebutTourAgissant
+
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ...entitee.agissant.agissant import Agissant
 
-# Imports des classes parentes
-from .agissant import Effet_agissant
-from ..effet import Evenement
-
-class Investissement_mana(Evenement,Effet_agissant):
+class InvestissementMana(TimeLimitedAgissant,OnDebutTourAgissant):
     """Le joueur met du mana de côté, et en a plus après !"""
-    def __init__(self,agissant:Agissant,temps_restant:float,mana:float):
-        self.agissant = agissant
-        self.temps_restant = temps_restant
+    def __init__(self,temps_restant:float,mana:float):
+        TimeLimitedAgissant.__init__(self,temps_restant)
         self.mana = mana
 
-    def action(self):
+    def debut_tour(self,agissant:Agissant):
         if self.termine():
-            self.agissant.statistiques.pm += self.mana
+            agissant.statistiques.pm += self.mana
 
-class Reserve_mana(Effet_agissant):
+class ReserveMana(EffetAgissant):
     """Effet qui correspond à une réserve de mana pour le joueur qui peut piocher dedans lorsqu'il en a besoin, mais ce mana n'est pas compté dans le calcul de son mana max."""
     def __init__(self,agissant:Agissant,mana:float):
         self.agissant = agissant
         self.mana = mana
 
-    def action(self,mana:float):
+    def paye(self,mana:float):
+        """Paye le mana."""
         self.mana -= mana
-
-    def execute(self,mana:float):
-        self.action(mana)
 
     def termine(self):
         return self.mana <= 0

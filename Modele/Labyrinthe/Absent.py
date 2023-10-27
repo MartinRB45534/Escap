@@ -3,14 +3,15 @@
 import carte as crt
 
 from .case import Case
-from ..effet.auras import AuraPermanente
+# from ..effet.case.aura.auras import AuraPermanente
 
-class AuraAbsente(AuraPermanente):
-    """Classe représentant l'aura de la position absente."""
+# class AuraAbsente(AuraPermanente):
+#     """Classe représentant l'aura de la position absente."""
 
-class CaseAbsent(Case, crt.caseAbsent):
+class CaseAbsent(Case, crt.CaseAbsent):
     """Classe représentant l'étage de la position absente."""
     def __init__(self):
-        super().__init__(crt.POSITION_ABSENTE,AuraAbsente)
+        # super().__init__(crt.POSITION_ABSENTE, AuraAbsente())
+        self.position = crt.POSITION_ABSENTE
 
 CASE_ABSENTE = CaseAbsent()

@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from .mur import MurVu
 
 # Import de la classe parente
-from ....labyrinthe.Extrait import Extrait
+from ....labyrinthe.extrait import Extrait
 
 class Vue(Extrait):
     def __init__(self, exterieur:Set[crt.Position], subgraph:nx.MultiDiGraph, position_case:dict[crt.Position,CaseVue]):
@@ -48,5 +48,5 @@ def voit_vue(extrait: Extrait) -> Vue:
         position_case,
     )
 
-from .case import voit_case
+from .case import voit_case, CasePasVue
 from .mur import voit_mur

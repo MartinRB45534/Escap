@@ -10,6 +10,9 @@ if TYPE_CHECKING:
 
 # Pas de classe parente
 
+# Imports utilisés pour les paramètres par défaut
+from ...labyrinthe.absent import CASE_ABSENTE
+
 class Inventaire:
 
     def __init__(self,possesseur:Agissant,nb_doigts:int):
@@ -226,9 +229,9 @@ class Inventaire:
 
     def drop_all(self,case:Case):
         for item in self.items:
-            self.drop(case,item)
+            self.drop(item,case)
 
-    def drop(self,case:Case,item:Item):
+    def drop(self,item:Item,case:Case=CASE_ABSENTE):
         for item in self.items:
             
             item.position = case.position
@@ -247,7 +250,7 @@ class Inventaire:
 
     def drop_random(self,case:Case):
         item = random.choice(list(self.items))
-        self.drop(case,item)
+        self.drop(item,case)
 
     def debut_tour(self):
         for item in self.items:
@@ -270,37 +273,37 @@ class Inventaire:
 
     def a_parchemin_vierge(self):
         for parchemin in self.parchemins:
-            if isinstance(parchemin,Parchemin_vierge):
+            if isinstance(parchemin,ParcheminVierge):
                 if isinstance(parchemin.action_portee,Impregne) and parchemin.action_portee.magie is None:
                     return True
         return False
     
     def get_parchemin_vierge(self):
         for parchemin in self.parchemins:
-            if isinstance(parchemin,Parchemin_vierge):
+            if isinstance(parchemin,ParcheminVierge):
                 if isinstance(parchemin.action_portee,Impregne) and parchemin.action_portee.magie is None:
                     return parchemin
         return None
 
 
 # Imports utilisés dans le code (il y en a beaucoup !!!)
-from ...effet.action.non_skill import Impregne
+from ...action.non_skill import Impregne
 from ..item.item import Item, Consommable
-from ..item.etats import EtatsItems
-from ..item.Potion.Potion import Potion
-from ..item.Parchemin.Parchemin import Parchemin
-from ..item.Cle import Cle
+from ...commons.etats_item import EtatsItems
+from ..item.potion.potion import Potion
+from ..item.parchemin.parchemin import Parchemin
+from ..item.cle import Cle
 from ..item.equippement.equippement import Equippement
 from ..item.equippement.degainable.degainable import Arme
 from ..item.equippement.degainable.bouclier.bouclier import Bouclier
-from ..item.equippement.Armure.Armure import Armure
-from ..item.equippement.Heaume.Heaume import Heaume
-from ..item.equippement.Anneau.Anneau import Anneau
+from ..item.equippement.armure.armure import Armure
+from ..item.equippement.heaume.heaume import Heaume
+from ..item.equippement.anneau.anneau import Anneau
 from ..item.projectile.projectile import Projectile
 from ..item.item import Ingredient
-from ..item.Cadavre import Cadavre
-from ..item.Oeuf import Oeuf
-from ..item.Parchemin.Parchemins import Parchemin_vierge
+from ..item.cadavre import Cadavre
+from ..item.oeuf import Oeuf
+from ..item.parchemin.parchemins import ParcheminVierge
 
 from warnings import warn
 import random

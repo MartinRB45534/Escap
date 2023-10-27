@@ -1,31 +1,35 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, List, Type, Dict, Set, Any
+import random
 import carte as crt
+
+# Imports des classes parentes
+from ..entitee import NonSuperposable, Mobile
+
+from ...action.deplacement import Deplace
+from ...effet.timings import OnDebutTourAgissant, OnPostDecisionAgissant, OnPostActionAgissant, OnFinTourAgissant, TimeLimited
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...systeme.classe.classe_principale import Classe_principale
+    from ...systeme.classe.classe_principale import ClassePrincipale
     from .espece import Espece
     from .inventaire import Inventaire
     from .statistiques import Statistiques
     from ...esprit.esprit import Esprit
     from ..item.item import Item
     from ...labyrinthe.labyrinthe import Labyrinthe
-    from ...systeme.elements import Element
+    from ...commons.elements import Element
     from .vue.vue import Vue
-
-# Imports des classes parentes
-from ..entitee import NonSuperposable, Mobile
 
 class Agissant(NonSuperposable,Mobile): #Tout agissant est un cadavre, tout cadavre n'agit pas.
     """La classe des entitées animées. Capable de décision, de différentes actions, etc. Les principales caractéristiques sont l'ID, les stats, et la classe principale."""
-    def __init__(self,identite:str,labyrinthe:Labyrinthe,cond_evo:List[float],skills_intrasecs:Set[Skill_intrasec],skills:Set[Skill_extra],niveau:int,pv_max:float,regen_pv_max:float,regen_pv_min:float,restauration_regen_pv:float,pm_max:float,regen_pm:float,force:float,priorite:float,vitesse:float,affinites:Dict[Element,float],immunites:Set[Element],espece:Espece,oubli:float,resolution:int,forme:str,forme_tete:str,nb_doigts:int,magies:List[Type[Magie]],items:List[Type[Item]],position:crt.Position,ID: Optional[int]=None):
+    def __init__(self,identite:str,labyrinthe:Labyrinthe,cond_evo:List[float],skills_intrasecs:Set[SkillIntrasec],skills:Set[SkillExtra],niveau:int,pv_max:float,regen_pv_max:float,regen_pv_min:float,restauration_regen_pv:float,pm_max:float,regen_pm:float,force:float,priorite:float,vitesse:float,affinites:Dict[Element,float],immunites:Set[Element],espece:Espece,oubli:float,resolution:int,forme:str,forme_tete:str,nb_doigts:int,magies:List[Type[Magie]],items:List[Type[Item]],position:crt.Position,ID: Optional[int]=None):
         Entitee.__init__(self,position,ID)
         self.identite = identite
         self.labyrinthe = labyrinthe
         self.statistiques = Statistiques(self,priorite,vitesse,force,pv_max,regen_pv_max,regen_pv_min,restauration_regen_pv,pm_max,regen_pm,affinites,immunites)
         self.espece = espece
-        self.classe_principale = Classe_principale(cond_evo,skills_intrasecs,skills,niveau)
+        self.classe_principale = ClassePrincipale(cond_evo,skills_intrasecs,skills,niveau)
         self.niveau = self.classe_principale.niveau
         self.oubli = oubli
         self.resolution = resolution
@@ -128,7 +132,7 @@ class Agissant(NonSuperposable,Mobile): #Tout agissant est un cadavre, tout cada
         return self.statistiques.get_affinite(element)
 
     def peut_payer(self,cout:float):
-        skill = trouve_skill(self.classe_principale,Skill_magie_infinie)
+        skill = trouve_skill(self.classe_principale,SkillMagieInfinie)
         res = True
         if skill is None:
             res = self.get_total_pm() >= cout
@@ -145,21 +149,21 @@ class Agissant(NonSuperposable,Mobile): #Tout agissant est un cadavre, tout cada
                 cout_restant -= self.pm
             if cout_restant > 0: #Sinon, on fait appel aux éventuelles réserves de mana
                 for effet in self.effets:
-                    if isinstance(effet,Reserve_mana):
+                    if isinstance(effet,ReserveMana):
                         if effet.mana >= cout_restant:
-                            effet.execute(cout_restant)
+                            effet.paye(cout_restant)
                             cout_restant = 0
                             break
                         else :
                             cout_restant -= effet.mana
-                            effet.execute(effet.mana)
+                            effet.paye(effet.mana)
             if cout_restant > 0: # Si ce n'est toujours pas assez, on utilise la magie infinie (on aurait pas pu se retrouver dans la situation de payer plus sans ça, donc on l'a forcement !)
                 self.pm -= cout_restant
 
     def get_total_pm(self):
         total = self.pm
         for effet in self.effets:
-            if isinstance(effet,Reserve_mana):
+            if isinstance(effet,ReserveMana):
                 total += effet.mana
         return total
     
@@ -175,13 +179,16 @@ class Agissant(NonSuperposable,Mobile): #Tout agissant est un cadavre, tout cada
     def priorite(self) -> float:
         return self.statistiques.get_priorite()
 
-    def subit(self,degats:float,element:Element):
-        if element not in self.statistiques.immunites:
+    def subit(self,degats:float,element:Element,inverse:bool=False):
+        if inverse:
+            degats *= self.statistiques.get_affinite(element)
+            self.statistiques.blesse(degats)
+        elif element not in self.statistiques.immunites:
             degats /= self.statistiques.get_affinite(element)
             self.statistiques.blesse(degats)
 
     def instakill(self,responsable:Agissant):
-        immortel = trouve_skill(self.classe_principale,Skill_immortel)
+        immortel = trouve_skill(self.classe_principale,SkillImmortel)
         if immortel is not None:
             if self.statistiques.pv > 0:
                 self.statistiques.pv = 0 #Et ça s'arrète là
@@ -207,8 +214,8 @@ class Agissant(NonSuperposable,Mobile): #Tout agissant est un cadavre, tout cada
     def get_esprit(self):
         return self.esprit
 
-    def get_skill_vision(self) -> Skill_vision:
-        skill = trouve_skill(self.classe_principale,Skill_vision)
+    def get_skill_vision(self) -> SkillVision:
+        skill = trouve_skill(self.classe_principale,SkillVision)
         if skill is None:
             raise ValueError("Un agissant n'a pas de skill de vision !")
         return skill
@@ -223,19 +230,17 @@ class Agissant(NonSuperposable,Mobile): #Tout agissant est un cadavre, tout cada
             # Partie auras à retravailler         /!\ Qu'est-ce que je voulais retravailler là ?
             skills = self.classe_principale.debut_tour()
             for skill in skills :
-                if isinstance(skill,Skill_aura):
+                if isinstance(skill,SkillAura):
                     effet = skill.utilise()
                     self.effets.append(effet)
                 # Quels autres skills peuvent tomber dans cette catégorie ?
             #Et les effets. Vous les voyez tous les beaux enchantements qui nous renforcent ?
             for i in range(len(self.effets)-1,-1,-1) :
                 effet = self.effets[i]
-                if isinstance(effet,OnDebutTour):
-                    effet.execute(self) #On exécute divers effets (dont les auras qu'on vient de rajouter au dessus)
                 if isinstance(effet,TimeLimited):
                     effet.wait()
-                if effet.phase == "affichage": #L'affichage se fait en fin de tour
-                    self.effets.remove(effet)
+                if isinstance(effet,OnDebutTourAgissant):
+                    effet.debut_tour(self) #On exécute divers effets (dont les auras qu'on vient de rajouter au dessus)
         else:
             raise ValueError("Oups, je ne suis pas vivant, je ne peux pas débuter mon tour !")
 
@@ -250,8 +255,14 @@ class Agissant(NonSuperposable,Mobile): #Tout agissant est un cadavre, tout cada
     def post_decision(self):
         #On a pris de bonnes décisions pour ce nouveau tour ! On va bientôt pouvoir agir, mais avant ça, peut-être quelques effets à activer ?
         for effet in self.effets:
-            if isinstance(effet,OnPostDecision):
-                effet.execute(self) #On exécute divers effets
+            if isinstance(effet,OnPostDecisionAgissant):
+                effet.post_decision(self) #On exécute divers effets
+
+    def confus(self, taux_erreur:float):
+        #On a été rendu condus par quelque chose.
+        if isinstance(self.action,Deplace):
+            if random.random() < taux_erreur:
+                self.action.direction = random.choice([dir for dir in crt.Direction if dir is not self.action.direction])
 
     # Les agissants agissent, les items projetés se déplacent, éventuellement explosent.
     def on_action(self):
@@ -264,29 +275,29 @@ class Agissant(NonSuperposable,Mobile): #Tout agissant est un cadavre, tout cada
         attaques:List[Attaque] = []
         dopages:List[Dopage] = []
         for effet in self.effets:
-            if isinstance(effet,OnPostAction): #Les protections (générales) par exemple
-                effet.execute(self)
+            if isinstance(effet,OnPostActionAgissant): #Les protections (générales) par exemple
+                effet.post_action(self)
             elif isinstance(effet,Dopage):
                 dopages.append(effet)
             elif isinstance(effet,Attaque):
                 attaques.append(effet)
         for attaque in attaques :
             for dopage in dopages:
-                dopage.execute(attaque)
+                attaque.dope(dopage) #C'est dans ce sens là pour deux raisons : 1) pouvoir doper proprement les attaques multiples 2) pouvoir ajouter d'autres sortes de dopages (non multiplicatifs)
             attaque.execute() #C'est à dire qu'on attaque autour de nous. On n'en est pas encore à subir.
 
     # Tout le monde s'est préparé, a placé ses attaques sur les autres, etc. Les cases ont protégé leurs occupants.
 
     def pre_attack(self):
         #On est visé par plein d'attaques ! Espérons qu'on puisse se protéger.
-        attaques:List[Attaque_particulier] = []
+        attaques:List[AttaqueParticulier] = []
         on_attaques:List[OnAttack] = []
         for effet in self.effets:
             if isinstance(effet,OnAttack): #Principalement les effets qui agissent sur les attaques
                 on_attaques.append(effet)
-            elif isinstance(effet,Attaque_particulier):
+            elif isinstance(effet,AttaqueParticulier):
                 attaques.append(effet)
-        skill:Optional[Skill_defense] = trouve_skill(self.classe_principale,Skill_defense)
+        skill:Optional[SkillDefense] = trouve_skill(self.classe_principale,SkillDefense)
         taux = 1
         if skill is not None :
             taux *= skill.utilise()
@@ -309,22 +320,18 @@ class Agissant(NonSuperposable,Mobile): #Tout agissant est un cadavre, tout cada
             #Quelques effets avant la fin du tour (maladie, soin, tout ça tout ça...)
             for i in range(len(self.effets)-1,-1,-1) :
                 effet = self.effets[i]
-                if isinstance(effet,On_fin_tour):
-                    effet.execute(self)
-                elif isinstance(effet,Maladie):
-                    effet.contagion(self)
-                if effet.phase == "terminé":
-                    self.effets.remove(effet)
+                if isinstance(effet,OnFinTourAgissant):
+                    effet.fin_tour(self)
             #Il est temps de voir si on peut encore recoller les morceaux.
         else:
             raise ValueError("Oups, je ne suis pas vivant, je ne peux pas finir mon tour !")
         if self.etat == EtatsAgissants.VIVANT:
             if self.statistiques.pv <= 0 :
-                immortel:Optional[Skill_immortel] = trouve_skill(self.classe_principale,Skill_immortel)
+                immortel:Optional[SkillImmortel] = trouve_skill(self.classe_principale,SkillImmortel)
                 if immortel is not None :
                     immortel.utilise()
                 else :
-                    essence:Optional[Skill_essence_magique] = trouve_skill(self.classe_principale,Skill_essence_magique)
+                    essence:Optional[SkillEssenceMagique] = trouve_skill(self.classe_principale,SkillEssenceMagique)
                     if essence is not None :
                         cout = essence.utilise(self.statistiques.pv)
                         if self.peut_payer(cout):
@@ -352,28 +359,28 @@ class NoOne(Agissant):
         self.esprit = NOBODY
 
     def __equal__(self, other:Any):
-        if isinstance(other,NoOne):
-            return True
-        else:
-            return False
+        return isinstance(other,NoOne)
+    
+from ...esprit.esprit import NOBODY
         
 NOONE = NoOne()
 
 # Imports utilisés dans le code (il y en a beaucoup !!!)
-from ...effet.action.attaque import Attaque
+from ...action.attaque import Attaque
 from ..entitee import Entitee
 from .vue.vue import voit_vue
-from .etats import EtatsAgissants
-from ...effet.action.action import Action
-from ...effet.action.magie.magie import Magie
-from ...esprit.esprit import NOBODY
-from ..item.Cadavre import Cadavre
-from ..item.equippement.role.Defensif.Defensif import Defensif
+from ...commons.etats_agissant import EtatsAgissants
+from ...action.action import Action
+from ...action.magie.magie import Magie
+from ..item.cadavre import Cadavre
+from ..item.equippement.role.defensif.defensif import Defensif
 from .inventaire import Inventaire
-from ...systeme.skill.skill import Skill_intrasec, Skill_extra
+from ...systeme.skill.skill import SkillIntrasec, SkillExtra
 from ...systeme.skill.actif import SkillAttaqueArme, SkillAttaque, SkillDeplacement, SkillsMagiques
-from ...systeme.skill.passif import Skill_magie_infinie, Skill_defense, Skill_immortel, Skill_essence_magique, Skill_vision, Skill_aura
+from ...systeme.skill.passif import SkillMagieInfinie, SkillDefense, SkillImmortel, SkillEssenceMagique, SkillVision, SkillAura
 from ...systeme.classe.classes import trouve_skill
-from ...effet.sante.maladies.maladie import Maladie
-from ...effet.attaque.attaque import Attaque_particulier
-from ...effet.effets_divers import Dopage, Reserve_mana
+from ...effet.attaque.attaque import AttaqueParticulier
+from ...effet.agissant.economie import ReserveMana
+from ...effet.agissant.agissants import Dopage
+from .statistiques import Statistiques
+from ...systeme.classe.classe_principale import ClassePrincipale

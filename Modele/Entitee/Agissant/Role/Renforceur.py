@@ -20,12 +20,12 @@ class Renforceur(Mage):
             new_cibles = sorted(cibles, key=itemgetter(0))
             skill = self.get_skill_magique()
             action = skill.fait(self,self.caste())
-            assert isinstance(action,Cible_agissant)
+            assert isinstance(action,CibleAgissant)
             action.cible = new_cibles[-1][-1]
             self.fait(action)
             defaut = "soutien"
         return defaut
 
 # Imports utilisés dans le code
-from ....effet.action.magie.magie import Cible_agissant
+from ....action.magie.magie import CibleAgissant
 from operator import itemgetter

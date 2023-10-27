@@ -5,12 +5,12 @@ import carte as crt
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ...entitee.agissant.agissant import Agissant
-    from ...effet.action.magie.magie import Magie
+    from ...action.magie.magie import Magie
     from ...entitee.item.equippement.degainable.degainable import Arme
-    from ...effet.action.action_skill import Action_skill, Derobe, Blocage, Ramasse, Alchimie
-    from ...effet.action.attaque import Attaque, AttaqueArme
-    from ...effet.action.deplacement import Marche
-    from ...effet.action.action_skill import Ramasse
+    from ...action.action_skill import ActionSkill, Derobe, Blocage, Ramasse, Alchimie
+    from ...action.attaque import Attaque, AttaqueArme
+    from ...action.deplacement import Marche
+    from ...action.action_skill import Ramasse
 
 # Imports des classes parentes
 from .skill import Skill
@@ -19,7 +19,7 @@ class Actif(Skill):
     """
     Les skills qui genèrent les actions.
     """
-    def fait(self,agissant:Agissant) -> Action_skill:
+    def fait(self,agissant:Agissant) -> ActionSkill:
         """Fait l'action"""
         raise NotImplementedError
 

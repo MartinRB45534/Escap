@@ -1,2 +1,2 @@
-from .Parchemin import *
-from .Parchemins import *
+from .parchemin import *
+from .parchemins import *

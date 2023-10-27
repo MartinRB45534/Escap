@@ -1,0 +1,3 @@
+[TYPECHECK]
+# Ignore pygame and networkx modules
+ignored-modules=pygame,networkx

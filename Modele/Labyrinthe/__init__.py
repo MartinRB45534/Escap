@@ -4,9 +4,6 @@ Le module labyrinthe contient les classes qui définissent les murs et les passa
 
 from .absent import *
 from .case import *
-from .deplacement import *
 from .extrait import *
-from .forme import *
 from .labyrinthe import *
 from .mur import *
-from .passage import *

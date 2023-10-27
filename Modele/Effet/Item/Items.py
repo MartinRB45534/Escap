@@ -1,37 +1,60 @@
+
+"""Contient les classes des effets des items."""
 from __future__ import annotations
 from typing import TYPE_CHECKING
+
+# Imports des classes parentes
+from .item import EffetItem, EffetArme
+from ..timings import OnFinTourItem
+
+# Imports des valeurs par défaut des paramètres
+from ...commons.elements import Element
+
+
+# Imports utilisés dans le code
+from ..attaque.attaque import AttaqueCase
+from ...commons import Deplacement
+from ...commons import Passage
+from ...commons import Forme
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ...entitee.item.item import Item
-    from ...entitee.item.equippement.degainable import Arme
-    from .item import OnHit
 
-# Imports des classes parentes
-from ...effet import OnTick
-from .item import EffetItem
+class Sursis(OnFinTourItem):
+    """L'effet de sursis d'un projectile perçant qui a jusqu'à la fin du tour pour tuer l'agissant sur sa case."""
+    def fin_tour(self, item: Item) -> None:
+        if item.labyrinthe.position_case[item.position].agissant is not None:
+            item.heurte()
 
-class Effet_arme(EffetItem):
-    """Effet qui est placé sur une arme."""
-    def __init__(self, item:Arme):
-        self.item = item
+class OnHit(EffetItem):
+    """La classe des effets qui se déclenchent quand un projectile heurte un agissant ou un mur."""
+    def __init__(self,portee:float,degats:float,element:Element=Element.TERRE):
+        EffetItem.__init__(self)
+        self.affiche = False
+        self.portee = portee
+        self.degats = degats
+        self.element = element
 
-class Effet_tranchant(OnTick, Effet_arme):
+    def hit(self,item:Item):
+        """L'effet est déclenché quand l'item heurte un agissant ou un mur."""
+        zone = item.labyrinthe.a_portee(item.position,self.portee,Deplacement.SPATIAL,Forme.CERCLE,Passage(False,False,False,True,False))
+        for position in zone:
+            item.labyrinthe.get_case(position).effets.add(AttaqueCase(item.lanceur,self.degats,self.element,"distance"))
+
+class EffetTranchant(EffetArme):
     """Effet qui modifie le tranchant d'une arme (en positif ou négatif)."""
     def modifie_tranchant(self, tranchant:float) -> float:
+        """Modifie la stat tranchant de l'arme."""
         raise NotImplementedError
 
-class Effet_portee(OnTick, Effet_arme):
+class EffetPortee(EffetArme):
     """Effet qui modifie la portée d'une arme (en positif ou négatif)."""
     def modifie_portee(self, portee:float) -> float:
+        """Modifie la stat portée de l'arme."""
         raise NotImplementedError
 
-class Effet_bombe(OnTick, EffetItem):
+class EffetBombe(OnHit):
     """Enchantement qui confère des propriétés explosives à un item."""
-    def __init__(self,item:Item,effet:OnHit):
-        self.item = item
-        self.effet = effet
-        self.item.effets.append(self.effet)
-
-    def execute(self) -> None:
-        pass
+    def __init__(self,portee:float,degats:float,element:Element=Element.TERRE):
+        OnHit.__init__(self,portee,degats,element)

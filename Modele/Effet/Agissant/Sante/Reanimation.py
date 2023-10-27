@@ -2,39 +2,33 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
 import carte as crt
 
+# Imports des classes parentes
+from ...timings import OnFinTourCadavre
+
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ....entitee.item.Cadavre import Cadavre
+    from ....entitee.item.cadavre import Cadavre
     from ....esprit.esprit import Esprit
 
-# Imports des classes parentes
-from ...effet import OneShot
-from ...item.item import EffetItem
-
-class Reanimation(OneShot, EffetItem):
+class Reanimation(OnFinTourCadavre):
     """Un effet de réanimation. Généralement placé sur le cadavre par une magie de réanimation de zone ou un skill de réanimation."""
-    def __init__(self,cadavre:Cadavre,taux:float,esprit:Optional[Esprit]):
-        self.magie = cadavre
+    def __init__(self,taux:float,esprit:Optional[Esprit]):
         self.taux = taux
         self.esprit = esprit
 
-    def action(self):
-        agissant = self.magie.agissant
+    def fin_tour(self,cadavre:Cadavre):
+        agissant = cadavre.agissant
         agissant.statistiques.pv = agissant.statistiques.pv_max*self.taux
         agissant.etat = EtatsAgissants.VIVANT
-        self.magie.etat = EtatsItems.BRISE
-        self.magie.labyrinthe.position_case[self.magie.position].agissant = agissant
-        agissant.position = self.magie.position
-        self.magie.position = crt.POSITION_ABSENTE
+        cadavre.etat = EtatsItems.BRISE
+        cadavre.labyrinthe.position_case[cadavre.position].agissant = agissant
+        agissant.position = cadavre.position
+        cadavre.position = crt.POSITION_ABSENTE
         if self.esprit is not None:
-            if agissant.esprit == NOBODY:
+            if not agissant.esprit: # NOBODY is falsy
                 agissant.esprit.retire_corp(agissant)
             self.esprit.ajoute_corp(agissant)
 
-    def execute(self):
-        self.action()
-
 # Imports utilisés dans le code
-from ....entitee.agissant.etats import EtatsAgissants
-from ....entitee.item.etats import EtatsItems
-from ....esprit.esprit import NOBODY
+from ....commons.etats_agissant import EtatsAgissants
+from ....commons.etats_item import EtatsItems

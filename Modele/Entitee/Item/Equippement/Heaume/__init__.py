@@ -1,2 +1,2 @@
-from .Heaume import *
-from .Heaumes import *
+from .heaume import *
+from .heaumes import *

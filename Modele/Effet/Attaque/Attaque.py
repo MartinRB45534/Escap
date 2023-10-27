@@ -1,120 +1,64 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
 import carte as crt
+from modele.labyrinthe.case import Case
+
+# Imports des classes parentes
+from ..case.case import EffetCase
+from ..agissant.agissant import EffetAgissant
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ...entitee.agissant.agissant import Agissant
     from ...labyrinthe.case import Case
-    from ...systeme.elements import Element
+    from ...commons.elements import Element
 
-# Imports des classes parentes
-from ..effet import OneShot, Delaye
+# Un attaque se déroule en trois temps : l'action (sur l'attaquant), l'attaque (sur les cases), et l'attaque particulière (sur les agissants).
 
-class AttaqueCase(OneShot):
-    """L'effet d'attaque dans sa version intermédiaire. Créée par une attaque (version générale), chargé d'attacher une attaque particulière aux agissants de la case, en passant d'abord les défenses de la case. Attachée à la case."""
-    def __init__(self,responsable:Agissant,degats:float,element:Element,distance:str="contact",direction:Optional[crt.Direction] = None,autre:Optional[str]=None,taux_autre:Optional[float]=None):
-        self.affiche = True
-        self.phase = "démarrage"
+class AttaqueCase(EffetCase):
+    """L'effet d'attaque dans sa version intermédiaire. Créée par une attaque (version générale), chargé d'attacher une attaque particulière aux agissants de la case, en passant d'abord les défenses de la case. Attaché à la case."""
+    def __init__(self,responsable:Agissant,degats:float,element:Element,distance:str="contact",direction:Optional[crt.Direction] = None,taux_perce:float=0,inverse:bool=False):
+        EffetCase.__init__(self)
         self.responsable = responsable
         self.degats = degats
         self.element = element
         self.direction = direction
-        self.autre = autre
-        self.taux_autre = taux_autre
+        self.taux_perce = taux_perce
+        self.inverse = inverse
         self.distance = distance
 
-    def action(self,case:Case):
+    def attaque(self,case:Case):
+        """L'attaque est lancée sur la case."""
         victime_potentielle = case.agissant
         if victime_potentielle is not None and victime_potentielle not in self.responsable.esprit.corps:
-            if self.autre is None :
-                victime_potentielle.effets.append(Attaque_particulier(self.responsable,self.degats,self.element,self.distance,self.direction))
-            elif self.autre == "piercing":
-                if self.taux_autre is not None:
-                    victime_potentielle.effets.append(Attaque_percante(self.responsable,self.degats,self.element,self.distance,self.direction,self.taux_autre))
-                else:
-                    warn("L'attaque est percante mais le taux de percement n'est pas défini !")
+            victime_potentielle.effets.append(AttaqueParticulier(self.responsable,self.degats,self.element,self.distance,self.direction,self.taux_perce,self.inverse))
 
-    def execute(self,case:Case):
-        if self.phase == "démarrage":
-            self.action(case)
-            self.termine()
+class AttaqueCaseDelayee(AttaqueCase):
+    """L'attaque est délayée, c'est à dire qu'elle ne s'effectue pas tout de suite. Elle sera déclenchée par un autre effet."""
+    def __init__(self,responsable:Agissant,degats:float,element:Element,distance:str="distance",direction:Optional[crt.Direction] = None,taux_perce:float=0,inverse:bool=False):
+        AttaqueCase.__init__(self,responsable,degats,element,distance,direction,taux_perce,inverse)
+        self.attente = True
 
-class AttaqueCase_delayee(AttaqueCase,Delaye):
-    def __init__(self,responsable:Agissant,degats:float,element:Element,distance:str="distance",direction:Optional[crt.Direction] = None,autre:Optional[str]=None,taux_autre:Optional[float]=None):
-        AttaqueCase.__init__(self,responsable,degats,element,distance,direction,autre,taux_autre)
-        self.affiche = False
+    def attaque(self, case: Case):
+        if not self.attente:
+            super().attaque(case)
 
-    def execute(self,case:Case):
-        if self.phase == "démarrage":
-            pass
-        elif self.phase == "en cours":
-            self.affiche = True
-            self.action(case)
-            self.termine()
+    def termine(self) -> bool:
+        return not self.attente
 
-class Attaque_particulier(OneShot):
+class AttaqueParticulier(EffetAgissant):
     """L'effet d'attaque dans sa version particulière. Créée par une attaque (version intermèdiaire), chargé d'infligé les dégats, en passant d'abord les défenses de l'agissant. Attachée à la victime."""
-    def __init__(self,responsable:Agissant,degats:float,element:Element,distance:str="contact",direction:Optional[crt.Direction] = None):
-        self.affiche = True
-        self.phase = "démarrage"
+    def __init__(self,responsable:Agissant,degats:float,element:Element,distance:str="contact",direction:Optional[crt.Direction] = None,taux_perce:float = 0,inverse:bool=False):
+        EffetAgissant.__init__(self)
         self.responsable = responsable
-        self.degats = degats
+        self.degats = degats*(1-taux_perce)
+        self.degats_imbloquables = degats*taux_perce #Ces dégats ne seront pas affectés par les bloquages.
         self.element = element
         self.direction = direction
         self.distance = distance
+        self.inverse = inverse #Si True, l'affinité à l'élément est pénalisante et l'immunité est ignorée.
 
-    def action(self,victime:Agissant):
-        victime.subit(self.degats,self.element)
-
-class Attaque_percante(Attaque_particulier): #Attention ! Perçant pour une attaque signifie qu'elle traverse les defenses. C'est totalement différend pour un item !
-    """L'effet d'attaque dans sa version particulière. Créée par une attaque (version générale), chargé d'infligé les dégats, en passant d'abord les défenses de la case puis celles de l'agissant. Attachée à la victime. En prime, une partie de ses dégats ne sont pas bloquables."""
-    def __init__(self,responsable:Agissant,degats:float,element:Element,distance:str="contact",direction:Optional[crt.Direction] = None,taux_perce:float = 0):
-        self.affiche = True
-        self.phase = "démarrage"
-        self.responsable = responsable
-        self.degats = degats * taux_perce
-        self.degats_imbloquables = degats - self.degats #Ces dégats ne seront pas affectés par les bloquages.
-        self.element = element
-        self.direction = direction
-        self.distance = distance
-
-    def action(self,victime:Agissant):
+    def attaque(self, agissant:Agissant):
+        """L'attaque est lancée sur l'agissant."""
         self.degats += self.degats_imbloquables
-        victime.subit(self.degats,self.element)
-
-class Attaque_lumineuse_case(AttaqueCase):
-    """L'effet de purification. Une attaque de 'lumière'."""
-    """L'effet d'attaque dans sa version intermédiaire. Créée par une attaque (version générale), chargé d'attacher une attaque particulière aux agissants de la case, en passant d'abord les défenses de la case. Attachée à la case."""
-    def __init__(self,responsable:Agissant,degats:float):
-        self.affiche = True
-        self.phase = "démarrage"
-        self.responsable = responsable
-        self.degats = degats
-
-    def action(self,case:Case):
-        victime_potentielle = case.agissant
-        if victime_potentielle is not None and victime_potentielle not in self.responsable.esprit.corps:
-            if self.autre is None :
-                victime_potentielle.effets.append(Attaque_lumineuse_particulier(self.responsable,self.degats))
-            else:
-                warn("L'attaque lumineuse n'est pas censée avoir d'effet autre !")
-
-    def execute(self,case:Case):
-        if self.phase == "démarrage":
-            self.action(case)
-            self.termine()
-
-class Attaque_lumineuse_particulier(Attaque_particulier):
-    """L'effet d'attaque dans sa version particulière. Créée par une attaque (version intermèdiaire), chargé d'infligé les dégats, en passant d'abord les défenses de l'agissant. Attachée à la victime."""
-    def __init__(self,responsable:Agissant,degats:float):
-        self.affiche = True
-        self.phase = "démarrage"
-        self.responsable = responsable
-        self.degats = degats
-
-    def action(self,victime:Agissant):
-        victime.subit(self.degats*victime.affinite(Element.OMBRE)**2,Element.OMBRE)
-
-# Imports utilisés dans le code
-from warnings import warn
+        agissant.subit(self.degats,self.element,self.inverse)

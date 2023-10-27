@@ -1,14 +1,17 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-# Imports utilisés uniquement dans les annotations
+# Imports des classes parentes
+from ..effet import Effet
+from ..timings import TimeLimited
+
 if TYPE_CHECKING:
     from ...entitee.agissant.agissant import Agissant
 
-# Imports des classes parentes
-from ..effet import Effet
-
-class Effet_agissant(Effet):
+class EffetAgissant(Effet):
     """Effet qui est placé sur un agissant."""
-    def __init__(self, agissant:Agissant):
-        self.agissant = agissant
+
+class TimeLimitedAgissant(TimeLimited):
+    """Un TimeLimited qui a quelque chose à faire, sur un agissant"""
+    def action(self,agissant:Agissant):
+        """Une action exécutée sur un agissant."""

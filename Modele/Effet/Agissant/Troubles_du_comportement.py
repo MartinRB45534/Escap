@@ -1,38 +1,33 @@
+"""
+Quelques effets qui peuvent être appliqués à un agissant, et qui modifient son comportement.
+"""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import random
-import carte as crt
+from modele.entitee.agissant.agissant import Agissant
+
+# Imports des classes parentes
+from ..timings import OnPostActionAgissant, OnPostDecisionAgissant
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ...entitee.agissant.agissant import Agissant
 
-
-# Imports des classes parentes
-from .agissant import Effet_agissant
-from ..effet import OnTick
-
-class Confusion(OnTick, Effet_agissant):
-    """Les enchantements qui provoque des erreurs de direction."""
-    def __init__(self,agissant:Agissant,taux_erreur:float):
-        self.agissant = agissant
+class Confusion(OnPostDecisionAgissant):
+    """Les effets qui provoque des erreurs de direction."""
+    def __init__(self,taux_erreur:float):
         self.taux_erreur = taux_erreur
 
-    def action(self):
-        if isinstance(self.agissant.action, Deplace) :
-            dir_voulue = self.agissant.action.direction
-            if random.random() < self.taux_erreur:
-                dir_possibles = [dir for dir in crt.Direction if dir is not dir_voulue]
-                self.agissant.action.direction = random.choice(dir_possibles)
+    def post_decision(self, agissant: Agissant):
+        # On vérifie que l'agissant a une action, avec une direction
+        agissant.confus(self.taux_erreur)
 
-class EnchantementPochesTrouees(OnTick, Effet_agissant):
-    """Les enchantements qui fait droper des items involontairement."""
-    def __init__(self,agissant:Agissant,taux_drop:float):
-        self.agissant = agissant
+class PochesTrouees(OnPostActionAgissant):
+    """L'effet qui fait droper des items involontairement."""
+    def __init__(self,taux_drop:float):
         self.taux_drop = taux_drop
 
-    def action(self):
+    def post_action(self, agissant: Agissant) -> None:
         if random.random() < self.taux_drop :
-            self.agissant.inventaire.drop_random(self.agissant.labyrinthe.position_case[self.agissant.position])
-
-from ..action.deplacement import Deplace
+            agissant.inventaire.drop_random(agissant.labyrinthe.position_case[agissant.position])

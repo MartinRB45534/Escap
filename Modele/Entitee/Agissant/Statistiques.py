@@ -1,13 +1,12 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Dict, Set
 
+# Imports des valeurs par défaut des paramètres
+from ...commons.elements import Element
+
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from .agissant import Agissant
-    from ...systeme.elements import Element
-
-# Imports des valeurs par défaut des paramètres
-from ...systeme.elements import Element
 
 class Statistiques:
 
@@ -115,14 +114,14 @@ class Statistiques:
     def depense_pm(self, pm:float):
         self.pm -= pm
 
-from ..item.equippement.role.Elementaires import Elementaire
-from ..item.equippement.role.Accelerateur import Accelerateur
-from ..item.equippement.role.Anoblisseur import Anoblisseur
+from ..item.equippement.role.elementaires import Elementaire
+from ..item.equippement.role.accelerateur import Accelerateur
+from ..item.equippement.role.anoblisseur import Anoblisseur
 from ..item.equippement.role.reparateur.reparateur import Reparateur
 from ..item.equippement.role.reparateur_magique.reparateur_magique import Reparateur_magique
-from ...effet.effets_agissants import EffetForce
-from ...effet.effets_agissants import EffetAffinite
-from ...effet.effets_agissants import EffetVision
-from ...effet.effets_agissants import EffetPv
-from ...effet.effets_agissants import EffetPm
-from ...effet.effets_agissants import EffetVitesse
+from ...effet.agissant.statistiques import EffetForce
+from ...effet.agissant.statistiques import EffetAffinite
+from ...effet.agissant.statistiques import EffetVision
+from ...effet.agissant.statistiques import EffetPv
+from ...effet.agissant.statistiques import EffetPm
+from ...effet.agissant.statistiques import EffetVitesse

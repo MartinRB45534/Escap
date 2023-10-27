@@ -2,16 +2,25 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Set, Type
 import carte as crt
 
+# Imports utilisés dans le code
+from ..effet.attaque.attaque import AttaqueCase, AttaqueCaseDelayee
+from ..effet.case.cases import Opacite
+from ..effet.case.aura.auras import AuraElementale, AuraPermanente
+from ..effet.case.protection.protection import Protection
+from ..effet.timings import OnDebutTourCase, OnPostActionCase, TimeLimited #, OnFinTourCase
+from ..entitee.entitee import Mobile, NonSuperposable
+from ..entitee.agissant.agissant import Agissant, NOONE
+from ..entitee.item.item import Item
+from ..systeme.classe.classes import trouve_skill
+from ..systeme.skill.passif import SkillEcrasement
+
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ..effet.effet import Effet
-    from ..effet.auras import Aura
-    from ..entitee.entitee import Mobile, NonSuperposable
-    from ..entitee.agissant.agissant import Agissant
-    from ..entitee.item.item import Item
+    from ..effet.case.aura.aura import Aura
     from ..entitee.decors.decors import Decors
 
-class Case(crt.case):
+class Case(crt.Case):
     """Une case du labyrinthe. Elle peut contenir un agissant, un décors, des items, des effets, des auras, et une aura élémentale."""
     def __init__(self,position:crt.Position, aura_elementale: Type[AuraPermanente], opacite:float = 1, niveau:int = 1):
         super().__init__(position)
@@ -24,24 +33,29 @@ class Case(crt.case):
         self.items:Set[Item] = set() #On peut avoir des items sur la case
         self.effets:Set[Effet] = set() #Les cases ont aussi des effets ! Les auras, par exemple.
         self.auras:Set[Aura] = set() #Les auras sont des effets qui s'appliquent à la case, et qui peuvent être de plusieurs types.
-        self.aura_elementale = aura_elementale(self.niveau) #L'aura élémentale est une aura particulière, qui s'applique à la case et qui peut être de plusieurs types.
+        self.aura_elementale = aura_elementale(self.niveau,NOONE) #L'aura élémentale est une aura particulière, qui s'applique à la case et qui peut être de plusieurs types.
     #Découvrons le déroulé d'un tour, avec case-chan :
 
     def debut_tour(self):
+        """Fonction qui s'exécute au début du tour."""
         #Un nouveau tour commence, qui s'annonce remplit de bonnes surprises et de nouvelles rencontres ! On commence par activer les effets réguliers :
         for effet in self.effets:
-            if isinstance(effet,OnDebutTour):
-                effet.execute(self) #On exécute divers effets
             if isinstance(effet,TimeLimited):
                 effet.wait()
-            if effet.phase == "affichage":
-                self.effets.remove(effet)
+            if isinstance(effet,OnDebutTourCase):
+                effet.debut_tour(self) #On exécute divers effets
 
-    def pseudo_debut_tour(self):
-        pass
+        for aura in self.auras:
+            if isinstance(aura,TimeLimited):
+                aura.wait()
+            if isinstance(aura,OnDebutTourCase):
+                aura.debut_tour(self)
+
+    def pseudo_debut_tour(self): #À quoi ça sert déjà ?
+        """Un faux début de tour"""
 
     #Certains agissants particulièrement tapageurs font un concours de celui qui aura la plus grosse aura (comment ça, cette phrase particulièrement compliquée aura juste servi à faire un jeu de mot sur aura ?)
-    def ajoute_aura(self,auras:Set[Aura]=set(),auras_elementales:Set[AuraElementale]=set()):
+    def ajoute_aura(self,auras:Set[Aura],auras_elementales:Set[AuraElementale]):
         """Fonction qui ajoute un effet d'aura. On décidera de ceux qui s'exécutent plus tard."""
         # Les auras non élémentales s'appliquent si personne n'a d'aura élémentale sur la case (même si l'aura de base de la case a plus de priorité)
         if {aura for aura in self.auras if isinstance(aura, AuraElementale)} == {self.aura_elementale}:
@@ -51,12 +65,13 @@ class Case(crt.case):
             self.auras = auras | auras_elementales # On vire aussi les auras non élémentales qui appartiennent à d'autres gens
 
     def arrive(self,entitee:Mobile):
+        """Une entitée mobile arrive sur la case."""
         if isinstance(entitee,Item):
             entitee.set_position(self.position) #Un item passe quoi qu'il arrive
             if isinstance(self.agissant,NonSuperposable):
-                entitee.heurte_non_superposable(self.agissant) #Mais il heurte les occupants
+                entitee.heurte_agissant() #Mais il heurte les occupants
             elif isinstance(self.decors,NonSuperposable):
-                entitee.heurte_non_superposable(self.decors)
+                entitee.heurte_decors()
             self.items.add(entitee)
             return True
         elif isinstance(entitee,Agissant):
@@ -80,6 +95,7 @@ class Case(crt.case):
         raise TypeError("On ne peut pas ajouter un objet de type "+str(type(entitee))+" sur une case !")
 
     def part(self,entitee:Mobile):
+        """Une entitée mobile part de la case."""
         if isinstance(entitee,Item):
             self.items.remove(entitee)
         elif isinstance(entitee,Agissant):
@@ -91,30 +107,29 @@ class Case(crt.case):
 
     #Tout le monde a fini de se déplacer.
     def post_action(self):
-        on_attaques:Set[OnAttack] = set()
+        """Fonction qui s'exécute après les actions des agissants, puis passe aux attaques."""
+        on_attaques:Set[Protection] = set()
         attaques:Set[AttaqueCase] = set()
 
         for effet in self.effets:
-            if isinstance(effet,OnAttack):
+            if isinstance(effet,Protection):
                 on_attaques.add(effet)
-            elif (isinstance(effet,AttaqueCaseDelayee) and effet.delai > 0):
-                effet.execute(self) #On diminue le délai
+            elif isinstance(effet,AttaqueCaseDelayee) and effet.attente:
+                pass #On attend, pour l'instant
             elif isinstance(effet,AttaqueCase):
                 attaques.add(effet)
-            elif isinstance(effet,OnPostAction): #Les auras non-élémentales sont aussi des OnPostAction
-                effet.execute(self)
-
-        for aura in self.auras:
-            aura.execute(self)
+            elif isinstance(effet,OnPostActionCase):
+                effet.post_action(self)
 
         for attaque in attaques:
             for protection in on_attaques:
-                protection.execute(attaque)
-            attaque.execute(self)
+                protection.protege(attaque)
+            attaque.attaque(self)
 
     def fin_tour(self):
+        """Fonction qui s'exécute à la fin du tour."""
         for effet in self.effets | self.auras:
-            if effet.phase == "terminé":
+            if effet.termine():
                 self.effets.remove(effet)
         if {aura for aura in self.auras if isinstance(aura, AuraElementale)} == set() or max({aura.priorite for aura in self.auras if isinstance(aura, AuraElementale)}) < self.aura_elementale.priorite: # Les auras de feu durent plusieurs tours, mais peuvent aussi être arrivée juste grâce à l'aide d'une aura de terre
             self.auras = {self.aura_elementale} # On remet l'aura de base pour le tour suivant
@@ -122,10 +137,11 @@ class Case(crt.case):
     #Le tour se termine gentiment, et on recommence !
 
     def get_opacite(self):
+        """Calcule l'opacité effective de la case."""
         opacite = self.opacite
         for aura in self.auras:
-            if isinstance(aura, ModificationOpacite):
-                opacite *= aura.coef_opacite
+            if isinstance(aura, Opacite):
+                opacite *= aura.gain_opacite # On pourrait additionner
         return opacite
 
     # def get_infos(self,clees:Set[str]): #Est-ce que ce serait plus clair sous forme de dictionnaire ? Ou d'objet ?
@@ -137,13 +153,6 @@ class Case(crt.case):
     # def get_codes_effets(self) -> List[List[int]]:
     #     effets=[]
     #     for effet in self.effets:
-    #         if isinstance(effet,AttaqueCase_delayee):
+    #         if isinstance(effet,AttaqueCaseDelayee):
     #             effets.append([effet.responsable,effet.delai,effet.degats])
     #     return effets
-
-# Imports utilisés dans le code
-from ..effet.auras import AuraElementale, AuraPermanente, ModificationOpacite
-from ..effet.effet import OnDebutTour, TimeLimited, OnAttack, OnPostAction
-from ..effet.attaque.attaque import AttaqueCase, AttaqueCaseDelayee
-from ..systeme.classe.classes import trouve_skill
-from ..systeme.skill.passif import SkillEcrasement

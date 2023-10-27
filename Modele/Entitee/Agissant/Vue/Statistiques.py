@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from ..statistiques import Statistiques
 
 # Valeurs par défaut des paramètres
-from ....systeme.elements import Element
+from ....commons.elements import Element
 
 class Statistiques_vues:
     def __init__(self, priorite:Optional[float]=None, vitesse:Optional[float]=None, force:Optional[float]=None, proportion_pv:Optional[float]=None, pv_max:Optional[float]=None, pv:Optional[float]=None, regen_pv_max:Optional[float]=None, regen_pv_min:Optional[float]=None, regen_pv:Optional[float]=None, restauration_regen_pv:Optional[float]=None, proportion_pm:Optional[float]=None, pm_max:Optional[float]=None, pm:Optional[float]=None, regen_pm:Optional[float]=None, affinites:Dict[Element,Optional[float]]={element: None for element in Element}, immunites:Set[Element]=set(),):

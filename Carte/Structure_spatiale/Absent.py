@@ -7,6 +7,11 @@ from typing import Set, Any
 from .position import Position
 from .etage import Etage
 
+class Absent:
+    """Classe représentant ce qui n'est pas sur la carte."""
+    def __bool__(self):
+        return False # Absents are falsy (often used in place of None)
+
 class EtageAbsent(Etage):
     """Classe représentant l'étage de la position absente."""
     def __init__(self):

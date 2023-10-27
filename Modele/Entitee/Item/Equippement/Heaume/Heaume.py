@@ -19,4 +19,4 @@ class Heaume(Equippement):
         return SKIN_HEAUME
 
 # Imports utilisés dans le code
-from .....Affichage.skins import SKIN_HEAUME
+from .....affichage.skins import SKIN_HEAUME

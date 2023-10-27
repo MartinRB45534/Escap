@@ -1,40 +1,36 @@
+"""
+Quelques effets de dégats.
+"""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
+
+# Imports des classes parentes
+from ...timings import OnDebutTourAgissant, OnFinTourAgissant
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ....entitee.agissant.agissant import Agissant
-    from ....systeme.elements import Element
+    from ....commons.elements import Element
 
-# Imports des classes parentes
-from ...effet import OnTick, OneShot
-from ..agissant import Effet_agissant
-
-class Degats(OneShot, Effet_agissant):
+class Degats(OnDebutTourAgissant):
     """La classe des effets de dégats."""
-    def __init__(self,agissant:Agissant,responsable:Agissant,element:Element,degats:float):
-        self.agissant = agissant
+    def __init__(self,responsable:Agissant,element:Element,degats:float):
         self.responsable = responsable
         self.element = element
         self.degats = degats
 
-    def action(self):
-        pass
+    def debut_tour(self, agissant: Agissant):
+        agissant.subit(self.degats,self.element)
 
-class Combustion(OnTick, Effet_agissant):
+class Combustion(Degats, OnFinTourAgissant):
     """La classe des effets de combustion (brulure)."""
-    def __init__(self,agissant:Agissant,responsable:Agissant,element:Element,degats:float,reduction:float):
-        self.agissant = agissant
-        self.responsable = responsable
-        self.element = element
-        self.degats = degats
+    def __init__(self,responsable:Agissant,element:Element,degats:float,reduction:float):
+        Degats.__init__(self,responsable,element,degats)
         self.reduction = reduction
 
-    def action(self):
+    def fin_tour(self,_agissant: Agissant):
         self.degats -= self.reduction
-
-    def execute(self):
-        self.action()
 
     def termine(self) -> bool:
         return self.degats <= 0

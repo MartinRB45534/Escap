@@ -19,18 +19,18 @@ class Attaquant_magique_case(Mage):
             new_cibles = sorted(cibles, key=itemgetter(0))
             skill = self.get_skill_magique()
             action = skill.fait(self,self.caste())
-            assert isinstance(action,Cible_case)
+            assert isinstance(action,CibleCase)
             action.cible = new_cibles[-1][-1]
             self.fait(action)
             defaut = "attaque"
         return defaut
 
     def get_impact(self):
-        if isinstance(self.action,Cible_case) and self.action.cible is not None:
+        if isinstance(self.action,CibleCase) and self.action.cible is not None:
             return self.action.cible
         else:
             return super().get_impact()
 
 # Imports utilisés dans le code
-from ....effet.action.magie.magie import Cible_case
+from ....action.magie.magie import CibleCase
 from operator import itemgetter

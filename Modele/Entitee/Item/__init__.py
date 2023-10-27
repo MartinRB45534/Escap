@@ -6,8 +6,6 @@ from .equippement import *
 from .parchemin import *
 from .potion import *
 from .projectile import *
-from .magie import *
 from .cle import *
-from .etats import *
 from .item import *
 from .oeuf import *

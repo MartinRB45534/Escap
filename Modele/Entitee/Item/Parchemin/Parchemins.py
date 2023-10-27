@@ -4,14 +4,14 @@ import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ....effet.action.non_skill import Impregne
-    from ....effet.action.magie.magie import Magie
+    from ....action.non_skill import Impregne
+    from ....action.magie.magie import Magie
     from ....labyrinthe.labyrinthe import Labyrinthe
 
 # Imports des classes parentes
-from .Parchemin import Parchemin
+from .parchemin import Parchemin
 
-class Parchemin_vierge(Parchemin):
+class ParcheminVierge(Parchemin):
     """Un parchemin qui peut être imprégné d'une magie."""
     def __init__(self,labyrinthe:Labyrinthe,impregne:Impregne|Magie,position:crt.Position=crt.POSITION_ABSENTE):
         Item.__init__(self,labyrinthe,position)

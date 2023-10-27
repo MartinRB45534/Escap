@@ -1019,4 +1019,4 @@ NOBODY = Mindless()
 # from ..esprit.representation_spatiale import Salle, Couloir, Zone_inconnue
 from .vision.vision import Vision
 from ..entitee.agissant.agissant import Agissant
-from ..entitee.agissant.etats import EtatsAgissants
+from ..commons.etats_agissant import EtatsAgissants

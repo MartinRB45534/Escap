@@ -5,7 +5,7 @@ import carte as crt
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ......labyrinthe.labyrinthe import Labyrinthe
-    from ......systeme.elements import Element
+    from ......commons.elements import Element
 
 # Imports des classes parentes
 from ..degainable import Arme

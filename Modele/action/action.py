@@ -1,9 +1,13 @@
+"""
+Contient la classe Action.
+"""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, List
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...entitee.agissant.agissant import Agissant
+    from ..entitee.agissant.agissant import Agissant
 
 # Pas de classe parente
 
@@ -40,13 +44,12 @@ class Action:
 
     def interrompt(self):
         """L'action est interrompue."""
-        pass
 
     def action(self):
         """L'action est appelée à certains moments."""
-        pass
 
     def get_vitesse(self):
+        """Retourne la vitesse de l'agissant."""
         return self.agissant.vitesse
 
     def set_repete(self):
@@ -63,7 +66,7 @@ class Action:
 
     # Il faut que l'action soit affichée, comme un skin par-dessus l'agissant
 
-class Non_repetable(Action):
+class NonRepetable(Action):
     """
     Action qui ne peut pas se répéter (ramasser un objet, rescussiter un allié, etc.)
     """
@@ -73,7 +76,7 @@ class Non_repetable(Action):
     def unset_repete(self):
         return False
 
-class Action_final(Action):
+class ActionFinal(Action):
     """
     Action qui se fait à la fin.
     """
@@ -83,7 +86,7 @@ class Action_final(Action):
         self.action()
         return res
 
-class Action_initial(Action):
+class ActionInitial(Action):
     """
     Action qui se fait au début.
     """
@@ -92,8 +95,8 @@ class Action_initial(Action):
         if self.latence == 0:
             self.action()
         return super().execute()
-        
-class Action_continu(Action):
+
+class ActionContinu(Action):
     """
     Action qui se fait à chaque tour.
     """
@@ -104,8 +107,8 @@ class Action_continu(Action):
         if self.latence >= self.latence_max:
             return self.termine()
         return False
-    
-class Action_fractionnaire(Action):
+
+class ActionFractionnaire(Action):
     """
     Action qui se fait un nombre fixe de fois, régulièrement.
     """
@@ -124,13 +127,13 @@ class Action_fractionnaire(Action):
         if self.latence >= self.latence_max:
             return self.termine()
         return False
-    
+
     def reinit(self):
         """L'action est réinitialisée."""
         self.rempli = 0
         super().reinit()
-    
-class Action_parcellaire(Action):
+
+class ActionParcellaire(Action):
     """
     Action qui se fait un nombre fixe de fois, irrégulièrement.
     """
@@ -148,7 +151,7 @@ class Action_parcellaire(Action):
         if self.latence >= self.latence_max:
             return self.termine()
         return False
-    
+
     def reinit(self):
         """L'action est réinitialisée."""
         self.rempli = 0

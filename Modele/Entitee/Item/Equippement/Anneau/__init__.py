@@ -1,2 +1,2 @@
-from .Anneau import *
-from .Anneaux import *
+from .anneau import *
+from .anneaux import *

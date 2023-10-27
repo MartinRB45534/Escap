@@ -7,8 +7,8 @@ if TYPE_CHECKING:
     from .....labyrinthe.labyrinthe import Labyrinthe
 
 # Imports des classes parentes
-from .Heaume import Heaume
-from ..role.Defensif.Defensifs import Defensif_proportion
+from .heaume import Heaume
+from ..role.defensif.defensifs import Defensif_proportion
 
 class Heaume_type(Heaume,Defensif_proportion):
     """Un heaume type : défend contre les attaques."""

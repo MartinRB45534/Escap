@@ -1,20 +1,20 @@
+"""
+Les auras sont des effets qui sont placés sur une case.
+"""
+
 from __future__ import annotations
-
-from Modele.labyrinthe.case import Case
-
-# Pas d'imports utilisés uniquement dans les annotations
+from typing import TYPE_CHECKING
 
 # Imports des classes parentes
-from ..case import Effet_case
-from ...effet import OnTick
+from ..case import EffetCase
 
-class Aura(Effet_case, OnTick):
+if TYPE_CHECKING:
+    from ....entitee.agissant.agissant import Agissant
+
+class Aura(EffetCase):
     """Effet qui est placé sur une case."""
-    def __init__(self, case: Case, niveau: int):
-        self.case = case
+    def __init__(self, niveau: int, responsable: Agissant):
+        EffetCase.__init__(self)
         self.niveau = niveau
         self.priorite = 0
-        self.responsable = NOONE
-
-# Imports utilisés dans le code
-from ....entitee.agissant.agissant import NOONE
+        self.responsable = responsable

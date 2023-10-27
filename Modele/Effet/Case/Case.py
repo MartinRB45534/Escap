@@ -1,14 +1,9 @@
-from __future__ import annotations
-from typing import TYPE_CHECKING
+"""Contient la classe EffetCase."""
 
-# Imports utilisés uniquement dans les annotations
-if TYPE_CHECKING:
-    from ...labyrinthe.case import Case
+from __future__ import annotations
 
 # Imports des classes parentes
 from ..effet import Effet
 
-class Effet_case(Effet):
+class EffetCase(Effet):
     """Effet qui est placé sur une case."""
-    def __init__(self, case:Case):
-        self.case = case

@@ -4,14 +4,14 @@ import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ....systeme.classe.classe_principale import Classe_principale
+    from ....systeme.classe.classe_principale import ClassePrincipale
     from .inventaire import Inventaire_vu
     from .statistiques import Statistiques_vues
     from ..agissant import Agissant
     from ..espece import Espece
 
 class AgissantVu:
-    def __init__(self, ID:int, identite:Optional[str], statistiques:Statistiques_vues, espece: Espece, niveau:int, inventaire:Inventaire_vu, dir_regard:crt.Direction, classe_principale:Optional[Classe_principale]=None):
+    def __init__(self, ID:int, identite:Optional[str], statistiques:Statistiques_vues, espece: Espece, niveau:int, inventaire:Inventaire_vu, dir_regard:crt.Direction, classe_principale:Optional[ClassePrincipale]=None):
         self.ID = ID
         self.identite = identite
         self.statistiques = statistiques

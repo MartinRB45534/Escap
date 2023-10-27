@@ -8,9 +8,7 @@ if TYPE_CHECKING:
     from .case import Case
     from .mur import Mur, MurImpassable
     from ..entitee.entitee import Mobile
-    from .deplacement import Deplacement
-    from .forme import Forme
-    from .passage import Passage
+    from ..commons import Deplacement, Forme, Passage
     from .extrait import Extrait
 
 class Labyrinthe(crt.Labyrinthe):

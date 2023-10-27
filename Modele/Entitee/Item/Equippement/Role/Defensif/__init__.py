@@ -1,2 +1,2 @@
-from .Defensif import *
-from .Defensifs import *
+from .defensif import *
+from .defensifs import *

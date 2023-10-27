@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ......effet.attaque.attaque import Attaque_particulier
+    from ......effet.attaque.attaque import AttaqueParticulier
 
 # Imports des classes parentes
 from ...equippement import Equippement
@@ -11,5 +11,5 @@ from ...equippement import Equippement
 class Defensif(Equippement):
     """La classe des équipements défensifs. Réduit les dégats."""
 
-    def intercepte(self,attaque:Attaque_particulier):
+    def intercepte(self,attaque:AttaqueParticulier):
         pass

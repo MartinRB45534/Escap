@@ -23,7 +23,7 @@ class Multi_soigneur(Soigneur,Multi_mage):
                 new_cibles = sorted(cibles, key=itemgetter(0))
                 skill = self.get_skill_magique()
                 action = skill.fait(self,self.caste())
-                assert isinstance(action,Cible_agissant)
+                assert isinstance(action,CibleAgissant)
                 action.cible = new_cibles[0][-1]
                 self.fait(action)
                 defaut = "soin"
@@ -31,7 +31,7 @@ class Multi_soigneur(Soigneur,Multi_mage):
             if self.peut_multi_caster():
                 skill = self.get_skill_magique()
                 action = skill.fait(self,self.multi_caste())
-                assert isinstance(action,Cible_agissants)
+                assert isinstance(action,CibleAgissants)
                 action.cible = [cible[-1] for cible in cibles]
                 self.fait(action)
                 defaut = "soin"
@@ -39,7 +39,7 @@ class Multi_soigneur(Soigneur,Multi_mage):
                 new_cibles = sorted(cibles, key=itemgetter(0))
                 skill = self.get_skill_magique()
                 action = skill.fait(self,self.caste())
-                assert isinstance(action,Cible_agissant)
+                assert isinstance(action,CibleAgissant)
                 action.cible = new_cibles[0][-1]
                 self.fait(action)
                 defaut = "soin"
@@ -47,5 +47,5 @@ class Multi_soigneur(Soigneur,Multi_mage):
 
 # Imports utilisés dans le code
 from operator import itemgetter
-from ....effet.action.magie.magie import Cible_agissant,Cible_agissants
-from ..etats import EtatsAgissants
+from ....action.magie.magie import CibleAgissant,CibleAgissants
+from ....commons.etats_agissant import EtatsAgissants

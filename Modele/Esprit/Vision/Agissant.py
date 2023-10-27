@@ -5,8 +5,8 @@ import carte as crt
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ...entitee.agissant.vue.agissant import AgissantVu
-    from .Position import VisionPosition
-    from .Vision import Vision
+    from .position import VisionPosition
+    from .vision import Vision
 
 class VisionAgissant:
     def __init__(self, agissant:Optional[AgissantVu],tour:int,labyrinthe:Vision):
@@ -33,4 +33,4 @@ class VisionAgissant:
         self.agissants[tour] = agissant
 
 # Imports utilisés dans le code
-from .Position import POSITION_INCONNUE
+from .position import POSITION_INCONNUE

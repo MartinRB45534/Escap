@@ -21,4 +21,4 @@ class Armure(Equippement):
         return SKIN_ARMURE
 
 # Imports utilisés dans le code
-from .....Affichage.skins import SKIN_ARMURE
+from .....affichage.skins import SKIN_ARMURE

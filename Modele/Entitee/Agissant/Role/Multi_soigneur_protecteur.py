@@ -20,7 +20,7 @@ class Multi_soigneur_protecteur(Multi_soigneur):
             if self.peut_caster():
                 skill = self.get_skill_magique()
                 action = skill.fait(self,self.caste())
-                assert isinstance(action,Cible_agissant)
+                assert isinstance(action,CibleAgissant)
                 action.cible = cibles[0][-1]
                 self.fait(action)
                 defaut = "soin"
@@ -28,7 +28,7 @@ class Multi_soigneur_protecteur(Multi_soigneur):
             if self.peut_multi_caster():
                 skill = self.get_skill_magique()
                 action = skill.fait(self,self.multi_caste())
-                assert isinstance(action,Cible_agissants)
+                assert isinstance(action,CibleAgissants)
                 action.cible = [cible[-1] for cible in cibles]
                 self.fait(action)
                 defaut = "soin"
@@ -36,7 +36,7 @@ class Multi_soigneur_protecteur(Multi_soigneur):
                 new_cibles = sorted(cibles, key=itemgetter(0))
                 skill = self.get_skill_magique()
                 action = skill.fait(self,self.caste())
-                assert isinstance(action,Cible_agissant)
+                assert isinstance(action,CibleAgissant)
                 action.cible = new_cibles[0][-1]
                 self.fait(action)
                 defaut = "soin"
@@ -53,14 +53,14 @@ class Multi_soigneur_protecteur(Multi_soigneur):
             if cibles_:
                 skill = self.get_skill_magique()
                 action = skill.fait(self,"magie protection sacrée")
-                assert isinstance(action,Cible_agissants)
+                assert isinstance(action,CibleAgissants)
                 action.cible = cibles_
                 self.fait(action)
                 defaut = "soin"
         return defaut
 
 # Imports utilisés dans le code
-from ....effet.effets_protection import ProtectionSacree
-from ....effet.action.magie.magie import Cible_agissant,Cible_agissants
-from ..etats import EtatsAgissants
+from ....effet.agissant.protection import ProtectionSacree
+from ....action.magie.magie import CibleAgissant,CibleAgissants
+from ....commons.etats_agissant import EtatsAgissants
 from operator import itemgetter

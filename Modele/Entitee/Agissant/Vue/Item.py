@@ -5,9 +5,9 @@ import carte as crt
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from .agissant import AgissantVu
-    from ....effet.action.action import Action
+    from ....action.action import Action
     from ...item.item import Item
-    from ...item.etats import EtatsItems
+    from ....commons.etats_item import EtatsItems
 
 class Item_vu:
     def __init__(self, etat:Optional[EtatsItems]=None, priorite:Optional[float]=None, action:Optional[Action]=None, lanceur:Optional[AgissantVu]=None, direction:Optional[crt.Direction]=None, poids:Optional[float]=None, frottements:Optional[float]=None, hauteur:Optional[float]=None, nom:Optional[str]=None):

@@ -1,12 +1,19 @@
+"""
+Contient les classes des actions de caste (lancer un sort ou un parchemin).
+"""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-# Imports utilisés uniquement dans les annotations
-if TYPE_CHECKING:
-    from ...entitee.agissant.agissant import Agissant
-
 # Imports des classes parentes
 from .action import Action
+
+# Imports utilisés dans le code
+from ..commons import Element
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from ..entitee.agissant.agissant import Agissant
 
 class Caste(Action):
     """
@@ -28,11 +35,11 @@ class Caste(Action):
     def interrompt(self):
         """L'action est interrompue. Le sort missfire."""
         self.agissant.subit(self.mana, Element.TERRE) # Est-ce que c'est une punition trop dure pour les interruptions ?
-        
-    def get_skin(self):
-        pass
 
-class Caste_final(Caste):
+    def get_skin(self):
+        """Retourne le skin de l'action."""
+
+class CasteFinal(Caste):
     """
     Lorsque le mana est absorbé à la fin du cast.
     """
@@ -41,7 +48,7 @@ class Caste_final(Caste):
         self.paye()
         return super().termine()
 
-class Caste_initial(Caste):
+class CasteInitial(Caste):
     """
     Lorsque le mana est absorbé au début du cast.
     """
@@ -50,8 +57,8 @@ class Caste_initial(Caste):
         if self.latence == 0:
             self.paye()
         return super().execute()
-        
-class Caste_continu(Caste):
+
+class CasteContinu(Caste):
     """
     Lorsque le mana est absorbé à chaque tour.
     """
@@ -70,8 +77,8 @@ class Caste_continu(Caste):
         if self.latence >= self.latence_max:
             return self.termine()
         return False
-    
-class Caste_fractionnaire(Caste):
+
+class CasteFractionnaire(Caste):
     """
     Lorsque le mana est absorbé par fractions.
     """
@@ -95,7 +102,3 @@ class Caste_fractionnaire(Caste):
         if self.latence >= self.latence_max:
             return self.termine()
         return False
-
-# Imports utilisés dans le code
-from ...entitee.agissant.agissant import Agissant
-from ...systeme.elements import Element

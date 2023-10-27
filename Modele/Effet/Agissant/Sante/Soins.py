@@ -1,92 +1,80 @@
+"""
+Contient les effets de soin, d'immunité, de purification, etc.
+"""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
+
+# Imports des classes parentes
+from ...timings import OnFinTourAgissant, OnPostActionCase
+
+# Imports utilisés dans le code
+from .maladies.maladie import Maladie
+from .poison import Poison
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ....entitee.agissant.agissant import Agissant
     from ....labyrinthe.case import Case
 
-# Imports des classes parentes
-from ...effet import OneShot, OnTick
-from ..agissant import Effet_agissant
-from ...case.case import Effet_case
-
-class Antidote(OneShot, Effet_agissant):
-    """Effet qui supprime les effets de poison du joueur."""
-    def __init__(self, agissant:Agissant):
-        self.agissant = agissant
-
-    def action(self):
-        for effet in self.agissant.effets:
+class Antidote(OnFinTourAgissant):
+    """Effet qui supprime les effets de poison de l'agissant."""
+    def fin_tour(self, agissant:Agissant):
+        for effet in agissant.effets:
             if isinstance(effet,Poison):
-                self.agissant.effets.remove(effet)
+                agissant.effets.remove(effet)
 
-class Medicament(OneShot, Effet_agissant):
-    """Effet qui supprime les effets de maladie du joueur."""
-    def __init__(self, agissant:Agissant):
-        self.agissant = agissant
-
-    def action(self):
-        for effet in self.agissant.effets:
+class Medicament(OnFinTourAgissant):
+    """Effet qui supprime les effets de maladie de l'agissant."""
+    def fin_tour(self, agissant:Agissant):
+        for effet in agissant.effets:
             if isinstance(effet,Maladie): # Créer des médicaments différents selon les maladies ?
-                self.agissant.effets.remove(effet)
+                agissant.effets.remove(effet)
 
-class Purification(OneShot, Effet_agissant):
-    """Effet qui supprime les effets de poison ou maladie du joueur."""
-    def __init__(self, agissant:Agissant):
-        self.agissant = agissant
-
-    def action(self):
-        for effet in self.agissant.effets:
+class Purification(OnFinTourAgissant):
+    """Effet qui supprime les effets de poison ou maladie de l'agissant"""
+    def fin_tour(self, agissant:Agissant):
+        for effet in agissant.effets:
             if isinstance(effet,(Maladie,Poison)):
-                self.agissant.effets.remove(effet)
+                agissant.effets.remove(effet)
 
-class Soin_case(OneShot, Effet_case):
+class SoinCase(OnPostActionCase):
     """Un effet de soin. À répercuter sur les occupants éventuels de la case."""
-    def __init__(self,case:Case,gain_pv:float,responsable:Agissant,cible:str="alliés"):
-        self.case = case
+    def __init__(self,gain_pv:float,responsable:Agissant,cible:str="alliés"):
         self.gain_pv = gain_pv
         self.responsable = responsable
         self.cible = cible
 
-    def action(self):
-        cible_potentielle = self.case.agissant
+    def post_action(self, case:Case):
+        cible_potentielle = case.agissant
         if cible_potentielle is not None:
-            if self.responsable == NOONE: #Pas de responsable. Sérieusement ?
-                cible_potentielle.effets.append(Soin(cible_potentielle,self.responsable,self.gain_pv))
+            if not self.responsable: #Pas de responsable. Sérieusement ?
+                cible_potentielle.effets.append(Soin(self.responsable,self.gain_pv))
             else:
                 esprit = self.responsable.esprit
-                if esprit == NOBODY: #Pas d'esprit ? Sérieusement ?
-                    cible_potentielle.effets.append(Soin(cible_potentielle,self.responsable,self.gain_pv))
+                if not esprit: #Pas d'esprit ? Sérieusement ?
+                    cible_potentielle.effets.append(Soin(self.responsable,self.gain_pv))
                 elif self.cible == "alliés" and cible_potentielle in esprit.corps:
-                    cible_potentielle.effets.append(Soin(cible_potentielle,self.responsable,self.gain_pv))
+                    cible_potentielle.effets.append(Soin(self.responsable,self.gain_pv))
                 elif self.cible == "neutres" and not cible_potentielle in esprit.corps:
-                    cible_potentielle.effets.append(Soin(cible_potentielle,self.responsable,self.gain_pv))
+                    cible_potentielle.effets.append(Soin(self.responsable,self.gain_pv))
 
-class Soin(OneShot, Effet_agissant):
+class Soin(OnFinTourAgissant):
     """Un effet de soin. Généralement placé sur l'agissant par une magie de soin, de soin de zone, ou d'auto-soin."""
-    def __init__(self,agissant:Agissant,responsable:Agissant,gain_pv:float):
-        self.agissant = agissant
+    def __init__(self,responsable:Agissant,gain_pv:float):
         self.responsable = responsable
         self.gain_pv = gain_pv
 
-    def action(self):
-        self.agissant.soigne(self.gain_pv)
+    def fin_tour(self, agissant:Agissant):
+        agissant.soigne(self.gain_pv)
 
-class Immunite(OnTick, Effet_agissant):
+class Immunite(OnFinTourAgissant):
     """Enchantement qui confère une immunité aux maladies, à condition de disposer de suffisamment de priorité."""
-    def __init__(self,agissant:Agissant,superiorite:float):
-        self.agissant = agissant
+    def __init__(self,superiorite:float):
         self.superiorite = superiorite
 
-    def action(self):
-        for effet in self.agissant.effets :
+    def fin_tour(self, agissant:Agissant):
+        for effet in agissant.effets :
             if isinstance(effet,Maladie):
-                if effet.virulence + self.superiorite < self.agissant.priorite :
-                    self.agissant.effets.remove(effet)
-
-# Imports utilisés dans le code
-from .maladies.maladie import Maladie
-from .poison import Poison
-from ....entitee.agissant.agissant import NOONE
-from ....esprit.esprit import NOBODY
+                if effet.virulence + self.superiorite < agissant.priorite :
+                    agissant.effets.remove(effet)

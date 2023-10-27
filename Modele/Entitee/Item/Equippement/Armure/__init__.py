@@ -1,1 +1,1 @@
-from .Armure import *
+from .armure import *

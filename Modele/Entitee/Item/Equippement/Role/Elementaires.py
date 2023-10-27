@@ -6,7 +6,7 @@ from __future__ import annotations
 from ..equippement import Equippement
 
 # Imports pour les variables de classe
-from .....systeme.elements import Element
+from .....commons.elements import Element
 
 class Elementaire(Equippement):
     """La classe des équipements qui augmentent l'affinité à un élément."""

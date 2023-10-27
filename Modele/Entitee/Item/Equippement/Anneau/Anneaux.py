@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from .....labyrinthe.labyrinthe import Labyrinthe
 
 # Imports des classes parentes
-from .Anneau import Anneau
+from .anneau import Anneau
 from ..role.reparateur.reparateurs import Renforce_regen_pv
 from ..role.reparateur_magique.reparateurs_magiques import Renforce_regen_pm
 

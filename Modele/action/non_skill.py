@@ -1,21 +1,24 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
 
+# Imports des classes parentes
+from .action import ActionFinal, NonRepetable
+from .caste import Caste, CasteContinu, CasteFinal, CasteInitial, CasteFractionnaire
+
+# Imports utilisés dans le code
+from ..commons import EtatsItems
+
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...entitee.agissant.agissant import Agissant
-    from ...entitee.item.item import Consommable
-    from ...entitee.item.Potion.Potion import Potion
-    from ...entitee.item.Parchemin.Parchemin import Parchemin
-    from ...entitee.item.Parchemin.Parchemins import Parchemin_vierge
+    from ..entitee.agissant.agissant import Agissant
+    from ..entitee.item.item import Consommable
+    from ..entitee.item.potion.potion import Potion
+    from ..entitee.item.parchemin.parchemin import Parchemin
+    from ..entitee.item.parchemin.parchemins import ParcheminVierge
     from ..effet import Effet
     from .magie.magie import Magie
 
-# Imports des classes parentes
-from .action import Action_final, Non_repetable
-from .caste import Caste, Caste_continu, Caste_final, Caste_initial, Caste_fractionnaire
-
-class Place_effet(Action_final, Non_repetable):
+class PlaceEffet(ActionFinal, NonRepetable):
     """
     L'action d'utilisation d'un consommable (potion ou parchemin) lorsque celui-ci se contente de placer un effet.
     """
@@ -33,14 +36,14 @@ class Place_effet(Action_final, Non_repetable):
         """L'action est interrompue."""
         self.item.etat = EtatsItems.BRISE
 
-class Boit(Place_effet):
+class Boit(PlaceEffet):
     """
     L'action de boire une potion.
     """
     def __init__(self,agissant:Agissant,latence:float,item:Potion,effet:Effet):
         super().__init__(agissant,latence,item,effet)
 
-class Lit(Caste, Non_repetable):
+class Lit(Caste, NonRepetable):
     """
     L'action de caster un parchemin.
     """
@@ -53,7 +56,7 @@ class Lit(Caste, Non_repetable):
     def get_skin(self):
         pass
 
-class Lit_effet(Lit,Place_effet):
+class LitEffet(Lit,PlaceEffet):
     """
     L'action de caster un parchemin qui place un effet.
     """
@@ -61,25 +64,27 @@ class Lit_effet(Lit,Place_effet):
         super().__init__(agissant,latence,item)
         self.effet = effet
 
-class Lit_effet_final(Lit_effet,Caste_final):
-    pass
+class LitEffetFinal(LitEffet,CasteFinal):
+    """Un parchemin qui place un effet, en caste final."""
 
-class Lit_effet_initial(Lit_effet,Caste_initial):
-    pass
+class LitEffetInitial(LitEffet,CasteInitial):
+    """Un parchemin qui place un effet, en caste initial."""
 
-class Lit_effet_continu(Lit_effet,Caste_continu):
-    pass
+class LitEffetContinu(LitEffet,CasteContinu):
+    """Un parchemin qui place un effet, en caste continu."""
 
-class Lit_effet_fractionnaire(Lit_effet,Caste_fractionnaire):
-    pass
+class LitEffetFractionnaire(LitEffet,CasteFractionnaire):
+    """Un parchemin qui place un effet, en caste fractionnaire."""
 
-class Impregne(Lit,Action_final,Caste_final):
+class Impregne(Lit,ActionFinal,CasteFinal):
     """
     L'action d'imprégner une magie sur un parchemin.
     """
-    def __init__(self,agissant:Agissant,latence:float,item:Parchemin_vierge,taux_cout_impregne:float,taux_cout_caste:float,taux_latence_impregne:float,taux_latence_caste:float):
+    def __init__(self,agissant:Agissant,latence:float,item:ParcheminVierge,taux_cout_impregne:float,taux_cout_caste:float,taux_latence_impregne:float,taux_latence_caste:float):
         Lit.__init__(self,agissant,latence,item)
-        self.item:Parchemin_vierge
+        ActionFinal.__init__(self,agissant,latence)
+        CasteFinal.__init__(self,agissant,latence)
+        self.item:ParcheminVierge
         self.taux_cout_impregne = taux_cout_impregne
         self.taux_cout_caste = taux_cout_caste
         self.taux_latence_impregne = taux_latence_impregne
@@ -106,5 +111,3 @@ class Impregne(Lit,Action_final,Caste_final):
         self.latence = magie.latence*self.taux_latence_impregne
         self.magie.cout*=self.taux_cout_caste
         self.magie.latence*=self.taux_latence_caste
-
-from ...entitee.item.etats import EtatsItems

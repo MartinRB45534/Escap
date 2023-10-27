@@ -1,1 +1,1 @@
-from .Potion import *
+from .potion import *
