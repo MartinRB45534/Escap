@@ -16,7 +16,7 @@ class Attaquant_magique_agissant(Mage):
         #On cherche l'ennemi le plus puissant en vue
         for pos in self.vue:
             case = self.vue.get_case(pos)
-            if case.agissant is not None and case.agissant.ID in [ennemi.ID for ennemi in self.esprit.ennemis]:
+            if case.agissant is not None and case.agissant.id in [ennemi.id for ennemi in self.esprit.ennemis]:
                 cibles.append((self.esprit.ennemis[case.agissant]["importance"],case.agissant))
         if cibles and self.peut_caster():
             new_cibles = sorted(cibles, key=itemgetter(0))
@@ -29,7 +29,7 @@ class Attaquant_magique_agissant(Mage):
         return defaut
 
     def get_impact(self):
-        if isinstance(self.action,CibleAgissant) and self.action.cible is not None:
+        if isinstance(self.action,CibleAgissant) and self.action.cible:
             return self.action.cible.position
         else:
             return super().get_impact()

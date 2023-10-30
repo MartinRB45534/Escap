@@ -1,6 +1,6 @@
+"""Les effets de santé (maladies, dégâts, soins, etc.)."""
+
 from .maladies import *
 from .degats import *
 from .poison import *
-from .reanimation import *
-from .resurection import *
 from .soins import *

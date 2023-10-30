@@ -3,7 +3,7 @@ Les enchantements d'items.
 """
 
 from .item import EffetItem
-from ..timings import Enchantement
+from ..enchantement import Enchantement
 
 class EnchantementItem(EffetItem,Enchantement):
     """Un effet (temporaire) qui enchante un item."""

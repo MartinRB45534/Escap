@@ -1,3 +1,7 @@
+"""
+Les entitées (tout ce qui occupe le labyrinthe).
+"""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, List
 import carte as crt
@@ -6,20 +10,24 @@ import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..action.action import Action
     from ..effet.effet import Effet
+    from ..labyrinthe.mur import Mur
 
 class Entitee:
     """La classe des entitées"""
     ID_max = 10 # Les 10 premières ID sont réservées
     def __init__(self, position: crt.Position=crt.POSITION_ABSENTE, id_: Optional[int]=None):
         self.position:crt.Position = position
-        self.priorite:float = 0
+        self._priorite:float = 0
         self.effets:List[Effet] = []
         if id_ is None:
-            id_ = Entitee.ID_max
-            Entitee.ID_max += 1
-        self.id = id_
+            # Dans les cas d'héritage multiple, on peut déjà avoir exécuté cet __init__
+            # On vérifie donc si on a déjà un ID
+            if not hasattr(self, "id"):
+                self.id = Entitee.ID_max
+                Entitee.ID_max += 1
+        else:
+            self.id = id_
 
     def set_position(self,position: crt.Position):
         """Change la position de l'entitée."""
@@ -33,9 +41,10 @@ class Entitee:
         """Retourne la position de l'entitée."""
         return self.position
 
-    def get_priorite(self):
+    @property
+    def priorite(self) -> float:
         """Retourne la priorité de l'entitée."""
-        return self.priorite
+        return self._priorite
 
     def get_direction(self) -> crt.Direction:
         """Retourne la direction de l'entitée."""
@@ -43,9 +52,6 @@ class Entitee:
 
 class EntiteeSuperieure(Entitee):
     """La classe des entitées qui font bouger le labyrinthe autour d'eux."""
-
-class Fantome(Entitee):
-    """La classe des entitées qui traversent les murs."""
 
 class Interactif(Entitee):
     """La classe des entitées avec lesquelles on peut interagir. Les humains, principalement, et quelques éléments de décors."""
@@ -55,16 +61,10 @@ class NonSuperposable(Entitee):
 
 class Mobile(Entitee):
     """La classe des entitées qui peuvent se déplacer (par elles-mêmes pour les agissants, en étant lancées pour les items)."""
-    def __init__(self, position: crt.Position=crt.POSITION_ABSENTE, id_: Optional[int]=None):
-        super().__init__(position,id_)
-        self.action:Optional[Action] = None
-
-    def add_latence(self,latence: float):
-        """Ajoute de la latence à l'action de l'entitée."""
-        if self.action is not None:
-            self.action.latence += latence
-
-    def set_latence(self,latence: float):
-        """Modifie la latence de l'action de l'entitée."""
-        if self.action is not None:
-            self.action.latence = latence
+    def __init__(self,position: crt.Position=crt.POSITION_ABSENTE, id_: Optional[int]=None, fantome:bool=False):
+        Entitee.__init__(self,position,id_)
+        self.fantome = fantome
+    
+    def passe(self,_mur:Mur) -> bool:
+        """Renvoie True si l'entitée peut passer à travers le mur (fermé)."""
+        return self.fantome

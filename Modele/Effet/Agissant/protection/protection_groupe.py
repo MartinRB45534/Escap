@@ -5,7 +5,7 @@ Un effet qui protège un groupe d'agissants.
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from ...timings import OnPostActionAgissant
+from ..timings import OnPostActionAgissant
 
 # Imports utilisés dans le code
 from ....commons.etats_agissant import EtatsAgissants

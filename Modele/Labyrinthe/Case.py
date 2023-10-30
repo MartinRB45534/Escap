@@ -1,28 +1,23 @@
+"""Ce module contient la classe Case, qui représente une case du labyrinthe."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Set, Type
 import carte as crt
 
 # Imports utilisés dans le code
-from ..effet.attaque.attaque import AttaqueCase, AttaqueCaseDelayee
-from ..effet.case.cases import Opacite
-from ..effet.case.aura.auras import AuraElementale, AuraPermanente
-from ..effet.case.protection.protection import Protection
-from ..effet.timings import OnDebutTourCase, OnPostActionCase, TimeLimited #, OnFinTourCase
-from ..entitee.entitee import Mobile, NonSuperposable
-from ..entitee.agissant.agissant import Agissant, NOONE
-from ..entitee.item.item import Item
-from ..systeme.classe.classes import trouve_skill
-from ..systeme.skill.passif import SkillEcrasement
+from ..effet import AttaqueCase, AttaqueCaseDelayee, Opacite, AuraElementale, AuraPermanente, ProtectionCase, OnDebutTourCase, OnPostActionCase, TimeLimited #, OnFinTourCase
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ..effet.effet import Effet
     from ..effet.case.aura.aura import Aura
+    from ..entitee.agissant.agissant import Agissant
+    from ..entitee.item.item import Item
     from ..entitee.decors.decors import Decors
 
 class Case(crt.Case):
     """Une case du labyrinthe. Elle peut contenir un agissant, un décors, des items, des effets, des auras, et une aura élémentale."""
-    def __init__(self,position:crt.Position, aura_elementale: Type[AuraPermanente], opacite:float = 1, niveau:int = 1):
+    def __init__(self,position:crt.Position, aura_elementale: Type[AuraPermanente], opacite:float, niveau:int, responsable:Agissant):
         super().__init__(position)
         self.opacite = opacite
         self.clarte:float = 0
@@ -33,7 +28,7 @@ class Case(crt.Case):
         self.items:Set[Item] = set() #On peut avoir des items sur la case
         self.effets:Set[Effet] = set() #Les cases ont aussi des effets ! Les auras, par exemple.
         self.auras:Set[Aura] = set() #Les auras sont des effets qui s'appliquent à la case, et qui peuvent être de plusieurs types.
-        self.aura_elementale = aura_elementale(self.niveau,NOONE) #L'aura élémentale est une aura particulière, qui s'applique à la case et qui peut être de plusieurs types.
+        self.aura_elementale = aura_elementale(self.niveau,responsable) #L'aura élémentale est une aura particulière, qui s'applique à la case et qui peut être de plusieurs types.
     #Découvrons le déroulé d'un tour, avec case-chan :
 
     def debut_tour(self):
@@ -64,55 +59,36 @@ class Case(crt.Case):
         if max({aura.priorite for aura in auras_elementales}) > max({aura.priorite for aura in self.auras if isinstance(aura, AuraElementale)}):
             self.auras = auras | auras_elementales # On vire aussi les auras non élémentales qui appartiennent à d'autres gens
 
-    def arrive(self,entitee:Mobile):
+    def agissant_arrive(self,entitee:Agissant):
         """Une entitée mobile arrive sur la case."""
-        if isinstance(entitee,Item):
-            entitee.set_position(self.position) #Un item passe quoi qu'il arrive
-            if isinstance(self.agissant,NonSuperposable):
-                entitee.heurte_agissant() #Mais il heurte les occupants
-            elif isinstance(self.decors,NonSuperposable):
-                entitee.heurte_decors()
-            self.items.add(entitee)
-            return True
-        elif isinstance(entitee,Agissant):
-            if self.agissant is not None: # On a déjà un agissant sur la case
-                ecrasement = trouve_skill(entitee.classe_principale,SkillEcrasement) #On peut peut-être l'écraser
-                if ecrasement is not None:
-                    if not ecrasement.utilise(self.agissant.get_priorite(),entitee.get_priorite()):
-                        return False
-                else:
-                    return False
-            elif isinstance(self.decors,NonSuperposable):
-                ecrasement = trouve_skill(entitee.classe_principale,SkillEcrasement) #On peut peut-être l'écraser
-                if ecrasement is not None:
-                    if not ecrasement.utilise(self.decors.get_priorite(),entitee.get_priorite()):
-                        return False
-                else:
-                    return False
-            self.agissant = entitee
-            entitee.set_position(self.position)
-            return True
-        raise TypeError("On ne peut pas ajouter un objet de type "+str(type(entitee))+" sur une case !")
+        if self.agissant: # On a déjà un agissant sur la case
+            if not entitee.arrive_agissant(self.agissant):
+                return False
+        elif self.decors:
+            if not entitee.arrive_decors(self.decors):
+                return False
+        self.agissant = entitee
+        entitee.set_position(self.position)
+        return True
 
-    def part(self,entitee:Mobile):
-        """Une entitée mobile part de la case."""
-        if isinstance(entitee,Item):
-            self.items.remove(entitee)
-        elif isinstance(entitee,Agissant):
-            if self.agissant is not entitee:
-                raise ValueError("L'entité "+str(entitee)+" n'est pas sur la case "+str(self))
-            self.agissant = None
-            return True
-        raise TypeError("On ne peut pas enlever un objet de type "+str(type(entitee))+" d'une case !")
+    def item_arrive(self,entitee:Item):
+        """Une entitée mobile arrive sur la case."""
+        entitee.set_position(self.position) #Un item passe quoi qu'il arrive
+        if self.agissant:
+            entitee.heurte_agissant() #Mais il heurte les occupants
+        elif self.decors:
+            entitee.heurte_decors()
+        self.items.add(entitee)
+        return True
 
     #Tout le monde a fini de se déplacer.
     def post_action(self):
         """Fonction qui s'exécute après les actions des agissants, puis passe aux attaques."""
-        on_attaques:Set[Protection] = set()
+        on_attaques:Set[ProtectionCase] = set()
         attaques:Set[AttaqueCase] = set()
 
         for effet in self.effets:
-            if isinstance(effet,Protection):
+            if isinstance(effet,ProtectionCase):
                 on_attaques.add(effet)
             elif isinstance(effet,AttaqueCaseDelayee) and effet.attente:
                 pass #On attend, pour l'instant

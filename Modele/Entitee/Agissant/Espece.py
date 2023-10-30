@@ -1,3 +1,5 @@
+"""Contient les classes Espece et Especes."""
+
 from __future__ import annotations
 from typing import List
 

@@ -4,14 +4,13 @@ Deux effets de case : obscurité et blizzard.
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from modele.labyrinthe.case import Case
-
 # Imports des classes parentes
 from .case import EffetCase
-from ..timings import TimeLimited, OnDebutTourCase
+from ..time_limited import TimeLimited
+from .timings import OnDebutTourCase
 
 # Imports utilisés dans les variables de classe
-from ...commons.elements import Element
+from ...commons import Element
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:

@@ -1,3 +1,5 @@
+"""La vue des agissants."""
+
 from .agissant import *
 from .case import *
 from .inventaire import *

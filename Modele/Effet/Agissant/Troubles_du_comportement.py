@@ -5,10 +5,9 @@ Quelques effets qui peuvent être appliqués à un agissant, et qui modifient so
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import random
-from modele.entitee.agissant.agissant import Agissant
 
 # Imports des classes parentes
-from ..timings import OnPostActionAgissant, OnPostDecisionAgissant
+from .timings import OnPostActionAgissant, OnPostDecisionAgissant
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:

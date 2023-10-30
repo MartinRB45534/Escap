@@ -6,7 +6,6 @@ from .dps import *
 from .fuyard import *
 from .mage import *
 from .multi_renforceur import *
-from .multi_soigneur_protecteur import *
 from .multi_soigneur import *
 from .renforceur import *
 from .sentinelle import *

@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 
 # Imports des classes parentes
 from .protection import Protection
-from ...timings import TimeLimited
+from ..timings import TimeLimited
 
 if TYPE_CHECKING:
     from ...attaque.attaque import AttaqueParticulier

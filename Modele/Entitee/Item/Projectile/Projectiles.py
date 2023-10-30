@@ -1,39 +1,32 @@
+"""
+Ce fichier contient les classes des projectiles et des items qui peuvent être lancés.
+"""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import carte as crt
 
-# Imports utilisés uniquement dans les annotations
-if TYPE_CHECKING:
-    from ....labyrinthe.labyrinthe import Labyrinthe
-    from ....commons.elements import Element
-
 # Imports des classes parentes
 from .projectile import Projectile
 from ..item import Item
-from ...entitee import Fantome
-from ....effet.item.items import OnHit, Sursis
 
 # Imports des valeurs par défaut des paramètres
-from ....commons.elements import Element
+from ....commons import Element, EtatsItems
+from ....effet import OnHit, Sursis
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from ....labyrinthe.labyrinthe import Labyrinthe
 
 class Explosif(Projectile):
     """La classe des projectiles qui explosent. Affectés différemment par certains skills."""
 
 class Charge(Explosif):
+    """Une charge explosive."""
     def __init__(self,labyrinthe:Labyrinthe,niveau:int,vitesse:float=0,poids:float=0,frottements:float=0,portee:float=0,degats:float=0,position:crt.Position=crt.POSITION_ABSENTE):
-        Item.__init__(self,labyrinthe,position)
-        self.etat = EtatsItems.INTACT #Le niveau l'évacuera s'il n'est plus intact.
-        self.priorite = 0
-        self.porteur = None
-        self.lanceur = None
-        self.direction = None
-        self.latence = 0
-        self.vitesse = vitesse
-        self.taux_vitesse = {}
+        Explosif.__init__(self,labyrinthe,vitesse,[OnHit(portee,degats)],position)
         self.poids = poids
         self.frottements = frottements
-        self.hauteur = 0
-        self.effets = [OnHit(portee,degats)]
         self.niveau = niveau #On garde l'info pour un éventuel observateur
 
 class Percant(Projectile):
@@ -45,58 +38,25 @@ class Percant(Projectile):
 class Fleche(Percant):
     """La classe des projectiles de type flèche. Affectés différemment par certains skills."""
     def __init__(self,labyrinthe:Labyrinthe,niveau:int,vitesse:float=0,poids:float=0,frottements:float=0,degats:float=0,position:crt.Position=crt.POSITION_ABSENTE):
-        Item.__init__(self,labyrinthe,position)
-        self.etat = EtatsItems.INTACT
-        self.priorite = 0 #Faire dépendre du niveau ?
-        self.porteur = None
-        self.lanceur = None
-        self.direction = None
-        self.latence = 0
-        self.vitesse = vitesse
-        self.taux_vitesse = {}
+        Percant.__init__(self,labyrinthe,vitesse,[OnHit(1,degats)],position)
         self.poids = poids
         self.frottements = frottements
-        self.hauteur = 0
-        self.effets = [OnHit(1,degats)]
         self.niveau = niveau #On garde l'info pour un éventuel observateur
 
-class Fleche_fantome(Fleche,Fantome):
+class FlecheFantome(Fleche):
     """Une flèche qui peut traverser les murs. Est-ce l'âme d'une flèche décédée ?"""
     def __init__(self,labyrinthe:Labyrinthe,niveau:int,vitesse:float=0,poids:float=0,frottements:float=0,degats:float=0,position:crt.Position=crt.POSITION_ABSENTE):
-        Item.__init__(self,labyrinthe,position)
-        self.etat = EtatsItems.INTACT
-        self.priorite = 0 #Faire dépendre du niveau ?
-        self.porteur = None
-        self.lanceur = None
-        self.direction = None
-        self.latence = 0
-        self.vitesse = vitesse
-        self.taux_vitesse = {}
-        self.poids = poids
-        self.frottements = frottements
-        self.hauteur = 0
-        self.effets = [OnHit(1,degats)]
-        self.niveau = niveau #On garde l'info pour un éventuel observateur
+        Fleche.__init__(self,labyrinthe,niveau,vitesse,poids,frottements,degats,position)
+        self.fantome = True
 
-class Fleche_explosive(Fleche,Explosif):
+class FlecheExplosive(Fleche,Explosif):
     """Une flèche explosive. C'est une flèche ou un explosif ? Mieux vaut rester loin en tous cas..."""
     def __init__(self,labyrinthe:Labyrinthe,niveau:int,vitesse:float=0,poids:float=0,frottements:float=0,portee:float=0,degats:float=0,position:crt.Position=crt.POSITION_ABSENTE):
-        Item.__init__(self,labyrinthe,position)
-        self.etat = EtatsItems.INTACT
-        self.priorite = 0 #Faire dépendre du niveau ?
-        self.porteur = None
-        self.lanceur = None
-        self.direction = None
-        self.latence = 0
-        self.vitesse = vitesse
-        self.taux_vitesse = {}
-        self.poids = poids
-        self.frottements = frottements
-        self.hauteur = 0
-        self.effets = [OnHit(portee,degats)]
-        self.niveau = niveau #On garde l'info pour un éventuel observateur
+        Fleche.__init__(self,labyrinthe,niveau,vitesse,poids,frottements,degats,position)
+        Explosif.__init__(self,labyrinthe,vitesse,[OnHit(portee,degats)],position)
+        # Fleche en premier pour que l'effet soit bien celui de l'explosion
 
-class Perce_armure(Item):
+class PerceArmure(Item):
     """La classe des items qui peuvent infliger des dégats sans être affectés par les défenses comme l'armure ou le bouclier."""
 
 class Fragile(Item):
@@ -111,57 +71,35 @@ class Evanescent(Item):
         self.etat = EtatsItems.BRISE
         super().arret()
 
-class Projectile_magique(Projectile,Evanescent):
+class ProjectileMagique(Projectile,Evanescent):
     """La classe des projectiles créés par magie."""
     def __init__(self,labyrinthe:Labyrinthe,niveau:int,vitesse:float,poids:float,frottements:float,degats:float,element:Element,position:crt.Position=crt.POSITION_ABSENTE):
-        Item.__init__(self,labyrinthe,position)
-        self.etat = EtatsItems.INTACT
-        self.priorite = 0 #Faire dépendre du niveau ?
-        self.porteur = None
-        self.lanceur = None
-        self.direction = None
-        self.latence = 0
-        self.vitesse = vitesse
-        self.taux_vitesse = {}
+        Evanescent.__init__(self,labyrinthe,position)
+        Projectile.__init__(self,labyrinthe,vitesse,[OnHit(1,degats,element)],position)
         self.poids = poids
         self.frottements = frottements
-        self.hauteur = 0
-        self.effets = [OnHit(1,degats,element)]
         self.niveau = niveau #On garde l'info pour un éventuel observateur
 
-class Magie_explosive(Explosif,Projectile_magique):
+class MagieExplosive(Explosif,ProjectileMagique):
     """La classe des projectiles explosifs créés par magie."""
     def __init__(self,labyrinthe:Labyrinthe,niveau:int,vitesse:float,poids:float,frottements:float,portee:float,degats:float,element:Element,position:crt.Position=crt.POSITION_ABSENTE):
-        Item.__init__(self,labyrinthe,position)
-        self.etat = EtatsItems.INTACT #Le niveau l'évacuera s'il n'est plus intact.
-        self.priorite = 0
-        self.porteur = None
-        self.lanceur = None
-        self.direction = None
-        self.latence = 0
-        self.vitesse = vitesse
-        self.taux_vitesse = {}
-        self.poids = poids
-        self.frottements = frottements
-        self.hauteur = 0
-        self.effets = [OnHit(portee,degats,element)]
-        self.niveau = niveau #On garde l'info pour un éventuel observateur
+        ProjectileMagique.__init__(self,labyrinthe,niveau,vitesse,poids,frottements,degats,element,position)
+        Explosif.__init__(self,labyrinthe,vitesse,[OnHit(portee,degats,element)],position)
 
-class Fleche_magique(Fleche,Projectile_magique):
+class FlecheMagique(Fleche,ProjectileMagique):
     """La classe des flèches créées par magie."""
     def __init__(self, labyrinthe: Labyrinthe, niveau: int, vitesse: float, poids: float, frottements: float, degats: float, element: Element, position: crt.Position = crt.POSITION_ABSENTE):
-        Projectile_magique.__init__(self,labyrinthe,niveau,vitesse,poids,frottements,degats,element,position)
+        Fleche.__init__(self,labyrinthe,niveau,vitesse,poids,frottements,degats,position)
+        ProjectileMagique.__init__(self,labyrinthe,niveau,vitesse,poids,frottements,degats,element,position)
 
-class Perce_armure_magique(Perce_armure,Projectile_magique):
+class PerceArmureMagique(PerceArmure,ProjectileMagique):
     """La classe des projectiles perce_armures créés par magie."""
     def __init__(self, labyrinthe: Labyrinthe, niveau: int, vitesse: float, poids: float, frottements: float, degats: float, element: Element, position: crt.Position = crt.POSITION_ABSENTE):
-        Projectile_magique.__init__(self,labyrinthe,niveau,vitesse,poids,frottements,degats,element,position)
+        PerceArmure.__init__(self,labyrinthe,position)
+        ProjectileMagique.__init__(self,labyrinthe,niveau,vitesse,poids,frottements,degats,element,position)
 
-class Magie_explosive_percante(Magie_explosive,Percant):
+class MagieExplosivePercante(MagieExplosive,Percant):
     """La classe des projectiles explosifs perçant créés par magie."""
     def __init__(self, labyrinthe: Labyrinthe, niveau: int, vitesse: float, poids: float, frottements: float, portee: float, degats: float, element: Element, position: crt.Position = crt.POSITION_ABSENTE):
-        Magie_explosive.__init__(self,labyrinthe,niveau,vitesse,poids,frottements,portee,degats,element,position)
-
-# Imports utilisés dans le code
-from ....commons.elements import Element
-from ....commons.etats_item import EtatsItems
+        Percant.__init__(self,labyrinthe,vitesse,[OnHit(portee,degats,element)],position)
+        MagieExplosive.__init__(self,labyrinthe,niveau,vitesse,poids,frottements,portee,degats,element,position)

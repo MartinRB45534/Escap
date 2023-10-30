@@ -8,11 +8,11 @@ from warnings import warn
 import carte as crt
 
 from .protection import ProtectionCase
-from ...timings import TimeLimited
+from ...time_limited import TimeLimited
 
 if TYPE_CHECKING:
     from ....entitee.item.equippement.degainable.bouclier.bouclier import Bouclier
-    from ...attaque.attaque import AttaqueCase
+    from ..attaque import AttaqueCase
     from ....commons.elements import Element
 
 class ProtectionCaseBouclier(ProtectionCase,TimeLimited):

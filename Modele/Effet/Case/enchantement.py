@@ -3,7 +3,7 @@ Les enchantements de cases.
 """
 
 from .case import EffetCase
-from ..timings import Enchantement
+from ..enchantement import Enchantement
 
 class EnchantementCase(EffetCase,Enchantement):
     """Un effet (temporaire) qui enchante un item."""

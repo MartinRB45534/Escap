@@ -1,3 +1,7 @@
+"""
+Les magies qui placent un enchantement sur un agissant ou un item.
+"""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 

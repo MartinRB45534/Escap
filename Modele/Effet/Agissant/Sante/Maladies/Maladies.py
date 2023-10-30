@@ -5,14 +5,12 @@ Contient les classes des maladies.
 from __future__ import annotations
 import random
 
-from modele.entitee.agissant.agissant import Agissant
-
 # Pas d'imports utilisés uniquement dans les annotations
 
 # Imports des classes parentes
 from .maladie import Maladie
 from ...statistiques import EffetStats
-from ....timings import OnDebutTourAgissant
+from ...timings import OnDebutTourAgissant
 
 class Tirnogose(Maladie, OnDebutTourAgissant):
     """Maladie qui cause une perte progressive de PV. Peut se transmettre aux voisins."""

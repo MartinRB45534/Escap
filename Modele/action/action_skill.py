@@ -1,3 +1,8 @@
+"""
+Les classes de base des actions liées à un skill,
+ainsi que quelques actions spécifiques.
+"""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, List
 import carte as crt

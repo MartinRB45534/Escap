@@ -6,11 +6,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Type, Callable
 import affichage as af
 import carte as crt
-from modele.commons.passage import Passage
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..entitee.entitee import Entitee
+    from ..entitee.agissant.agissant import Agissant
+    from ..entitee.entitee import Mobile
     from ..commons.passage import Passage
 
 class Mur(crt.Mur):
@@ -22,7 +22,7 @@ class Mur(crt.Mur):
     def casser(self):
         """Casse le mur."""
 
-    def peut_passer(self,_entitee:Entitee):
+    def peut_passer(self,_entitee:Mobile):
         """Renvoie True si l'entitée peut passer à travers le mur."""
         if not self.ferme :
             return True
@@ -41,7 +41,7 @@ class MurImpassable(Mur):
     def casser(self) -> None:
         raise NotImplementedError("Impossible de casser un mur impassable")
 
-    def peut_passer(self,_entitee:Entitee) -> bool:
+    def peut_passer(self,_entitee:Mobile) -> bool:
         return False
 
     def passage(self,passage:Passage):
@@ -61,22 +61,11 @@ class MurPlein(Mur):
     def casser(self):
         self.casse = True
 
-    def peut_passer(self,entitee:Entitee):
+    def peut_passer(self,entitee:Mobile):
         if not self.ferme :
             return True # Si le mur est ouvert (détruit), on peut passer
-        elif isinstance(entitee,Fantome):
-            return True # Les fantômes peuvent passer à travers les murs
         else :
-            ecrasement = None
-            if isinstance(entitee,Agissant):
-                ecrasement = trouve_skill(entitee.classe_principale,SkillEcrasement)   # ou l'écraser.
-            if ecrasement is not None :
-                passage = ecrasement.utilise(self.niveau,entitee.get_priorite())
-                if passage :
-                    self.casser()
-                return passage
-            else :
-                return False
+            return entitee.passe(self) # Sinon, on regarde si l'entitée peut passer à travers un mur fermé (fantome ou écrasement)
 
     def passage(self,passage:Passage):
         return passage.mur or not self.ferme
@@ -119,7 +108,7 @@ class MurOuvert(Mur):
     def casser(self):
         pass
 
-    def peut_passer(self,_entitee:Entitee) -> bool:
+    def peut_passer(self,_entitee:Mobile) -> bool:
         return True
 
     def passage(self,passage:Passage) -> bool:
@@ -127,11 +116,11 @@ class MurOuvert(Mur):
 
 class Barriere(MurOuvert):
     """Un mur qui peut être traversé sous certaines conditions."""
-    def __init__(self,niveau:int,condition:Callable[[Entitee],bool]):
+    def __init__(self,niveau:int,condition:Callable[[Mobile],bool]):
         super().__init__(niveau)
         self.condition = condition
 
-    def peut_passer(self,entitee:Entitee):
+    def peut_passer(self,entitee:Mobile):
         return self.condition(entitee) # Si la condition est remplie, on peut passer
 
     def passage(self,passage:Passage):
@@ -162,7 +151,7 @@ class MurAsymetrique(Mur): # Hérite vraiment ?
     def casser(self):
         self.mur.casser()
 
-    def peut_passer(self,entitee:Entitee):
+    def peut_passer(self,entitee:Mobile):
         return self.mur.peut_passer(entitee)
 
     def passage(self, passage: Passage) -> bool:
@@ -207,9 +196,3 @@ class Escalier(MurAsymetrique, MurOuvert):
 
     def passage(self, passage: Passage):
         return passage.escalier
-
-# Imports utilisés dans le code
-from ..entitee.entitee import Fantome
-from ..entitee.agissant.agissant import Agissant
-from ..systeme.classe.classes import trouve_skill
-from ..systeme.skill.passif import SkillEcrasement

@@ -3,7 +3,7 @@ Les enchantements d'agissants.
 """
 
 from .agissant import EffetAgissant
-from ..timings import Enchantement
+from ..enchantement import Enchantement
 
 class EnchantementAgissant(EffetAgissant,Enchantement):
     """Un effet (temporaire) qui enchante un item."""

@@ -6,7 +6,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 # Imports des classes parentes
-from ...timings import OnDebutTourAgissant, OnFinTourAgissant
+from ..timings import OnDebutTourAgissant, OnFinTourAgissant
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:

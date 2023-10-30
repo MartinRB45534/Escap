@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Type
 
 # Imports des classes parentes
 from .agissant import EffetAgissant
-from ..timings import OnFinTourAgissant
+from .timings import OnFinTourAgissant
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:

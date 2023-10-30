@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from ..case import EffetCase
-from ...attaque.attaque import AttaqueCase
+from ..attaque import AttaqueCase
 
 class ProtectionCase(EffetCase):
     """Une protection qui agit comme un 'mur' autour de l'agissant, c'est à dire qu'elle absorbe les dégats jusqu'à se briser."""

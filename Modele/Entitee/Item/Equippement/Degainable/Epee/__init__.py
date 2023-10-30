@@ -1,1 +1,3 @@
-from .Epee import *
+"""L'epee."""
+
+from .epee import *

@@ -1,3 +1,5 @@
+"""Les équipements."""
+
 from .anneau import *
 from .armure import *
 from .degainable import *

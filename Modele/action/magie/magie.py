@@ -1,3 +1,7 @@
+"""
+Les classes de base des magies.
+"""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, List
 import carte as crt
@@ -43,57 +47,58 @@ class MagieCout(Magie, NonRepetable):
     """La classe des magies dont le coût peut varier."""
 
     def set_cout(self,cout:float):
+        """Change le coût de la magie."""
         self.cout = cout
     
-class Magie_cible(Magie) :
+class MagieCible(Magie) :
     """La classe des magies qui nécessitent une (ou parfois plusieurs) cible(s)."""
 
-class Multi_cible(Magie_cible) :
+class MultiCible(MagieCible) :
     """La classe des magies qui nécessitent plusieurs cibles."""
 
-class Magie_cible_dirigee(Magie_cible,MagieDirigee):
+class MagieCibleDirigee(MagieCible,MagieDirigee):
     """La classe des magies qui nécessitent une direction et une cible."""
 
-class PorteeLimitee(Magie_cible) :
+class PorteeLimitee(MagieCible) :
     """La classe des magies qui ciblent quelque chose dans la proximité du joueur avec une portée limitée (sinon elles peuvent viser tout ce qui est dans le champ de vision du joueur)."""
     def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,niveau:int,portee_limite:float):
-        Magie_cible.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau)
+        MagieCible.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau)
         self.portee_limite = portee_limite
 
-class CibleAgissant(Magie_cible):
+class CibleAgissant(MagieCible):
     """La classe des magies qui ciblent des agissants."""
     def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,niveau:int,cible:Agissant):
-        Magie_cible.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau)
+        MagieCible.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau)
         self.cible = cible
 
-class CibleAgissants(Multi_cible):
+class CibleAgissants(MultiCible):
     """La classe des magies qui ciblent plusieurs agissants."""
     def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,niveau:int,cible:List[Agissant]):
-        Multi_cible.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau)
+        MultiCible.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau)
         self.cible = cible
 
-class CibleItem(Magie_cible):
+class CibleItem(MagieCible):
     """La classe des magies qui ciblent des items."""
     def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,niveau:int,cible:Item):
-        Magie_cible.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau)
+        MagieCible.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau)
         self.cible = cible
 
-class CibleItems(Multi_cible):
+class CibleItems(MultiCible):
     """La classe des magies qui ciblent plusieurs items."""
     def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,niveau:int,cible:List[Item]):
-        Multi_cible.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau)
+        MultiCible.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau)
         self.cible = cible
 
-class CibleCase(Magie_cible):
+class CibleCase(MagieCible):
     """La classe des magies qui ciblent une case. (Si si, une case. Pour une explosion par exemple, vous n'avez pas envie d'être au centre ! Vraiment !)"""
     def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,niveau:int,cible:crt.Position):
-        Magie_cible.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau)
+        MagieCible.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau)
         self.cible = cible
 
-class CibleCases(Multi_cible):
+class CibleCases(MultiCible):
     """La classe des magies qui ciblent plusieurs cases."""
     def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,niveau:int,cible:List[crt.Position]):
-        Multi_cible.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau)
+        MultiCible.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau)
         self.cible = cible
 
 # Normalement on en a fini avec les magies ciblées
@@ -128,11 +133,11 @@ class CreationEffet(Magie):
         """Renvoie l'effet créé."""
         return self.effet
 
-class Enchante(CreationEffet, Magie_cible, NonRepetable):
+class Enchante(CreationEffet, MagieCible, NonRepetable):
     """La classe des magies qui créent des enchantements (des effets sur le très, très long terme)."""
     def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,enchantement:Enchantement,niveau:int):
         CreationEffet.__init__(self,skill,agissant,gain_xp,cout_pm,latence,enchantement,niveau)
-        Magie_cible.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau)
+        MagieCible.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau)
         NonRepetable.__init__(self,agissant,latence)
         self.enchantement = enchantement
 

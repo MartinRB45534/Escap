@@ -35,11 +35,11 @@ class CarteExtrait(af.ParentNoeud, af.Proportionnel):
         assert isinstance(self.courant,VignetteCase|None)
         courant = None
         self.objets:List[af.Affichable] = []
-        if len(self.labyrinthe.position_case) > 1: # On a au moins une case plus l'absente
+        if len(self.labyrinthe.nodes) > 1: # On a au moins une case plus l'absente
             # On a le même étage pour toutes les cases du labyrinthe (sauf l'absente)
-            assert len({position.etage for position in self.labyrinthe.position_case if position is not POSITION_ABSENTE}) == 1
-            etage = [position.etage for position in self.labyrinthe.position_case if position is not POSITION_ABSENTE][0]
-            visible = [min(position.x for position in self.labyrinthe.position_case)-1, max(position.x for position in self.labyrinthe.position_case)+1, min(position.y for position in self.labyrinthe.position_case)-1, max(position.y for position in self.labyrinthe.position_case)+1]
+            assert len({position.etage for position in self.labyrinthe.nodes if position is not POSITION_ABSENTE}) == 1
+            etage = [position.etage for position in self.labyrinthe.nodes if position is not POSITION_ABSENTE][0]
+            visible = [min(position.x for position in self.labyrinthe.nodes)-1, max(position.x for position in self.labyrinthe.nodes)+1, min(position.y for position in self.labyrinthe.nodes)-1, max(position.y for position in self.labyrinthe.nodes)+1]
             nb_cases = max(visible[1]-visible[0], visible[3]-visible[2])+3
             taille_case = int(min(self.tailles) // (nb_cases-1))
             hauteur_exploitee = taille_case * nb_cases

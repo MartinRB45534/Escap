@@ -1,20 +1,27 @@
+"""L'inventaire"""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type, List, Dict, Set
+from warnings import warn
+import random
 import carte as crt
 
-# Imports utilisés uniquement dans les annotations
-if TYPE_CHECKING:
-    from .agissant import Agissant
-    from ..item.item import Item
-    from ...labyrinthe.case import Case
 
-# Pas de classe parente
+# Imports utilisés dans le code (il y en a beaucoup !!!)
+from ...action import Impregne
+from ...commons import EtatsItems
+from ..item import Item, Consommable, Potion, Parchemin, Cle, Equippement, Arme, Bouclier, Armure, Heaume, Anneau, Projectile, Ingredient, Cadavre, Oeuf, ParcheminVierge
 
 # Imports utilisés pour les paramètres par défaut
 from ...labyrinthe.absent import CASE_ABSENTE
 
-class Inventaire:
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from .agissant import Agissant
+    from ...labyrinthe.case import Case
 
+class Inventaire:
+    """L'inventaire d'un agissant. Contient tous les items qu'il possède."""
     def __init__(self,possesseur:Agissant,nb_doigts:int):
         self.possesseur = possesseur #On classe les possessions d'un agissant selon les usages qu'il peut en faire :
 
@@ -32,24 +39,24 @@ class Inventaire:
     @property
     def consommables(self) -> Set[Item]: # Les consommables regroupent les potions et les parchemins
         return {item for item in self.items if isinstance(item,Consommable)}
-    
+
     @property
     def potions(self) -> Set[Potion]: # Les potions peuvent se boire (sans coût de mana)
         print("I'm not useless !! !!!")
         return {item for item in self.items if isinstance(item,Potion)}
-    
+
     @property
     def parchemins(self) -> Set[Parchemin]: # Les parchemins peuvent s'activer avec du mana
         return {item for item in self.items if isinstance(item,Parchemin)}
-    
+
     @property
     def cles(self) -> Set[Cle]: # Les clés ouvrent ou ferment les portes
         return {item for item in self.items if isinstance(item,Cle)}
-    
+
     @property
     def equippements(self) -> Set[Item]: # L'équipement regroupe les armes, les boucliers, les armures, les heaumes et les anneaux
         return {item for item in self.items if isinstance(item,Equippement)}
-    
+
     @property
     def armes(self) -> Set[Arme]: # Les armes sont utilisées pour attaquer
         return {item for item in self.items if isinstance(item,Arme)}
@@ -57,31 +64,31 @@ class Inventaire:
     @property
     def boucliers(self) -> Set[Bouclier]: # Les boucliers sont utilisés pour se défendre
         return {item for item in self.items if isinstance(item,Bouclier)}
-    
+
     @property
     def armures(self) -> Set[Armure]: # Les armures ont des effets passifs
         return {item for item in self.items if isinstance(item,Armure)}
-    
+
     @property
     def heaumes(self) -> Set[Heaume]: # Les heaumes ont des effets passifs
         return {item for item in self.items if isinstance(item,Heaume)}
-    
+
     @property
     def anneaux(self) -> Set[Anneau]: # Les anneaux ont des effets passifs
         return {item for item in self.items if isinstance(item,Anneau)}
-    
+
     @property
     def projectiles(self) -> Set[Projectile]: # Les projectiles se lancent (on peut lancer n'importe quoi, techniquement...)
         return {item for item in self.items if isinstance(item,Projectile)}
-    
+
     @property
     def ingredients(self) -> Set[Ingredient]: # Les ingrédients sont utilisés pour l'alchimie
         return {item for item in self.items if isinstance(item,Ingredient)}
-    
+
     @property
     def cadavres(self) -> Set[Cadavre]: # Oui, on peut récupérer des cadavres, et alors, circulez, y'a rien à voir...
         return {item for item in self.items if isinstance(item,Cadavre)}
-    
+
     @property
     def oeufs(self) -> Set[Oeuf]: # Vous n'allez quand même pas me dire que c'est l'oeuf qui vous choque ! Il y a marqué cadavre juste au dessus !
         return {item for item in self.items if isinstance(item,Oeuf)}
@@ -277,33 +284,10 @@ class Inventaire:
                 if isinstance(parchemin.action_portee,Impregne) and parchemin.action_portee.magie is None:
                     return True
         return False
-    
+
     def get_parchemin_vierge(self):
         for parchemin in self.parchemins:
             if isinstance(parchemin,ParcheminVierge):
                 if isinstance(parchemin.action_portee,Impregne) and parchemin.action_portee.magie is None:
                     return parchemin
         return None
-
-
-# Imports utilisés dans le code (il y en a beaucoup !!!)
-from ...action.non_skill import Impregne
-from ..item.item import Item, Consommable
-from ...commons.etats_item import EtatsItems
-from ..item.potion.potion import Potion
-from ..item.parchemin.parchemin import Parchemin
-from ..item.cle import Cle
-from ..item.equippement.equippement import Equippement
-from ..item.equippement.degainable.degainable import Arme
-from ..item.equippement.degainable.bouclier.bouclier import Bouclier
-from ..item.equippement.armure.armure import Armure
-from ..item.equippement.heaume.heaume import Heaume
-from ..item.equippement.anneau.anneau import Anneau
-from ..item.projectile.projectile import Projectile
-from ..item.item import Ingredient
-from ..item.cadavre import Cadavre
-from ..item.oeuf import Oeuf
-from ..item.parchemin.parchemins import ParcheminVierge
-
-from warnings import warn
-import random

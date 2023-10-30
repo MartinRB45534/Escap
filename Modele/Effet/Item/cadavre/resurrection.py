@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 import carte as crt
 
 # Imports des classes parentes
-from ...timings import OnFinTourCadavre
+from .timings import OnFinTourCadavre
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:

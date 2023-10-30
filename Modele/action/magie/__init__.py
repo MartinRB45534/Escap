@@ -1,3 +1,7 @@
+"""
+Les magies, un type d'action.
+"""
+
 from .magie import *
 from .magies_attaque import *
 from .magies_diverses import *

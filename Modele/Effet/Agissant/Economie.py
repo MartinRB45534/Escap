@@ -1,9 +1,11 @@
+"""Les effets liés aux magies à coût variable."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
 # Imports des classes parentes
-from .agissant import EffetAgissant, TimeLimitedAgissant
-from ..timings import OnDebutTourAgissant
+from .agissant import EffetAgissant
+from .timings import OnDebutTourAgissant, TimeLimitedAgissant
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:

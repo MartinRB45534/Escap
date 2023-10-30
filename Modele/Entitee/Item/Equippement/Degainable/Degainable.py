@@ -1,23 +1,29 @@
+"""Contient la classe Degainable, parente de tous les items qui doivent être dégainés."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Dict
 import carte as crt
+
+# Imports des classes parentes
+from ..equippement import Equippement
+    
+# Imports utilisés dans le code
+from .....affichage import SKIN_ARME
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from .....labyrinthe.labyrinthe import Labyrinthe
     from .....commons.elements import Element
 
-# Imports des classes parentes
-from ..equippement import Equippement
-
 class Degainable(Equippement):
     """La classe des items qui doivent être dégainés. Sont utilisés en complément d'un skill, n'ont pas d'effet le reste du temps."""
-    pass
 
 class Arme(Degainable):
     """La classe des équipements qui augmentent la force d'attaque."""
     def __init__(self,labyrinthe:Labyrinthe,poids:float,frottements:float,element:Element,tranchant:float,portee:int,position:crt.Position=crt.POSITION_ABSENTE):
-        Equippement.__init__(self,labyrinthe,position)
+        Degainable.__init__(self,labyrinthe,position)
+        self.poids = poids
+        self.frottements = frottements
         self.element = element
         self.tranchant = tranchant
         self.taux_tranchant:Dict[str, float] = {}
@@ -26,6 +32,7 @@ class Arme(Degainable):
         self.taux_stats:Dict[str, float] = {}
 
     def get_stats_attaque(self):
+        """Renvoie les stats de l'arme."""
         tranchant = self.tranchant
         for taux in self.taux_tranchant.values():
             tranchant *= taux
@@ -40,6 +47,3 @@ class Arme(Degainable):
     @staticmethod
     def get_image():
         return SKIN_ARME
-    
-# Imports utilisés dans le code
-from .....affichage.skins import SKIN_ARME

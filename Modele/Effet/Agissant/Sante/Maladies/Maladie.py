@@ -7,12 +7,10 @@ from typing import TYPE_CHECKING
 import random
 
 # Imports des classes parentes
-from ....timings import OnFinTourAgissant
+from ...timings import OnFinTourAgissant
 
 # Imports utilisés dans le code
-from .....commons import Deplacement
-from .....commons import Forme
-from .....commons import Passage
+from .....commons import Deplacement, Forme, Passage
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:

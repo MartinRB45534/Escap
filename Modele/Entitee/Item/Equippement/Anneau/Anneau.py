@@ -1,13 +1,18 @@
+"""Contient la classe Anneau."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import carte as crt
 
+# Imports des classes parentes
+from ..equippement import Equippement
+
+# Imports utilisés dans le code
+from .....affichage.skins import SKIN_ANNEAU
+
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from .....labyrinthe.labyrinthe import Labyrinthe
-
-# Imports des classes parentes
-from ..equippement import Equippement
 
 class Anneau(Equippement):
     """La classe des équipements de type anneau. Le nombre d'anneaux qu'on peut porter dépend de l'espèce. Les anneaux peuvent avoir des effets très différends (magiques pour la plupart)."""
@@ -19,6 +24,3 @@ class Anneau(Equippement):
     @staticmethod
     def get_image():
         return SKIN_ANNEAU
-
-# Imports utilisés dans le code
-from .....affichage.skins import SKIN_ANNEAU

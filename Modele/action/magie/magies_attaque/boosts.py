@@ -44,7 +44,7 @@ class MagieBoost(CibleAgissant):
 class MagieMultiBoost(CibleAgissants):
     """La magie qui crée un effet de dopage sur plusieurs autres agissants."""
     nom = "magie multi boost"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,taux:float,duree:float,niveau:int,cible:List[Agissant]=[]):
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,taux:float,duree:float,niveau:int,cible:List[Agissant]):
         CibleAgissants.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau,cible)
         self.cible:List[Agissant] = cible
         self.taux = taux

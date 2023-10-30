@@ -13,7 +13,7 @@ class Attaquant_magique_case(Mage):
         #On cherche l'ennemi le plus puissant en vue
         for pos in self.vue:
             case = self.vue.get_case(pos)
-            if case.agissant is not None and case.agissant.ID in [ennemi.ID for ennemi in self.esprit.ennemis]:
+            if case.agissant is not None and case.agissant.id in [ennemi.id for ennemi in self.esprit.ennemis]:
                     cibles.append((self.esprit.ennemis[case.agissant]["importance"],case.position))
         if cibles and self.peut_caster():
             new_cibles = sorted(cibles, key=itemgetter(0))

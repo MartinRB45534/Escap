@@ -54,13 +54,13 @@ class Vision(Extrait):
             self.voit_agissant(case.agissant, tour)
         
     def voit_agissant(self, agissant:AgissantVu, tour:int):
-        if agissant.ID not in {agissant.ID for agissant in self.corps}: # Les corps nous donnent leurs infos en direct
-            if agissant.ID in self.ennemis:
-                self.ennemis[agissant.ID].voit(agissant, tour)
-            elif agissant.ID in self.neutres:
-                self.neutres[agissant.ID].voit(agissant, tour)
+        if agissant.id not in {agissant.id for agissant in self.corps}: # Les corps nous donnent leurs infos en direct
+            if agissant.id in self.ennemis:
+                self.ennemis[agissant.id].voit(agissant, tour)
+            elif agissant.id in self.neutres:
+                self.neutres[agissant.id].voit(agissant, tour)
             else:
-                self.neutres[agissant.ID] = VisionAgissant(agissant, tour, self)
+                self.neutres[agissant.id] = VisionAgissant(agissant, tour, self)
 
     def get_case(self, position:crt.Position) -> VisionCase:
         return self.position_case[position]

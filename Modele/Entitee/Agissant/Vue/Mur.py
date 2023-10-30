@@ -1,76 +1,79 @@
+"""Contient les classes de murs vus par le joueur."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Callable
 import affichage as af
 import carte as crt
+
+from ....labyrinthe import Mur, MurPlein, MurOuvert, Porte, Barriere, Teleporteur, PorteALoquet, Escalier
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ...entitee import Entitee
 
 class MurVu(crt.Mur):
+    """Un mur vu par le joueur."""
     def __init__(self,niveau:int):
+        super().__init__()
         self.niveau = niveau
-        self.ferme = False
 
-class MurImpassable_vu(MurVu):
+class MurImpassableVu(MurVu):
+    """Un mur qui ne peut pas être traversé."""
     def __init__(self,niveau:int):
         super().__init__(niveau)
         self.ferme = True
 
-class MurPlein_vu(MurVu):
+class MurPleinVu(MurVu):
+    """Un mur ferme"""
     def __init__(self,niveau:int):
         super().__init__(niveau)
         self.casse = False
 
-class Porte_vue(MurPlein_vu):
+class PorteVue(MurPleinVu):
+    """Une porte qui peut être ouverte avec une clé"""
     def __init__(self,niveau:int,code:str):
         super().__init__(niveau)
         self.code = code
         self.ouvert = False
         self.casse = False
 
-class MurOuvert_vu(MurVu):
-    def __init__(self,niveau:int):
-        super().__init__(niveau)
+class MurOuvertVu(MurVu):
+    """Un mur qui peut être ouvert ou fermé"""
 
-class Barriere_vue(MurOuvert_vu):
+class BarriereVue(MurOuvertVu):
+    """Une barrière qui peut s'ouvrir sous certaines conditions"""
     def __init__(self,niveau:int,condition:Callable[[Entitee],bool]):
         super().__init__(niveau)
         self.condition = condition
 
-class Teleporteur_vu(MurOuvert_vu): # La seule différence avec un mur ouvert est que les téléporteurs sont affichés différemment
-    def __init__(self,niveau:int):
-        super().__init__(niveau)
+class TeleporteurVu(MurOuvertVu): # La seule différence avec un mur ouvert est que les téléporteurs sont affichés différemment
+    """Un téléporteur sans notion de haut et de bas"""
 
 # Quelques murs pas symétriques
-class Porte_a_loquet_vue(Porte_vue):
+class PorteALoquetVue(PorteVue):
     """Une porte qui peut s'ouvrir sans clé de l'autre côté"""
-    def __init__(self, niveau: int, code: str):
-        super().__init__(niveau, code)
 
-class Escalier_vu(MurOuvert_vu):
+class EscalierVu(MurOuvertVu):
     """Un téléporteur avec une notion graphique de haut et de bas"""
     def __init__(self, niveau: int, direction: af.DirectionAff):
         super().__init__(niveau)
         self.direction = direction
 
 def voit_mur(mur:Mur) -> MurVu:
+    """Transforme un mur en mur vu."""
     if isinstance(mur,Escalier):
-        return Escalier_vu(mur.niveau,mur.direction)
-    elif isinstance(mur,Porte_a_loquet) and mur.loquet:
-        return Porte_a_loquet_vue(mur.niveau,mur.code)
+        return EscalierVu(mur.niveau,mur.direction)
+    elif isinstance(mur,PorteALoquet) and mur.loquet:
+        return PorteALoquetVue(mur.niveau,mur.code)
     elif isinstance(mur,Porte):
-        return Porte_vue(mur.niveau,mur.code)
+        return PorteVue(mur.niveau,mur.code)
     elif isinstance(mur,Barriere):
-        return Barriere_vue(mur.niveau,mur.condition)
+        return BarriereVue(mur.niveau,mur.condition)
     elif isinstance(mur,Teleporteur):
-        return Teleporteur_vu(mur.niveau)
+        return TeleporteurVu(mur.niveau)
     elif isinstance(mur,MurPlein):
-        return MurPlein_vu(mur.niveau)
+        return MurPleinVu(mur.niveau)
     elif isinstance(mur,MurOuvert):
-        return MurOuvert_vu(mur.niveau)
+        return MurOuvertVu(mur.niveau)
     else:
         raise TypeError(f"Le type {type(mur)} n'est pas reconnu comme un mur.")
-
-
-from ....labyrinthe.mur import Mur, MurPlein, MurOuvert, Porte, Barriere, Teleporteur, Porte_a_loquet, Escalier

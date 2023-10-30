@@ -1,3 +1,7 @@
+"""
+Quelques magies diverses.
+"""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, List, Optional, Set
 import carte as crt
@@ -62,7 +66,7 @@ class MagieInstakill(CibleAgissant, NonRepetable):
 class MagieProtectionSacree(CibleAgissants):
     """La magie qui crée un effet de protection sacrée sur des agissants."""
     nom = "magie protection sacrée"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,duree:float,pv:float,niveau:int,cible:List[Agissant]=[]):
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,duree:float,pv:float,niveau:int,cible:List[Agissant]):
         CibleAgissants.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau,cible)
         self.duree = duree
         self.pv = pv
@@ -77,7 +81,7 @@ class MagieProtectionSacree(CibleAgissants):
 class MagieTeleportation(CibleCases, NonRepetable):
     """La magie qui téléporte des entitées."""
     nom = "magie téléportation"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,niveau:int,cases:List[crt.Position]=[]):
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,niveau:int,cases:List[crt.Position]):
         CibleCases.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau,cases)
         NonRepetable.__init__(self,agissant,latence)
 
@@ -93,16 +97,15 @@ class MagieTeleportation(CibleCases, NonRepetable):
                 if case.decors is not None:
                     continue
                 cases.append(case)
-                if case.agissant is not None:
-                    case.part(case.agissant)
                 agissants.append(case.agissant)
+                case.agissant = None
                 items.append(case.items)
                 case.items = set()
             
             for i in range(len(cases)):
                 agissant = agissants[i]
                 if agissant is not None:
-                    cases[i-1].arrive(agissant)
+                    cases[i-1].agissant_arrive(agissant)
                     agissant.position = cases[i-1].position
                 cases[i-1].items = items[i]
                 for item in cases[i-1].items:

@@ -1,14 +1,16 @@
+"""Contient la classe Epee."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import carte as crt
+
+# Imports des classes parentes
+from ..degainable import Arme
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ......labyrinthe.labyrinthe import Labyrinthe
     from ......commons.elements import Element
-
-# Imports des classes parentes
-from ..degainable import Arme
 
 class Epee(Arme):
     """La classe des armes de type épée. Permettent de porter des coups semi-circulaires devant l'agissant."""

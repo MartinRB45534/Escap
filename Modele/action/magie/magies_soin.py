@@ -36,7 +36,7 @@ class MagieSoin(CibleAgissant):
 class MagieMultiSoin(CibleAgissants):
     """La magie qui invoque un effet de soin sur des agissants ciblés."""
     nom = "magie multi soin"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,gain_pv:float,niveau:int,cible:List[Agissant]=[]):
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,gain_pv:float,niveau:int,cible:List[Agissant]):
         CibleAgissants.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau,cible)
         self.gain_pv = gain_pv
 
@@ -101,5 +101,5 @@ class MagieReanimationDeZone(CibleCase,PorteeLimitee):
             for position in zone:
                 for item in self.agissant.labyrinthe.get_case(position).items:
                     if isinstance(item,Cadavre):
-                        if item.get_priorite()+self.superiorite < self.agissant.get_priorite():
+                        if item.priorite+self.superiorite < self.agissant.priorite:
                             item.effets.append(Reanimation(self.taux_pv,self.agissant.esprit))

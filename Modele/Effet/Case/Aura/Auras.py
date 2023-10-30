@@ -1,13 +1,15 @@
+"""Contient les classes des effets d'auras élémentales."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
 # Imports des classes parentes
 from ..cases import DegatsCase, Ralenti, Opacite
 from .aura import Aura
-from ...timings import TimeLimited
+from ...time_limited import TimeLimited
 
 # Variables de classe
-from ....commons.elements import Element
+from ....commons import Element
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:

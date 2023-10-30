@@ -5,17 +5,11 @@ from typing import TYPE_CHECKING
 
 # Imports des classes parentes
 from .item import EffetItem, EffetArme
-from ..timings import OnFinTourItem
-
-# Imports des valeurs par défaut des paramètres
-from ...commons.elements import Element
-
+from .timings import OnFinTourItem
 
 # Imports utilisés dans le code
-from ..attaque.attaque import AttaqueCase
-from ...commons import Deplacement
-from ...commons import Passage
-from ...commons import Forme
+from ..case.attaque import AttaqueCase
+from ...commons import Deplacement, Passage, Forme, Element
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
@@ -38,9 +32,11 @@ class OnHit(EffetItem):
 
     def hit(self,item:Item):
         """L'effet est déclenché quand l'item heurte un agissant ou un mur."""
+        if item.action is None:
+            raise ValueError("L'item frappe sans être en vol !")
         zone = item.labyrinthe.a_portee(item.position,self.portee,Deplacement.SPATIAL,Forme.CERCLE,Passage(False,False,False,True,False))
         for position in zone:
-            item.labyrinthe.get_case(position).effets.add(AttaqueCase(item.lanceur,self.degats,self.element,"distance"))
+            item.labyrinthe.get_case(position).effets.add(AttaqueCase(item.action.lanceur,self.degats,self.element,"distance"))
 
 class EffetTranchant(EffetArme):
     """Effet qui modifie le tranchant d'une arme (en positif ou négatif)."""

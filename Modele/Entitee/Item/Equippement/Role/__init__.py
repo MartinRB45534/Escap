@@ -1,3 +1,5 @@
+"""Les rôles des items."""
+
 from .defensif import *
 from .reparateur import *
 from .reparateur_magique import *

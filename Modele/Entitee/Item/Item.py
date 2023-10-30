@@ -1,3 +1,7 @@
+"""
+Les items sont des entitées inanimées qui peuvent être ramassées, lancées, etc.
+"""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Any
 import carte as crt
@@ -7,16 +11,13 @@ import affichage as af
 from ..entitee import Mobile
 
 # Imports utilisés dans le code
-from ..agissant.agissant import NOONE
-from ...commons.etats_item import EtatsItems
-from ...affichage.skins import SKIN_INGREDIENT
-from ...effet.timings import OnDebutTourItem, OnFinTourItem, TimeLimited
-from ...effet.item import OnHit
+from ...commons import EtatsItems
+from ...affichage import SKIN_INGREDIENT
+from ...effet import OnDebutTourItem, OnFinTourItem, TimeLimited, OnHit
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..agissant.agissant import Agissant
-    from ...action.deplacement import Vole
+    from ...action.deplacement import Plane
     from ...labyrinthe.labyrinthe import Labyrinthe
 
 class Item(Mobile):
@@ -25,9 +26,8 @@ class Item(Mobile):
         Mobile.__init__(self,position,ID)
         self.labyrinthe = labyrinthe
         self.etat = EtatsItems.INTACT #Le niveau l'évacuera s'il n'est plus intact.
-        self.priorite = 0 #Pour avoir le droit de la ramasser.
-        self.action:Optional[Vole] = None #Utile uniquement quand l'item est lancé. Les items ne peuvent que voler
-        self.lanceur:Agissant = NOONE
+        self._priorite = 0 #Pour avoir le droit de la ramasser.
+        self.action:Optional[Plane] = None #Utile uniquement quand l'item est lancé. Les items ne peuvent que voler
         self.direction:Optional[crt.Direction] = None #Utile uniquement quand l'item se déplace.
         self.poids:float = 10 #Utile uniquement quand l'item est lancé. Détermine le temps qu'il faut à l'agissant pour le lancer et le temps que l'item se déplacera.
         self.frottements:float = 10 #Utile uniquement quand l'item se déplace. Détermine la latence à chaque déplacement.
@@ -73,8 +73,18 @@ class Item(Mobile):
     def arret(self):
         """L'item s'arrête."""
         if self.action is not None:
-            self.action = None #Pylint n'a pas l'air de comprendre que Vole hérite de Action
+            self.action = None
         self.hauteur = 0
+
+    def add_latence(self,latence: float):
+        """Ajoute de la latence à l'action de l'entitée."""
+        if self.action is not None:
+            self.action.latence += latence
+
+    def set_latence(self,latence: float):
+        """Modifie la latence de l'action de l'entitée."""
+        if self.action is not None:
+            self.action.latence = latence
 
     #Découvrons le déroulé d'un tour, avec item-kun :
     def debut_tour(self):

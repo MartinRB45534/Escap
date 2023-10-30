@@ -1,11 +1,12 @@
-from __future__ import annotations
+"""Contient la classe ReparateurMagique."""
 
-# Pas d'import pour les annotations
+from __future__ import annotations
 
 # Imports des classes parentes
 from ...equippement import Equippement
 
-class Reparateur_magique(Equippement):
+class ReparateurMagique(Equippement):
     """La classe des équipements qui régénèrent les pm."""
     def regen_pm(self,regen_pm:float):
+        """Renvoie la nouvelle régénération des pm."""
         return regen_pm

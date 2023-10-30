@@ -1,1 +1,3 @@
-from .Lance import *
+"""La lance."""
+
+from .lance import *

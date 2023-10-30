@@ -1,18 +1,24 @@
+"""Contient la classe Bouclier."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import carte as crt
+
+# Imports des classes parentes
+from ..degainable import Degainable
+
+# Imports utilisés dans le code
+from ......affichage import SKIN_BOUCLIER
+from ......effet import AttaqueCase
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ......labyrinthe.labyrinthe import Labyrinthe
 
-# Imports des classes parentes
-from ..degainable import Degainable
-
 class Bouclier(Degainable):
     """La classe des boucliers. Permettent de se protéger des attaques lorsqu'ils sont utilisés."""
     def __init__(self,labyrinthe:Labyrinthe,poids:float,frottements:float,degats_bloques:float,taux_degats:float,position:crt.Position=crt.POSITION_ABSENTE):
-        Equippement.__init__(self,labyrinthe,position)
+        Degainable.__init__(self,labyrinthe,position)
         self.degats_bloques = degats_bloques
         self.taux_degats = taux_degats
         self.taux_stats = {}
@@ -31,8 +37,3 @@ class Bouclier(Degainable):
     @staticmethod
     def get_image():
         return SKIN_BOUCLIER
-
-# Imports utilisés dans le code
-from ......affichage.skins import SKIN_BOUCLIER
-from ......effet.attaque.attaque import AttaqueCase
-from ...equippement import Equippement

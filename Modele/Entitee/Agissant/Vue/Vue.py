@@ -1,17 +1,22 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Set
-import carte as crt
 import networkx as nx
-
-# Imports utilisés uniquement dans les annotations
-if TYPE_CHECKING:
-    from .case import CaseVue, CasePasVue
-    from .mur import MurVu
+import carte as crt
 
 # Import de la classe parente
 from ....labyrinthe.extrait import Extrait
 
+# Imports utilisés dans le code
+from .case import voit_case, CasePasVue
+from .mur import voit_mur
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from .case import CaseVue
+    from .mur import MurVu
+
 class Vue(Extrait):
+    """Un extrait de labyrinthe vu par un agissant."""
     def __init__(self, exterieur:Set[crt.Position], subgraph:nx.MultiDiGraph, position_case:dict[crt.Position,CaseVue]):
         nx.MultiDiGraph.__init__(self)
         self.add_nodes_from(subgraph.nodes(data=True))
@@ -34,6 +39,7 @@ class Vue(Extrait):
         return mur
 
 def voit_vue(extrait: Extrait) -> Vue:
+    """Transforme un extrait en vue."""
     subgraph = nx.MultiDiGraph(extrait)
     position_case = {position: voit_case(case) for position, case in extrait.position_case.items()}
     for position in extrait:
@@ -47,6 +53,3 @@ def voit_vue(extrait: Extrait) -> Vue:
         subgraph,
         position_case,
     )
-
-from .case import voit_case, CasePasVue
-from .mur import voit_mur

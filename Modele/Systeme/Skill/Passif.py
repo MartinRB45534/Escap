@@ -6,11 +6,11 @@ from .skill import Skill
 
 # Variables de classe
 from ...commons.elements import Element
-from ...entitee.item.equippement.degainable.degainable import Arme
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ...effet import Aura
+    from ...entitee.item.equippement.degainable.degainable import Arme
 
 class Passif(Skill):
     """
@@ -34,7 +34,7 @@ class SkillVision(Passif):
     def utilise(self) -> None: #Le skill ne fait que donner des infos, il ne peut pas manipuler d'objet labyrinthe ou autres
         raise NotImplementedError
 
-class SkillAura(Skill_debut_tour): #Toutes les auras ne sont pas des skills intrasecs, mais par rapport aux méthodes c'est plus logique comme ça.
+class SkillAura(SkillDebutTour): #Toutes les auras ne sont pas des skills intrasecs, mais par rapport aux méthodes c'est plus logique comme ça.
     """Offre une aura qui se matérialise autour de l'agissant. Les effets de l'aura diffèrent selon l'aura. Skill aura est une classe parente et ne doit pas être instanciée.
        Les auras sont des skills passifs, qui s'actionne à chaque tour."""
     def __init__(self,effet:Type[Aura]):

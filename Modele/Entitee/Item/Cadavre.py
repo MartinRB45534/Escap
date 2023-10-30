@@ -1,9 +1,14 @@
+"""Contient la classe Cadavre."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import carte as crt
 
 # Imports des classes parentes
 from .item import Item
+
+# Imports utilisés dans le code
+from ...affichage import SKIN_CADAVRE
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
@@ -16,13 +21,6 @@ class Cadavre(Item):
         self.poids = 1
         self.agissant = agissant
 
-    def get_classe(self):
-        """Se limite aux catégories de l'inventaire."""
-        return Cadavre
-
     @staticmethod
     def get_image():
         return SKIN_CADAVRE
-
-# Imports utilisés dans le code
-from ...affichage.skins import SKIN_CADAVRE
