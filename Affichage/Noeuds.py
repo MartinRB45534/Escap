@@ -1,3 +1,5 @@
+"""Définitions des noeuds de l'arbre d'affichage."""
+
 from __future__ import annotations
 from typing import Literal, Optional, TYPE_CHECKING
 
@@ -40,7 +42,7 @@ class NoeudVerticalProfondeurAgnostique(Noeud):
         res = self.in_down()
         self.courant.set_actif()
         return res
-    
+
 class NoeudHorizontal(Noeud):
     """Un élément dont le contenu est disposé horizontalement (donc next et previous correspondent à gauche et droite)."""
     def through_previous(self):
@@ -56,8 +58,8 @@ class NoeudHorizontal(Noeud):
         res = self.in_right()
         self.courant.set_actif()
         return res
-    
-class NoeudHorizontalProfondeur_Agnostique(Noeud):
+
+class NoeudHorizontalProfondeurAgnostique(Noeud):
     """Un knot_horizontal qui ne fait pas de différence entre in et through (pour gauche et droite)."""
     def through_left(self):
         assert self.courant is not None
@@ -77,45 +79,45 @@ class NoeudHierarchiqueSinistre(Noeud):
     """Un élément dont le contenu est hiérarchique de gauche à droite (donc gauche et droite correspondent à out et in)."""
     def in_left(self):
         return self.in_out()
-    
+
     def through_left(self):
         return self.through_out()
-    
+
     def in_right(self):
         return self.in_in()
-    
+
 class NoeudHierarchiqueSinistreSommet(Noeud):
     """Au sommet de la hiérarchie (donc il n'y a rien à gauche)"""
     def through_left(self):
         return self.through_out()
-    
+
     def in_right(self):
         return self.in_in()
-    
+
 class NoeudHierarchiqueSinistreBase(Noeud):
     """En bas de la hiérarchie (donc il n'y a rien à droite)"""
     def in_left(self):
         return self.in_out()
-    
+
 class NoeudHierarchiqueDextre(Noeud):
     """Un élément dont le contenu est hiérarchique de droite à gauche (donc gauche et droite correspondent à in et out)."""
     def in_left(self):
         return self.in_in()
-    
+
     def through_right(self):
         return self.through_out()
-    
+
     def in_right(self):
         return self.in_out()
-    
+
 class NoeudHierarchiqueDextreSommet(Noeud):
     """Au sommet de la hiérarchie (donc il n'y a rien à droite)"""
     def through_right(self):
         return self.through_out()
-    
+
     def in_left(self):
         return self.in_in()
-    
+
 class NoeudHierarchiqueDextreBase(Noeud):
     """En bas de la hiérarchie (donc il n'y a rien à gauche)"""
     def in_right(self):
@@ -152,6 +154,6 @@ class NoeudBloque(Noeud):
                     self.set_actif()
                     return self
             return self
-            
+
     def select(self, selection: Affichable, droit: bool = False):
         pass

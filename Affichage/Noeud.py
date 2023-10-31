@@ -12,7 +12,7 @@ from .direction import Direction, DirectionAff
 class Noeud(Cliquable):
     """Un élément qui réagit aux clics et qui peut contenir un autre élément actif."""
     def __init__(self):
-        super().__init__()
+        Cliquable.__init__(self)
         self.courant = None #Quel est l'élément suivant dans la hiérarchie ?
 
     def trouve_actif(self):
@@ -99,6 +99,8 @@ class Noeud(Cliquable):
             return self.through_up()
         elif direction ==  DirectionAff.DOWN:
             return self.through_down()
+        elif direction ==  DirectionAff.VALIDATE:
+            return self.through_out()
         else:
             warn(f"Knot.navigue_through : Direction inconnue : {direction}")
             return self

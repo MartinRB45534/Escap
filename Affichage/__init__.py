@@ -19,6 +19,7 @@ Classes:
 - Skin
 - Skins
 - Survolable
+- Texte_input
 - Texte
 - Vignette
 - Vignettes
@@ -44,6 +45,7 @@ from .polices import *
 from .skin import *
 from .skins import *
 from .survolable import *
+from .texte_input import *
 from .texte import *
 from .vignette import *
 from .vignettes import *

@@ -8,13 +8,13 @@ from warnings import warn
 import pygame
 
 from .affichable import Affichable
+from .survolable import Survolable
+from .cliquable import Cliquable
 
 from ._ensure_pygame import transparency_flag
 
 if TYPE_CHECKING:
     from .placeholder import Placeheldholder
-    from .cliquable import Cliquable
-    from .survolable import Survolable
 
 class Wrapper(Affichable):
     """Un conteneur avec un unique élément"""
@@ -73,14 +73,14 @@ class Wrapper(Affichable):
                 res = res_objet
         return res
     
-    def clique_placeholder(self,placeheldholder:Placeheldholder,droit:bool=False):
+    def clique_placeholder(self,placeheldholder:Placeheldholder,_droit:bool=False):
         res = False
         if self.contenu:
-            res_contenu = self.contenu.clique_placeholder(placeheldholder,droit)
+            res_contenu = self.contenu.clique_placeholder(placeheldholder,_droit)
             if res_contenu:
                 res = res_contenu
         for objet in self.objets:
-            res_objet = objet.clique_placeholder(placeheldholder,droit)
+            res_objet = objet.clique_placeholder(placeheldholder,_droit)
             if res_objet:
                 res = res_objet
         return res

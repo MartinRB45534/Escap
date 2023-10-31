@@ -54,7 +54,7 @@ class Texte(Cliquable):
         texte=POLICE20.render(self.get_texte(True),True,(0,0,0))
         screen.blit(texte,self.position)
 
-    def get_tailles(self,tailles:Tuple[int,int]) -> Tuple[int,int]:
+    def get_tailles(self,_tailles:Tuple[int,int]) -> Tuple[int,int]:
         return (POLICE20.size(self.get_texte())[0],20)
 
 class Pave(Texte,TailleVariable):

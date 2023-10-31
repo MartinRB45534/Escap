@@ -1,7 +1,10 @@
+"""Détermine les modificateurs de touches."""
+
 from typing import Set
 import pygame
 
 def get_modifiers(mod:int) -> Set[int]:
+    """Détermine les modificateurs de touches."""
     if mod == pygame.KMOD_NONE:
         return set()
     else:

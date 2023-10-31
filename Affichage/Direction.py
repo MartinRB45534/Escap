@@ -17,6 +17,7 @@ class DirectionAff(Direction,Enum):
     OUT = "Out"
     NEXT = "Next"
     PREVIOUS = "Previous"
+    VALIDATE = "Validate" # Valide la saisie
 
     @property
     def oppose(self):
@@ -37,5 +38,7 @@ class DirectionAff(Direction,Enum):
             return DirectionAff.PREVIOUS
         elif self == DirectionAff.PREVIOUS:
             return DirectionAff.NEXT
+        elif self == DirectionAff.VALIDATE:
+            return DirectionAff.VALIDATE # Pas d'opposé
         else:
             raise ValueError("La direction n'est pas valide")
