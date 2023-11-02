@@ -182,7 +182,7 @@ class Paves(Cliquable,TailleVariable):
 class CenterTexte(WrapperNoeudBloque):
     """Un texte centré"""
     def __init__(self, texte:str):
-        super().__init__()
+        WrapperNoeudBloque.__init__(self)
         self.texte = Texte(texte)
         self.set_courant(self.texte)
         self.init()

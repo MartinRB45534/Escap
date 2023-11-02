@@ -40,6 +40,8 @@ from .liste import *
 from .marge import *
 from .noeud import *
 from .noeuds import *
+from .onglet import *
+from .onglets import *
 from .pavage import *
 from .polices import *
 from .skin import *

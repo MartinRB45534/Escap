@@ -23,6 +23,7 @@ class Editeur:
         while self.loop:
             self.input()
             self.affichage.trouve_actif()
+            self.affichage.update()
             self.affichage.affiche(screen)
             pygame.display.flip()
             self.patiente()
