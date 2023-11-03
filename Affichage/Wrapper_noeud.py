@@ -11,7 +11,7 @@ from .wrapper import Wrapper
 from .wrapper_cliquable import WrapperCliquable
 
 if TYPE_CHECKING:
-    from placeholder import Placeheldholder
+    from .placeholder import Placeheldholder
     from .cliquable import Cliquable
 
 class WrapperNoeud(Noeud,WrapperCliquable):
@@ -37,7 +37,7 @@ class WrapperNoeud(Noeud,WrapperCliquable):
         if clique:
             return self
         return False
-    
+
     def clique_placeholder(self,placeheldholder: Placeheldholder, droit:bool=False) -> Cliquable|Literal[False]:
         res = Wrapper.clique_placeholder(self,placeheldholder, droit)
         if res:
@@ -48,4 +48,5 @@ class WrapperNoeud(Noeud,WrapperCliquable):
 class WrapperNoeudBloque(NoeudBloque,WrapperNoeud):
     """Un wrapper_noeud qui est bloqué"""
 
+# Désolé pour ça, mais Placeheldholder hérite de WrapperNoeud donc il faut que ce soit après
 from .placeholder import Placeheldholder

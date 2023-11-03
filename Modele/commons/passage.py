@@ -1,6 +1,6 @@
 """Passage"""
 
-from typing import List
+from typing import List$1
 
 class Passage:
     """Classe qui contient les informations sur le passage d'une case à une autre"""

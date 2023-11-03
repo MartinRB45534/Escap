@@ -3,7 +3,7 @@ Contient les classes de protection des cases.
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List$1
 from warnings import warn
 import carte as crt
 

@@ -3,7 +3,7 @@ Contient les classes mères des skills
 """
 
 from __future__ import annotations
-from typing import List
+from typing import List$1
 import affichage as af
 
 # Pas d'import utilisés uniquement dans les annotations

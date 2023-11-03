@@ -3,7 +3,7 @@ Les skills d'attaque physique.
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List$1
 import carte as crt
 
 # Imports des classes parentes

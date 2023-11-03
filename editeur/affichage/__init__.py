@@ -2,3 +2,4 @@
 
 from .affichage_editeur import *
 from .especes import *
+from .items import *

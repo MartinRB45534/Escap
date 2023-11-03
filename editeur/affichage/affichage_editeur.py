@@ -20,6 +20,8 @@ class AffichageEditeur(af.Onglets):
         self.jeu = jeu
         self.set_onglets([
             OngletEspeces(self.jeu),
+            # OngletEffets(self.jeu),
+            
         ])
 
     def bouge_souris(self, event:pygame.event.Event):

@@ -22,7 +22,7 @@ class Conteneur(Affichable):
         self.contenu:List[Affichable] = [] #Les objets qu'il 'contient'
         self.fond = (0,0,0,0)
         super().__init__()
-    
+
     def set_contenu(self,contenu:List[Affichable]):
         """Change le contenu du conteneur."""
         self.contenu = contenu
@@ -36,7 +36,7 @@ class Conteneur(Affichable):
         super().decale(decalage)
         for objet in self.objets:
             objet.decale(decalage)
-    
+
     def affiche(self,screen:pygame.Surface,frame:int=1,frame_par_tour:int=1):
         surf = pygame.Surface(self.tailles, transparency_flag)
         surf.fill(self.fond)

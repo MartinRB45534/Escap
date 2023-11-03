@@ -3,7 +3,7 @@ Contient la classe Liste, qui permet d'afficher des objets à la suite, et de le
 """
 
 from __future__ import annotations
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Sequence
 from warnings import warn
 import pygame
 
@@ -19,7 +19,8 @@ from ._ensure_pygame import transparency_flag
 class Liste(Conteneur):
     """Contient des objets, et les affiche à la suite."""
     def __init__(self):
-        super().__init__()
+        Conteneur.__init__(self)
+        self.contenu:List[Affichable]
         self.repartition = []
         self.courant = 0 #L'élément 'courant' de la liste TODO : trouver un meilleur nom (ça risque de prêter à confusion)
         self.decalage = 0
@@ -85,7 +86,7 @@ class Liste(Conteneur):
             if res_objet:
                 res = res_objet
         return res
-    
+
     def ajuste(self,element:Affichable):
         """Ajuste la liste pour que l'élément soit visible."""
 
@@ -268,12 +269,38 @@ class ListeHorizontale(Liste):
             self.decalage += ancienne_rep if ancienne_rep else ancien_contenu.get_tailles(self.tailles)[0] - rep if rep else contenu.get_tailles(self.tailles)[0]
         self.set_tailles(self.tailles)
 
+class ListeMarge(Liste):
+    """Une liste avec des marges automatiques."""
+    def __init__(self, marge: int = 5):
+        Liste.__init__(self)
+        self.marge = marge
+
+    def set_contenu(self, contenu: Sequence[Affichable], repartition: Optional[List[int]] = None, courant: int = 0):
+        if repartition is None:
+            repartition = [0] * len(contenu)
+        # On vérifie qu'il n'y a pas de nombres négatifs dans la répartition
+        if any(taille < 0 for taille in repartition):
+            warn("Les tailles doivent être positives dans les listes !")
+        # On vérifie qu'il y a autant d'éléments dans la répartition que dans le contenu
+        elif len(contenu) != len(repartition):
+            warn(f"Hoy, {contenu} et {repartition} ne sont pas de même taille !")
+        else:
+            self.contenu = [(MargeHorizontale() if isinstance(self, ListeVerticale) else MargeVerticale()) if i % 2 else contenu[i // 2] for i in range(2 * len(contenu) - 1)]
+            self.repartition = [self.marge if i%2 else repartition[i//2] for i in range(2*len(repartition)-1)]
+            self.courant = courant
+
+class ListeMargeVerticale(ListeMarge, ListeVerticale):
+    """Une liste disposée verticalement avec des marges automatiques."""
+
+class ListeMargeHorizontale(ListeMarge, ListeHorizontale):
+    """Une liste disposée horizontalement avec des marges automatiques."""
+
 class ListeMenu(WrapperNoeud):
     """Une liste sur plusieurs lignes"""
     def __init__(self):
         WrapperNoeud.__init__(self)
         self.items:List[Cliquable] = []
-        self.liste = ListeVerticale()
+        self.liste = ListeMargeVerticale()
 
     def set_fond(self,fond:Tuple[int,int,int,int]|Tuple[int,int,int]):
         self.fond = fond
@@ -285,18 +312,18 @@ class ListeMenu(WrapperNoeud):
 
     def set_tailles(self,tailles:Tuple[int,int]):
         self.tailles = tailles
-        listes:List[ListeHorizontale] = []
-        ligne:List[Cliquable] = []
-        ligne_courante:List[Cliquable] = []
-        liste_courante=ListeHorizontale()
+        listes:List[Affichable] = []
+        ligne:List[Affichable] = []
+        ligne_courante:List[Affichable] = []
+        liste_courante=ListeMargeHorizontale()
         longueur_ligne=5
         for contenu in self.items:
             if contenu.get_tailles(self.tailles)[0] + 10 >tailles[0]:
                 warn(f"Je n'ai même pas la place d'afficher {contenu} !")
                 break
             elif longueur_ligne + contenu.get_tailles(self.tailles)[0] + 5 > tailles[0]:
-                liste = ListeHorizontale()
-                liste.set_contenu([ligne[j//2] if j%2 == 0 else MargeVerticale() for j in range(-1,2*len(ligne))],[0 if j%2 == 0 else 5 for j in range(-1,2*len(ligne))])
+                liste = ListeMargeHorizontale()
+                liste.set_contenu(ligne)
                 listes.append(liste)
                 if ligne == ligne_courante:
                     liste_courante = liste
@@ -309,12 +336,12 @@ class ListeMenu(WrapperNoeud):
                 longueur_ligne += contenu.tailles[0] + 5
                 if contenu == self.courant:
                     ligne_courante = ligne
-        liste = ListeHorizontale()
-        liste.set_contenu([ligne[j//2] if j%2 == 0 else MargeVerticale() for j in range(-1,2*len(ligne))],[0 if j%2 == 0 else 5 for j in range(-1,2*len(ligne))])
+        liste = ListeMargeHorizontale()
+        liste.set_contenu(ligne)
         listes.append(liste)
         if ligne == ligne_courante:
             liste_courante = liste
-        self.liste.set_contenu([listes[j//2] if j%2 == 0 else MargeHorizontale() for j in range(-1,2*len(listes))],[0 if j%2 == 0 else 5 for j in range(-1,2*len(listes))])
+        self.liste.set_contenu(listes)
         self.liste.set_tailles(self.tailles)
         self.liste.ajuste(liste_courante)
 

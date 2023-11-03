@@ -2,5 +2,5 @@
     "reportMissingTypeStubs": "warning",
     "reportGeneralTypeIssues": "warning",
     "strict": true,
-    "ignores": ["pygame","networkx"]
+    "ignores": ["pygame","networkx","pygame_textinput"]
 }

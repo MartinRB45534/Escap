@@ -5,9 +5,9 @@ from typing import Tuple, Optional, Callable, TYPE_CHECKING
 import pygame
 
 from .wrapper_cliquable import WrapperCliquable
-from .pavage import PavageVertical, PavageHorizontal
+from .wrapper_marge import WrapperMarge
+from .liste import ListeMargeHorizontale
 from .placeholder import Placeholder
-from .marge import MargeVerticale, MargeHorizontale
 from .texte import Texte
 from .vignette import Vignette
 from .skins import Skin
@@ -36,10 +36,10 @@ class Bouton(WrapperCliquable):
 
     def init(self):
         """Initialise le bouton"""
-        contenu = PavageVertical()
-        triptique = PavageHorizontal()
-        triptique.set_contenu([MargeVerticale(),Vignette((0,0),20,self.skin),MargeVerticale(),Texte(self.texte),MargeVerticale()],[5,0,5,0,5])
-        contenu.set_contenu([MargeHorizontale(),triptique,MargeHorizontale()],[5,0,5])
+        contenu = WrapperMarge()
+        liste = ListeMargeHorizontale()
+        liste.set_contenu([Vignette((0,0),20,self.skin),Texte(self.texte)])
+        contenu.set_contenu(liste)
         self.set_contenu(contenu)
 
     def get_fond(self):

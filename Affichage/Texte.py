@@ -1,12 +1,11 @@
+"""Contient les classes de textes"""
+
 from __future__ import annotations
 from typing import List, Tuple, Optional
 import pygame
 
 from .cliquable import Cliquable
 from .affichable import TailleVariable
-from .wrapper_noeud import WrapperNoeudBloque
-from .pavage import PavageHorizontal, PavageVertical
-from .marge import MargeHorizontale, MargeVerticale
 
 from .polices import POLICE20
 
@@ -26,7 +25,7 @@ class Texte(Cliquable):
         self.texte_est_courant=texte_est_courant if texte_est_courant else self.texte
         # Élément pas très important non plus : le texte actif (pour montrer au joueur que s'il revient dans le dialogue, le texte sera actif)
         self.texte_actif=texte_actif if texte_actif else self.texte_est_courant
-    
+
     def get_texte(self,reset:bool=False) -> str:
         """Renvoie le texte à afficher."""
         if self.marque_survol:
@@ -178,53 +177,3 @@ class Paves(Cliquable,TailleVariable):
                     i+=1
                 screen.blit(POLICE20.render(ligne,True,(0,0,0)),[self.position[0],self.position[1]+hauteur*20])
                 hauteur += 1
-
-class CenterTexte(WrapperNoeudBloque):
-    """Un texte centré"""
-    def __init__(self, texte:str):
-        WrapperNoeudBloque.__init__(self)
-        self.texte = Texte(texte)
-        self.set_courant(self.texte)
-        self.init()
-
-    def init(self):
-        """Initialise le contenu du wrapper"""
-        contenu = PavageVertical()
-        monotique = PavageHorizontal()
-        monotique.set_contenu([MargeVerticale(), self.texte, MargeVerticale()], [-1, 0, -1])
-        contenu.set_contenu([MargeHorizontale(), monotique, MargeHorizontale()], [-1, 0, -1])
-        self.set_contenu(contenu)
-
-class MarginTexte(WrapperNoeudBloque):
-    """Un texte avec des marges"""
-    def __init__(self, texte:str):
-        super().__init__()
-        self.texte = Texte(texte)
-        self.set_courant(self.texte)
-        self.init()
-
-    def init(self):
-        """Initialise le contenu du wrapper"""
-        contenu = PavageVertical()
-        monotique = PavageHorizontal()
-        monotique.set_contenu([MargeVerticale(), self.texte, MargeVerticale()], [5, 0, 5])
-        contenu.set_contenu([MargeHorizontale(), monotique, MargeHorizontale()], [5, 0, 5])
-        self.set_contenu(contenu)
-
-class CenterHorizontalTexte(CenterTexte, MarginTexte):
-    """Un texte centré horizontalement, avec des marges au dessus et en dessous"""
-    def init(self):
-        contenu = PavageVertical()
-        monotique = PavageHorizontal()
-        monotique.set_contenu([MargeVerticale(), self.texte, MargeVerticale()], [-1, 0, -1])
-        contenu.set_contenu([MargeHorizontale(), monotique, MargeHorizontale()], [5, 0, 5])
-        self.set_contenu(contenu)
-
-class CenterVerticalTexte(CenterTexte, MarginTexte):
-    """Un texte centré verticalement, avec des marges à gauche et à droite"""
-    def init(self):
-        contenu = PavageVertical()
-        monotique = PavageHorizontal()
-        monotique.set_contenu([MargeVerticale(), self.texte, MargeVerticale()], [5, 0, 5])
-        contenu.set_contenu([MargeHorizontale(), monotique, MargeHorizontale()], [-1, 0, -1])
-        self.set_contenu(contenu)

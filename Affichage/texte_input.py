@@ -15,9 +15,10 @@ if TYPE_CHECKING:
 class TexteInput(Cliquable):
     """Un élément qui permet de saisir du texte."""
     current_input: Optional[pygame_textinput.TextInputVisualizer] = None
-    def __init__(self, texte: str = "", validator:Optional[Callable[[str],bool]] = lambda x: True):
+    def __init__(self, texte: str = "(Cliquez ici)", validator:Callable[[str],bool] = lambda x: True, acceptor:Callable[[str],bool] = lambda x: True):
         Cliquable.__init__(self)
         manager = pygame_textinput.TextInputManager(texte, validator)
+        self.acceptor = acceptor
         self.textinput = pygame_textinput.TextInputVisualizer(manager,POLICE20)
 
     def get_tailles(self, _tailles: Tuple[int, int]):
@@ -25,6 +26,10 @@ class TexteInput(Cliquable):
 
     def affiche(self, screen: pygame.Surface, frame: int = 1, frame_par_tour: int = 1):
         """Affiche l'élément."""
+        if self.acceptor(self.textinput.value): # type: ignore # Type partially unknown
+            self.textinput.font_color = (0,0,0)
+        else:
+            self.textinput.font_color = (255,0,0)
         screen.blit(self.textinput.surface, self.position)
 
     def set_actif(self):
@@ -46,10 +51,23 @@ class TexteInput(Cliquable):
 
 class IntInput(TexteInput):
     """Un élément qui permet de saisir un entier."""
-    def __init__(self, texte: str = ""): # On accepte les entiers, positifs et négatifs, et les chaines vides
-        TexteInput.__init__(self, texte, lambda x: x.isdigit() or (x.startswith("-") and x[1:].isdigit()) or x == "")
+    def __init__(self, texte: str = "0", acceptor:Callable[[str],bool] = lambda x: True): # On accepte les entiers, positifs et négatifs, et les chaines vides
+        TexteInput.__init__(self, texte, lambda x: x.isdigit() or (x.startswith("-") and x[1:].isdigit()) or x == "", acceptor)
+
+    def navigue(self, direction: Direction) -> Optional[Cliquable]|Literal[False]:
+        """Navigue dans la direction donnée, et renvoie l'élément navigué, ou False sinon
+           (récursif pour d'autres éléments).
+           """
+        if self.actif:
+            if direction == DirectionAff.UP:
+                self.textinput.value = str(int(self.textinput.value)+1) # type: ignore # Type partially unknown
+                return self
+            elif direction == DirectionAff.DOWN:
+                self.textinput.value = str(int(self.textinput.value)-1) # type: ignore # Type partially unknown
+                return self
+        return TexteInput.navigue(self, direction)
 
 class NumberInput(TexteInput):
     """Un élément qui permet de saisir un nombre."""
-    def __init__(self, texte: str = ""): # On accepte les nombres, positifs et négatifs, et les chaines vides
-        TexteInput.__init__(self, texte, lambda x: x.replace(".","",1).isdigit() or (x.startswith("-") and x[1:].replace(".","",1).isdigit()) or x == "")
+    def __init__(self, texte: str = "0.0", acceptor:Callable[[str],bool] = lambda x: True): # On accepte les nombres, positifs et négatifs, et les chaines vides
+        TexteInput.__init__(self, texte, lambda x: x.replace(".","",1).isdigit() or (x.startswith("-") and x[1:].replace(".","",1).isdigit()) or x == "", acceptor)

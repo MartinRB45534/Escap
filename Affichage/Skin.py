@@ -26,10 +26,10 @@ class Illustration:
 
 class Image(Illustration):
     """Une image avec une direction, qui peut être tournée."""
-    def dessine_toi(self,screen:pygame.Surface,position:Tuple[int,int],tailles:Tuple[int,int]=(40,40),_frame:int=1,_frame_par_tour:int=1,direction:int=0):
+    def dessine_toi(self,screen:pygame.Surface,position:Tuple[int,int],_frame:int=1,_frame_par_tour:int=1,tailles:Tuple[int,int]=(40,40),direction:int=0):
         screen.blit(pygame.transform.scale(pygame.transform.rotate(self.image,int(direction)*-90),tailles),position)
 
 class Skin(Illustration):
     """Un skin, qui peut être tourné et redimensionné."""
-    def dessine_toi(self,screen:pygame.Surface,position:Tuple[int,int],taille:int=40,_frame:int=1,_frame_par_tour:int=1,direction:int=0):
+    def dessine_toi(self,screen:pygame.Surface,position:Tuple[int,int],_frame:int=1,_frame_par_tour:int=1,taille:int=40,direction:int=0):
         screen.blit(pygame.transform.scale(pygame.transform.rotate(self.image,int(direction)*-90),(taille,taille)),position)

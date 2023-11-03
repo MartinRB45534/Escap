@@ -3,7 +3,7 @@ Les classes de base des magies.
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, List
+from typing import TYPE_CHECKING, Optional, List$1
 import carte as crt
 
 # Imports des classes parentes

@@ -72,7 +72,7 @@ class Wrapper(Affichable):
             if res_objet:
                 res = res_objet
         return res
-    
+
     def clique_placeholder(self,placeheldholder:Placeheldholder,_droit:bool=False):
         res = False
         if self.contenu:

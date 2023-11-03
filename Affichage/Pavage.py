@@ -16,7 +16,7 @@ class Pavage(Conteneur):
         super().__init__()
         self.repartition = [] #La répartition des objets contenus
 
-    def set_contenu(self,contenu:List[Affichable],repartition:Optional[List[int]]=None):
+    def set_contenu(self, contenu:List[Affichable], repartition:Optional[List[int]]=None):
         if repartition is None:
             repartition = [0]*len(contenu)
         if all(taille >= 0 for taille in repartition):
@@ -132,3 +132,27 @@ class PavageVertical(Pavage):
                 somme += tailles_effectives[1]
                 maxi = max(maxi,tailles_effectives[0])
         return (maxi,somme)
+
+class PavageMarge(Pavage):
+    """Une liste avec des marges automatiques."""
+    def __init__(self, marge: int = 5):
+        Pavage.__init__(self)
+        self.marge = marge
+
+    def set_contenu(self, contenu: List[Affichable], repartition: Optional[List[int]] = None):
+        if repartition is None:
+            repartition = [0] * len(contenu)
+        if any(taille >= 0 for taille in repartition):
+            warn("Il n'y a pas d'élément ajustable dans ce pavage !?")
+        # On vérifie qu'il y a autant d'éléments dans la répartition que dans le contenu
+        if len(contenu) != len(repartition):
+            warn(f"Hey, {contenu} et {repartition} ne sont pas de même taille !")
+        else:
+            self.contenu = [(MargeHorizontale() if isinstance(self, PavageVertical) else MargeVerticale()) if i % 2 else contenu[i // 2] for i in range(2 * len(contenu) - 1)]
+            self.repartition = [self.marge if i%2 else repartition[i//2] for i in range(2*len(repartition)-1)]
+
+class PavageHorizontalMarge(PavageMarge, PavageHorizontal):
+    """Un pavage horizontal avec des marges automatiques."""
+
+class PavageVerticalMarge(PavageMarge, PavageVertical):
+    """Un pavage vertical avec des marges automatiques."""

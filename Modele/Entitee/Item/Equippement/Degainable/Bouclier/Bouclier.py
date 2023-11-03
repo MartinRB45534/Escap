@@ -26,6 +26,7 @@ class Bouclier(Degainable):
         self.frottements = frottements
 
     def intercepte(self,attaque:AttaqueCase):
+        """Intercepte une attaque."""
         attaque.degats -= self.degats_bloques
         if attaque.degats < 0:
             attaque.degats = 0

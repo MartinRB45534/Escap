@@ -1,4 +1,4 @@
-"""Le contenu de l'onglet de création d'espèces."""
+"""Le contenu de l'onglet de création de parchemins."""
 
 from __future__ import annotations
 from typing import TYPE_CHECKING, Callable
@@ -8,32 +8,32 @@ import modele as mdl
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..jeu import Jeu
+    from ...jeu import Jeu
 
 class OngletEspeces(af.Onglet):
-    """L'onglet de création d'espèces."""
+    """L'onglet de création de parchemins."""
     def __init__(self, jeu:Jeu):
         self.onglets = af.Onglets(af.DirectionAff.LEFT)
-        af.Onglet.__init__(self, "Espèces", self.onglets)
+        af.Onglet.__init__(self, "Parchemins", self.onglets)
         self.jeu = jeu
-        ajout = OngletAjoutEspece(jeu, self.ajouter)
-        onglets = [af.Onglet("Nouvelle espèce", ajout)]
-        onglets.extend(af.Onglet(espece.nom, OngletModificationEspece(jeu, espece, self.supprimer)) for espece in jeu.especes)
+        ajout = OngletAjoutParchemin(jeu, self.ajouter)
+        onglets = [af.Onglet("Nouveau parchemin", ajout)]
+        onglets.extend(af.Onglet(espece.nom, OngletModificationParchemin(jeu, espece, self.supprimer)) for espece in jeu.especes)
         self.onglets.set_onglets(onglets)
 
     def ajouter(self,espece:mdl.Espece):
         """Ajoute une nouvelle espèce."""
         self.jeu.especes.append(espece)
-        self.onglets.set_onglets(self.onglets.onglets + [af.Onglet(espece.nom, OngletModificationEspece(self.jeu, espece, self.supprimer))])
+        self.onglets.set_onglets(self.onglets.onglets + [af.Onglet(espece.nom, OngletModificationParchemin(self.jeu, espece, self.supprimer))])
         self.onglets.select(self.onglets.boutons[-1])
 
     def supprimer(self,espece:mdl.Espece):
         """Supprime une espèce."""
         self.jeu.especes.remove(espece)
-        self.onglets.set_onglets([af.Onglet("Nouvelle espèce", OngletAjoutEspece(self.jeu, self.ajouter))] + [af.Onglet(espece.nom, OngletModificationEspece(self.jeu, espece, self.supprimer)) for espece in self.jeu.especes])
+        self.onglets.set_onglets([af.Onglet("Nouvelle espèce", OngletAjoutParchemin(self.jeu, self.ajouter))] + [af.Onglet(espece.nom, OngletModificationParchemin(self.jeu, espece, self.supprimer)) for espece in self.jeu.especes])
         self.onglets.select(self.onglets.boutons[0])
 
-class OngletAjoutEspece(af.WrapperCliquable):
+class OngletAjoutParchemin(af.WrapperCliquable):
     """L'onglet d'ajout d'une nouvelle espece."""
     def __init__(self, jeu:Jeu, ajouter:Callable[[mdl.Espece],None]):
         af.WrapperCliquable.__init__(self)
@@ -140,7 +140,7 @@ class OngletAjoutEspece(af.WrapperCliquable):
 
         self.super_ajouter(espece)
 
-class OngletModificationEspece(af.WrapperCliquable):
+class OngletModificationParchemin(af.WrapperCliquable):
     """L'onglet de modification d'une espèce."""
     def __init__(self, jeu:Jeu, espece:mdl.Espece, supprimer:Callable[[mdl.Espece],None]):
         af.WrapperCliquable.__init__(self)
