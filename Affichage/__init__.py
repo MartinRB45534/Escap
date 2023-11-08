@@ -38,6 +38,7 @@ from .conteneur import *
 from .direction import *
 from .liste import *
 from .marge import *
+from .menu_deroulant import *
 from .noeud import *
 from .noeuds import *
 from .onglet import *

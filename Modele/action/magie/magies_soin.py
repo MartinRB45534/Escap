@@ -3,7 +3,7 @@ Les magies de soin (et de résurection/réanimation).
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, List$1
+from typing import TYPE_CHECKING, List
 import carte as crt
 
 # Imports des classes parentes

@@ -73,7 +73,7 @@ class Onglets(WrapperNoeud,NoeudHorizontalProfondeurAgnostique,NoeudVerticalProf
             if selection in self.boutons:
                 self.onglet.set_contenu(self.onglets[self.boutons.index(selection)])
                 self.set_courant(self.onglets[self.boutons.index(selection)])
-        self.onglet.set_tailles(self.onglet.tailles)
+        self.set_tailles(self.tailles)
 
     def set_courant(self, element: Optional[Cliquable]):
         if element is None:
@@ -84,7 +84,7 @@ class Onglets(WrapperNoeud,NoeudHorizontalProfondeurAgnostique,NoeudVerticalProf
             self.courant = texte
         else:
             self.courant = element
-        self.onglet.set_tailles(self.onglet.tailles)
+        self.set_tailles(self.tailles)
 
     def set_onglets(self, onglets: List[Onglet]):
         """Définit les onglets."""

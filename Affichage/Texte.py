@@ -13,6 +13,10 @@ class Texte(Cliquable):
     """Un élément qui est juste un bout de texte."""
     def __init__(self,texte:str, texte_marque_survol:Optional[str]=None, texte_marque_actif:Optional[str]=None, texte_marque_courant:Optional[str]=None, texte_est_courant:Optional[str]=None, texte_actif:Optional[str]=None):
         Cliquable.__init__(self)
+        self.set_texte(texte, texte_marque_survol, texte_marque_actif, texte_marque_courant, texte_est_courant, texte_actif)
+
+    def set_texte(self,texte:str, texte_marque_survol:Optional[str]=None, texte_marque_actif:Optional[str]=None, texte_marque_courant:Optional[str]=None, texte_est_courant:Optional[str]=None, texte_actif:Optional[str]=None):
+        """Change le texte."""
         # Élément le plus important : le texte "normal"
         self.texte=texte
         # Second élément le plus important : le texte survolé (pour montrer au joueur qu'il peut cliquer dessus et que c'est interactif, que le jeu a pas planté, etc.)
@@ -55,6 +59,13 @@ class Texte(Cliquable):
 
     def get_tailles(self,_tailles:Tuple[int,int]) -> Tuple[int,int]:
         return (POLICE20.size(self.get_texte())[0],20)
+
+class TexteCache(Texte):
+    """Un texte qui ne prend pas de place quand il est vide."""
+    def get_tailles(self, _tailles: Tuple[int, int]) -> Tuple[int, int]:
+        if self.get_texte() == "":
+            return (0,0)
+        return super().get_tailles(_tailles)
 
 class Pave(Texte,TailleVariable):
     """Un élément avec beaucoup de texte. S'adapte sur plusieurs lignes si besoin"""

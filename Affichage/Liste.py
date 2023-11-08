@@ -128,7 +128,7 @@ class ListeVerticale(Liste):
             self.decalage += decalage
 
     def get_tailles(self,tailles:Tuple[int,int]):
-        return (max(contenu.get_tailles(tailles)[0] for contenu in self.contenu),tailles[1])#[max(contenu.get_tailles(tailles)[0] for contenu in self.contenu),min(tailles[1],sum(self.repartition[i] if self.repartition[i] else self.contenu[i].get_tailles(tailles)[1] for i in range(len(self.repartition))))]
+        return (max(contenu.get_tailles(tailles)[0] for contenu in self.contenu),tailles[1]) if self.contenu else (0,0)
 
     def scroll(self,position:Tuple[int,int],x:int,y:int):
         if self.scroll_liste(position,x,y): #Un de nos éléments a scrollé
@@ -211,7 +211,7 @@ class ListeHorizontale(Liste):
             self.decalage += decalage
 
     def get_tailles(self,tailles:Tuple[int,int]):
-        return (tailles[0],max(contenu.get_tailles(tailles)[1] for contenu in self.contenu))#[min(tailles[0],sum(self.repartition[i] if self.repartition[i] else self.contenu[i].get_tailles(tailles)[0] for i in range(len(self.repartition)))),max(contenu.get_tailles(tailles)[1] for contenu in self.contenu)]
+        return (tailles[0],max(contenu.get_tailles(tailles)[1] for contenu in self.contenu)) if self.contenu else (0,0)
 
     def scroll(self,position:Tuple[int,int],x:int,y:int):
         if self.scroll_liste(position,x,y): #Un de nos éléments a scrollé

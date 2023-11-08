@@ -3,7 +3,7 @@ Les classes de base des magies.
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, List$1
+from typing import TYPE_CHECKING, Optional, List
 import carte as crt
 
 # Imports des classes parentes
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from ...entitee.item.projectile.projectile import Projectile
     from ...entitee.item.item import Item
     from ...effet.effet import Effet
-    from ...effet.timings import Enchantement
+    from ...effet.enchantement import Enchantement
     from ...effet.agissant.enchantement import EnchantementAgissant
     from ...effet.case.enchantement import EnchantementCase
     from ...effet.item.enchantement import EnchantementItem

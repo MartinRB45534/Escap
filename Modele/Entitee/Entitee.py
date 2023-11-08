@@ -3,7 +3,7 @@ Les entitées (tout ce qui occupe le labyrinthe).
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, List$1
+from typing import TYPE_CHECKING, Optional, List
 import carte as crt
 
 # Pas de classe parente

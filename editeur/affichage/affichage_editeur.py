@@ -4,24 +4,25 @@ from __future__ import annotations
 import pygame
 
 import affichage as af
+import stockage as stck
 
 # Imports utilisés dans le code
-from ..jeu import Jeu
 from .especes import OngletEspeces
+from .items import OngletItems
 
 class AffichageEditeur(af.Onglets):
     """L'affichage principal de l'éditeur."""
     def __init__(self):
         af.Onglets.__init__(self,af.DirectionAff.LEFT)
-        self.set_jeu(Jeu())
+        self.set_jeu(stck.StockageGlobal.global_)
 
-    def set_jeu(self,jeu:Jeu):
+    def set_jeu(self, stockage:stck.StockageGlobal):
         """Définit le jeu à afficher."""
-        self.jeu = jeu
+        self.stockage = stockage
         self.set_onglets([
-            OngletEspeces(self.jeu),
+            OngletEspeces(self.stockage),
             # OngletEffets(self.jeu),
-            
+            OngletItems(self.stockage),
         ])
 
     def bouge_souris(self, event:pygame.event.Event):

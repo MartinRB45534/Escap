@@ -24,6 +24,10 @@ class WrapperMarge(Wrapper):
         self.marges = marges
 
     def set_tailles(self, tailles: Tuple[int, int]):
+        if tailles[0] < self.marges[0]+self.marges[2]:
+            tailles = (self.marges[0]+self.marges[2],tailles[1])
+        if tailles[1] < self.marges[1]+self.marges[3]:
+            tailles = (tailles[0],self.marges[1]+self.marges[3])
         Wrapper.set_tailles(self, (tailles[0]-self.marges[0]-self.marges[2],tailles[1]-self.marges[1]-self.marges[3]))
 
     def get_tailles(self, tailles: Tuple[int, int]):
@@ -31,9 +35,13 @@ class WrapperMarge(Wrapper):
         return (tailles[0]+self.marges[0]+self.marges[2],tailles[1]+self.marges[1]+self.marges[3])
 
     def affiche(self, screen: pygame.Surface, frame: int = 1, frame_par_tour: int = 1):
-        surf = pygame.Surface((self.tailles[0]-self.marges[0]-self.marges[2],self.tailles[1]-self.marges[1]-self.marges[3]), transparency_flag)
-        Wrapper.affiche(self, surf, frame, frame_par_tour)
+        assert self.contenu is not None
+        surf = pygame.Surface((self.tailles[0],self.tailles[1]), transparency_flag)
+        surf.fill(self.fond)
+        self.contenu.affiche(surf, frame, frame_par_tour)
         screen.blit(surf, (self.position[0]+self.marges[0],self.position[1]+self.marges[1]))
+        for objet in self.objets:
+            objet.affiche(screen, frame, frame_par_tour)
 
     def clique(self, position: Tuple[int, int], droit: bool = False) -> Cliquable | Literal[False]:
         return Wrapper.clique(self, (position[0]-self.marges[0],position[1]-self.marges[1]), droit)
@@ -50,6 +58,7 @@ class WrapperCentre(WrapperMarge):
         WrapperMarge.__init__(self, (0, 0, 0, 0))
 
     def set_tailles(self, tailles: Tuple[int, int]):
+        print(tailles)
         self.get_tailles(tailles) # Pour calculer les marges
         WrapperMarge.set_tailles(self, tailles)
 

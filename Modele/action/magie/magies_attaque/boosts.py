@@ -3,7 +3,7 @@ Ce fichier contient les classes des magies de type boost.
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, List$1
+from typing import TYPE_CHECKING, List
 
 # Imports des classes parentes
 from ..magie import Magie, CibleAgissant, CibleAgissants

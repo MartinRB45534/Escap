@@ -6,7 +6,7 @@ import pygame
 
 from .wrapper_cliquable import WrapperCliquable
 from .wrapper_marge import WrapperMarge
-from .liste import ListeMargeHorizontale
+from .pavage import PavageHorizontalMarge
 from .placeholder import Placeholder
 from .texte import Texte
 from .vignette import Vignette
@@ -37,7 +37,7 @@ class Bouton(WrapperCliquable):
     def init(self):
         """Initialise le bouton"""
         contenu = WrapperMarge()
-        liste = ListeMargeHorizontale()
+        liste = PavageHorizontalMarge()
         liste.set_contenu([Vignette((0,0),20,self.skin),Texte(self.texte)])
         contenu.set_contenu(liste)
         self.set_contenu(contenu)

@@ -1,7 +1,7 @@
 """Les deux classes de parchemins."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 import carte as crt
 
 # Imports des classes parentes
@@ -26,4 +26,16 @@ class ParcheminVierge(Parchemin):
     """Un parchemin qui peut être imprégné d'une magie."""
     def __init__(self,labyrinthe:Labyrinthe,impregne:Impregne|Magie,position:crt.Position=crt.POSITION_ABSENTE):
         Parchemin.__init__(self,labyrinthe,position)
+        if isinstance(impregne,Impregne):
+            impregne.item = self
         self.action_portee:Impregne|Magie = impregne
+
+class NoWritting(ParcheminVierge):
+    def __init__(self):
+        pass
+
+    def __equal__(self,other:Any):
+        return isinstance(other,NoWritting)
+    
+NOWRITTING = NoWritting()
+

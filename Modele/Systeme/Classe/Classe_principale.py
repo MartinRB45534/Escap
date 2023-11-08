@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Set, List$1
+from typing import TYPE_CHECKING, Set, List
 
 from .classe import Classe
 

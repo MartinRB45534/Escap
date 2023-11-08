@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Set, List$1
+from typing import TYPE_CHECKING, Set, List
 import affichage as af
 
 # Imports utilisés uniquement dans les annotations

@@ -41,18 +41,18 @@ class Boit(PlaceEffet):
     L'action de boire une potion.
     """
     def __init__(self,agissant:Agissant,latence:float,item:Potion,effet:Effet):
-        super().__init__(agissant,latence,item,effet)
+        PlaceEffet.__init__(self,agissant,latence,item,effet)
 
 class Lit(Caste, NonRepetable):
     """
     L'action de caster un parchemin.
     """
     def __init__(self,agissant:Agissant,latence:float,item:Parchemin):
-        super().__init__(agissant,latence)
+        Caste.__init__(self,agissant,latence)
+        NonRepetable.__init__(self,agissant,latence)
         self.item = item
         self.mana = 0
-        self.cout = item.cout
-        
+
     def get_skin(self):
         pass
 
@@ -61,8 +61,8 @@ class LitEffet(Lit,PlaceEffet):
     L'action de caster un parchemin qui place un effet.
     """
     def __init__(self,agissant:Agissant,latence:float,item:Parchemin,effet:Effet):
-        super().__init__(agissant,latence,item)
-        self.effet = effet
+        Lit.__init__(self,agissant,latence,item)
+        PlaceEffet.__init__(self,agissant,latence,item,effet)
 
 class LitEffetFinal(LitEffet,CasteFinal):
     """Un parchemin qui place un effet, en caste final."""
