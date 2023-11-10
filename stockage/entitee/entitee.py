@@ -8,9 +8,9 @@ from __future__ import annotations
 import modele as mdl
 import carte as crt
 
-from ..stockage import Stockage, StockageNivele
+from ..stockage import StockageUnique, StockageNivele
 
-class Entitee(Stockage):
+class Entitee(StockageUnique):
     """Classe mère des classes de stockage d'entitées."""
     def make(self, labyrinthe: mdl.Labyrinthe, position: crt.Position) -> mdl.Entitee:
         """Retourne l'entité correspondante."""

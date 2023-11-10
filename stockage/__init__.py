@@ -8,6 +8,7 @@ Utilisé par le jeu pour charger les niveaux.
 (Sera peut-être utilisé par le jeu pour stocker une partie en cours.)
 """
 
+from .affichage import *
 from .entitee import *
 from .espece import *
 from .stockage import *

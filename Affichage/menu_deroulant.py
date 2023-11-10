@@ -27,6 +27,7 @@ class MenuDeroulant(Placeheldholder):
         assert self.contenu is not None
         self.contenu.set_tailles(tailles)
         self.liste.set_tailles((tailles[0], self.liste.get_tailles(tailles)[1]))
+        Placeheldholder.set_tailles(self, tailles)
 
     def set_contenu_liste(self,contenu:List[TexteMenuDeroulant]):
         """Change le contenu du menu déroulant."""

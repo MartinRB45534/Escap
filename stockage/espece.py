@@ -3,17 +3,17 @@ Classe de stockage des espèces.
 """
 
 from __future__ import annotations
-from typing import Optional
+from typing import Optional, Type, Tuple, Callable
 from json import loads as parse
 
 import modele as mdl
 
-from .stockage import Stockage, StockageGlobal
+from .stockage import StockageCategorie, StockageGlobal, StockageUnique, StockageNivele
 
-class Especes(Stockage):
+class Especes(StockageCategorie):
     """Les informations des espèces."""
     def __init__(self):
-        Stockage.__init__(self, "Especes")
+        StockageCategorie.__init__(self, "Especes")
         self.especes:dict[str, Espece] = {}
 
     def check(self) -> bool:
@@ -42,11 +42,18 @@ class Especes(Stockage):
             return self.especes[nom].make()
         else:
             raise ValueError(f"L'espèce {nom} n'existe pas.")
+        
+    @classmethod
+    @property
+    def elements(cls) -> dict[str, Type[StockageUnique]|Tuple[Type[StockageUnique], Type[StockageNivele]]]:
+        return {
+            "especes": Espece
+        }
 
-class Espece(Stockage):
+class Espece(StockageUnique):
     """Les informations d'une espèce."""
     def __init__(self, nom: str, nb_doigts: int):
-        Stockage.__init__(self, nom)
+        StockageUnique.__init__(self, nom)
         self.nb_doigts = nb_doigts
         self.espece:Optional[mdl.Espece] = None
 
@@ -63,7 +70,28 @@ class Espece(Stockage):
     def parse(cls, json: str) -> Espece:
         dictionnaire = parse(json)
         return Espece(dictionnaire["nom"], dictionnaire["nb_doigts"])
+
+    @classmethod
+    @property
+    def champs(cls) -> dict[str, type]:
+        return {
+            "nb_doigts": int
+        }
     
+    @classmethod
+    @property
+    def acceptors(cls) -> dict[str, Callable[[str], bool]]:
+        return {
+            "nb_doigts": lambda nb_doigts: int(nb_doigts) > 0
+        }
+    
+    @classmethod
+    @property
+    def avertissements(cls) -> dict[str, str]:
+        return {
+            "nb_doigts": "Le nombre de doigts doit être strictement positif."
+        }
+
     def make(self) -> mdl.Espece:
         """Retourne l'espèce correspondante."""
         if self.espece is None:

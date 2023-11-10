@@ -26,7 +26,7 @@ class TexteInput(Cliquable):
 
     def affiche(self, screen: pygame.Surface, frame: int = 1, frame_par_tour: int = 1):
         """Affiche l'élément."""
-        if self.acceptor(self.textinput.value): # type: ignore # Type partially unknown
+        if self.accepte:
             self.textinput.font_color = (0,0,0)
         else:
             self.textinput.font_color = (255,0,0)
@@ -49,6 +49,21 @@ class TexteInput(Cliquable):
                 pygame.key.set_repeat()
             return False
 
+    @property
+    def valeur(self) -> str:
+        """Renvoie la valeur saisie."""
+        return self.textinput.value # type: ignore # Type partially unknown
+
+    @valeur.setter
+    def valeur(self, valeur: str):
+        """Change la valeur saisie."""
+        self.textinput.value = valeur
+
+    @property
+    def accepte(self):
+        """Renvoie si la valeur saisie est acceptée."""
+        return self.valeur and self.acceptor(self.valeur)
+
 class IntInput(TexteInput):
     """Un élément qui permet de saisir un entier."""
     def __init__(self, texte: str = "0", acceptor:Callable[[str],bool] = lambda x: True): # On accepte les entiers, positifs et négatifs, et les chaines vides
@@ -60,10 +75,10 @@ class IntInput(TexteInput):
            """
         if self.actif:
             if direction == DirectionAff.UP:
-                self.textinput.value = str(int(self.textinput.value)+1) # type: ignore # Type partially unknown
+                self.valeur = str(int(self.valeur)+1)
                 return self
             elif direction == DirectionAff.DOWN:
-                self.textinput.value = str(int(self.textinput.value)-1) # type: ignore # Type partially unknown
+                self.valeur = str(int(self.valeur)-1)
                 return self
         return TexteInput.navigue(self, direction)
 

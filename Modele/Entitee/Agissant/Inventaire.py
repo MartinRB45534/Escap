@@ -37,60 +37,74 @@ class Inventaire:
     # Les items peuvent être de plusieurs catégories :
 
     @property
-    def consommables(self) -> Set[Item]: # Les consommables regroupent les potions et les parchemins
+    def consommables(self) -> Set[Item]:
+        """Les consommables regroupent les potions et les parchemins"""
         return {item for item in self.items if isinstance(item,Consommable)}
 
     @property
-    def potions(self) -> Set[Potion]: # Les potions peuvent se boire (sans coût de mana)
+    def potions(self) -> Set[Potion]:
+        """Les potions peuvent se boire (sans coût de mana)"""
         print("I'm not useless !! !!!")
         return {item for item in self.items if isinstance(item,Potion)}
 
     @property
-    def parchemins(self) -> Set[Parchemin]: # Les parchemins peuvent s'activer avec du mana
+    def parchemins(self) -> Set[Parchemin]:
+        """Les parchemins peuvent s'activer avec du mana"""
         return {item for item in self.items if isinstance(item,Parchemin)}
 
     @property
-    def cles(self) -> Set[Cle]: # Les clés ouvrent ou ferment les portes
+    def cles(self) -> Set[Cle]:
+        """Les clés ouvrent ou ferment les portes"""
         return {item for item in self.items if isinstance(item,Cle)}
 
     @property
-    def equippements(self) -> Set[Item]: # L'équipement regroupe les armes, les boucliers, les armures, les heaumes et les anneaux
+    def equippements(self) -> Set[Item]:
+        """L'équipement regroupe les armes, les boucliers, les armures, les heaumes et les anneaux"""
         return {item for item in self.items if isinstance(item,Equippement)}
 
     @property
-    def armes(self) -> Set[Arme]: # Les armes sont utilisées pour attaquer
+    def armes(self) -> Set[Arme]:
+        """Les armes sont utilisées pour attaquer"""
         return {item for item in self.items if isinstance(item,Arme)}
 
     @property
-    def boucliers(self) -> Set[Bouclier]: # Les boucliers sont utilisés pour se défendre
+    def boucliers(self) -> Set[Bouclier]:
+        """Les boucliers sont utilisés pour se défendre"""
         return {item for item in self.items if isinstance(item,Bouclier)}
 
     @property
-    def armures(self) -> Set[Armure]: # Les armures ont des effets passifs
+    def armures(self) -> Set[Armure]:
+        """Les armures ont des effets passifs"""
         return {item for item in self.items if isinstance(item,Armure)}
 
     @property
-    def heaumes(self) -> Set[Heaume]: # Les heaumes ont des effets passifs
+    def heaumes(self) -> Set[Heaume]:
+        """Les heaumes ont des effets passifs"""
         return {item for item in self.items if isinstance(item,Heaume)}
 
     @property
-    def anneaux(self) -> Set[Anneau]: # Les anneaux ont des effets passifs
+    def anneaux(self) -> Set[Anneau]:
+        """Les anneaux ont des effets passifs"""
         return {item for item in self.items if isinstance(item,Anneau)}
 
     @property
-    def projectiles(self) -> Set[Projectile]: # Les projectiles se lancent (on peut lancer n'importe quoi, techniquement...)
+    def projectiles(self) -> Set[Projectile]:
+        """Les projectiles se lancent (on peut lancer n'importe quoi, techniquement...)"""
         return {item for item in self.items if isinstance(item,Projectile)}
 
     @property
-    def ingredients(self) -> Set[Ingredient]: # Les ingrédients sont utilisés pour l'alchimie
+    def ingredients(self) -> Set[Ingredient]:
+        """Les ingrédients sont utilisés pour l'alchimie"""
         return {item for item in self.items if isinstance(item,Ingredient)}
 
     @property
-    def cadavres(self) -> Set[Cadavre]: # Oui, on peut récupérer des cadavres, et alors, circulez, y'a rien à voir...
+    def cadavres(self) -> Set[Cadavre]:
+        """Oui, on peut récupérer des cadavres, et alors, circulez, y'a rien à voir..."""
         return {item for item in self.items if isinstance(item,Cadavre)}
 
     @property
-    def oeufs(self) -> Set[Oeuf]: # Vous n'allez quand même pas me dire que c'est l'oeuf qui vous choque ! Il y a marqué cadavre juste au dessus !
+    def oeufs(self) -> Set[Oeuf]:
+        """Vous n'allez quand même pas me dire que c'est l'oeuf qui vous choque ! Il y a marqué cadavre juste au dessus !"""
         return {item for item in self.items if isinstance(item,Oeuf)}
 
     def ajoute(self,item:Item):
