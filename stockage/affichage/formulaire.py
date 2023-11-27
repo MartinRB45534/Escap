@@ -509,8 +509,6 @@ class FormulaireCategorie(af.WrapperNoeud, af.NoeudVertical):
 
         self.courant = self.element
 
-        self.set_tailles(self.tailles)
-
     def set_courant(self, element: Cliquable | None):
         self.courant = element
         if element is None:
@@ -650,8 +648,6 @@ class FormulaireCategorieUnique(af.WrapperNoeud,af.NoeudVertical):
 
         self.courant = self.formulaire
 
-        self.set_tailles(self.tailles)
-
     def set_courant(self, element: Cliquable | None):
         self.courant = element
         if element is None:
@@ -718,8 +714,6 @@ class FormulaireCategorieNivele(af.WrapperNoeud, af.NoeudVertical):
         self.contenu.set_contenu(self.liste)
 
         self.courant = self.niveau
-
-        self.set_tailles(self.tailles)
 
     def set_courant(self, element: Cliquable | None):
         self.courant = element

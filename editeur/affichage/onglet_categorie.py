@@ -18,14 +18,14 @@ class OngletCategorie(af.Onglet):
         ajout = stck.FormulaireCategorie(
                     self.stockage,
                     self.ajouter # type: ignore # Pylint can see it but Pylance can't
-                )# if len(self.stockage.elements) > 1 else stck.FormulaireCategorieNivele(
-                #     self.stockage,
-                #     self.ajouter # type: ignore # Pylint can see it but Pylance can't
-                # ) if isinstance(list(self.stockage.elements.values())[0],
-                # tuple) else stck.FormulaireCategorieUnique(
-                #     self.stockage,
-                #     self.ajouter # type: ignore # Pylint can see it but Pylance can't
-                # )
+                ) if len(self.stockage.elements) > 1 else stck.FormulaireCategorieNivele(
+                    self.stockage,
+                    self.ajouter # type: ignore # Pylint can see it but Pylance can't
+                ) if isinstance(list(self.stockage.elements.values())[0],
+                tuple) else stck.FormulaireCategorieUnique(
+                    self.stockage,
+                    self.ajouter # type: ignore # Pylint can see it but Pylance can't
+                )
         onglets = [af.Onglet(self.stockage.titre_nouveau, ajout)]
         onglets.extend(af.Onglet(nom, stck.FormulaireModificationUnique(
             type(element),
