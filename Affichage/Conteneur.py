@@ -20,7 +20,7 @@ class Conteneur(Affichable):
     def __init__(self):
         self.objets:List[Affichable] = [] #Il peut quand même avoir des objets 'normaux'
         self.contenu:List[Affichable] = [] #Les objets qu'il 'contient'
-        self.fond = (0,0,0,0)
+        self.fond:Tuple[int,int,int]|Tuple[int,int,int,int] = (0,0,0,0)
         super().__init__()
 
     def set_contenu(self,contenu:List[Affichable]):

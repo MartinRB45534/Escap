@@ -1,9 +1,12 @@
 """Contient la classe Bouton, qui est un bouton cliquable avec un texte et une vignette"""
 
 from __future__ import annotations
-from typing import Tuple, Optional, Callable, TYPE_CHECKING
+from typing import Literal, Tuple, Optional, Callable, TYPE_CHECKING
 import pygame
 
+from affichage.survolable import Survolable
+
+from .wrapper import Wrapper
 from .wrapper_cliquable import WrapperCliquable
 from .wrapper_marge import WrapperMarge
 from .pavage import PavageHorizontalMarge
@@ -69,6 +72,19 @@ class Bouton(WrapperCliquable):
         screen.blit(surf,self.position)
         for objet in self.objets:
             objet.affiche(screen,frame,frame_par_tour)
+    
+    def survol(self, position: Tuple[int, int]) -> Survolable | Literal[False]:
+        survol = WrapperCliquable.survol(self, position)
+        if survol:
+            self.marque_survol = True
+        return survol
+
+    def clique(self,position:Tuple[int,int],droit:bool=False) -> Cliquable|Literal[False]:
+        clique = Wrapper.clique(self,position,droit)
+        if clique:
+            self.set_actif()
+            return self
+        return False
 
 class BoutonFonction(Bouton):
     """Un bouton qui appelle lui-même une fonction"""

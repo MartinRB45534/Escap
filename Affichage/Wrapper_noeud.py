@@ -24,14 +24,13 @@ class WrapperNoeud(Noeud,WrapperCliquable):
         clique = Wrapper.clique(self,position,droit)
         if clique is self:
             self.set_actif()
-        elif isinstance(clique, Placeheldholder):
-            res = self.clique_placeholder(clique, droit)
-            if not res:
-                self.unset_actif()
-                return clique
         elif clique:
             self.select(clique, droit)
             self.unset_actif()
+            if isinstance(clique, Placeheldholder):
+                res = self.clique_placeholder(clique, droit)
+                if not res:
+                    return clique
         else:
             self.unset_actif()
         if clique:

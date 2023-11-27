@@ -1,11 +1,13 @@
 """Définitions des noeuds de l'arbre d'affichage."""
 
 from __future__ import annotations
-from typing import Literal, Optional, TYPE_CHECKING
+from typing import Literal, TYPE_CHECKING
 
 from .affichable import Affichable
-from .direction import Direction, DirectionAff
+from .direction import Direction
 from .noeud import Noeud
+
+from .erreur import NavigationError
 
 if TYPE_CHECKING:
     from .cliquable import Cliquable
@@ -13,67 +15,34 @@ if TYPE_CHECKING:
 class NoeudVertical(Noeud):
     """Un élément dont le contenu est disposé verticalement (donc next et previous correspondent à haut et bas)."""
     def through_previous(self):
-        assert self.courant is not None
-        self.courant.unset_actif() # Devrait être inutile
-        res = self.in_up()
-        self.courant.set_actif()
-        return res
-    
+        return self.in_up()
+
     def through_next(self):
-        if self.courant is None:
-            raise RuntimeError("Noeud.through_next : self.courant is None")
-        self.courant.unset_actif() # Devrait être inutile
-        res = self.in_down()
-        self.courant.set_actif()
-        return res
+        return self.in_down()
 
 class NoeudVerticalProfondeurAgnostique(Noeud):
     """Un knot_vertical qui ne fait pas de différence entre in et through (pour haut et bas)."""
     def through_up(self):
-        assert self.courant is not None
-        self.courant.unset_actif() # Devrait être inutile
-        res = self.in_up()
-        self.courant.set_actif()
-        return res
-    
+        return self.in_up()
+
     def through_down(self):
-        assert self.courant is not None
-        self.courant.unset_actif()
-        res = self.in_down()
-        self.courant.set_actif()
-        return res
+        return self.in_down()
 
 class NoeudHorizontal(Noeud):
     """Un élément dont le contenu est disposé horizontalement (donc next et previous correspondent à gauche et droite)."""
     def through_previous(self):
-        assert self.courant is not None
-        self.courant.unset_actif() # Devrait être inutile
-        res = self.in_left()
-        self.courant.set_actif()
-        return res
-    
+        return self.in_left()
+
     def through_next(self):
-        assert self.courant is not None
-        self.courant.unset_actif() # Devrait être inutile
-        res = self.in_right()
-        self.courant.set_actif()
-        return res
+        return self.in_right()
 
 class NoeudHorizontalProfondeurAgnostique(Noeud):
     """Un knot_horizontal qui ne fait pas de différence entre in et through (pour gauche et droite)."""
     def through_left(self):
-        assert self.courant is not None
-        self.courant.unset_actif() # Devrait être inutile
-        res = self.in_left()
-        self.courant.set_actif()
-        return res
-    
+        return self.in_left()
+
     def through_right(self):
-        assert self.courant is not None
-        self.courant.unset_actif()
-        res = self.in_right()
-        self.courant.set_actif()
-        return res
+        return self.in_right()
 
 class NoeudHierarchiqueSinistre(Noeud):
     """Un élément dont le contenu est hiérarchique de gauche à droite (donc gauche et droite correspondent à out et in)."""
@@ -125,35 +94,20 @@ class NoeudHierarchiqueDextreBase(Noeud):
 
 class NoeudBloque(Noeud):
     """Un élément bloqué (pas de navigation, ni d'effets pour les clics)."""
-    def navigue(self, direction: Direction) -> Optional[Cliquable]|Literal[False]:
-        if self.actif:
-            if direction == DirectionAff.IN:
-                if self.courant is None:
-                    raise(NotImplementedError("Un Noeud_bloque doit avoir un élément courant."))
-                self.unset_actif()
-                self.courant.set_actif()
-                return self
-            if direction == DirectionAff.OUT:
-                self.unset_actif()
-                return False
-            if direction == DirectionAff.PREVIOUS:
-                self.unset_actif()
-                return False
-            if direction == DirectionAff.NEXT:
-                self.unset_actif()
-                return False
-        elif self.courant is None:
-            raise NotImplementedError("Un Wrapper_bloque doit avoir un élément courant.")
+    def navigue(self, direction: Direction) -> Cliquable|Literal[False]:
+        if self.courant is None:
+            raise NotImplementedError("Un Noeud_bloque doit avoir un élément courant.")
+        res = self.courant.navigue(direction)
+        if res is False:
+            return False
         else:
-            nav = self.courant.navigue(direction)
-            if nav:
-                self.select(nav)
-                return self
-            else:
-                if direction == DirectionAff.OUT:
-                    self.set_actif()
-                    return self
             return self
 
-    def select(self, selection: Affichable, droit: bool = False):
-        pass
+    def select(self, selection: Affichable, droit: bool = False) -> None:
+        raise NavigationError("Comment est-ce qu'on a pu sélectionner un noeud bloqué ?")
+
+    def set_actif(self):
+        if self.courant is None:
+            raise NotImplementedError("Un Noeud_bloque doit avoir un élément courant.")
+        self.actif = False
+        self.courant.set_actif()

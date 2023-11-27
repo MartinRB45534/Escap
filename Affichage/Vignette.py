@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 from typing import Tuple, TYPE_CHECKING
-from warnings import warn
 import pygame
 
 from .affichable import Affichable
+
+from .erreur import DisplayError
 
 if TYPE_CHECKING:
     from skin import Skin, Image
@@ -21,7 +22,7 @@ class Vignette(Affichable):
 
     def set_tailles(self,tailles:Tuple[int,int]):
         if tailles != self.tailles:
-            warn(f"Tu ne peux pas modifier la taille d'une vignette ! Vérifie où tu as rangé {self}.")
+            raise DisplayError(f"Tu ne peux pas modifier la taille d'une vignette ! Vérifie où tu as rangé {self}.")
 
     def affiche(self,screen:pygame.Surface,frame:int=1,frame_par_tour:int=1):
         self.skin.dessine_toi(screen,self.position,frame,frame_par_tour,self.tailles[0],self.direction)
@@ -37,7 +38,7 @@ class VignetteImage(Affichable):
 
     def set_tailles(self,tailles:Tuple[int,int]):
         if tailles != self.tailles:
-            warn(f"Tu ne peux pas modifier la taille d'une vignette ! Vérifie où tu as rangé {self}.")
+            raise DisplayError(f"Tu ne peux pas modifier la taille d'une vignette ! Vérifie où tu as rangé {self}.")
 
     def affiche(self,screen:pygame.Surface,frame:int=1,frame_par_tour:int=1):
         self.skin.dessine_toi(screen,self.position,frame,frame_par_tour,self.tailles,0)

@@ -20,6 +20,7 @@ class Editeur:
         """Fait tourner l'éditeur."""
         self.loop=True
         self.affichage.set_tailles(screen.get_size())
+        self.affichage.set_actif()
         while self.loop:
             self.input()
             self.affichage.trouve_actif()
@@ -41,7 +42,10 @@ class Editeur:
             elif event.type in [pygame.KEYDOWN,pygame.KEYUP]:
                 self.controle_clavier(event,cm.get_modifiers(event.mod))
         if af.TexteInput.current_input is not None:
-            af.TexteInput.current_input.update(events) # type: ignore # Type partially unknown
+            af.TexteInput.event(events) # type: ignore # Type partially unknown
+        # On resurvole pour conserver le survol des boutons
+        if pygame.mouse.get_focused():
+            self.affichage.survol(pygame.mouse.get_pos())
 
     def quitte(self):
         """Quitte l'éditeur."""
@@ -89,6 +93,8 @@ class Editeur:
         if af.TexteInput.current_input is not None:
             if direction is af.DirectionAff.IN: # Return is the only key that we must handle manually
                 direction = af.DirectionAff.VALIDATE
+            elif direction in [af.DirectionAff.UP,af.DirectionAff.DOWN,af.DirectionAff.NEXT,af.DirectionAff.PREVIOUS]:
+                pass # Let those keys navigate as usual
             else:
                 return
         if event.type == pygame.KEYDOWN:

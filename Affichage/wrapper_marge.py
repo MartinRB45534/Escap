@@ -58,7 +58,6 @@ class WrapperCentre(WrapperMarge):
         WrapperMarge.__init__(self, (0, 0, 0, 0))
 
     def set_tailles(self, tailles: Tuple[int, int]):
-        print(tailles)
         self.get_tailles(tailles) # Pour calculer les marges
         WrapperMarge.set_tailles(self, tailles)
 

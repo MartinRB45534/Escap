@@ -55,7 +55,7 @@ class Texte(Cliquable):
 
     def affiche(self,screen:pygame.Surface,frame:int=1,frame_par_tour:int=1):
         texte=POLICE20.render(self.get_texte(True),True,(0,0,0))
-        screen.blit(texte,self.position)
+        screen.blit(texte,(self.position[0],self.position[1]-3))
 
     def get_tailles(self,_tailles:Tuple[int,int]) -> Tuple[int,int]:
         return (POLICE20.size(self.get_texte())[0],20)
@@ -65,7 +65,7 @@ class TexteCache(Texte):
     def get_tailles(self, _tailles: Tuple[int, int]) -> Tuple[int, int]:
         if self.get_texte() == "":
             return (0,0)
-        return super().get_tailles(_tailles)
+        return Texte.get_tailles(self,_tailles)
 
 class Pave(Texte,TailleVariable):
     """Un élément avec beaucoup de texte. S'adapte sur plusieurs lignes si besoin"""

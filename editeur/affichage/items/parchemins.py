@@ -39,7 +39,8 @@ class OngletParchemins(af.Onglet):
             self.supprimer
         )) for nom, parchemin in self.stockage.items.parchemin.parchemins.items())
         self.onglets.set_onglets(onglets)
-        self.set_tailles(self.tailles)
+        if self.tailles != (0,0):
+            self.set_tailles(self.tailles)
 
     def ajouter(self,parchemin:stck.ParcheminVierge|stck.ParcheminViergeNivele):
         """Ajoute une nouvelle espèce."""

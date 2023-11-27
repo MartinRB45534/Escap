@@ -4,11 +4,12 @@ Contient les classes liées aux pavages
 
 from __future__ import annotations
 from typing import List, Tuple, Optional
-from warnings import warn
 
 from .affichable import Affichable
 from .conteneur import Conteneur
 from .marge import MargeHorizontale, MargeVerticale
+
+from .erreur import DisplayError
 
 class Pavage(Conteneur):
     """Contient des objets, qui s'adaptent au pavage"""
@@ -19,10 +20,8 @@ class Pavage(Conteneur):
     def set_contenu(self, contenu:List[Affichable], repartition:Optional[List[int]]=None):
         if repartition is None:
             repartition = [0]*len(contenu)
-        if all(taille >= 0 for taille in repartition):
-            warn("Il n'y a pas d'élément ajustable dans ce pavage !?")
-        if len(contenu) != len(repartition):
-            warn(f"Hey, {contenu} et {repartition} ne sont pas de même taille !")
+        elif len(contenu) != len(repartition):
+            raise ValueError(f"Hey, {contenu} et {repartition} ne sont pas de même taille !")
         else:
             self.contenu = contenu
             self.repartition = repartition
@@ -31,16 +30,23 @@ class PavageHorizontal(Pavage):
     """Un pavage horizontal"""
     def set_contenu(self, contenu:List[Affichable], repartition:Optional[List[int]]=None):
         if any(isinstance(objet,MargeHorizontale) for objet in contenu):
-            warn("Il y a une marge horizontale dans un pavage horizontal !")
+            raise ValueError("Il y a une marge horizontale dans un pavage horizontal !")
         return super().set_contenu(contenu, repartition)
 
     def set_tailles(self,tailles:Tuple[int,int]):
-        libre = tailles[0] - sum(self.repartition[i] if self.repartition[i]>0 else self.contenu[i].get_tailles(tailles)[0] if not(self.repartition[i]) else 0 for i in range(len(self.repartition)))
+        libre = tailles[0] - sum(
+            self.repartition[i] if self.repartition[i]>0 else
+            self.contenu[i].get_tailles(tailles)[0] if not(self.repartition[i]) else
+            0 for i in range(len(self.repartition)))
         if libre < 0:
             if tailles == (0,0):
-                warn(f"Tailles nulles pour {self} !")
+                raise ValueError(f"Tailles nulles pour {self} !")
             else:
-                raise RuntimeError(f"Je ne peux pas faire rentrer {self.contenu} ({[self.repartition[i] if self.repartition[i]>0 else self.contenu[i].get_tailles(tailles)[0] if not(self.repartition[i]) else 0 for i in range(len(self.contenu))]}) en {self.repartition} ({tailles[0]}) dans {self} !")
+                raise RuntimeError(f"""Je ne peux pas faire rentrer {self.contenu} ({
+                    [self.repartition[i] if self.repartition[i]>0 else
+                     self.contenu[i].get_tailles(tailles)[0] if not(self.repartition[i]) else
+                     0 for i in range(len(self.contenu))]
+                    }) en {self.repartition} ({tailles[0]}) dans {self} !""")
         else:
             nb_portions = sum(taille for taille in self.repartition if taille<0)
             portion = 0
@@ -61,9 +67,16 @@ class PavageHorizontal(Pavage):
     def get_tailles(self,tailles:Tuple[int,int]):
         somme = 0
         maxi = 0
-        libre = tailles[0] - sum(self.repartition[i] if self.repartition[i]>0 else self.contenu[i].get_tailles(tailles)[0] if not(self.repartition[i]) else 0 for i in range(len(self.repartition)))
+        libre = tailles[0] - sum(
+            self.repartition[i] if self.repartition[i]>0 else
+            self.contenu[i].get_tailles(tailles)[0] if not(self.repartition[i]) else
+            0 for i in range(len(self.repartition)))
         if libre < 0:
-            warn(f"Je ne peux pas faire rentrer {self.contenu} ({[self.repartition[i] if self.repartition[i]>0 else self.contenu[i].get_tailles(tailles)[0] if not(self.repartition[i]) else 0 for i in range(len(self.contenu))]}) en {self.repartition} ({tailles[0]}) dans {self} !")
+            raise RuntimeError(f"""Je ne peux pas faire rentrer {self.contenu} ({
+                [self.repartition[i] if self.repartition[i]>0 else
+                 self.contenu[i].get_tailles(tailles)[0] if not(self.repartition[i]) else
+                 0 for i in range(len(self.contenu))]
+                }) en {self.repartition} ({tailles[0]}) dans {self} !""")
         else:
             nb_portions = sum(taille for taille in self.repartition if taille<0)
             portion = 0
@@ -84,16 +97,23 @@ class PavageVertical(Pavage):
     """Un pavage vertical"""
     def set_contenu(self, contenu:List[Affichable], repartition:Optional[List[int]]=None):
         if any(isinstance(objet,MargeVerticale) for objet in contenu):
-            warn("Il y a une marge verticale dans un pavage vertical !")
+            raise ValueError("Il y a une marge verticale dans un pavage vertical !")
         return super().set_contenu(contenu, repartition)
 
     def set_tailles(self,tailles:Tuple[int,int]):
-        libre = tailles[1] - sum(self.repartition[i] if self.repartition[i]>0 else self.contenu[i].get_tailles(tailles)[1] if not(self.repartition[i]) else 0 for i in range(len(self.repartition)))
+        libre = tailles[1] - sum(
+            self.repartition[i] if self.repartition[i]>0 else
+            self.contenu[i].get_tailles(tailles)[1] if not(self.repartition[i]) else
+            0 for i in range(len(self.repartition)))
         if libre < 0:
             if tailles == (0,0):
-                warn(f"Tailles nulles pour {self} !")
+                raise DisplayError(f"Tailles nulles pour {self} !")
             else:
-                raise RuntimeError(f"Je ne peux pas faire rentrer {self.contenu} ({[self.repartition[i] if self.repartition[i]>0 else self.contenu[i].get_tailles(tailles)[1] if not(self.repartition[i]) else 0 for i in range(len(self.contenu))]}) en {self.repartition} ({tailles[1]}) dans {self} !")
+                raise RuntimeError(f"""Je ne peux pas faire rentrer {self.contenu} ({
+                    [self.repartition[i] if self.repartition[i]>0 else
+                     self.contenu[i].get_tailles(tailles)[1] if not(self.repartition[i])
+                     else 0 for i in range(len(self.contenu))
+                    ]}) en {self.repartition} ({tailles[1]}) dans {self} !""")
         else:
             nb_portions = sum(taille for taille in self.repartition if taille<0)
             portion = 0
@@ -114,9 +134,16 @@ class PavageVertical(Pavage):
     def get_tailles(self,tailles:Tuple[int,int]):
         somme = 0
         maxi = 0
-        libre = tailles[1] - sum(self.repartition[i] if self.repartition[i]>0 else self.contenu[i].get_tailles(tailles)[1] if not(self.repartition[i]) else 0 for i in range(len(self.repartition)))
+        libre = tailles[1] - sum(
+            self.repartition[i] if self.repartition[i]>0 else
+            self.contenu[i].get_tailles(tailles)[1] if not(self.repartition[i]) else
+            0 for i in range(len(self.repartition)))
         if libre < 0:
-            warn(f"Je ne peux pas faire rentrer {self.contenu} ({[self.repartition[i] if self.repartition[i]>0 else self.contenu[i].get_tailles(tailles)[1] if not(self.repartition[i]) else 0 for i in range(len(self.contenu))]}) en {self.repartition} ({tailles[1]}) dans {self} !")
+            raise RuntimeError(f"""Je ne peux pas faire rentrer {self.contenu} ({
+                [self.repartition[i] if self.repartition[i]>0 else
+                 self.contenu[i].get_tailles(tailles)[1] if not(self.repartition[i]) else
+                 0 for i in range(len(self.contenu))
+                ]}) en {self.repartition} ({tailles[1]}) dans {self} !""")
         else:
             nb_portions = sum(taille for taille in self.repartition if taille<0)
             portion = 0
@@ -142,14 +169,13 @@ class PavageMarge(Pavage):
     def set_contenu(self, contenu: List[Affichable], repartition: Optional[List[int]] = None):
         if repartition is None:
             repartition = [0] * len(contenu)
-        if any(taille >= 0 for taille in repartition):
-            warn("Il n'y a pas d'élément ajustable dans ce pavage !?")
-        # On vérifie qu'il y a autant d'éléments dans la répartition que dans le contenu
-        if len(contenu) != len(repartition):
-            warn(f"Hey, {contenu} et {repartition} ne sont pas de même taille !")
-        else:
-            self.contenu = [(MargeHorizontale() if isinstance(self, PavageVertical) else MargeVerticale()) if i % 2 else contenu[i // 2] for i in range(2 * len(contenu) - 1)]
-            self.repartition = [self.marge if i%2 else repartition[i//2] for i in range(2*len(repartition)-1)]
+        elif len(contenu) != len(repartition):
+            raise ValueError(f"Hey, {contenu} et {repartition} ne sont pas de même taille !")
+        self.contenu = [(MargeHorizontale() if isinstance(self, PavageVertical) else
+                         MargeVerticale()) if i % 2 else
+                         contenu[i // 2] for i in range(2 * len(contenu) - 1)]
+        self.repartition = [self.marge if i%2 else
+                            repartition[i//2] for i in range(2*len(repartition)-1)]
 
 class PavageHorizontalMarge(PavageMarge, PavageHorizontal):
     """Un pavage horizontal avec des marges automatiques."""

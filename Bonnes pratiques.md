@@ -10,7 +10,7 @@ Pour l'ensemble des menus.
 Qu'est-ce que je veux en menus ?
 
 Deux versions :
-Version "commerciale", avec les sauvegardes, les joueurs, etc. et moins de prints d'erreurs par exemple.
+Version "commerciale", avec les sauvegardes, les joueurs, etc. et moins de sorties d'erreurs par exemple.
 Version "dev", avec l'éditeur de niveux, des outils de visualisation (vues des esprits par exemple) et des accès rapides à des parties de test.
 
 Faire un moteur unique pour le jeu. (Peut-être un module à part ? Si j'y arrive.) Avec quelques fonctions à appeler pour tout faire tourner. Et importer ce module depuis chaque version.

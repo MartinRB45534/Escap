@@ -65,7 +65,7 @@ class Parchemins(StockageCategorie):
     @property
     def elements(cls) -> dict[str, Type[StockageUnique]|Tuple[Type[StockageUnique], Type[StockageNivele]]]:
         return {
-            "parchemins": (ParcheminVierge, ParcheminViergeNivele)
+            "parchemins vierges": (ParcheminVierge, ParcheminViergeNivele)
         }
 
 class ParcheminVierge(Entitee):

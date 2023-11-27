@@ -79,15 +79,14 @@ class AffichageEditeur(af.WrapperNoeud):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1: #On a cliqué sur quelque chose. Vérifions quoi :
             if not self.clique(event.pos):
                 # Now that's weird...
-                print("Clic sur rien")
+                pass
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3: #On a cliqué droit
             if not self.clique(event.pos, True):
                 # Now that's weird...
-                print("Clic droit sur rien")
+                pass
         elif event.type == pygame.MOUSEWHEEL: #On a scrollé
             self.scroll(pygame.mouse.get_pos(), 10*event.x, 10*event.y)
         elif event.type == pygame.MOUSEMOTION: #On a bougé la souris
             # On vérifie que la souris est dans la fenêtre
             if event.pos[0] >= 0 and event.pos[0] <= self.tailles[0] and event.pos[1] >= 0 and event.pos[1] <= self.tailles[1]:
-                # print("survol")
                 self.survol(event.pos)

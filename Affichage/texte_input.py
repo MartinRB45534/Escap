@@ -1,7 +1,7 @@
 """Les fonctions de saisie de texte."""
 
 from __future__ import annotations
-from typing import Optional, TYPE_CHECKING, Literal, Callable, Tuple
+from typing import Optional, TYPE_CHECKING, Literal, Callable, Tuple, List
 import pygame_textinput # type: ignore # Missing type stubs
 import pygame
 
@@ -15,6 +15,7 @@ if TYPE_CHECKING:
 class TexteInput(Cliquable):
     """Un élément qui permet de saisir du texte."""
     current_input: Optional[pygame_textinput.TextInputVisualizer] = None
+    waiting: bool = False
     def __init__(self, texte: str = "(Cliquez ici)", validator:Callable[[str],bool] = lambda x: True, acceptor:Callable[[str],bool] = lambda x: True):
         Cliquable.__init__(self)
         manager = pygame_textinput.TextInputManager(texte, validator)
@@ -34,20 +35,37 @@ class TexteInput(Cliquable):
 
     def set_actif(self):
         """Rend l'élément actif."""
+        if TexteInput.current_input:
+            TexteInput.current_input.cursor_visible = False
         TexteInput.current_input = self.textinput
+        TexteInput.waiting = True
         pygame.key.set_repeat(500, 50)
+        Cliquable.set_actif(self)
 
-    def navigue(self,direction: Direction) -> Optional[Cliquable]|Literal[False]:
+    def unset_actif(self):
+        """Rend l'élément inactif."""
+        if TexteInput.current_input:
+            TexteInput.current_input.cursor_visible = False
+        TexteInput.current_input = None
+        pygame.key.set_repeat()
+        Cliquable.unset_actif(self)
+
+    def navigue(self,direction: Direction) -> Cliquable|Literal[False]:
         """Navigue dans la direction donnée, et renvoie l'élément navigué, ou False sinon
            (récursif pour d'autres éléments).
            """
         if self.actif: #On est à ce niveau
             if direction == DirectionAff.IN:
                 return self
-            if direction == DirectionAff.VALIDATE:
-                TexteInput.current_input = None # On a validé la saisie
-                pygame.key.set_repeat()
-            return False
+        return False
+
+    @classmethod
+    def event(cls, events : List[pygame.event.Event]):
+        """Traite les évènements."""
+        if cls.waiting:
+            cls.waiting = False
+        else:
+            cls.current_input.update(events) # type: ignore # Type partially unknown
 
     @property
     def valeur(self) -> str:
@@ -69,7 +87,7 @@ class IntInput(TexteInput):
     def __init__(self, texte: str = "0", acceptor:Callable[[str],bool] = lambda x: True): # On accepte les entiers, positifs et négatifs, et les chaines vides
         TexteInput.__init__(self, texte, lambda x: x.isdigit() or (x.startswith("-") and x[1:].isdigit()) or x == "", acceptor)
 
-    def navigue(self, direction: Direction) -> Optional[Cliquable]|Literal[False]:
+    def navigue(self, direction: Direction) -> Cliquable|Literal[False]:
         """Navigue dans la direction donnée, et renvoie l'élément navigué, ou False sinon
            (récursif pour d'autres éléments).
            """

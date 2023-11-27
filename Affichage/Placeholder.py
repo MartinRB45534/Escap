@@ -16,16 +16,13 @@ class Placeheldholder(WrapperNoeud):
         clique = Wrapper.clique(self,position,droit)
         if clique is self:
             self.set_actif()
-        elif isinstance(clique, Placeheldholder):
-            res = self.clique_placeholder(clique, droit)
-            if not res:
-                self.unset_actif()
-                return clique
         elif clique:
             self.select(clique, droit)
             self.unset_actif()
-        # else:
-        #     self.unset_actif()
+            if isinstance(clique, Placeheldholder):
+                res = self.clique_placeholder(clique, droit)
+                if not res:
+                    return clique
         if clique:
             return self
         return False
@@ -52,11 +49,10 @@ class Placeholder(Noeud):
 
     def set_courant(self,element: Optional[Cliquable]):
         self.courant = element
-        self.set_actif()
 
     def set_actif(self):
         assert self.courant is not None
-        super().set_actif()
+        Noeud.set_actif(self)
         self.placeheldholder.set_contenu(self.courant)
         if self.placeheldholder_ajuster.tailles != (0,0):
             self.placeheldholder_ajuster.set_tailles(self.placeheldholder_ajuster.tailles)

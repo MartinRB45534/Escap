@@ -37,14 +37,19 @@ class FormulaireUnique(af.WrapperNoeud):
             self.form(key, stockage.champs[key], stockage.acceptors[key],
                       stockage.avertissements[key])
 
-        self.contenu = af.ListeMargeVerticale()
-        self.contenu.set_contenu(
+        self.liste = af.ListeMargeVerticale(shrink=True)
+        self.liste.set_contenu(
             sum([
                 [texte, self.inputs[key], self.avertissements[key]]
                 for key, texte in self.textes.items()
             ], []) # type: ignore # Pylance wants me to specify the type if that empty list smh
             + [af.BoutonFonction(af.SKIN_SHADE, "Ajouter", self.ajouter)]
         )
+
+        self.contenu = af.WrapperMarge()
+        self.contenu.set_contenu(self.liste)
+
+        self.courant = self.inputs["nom"]
 
         self.super_ajouter = ajouter
 
@@ -79,9 +84,9 @@ class FormulaireUnique(af.WrapperNoeud):
         """Ajoute l'objet."""
         self.check()
         if all([avertissement.get_texte() == "" for avertissement in self.avertissements.values()]):
-            json = f"""{{
-    {", ".join([f'"{key}": {input_.valeur}' for key, input_ in self.inputs.items()])}
-}}"""
+            json = f"""{{{
+", ".join([f'"{key}": "{input_.valeur}"' for key, input_ in self.inputs.items()])
+}}}"""
             self.super_ajouter(self.stockage.parse(json))
 
     def select(self, selection: af.Cliquable, droit:bool=False):
@@ -89,28 +94,132 @@ class FormulaireUnique(af.WrapperNoeud):
         self.update()
         af.WrapperNoeud.select(self, selection, droit)
 
-class FormulaireModificationUnique(FormulaireUnique):
+    def set_actif(self):
+        if self.courant:
+            self.courant.set_actif()
+        else:
+            raise af.NavigationError("Les formulaires devraient toujours avoir un élément courant.")
+
+    def unset_actif(self):
+        if self.courant:
+            self.courant.unset_actif()
+        else:
+            raise af.NavigationError("Les formulaires devraient toujours avoir un élément courant.")
+
+    def in_up(self):
+        if isinstance(self.courant, af.TexteInput):
+            i = list(self.inputs.values()).index(self.courant)
+            if i == 0:
+                self.courant.unset_actif()
+                return False
+            self.courant.unset_actif()
+            self.courant = list(self.inputs.values())[i-1]
+            self.courant.set_actif()
+            return self
+        self.courant.unset_actif()
+        self.courant = list(self.inputs.values())[-1]
+        self.courant.set_actif()
+        return self
+
+    def in_down(self):
+        if isinstance(self.courant, af.TexteInput):
+            i = list(self.inputs.values()).index(self.courant)
+            if i == len(self.inputs.values())-1:
+                courant = self.liste.contenu[-1]
+                if isinstance(courant, af.Bouton):
+                    self.courant.unset_actif()
+                    self.courant = courant
+                    self.courant.set_actif()
+                else:
+                    raise ValueError(f"Que fait {self.courant} en dernier élément de la liste ?")
+            else:
+                self.courant.unset_actif()
+                self.courant = list(self.inputs.values())[i+1]
+                self.courant.set_actif()
+            return self
+        return False
+
+    def through_out(self):
+        self.courant.unset_actif()
+        self.unset_actif() # Just to be really sure
+        return False
+
+class FormulaireModificationUnique(FormulaireUnique, af.NoeudVertical):
     """Un formulaire, avec des champs à remplir pour modifier un objet."""
     def __init__(self, stockage: Type[StockageUn], acceptor: Callable[[str], bool],
                  avertissement:str, modifier: Callable[[StockageUn], None],
                  objet:StockageUn, supprimer: Callable[[StockageUn], None]):
+        af.NoeudVertical.__init__(self)
         FormulaireUnique.__init__(self, stockage,
                                   lambda nom: acceptor(nom) or nom == objet.nom,
                                   avertissement, modifier)
+
         self.objet = objet
         self.inputs["nom"].valeur = objet.nom
         for key in stockage.champs:
-            self.inputs[key].valeur = str(getattr(objet, key)) # Est-ce que c'est pire que d'utiliset la jsonification ?
+            # Est-ce que c'est pire que d'utiliset la jsonification ?
+            self.inputs[key].valeur = str(getattr(objet, key))
 
-        assert isinstance(self.contenu, af.ListeMargeVerticale)
-        self.contenu.set_contenu(
+        self.bouton_modifier = af.BoutonFonction(af.SKIN_SHADE, "Modifier", self.ajouter)
+        self.bouton_supprimer = af.BoutonFonction(af.SKIN_SHADE, "Supprimer", lambda: supprimer(objet))
+
+        self.liste.set_contenu(
             sum([
                 [texte, self.inputs[key], self.avertissements[key]]
                 for key, texte in self.textes.items()
             ], []) # type: ignore # Pylance wants me to specify the type if that empty list smh
-            + [af.BoutonFonction(af.SKIN_SHADE, "Modifier", self.ajouter),
-               af.BoutonFonction(af.SKIN_SHADE, "Supprimer", lambda: supprimer(objet))]
+            + [self.bouton_modifier, self.bouton_supprimer]
         )
+
+    def in_right(self):
+        # On continue vers l'intérieur (pour coller avec le reste)
+        return self.in_in()
+
+    def in_up(self):
+        if isinstance(self.courant, af.TexteInput):
+            i = list(self.inputs.values()).index(self.courant)
+            if i == 0:
+                self.courant.unset_actif()
+                return False
+            self.courant.unset_actif()
+            self.courant = list(self.inputs.values())[i-1]
+            self.courant.set_actif()
+            return self
+        if self.courant is self.bouton_modifier:
+            self.courant.unset_actif()
+            self.courant = list(self.inputs.values())[-1]
+            self.courant.set_actif()
+            return self
+        self.courant.unset_actif()
+        self.courant = self.bouton_modifier
+        self.courant.set_actif()
+        return self
+
+    def in_down(self):
+        if isinstance(self.courant, af.TexteInput):
+            i = list(self.inputs.values()).index(self.courant)
+            if i == len(self.inputs.values())-1:
+                courant = self.bouton_modifier
+                self.courant.unset_actif()
+                self.courant = courant
+                self.courant.set_actif()
+            else:
+                self.courant.unset_actif()
+                self.courant = list(self.inputs.values())[i+1]
+                self.courant.set_actif()
+            return self
+        if self.courant is self.bouton_modifier:
+            self.courant.unset_actif()
+            self.courant = self.bouton_supprimer
+            self.courant.set_actif()
+            return self
+        return False
+
+    def through_up(self):
+        return self.in_up()
+
+    def through_down(self):
+        return self.in_down()
 
 StockageNi = TypeVar("StockageNi", bound=StockageNivele)
 
@@ -145,14 +254,19 @@ class FormulaireNivele(af.WrapperNoeud):
             self.form(key, stockage.champs[key], stockage.acceptors[key],
                       stockage.avertissements[key])
 
-        self.contenu = af.ListeMargeVerticale()
-        self.contenu.set_contenu(
+        self.liste = af.ListeMargeVerticale(shrink=True)
+        self.liste.set_contenu(
             sum([
                 [texte, self.inputs[key], self.avertissements[key]]
                 for key, texte in self.textes.items()
             ], []) # type: ignore # Pylance wants me to specify the type if that empty list smh
             + [af.BoutonFonction(af.SKIN_SHADE, "Ajouter", self.ajouter)]
         )
+
+        self.contenu = af.WrapperMarge()
+        self.contenu.set_contenu(self.liste)
+
+        self.courant = self.inputs["nom"]
 
         self.super_ajouter = ajouter
 
@@ -189,7 +303,8 @@ class FormulaireNivele(af.WrapperNoeud):
         # On met à jour les avertissements
         if niveaux_problematiques:
             self.avertissements["niveau"].set_texte(
-                f"Les niveaux {', '.join([str(niveau) for niveau in niveaux_problematiques])} ne sont pas valides.")
+                f"""Les niveaux {', '.join([str(niveau) for niveau in niveaux_problematiques])}
+ne sont pas valides.""")
 
     def update(self):
         self.check()
@@ -204,10 +319,9 @@ class FormulaireNivele(af.WrapperNoeud):
         """Ajoute l'objet."""
         self.check()
         if all([avertissement.get_texte() == "" for avertissement in self.avertissements.values()]):
-            json = f"""{{
-    "nom": "{self.inputs["nom"].valeur}",
-    {", ".join([f'"{key}": [{", ".join([valeur for valeur in valeurs])}]' for key, valeurs in self.valeurs.items()])}
-}}"""
+            json = f"""{{"nom": "{self.inputs["nom"].valeur}", {
+", ".join([f'"{key}": [{", ".join([valeur for valeur in valeurs])}]' for key, valeurs in self.valeurs.items()])
+}}}"""
             self.super_ajouter(self.stockage.parse(json))
 
     def select(self, selection: af.Cliquable, droit:bool=False):
@@ -215,54 +329,163 @@ class FormulaireNivele(af.WrapperNoeud):
         self.update()
         af.WrapperNoeud.select(self, selection, droit)
 
-class FormulaireModificationNivele(FormulaireNivele):
+    def set_actif(self):
+        if self.courant:
+            self.courant.set_actif()
+        else:
+            raise af.NavigationError("Les formulaires devraient toujours avoir un élément courant.")
+
+    def unset_actif(self):
+        if self.courant:
+            self.courant.unset_actif()
+        else:
+            raise af.NavigationError("Les formulaires devraient toujours avoir un élément courant.")
+
+    def in_up(self):
+        if isinstance(self.courant, af.TexteInput):
+            i = list(self.inputs.values()).index(self.courant)
+            if i == 0:
+                self.courant.unset_actif()
+                return False
+            self.courant.unset_actif()
+            self.courant = list(self.inputs.values())[i-1]
+            self.courant.set_actif()
+            return self
+        self.courant.unset_actif()
+        self.courant = list(self.inputs.values())[-1]
+        self.courant.set_actif()
+        return self
+
+    def in_down(self):
+        if isinstance(self.courant, af.TexteInput):
+            i = list(self.inputs.values()).index(self.courant)
+            if i == len(self.inputs.values())-1:
+                courant = self.liste.contenu[-1]
+                if isinstance(courant, af.Bouton):
+                    self.courant.unset_actif()
+                    self.courant = courant
+                    self.courant.set_actif()
+                else:
+                    raise ValueError(f"Que fait {self.courant} en dernier élément de la liste ?")
+            else:
+                self.courant.unset_actif()
+                self.courant = list(self.inputs.values())[i+1]
+                self.courant.set_actif()
+            return self
+        return False
+
+    def through_out(self):
+        self.courant.unset_actif()
+        self.unset_actif() # Just to be really sure
+        return False
+
+class FormulaireModificationNivele(FormulaireNivele, af.NoeudVertical):
     """Un formulaire, avec des champs à remplir pour modifier un objet."""
     def __init__(self, stockage: Type[StockageNi], acceptor: Callable[[str], bool],
                  avertissement:str, modifier: Callable[[StockageNi], None],
                  objet:StockageNi, supprimer: Callable[[StockageNi], None]):
+        af.NoeudVertical.__init__(self)
         FormulaireNivele.__init__(self, stockage,
                                   lambda nom: acceptor(nom) or nom == objet.nom,
                                   avertissement, modifier)
+
         self.objet = objet
         self.inputs["nom"].valeur = objet.nom
         for key in stockage.champs:
-            self.inputs[key].valeur = str(getattr(objet, key)[0]) # Est-ce que c'est pire que d'utiliset la jsonification ?
+            # Est-ce que c'est pire que d'utiliset la jsonification ?
+            self.inputs[key].valeur = str(getattr(objet, key)[0])
             self.valeurs[key] = [str(attr) for attr in getattr(objet, key)]
 
-        assert isinstance(self.contenu, af.ListeMargeVerticale)
-        self.contenu.set_contenu(
+        self.bouton_modifier = af.BoutonFonction(af.SKIN_SHADE, "Modifier", self.ajouter)
+        self.bouton_supprimer = af.BoutonFonction(af.SKIN_SHADE, "Supprimer", lambda: supprimer(objet))
+
+        self.liste.set_contenu(
             sum([
                 [texte, self.inputs[key], self.avertissements[key]]
                 for key, texte in self.textes.items()
             ], []) # type: ignore # Pylance wants me to specify the type if that empty list smh
-            + [af.BoutonFonction(af.SKIN_SHADE, "Modifier", self.ajouter),
-               af.BoutonFonction(af.SKIN_SHADE, "Supprimer", lambda: supprimer(objet))]
+            + [self.bouton_modifier, self.bouton_supprimer]
         )
+
+    def in_right(self):
+        # On continue vers l'intérieur (pour coller avec le reste)
+        return self.in_in()
+
+    def in_up(self):
+        if isinstance(self.courant, af.TexteInput):
+            i = list(self.inputs.values()).index(self.courant)
+            if i == 0:
+                self.courant.unset_actif()
+                return False
+            self.courant.unset_actif()
+            self.courant = list(self.inputs.values())[i-1]
+            self.courant.set_actif()
+            return self
+        if self.courant is self.bouton_modifier:
+            self.courant.unset_actif()
+            self.courant = list(self.inputs.values())[-1]
+            self.courant.set_actif()
+            return self
+        self.courant.unset_actif()
+        self.courant = self.bouton_modifier
+        self.courant.set_actif()
+        return self
+
+    def in_down(self):
+        if isinstance(self.courant, af.TexteInput):
+            i = list(self.inputs.values()).index(self.courant)
+            if i == len(self.inputs.values())-1:
+                courant = self.bouton_modifier
+                self.courant.unset_actif()
+                self.courant = courant
+                self.courant.set_actif()
+            else:
+                self.courant.unset_actif()
+                self.courant = list(self.inputs.values())[i+1]
+                self.courant.set_actif()
+            return self
+        if self.courant is self.bouton_modifier:
+            self.courant.unset_actif()
+            self.courant = self.bouton_supprimer
+            self.courant.set_actif()
+            return self
+        return False
+
+    def through_up(self):
+        return self.in_up()
+
+    def through_down(self):
+        return self.in_down()
 
 StockageCat = TypeVar("StockageCat", bound=StockageCategorie)
 
-class FormulaireCategorie(af.WrapperNoeud):
+class FormulaireCategorie(af.WrapperNoeud, af.NoeudVertical):
     """Un formulaire pour les catégories. Donne accès aux formulaires des éléments."""
-    def __init__(self, stockage: StockageCategorie, description: str, acceptor: Callable[[str], bool], avertissement:str, ajouter: Callable[[StockageUnique|StockageNivele], None]):
+    def __init__(self, stockage: StockageCategorie, description: str,
+                 acceptor: Callable[[str], bool], avertissement:str,
+                 ajouter: Callable[[StockageUnique|StockageNivele], None]):
         af.WrapperNoeud.__init__(self)
+        af.NoeudVertical.__init__(self)
         self.stockage = stockage
 
         self.texte = af.Pave(description)
 
-        self.element = af.MenuDeroulant()
+        self.element = af.MenuDeroulant(af.Texte("Choisissez un type"))
         self.element.set_contenu_liste(
             [af.TexteMenuDeroulant(self.element,element) for element in stockage.elements]
         )
-        self.element.set_contenu(af.Texte("Choisissez un type"))
 
-        self.niveau = af.MenuDeroulant()
-        self.niveau.set_contenu_liste(
+        self.menu_niveau = af.MenuDeroulant(
+            af.Texte("Choisissez si l'élément est unique ou a 10 niveaux")
+        )
+        self.menu_niveau.set_contenu_liste(
             [
-                af.TexteMenuDeroulant(self.niveau, "Unique"),
-                af.TexteMenuDeroulant(self.niveau, "10 niveaux"),
+                af.TexteMenuDeroulant(self.menu_niveau, "Unique"),
+                af.TexteMenuDeroulant(self.menu_niveau, "10 niveaux"),
             ]
         )
-        self.niveau.set_contenu(af.Texte("Choisissez si l'élément est unique ou a 10 niveaux"))
+
+        self.niveau:Optional[af.MenuDeroulant] = None
 
         self.formulaire:Optional[FormulaireUnique|FormulaireNivele] = None
 
@@ -274,10 +497,16 @@ class FormulaireCategorie(af.WrapperNoeud):
             for nom, stockage_ in stockage.elements.items()
         }
 
-        self.contenu = af.ListeMargeVerticale()
-        self.contenu.set_contenu(
+        self.liste = af.ListeMargeVerticale(shrink=True)
+        self.liste.set_contenu(
             [self.texte, self.element]
         )
+
+        self.contenu = af.WrapperMarge()
+        self.contenu.set_contenu(self.liste)
+
+        self.courant = self.element
+
         self.set_tailles(self.tailles)
 
     def set_courant(self, element: Cliquable | None):
@@ -295,39 +524,101 @@ class FormulaireCategorie(af.WrapperNoeud):
 
     def change_element(self):
         """Change le formulaire."""
-        assert isinstance(self.contenu, af.ListeMargeVerticale)
-        if isinstance(self.element.courant, af.TexteMenuDeroulant):
+        if self.element.courant.get_texte() in self.formulaires:
             formulaire = self.formulaires[self.element.courant.get_texte()]
             if isinstance(formulaire, tuple):
-                self.niveau.set_contenu(af.Texte("Choisissez si l'élément est unique ou a 10 niveaux"))
-                self.contenu.set_contenu([self.texte, self.element, self.niveau])
+                self.niveau = self.menu_niveau
+                self.niveau.set_contenu(
+                    af.Texte("Choisissez si l'élément est unique ou a 10 niveaux"))
+                self.liste.set_contenu([self.texte, self.element, self.niveau])
             else:
+                self.niveau = None
                 self.formulaire = formulaire
-                self.contenu.set_contenu([self.texte, self.element, self.formulaire])
-        else:
-            self.contenu.set_contenu([self.texte, self.element])
+                self.liste.set_contenu([self.texte, self.element, self.formulaire])
+        else: # On a sélectionné "Choisissez un type"
+            self.liste.set_contenu([self.texte, self.element])
 
     def change_niveau(self):
         """Change le formulaire."""
-        assert isinstance(self.contenu, af.ListeMargeVerticale)
-        assert isinstance(self.element.courant, af.TexteMenuDeroulant)
         formulaire = self.formulaires[self.element.courant.get_texte()]
-        assert isinstance(formulaire, tuple)
-        if isinstance(self.niveau.courant, af.TexteMenuDeroulant):
-            if self.niveau.courant.get_texte() == "Unique":
-                self.formulaire = formulaire[0]
-                self.contenu.set_contenu([self.texte, self.element, self.niveau, self.formulaire])
-            elif self.niveau.courant.get_texte() == "10 niveaux":
-                self.formulaire = formulaire[1]
-                self.contenu.set_contenu([self.texte, self.element, self.niveau, self.formulaire])
-            else:
-                raise ValueError(f"Le niveau {self.niveau.courant.get_texte()} n'existe pas.")
+        if isinstance(formulaire, tuple) and self.niveau:
+            match self.niveau.courant.get_texte():
+                case "Unique":
+                    self.formulaire = formulaire[0]
+                    self.liste.set_contenu([self.texte, self.element, self.niveau, self.formulaire])
+                case "10 niveaux":
+                    self.formulaire = formulaire[1]
+                    self.liste.set_contenu([self.texte, self.element, self.niveau, self.formulaire])
+                case "Choisissez si l'élément est unique ou a 10 niveaux":
+                    self.liste.set_contenu([self.texte, self.element, self.niveau])
+                case _:
+                    raise ValueError(f"Le niveau {self.niveau.courant.get_texte()} n'existe pas.")
         else:
-            self.contenu.set_contenu([self.texte, self.element, self.niveau])
+            raise ValueError("On a accès à un choix de niveau pour un élément unique")
+
+    def in_right(self):
+        # On continue vers l'intérieur (pour coller avec le reste)
+        return self.in_in()
+
+    def in_up(self):
+        match self.courant:
+            case self.element:
+                return self
+            case self.niveau:
+                self.set_courant(self.element)
+                return self
+            case self.formulaire:
+                assert self.formulaire is not None
+                if not self.formulaire.in_up():
+                    self.formulaire.unset_actif()
+                    if self.niveau:
+                        self.set_courant(self.niveau)
+                        self.niveau.set_actif()
+                    else:
+                        self.set_courant(self.element)
+                        self.element.set_actif()
+                return self
+            case _:
+                raise ValueError(f"Qu'est-ce que {self.courant} fait là ?")
+
+    def in_down(self):
+        match self.courant:
+            case self.element:
+                if self.niveau:
+                    self.set_courant(self.niveau)
+                elif self.formulaire:
+                    self.unset_actif()
+                    self.set_courant(self.formulaire)
+                    self.formulaire.set_courant(self.formulaire.inputs["nom"])
+                    self.formulaire.set_actif()
+                return self
+            case self.niveau:
+                if self.formulaire:
+                    self.unset_actif()
+                    self.set_courant(self.formulaire)
+                    self.formulaire.set_courant(self.formulaire.inputs["nom"])
+                    self.formulaire.set_actif()
+                return self
+            case self.formulaire:
+                assert self.formulaire is not None
+                self.formulaire.in_down()
+                return self
+            case _:
+                raise ValueError(f"Qu'est-ce que {self.courant} fait là ?")
+
+    def through_up(self):
+        if self.courant is self.formulaire:
+            return self.in_up()
+        return self
+
+    def through_down(self):
+        if self.courant is self.formulaire:
+            return self.in_down()
+        return self
 
     def affiche(self, screen: pygame.Surface, frame: int = 1, frame_par_tour: int = 1):
         af.WrapperNoeud.affiche(self, screen, frame, frame_par_tour)
-        if self.element.est_courant:
-            self.element.liste.affiche(screen, frame, frame_par_tour)
-        if self.niveau.est_courant:
-            self.niveau.liste.affiche(screen, frame, frame_par_tour)
+        if self.courant is self.element:
+            self.element.affiche_liste(screen, (5, 5), frame, frame_par_tour)
+        if self.niveau and self.courant is self.niveau:
+            self.niveau.affiche_liste(screen, (5, 5), frame, frame_par_tour)

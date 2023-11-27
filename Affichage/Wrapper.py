@@ -24,7 +24,7 @@ class Wrapper(Affichable):
         self.contenu:Optional[Affichable] = None #L'objet qu'il 'contient'
         self.fond:Tuple[int,int,int,int]|Tuple[int,int,int] = (0,0,0,0)
 
-    def set_contenu(self,contenu:Optional[Affichable]):
+    def set_contenu(self,contenu:Affichable):
         """Change le contenu du conteneur."""
         self.contenu = contenu
 

@@ -4,7 +4,6 @@ Contient la classe Liste, qui permet d'afficher des objets à la suite, et de le
 
 from __future__ import annotations
 from typing import List, Tuple, Optional, Sequence
-from warnings import warn
 import pygame
 
 from .affichable import Affichable
@@ -14,26 +13,30 @@ from .wrapper_noeud import WrapperNoeud
 from .marge import MargeHorizontale, MargeVerticale
 from .placeholder import Placeheldholder
 
+from .erreur import DisplayError
+
 from ._ensure_pygame import transparency_flag
 
 class Liste(Conteneur):
     """Contient des objets, et les affiche à la suite."""
-    def __init__(self):
+    def __init__(self, shrink: bool = False):
         Conteneur.__init__(self)
         self.contenu:List[Affichable]
         self.repartition = []
-        self.courant = 0 #L'élément 'courant' de la liste TODO : trouver un meilleur nom (ça risque de prêter à confusion)
+        self.courant = 0 #L'élément 'courant' de la liste
         self.decalage = 0
+        self.shrink = shrink
 
-    def set_contenu(self,contenu:List[Affichable],repartition:Optional[List[int]]=None,courant:int=0):
+    def set_contenu(self,contenu:List[Affichable],
+                    repartition:Optional[List[int]]=None,courant:int=0):
         if repartition is None:
             repartition = [0]*len(contenu)
         # On vérifie qu'il n'y a pas de nombres négatifs dans la répartition
         if any(taille<0 for taille in repartition):
-            warn("Les tailles doivent être positives dans les listes !")
+            raise ValueError("Les tailles doivent être positives dans les listes !")
         # On vérifie qu'il y a autant d'éléments dans la répartition que dans le contenu
         elif len(contenu) != len(repartition):
-            warn(f"Hoy, {contenu} et {repartition} ne sont pas de même taille !")
+            raise ValueError(f"Hoy, {contenu} et {repartition} ne sont pas de même taille !")
         else:
             self.contenu = contenu
             self.repartition = repartition
@@ -107,7 +110,6 @@ class ListeVerticale(Liste):
     """Une liste disposée verticalement."""
     def set_tailles(self,tailles:Tuple[int,int]):
         self.tailles = tailles
-        #occupe = sum(self.repartition[i] if self.repartition[i] else self.contenu[i].get_tailles(tailles)[1] for i in range(len(self.repartition)))
         somme = self.decalage
         for i, contenu in enumerate(self.contenu):
             contenu.set_position((0,somme))
@@ -115,7 +117,7 @@ class ListeVerticale(Liste):
                 tailles_contenu = contenu.get_tailles((tailles[0],self.repartition[i]))
             else:
                 tailles_contenu = contenu.get_tailles(tailles)
-            contenu.set_tailles(tailles_contenu) #Certains adaptent leur taille en fonction de ce qu'on leur accorde
+            contenu.set_tailles(tailles_contenu)
             somme += tailles_contenu[1]
         decalage = 0
         if somme < tailles[1]:
@@ -128,14 +130,22 @@ class ListeVerticale(Liste):
             self.decalage += decalage
 
     def get_tailles(self,tailles:Tuple[int,int]):
-        return (max(contenu.get_tailles(tailles)[0] for contenu in self.contenu),tailles[1]) if self.contenu else (0,0)
+        return (max(contenu.get_tailles(tailles)[0] for contenu in self.contenu),
+                tailles[1] if not self.shrink else
+                min(sum(self.repartition[i] if self.repartition[i] else
+                        self.contenu[i].get_tailles(tailles)[1]
+                        for i in range(len(self.repartition))),tailles[1])
+                ) if self.contenu else (0,0)
 
     def scroll(self,position:Tuple[int,int],x:int,y:int):
         if self.scroll_liste(position,x,y): #Un de nos éléments a scrollé
             return True
         elif self.touche(position) and y: #Personne n'a scrollé, peut-être qu'on peut le faire
-            taille_contenu = sum(self.repartition[i] if self.repartition[i] else self.contenu[i].get_tailles(self.tailles)[1] for i in range(len(self.repartition)))
-            if taille_contenu > self.tailles[1]: # On ne scrolle pas si on ne peut même pas remplir tout l'espace disponible
+            taille_contenu = sum(self.repartition[i] if self.repartition[i] else
+                                 self.contenu[i].get_tailles(self.tailles)[1]
+                                 for i in range(len(self.repartition)))
+            if taille_contenu > self.tailles[1]:
+                # On ne scrolle pas si on ne peut même pas remplir tout l'espace disponible
                 if y<0:
                     decalage = max(y,self.tailles[1] - taille_contenu - self.decalage)
                 else:
@@ -183,14 +193,14 @@ class ListeVerticale(Liste):
         self.contenu[i] = contenu
         self.repartition[i] = rep
         if i < self.courant:
-            self.decalage += ancienne_rep if ancienne_rep else ancien_contenu.get_tailles(self.tailles)[1] - rep if rep else contenu.get_tailles(self.tailles)[1]
+            self.decalage += ancienne_rep if ancienne_rep else ancien_contenu.get_tailles(
+                self.tailles)[1] - rep if rep else contenu.get_tailles(self.tailles)[1]
         self.set_tailles(self.tailles)
 
 class ListeHorizontale(Liste):
     """Une liste disposée horizontalement."""
     def set_tailles(self,tailles:Tuple[int,int]):
         self.tailles = tailles
-        #occupe = sum(self.repartition[i] if self.repartition[i] else self.contenu[i].get_tailles(tailles)[0] for i in range(len(self.repartition)))
         somme = self.decalage
         for i, contenu in enumerate(self.contenu):
             contenu.set_position((somme,0))
@@ -198,7 +208,7 @@ class ListeHorizontale(Liste):
                 tailles_contenu = contenu.get_tailles((self.repartition[i],tailles[1]))
             else:
                 tailles_contenu = contenu.get_tailles(tailles)
-            contenu.set_tailles(tailles_contenu) #Certains adaptent leur taille en fonction de ce qu'on leur accorde
+            contenu.set_tailles(tailles_contenu)
             somme += tailles_contenu[0]
         decalage = 0
         if somme < tailles[0]:
@@ -211,14 +221,22 @@ class ListeHorizontale(Liste):
             self.decalage += decalage
 
     def get_tailles(self,tailles:Tuple[int,int]):
-        return (tailles[0],max(contenu.get_tailles(tailles)[1] for contenu in self.contenu)) if self.contenu else (0,0)
+        return (tailles[0] if not self.shrink else
+                min(sum(self.repartition[i] if self.repartition[i] else
+                        self.contenu[i].get_tailles(tailles)[0]
+                        for i in range(len(self.repartition))),tailles[0]),
+                max(contenu.get_tailles(tailles)[1]
+                    for contenu in self.contenu))if self.contenu else (0,0)
 
     def scroll(self,position:Tuple[int,int],x:int,y:int):
         if self.scroll_liste(position,x,y): #Un de nos éléments a scrollé
             return True
         elif self.touche(position) and x: #Personne n'a scrollé, peut-être qu'on peut le faire
-            taille_contenu = sum(self.repartition[i] if self.repartition[i] else self.contenu[i].get_tailles(self.tailles)[0] for i in range(len(self.repartition)))
-            if taille_contenu > self.tailles[0]: # On ne scrolle pas si on ne peut même pas remplir tout l'espace disponible
+            taille_contenu = sum(self.repartition[i] if self.repartition[i] else
+                                 self.contenu[i].get_tailles(self.tailles)[0]
+                                 for i in range(len(self.repartition)))
+            if taille_contenu > self.tailles[0]:
+                # On ne scrolle pas si on ne peut même pas remplir tout l'espace disponible
                 if x<0:
                     decalage = max(x,self.tailles[0] - taille_contenu - self.decalage)
                 else:
@@ -266,33 +284,38 @@ class ListeHorizontale(Liste):
         self.contenu[i] = contenu
         self.repartition[i] = rep
         if i < self.courant:
-            self.decalage += ancienne_rep if ancienne_rep else ancien_contenu.get_tailles(self.tailles)[0] - rep if rep else contenu.get_tailles(self.tailles)[0]
+            self.decalage += ancienne_rep if ancienne_rep else ancien_contenu.get_tailles(
+                self.tailles)[0] - rep if rep else contenu.get_tailles(self.tailles)[0]
         self.set_tailles(self.tailles)
 
 class ListeMarge(Liste):
     """Une liste avec des marges automatiques."""
-    def __init__(self, marge: int = 5):
-        Liste.__init__(self)
+    def __init__(self, marge: int = 5, shrink: bool = False):
+        Liste.__init__(self, shrink)
         self.marge = marge
 
-    def set_contenu(self, contenu: Sequence[Affichable], repartition: Optional[List[int]] = None, courant: int = 0):
+    def set_contenu(self, contenu: Sequence[Affichable],
+                    repartition: Optional[List[int]] = None, courant: int = 0):
         if repartition is None:
             repartition = [0] * len(contenu)
         # On vérifie qu'il n'y a pas de nombres négatifs dans la répartition
         if any(taille < 0 for taille in repartition):
-            warn("Les tailles doivent être positives dans les listes !")
+            raise ValueError("Les tailles doivent être positives dans les listes !")
         # On vérifie qu'il y a autant d'éléments dans la répartition que dans le contenu
         elif len(contenu) != len(repartition):
-            warn(f"Hoy, {contenu} et {repartition} ne sont pas de même taille !")
+            raise ValueError(f"Hoy, {contenu} et {repartition} ne sont pas de même taille !")
         else:
-            self.contenu = [(MargeHorizontale() if isinstance(self, ListeVerticale) else MargeVerticale()) if i % 2 else contenu[i // 2] for i in range(2 * len(contenu) - 1)]
-            self.repartition = [self.marge if i%2 else repartition[i//2] for i in range(2*len(repartition)-1)]
+            self.contenu = [
+                (MargeHorizontale() if isinstance(self, ListeVerticale) else MargeVerticale())
+                if i % 2 else contenu[i // 2] for i in range(2 * len(contenu) - 1)]
+            self.repartition = [self.marge
+                                if i%2 else repartition[i//2] for i in range(2*len(repartition)-1)]
             self.courant = courant
 
-class ListeMargeVerticale(ListeMarge, ListeVerticale):
+class ListeMargeVerticale(ListeVerticale, ListeMarge):
     """Une liste disposée verticalement avec des marges automatiques."""
 
-class ListeMargeHorizontale(ListeMarge, ListeHorizontale):
+class ListeMargeHorizontale(ListeHorizontale, ListeMarge):
     """Une liste disposée horizontalement avec des marges automatiques."""
 
 class ListeMenu(WrapperNoeud):
@@ -319,8 +342,7 @@ class ListeMenu(WrapperNoeud):
         longueur_ligne=5
         for contenu in self.items:
             if contenu.get_tailles(self.tailles)[0] + 10 >tailles[0]:
-                warn(f"Je n'ai même pas la place d'afficher {contenu} !")
-                break
+                raise DisplayError(f"Je n'ai même pas la place d'afficher {contenu} !")
             elif longueur_ligne + contenu.get_tailles(self.tailles)[0] + 5 > tailles[0]:
                 liste = ListeMargeHorizontale()
                 liste.set_contenu(ligne)
