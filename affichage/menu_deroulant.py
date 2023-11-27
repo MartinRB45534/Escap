@@ -15,8 +15,6 @@ from .texte import Texte
 from .wrapper import Wrapper
 from .wrapper_noeud import WrapperNoeud
 
-from .erreur import NavigationError
-
 class MenuDeroulant(Placeheldholder):
     """Un menu déroulant"""
     def __init__(self, contenu: Texte):
@@ -50,19 +48,17 @@ class MenuDeroulant(Placeheldholder):
         self.liste.set_contenu(contenu)
 
     def clique(self, position: Tuple[int, int], droit: bool = False):
+        self.objets.append(self.liste)
         clique = Wrapper.clique(self, position, droit)
+        self.objets.pop() # Ce serait bien de faire ça plus proprement
         if clique is self or clique is self.contenu:
             self.set_actif()
             return self
         return False
 
     def trouve_actif(self):
-        if self.actif:
-            self.marque_actif = True
-        else:
-            raise NavigationError(f"""Erreur : on a atteint {self} qui n'est pas actif,
-mais n'est qu'un pauvre menu déroulant !""")
-        
+        Cliquable.trouve_actif(self)
+
     def set_actif(self):
         Cliquable.set_actif(self) # On n'utilise pas le set_actif de Placeheldholder
 

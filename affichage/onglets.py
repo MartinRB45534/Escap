@@ -73,6 +73,9 @@ class Onglets(WrapperNoeud):
         if not droit:
             if selection in self.boutons:
                 self.onglet.set_contenu(self.onglets[self.boutons.index(selection)])
+                if self.actif:
+                    self.unset_actif()
+                    selection.set_actif()
             elif selection in self.onglets:
                 self.onglet.set_contenu(selection)
                 if self.actif:
@@ -90,8 +93,14 @@ class Onglets(WrapperNoeud):
             contenu.set_contenu(texte)
             self.onglet.set_contenu(contenu)
             self.courant = texte
-        else:
+        elif element in self.boutons:
             self.courant = element
+            self.onglet.set_contenu(self.onglets[self.boutons.index(element)])
+        elif element in self.onglets:
+            self.courant = element
+            self.onglet.set_contenu(element)
+        else:
+            raise ValueError(f"{self}.set_courant : {element} n'est pas un élément de {self}")
         if self.tailles != (0,0):
             self.set_tailles(self.tailles)
 
@@ -100,7 +109,11 @@ class Onglets(WrapperNoeud):
         self.onglets = onglets
         self.boutons = [Bouton(SKIN_SHADE, onglet.nom) for onglet in onglets]
         self.liste_boutons.set_contenu(self.boutons)
-        self.set_courant(self.boutons[0] if self.onglets else None)
+        if self.onglets:
+            self.set_courant(self.boutons[0])
+            self.boutons[0].set_actif()
+        else:
+            self.set_courant(None)
 
     def in_previous(self):
         if self.courant in self.boutons[1:]:

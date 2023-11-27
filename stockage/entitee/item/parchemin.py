@@ -139,20 +139,20 @@ class ParcheminVierge(Entitee):
 
 class ParcheminViergeNivele(EntiteeNivele):
     """Les informations d'un parchemin vierge."""
-    def __init__(self, nom: str, latences_impregne: List[float], taux_cout_caste: List[float], taux_cout_impregne: List[float], taux_latence_caste: List[float], taux_latence_impregne: List[float]):
+    def __init__(self, nom: str, latence_impregne: List[float], taux_cout_caste: List[float], taux_cout_impregne: List[float], taux_latence_caste: List[float], taux_latence_impregne: List[float]):
         EntiteeNivele.__init__(self, nom)
-        self.latences_impregne = latences_impregne
+        self.latence_impregne = latence_impregne
         self.taux_cout_caste = taux_cout_caste
         self.taux_cout_impregne = taux_cout_impregne
         self.taux_latence_caste = taux_latence_caste
         self.taux_latence_impregne = taux_latence_impregne
 
     def check(self) -> bool:
-        return len(self.latences_impregne) == 10 and len(self.taux_cout_caste) == 10 and len(self.taux_cout_impregne) == 10 and len(self.taux_latence_caste) == 10 and len(self.taux_latence_impregne) == 10 and all([latence >= 0 for latence in self.latences_impregne]) and all([taux >= 0 for taux in self.taux_cout_caste]) and all([taux >= 0 for taux in self.taux_cout_impregne]) and all([taux >= 0 for taux in self.taux_latence_caste]) and all([taux >= 0 for taux in self.taux_latence_impregne])
+        return len(self.latence_impregne) == 10 and len(self.taux_cout_caste) == 10 and len(self.taux_cout_impregne) == 10 and len(self.taux_latence_caste) == 10 and len(self.taux_latence_impregne) == 10 and all([latence >= 0 for latence in self.latence_impregne]) and all([taux >= 0 for taux in self.taux_cout_caste]) and all([taux >= 0 for taux in self.taux_cout_impregne]) and all([taux >= 0 for taux in self.taux_latence_caste]) and all([taux >= 0 for taux in self.taux_latence_impregne])
 
     def stringify(self) -> str:
         return f"""{{
-    "latences_impregne": {self.latences_impregne},
+    "latence_impregne": {self.latence_impregne},
     "taux_cout_caste": {self.taux_cout_caste},
     "taux_cout_impregne": {self.taux_cout_impregne},
     "taux_latence_caste": {self.taux_latence_caste},
@@ -162,7 +162,7 @@ class ParcheminViergeNivele(EntiteeNivele):
     @classmethod
     def parse(cls, json: str) -> ParcheminViergeNivele:
         dictionnaire = parse(json)
-        return ParcheminViergeNivele(dictionnaire["nom"],  dictionnaire["latences_impregne"], dictionnaire["taux_cout_caste"], dictionnaire["taux_cout_impregne"], dictionnaire["taux_latence_caste"], dictionnaire["taux_latence_impregne"])
+        return ParcheminViergeNivele(dictionnaire["nom"],  dictionnaire["latence_impregne"], dictionnaire["taux_cout_caste"], dictionnaire["taux_cout_impregne"], dictionnaire["taux_latence_caste"], dictionnaire["taux_latence_impregne"])
 
     @classmethod
     @property
@@ -199,7 +199,7 @@ class ParcheminViergeNivele(EntiteeNivele):
 
     def make(self, labyrinthe: mdl.Labyrinthe, position:crt.Position, niveau:int) -> mdl.ParcheminVierge:
         """Retourne le parchemin correspondant."""
-        effet = mdl.Impregne(mdl.NOONE, self.latences_impregne[niveau], mdl.NOWRITTING, self.taux_cout_impregne[niveau], self.taux_cout_caste[niveau], self.taux_latence_impregne[niveau], self.taux_latence_caste[niveau])
+        effet = mdl.Impregne(mdl.NOONE, self.latence_impregne[niveau], mdl.NOWRITTING, self.taux_cout_impregne[niveau], self.taux_cout_caste[niveau], self.taux_latence_impregne[niveau], self.taux_latence_caste[niveau])
         parchemin = mdl.ParcheminVierge(labyrinthe, effet, position)
         return parchemin
         

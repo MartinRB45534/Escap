@@ -75,6 +75,7 @@ class FormulaireUnique(af.WrapperNoeud):
                 self.avertissements[key].set_texte("")
             else:
                 self.avertissements[key].set_texte(self.textes_avertissements[key])
+        self.set_tailles(self.tailles)
 
     def update(self):
         self.check()
@@ -311,6 +312,8 @@ ne sont pas valides.""")
         if self.inputs["niveau"].accepte and self.niveau != int(self.inputs["niveau"].valeur):
             self.niveau = int(self.inputs["niveau"].valeur)
             for key, input_ in self.inputs.items():
+                if key in ["nom", "niveau"]:
+                    continue
                 input_.valeur = self.valeurs[key][self.niveau-1]
         self.check()
         af.WrapperNoeud.update(self)
@@ -566,6 +569,7 @@ class FormulaireCategorie(af.WrapperNoeud, af.NoeudVertical):
                 return self
             case self.niveau:
                 self.set_courant(self.element)
+                self.element.set_actif()
                 return self
             case self.formulaire:
                 assert self.formulaire is not None
@@ -586,6 +590,7 @@ class FormulaireCategorie(af.WrapperNoeud, af.NoeudVertical):
             case self.element:
                 if self.niveau:
                     self.set_courant(self.niveau)
+                    self.niveau.set_actif()
                 elif self.formulaire:
                     self.unset_actif()
                     self.set_courant(self.formulaire)

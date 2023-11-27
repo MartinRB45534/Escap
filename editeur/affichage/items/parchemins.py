@@ -46,6 +46,7 @@ class OngletParchemins(af.Onglet):
         """Ajoute une nouvelle espèce."""
         self.stockage.items.parchemin.parchemins[parchemin.nom] = parchemin
         self.make_onglets()
+        self.set_actif()
         self.onglets.select(self.onglets.boutons[-1])
 
     def supprimer(self,parchemin:stck.ParcheminVierge|stck.ParcheminViergeNivele):

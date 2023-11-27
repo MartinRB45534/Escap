@@ -37,7 +37,8 @@ class Editeur:
                 self.quitte()
             elif event.type == pygame.VIDEORESIZE:
                 self.affichage.set_tailles(event.size)
-            elif event.type in [pygame.MOUSEBUTTONDOWN,pygame.MOUSEBUTTONUP,pygame.MOUSEWHEEL,pygame.MOUSEMOTION]:
+            elif event.type in [pygame.MOUSEBUTTONDOWN,pygame.MOUSEBUTTONUP,
+                                pygame.MOUSEWHEEL,pygame.MOUSEMOTION]:
                 self.affichage.bouge_souris(event)
             elif event.type in [pygame.KEYDOWN,pygame.KEYUP]:
                 self.controle_clavier(event,cm.get_modifiers(event.mod))
@@ -57,23 +58,28 @@ class Editeur:
 
     def get_direction(self, event:pygame.event.Event) -> Optional[af.DirectionAff]:
         """Renvoie la direction correspondant à une touche du clavier."""
-        match event.scancode: #Le scancode est le code de la touche, indépendant de la disposition du clavier
+        match event.scancode: # Le scancode est le code de la touche,
+                              # indépendant de la disposition du clavier
             case pygame.KSCAN_UP:
                 return af.DirectionAff.UP
             case pygame.KSCAN_W:
-                return af.DirectionAff.UP
+                if not af.TexteInput.current_input:
+                    return af.DirectionAff.UP
             case pygame.KSCAN_DOWN:
                 return af.DirectionAff.DOWN
             case pygame.KSCAN_S:
-                return af.DirectionAff.DOWN
+                if not af.TexteInput.current_input:
+                    return af.DirectionAff.DOWN
             case pygame.KSCAN_LEFT:
                 return af.DirectionAff.LEFT
             case pygame.KSCAN_A:
-                return af.DirectionAff.LEFT
+                if not af.TexteInput.current_input:
+                    return af.DirectionAff.LEFT
             case pygame.KSCAN_RIGHT:
                 return af.DirectionAff.RIGHT
             case pygame.KSCAN_D:
-                return af.DirectionAff.RIGHT
+                if not af.TexteInput.current_input:
+                    return af.DirectionAff.RIGHT
             case pygame.KSCAN_RETURN:
                 return af.DirectionAff.IN
             case pygame.KSCAN_BACKSPACE:
@@ -91,9 +97,10 @@ class Editeur:
         if pygame.KMOD_LSHIFT in modifiers or pygame.KMOD_RSHIFT in modifiers:
             direction = direction.oppose
         if af.TexteInput.current_input is not None:
-            if direction is af.DirectionAff.IN: # Return is the only key that we must handle manually
+            if direction is af.DirectionAff.IN: # Return is used to validate the input
                 direction = af.DirectionAff.VALIDATE
-            elif direction in [af.DirectionAff.UP,af.DirectionAff.DOWN,af.DirectionAff.NEXT,af.DirectionAff.PREVIOUS]:
+            elif direction in [af.DirectionAff.UP,af.DirectionAff.DOWN,
+                               af.DirectionAff.NEXT,af.DirectionAff.PREVIOUS]:
                 pass # Let those keys navigate as usual
             else:
                 return
