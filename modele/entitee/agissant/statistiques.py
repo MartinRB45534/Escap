@@ -3,7 +3,7 @@ Contient la classe Statistiques.
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Dict, Set
+from typing import TYPE_CHECKING
 
 # Imports des valeurs par défaut des paramètres
 from ...commons.elements import Element
@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 
 class Statistiques:
     """Les statistiques d'un agissant."""
-    def __init__(self,possesseur:Agissant, priorite:float, vitesse:float, force:float, pv:float, regen_pv_max:float, regen_pv_min:float, restauration_regen_pv:float, pm:float, regen_pm:float, affinites:Dict[Element,float], immunites:Set[Element]):
+    def __init__(self,possesseur:Agissant, priorite:float, vitesse:float, force:float, pv:float, regen_pv_max:float, regen_pv_min:float, restauration_regen_pv:float, pm:float, regen_pm:float, affinites:dict[Element,float], immunites:set[Element]):
         self.possesseur = possesseur #Entité possédant ces statistiques (utilisé pour chercher des effets par exemple)
 
         self.priorite = priorite #La priorité sert à bloquer ou forcer certains actions (ex: le vol, l'instakill, etc.)

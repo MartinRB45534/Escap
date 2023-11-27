@@ -3,7 +3,7 @@ Affiche la carte centrée sur une case.
 """
 
 from __future__ import annotations
-from typing import List, TYPE_CHECKING
+from typing import TYPE_CHECKING
 import affichage as af
 
 from .carte_extrait import CarteExtrait
@@ -23,7 +23,7 @@ class CarteCentree(CarteExtrait):
     def update(self):
         assert isinstance(self.courant,VignetteCase|None)
         courant = None
-        self.objets:List[af.Affichable] = []
+        self.objets:list[af.Affichable] = []
         if len(self.labyrinthe.nodes) > 1: # On a au moins une case plus l'absente
             # On a le même étage pour toutes les cases du labyrinthe (sauf l'absente)
             assert len({position.etage for position in self.labyrinthe.nodes if position is not POSITION_ABSENTE}) == 1

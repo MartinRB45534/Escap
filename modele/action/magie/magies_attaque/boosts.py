@@ -3,7 +3,7 @@ Ce fichier contient les classes des magies de type boost.
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING
 
 # Imports des classes parentes
 from ..magie import Magie, CibleAgissant, CibleAgissants
@@ -44,9 +44,9 @@ class MagieBoost(CibleAgissant):
 class MagieMultiBoost(CibleAgissants):
     """La magie qui crée un effet de dopage sur plusieurs autres agissants."""
     nom = "magie multi boost"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,taux:float,duree:float,niveau:int,cible:List[Agissant]):
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,taux:float,duree:float,niveau:int,cible:list[Agissant]):
         CibleAgissants.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau,cible)
-        self.cible:List[Agissant] = cible
+        self.cible:list[Agissant] = cible
         self.taux = taux
         self.duree = duree
 

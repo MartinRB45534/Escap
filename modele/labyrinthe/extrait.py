@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Set, Optional, Iterator, Any
+from typing import TYPE_CHECKING, Optional, Iterator, Any
 import carte as crt
 import networkx as nx
 
@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 class Extrait(crt.Extrait):
     """Un extrait du labyrinthe"""
-    def __init__(self, exterieur:Set[crt.Position], subgraph:nx.MultiDiGraph):
+    def __init__(self, exterieur:set[crt.Position], subgraph:nx.MultiDiGraph):
         nx.MultiDiGraph.__init__(self)
         self.add_nodes_from(subgraph.nodes(data=True))
         self.add_edges_from(subgraph.edges(data=True, keys=True))

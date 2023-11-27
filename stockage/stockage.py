@@ -3,7 +3,7 @@ Classes mères des classes de stockage.
 """
 
 from __future__ import annotations
-from typing import Self, Optional, Type, Callable, Tuple, TYPE_CHECKING
+from typing import Self, Optional,  Callable, TYPE_CHECKING
 from json import loads as parse
 
 import modele as mdl
@@ -35,7 +35,7 @@ class StockageUnique(Stockage):
     """Stocke un élément, pas une catégorie d'éléments."""
     @classmethod
     @property
-    def champs(cls) -> dict[str, Type[int|str|float]]:
+    def champs(cls) -> dict[str, type[int|str|float]]:
         """Retourne les champs de l'objet."""
         raise NotImplementedError
 
@@ -59,7 +59,7 @@ class StockageNivele(Stockage):
     """Stocke un élément avec un niveau."""
     @classmethod
     @property
-    def champs(cls) -> dict[str, Type[int|str|float]]:
+    def champs(cls) -> dict[str, type[int|str|float]]:
         """Retourne les champs de l'objet."""
         raise NotImplementedError
 
@@ -146,7 +146,7 @@ class StockageCategorie(Stockage):
     @classmethod
     @property
     def elements(cls) -> dict[str,
-        Type[StockageUnique]|Tuple[Type[StockageUnique], Type[StockageNivele]]]:
+        type[StockageUnique]|tuple[type[StockageUnique], type[StockageNivele]]]:
         """Retourne les éléments de la catégorie."""
         raise NotImplementedError
 

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Set, List
+from typing import TYPE_CHECKING
 import affichage as af
 
 # Imports utilisés uniquement dans les annotations
@@ -14,13 +14,13 @@ if TYPE_CHECKING:
 
 class Classe:
     """!!! Classe != class !!! Correspond aux classes avec des niveaux, qui évoluent, contiennent des skills, etc."""
-    def __init__(self,conditions_evo:List[float]=[0,10,20,30,40,50,60,70,80,90],skills_intrasecs:Set[SkillIntrasec]=set(),skills:Set[SkillExtra]=set()):
+    def __init__(self,conditions_evo:list[float]=[0,10,20,30,40,50,60,70,80,90],skills_intrasecs:set[SkillIntrasec]=set(),skills:set[SkillExtra]=set()):
         """conditions_evo : les conditions d'évolution de la classe au niveau supérieur ; si c'est un nombre, indique l'xp nécessaire à l'évolution, si c'est une chaine de caractère, indique la fonction capable d'évaluer la condition
            skills_intrasecs : les skills obtenus automatiquement avec la classe
            cadeux_evo : les récompenses d'évolution ; peuvent être des skills, des classes ou de l'xp""" #Plus vraiment, en fait... À rafraichir
         self.skills=skills
         self.skills_intrasecs=skills_intrasecs
-        self.sous_classes:Set[Classe]=set() #Une classe peut posséder des sous-classes, qui contribueront à son évolution moins qu'à celle de la classe principale
+        self.sous_classes:set[Classe]=set() #Une classe peut posséder des sous-classes, qui contribueront à son évolution moins qu'à celle de la classe principale
         self.niveau=0 #Le niveau devrais passer à 1 lorsqu'on acquiert la classe
         self.cond_evo=conditions_evo
         self.xp=0 #L'xp commence à 0, évidemment
@@ -70,9 +70,9 @@ class Classe:
             for skill in self.skills_intrasecs:
                 skill.evo()
 
-    def get_skills_actifs(self) -> Set[Actif]:
+    def get_skills_actifs(self) -> set[Actif]:
         """Fonction qui renvoie tous les skills actifs de la classe et de ses sous-classes"""
-        skills:Set[Actif] = set()
+        skills:set[Actif] = set()
         for skill in self.skills | self.skills_intrasecs:
             if isinstance(skill,Actif):
                 skills.add(skill) #Ne prend pas en compte la création d'items pour l'instant !
@@ -80,9 +80,9 @@ class Classe:
             skills |= classe.get_skills_actifs()
         return skills
 
-    def debut_tour(self) -> Set[SkillDebutTour]:
+    def debut_tour(self) -> set[SkillDebutTour]:
         """Fonction qui renvoie tous les skills qui ont besoin d'être appelés au début du tour (juste les auras pour l'instant)."""
-        skills:Set[SkillDebutTour] = set()
+        skills:set[SkillDebutTour] = set()
         for skill in self.skills | self.skills_intrasecs:
             if isinstance(skill,SkillDebutTour):
                 skills.add(skill)

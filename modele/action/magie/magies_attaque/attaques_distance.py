@@ -3,7 +3,7 @@ Contient les classes des magies qui créent une attaque à distance.
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING
 import carte as crt
 
 # Imports des classes parentes
@@ -25,7 +25,7 @@ class MagieAttaqueDistance(CibleCase,MagiesOffensives):
         CibleCase.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau,cible)
         MagiesOffensives.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau)
         self.cible = cible
-        self.effets:List[AttaqueCaseDelayee] = []
+        self.effets:list[AttaqueCaseDelayee] = []
         self.portee = portee
         self.degats = degats
         self.element = element

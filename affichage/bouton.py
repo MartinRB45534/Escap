@@ -1,7 +1,7 @@
 """Contient la classe Bouton, qui est un bouton cliquable avec un texte et une vignette"""
 
 from __future__ import annotations
-from typing import Literal, Tuple, Optional, Callable, TYPE_CHECKING
+from typing import Literal, Optional, Callable, TYPE_CHECKING
 import pygame
 
 from affichage.survolable import Survolable
@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 
 class Bouton(WrapperCliquable):
     """Un bouton cliquable avec un texte et une vignette"""
-    def __init__(self, skin:Skin, texte:str, fond:Tuple[int,int,int]=(255,255,255), fond_marque_survol:Optional[Tuple[int,int,int]]=(228,35,19), fond_marque_actif:Optional[Tuple[int,int,int]]=(51,153,0), fond_marque_courant:Optional[Tuple[int,int,int]]=(255,192,0), fond_est_courant:Optional[Tuple[int,int,int]]=(238,238,238), fond_actif:Optional[Tuple[int,int,int]]=(238,238,238)):
+    def __init__(self, skin:Skin, texte:str, fond:tuple[int,int,int]=(255,255,255), fond_marque_survol:Optional[tuple[int,int,int]]=(228,35,19), fond_marque_actif:Optional[tuple[int,int,int]]=(51,153,0), fond_marque_courant:Optional[tuple[int,int,int]]=(255,192,0), fond_est_courant:Optional[tuple[int,int,int]]=(238,238,238), fond_actif:Optional[tuple[int,int,int]]=(238,238,238)):
         WrapperCliquable.__init__(self)
 
         self.fond = fond
@@ -73,13 +73,13 @@ class Bouton(WrapperCliquable):
         for objet in self.objets:
             objet.affiche(screen,frame,frame_par_tour)
     
-    def survol(self, position: Tuple[int, int]) -> Survolable | Literal[False]:
+    def survol(self, position: tuple[int, int]) -> Survolable | Literal[False]:
         survol = WrapperCliquable.survol(self, position)
         if survol:
             self.marque_survol = True
         return survol
 
-    def clique(self,position:Tuple[int,int],droit:bool=False) -> Cliquable|Literal[False]:
+    def clique(self,position:tuple[int,int],droit:bool=False) -> Cliquable|Literal[False]:
         clique = Wrapper.clique(self,position,droit)
         if clique:
             self.set_actif()
@@ -88,7 +88,7 @@ class Bouton(WrapperCliquable):
 
 class BoutonFonction(Bouton):
     """Un bouton qui appelle lui-même une fonction"""
-    def __init__(self, skin:Skin, texte:str, fonction:Callable[[],None], fond:Tuple[int,int,int]=(255,255,255), fond_marque_survol:Tuple[int,int,int]=(200,200,200), fond_marque_actif:Optional[Tuple[int,int,int]]=None, fond_marque_courant:Optional[Tuple[int,int,int]]=None, fond_est_courant:Optional[Tuple[int,int,int]]=None, fond_actif:Optional[Tuple[int,int,int]]=None):
+    def __init__(self, skin:Skin, texte:str, fonction:Callable[[],None], fond:tuple[int,int,int]=(255,255,255), fond_marque_survol:tuple[int,int,int]=(200,200,200), fond_marque_actif:Optional[tuple[int,int,int]]=None, fond_marque_courant:Optional[tuple[int,int,int]]=None, fond_est_courant:Optional[tuple[int,int,int]]=None, fond_actif:Optional[tuple[int,int,int]]=None):
         Bouton.__init__(self, skin, texte, fond, fond_marque_survol, fond_marque_actif, fond_marque_courant, fond_est_courant, fond_actif)
         self.fonction = fonction
 
@@ -100,6 +100,6 @@ class BoutonFonction(Bouton):
 
 class BoutonPlaceholder(Placeholder, Bouton):
     """Un placeholder qui se présente comme un bouton"""
-    def __init__(self, placeheldholder:Placeheldholder, placeheld:Optional[Cliquable], skin:Skin, texte:str, fond:Tuple[int,int,int]=(255,255,255), fond_marque_survol:Tuple[int,int,int]=(200,200,200), fond_marque_actif:Optional[Tuple[int,int,int]]=None, fond_marque_courant:Optional[Tuple[int,int,int]]=None, fond_est_courant:Optional[Tuple[int,int,int]]=None, fond_actif:Optional[Tuple[int,int,int]]=None):
+    def __init__(self, placeheldholder:Placeheldholder, placeheld:Optional[Cliquable], skin:Skin, texte:str, fond:tuple[int,int,int]=(255,255,255), fond_marque_survol:tuple[int,int,int]=(200,200,200), fond_marque_actif:Optional[tuple[int,int,int]]=None, fond_marque_courant:Optional[tuple[int,int,int]]=None, fond_est_courant:Optional[tuple[int,int,int]]=None, fond_actif:Optional[tuple[int,int,int]]=None):
         Placeholder.__init__(self, placeheldholder, placeheld)
         Bouton.__init__(self, skin, texte, fond, fond_marque_survol, fond_marque_actif, fond_marque_courant, fond_est_courant, fond_actif)

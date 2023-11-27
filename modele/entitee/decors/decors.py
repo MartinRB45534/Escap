@@ -1,7 +1,7 @@
 """Contient les classes des décors."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, List, Dict, Type
+from typing import TYPE_CHECKING
 import carte as crt
 
 # Imports des classes parentes
@@ -28,7 +28,7 @@ class DecorsInteractif(Decors,Interactif):
 
 class Ustensile(DecorsInteractif):
     """Permet de créer un Item à partir d'ingrédients"""
-    def __init__(self,recettes:List[Dict[str,Dict[Type[Item],int]]],position:crt.Position=crt.POSITION_ABSENTE):
+    def __init__(self,recettes:list[dict[str,dict[type[Item],int]]],position:crt.Position=crt.POSITION_ABSENTE):
         DecorsInteractif.__init__(self,position)
         self.recettes = recettes #Les recettes de création d'Item
 
@@ -36,6 +36,6 @@ class Ustensile(DecorsInteractif):
         """Renvoie les recettes de l'ustensile."""
         return self.recettes
 
-    def cuisine(self, labyrinthe:Labyrinthe, recette:Dict[str,Dict[Type[Item],int]]):
+    def cuisine(self, labyrinthe:Labyrinthe, recette:dict[str,dict[type[Item],int]]):
         """Renvoie un Item à partir d'une recette."""
         return [produit(labyrinthe,crt.POSITION_ABSENTE) for produit in recette["produit"] for _ in range(recette["produit"][produit])]

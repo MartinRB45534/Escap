@@ -1,7 +1,7 @@
 """Vue d'un inventaire."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Set
+from typing import TYPE_CHECKING
 
 from .item import voit_item
 
@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from .item import ItemVu
 
 class InventaireVu:
-    def __init__(self, items:Set[ItemVu], equippement:Set[ItemVu]):
+    def __init__(self, items:set[ItemVu], equippement:set[ItemVu]):
         self.items = items
         self.equippement = equippement
 

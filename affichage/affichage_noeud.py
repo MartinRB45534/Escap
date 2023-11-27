@@ -3,7 +3,7 @@ Contient la classe ParentNoeud, qui est un noeud qui peut contenir des objets
 """
 
 from __future__ import annotations
-from typing import List, Tuple, Literal, TYPE_CHECKING
+from typing import Literal, TYPE_CHECKING
 
 from .affichable import Affichable
 from .cliquable import Cliquable
@@ -17,9 +17,9 @@ class ParentNoeud(Noeud):
     def __init__(self):
         Noeud.__init__(self)
         
-        self.objets:List[Affichable] = [] #La liste des objets à afficher
+        self.objets:list[Affichable] = [] #La liste des objets à afficher
 
-    def clique(self,position:Tuple[int,int],droit:bool=False):
+    def clique(self,position:tuple[int,int],droit:bool=False):
         clique = False
         if self.touche(position):
             clique = self
@@ -50,7 +50,7 @@ class ParentNoeud(Noeud):
             return self
         return False
 
-    def survol(self,position:Tuple[int,int]):
+    def survol(self,position:tuple[int,int]):
         survol = False
         if self.touche(position):
             survol = self

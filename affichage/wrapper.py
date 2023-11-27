@@ -3,7 +3,7 @@ Conteneur avec un unique élément
 """
 
 from __future__ import annotations
-from typing import Optional, Tuple, List, Literal, TYPE_CHECKING
+from typing import Optional, Literal, TYPE_CHECKING
 from warnings import warn
 import pygame
 
@@ -20,29 +20,29 @@ class Wrapper(Affichable):
     """Un conteneur avec un unique élément"""
     def __init__(self):
         super().__init__()
-        self.objets:List[Affichable] = []
+        self.objets:list[Affichable] = []
         self.contenu:Optional[Affichable] = None #L'objet qu'il 'contient'
-        self.fond:Tuple[int,int,int,int]|Tuple[int,int,int] = (0,0,0,0)
+        self.fond:tuple[int,int,int,int]|tuple[int,int,int] = (0,0,0,0)
 
     def set_contenu(self,contenu:Affichable):
         """Change le contenu du conteneur."""
         self.contenu = contenu
 
-    def set_fond(self,fond:Tuple[int,int,int,int]|Tuple[int,int,int]):
+    def set_fond(self,fond:tuple[int,int,int,int]|tuple[int,int,int]):
         """Change le fond du conteneur."""
         self.fond = fond
 
-    def decale(self,decalage:Tuple[int,int]):
+    def decale(self,decalage:tuple[int,int]):
         self.position = (self.position[0] + decalage[0],self.position[1] + decalage[1])
         for objet in self.objets:
             objet.decale(decalage)
 
-    def set_tailles(self,tailles:Tuple[int,int]):
+    def set_tailles(self,tailles:tuple[int,int]):
         assert self.contenu is not None
         self.tailles = tailles
         self.contenu.set_tailles(tailles)
 
-    def get_tailles(self,tailles:Tuple[int,int]):
+    def get_tailles(self,tailles:tuple[int,int]):
         if self.contenu is None:
             warn(f"{self} n'a pas de contenu !")
             return (0,0)
@@ -57,7 +57,7 @@ class Wrapper(Affichable):
         for objet in self.objets:
             objet.affiche(screen,frame,frame_par_tour)
 
-    def clique(self,position:Tuple[int,int],droit:bool=False) -> Cliquable|Literal[False]:
+    def clique(self,position:tuple[int,int],droit:bool=False) -> Cliquable|Literal[False]:
         res = False
         if self.touche(position):
             if isinstance(self,Cliquable):
@@ -85,7 +85,7 @@ class Wrapper(Affichable):
                 res = res_objet
         return res
 
-    def survol(self,position:Tuple[int,int]) -> Survolable|Literal[False]:
+    def survol(self,position:tuple[int,int]) -> Survolable|Literal[False]:
         res = False
         if self.touche(position):
             if isinstance(self,Survolable):
@@ -101,7 +101,7 @@ class Wrapper(Affichable):
                 res = res_objet
         return res
 
-    def scroll(self,position:Tuple[int,int],x:int,y:int):
+    def scroll(self,position:tuple[int,int],x:int,y:int):
         assert self.contenu is not None
         res = False
         if self.touche(position):

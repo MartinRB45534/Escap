@@ -1,7 +1,7 @@
 """Contient la classe Projectile."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING
 import carte as crt
 
 # Imports des classes parentes
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 class Projectile(Item):
     """La classe des items destinés à être lancés. Possèdent naturellement une vitesse non nulle."""
-    def __init__(self,labyrinthe:Labyrinthe,vitesse:float,effets:List[Effet],position:crt.Position=crt.POSITION_ABSENTE):
+    def __init__(self,labyrinthe:Labyrinthe,vitesse:float,effets:list[Effet],position:crt.Position=crt.POSITION_ABSENTE):
         Item.__init__(self,labyrinthe,position)
         self.vitesse = vitesse
         self.effets = effets #Les effets déclenché lors du choc avec un agissant.

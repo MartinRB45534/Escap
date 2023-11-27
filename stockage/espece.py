@@ -3,7 +3,7 @@ Classe de stockage des espèces.
 """
 
 from __future__ import annotations
-from typing import Optional, Type, Tuple, Callable
+from typing import Optional,  Callable
 from json import loads as parse
 
 import modele as mdl
@@ -19,7 +19,7 @@ class Especes(StockageCategorie):
 
     @classmethod
     @property
-    def elements(cls) -> dict[str, Type[StockageUnique]|Tuple[Type[StockageUnique], Type[StockageNivele]]]:
+    def elements(cls) -> dict[str, type[StockageUnique]|tuple[type[StockageUnique], type[StockageNivele]]]:
         return {
             "especes": Espece
         }

@@ -1,7 +1,7 @@
 """L'inventaire"""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, Type, List, Dict, Set
+from typing import TYPE_CHECKING, Optional
 from warnings import warn
 import random
 import carte as crt
@@ -25,85 +25,85 @@ class Inventaire:
     def __init__(self,possesseur:Agissant,nb_doigts:int):
         self.possesseur = possesseur #On classe les possessions d'un agissant selon les usages qu'il peut en faire :
 
-        self.items:Set[Item] = set()
+        self.items:set[Item] = set()
 
         self.arme:Optional[Arme] = None #L'arme équipée
         self.bouclier:Optional[Bouclier] = None #Le bouclier équipé
         self.armure:Optional[Armure] = None #L'armure équipée
         self.heaume:Optional[Heaume] = None #Le heaume équipé
-        self.anneau:List[Anneau] = [] #Les anneaux équipés
+        self.anneau:list[Anneau] = [] #Les anneaux équipés
         self.doigts = nb_doigts #Le nombre d'anneaux que l'on peut équiper
 
     # Les items peuvent être de plusieurs catégories :
 
     @property
-    def consommables(self) -> Set[Item]:
+    def consommables(self) -> set[Item]:
         """Les consommables regroupent les potions et les parchemins"""
         return {item for item in self.items if isinstance(item,Consommable)}
 
     @property
-    def potions(self) -> Set[Potion]:
+    def potions(self) -> set[Potion]:
         """Les potions peuvent se boire (sans coût de mana)"""
         print("I'm not useless !! !!!")
         return {item for item in self.items if isinstance(item,Potion)}
 
     @property
-    def parchemins(self) -> Set[Parchemin]:
+    def parchemins(self) -> set[Parchemin]:
         """Les parchemins peuvent s'activer avec du mana"""
         return {item for item in self.items if isinstance(item,Parchemin)}
 
     @property
-    def cles(self) -> Set[Cle]:
+    def cles(self) -> set[Cle]:
         """Les clés ouvrent ou ferment les portes"""
         return {item for item in self.items if isinstance(item,Cle)}
 
     @property
-    def equippements(self) -> Set[Item]:
+    def equippements(self) -> set[Item]:
         """L'équipement regroupe les armes, les boucliers, les armures, les heaumes et les anneaux"""
         return {item for item in self.items if isinstance(item,Equippement)}
 
     @property
-    def armes(self) -> Set[Arme]:
+    def armes(self) -> set[Arme]:
         """Les armes sont utilisées pour attaquer"""
         return {item for item in self.items if isinstance(item,Arme)}
 
     @property
-    def boucliers(self) -> Set[Bouclier]:
+    def boucliers(self) -> set[Bouclier]:
         """Les boucliers sont utilisés pour se défendre"""
         return {item for item in self.items if isinstance(item,Bouclier)}
 
     @property
-    def armures(self) -> Set[Armure]:
+    def armures(self) -> set[Armure]:
         """Les armures ont des effets passifs"""
         return {item for item in self.items if isinstance(item,Armure)}
 
     @property
-    def heaumes(self) -> Set[Heaume]:
+    def heaumes(self) -> set[Heaume]:
         """Les heaumes ont des effets passifs"""
         return {item for item in self.items if isinstance(item,Heaume)}
 
     @property
-    def anneaux(self) -> Set[Anneau]:
+    def anneaux(self) -> set[Anneau]:
         """Les anneaux ont des effets passifs"""
         return {item for item in self.items if isinstance(item,Anneau)}
 
     @property
-    def projectiles(self) -> Set[Projectile]:
+    def projectiles(self) -> set[Projectile]:
         """Les projectiles se lancent (on peut lancer n'importe quoi, techniquement...)"""
         return {item for item in self.items if isinstance(item,Projectile)}
 
     @property
-    def ingredients(self) -> Set[Ingredient]:
+    def ingredients(self) -> set[Ingredient]:
         """Les ingrédients sont utilisés pour l'alchimie"""
         return {item for item in self.items if isinstance(item,Ingredient)}
 
     @property
-    def cadavres(self) -> Set[Cadavre]:
+    def cadavres(self) -> set[Cadavre]:
         """Oui, on peut récupérer des cadavres, et alors, circulez, y'a rien à voir..."""
         return {item for item in self.items if isinstance(item,Cadavre)}
 
     @property
-    def oeufs(self) -> Set[Oeuf]:
+    def oeufs(self) -> set[Oeuf]:
         """Vous n'allez quand même pas me dire que c'est l'oeuf qui vous choque ! Il y a marqué cadavre juste au dessus !"""
         return {item for item in self.items if isinstance(item,Oeuf)}
 
@@ -114,13 +114,13 @@ class Inventaire:
             item.position = crt.POSITION_ABSENTE
         self.items.add(item)
 
-    def peut_fournir(self,items:Dict[Type[Ingredient],int]):
+    def peut_fournir(self,items:dict[type[Ingredient],int]):
         for item in items:
             if self.quantite(item) < items[item]:
                 return False
         return True
 
-    def quantite(self,classe:Type[Ingredient]):
+    def quantite(self,classe:type[Ingredient]):
         """Indique la quantité d'items correspondants à une classe voulue.""" #Pour les ingrédients des recettes
         res=0
         for item in self.ingredients:
@@ -128,15 +128,15 @@ class Inventaire:
                 res+=1
         return res
 
-    def consomme(self,classe:Type[Ingredient]):
+    def consomme(self,classe:type[Ingredient]):
         """Consomme un ingrédient lors d'une opération d'alchimie.""" #/!\ Rien à voir avec les consommables !
         for item in self.ingredients:
             if isinstance(item,classe) and item.etat == EtatsItems.INTACT:
                 item.etat = EtatsItems.BRISE
                 break
 
-    def get_items_visibles(self) -> Set[Item]:
-        items_visibles:Set[Item] = set()
+    def get_items_visibles(self) -> set[Item]:
+        items_visibles:set[Item] = set()
         if self.arme is not None:
             items_visibles.add(self.arme)
         if self.bouclier is not None:
@@ -171,7 +171,7 @@ class Inventaire:
     def set_heaume(self,heaume:Heaume):
         self.heaume = heaume
 
-    def get_anneau(self) -> Set[Anneau]:
+    def get_anneau(self) -> set[Anneau]:
         return {*self.anneau}
 
     def set_anneau(self,anneau:Anneau):
@@ -182,8 +182,8 @@ class Inventaire:
             if len(self.anneau) > self.doigts:
                 self.anneau.pop(0)
 
-    def get_equippement(self) -> Set[Item]:
-        equippement:Set[Item] = {*self.anneau}
+    def get_equippement(self) -> set[Item]:
+        equippement:set[Item] = {*self.anneau}
         if self.arme is not None:
             equippement.add(self.arme)
         if self.bouclier is not None:
@@ -194,7 +194,7 @@ class Inventaire:
             equippement.add(self.heaume)
         return equippement
 
-    def equippe(self,equippement:Set[Item]):
+    def equippe(self,equippement:set[Item]):
         for item in equippement:
             self.items.add(item)
             if isinstance(item,Arme):
@@ -208,7 +208,7 @@ class Inventaire:
             elif isinstance(item,Anneau):
                 self.set_anneau(item)
 
-    def desequippe(self,equippement:List[Item]):
+    def desequippe(self,equippement:list[Item]):
         for item in equippement:
             if item is self.arme:
                 self.arme = None
@@ -221,8 +221,8 @@ class Inventaire:
             elif item in self.anneau:
                 self.anneau.remove(item)
 
-    def get_clees(self) -> Set[str]:
-        clees:Set[str] = set()
+    def get_clees(self) -> set[str]:
+        clees:set[str] = set()
         for cle in self.cles:
             for code in cle.codes:
                 clees.add(code)

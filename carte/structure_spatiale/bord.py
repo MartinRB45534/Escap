@@ -4,7 +4,7 @@ Contient toutes les classes permettant de représenter les bords d'un espace.
 
 from __future__ import annotations
 from types import NotImplementedType
-from typing import TYPE_CHECKING, List, Any
+from typing import TYPE_CHECKING, Any
 from .decalage import Decalage
 
 if TYPE_CHECKING:
@@ -33,7 +33,7 @@ class Bord:
 
 class BordDec(Bord):
     """Un bord, décalé dans l'espace"""
-    def __init__(self,position:Position,emplacement:Decalage=Decalage(1,1),entrees:List[CoteDecalage]=[]):
+    def __init__(self,position:Position,emplacement:Decalage=Decalage(1,1),entrees:list[CoteDecalage]=[]):
         super().__init__(emplacement)
         self.position = position
         self.entrees = entrees
@@ -76,7 +76,7 @@ class BordPat(BordDec):
 
 class BordLab(Bord):
     """Représente les différents bords (bords réels, bords de patterns) d'un labyrinthe"""
-    def __init__(self,emplacement:Position|Decalage,bords_interieurs:List[BordPat]):
+    def __init__(self,emplacement:Position|Decalage,bords_interieurs:list[BordPat]):
         super().__init__(emplacement)
         self.bords_interieurs = bords_interieurs
 

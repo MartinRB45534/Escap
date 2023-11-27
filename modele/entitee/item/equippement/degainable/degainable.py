@@ -1,7 +1,7 @@
 """Contient la classe Degainable, parente de tous les items qui doivent être dégainés."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Dict
+from typing import TYPE_CHECKING
 import carte as crt
 
 # Imports des classes parentes
@@ -26,10 +26,10 @@ class Arme(Degainable):
         self.frottements = frottements
         self.element = element
         self.tranchant = tranchant
-        self.taux_tranchant:Dict[str, float] = {}
+        self.taux_tranchant:dict[str, float] = {}
         self.portee = portee
-        self.taux_portee:Dict[str, float] = {}
-        self.taux_stats:Dict[str, float] = {}
+        self.taux_portee:dict[str, float] = {}
+        self.taux_stats:dict[str, float] = {}
 
     def get_stats_attaque(self):
         """Renvoie les stats de l'arme."""

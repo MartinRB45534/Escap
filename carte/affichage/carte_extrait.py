@@ -3,7 +3,7 @@ Affiche un extrait de labyrinthe.
 """
 
 from __future__ import annotations
-from typing import List, Tuple, TYPE_CHECKING
+from typing import TYPE_CHECKING
 import affichage as af
 
 from ..structure_spatiale.absent import POSITION_ABSENTE
@@ -27,14 +27,14 @@ class CarteExtrait(af.ParentNoeud, af.Proportionnel):
         self.nb_cases = 0
         self.proportions = [1, 1]
 
-    def set_tailles(self, tailles:Tuple[int,int]):
+    def set_tailles(self, tailles:tuple[int,int]):
         af.Proportionnel.set_tailles(self, tailles)
         self.update()
 
     def update(self):
         assert isinstance(self.courant,VignetteCase|None)
         courant = None
-        self.objets:List[af.Affichable] = []
+        self.objets:list[af.Affichable] = []
         if len(self.labyrinthe.nodes) > 1: # On a au moins une case plus l'absente
             # On a le même étage pour toutes les cases du labyrinthe (sauf l'absente)
             assert len({position.etage for position in self.labyrinthe.nodes if position is not POSITION_ABSENTE}) == 1
@@ -60,7 +60,7 @@ class CarteExtrait(af.ParentNoeud, af.Proportionnel):
                 marge_haut += taille_case
         self.set_courant(courant)
 
-    def make_vignette(self, position:Tuple[int,int], position_vue:Position, taille:int):
+    def make_vignette(self, position:tuple[int,int], position_vue:Position, taille:int):
         """Crée une vignette à partir d'une position et d'une taille."""
         return VignetteCase(position, self.labyrinthe, position_vue, taille)
 

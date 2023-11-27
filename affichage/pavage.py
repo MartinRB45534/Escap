@@ -3,7 +3,7 @@ Contient les classes liées aux pavages
 """
 
 from __future__ import annotations
-from typing import List, Tuple, Optional
+from typing import Optional
 
 from .affichable import Affichable
 from .conteneur import Conteneur
@@ -17,7 +17,7 @@ class Pavage(Conteneur):
         super().__init__()
         self.repartition = [] #La répartition des objets contenus
 
-    def set_contenu(self, contenu:List[Affichable], repartition:Optional[List[int]]=None):
+    def set_contenu(self, contenu:list[Affichable], repartition:Optional[list[int]]=None):
         if repartition is None:
             repartition = [0]*len(contenu)
         elif len(contenu) != len(repartition):
@@ -28,12 +28,12 @@ class Pavage(Conteneur):
 
 class PavageHorizontal(Pavage):
     """Un pavage horizontal"""
-    def set_contenu(self, contenu:List[Affichable], repartition:Optional[List[int]]=None):
+    def set_contenu(self, contenu:list[Affichable], repartition:Optional[list[int]]=None):
         if any(isinstance(objet,MargeHorizontale) for objet in contenu):
             raise ValueError("Il y a une marge horizontale dans un pavage horizontal !")
         return super().set_contenu(contenu, repartition)
 
-    def set_tailles(self,tailles:Tuple[int,int]):
+    def set_tailles(self,tailles:tuple[int,int]):
         libre = tailles[0] - sum(
             self.repartition[i] if self.repartition[i]>0 else
             self.contenu[i].get_tailles(tailles)[0] if not(self.repartition[i]) else
@@ -64,7 +64,7 @@ class PavageHorizontal(Pavage):
                 somme += taille
         self.tailles = tailles
 
-    def get_tailles(self,tailles:Tuple[int,int]):
+    def get_tailles(self,tailles:tuple[int,int]):
         somme = 0
         maxi = 0
         libre = tailles[0] - sum(
@@ -95,12 +95,12 @@ class PavageHorizontal(Pavage):
 
 class PavageVertical(Pavage):
     """Un pavage vertical"""
-    def set_contenu(self, contenu:List[Affichable], repartition:Optional[List[int]]=None):
+    def set_contenu(self, contenu:list[Affichable], repartition:Optional[list[int]]=None):
         if any(isinstance(objet,MargeVerticale) for objet in contenu):
             raise ValueError("Il y a une marge verticale dans un pavage vertical !")
         return super().set_contenu(contenu, repartition)
 
-    def set_tailles(self,tailles:Tuple[int,int]):
+    def set_tailles(self,tailles:tuple[int,int]):
         libre = tailles[1] - sum(
             self.repartition[i] if self.repartition[i]>0 else
             self.contenu[i].get_tailles(tailles)[1] if not(self.repartition[i]) else
@@ -131,7 +131,7 @@ class PavageVertical(Pavage):
                 somme += taille
         self.tailles = tailles
 
-    def get_tailles(self,tailles:Tuple[int,int]):
+    def get_tailles(self,tailles:tuple[int,int]):
         somme = 0
         maxi = 0
         libre = tailles[1] - sum(
@@ -166,7 +166,7 @@ class PavageMarge(Pavage):
         Pavage.__init__(self)
         self.marge = marge
 
-    def set_contenu(self, contenu: List[Affichable], repartition: Optional[List[int]] = None):
+    def set_contenu(self, contenu: list[Affichable], repartition: Optional[list[int]] = None):
         if repartition is None:
             repartition = [0] * len(contenu)
         elif len(contenu) != len(repartition):

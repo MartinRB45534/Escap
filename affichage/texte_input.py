@@ -1,7 +1,7 @@
 """Les fonctions de saisie de texte."""
 
 from __future__ import annotations
-from typing import Optional, TYPE_CHECKING, Literal, Callable, Tuple, List
+from typing import Optional, TYPE_CHECKING, Literal, Callable
 import pygame_textinput # type: ignore # Missing type stubs
 import pygame
 
@@ -22,7 +22,7 @@ class TexteInput(Cliquable):
         self.acceptor = acceptor
         self.textinput = pygame_textinput.TextInputVisualizer(manager,POLICE20)
 
-    def get_tailles(self, _tailles: Tuple[int, int]):
+    def get_tailles(self, _tailles: tuple[int, int]):
         return self.textinput.surface.get_size()
 
     def affiche(self, screen: pygame.Surface, frame: int = 1, frame_par_tour: int = 1):
@@ -60,7 +60,7 @@ class TexteInput(Cliquable):
         return False
 
     @classmethod
-    def event(cls, events : List[pygame.event.Event]):
+    def event(cls, events : list[pygame.event.Event]):
         """Traite les évènements."""
         if cls.waiting:
             cls.waiting = False

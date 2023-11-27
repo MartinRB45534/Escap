@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Set, Optional, Dict, Self
+from typing import TYPE_CHECKING, Optional, Self
 import carte as crt
 import networkx as nx
 
@@ -17,16 +17,16 @@ if TYPE_CHECKING:
 from ...labyrinthe.extrait import Extrait
 
 class Vision(Extrait):
-    def __init__(self, vues:Set[Vue], tour:int):
+    def __init__(self, vues:set[Vue], tour:int):
         nx.MultiDiGraph.__init__(self)
         self.position_case:dict[crt.Position, VisionCase] = {}
-        self.exterieur:Set[crt.Position] = set()
-        self.corps:Set[Agissant] = set() # Nos corps nous donnent accès à toutes leurs infos
-        self.neutres:Dict[int,VisionAgissant] = {} # On ne sait des neutres que ce que l'on voit
-        self.ennemis:Dict[int,VisionAgissant] = {} # On ne sait des ennemis que ce que l'on voit
+        self.exterieur:set[crt.Position] = set()
+        self.corps:set[Agissant] = set() # Nos corps nous donnent accès à toutes leurs infos
+        self.neutres:dict[int,VisionAgissant] = {} # On ne sait des neutres que ce que l'on voit
+        self.ennemis:dict[int,VisionAgissant] = {} # On ne sait des ennemis que ce que l'on voit
         self.voit(vues, tour)
 
-    def voit(self, vues:Set[Vue], tour:int):
+    def voit(self, vues:set[Vue], tour:int):
         for vue in vues:
             for position in vue:
                 self.voit_case(vue.get_case(position), tour)

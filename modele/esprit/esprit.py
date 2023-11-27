@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, List, Dict, Set, Self
+from typing import TYPE_CHECKING, Self
 import carte as crt
 
 # Imports utilisés uniquement dans les annotations
@@ -14,10 +14,10 @@ if TYPE_CHECKING:
 class Esprit :
     """La classe des esprits, qui manipulent les agisants."""
     def __init__(self,nom:str): #On identifie les esprits par des noms (en fait on s'en fout, vu qu'on ne fait pas d'opérations dessus on pourrait avoir des labs, des entitees et des esprits nommés avec des str, des int, des float, des bool, etc.)
-        self.corps:Set[Agissant] = set()
+        self.corps:set[Agissant] = set()
         self.vision = Vision(set(),0)
         self.tour = 0 # Chaque esprit a son horloge interne
-        self.ennemis:Dict[Agissant,Dict[str,float]] = {}
+        self.ennemis:dict[Agissant,dict[str,float]] = {}
         self.dispersion_spatiale = 0.9 #La décroissance de l'importance dans l'espace. Tester plusieurs options pour l'optimiser
         self.prejuges = []
         self.pardon = 0.9 #La décroissance de l'importance avec le temps. Peut être supérieure à 1 pour s'en prendre en priorité aux ennemis ancestraux.
@@ -28,31 +28,31 @@ class Esprit :
     def ajoute_corp(self,corp:Agissant):
         self.corps.add(corp)
 
-    def ajoute_corps(self,corps:Set[Agissant]):
+    def ajoute_corps(self,corps:set[Agissant]):
         self.corps.update(corps)
 
     def retire_corp(self,corp:Agissant):
         self.corps.remove(corp)
 
-    def retire_corps(self,corps:Set[Agissant]):
+    def retire_corps(self,corps:set[Agissant]):
         self.corps.difference_update(corps)
 
     def __contains__(self,corp:Agissant):
         return corp in self.corps
 
     def refait_vue(self):
-        vues:Set[Vue] = set()
+        vues:set[Vue] = set()
         for corp in self.corps:
             if corp.etat == EtatsAgissants.VIVANT:
                 vues.add(corp.vue)
         self.vision.voit(vues, self.tour)
         # TODO : préjugés & zones
 
-    # def update_zones(self,cases:Set[Representation_case],nouvelles_cases:Set[Representation_case],cases_limites:Set[Representation_case],agissants_oublies:Set[Tuple[Agissant,Representation_case]]):
+    # def update_zones(self,cases:set[Representation_case],nouvelles_cases:set[Representation_case],cases_limites:set[Representation_case],agissants_oublies:set[tuple[Agissant,Representation_case]]):
     #     cases_memorisees = {case for case in self.vue if case.oubli>0} - cases
     #     # print(cases)
     #     # print(nouvelles_cases)
-    #     zones_mod:Set[Zone_inconnue] = set()
+    #     zones_mod:set[Zone_inconnue] = set()
     #     for case in nouvelles_cases:
     #         for zone in self.zones_inconnues:
     #             if case in zone.cases:
@@ -117,22 +117,22 @@ class Esprit :
     #         if zone.cases == set() and zone.entrees == set():
     #             self.remove_zone(zone)
 
-    # def update_representation(self,cases:Set[Representation_case]):
-    #     carres_pot:Set[Position] = set()
+    # def update_representation(self,cases:set[Representation_case]):
+    #     carres_pot:set[Position] = set()
     #     for case in cases:
     #         pos = case.case.position
     #         for dec in Decalage(2,2):
     #             if pos-dec in self.vue and pos-dec+Decalage(1,1) in self.vue:
     #                 carres_pot.add(pos-dec)
-    #     carres:Set[Position] = set()
+    #     carres:set[Position] = set()
     #     for carre_pot in carres_pot:
     #         if self.vue.case_from_position(carre_pot).cibles[DROITE][BASIQUE] and self.vue.case_from_position(carre_pot+DROITE).cibles[GAUCHE][BASIQUE] and self.vue.case_from_position(carre_pot).cibles[BAS][BASIQUE] and self.vue.case_from_position(carre_pot+BAS).cibles[HAUT][BASIQUE] and self.vue.case_from_position(carre_pot+BAS).cibles[DROITE][BASIQUE] and self.vue.case_from_position(carre_pot+DROITE+BAS).cibles[GAUCHE][BASIQUE] and self.vue.case_from_position(carre_pot+DROITE).cibles[BAS][BASIQUE] and self.vue.case_from_position(carre_pot+BAS+DROITE).cibles[HAUT][BASIQUE] :
     #             carres.add(carre_pot)
     #             if carre_pot.lab == "Étage 3 : combat":
     #                 if carre_pot.x in range(2,5) and carre_pot.y in range(7,10):
     #                     print("Check1")
-    #     salles_mod:Set[Salle] = set() #Les salles qu'on a modifiées
-    #     couloirs_mod:Set[Couloir] = set() #Les couloirs qu'on a modifiés
+    #     salles_mod:set[Salle] = set() #Les salles qu'on a modifiées
+    #     couloirs_mod:set[Couloir] = set() #Les couloirs qu'on a modifiés
     #     # print("Salles :")
     #     # print(len(self.salles))
     #     for carre in carres:
@@ -244,8 +244,8 @@ class Esprit :
     #             if espace not in self.entrees.get(entree,set()) and espace in self.salles|self.couloirs:
     #                 self.entrees[entree] = self.entrees.get(entree,set())|{espace}
 
-    # def downdate_zones(self,cases:List[Position]):
-    #     zones_mod:List[Zone_inconnue] = []
+    # def downdate_zones(self,cases:list[Position]):
+    #     zones_mod:list[Zone_inconnue] = []
     #     for case in cases:
     #         for zone in [*self.zones_inconnues]:
     #             if case in zone.cases:
@@ -259,23 +259,23 @@ class Esprit :
     #                     if voisin and ((not voisin in self.vue) or self.vue.case_from_position(voisin).clarte == 0):
     #                         zone.sorties.add(voisin)
 
-    # def downdate_representation(self,cases:List[Position]):
-    #     carres_pot:List[Position] = []
+    # def downdate_representation(self,cases:list[Position]):
+    #     carres_pot:list[Position] = []
     #     for case in cases:
     #         for dec in Decalage(2,2):
     #             if case-dec in self.vue and case-dec+Decalage(1,1) in self.vue:
     #                 carres_pot.append(case-dec)
     #     carres_pot = [*set(carres_pot)]
-    #     carres_suppr:List[Position] = []
+    #     carres_suppr:list[Position] = []
     #     for carre_pot in carres_pot:
     #         if not(self.vue.case_from_position(carre_pot).cibles[DROITE][BASIQUE] and self.vue.case_from_position(carre_pot+DROITE).cibles[GAUCHE][BASIQUE] and self.vue.case_from_position(carre_pot+BAS).cibles[DROITE][BASIQUE] and self.vue.case_from_position(carre_pot+DROITE+BAS).cibles[GAUCHE][BASIQUE] and self.vue.case_from_position(carre_pot).cibles[BAS][BASIQUE] and self.vue.case_from_position(carre_pot+BAS).cibles[HAUT][BASIQUE] and self.vue.case_from_position(carre_pot+DROITE).cibles[BAS][BASIQUE] and self.vue.case_from_position(carre_pot+BAS+DROITE).cibles[HAUT][BASIQUE]):
     #             carres_suppr.append(carre_pot)
-    #     salles_mod:List[Salle] = [] #Les salles qu'on a modifiées
+    #     salles_mod:list[Salle] = [] #Les salles qu'on a modifiées
     #     for carre in carres_suppr:
     #         for salle in [*self.salles]:
     #             if carre in salle.carres:
     #                 salles_mod += self.scinde_salle(salle,carre)
-    #     couloirs_mod:List[Couloir] = []
+    #     couloirs_mod:list[Couloir] = []
     #     for salle in salles_mod:
     #         if salle in self.salles: #On peut en avoir retirées
     #             salle.add_cases()
@@ -305,9 +305,9 @@ class Esprit :
     #         for entree in espace.entrees:
     #             self.entrees[entree] = self.entrees.get(entree,set())|{espace}
 
-    # def merge_zones(self,esprit:Self,cases_self:Set[Representation_case],cases_esprit:Set[Representation_case]):
-    #     zones_mod:Set[Zone_inconnue] = set()
-    #     entrees:Set[Position] = set()
+    # def merge_zones(self,esprit:Self,cases_self:set[Representation_case],cases_esprit:set[Representation_case]):
+    #     zones_mod:set[Zone_inconnue] = set()
+    #     entrees:set[Position] = set()
     #     for zone in self.zones_inconnues|esprit.zones_inconnues:
     #         entrees |= zone.entrees
     #     for zone in self.zones_inconnues|esprit.zones_inconnues:
@@ -344,10 +344,10 @@ class Esprit :
     #                     if voisin and ((not voisin in self.vue) or self.vue.case_from_position(voisin).clarte == 0):
     #                         zone.sorties.add(voisin)
         
-    # def merge_representation(self,esprit:Self,cases_self:Set[Representation_case],cases_esprit:Set[Representation_case]):
-    #     salles_mod:List[Salle] = []
-    #     carres_pot_esprit:List[Position] = []
-    #     carres_pot_self:List[Position] = []
+    # def merge_representation(self,esprit:Self,cases_self:set[Representation_case],cases_esprit:set[Representation_case]):
+    #     salles_mod:list[Salle] = []
+    #     carres_pot_esprit:list[Position] = []
+    #     carres_pot_self:list[Position] = []
     #     for case in cases_self:
     #         for dec in Decalage(2,2):
     #             if case.case.position-dec in self.vue and case.case.position-dec+Decalage(1,1) in self.vue:
@@ -356,8 +356,8 @@ class Esprit :
     #         for dec in Decalage(2,2):
     #             if case.case.position-dec in esprit.vue and case.case.position-dec+Decalage(1,1) in esprit.vue:
     #                 carres_pot_self.append(case.case.position-dec)
-    #     carres_esprit:List[Position] = []
-    #     carres_self:List[Position] = []
+    #     carres_esprit:list[Position] = []
+    #     carres_self:list[Position] = []
     #     for carre in carres_pot_esprit:
     #         if self.vue.case_from_position(carre).cibles[DROITE][BASIQUE] and self.vue.case_from_position(carre+DROITE).cibles[GAUCHE][BASIQUE] and self.vue.case_from_position(carre).cibles[BAS][BASIQUE] and self.vue.case_from_position(carre+BAS).cibles[HAUT][BASIQUE] and self.vue.case_from_position(carre+BAS).cibles[DROITE][BASIQUE] and self.vue.case_from_position(carre+DROITE+BAS).cibles[GAUCHE][BASIQUE] and self.vue.case_from_position(carre+DROITE).cibles[BAS][BASIQUE] and self.vue.case_from_position(carre+BAS+DROITE).cibles[HAUT][BASIQUE] :
     #             if not all([carre+dec in cases_self for dec in Decalage(2,2)]): # Si le carré était déjà entièrement visible par self, on s'en est déjà occupé plus tôt
@@ -366,7 +366,7 @@ class Esprit :
     #         if esprit.vue.case_from_position(carre).cibles[DROITE][BASIQUE] and esprit.vue.case_from_position(carre+DROITE).cibles[GAUCHE][BASIQUE] and esprit.vue.case_from_position(carre).cibles[BAS][BASIQUE] and esprit.vue.case_from_position(carre+BAS).cibles[HAUT][BASIQUE] and esprit.vue.case_from_position(carre+BAS).cibles[DROITE][BASIQUE] and esprit.vue.case_from_position(carre+DROITE+BAS).cibles[GAUCHE][BASIQUE] and esprit.vue.case_from_position(carre+DROITE).cibles[BAS][BASIQUE] and esprit.vue.case_from_position(carre+BAS+DROITE).cibles[HAUT][BASIQUE] :
     #             if not all([carre+dec in cases_esprit for dec in Decalage(2,2)]):
     #                 carres_self.append(carre)
-    #     couloirs_mod:List[Couloir] = []
+    #     couloirs_mod:list[Couloir] = []
     #     for carre in carres_esprit:
     #         libre = True
     #         for salle in esprit.salles:
@@ -555,7 +555,7 @@ class Esprit :
     # def scinde_salle(self,salle:Salle,carre:crt.Position):
     #     salle.carres.remove(carre)
     #     voisins = [carre+dir for dir in DIRECTIONS if carre+dir in salle.carres]
-    #     salles:Set[Salle] = set()
+    #     salles:set[Salle] = set()
     #     while voisins:
     #         depart = voisins.pop(0)
     #         queue = [depart]
@@ -593,7 +593,7 @@ class Esprit :
     #     self.remove_couloir(couloir)
     #     return couloirs
 
-    # def scinde_zone(self,zone:Zone_inconnue,case:crt.Position) -> Set[Zone_inconnue]:
+    # def scinde_zone(self,zone:Zone_inconnue,case:crt.Position) -> set[Zone_inconnue]:
     #     zone.cases.remove(case)
     #     voisins = {case+dir for dir in DIRECTIONS if case+dir in zone.cases}
     #     zones = set()
@@ -644,7 +644,7 @@ class Esprit :
     #         # /!\ Regarder avec attention ce qui se passe pour les entrées
 
     def get_pos_vues(self):
-        positions:List[crt.Position] = []
+        positions:list[crt.Position] = []
         for corp in self.corps:
             if corp.etat == EtatsAgissants.VIVANT:
                 positions.append(corp.position)
@@ -662,7 +662,7 @@ class Esprit :
     #     for espace in self.salles|self.couloirs:
     #         espace.skip = False
 
-    # def set_skip(self,sources:Set[Position],recepteurs:Set[Position]):
+    # def set_skip(self,sources:set[Position],recepteurs:set[Position]):
     #     for espace in self.salles|self.couloirs:
     #         espace.skip = True
     #         for source in sources:
@@ -674,7 +674,7 @@ class Esprit :
 
     # def calcule_trajets(self):
     #     # On détermine la dangerosité de chaque case en fonction des dégats qui vont y avoir lieu
-    #     pos_corps:Set[Position] = {corp.get_position() for corp in self.corps if self.corps[corp] != "incapacite"}
+    #     pos_corps:set[Position] = {corp.get_position() for corp in self.corps if self.corps[corp] != "incapacite"}
     #     coef=7 #/!\ Expérimenter avec ce coef à l'occasion
     #     for case in self.vue:
     #         for effet in case.effets:
@@ -695,7 +695,7 @@ class Esprit :
     #     coef_importance = 0.9
     #     coef_dangerosite = 0.9
     #     dangerosites = seuils
-    #     importances:Set[Position] = set()
+    #     importances:set[Position] = set()
     #     for ennemi in self.ennemis:
     #         if ennemi.etat == "vivant":
     #             position = ennemi.get_position()
@@ -729,7 +729,7 @@ class Esprit :
     #         self.vue.case_from_position(position)[trajet,0] = valeur
     #         self.propage({position},self.dispersion_spatiale,trajet,stop_on_obstacles=True,clear=True)
 
-    # def propage(self,positions:Set[Position],coef:float,trajet:str,stop_on_obstacles=False,comparateur=1,clear=False):
+    # def propage(self,positions:set[Position],coef:float,trajet:str,stop_on_obstacles=False,comparateur=1,clear=False):
     #     """'Résoud' un labyrinthe à partir de plusieurs points"""
 
     #     i = 0
@@ -744,7 +744,7 @@ class Esprit :
 
     #         queue = [{"position":position,"valeur":self.vue.case_from_position(position)[trajet,i]} for position in positions]
 
-    #         obstacles:Set[Position] = set()
+    #         obstacles:set[Position] = set()
 
     #         # On trie par valeur (décroissant par défaut)
     #         queue.sort(key=lambda x:x["valeur"],reverse=comparateur==1)
@@ -779,13 +779,13 @@ class Esprit :
     #             positions = obstacles
     #             i += 1
 
-    # def trouve_seuils(self,positions:List[Position],trajet="dangerosite") -> Set[Position]:
+    # def trouve_seuils(self,positions:list[Position],trajet="dangerosite") -> set[Position]:
     #     """Fonction qui trouve les 'seuils', c'est à  dire les cases qui ont une valeur plus grande que leurs voisines"""
 
     #     for case in self.vue:
     #         case.visitee = False
 
-    #     seuils:Set[Position] = set()
+    #     seuils:set[Position] = set()
 
     #     #la queue est une liste de positions
     #     queue = [position for position in positions]
@@ -925,9 +925,9 @@ class Esprit :
     #                 print(bas)
     #             print("")
 
-    # def positions_utilisables(self,position:crt.Position)->Tuple[Dict[Position,int],Dict[Position,int]]:
-    #     pos_utilisables:Dict[Position,int]={}
-    #     pos_obstacles:Dict[Position,int]={}
+    # def positions_utilisables(self,position:crt.Position)->tuple[dict[Position,int],dict[Position,int]]:
+    #     pos_utilisables:dict[Position,int]={}
+    #     pos_obstacles:dict[Position,int]={}
 
     #     case = self.vue.case_from_position(position)
     #     case:Representation_case

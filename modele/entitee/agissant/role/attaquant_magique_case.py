@@ -1,5 +1,4 @@
 from __future__ import annotations
-from typing import List, Tuple
 import carte as crt
 
 # Imports des classes parentes
@@ -9,7 +8,7 @@ class Attaquant_magique_case(Mage):
     """Les agissants qui combattent en lançant des attaques magiques de loin sur des cases."""
 
     def agit_en_vue(self,defaut:str = ""):
-        cibles:List[Tuple[float,crt.Position]] = []
+        cibles:list[tuple[float,crt.Position]] = []
         #On cherche l'ennemi le plus puissant en vue
         for pos in self.vue:
             case = self.vue.get_case(pos)

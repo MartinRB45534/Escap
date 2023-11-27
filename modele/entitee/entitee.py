@@ -3,7 +3,7 @@ Les entitées (tout ce qui occupe le labyrinthe).
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, List
+from typing import TYPE_CHECKING, Optional
 import carte as crt
 
 # Pas de classe parente
@@ -19,7 +19,7 @@ class Entitee:
     def __init__(self, position: crt.Position=crt.POSITION_ABSENTE, id_: Optional[int]=None):
         self.position:crt.Position = position
         self._priorite:float = 0
-        self.effets:List[Effet] = []
+        self.effets:list[Effet] = []
         if id_ is None:
             # Dans les cas d'héritage multiple, on peut déjà avoir exécuté cet __init__
             # On vérifie donc si on a déjà un ID

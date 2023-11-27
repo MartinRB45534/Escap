@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, List, Tuple
+from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
@@ -12,7 +12,7 @@ class Attaquant_magique_agissant(Mage):
     """Les agissants qui combattent en lançant des attaques magiques de loin sur des agissants."""
 
     def agit_en_vue(self,defaut:str = ""):
-        cibles:List[Tuple[float,Agissant]] = []
+        cibles:list[tuple[float,Agissant]] = []
         #On cherche l'ennemi le plus puissant en vue
         for pos in self.vue:
             case = self.vue.get_case(pos)

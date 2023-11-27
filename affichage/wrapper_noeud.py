@@ -3,7 +3,7 @@ Contient les classes Wrapper_noeud et Wrapper_noeud_bloque
 """
 
 from __future__ import annotations
-from typing import Tuple, Literal, TYPE_CHECKING
+from typing import Literal, TYPE_CHECKING
 
 from .noeud import Noeud
 from .noeuds import NoeudBloque
@@ -20,7 +20,7 @@ class WrapperNoeud(Noeud,WrapperCliquable):
         Noeud.__init__(self)
         WrapperCliquable.__init__(self)
 
-    def clique(self,position:Tuple[int,int], droit:bool=False) -> Cliquable|Literal[False]:
+    def clique(self,position:tuple[int,int], droit:bool=False) -> Cliquable|Literal[False]:
         clique = Wrapper.clique(self,position,droit)
         if clique is self:
             self.set_actif()

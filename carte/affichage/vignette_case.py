@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List, Tuple, TYPE_CHECKING
+from typing import TYPE_CHECKING
 import affichage as af
 
 from ..structure_spatiale.direction import Direction
@@ -12,9 +12,9 @@ if TYPE_CHECKING:
 
 class VignetteCase(af.VignetteComposee):
     """Vignette représentant une case."""
-    def __init__(self,position:Tuple[int,int],vue:Extrait|Labyrinthe,pos:Position,taille:int):
+    def __init__(self,position:tuple[int,int],vue:Extrait|Labyrinthe,pos:Position,taille:int):
         self.pos = pos
-        vignettes:List[af.Affichable] = []
+        vignettes:list[af.Affichable] = []
         if pos in vue:
             vignettes.append(af.Vignette(position,taille,SKIN_CASE)) #La case en premier, donc en bas
             for direction in Direction:

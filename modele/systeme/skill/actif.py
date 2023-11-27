@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, List, Tuple, Type, Dict
+from typing import TYPE_CHECKING, Optional
 import carte as crt
 
 # Imports utilisés uniquement dans les annotations
@@ -36,7 +36,7 @@ class SkillsProjectiles(Actif): #/!\ Retravailler un jour
     Un skill qui lance un objet.
     """
 
-    def utilise(self) -> Tuple[float, float, float]:
+    def utilise(self) -> tuple[float, float, float]:
         """Utilise le skill, et renvoie l'objet lancé"""
         raise NotImplementedError
 
@@ -45,17 +45,17 @@ class SkillsMagiques(Actif):
     Un skill qui permet de lancer des magies.
     """
     def __init__(self): #On précise les magies directement disponibles. D'autres peuvent être acquisent en cours de jeu dans le cas du joueur. magies est un dictionnaire, les clées sont les noms des magies.
-        self.magies:Dict[str,Type[Magie]]={}
+        self.magies:dict[str,type[Magie]]={}
         self.latence = 0 #La latence dépend du sort utilisé
         self.gain_xp = 0 #L'xp dépend du sort utilisé et du mana dépensé
 
-    def ajoute(self,magie:Type[Magie]):
+    def ajoute(self,magie:type[Magie]):
         """Ajoute une magie au skill"""
         self.magies[magie.nom]=magie
 
-    def menu_magie(self) -> List[Magie]:
+    def menu_magie(self) -> list[Magie]:
         """Renvoie la liste des magies que le skill peut lancer"""
-        res:List[Magie] = []
+        res:list[Magie] = []
         for nom in self.magies:
             type_magie = self.magies[nom]
             magie = type_magie(self.niveau) # Qu'est-ce que je voulais faire là ?

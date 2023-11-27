@@ -3,7 +3,7 @@ Contient la classe Action.
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, List, Dict
+from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
@@ -19,7 +19,7 @@ class Action:
         self.agissant = agissant # Pour ne pas avoir à repasser l'agissant en paramètre à chaque fois
         self.latence:float = 0 # Le temps écoulé depuis le début de l'action
         self.latence_max = latence # Le temps que l'action doit durer
-        self.taux_vitesse:Dict[str,float] = {} # Les taux de vitesse de l'agissant
+        self.taux_vitesse:dict[str,float] = {} # Les taux de vitesse de l'agissant
         self.repete = False # Si l'action doit être répétée
         self.repetitions = 0 # Le nombre de fois que l'action a été répétée
 
@@ -140,7 +140,7 @@ class ActionParcellaire(Action):
     """
     Action qui se fait un nombre fixe de fois, irrégulièrement.
     """
-    def __init__(self,agissant:Agissant,latences:List[float]):
+    def __init__(self,agissant:Agissant,latences:list[float]):
         super().__init__(agissant,sum(latences))
         self.latences = latences # Les latences entre chaque action
         self.rempli = 0 # Le nombre de fois que l'action a été faite

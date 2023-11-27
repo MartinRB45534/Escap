@@ -3,7 +3,7 @@ Contient les classes d'action de déplacement.
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Dict
+from typing import TYPE_CHECKING
 import carte as crt
 
 # Imports des classes parentes
@@ -45,7 +45,7 @@ class Plane:
         self.lanceur = lanceur
         self.latence:float = 0
         self.latence_max = latence
-        self.taux_vitesse:Dict[str,float] = {}
+        self.taux_vitesse:dict[str,float] = {}
         self.direction = direction
         self.repete = True
 

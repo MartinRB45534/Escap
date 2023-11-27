@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Dict
+from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 
 class VisionCase:
     def __init__(self, case:CaseVue, tour:int):
-        self.cases:Dict[int, CaseVue] = {}
+        self.cases:dict[int, CaseVue] = {}
         self.voit(case, tour)
 
     def voit(self, case:CaseVue, tour: int):

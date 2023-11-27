@@ -14,6 +14,6 @@ Conserver les objets vus ? Avec à chaque fois le tour et le niveau d'observatio
 
 Ne retirer que si on a un nouvel objet vu dont le tour et le niveau d'observation sont au moins égaux.
 
-Dictionnaire avec le tour et le niveau d'observation comme clés ?
+dictionnaire avec le tour et le niveau d'observation comme clés ?
 
 Et ajouter quelques informations spécifiques à l'esprit.

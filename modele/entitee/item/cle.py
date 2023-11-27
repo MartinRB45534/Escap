@@ -1,7 +1,7 @@
 """Contient la classe Cle."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Set
+from typing import TYPE_CHECKING
 import carte as crt
 
 # Imports des classes parentes
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 class Cle(Item):
     """La classe des items qui ouvrent les portes (et les coffres ?)."""
-    def __init__(self,labyrinthe:Labyrinthe,codes:Set[str],position:crt.Position=crt.POSITION_ABSENTE):
+    def __init__(self,labyrinthe:Labyrinthe,codes:set[str],position:crt.Position=crt.POSITION_ABSENTE):
         Item.__init__(self,labyrinthe,position)
         self.codes = codes
 

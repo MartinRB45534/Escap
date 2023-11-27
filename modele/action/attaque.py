@@ -3,7 +3,7 @@ Les skills d'attaque physique.
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING
 import carte as crt
 
 # Imports des classes parentes
@@ -94,7 +94,7 @@ class AttaqueMultiple(ActionParcellaire,AttaqueArme): # Les attaques sans arme n
     """
     Une attaque complexe avec plusieurs coups.
     """
-    def __init__(self,agissant:Agissant,latences:List[float],skill:Actif,xp:float,taux:List[float],directions:List[crt.Direction],arme:Arme,deplacement:Deplacement,formes:List[Forme],passage:Passage,distance:str="contact"):
+    def __init__(self,agissant:Agissant,latences:list[float],skill:Actif,xp:float,taux:list[float],directions:list[crt.Direction],arme:Arme,deplacement:Deplacement,formes:list[Forme],passage:Passage,distance:str="contact"):
         ActionParcellaire.__init__(self,agissant,latences)
         AttaqueArme.__init__(self,agissant,sum(latences),skill,xp,arme)
         self.taux = taux

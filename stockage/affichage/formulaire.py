@@ -1,7 +1,7 @@
 """Contient la classe Formulaire."""
 
 from __future__ import annotations
-from typing import Type, Callable, TypeVar, Optional, Tuple, Set, List
+from typing import  Callable, TypeVar, Optional
 
 import pygame
 
@@ -15,7 +15,7 @@ StockageUn = TypeVar("StockageUn", bound=StockageUnique)
 
 class FormulaireUnique(af.WrapperNoeud):
     """Un formulaire, avec des champs à remplir pour créer un objet."""
-    def __init__(self, stockage: Type[StockageUn], acceptor: Callable[[str], bool],
+    def __init__(self, stockage: type[StockageUn], acceptor: Callable[[str], bool],
                  avertissement:str, ajouter: Callable[[StockageUn], None]):
         af.WrapperNoeud.__init__(self)
         self.stockage = stockage
@@ -53,7 +53,7 @@ class FormulaireUnique(af.WrapperNoeud):
 
         self.super_ajouter = ajouter
 
-    def form(self, nom:str, type_: Type[int|str|float],
+    def form(self, nom:str, type_: type[int|str|float],
              acceptor: Callable[[str], bool], avertissement:str):
         """Ajoute un champ."""
         self.textes[nom] = af.Texte(nom)
@@ -147,7 +147,7 @@ class FormulaireUnique(af.WrapperNoeud):
 
 class FormulaireModificationUnique(FormulaireUnique, af.NoeudVertical):
     """Un formulaire, avec des champs à remplir pour modifier un objet."""
-    def __init__(self, stockage: Type[StockageUn], acceptor: Callable[[str], bool],
+    def __init__(self, stockage: type[StockageUn], acceptor: Callable[[str], bool],
                  avertissement:str, modifier: Callable[[StockageUn], None],
                  objet:StockageUn, supprimer: Callable[[StockageUn], None]):
         af.NoeudVertical.__init__(self)
@@ -226,7 +226,7 @@ StockageNi = TypeVar("StockageNi", bound=StockageNivele)
 
 class FormulaireNivele(af.WrapperNoeud):
     """Un formulaire, avec des champs à remplir pour créer un objet."""
-    def __init__(self, stockage: Type[StockageNi], acceptor: Callable[[str], bool],
+    def __init__(self, stockage: type[StockageNi], acceptor: Callable[[str], bool],
                  avertissement:str, ajouter: Callable[[StockageNi], None]):
         af.WrapperNoeud.__init__(self)
         self.stockage = stockage
@@ -249,7 +249,7 @@ class FormulaireNivele(af.WrapperNoeud):
         }
 
         self.niveau = 1
-        self.valeurs:dict[str, List[str]] = {}
+        self.valeurs:dict[str, list[str]] = {}
 
         for key in stockage.champs:
             self.form(key, stockage.champs[key], stockage.acceptors[key],
@@ -271,7 +271,7 @@ class FormulaireNivele(af.WrapperNoeud):
 
         self.super_ajouter = ajouter
 
-    def form(self, nom:str, type_: Type[int|str|float],
+    def form(self, nom:str, type_: type[int|str|float],
              acceptor: Callable[[str], bool], avertissement:str):
         """Ajoute un champ."""
         self.textes[nom] = af.Texte(nom)
@@ -290,7 +290,7 @@ class FormulaireNivele(af.WrapperNoeud):
     def check(self):
         """Met à jour les avertissements"""
         # On enregistre d'abord les dernières valeurs
-        niveaux_problematiques: Set[int] = set()
+        niveaux_problematiques: set[int] = set()
         for key, valeurs in self.valeurs.items():
             valeurs[self.niveau-1] = self.inputs[key].valeur
             for niveau in range(10):
@@ -384,7 +384,7 @@ ne sont pas valides.""")
 
 class FormulaireModificationNivele(FormulaireNivele, af.NoeudVertical):
     """Un formulaire, avec des champs à remplir pour modifier un objet."""
-    def __init__(self, stockage: Type[StockageNi], acceptor: Callable[[str], bool],
+    def __init__(self, stockage: type[StockageNi], acceptor: Callable[[str], bool],
                  avertissement:str, modifier: Callable[[StockageNi], None],
                  objet:StockageNi, supprimer: Callable[[StockageNi], None]):
         af.NoeudVertical.__init__(self)
@@ -491,7 +491,7 @@ class FormulaireCategorie(af.WrapperNoeud, af.NoeudVertical):
 
         self.formulaire:Optional[FormulaireUnique|FormulaireNivele] = None
 
-        self.formulaires:dict[str, FormulaireUnique|Tuple[FormulaireUnique, FormulaireNivele]] = {
+        self.formulaires:dict[str, FormulaireUnique|tuple[FormulaireUnique, FormulaireNivele]] = {
             nom: (FormulaireUnique(stockage_[0], stockage.acceptor, stockage.avertissement, ajouter),
                   FormulaireNivele(stockage_[1], stockage.acceptor, stockage.avertissement, ajouter))
             if isinstance(stockage_, tuple)

@@ -1,7 +1,6 @@
 """Contient la classe MenuDeroulant, qui est un menu déroulant"""
 
 from __future__ import annotations
-from typing import List, Tuple
 
 import pygame
 
@@ -24,13 +23,13 @@ class MenuDeroulant(Placeheldholder):
         self.contenu = contenu
         self.courant = contenu
 
-    def get_tailles(self, tailles: Tuple[int, int]):
+    def get_tailles(self, tailles: tuple[int, int]):
         assert self.contenu is not None
         tailles_contenu = self.contenu.get_tailles(tailles)
         tailles_liste = self.liste.get_tailles(tailles)
         return (max(tailles_contenu[0], tailles_liste[0]), tailles_contenu[1])
 
-    def set_tailles(self, tailles: Tuple[int, int]):
+    def set_tailles(self, tailles: tuple[int, int]):
         assert self.contenu is not None
         self.tailles = tailles
         self.contenu.set_tailles(tailles)
@@ -43,11 +42,11 @@ class MenuDeroulant(Placeheldholder):
         else:
             raise TypeError("Le contenu d'un menu déroulant doit être un Texte")
 
-    def set_contenu_liste(self,contenu:List[TexteMenuDeroulant]):
+    def set_contenu_liste(self,contenu:list[TexteMenuDeroulant]):
         """Change le contenu du menu déroulant."""
         self.liste.set_contenu(contenu)
 
-    def clique(self, position: Tuple[int, int], droit: bool = False):
+    def clique(self, position: tuple[int, int], droit: bool = False):
         self.objets.append(self.liste)
         clique = Wrapper.clique(self, position, droit)
         self.objets.pop() # Ce serait bien de faire ça plus proprement
@@ -106,7 +105,7 @@ ne devrait avoir que des TexteMenuDeroulant en courant"""
         self.liste.set_tailles(tailles_liste)
         WrapperNoeud.affiche(self, screen, frame, frame_par_tour)
 
-    def affiche_liste(self, screen: pygame.Surface, marge: Tuple[int, int],
+    def affiche_liste(self, screen: pygame.Surface, marge: tuple[int, int],
                       frame: int = 1, frame_par_tour: int = 1):
         """Affiche la liste du menu déroulant."""
         self.liste.position = (self.liste.position[0] + marge[0], self.liste.position[1] + marge[1])

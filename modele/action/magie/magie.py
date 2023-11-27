@@ -3,7 +3,7 @@ Les classes de base des magies.
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, List
+from typing import TYPE_CHECKING, Optional
 import carte as crt
 
 # Imports des classes parentes
@@ -73,7 +73,7 @@ class CibleAgissant(MagieCible):
 
 class CibleAgissants(MultiCible):
     """La classe des magies qui ciblent plusieurs agissants."""
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,niveau:int,cible:List[Agissant]):
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,niveau:int,cible:list[Agissant]):
         MultiCible.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau)
         self.cible = cible
 
@@ -85,7 +85,7 @@ class CibleItem(MagieCible):
 
 class CibleItems(MultiCible):
     """La classe des magies qui ciblent plusieurs items."""
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,niveau:int,cible:List[Item]):
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,niveau:int,cible:list[Item]):
         MultiCible.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau)
         self.cible = cible
 
@@ -97,7 +97,7 @@ class CibleCase(MagieCible):
 
 class CibleCases(MultiCible):
     """La classe des magies qui ciblent plusieurs cases."""
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,niveau:int,cible:List[crt.Position]):
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,niveau:int,cible:list[crt.Position]):
         MultiCible.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau)
         self.cible = cible
 
@@ -159,7 +159,7 @@ class EnchanteItem(Enchante, CibleItem):
 
 class EnchanteCases(Enchante, CibleCases):
     """La classe des magies qui enchantent des cases."""
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,enchantement:EnchantementCase,cases:List[crt.Position],niveau:int):
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,enchantement:EnchantementCase,cases:list[crt.Position],niveau:int):
         Enchante.__init__(self,skill,agissant,gain_xp,cout_pm,latence,enchantement,niveau)
         CibleCases.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau,cases)
 

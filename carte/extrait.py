@@ -3,7 +3,7 @@ Ce fichier contient la classe Extrait, qui représente un extrait de labyrinthe.
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Set, Optional, Iterator, Any
+from typing import TYPE_CHECKING, Optional, Iterator, Any
 import networkx as nx
     
 from .structure_spatiale.absent import POSITION_ABSENTE
@@ -18,12 +18,12 @@ if TYPE_CHECKING:
 
 class Extrait(nx.MultiDiGraph):
     """Classe représentant un extrait de labyrinthe."""
-    def __init__(self, exterieur:Set[Position], subgraph:nx.MultiDiGraph):
+    def __init__(self, exterieur:set[Position], subgraph:nx.MultiDiGraph):
         super().__init__() # type: ignore
         self.add_nodes_from(subgraph.nodes(data=True)) # type: ignore
         self.add_edges_from(subgraph.edges(data=True, keys=True)) # type: ignore
         self.exterieur = exterieur
-        self.nodes:Set[Position] # type: ignore # C'est faux mais ça appaise les linters
+        self.nodes:set[Position] # type: ignore # C'est faux mais ça appaise les linters
 
     def __contains__(self, item:Any): 
         return item in self.nodes and item not in self.exterieur and item is not POSITION_ABSENTE

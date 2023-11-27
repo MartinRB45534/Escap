@@ -3,7 +3,6 @@ Contient les classes mères des skills
 """
 
 from __future__ import annotations
-from typing import List
 import affichage as af
 
 # Pas d'import utilisés uniquement dans les annotations
@@ -48,7 +47,7 @@ class SkillExtra(Skill):
     """
     Les skills extrinsèques sont indépendants de la classe. Ils évoluent selon leur propre utilisation, et peuvent changer de classe.
     """
-    def __init__(self,conditions_evo:List[float]=[0,10,20,30,40,50,60,70,80,90]):
+    def __init__(self,conditions_evo:list[float]=[0,10,20,30,40,50,60,70,80,90]):
         super().__init__()
         self.cond_evo=conditions_evo
         self.xp=0 #L'xp commence à 0, évidemment

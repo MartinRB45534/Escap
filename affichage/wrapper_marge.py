@@ -3,7 +3,7 @@ Contient les classes Wrapper_noeud et Wrapper_noeud_bloque
 """
 
 from __future__ import annotations
-from typing import Tuple, Literal, TYPE_CHECKING
+from typing import Literal, TYPE_CHECKING
 from warnings import warn
 import pygame
 
@@ -19,18 +19,18 @@ if TYPE_CHECKING:
 
 class WrapperMarge(Wrapper):
     """Un wrapper qui a une petite marge"""
-    def __init__(self, marges: Tuple[int, int, int, int] = (5, 5, 5, 5)):
+    def __init__(self, marges: tuple[int, int, int, int] = (5, 5, 5, 5)):
         Wrapper.__init__(self)
         self.marges = marges
 
-    def set_tailles(self, tailles: Tuple[int, int]):
+    def set_tailles(self, tailles: tuple[int, int]):
         if tailles[0] < self.marges[0]+self.marges[2]:
             tailles = (self.marges[0]+self.marges[2],tailles[1])
         if tailles[1] < self.marges[1]+self.marges[3]:
             tailles = (tailles[0],self.marges[1]+self.marges[3])
         Wrapper.set_tailles(self, (tailles[0]-self.marges[0]-self.marges[2],tailles[1]-self.marges[1]-self.marges[3]))
 
-    def get_tailles(self, tailles: Tuple[int, int]):
+    def get_tailles(self, tailles: tuple[int, int]):
         tailles = Wrapper.get_tailles(self, tailles)
         return (tailles[0]+self.marges[0]+self.marges[2],tailles[1]+self.marges[1]+self.marges[3])
 
@@ -43,13 +43,13 @@ class WrapperMarge(Wrapper):
         for objet in self.objets:
             objet.affiche(screen, frame, frame_par_tour)
 
-    def clique(self, position: Tuple[int, int], droit: bool = False) -> Cliquable | Literal[False]:
+    def clique(self, position: tuple[int, int], droit: bool = False) -> Cliquable | Literal[False]:
         return Wrapper.clique(self, (position[0]-self.marges[0],position[1]-self.marges[1]), droit)
 
-    def survol(self, position: Tuple[int, int]) -> Survolable | Literal[False]:
+    def survol(self, position: tuple[int, int]) -> Survolable | Literal[False]:
         return Wrapper.survol(self, (position[0]-self.marges[0],position[1]-self.marges[1]))
 
-    def scroll(self, position: Tuple[int, int], x: int, y: int):
+    def scroll(self, position: tuple[int, int], x: int, y: int):
         return Wrapper.scroll(self, (position[0]-self.marges[0],position[1]-self.marges[1]), x, y)
 
 class WrapperCentre(WrapperMarge):
@@ -57,11 +57,11 @@ class WrapperCentre(WrapperMarge):
     def __init__(self):
         WrapperMarge.__init__(self, (0, 0, 0, 0))
 
-    def set_tailles(self, tailles: Tuple[int, int]):
+    def set_tailles(self, tailles: tuple[int, int]):
         self.get_tailles(tailles) # Pour calculer les marges
         WrapperMarge.set_tailles(self, tailles)
 
-    def get_tailles(self, tailles: Tuple[int, int]):
+    def get_tailles(self, tailles: tuple[int, int]):
         if self.contenu is None:
             warn(f"{self} n'a pas de contenu !")
             return (0,0)
@@ -78,11 +78,11 @@ class WrapperCentreHorizontal(WrapperMarge):
     def __init__(self):
         WrapperMarge.__init__(self, (0, 5, 0, 5))
 
-    def set_tailles(self, tailles: Tuple[int, int]):
+    def set_tailles(self, tailles: tuple[int, int]):
         self.get_tailles(tailles)
         WrapperMarge.set_tailles(self, tailles)
 
-    def get_tailles(self, tailles: Tuple[int, int]):
+    def get_tailles(self, tailles: tuple[int, int]):
         if self.contenu is None:
             warn(f"{self} n'a pas de contenu !")
             return (0,0)
@@ -97,11 +97,11 @@ class WrapperCentreVertical(WrapperMarge):
     def __init__(self):
         WrapperMarge.__init__(self, (5, 0, 5, 0))
 
-    def set_tailles(self, tailles: Tuple[int, int]):
+    def set_tailles(self, tailles: tuple[int, int]):
         self.get_tailles(tailles)
         WrapperMarge.set_tailles(self, tailles)
 
-    def get_tailles(self, tailles: Tuple[int, int]):
+    def get_tailles(self, tailles: tuple[int, int]):
         if self.contenu is None:
             warn(f"{self} n'a pas de contenu !")
             return (0,0)

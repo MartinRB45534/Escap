@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, List, Type, Dict, Set, Any
+from typing import TYPE_CHECKING, Optional,  Any
 import random
 import carte as crt
 
@@ -29,7 +29,7 @@ if TYPE_CHECKING:
 
 class Agissant(NonSuperposable,Mobile):
     """La classe des entitées animées. Capable de décision, de différentes actions, etc. Les principales caractéristiques sont l'ID, les stats, et la classe principale."""
-    def __init__(self,identite:str,labyrinthe:Labyrinthe,cond_evo:List[float],skills_intrasecs:Set[SkillIntrasec],skills:Set[SkillExtra],niveau:int,pv_max:float,regen_pv_max:float,regen_pv_min:float,restauration_regen_pv:float,pm_max:float,regen_pm:float,force:float,priorite:float,vitesse:float,affinites:Dict[Element,float],immunites:Set[Element],espece:Espece,oubli:float,resolution:int,forme:str,forme_tete:str,nb_doigts:int,magies:List[Type[Magie]],items:List[Type[Item]],position:crt.Position,ID: Optional[int]=None):
+    def __init__(self,identite:str,labyrinthe:Labyrinthe,cond_evo:list[float],skills_intrasecs:set[SkillIntrasec],skills:set[SkillExtra],niveau:int,pv_max:float,regen_pv_max:float,regen_pv_min:float,restauration_regen_pv:float,pm_max:float,regen_pm:float,force:float,priorite:float,vitesse:float,affinites:dict[Element,float],immunites:set[Element],espece:Espece,oubli:float,resolution:int,forme:str,forme_tete:str,nb_doigts:int,magies:list[type[Magie]],items:list[type[Item]],position:crt.Position,ID: Optional[int]=None):
         Mobile.__init__(self,position,ID)
         NonSuperposable.__init__(self,position,ID)
         self.identite = identite
@@ -69,7 +69,7 @@ class Agissant(NonSuperposable,Mobile):
             for magie in magies:
                 skill.ajoute(magie)
         if items:
-            new_items:Set[Item] = set()
+            new_items:set[Item] = set()
             for item in items:
                 new_items.add(item(labyrinthe,crt.POSITION_ABSENTE))
             self.inventaire.equippe(new_items)
@@ -357,8 +357,8 @@ class Agissant(NonSuperposable,Mobile):
     def post_action(self):
         """L'agissant a agit."""
         #Le controleur nous a encore forcé à agir ! Quel rabat-joie, avec ses cout de mana, ses latences, ses "Vous ne pouvez pas utiliser un skill que vous n'avez pas." !
-        attaques:List[Attaque] = []
-        dopages:List[Dopage] = []
+        attaques:list[Attaque] = []
+        dopages:list[Dopage] = []
         for effet in self.effets:
             if isinstance(effet,OnPostActionAgissant): #Les protections (générales) par exemple
                 effet.post_action(self)
@@ -376,8 +376,8 @@ class Agissant(NonSuperposable,Mobile):
     def pre_attack(self):
         """L'agissant est sur le point d'être attaqué (peut-être)."""
         #On est visé par plein d'attaques ! Espérons qu'on puisse se protéger.
-        attaques:List[AttaqueParticulier] = []
-        on_attaques:List[Protection] = []
+        attaques:list[AttaqueParticulier] = []
+        on_attaques:list[Protection] = []
         for effet in self.effets:
             if isinstance(effet,Protection): #Principalement les effets qui agissent sur les attaques
                 on_attaques.append(effet)
@@ -387,7 +387,7 @@ class Agissant(NonSuperposable,Mobile):
         taux = 1
         if skill is not None :
             taux *= skill.utilise()
-        items:List[Defensif] = []
+        items:list[Defensif] = []
         for item in self.inventaire.get_equippement():
             if isinstance(item,Defensif):
                 items.append(item)

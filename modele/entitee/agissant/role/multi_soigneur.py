@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, List,Tuple
+from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
@@ -13,7 +13,7 @@ class Multi_soigneur(Soigneur,Multi_mage):
     """Les soigneurs capables de soigner plusieurs agissants à la fois."""
 
     def agit_en_vue(self,defaut:str = ""):
-        cibles:List[Tuple[float,Agissant]] = []
+        cibles:list[tuple[float,Agissant]] = []
         skill = type(self.get_skill_magique())
         for corp in self.esprit.corps:
             if corp.etat == EtatsAgissants.VIVANT and corp.statistiques.pv < corp.statistiques.pv_max:

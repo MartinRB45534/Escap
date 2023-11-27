@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Set, Any
+from typing import Any
 
 # Pas d'import pour les annotations
 
@@ -16,7 +16,7 @@ class EtageAbsent(Etage):
     """Classe représentant l'étage de la position absente."""
     def __init__(self):
         super().__init__("Absent", -1, -1)
-        self.positions:Set[Position] = set()
+        self.positions:set[Position] = set()
 
     def __contains__(self, item:Any):
         return item is POSITION_ABSENTE

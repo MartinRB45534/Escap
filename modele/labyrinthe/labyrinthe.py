@@ -1,7 +1,7 @@
 """Ce module contient la classe Labyrinthe, qui représente le labyrinthe du jeu."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, Set, Any, Dict, Type
+from typing import TYPE_CHECKING, Optional, Any
 import networkx as nx
 import carte as crt
 
@@ -23,7 +23,7 @@ class Labyrinthe(crt.Labyrinthe):
     """Le labyrinthe"""
     def __init__(self):
         super().__init__()
-        self.position_case: Dict[crt.Position,Case] = {}
+        self.position_case: dict[crt.Position,Case] = {}
         self.add_case(CASE_ABSENTE)
 
     def __contains__(self, item: Any):
@@ -31,7 +31,7 @@ class Labyrinthe(crt.Labyrinthe):
             return item in self.nodes and item is not crt.POSITION_ABSENTE
         return super().__contains__(item)
     
-    def ajoute_etage(self, etage:crt.Etage, aura:Type[AuraPermanente], opacite:int, niveau:int, responsable:Agissant):
+    def ajoute_etage(self, etage:crt.Etage, aura:type[AuraPermanente], opacite:int, niveau:int, responsable:Agissant):
         """Ajoute un étage au labyrinthe."""
         for position in etage.positions:
             self.add_case(Case(position, aura, opacite, niveau, responsable))
@@ -42,7 +42,7 @@ class Labyrinthe(crt.Labyrinthe):
                 else:
                     self.add_mur(position, crt.POSITION_ABSENTE, direction, MurImpassable(10))
 
-    def add_case(self, case:Case, **attr:Dict[str,Any]):
+    def add_case(self, case:Case, **attr:dict[str,Any]):
         """Ajoute une case au labyrinthe."""
         self.add_node(case.position, case=case, **attr) #type: ignore
         self.position_case[case.position] = case
@@ -50,7 +50,7 @@ class Labyrinthe(crt.Labyrinthe):
             self.etages[case.position.etage] = nx.Graph()
         self.etages[case.position.etage].add_node(case.position) #type: ignore
 
-    def add_mur(self, u:crt.Position, v:crt.Position, direction:crt.Direction, mur:Mur, **attr:Dict[str,Any]): #type: ignore
+    def add_mur(self, u:crt.Position, v:crt.Position, direction:crt.Direction, mur:Mur, **attr:dict[str,Any]): #type: ignore
         """Ajoute un mur entre deux cases."""
         if v not in self.position_case:
             raise ValueError(f"La case {v} n'existe pas")
@@ -86,8 +86,8 @@ class Labyrinthe(crt.Labyrinthe):
                 return voisin #type: ignore
         raise ValueError(f"La position {position} n'a pas de mur dans la direction {direction}")
 
-    def extrait(self, positions:Set[crt.Position]) -> Extrait:
-        voisins:Set[crt.Position] = {voisin for position in positions for voisin in self[position] if voisin not in positions} #type: ignore
+    def extrait(self, positions:set[crt.Position]) -> Extrait:
+        voisins:set[crt.Position] = {voisin for position in positions for voisin in self[position] if voisin not in positions} #type: ignore
         subgraph = super().subgraph(positions|voisins) # type: ignore
         return Extrait(voisins, subgraph) # type: ignore
 

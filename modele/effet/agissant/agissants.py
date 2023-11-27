@@ -3,7 +3,7 @@ Contient quelques effets divers.
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Type
+from typing import TYPE_CHECKING
 
 # Imports des classes parentes
 from .agissant import EffetAgissant
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 class Enseignement(EffetAgissant):
     """Effet qui enseigne une magie au joueur."""
-    def __init__(self,magie:Type[Magie]):
+    def __init__(self,magie:type[Magie]):
         self.magie = magie
 
     def enseigne(self,agissant:Mage):

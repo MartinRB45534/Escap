@@ -1,7 +1,7 @@
 """Contient les classes de textes"""
 
 from __future__ import annotations
-from typing import List, Tuple, Optional
+from typing import Optional
 import pygame
 
 from .cliquable import Cliquable
@@ -57,19 +57,19 @@ class Texte(Cliquable):
         texte=POLICE20.render(self.get_texte(True),True,(0,0,0))
         screen.blit(texte,(self.position[0],self.position[1]-3))
 
-    def get_tailles(self,_tailles:Tuple[int,int]) -> Tuple[int,int]:
+    def get_tailles(self,_tailles:tuple[int,int]) -> tuple[int,int]:
         return (POLICE20.size(self.get_texte())[0],20)
 
 class TexteCache(Texte):
     """Un texte qui ne prend pas de place quand il est vide."""
-    def get_tailles(self, _tailles: Tuple[int, int]) -> Tuple[int, int]:
+    def get_tailles(self, _tailles: tuple[int, int]) -> tuple[int, int]:
         if self.get_texte() == "":
             return (0,0)
         return Texte.get_tailles(self,_tailles)
 
 class Pave(Texte,TailleVariable):
     """Un élément avec beaucoup de texte. S'adapte sur plusieurs lignes si besoin"""
-    def get_tailles(self,tailles:Tuple[int,int]):
+    def get_tailles(self,tailles:tuple[int,int]):
         mots = self.get_texte().split() # Peut-être voir à couper mieux un jour (espaces insécables, etc.)
         i = 0
         hauteur = 0
@@ -82,7 +82,7 @@ class Pave(Texte,TailleVariable):
             hauteur += 1
         return (tailles[0],20*hauteur)
 
-    def set_tailles(self,tailles:Tuple[int,int]):
+    def set_tailles(self,tailles:tuple[int,int]):
         mots = self.get_texte().split()
         i = 0
         hauteur = 0
@@ -111,7 +111,7 @@ class Pave(Texte,TailleVariable):
 
 class Paves(Cliquable,TailleVariable):
     """Un pavé avec plusieurs lignes"""
-    def __init__(self, textes:List[str], textes_marques_survol:Optional[List[str]]=None, textes_marques_actifs:Optional[List[str]]=None, textes_marque_courant:Optional[List[str]]=None, textes_est_courant:Optional[List[str]]=None, textes_actifs:Optional[List[str]]=None):
+    def __init__(self, textes:list[str], textes_marques_survol:Optional[list[str]]=None, textes_marques_actifs:Optional[list[str]]=None, textes_marque_courant:Optional[list[str]]=None, textes_est_courant:Optional[list[str]]=None, textes_actifs:Optional[list[str]]=None):
         super().__init__()
         self.textes=textes
         self.textes_marques_survol=textes_marques_survol if textes_marques_survol else self.textes
@@ -120,7 +120,7 @@ class Paves(Cliquable,TailleVariable):
         self.textes_est_courant=textes_est_courant if textes_est_courant else self.textes
         self.textes_actifs=textes_actifs if textes_actifs else self.textes_est_courant
 
-    def get_textes(self,reset:bool=False) -> List[str]:
+    def get_textes(self,reset:bool=False) -> list[str]:
         """Renvoie le texte à afficher."""
         if self.marque_survol:
             if reset:
@@ -143,7 +143,7 @@ class Paves(Cliquable,TailleVariable):
         else:
             return self.textes
 
-    def get_tailles(self,tailles:Tuple[int,int]):
+    def get_tailles(self,tailles:tuple[int,int]):
         hauteur = 0
         textes = self.get_textes()
         for texte in textes:
@@ -158,7 +158,7 @@ class Paves(Cliquable,TailleVariable):
                 hauteur += 1
         return (tailles[0],20*hauteur)
 
-    def set_tailles(self,tailles:Tuple[int,int]):
+    def set_tailles(self,tailles:tuple[int,int]):
         hauteur = 0
         textes = self.get_textes()
         for texte in textes:

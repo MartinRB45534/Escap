@@ -1,7 +1,7 @@
 """Contient la classe Vignette, qui est un élément qui est juste une image."""
 
 from __future__ import annotations
-from typing import Tuple, TYPE_CHECKING
+from typing import TYPE_CHECKING
 import pygame
 
 from .affichable import Affichable
@@ -13,14 +13,14 @@ if TYPE_CHECKING:
 
 class Vignette(Affichable):
     """Un élément qui est juste une image."""
-    def __init__(self,position:Tuple[int,int],taille:int,skin:Skin,direction:int=0):
+    def __init__(self,position:tuple[int,int],taille:int,skin:Skin,direction:int=0):
         super().__init__()
         self.tailles = (taille,taille)
         self.position = position
         self.skin = skin
         self.direction = direction
 
-    def set_tailles(self,tailles:Tuple[int,int]):
+    def set_tailles(self,tailles:tuple[int,int]):
         if tailles != self.tailles:
             raise DisplayError(f"Tu ne peux pas modifier la taille d'une vignette ! Vérifie où tu as rangé {self}.")
 
@@ -29,14 +29,14 @@ class Vignette(Affichable):
 
 class VignetteImage(Affichable):
     """Un élément qui est juste une image."""
-    def __init__(self,position:Tuple[int,int],tailles:Tuple[int,int],skin:Image,direction:int=0):
+    def __init__(self,position:tuple[int,int],tailles:tuple[int,int],skin:Image,direction:int=0):
         super().__init__()
         self.tailles = tailles
         self.position = position
         self.skin = skin
         self.direction = direction
 
-    def set_tailles(self,tailles:Tuple[int,int]):
+    def set_tailles(self,tailles:tuple[int,int]):
         if tailles != self.tailles:
             raise DisplayError(f"Tu ne peux pas modifier la taille d'une vignette ! Vérifie où tu as rangé {self}.")
 

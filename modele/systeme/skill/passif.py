@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Type
+from typing import TYPE_CHECKING
 
 # Imports des classes parentes
 from .skill import Skill
@@ -37,7 +37,7 @@ class SkillVision(Passif):
 class SkillAura(SkillDebutTour): #Toutes les auras ne sont pas des skills intrasecs, mais par rapport aux méthodes c'est plus logique comme ça.
     """Offre une aura qui se matérialise autour de l'agissant. Les effets de l'aura diffèrent selon l'aura. Skill aura est une classe parente et ne doit pas être instanciée.
        Les auras sont des skills passifs, qui s'actionne à chaque tour."""
-    def __init__(self,effet:Type[Aura]):
+    def __init__(self,effet:type[Aura]):
         Passif.__init__(self)
         self.effet = effet #L'effet qui distribuera l'aura sur la zone (il ira chercher la portée tout seul comme un grand)
         self.gain_xp = 0.1 #Il faut 100 tours pour augmenter le niveau d'un skill d'aura. C'est trop peu...
@@ -107,7 +107,7 @@ class SkillManipulationArme(Passif):
     """
     Renforce les attaques réalisées à l'aide d'armes. Il y a un skill par type d'arme, et on peut en avoir plusieurs. Les skills sont cumulatifs, mais ne s'appliquent qu'à une seule arme à la fois.
     """
-    arme:Type[Arme]
+    arme:type[Arme]
     def __init__(self, boost_degats:float, gain_xp:float):
         Passif.__init__(self)
         self.boost_degats = boost_degats #Le coefficient appliqué aux dégats de base pour calculer les dégats réels

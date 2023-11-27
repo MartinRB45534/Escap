@@ -3,7 +3,7 @@ Cliquable : un élément qui réagit aux clics
 """
 
 from __future__ import annotations
-from typing import Tuple, Literal
+from typing import Literal
 
 from .survolable import Survolable
 from .direction import Direction, DirectionAff
@@ -34,7 +34,7 @@ class Cliquable(Survolable): #Il faut être survolable pour être cliquable
         """Rend l'élément inactif."""
         self.actif = False
 
-    def clique(self,position:Tuple[int,int], _droit:bool=False) -> Cliquable|Literal[False]:
+    def clique(self,position:tuple[int,int], _droit:bool=False) -> Cliquable|Literal[False]:
         """Renvoie l'élément cliqué, ou False sinon (récursif pour d'autres éléments)."""
         if self.touche(position):
             self.set_actif()

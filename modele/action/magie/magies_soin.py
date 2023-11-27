@@ -3,7 +3,7 @@ Les magies de soin (et de résurection/réanimation).
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING
 import carte as crt
 
 # Imports des classes parentes
@@ -36,7 +36,7 @@ class MagieSoin(CibleAgissant):
 class MagieMultiSoin(CibleAgissants):
     """La magie qui invoque un effet de soin sur des agissants ciblés."""
     nom = "magie multi soin"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,gain_pv:float,niveau:int,cible:List[Agissant]):
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,gain_pv:float,niveau:int,cible:list[Agissant]):
         CibleAgissants.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau,cible)
         self.gain_pv = gain_pv
 

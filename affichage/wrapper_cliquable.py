@@ -3,7 +3,7 @@ Contient la classe WrapperCliquable
 """
 
 from __future__ import annotations
-from typing import Tuple, Literal, TYPE_CHECKING
+from typing import Literal, TYPE_CHECKING
 import pygame
 
 from .cliquable import Cliquable
@@ -50,7 +50,7 @@ class WrapperCliquable(Wrapper,Cliquable):
         for objet in self.objets:
             objet.affiche(screen,frame,frame_par_tour)
 
-    def clique(self,position:Tuple[int,int],droit:bool=False) -> Cliquable|Literal[False]:
+    def clique(self,position:tuple[int,int],droit:bool=False) -> Cliquable|Literal[False]:
         clique = Wrapper.clique(self,position,droit)
         if clique is self:
             self.set_actif()
@@ -60,7 +60,7 @@ class WrapperCliquable(Wrapper,Cliquable):
             return self
         return False
 
-    def survol(self,position:Tuple[int,int]) -> Survolable|Literal[False]:
+    def survol(self,position:tuple[int,int]) -> Survolable|Literal[False]:
         survol = Wrapper.survol(self,position)
         if survol is self:
             self.marque_survol = True

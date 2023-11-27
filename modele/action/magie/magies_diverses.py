@@ -3,7 +3,7 @@ Quelques magies diverses.
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, List, Optional, Set
+from typing import TYPE_CHECKING, Optional
 import carte as crt
 
 # Imports des classes parentes
@@ -66,7 +66,7 @@ class MagieInstakill(CibleAgissant, NonRepetable):
 class MagieProtectionSacree(CibleAgissants):
     """La magie qui crée un effet de protection sacrée sur des agissants."""
     nom = "magie protection sacrée"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,duree:float,pv:float,niveau:int,cible:List[Agissant]):
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,duree:float,pv:float,niveau:int,cible:list[Agissant]):
         CibleAgissants.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau,cible)
         self.duree = duree
         self.pv = pv
@@ -81,7 +81,7 @@ class MagieProtectionSacree(CibleAgissants):
 class MagieTeleportation(CibleCases, NonRepetable):
     """La magie qui téléporte des entitées."""
     nom = "magie téléportation"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,niveau:int,cases:List[crt.Position]):
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,niveau:int,cases:list[crt.Position]):
         CibleCases.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau,cases)
         NonRepetable.__init__(self,agissant,latence)
 
@@ -89,9 +89,9 @@ class MagieTeleportation(CibleCases, NonRepetable):
         if self.cible == []:
             self.interrompt()
         else:
-            agissants : List[Optional[Agissant]] = []
-            items : List[Set[Item]] = []
-            cases : List[Case] = []
+            agissants : list[Optional[Agissant]] = []
+            items : list[set[Item]] = []
+            cases : list[Case] = []
             for position in self.cible:
                 case = self.agissant.labyrinthe.get_case(position)
                 if case.decors is not None:

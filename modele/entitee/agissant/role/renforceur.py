@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, List, Tuple
+from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
@@ -12,7 +12,7 @@ class Renforceur(Mage):
     """Les agissants qui boostent les attaques de leurs alliés."""
 
     def agit_en_vue(self,defaut:str = ""):
-        cibles: List[Tuple[float,Agissant]] = []
+        cibles: list[tuple[float,Agissant]] = []
         for corp in self.esprit.corps:
             if corp.statut == "attaque":
                 cibles.append((self.esprit.get_importance(corp.get_impact()),corp))

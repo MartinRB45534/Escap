@@ -3,7 +3,7 @@ Ce fichier contient la classe Labyrinthe, qui représente un labyrinthe.
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, Set, Any, Dict
+from typing import TYPE_CHECKING, Optional, Any
 import networkx as nx
 
 from .structure_spatiale.direction import Direction
@@ -20,14 +20,14 @@ class Labyrinthe(nx.MultiDiGraph): #Rarement Multi, mais ça arrive pour la case
     """Classe représentant un labyrinthe."""
     def __init__(self):
         super().__init__() # type: ignore
-        self.etages: Dict[Etage,nx.Graph] = {}
+        self.etages: dict[Etage,nx.Graph] = {}
         self.add_pos(POSITION_ABSENTE)
-        self.nodes:Set[Position] # type: ignore # C'est faux mais ça appaise les linters
+        self.nodes:set[Position] # type: ignore # C'est faux mais ça appaise les linters
 
     def __contains__(self, item:Any) -> bool:
         return item in self.nodes and item is not POSITION_ABSENTE
 
-    def add_pos(self, position:Position, **attr:Dict[str,Any]):
+    def add_pos(self, position:Position, **attr:dict[str,Any]):
         """Ajoute une case au labyrinthe."""
         self.add_node(position, **attr) #type: ignore
         if position.etage not in self.etages:
@@ -37,7 +37,7 @@ class Labyrinthe(nx.MultiDiGraph): #Rarement Multi, mais ça arrive pour la case
             if position+direction in position.etage:
                 self.add_wal(position, position+direction, direction)
 
-    def add_wal(self, u:Position, v:Position, direction:Direction, **attr:Dict[str,Any]):
+    def add_wal(self, u:Position, v:Position, direction:Direction, **attr:dict[str,Any]):
         """Ajoute un mur entre deux cases."""
         if v not in self.nodes:
             self.add_pos(v)
@@ -69,8 +69,8 @@ class Labyrinthe(nx.MultiDiGraph): #Rarement Multi, mais ça arrive pour la case
                 return voisin #type: ignore
         raise ValueError(f"La position {position} n'a pas de mur dans la direction {direction}")
         
-    def extrait(self, positions:Set[Position]) -> Extrait:
+    def extrait(self, positions:set[Position]) -> Extrait:
         """Renvoie un extrait du labyrinthe contenant les positions données."""
-        voisins:Set[Position] = {voisin for position in positions for voisin in self[position] if voisin not in positions} #type: ignore
+        voisins:set[Position] = {voisin for position in positions for voisin in self[position] if voisin not in positions} #type: ignore
         subgraph = super().subgraph(positions|voisins) # type: ignore
         return Extrait(voisins, subgraph) # type: ignore

@@ -1,7 +1,7 @@
 """Contient les classes Placeholder et Placeheldholder."""
 
 from __future__ import annotations
-from typing import Optional, Tuple
+from typing import Optional
 
 from .affichable import Affichable
 from .direction import Direction
@@ -12,7 +12,7 @@ from .wrapper_noeud import WrapperNoeud
 
 class Placeheldholder(WrapperNoeud):
     """L'élément où le placeheld du placeholder est placé."""
-    def clique(self,position:Tuple[int,int], droit:bool=False):
+    def clique(self,position:tuple[int,int], droit:bool=False):
         clique = Wrapper.clique(self,position,droit)
         if clique is self:
             self.set_actif()
@@ -68,7 +68,7 @@ class Placeholder(Noeud):
         self.marque_actif = True
         self.courant.trouve_actif()
 
-    def clique(self, position: Tuple[int,int], droit:bool=False):
+    def clique(self, position: tuple[int,int], droit:bool=False):
         return Cliquable.clique(self, position, droit) # On ne veut pas que le clique soit propagé
 
     def clique_placeholder(self,placeheldholder:Placeheldholder, _droit:bool=False):
@@ -76,7 +76,7 @@ class Placeholder(Noeud):
             return self
         return False
 
-    def survol(self, position: Tuple[int,int]):
+    def survol(self, position: tuple[int,int]):
         return Cliquable.survol(self, position)
     
     def navigue(self, direction: Direction):

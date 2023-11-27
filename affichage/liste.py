@@ -3,7 +3,7 @@ Contient la classe Liste, qui permet d'afficher des objets à la suite, et de le
 """
 
 from __future__ import annotations
-from typing import List, Tuple, Optional, Sequence
+from typing import Optional, Sequence
 import pygame
 
 from .affichable import Affichable
@@ -21,14 +21,14 @@ class Liste(Conteneur):
     """Contient des objets, et les affiche à la suite."""
     def __init__(self, shrink: bool = False):
         Conteneur.__init__(self)
-        self.contenu:List[Affichable]
+        self.contenu:list[Affichable]
         self.repartition = []
         self.courant = 0 #L'élément 'courant' de la liste
         self.decalage = 0
         self.shrink = shrink
 
-    def set_contenu(self,contenu:List[Affichable],
-                    repartition:Optional[List[int]]=None,courant:int=0):
+    def set_contenu(self,contenu:list[Affichable],
+                    repartition:Optional[list[int]]=None,courant:int=0):
         if repartition is None:
             repartition = [0]*len(contenu)
         # On vérifie qu'il n'y a pas de nombres négatifs dans la répartition
@@ -42,7 +42,7 @@ class Liste(Conteneur):
             self.repartition = repartition
             self.courant = courant
 
-    def clique(self,position:Tuple[int,int],droit:bool=False):
+    def clique(self,position:tuple[int,int],droit:bool=False):
         #Trouve l'élément survolé par la souris et le renvoie
         res = False
         if self.touche(position):
@@ -73,7 +73,7 @@ class Liste(Conteneur):
                 res = res_objet
         return res
 
-    def survol(self,position:Tuple[int,int]):
+    def survol(self,position:tuple[int,int]):
         #Trouve l'élément survolé par la souris et le renvoie
         res = False
         if self.touche(position):
@@ -93,7 +93,7 @@ class Liste(Conteneur):
     def ajuste(self,element:Affichable):
         """Ajuste la liste pour que l'élément soit visible."""
 
-    def scroll_liste(self,position:Tuple[int,int],x:int,y:int):
+    def scroll_liste(self,position:tuple[int,int],x:int,y:int):
         """Scroll la liste, si possible."""
         res = False
         if self.touche(position):
@@ -108,7 +108,7 @@ class Liste(Conteneur):
 
 class ListeVerticale(Liste):
     """Une liste disposée verticalement."""
-    def set_tailles(self,tailles:Tuple[int,int]):
+    def set_tailles(self,tailles:tuple[int,int]):
         self.tailles = tailles
         somme = self.decalage
         for i, contenu in enumerate(self.contenu):
@@ -129,7 +129,7 @@ class ListeVerticale(Liste):
                 contenu.decale((0,decalage))
             self.decalage += decalage
 
-    def get_tailles(self,tailles:Tuple[int,int]):
+    def get_tailles(self,tailles:tuple[int,int]):
         return (max(contenu.get_tailles(tailles)[0] for contenu in self.contenu),
                 tailles[1] if not self.shrink else
                 min(sum(self.repartition[i] if self.repartition[i] else
@@ -137,7 +137,7 @@ class ListeVerticale(Liste):
                         for i in range(len(self.repartition))),tailles[1])
                 ) if self.contenu else (0,0)
 
-    def scroll(self,position:Tuple[int,int],x:int,y:int):
+    def scroll(self,position:tuple[int,int],x:int,y:int):
         if self.scroll_liste(position,x,y): #Un de nos éléments a scrollé
             return True
         elif self.touche(position) and y: #Personne n'a scrollé, peut-être qu'on peut le faire
@@ -199,7 +199,7 @@ class ListeVerticale(Liste):
 
 class ListeHorizontale(Liste):
     """Une liste disposée horizontalement."""
-    def set_tailles(self,tailles:Tuple[int,int]):
+    def set_tailles(self,tailles:tuple[int,int]):
         self.tailles = tailles
         somme = self.decalage
         for i, contenu in enumerate(self.contenu):
@@ -220,7 +220,7 @@ class ListeHorizontale(Liste):
                 contenu.decale((decalage,0))
             self.decalage += decalage
 
-    def get_tailles(self,tailles:Tuple[int,int]):
+    def get_tailles(self,tailles:tuple[int,int]):
         return (tailles[0] if not self.shrink else
                 min(sum(self.repartition[i] if self.repartition[i] else
                         self.contenu[i].get_tailles(tailles)[0]
@@ -228,7 +228,7 @@ class ListeHorizontale(Liste):
                 max(contenu.get_tailles(tailles)[1]
                     for contenu in self.contenu))if self.contenu else (0,0)
 
-    def scroll(self,position:Tuple[int,int],x:int,y:int):
+    def scroll(self,position:tuple[int,int],x:int,y:int):
         if self.scroll_liste(position,x,y): #Un de nos éléments a scrollé
             return True
         elif self.touche(position) and x: #Personne n'a scrollé, peut-être qu'on peut le faire
@@ -295,7 +295,7 @@ class ListeMarge(Liste):
         self.marge = marge
 
     def set_contenu(self, contenu: Sequence[Affichable],
-                    repartition: Optional[List[int]] = None, courant: int = 0):
+                    repartition: Optional[list[int]] = None, courant: int = 0):
         if repartition is None:
             repartition = [0] * len(contenu)
         # On vérifie qu'il n'y a pas de nombres négatifs dans la répartition
@@ -322,22 +322,22 @@ class ListeMenu(WrapperNoeud):
     """Une liste sur plusieurs lignes"""
     def __init__(self):
         WrapperNoeud.__init__(self)
-        self.items:List[Cliquable] = []
+        self.items:list[Cliquable] = []
         self.liste = ListeMargeVerticale()
 
-    def set_fond(self,fond:Tuple[int,int,int,int]|Tuple[int,int,int]):
+    def set_fond(self,fond:tuple[int,int,int,int]|tuple[int,int,int]):
         self.fond = fond
 
-    def set_items(self,items:List[Cliquable]):
+    def set_items(self,items:list[Cliquable]):
         """Change le contenu du conteneur."""
         self.items = items
         self.set_courant(items[0])
 
-    def set_tailles(self,tailles:Tuple[int,int]):
+    def set_tailles(self,tailles:tuple[int,int]):
         self.tailles = tailles
-        listes:List[Affichable] = []
-        ligne:List[Affichable] = []
-        ligne_courante:List[Affichable] = []
+        listes:list[Affichable] = []
+        ligne:list[Affichable] = []
+        ligne_courante:list[Affichable] = []
         liste_courante=ListeMargeHorizontale()
         longueur_ligne=5
         for contenu in self.items:
@@ -367,7 +367,7 @@ class ListeMenu(WrapperNoeud):
         self.liste.set_tailles(self.tailles)
         self.liste.ajuste(liste_courante)
 
-    def get_tailles(self,tailles:Tuple[int,int]):
+    def get_tailles(self,tailles:tuple[int,int]):
         return tailles
 
     def affiche(self,screen:pygame.Surface,frame:int=1,frame_par_tour:int=1):
@@ -398,7 +398,7 @@ class ListeMenu(WrapperNoeud):
         for objet in self.objets:
             objet.affiche(screen,frame,frame_par_tour)
 
-    def clique(self,position:Tuple[int,int],droit:bool=False):
+    def clique(self,position:tuple[int,int],droit:bool=False):
         #Trouve l'élément survolé par la souris et le renvoie
         res = False
         if self.touche(position):
@@ -429,7 +429,7 @@ class ListeMenu(WrapperNoeud):
                 res = res_objet
         return res
 
-    def survol(self,position:Tuple[int,int]):
+    def survol(self,position:tuple[int,int]):
         #Trouve l'élément survolé par la souris et le renvoie
         res = False
         if self.touche(position):
@@ -445,7 +445,7 @@ class ListeMenu(WrapperNoeud):
                 res = res_objet
         return res
 
-    def survol_wrapper(self,position:Tuple[int,int]):
+    def survol_wrapper(self,position:tuple[int,int]):
         """Trouve l'élément survolé par la souris et le renvoie"""
         res = False
         if self.touche(position):
@@ -460,7 +460,7 @@ class ListeMenu(WrapperNoeud):
                 res = res_objet
         return res
 
-    def scroll(self,position:Tuple[int,int],x:int,y:int):
+    def scroll(self,position:tuple[int,int],x:int,y:int):
         res = False
         if self.touche(position):
             pos_rel = (position[0]-self.position[0],position[1]-self.position[1])

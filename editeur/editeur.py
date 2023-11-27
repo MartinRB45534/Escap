@@ -1,7 +1,7 @@
 """L'éditeur du jeu."""
 
 from __future__ import annotations
-from typing import Set, Optional
+from typing import Optional
 
 import pygame
 
@@ -89,7 +89,7 @@ class Editeur:
             case _:
                 pass
 
-    def controle_clavier(self,event:pygame.event.Event,modifiers:Set[int]):
+    def controle_clavier(self,event:pygame.event.Event,modifiers:set[int]):
         """Contrôle l'affichage à partir d'un évènement clavier."""
         direction = self.get_direction(event)
         if direction is None:

@@ -3,7 +3,7 @@ Ce module contient la classe Conteneur, qui est un élément qui peut en conteni
 """
 
 from __future__ import annotations
-from typing import List, Tuple, Literal, TYPE_CHECKING
+from typing import Literal, TYPE_CHECKING
 import pygame
 
 from .affichable import Affichable
@@ -18,12 +18,12 @@ if TYPE_CHECKING:
 class Conteneur(Affichable):
     """Un élément qui peut en 'contenir' d'autres, c'est-à-dire qu'il va les afficher 'à l'interieur' et ils ne pourront pas déborder."""
     def __init__(self):
-        self.objets:List[Affichable] = [] #Il peut quand même avoir des objets 'normaux'
-        self.contenu:List[Affichable] = [] #Les objets qu'il 'contient'
-        self.fond:Tuple[int,int,int]|Tuple[int,int,int,int] = (0,0,0,0)
+        self.objets:list[Affichable] = [] #Il peut quand même avoir des objets 'normaux'
+        self.contenu:list[Affichable] = [] #Les objets qu'il 'contient'
+        self.fond:tuple[int,int,int]|tuple[int,int,int,int] = (0,0,0,0)
         super().__init__()
 
-    def set_contenu(self,contenu:List[Affichable]):
+    def set_contenu(self,contenu:list[Affichable]):
         """Change le contenu du conteneur."""
         self.contenu = contenu
 
@@ -31,7 +31,7 @@ class Conteneur(Affichable):
         """Change le fond du conteneur."""
         self.fond = fond
 
-    def decale(self,decalage:Tuple[int,int]):
+    def decale(self,decalage:tuple[int,int]):
         """Décale l'élément et ses objets."""
         super().decale(decalage)
         for objet in self.objets:
@@ -46,7 +46,7 @@ class Conteneur(Affichable):
         for objet in self.objets:
             objet.affiche(screen,frame,frame_par_tour)
 
-    def clique(self,position:Tuple[int,int],droit:bool=False) -> Cliquable|Literal[False]:
+    def clique(self,position:tuple[int,int],droit:bool=False) -> Cliquable|Literal[False]:
         #Trouve l'élément survolé par la souris et le renvoie
         res = False
         if self.touche(position):
@@ -73,7 +73,7 @@ class Conteneur(Affichable):
                 res = res_objet
         return res
 
-    def survol(self,position:Tuple[int,int]) -> Survolable|Literal[False]:
+    def survol(self,position:tuple[int,int]) -> Survolable|Literal[False]:
         #Trouve l'élément survolé par la souris et le renvoie
         res = False
         if self.touche(position):
@@ -88,7 +88,7 @@ class Conteneur(Affichable):
                 res = res_objet
         return res
 
-    def scroll(self,position:Tuple[int,int],x:int,y:int):
+    def scroll(self,position:tuple[int,int],x:int,y:int):
         res = False
         if self.touche(position):
             pos_rel = (position[0]-self.position[0],position[1]-self.position[1])

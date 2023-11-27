@@ -1,7 +1,6 @@
 """Contient les classes Espece et Especes."""
 
 from __future__ import annotations
-from typing import List
 
 class Espece:
     """
@@ -20,7 +19,7 @@ class Especes(Espece):
     """
     # Parce que les ombriuls peuvent avoir une autre espèce (comme gobelin pour un gobelin corrompu)
     # Le joueur peut "perdre" son humanité pour éviter l'aggro de certains monstres
-    def __init__(self, especes:List[Espece]):
+    def __init__(self, especes:list[Espece]):
         self.especes = especes
 
     @property

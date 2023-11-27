@@ -3,7 +3,7 @@ Contient les classes de protection des cases.
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING
 from warnings import warn
 import carte as crt
 
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 class ProtectionCaseBouclier(ProtectionCase,TimeLimited):
     """La case protégée par le bouclier est 'entourée' par ce dernier, c'est à dire que pour y rentrer par certains côtés, une attaque doit d'abord être affectée par le bouclier."""
-    def __init__(self,temps_restant:float,bouclier:Bouclier,directions:List[crt.Direction]):
+    def __init__(self,temps_restant:float,bouclier:Bouclier,directions:list[crt.Direction]):
         ProtectionCase.__init__(self)
         TimeLimited.__init__(self,temps_restant)
         self.bouclier = bouclier #Techniquement c'est le bouclier qui intercepte.

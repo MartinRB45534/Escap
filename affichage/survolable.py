@@ -3,7 +3,7 @@ Ce module contient la classe Survolable, qui est un élément qui réagit au sur
 """
 
 from __future__ import annotations
-from typing import Tuple, Literal
+from typing import Literal
 from .affichable import Affichable
 
 class Survolable(Affichable):
@@ -12,7 +12,7 @@ class Survolable(Affichable):
         super().__init__()
         self.marque_survol = False #Est-ce que la souris est dessus ?
 
-    def survol(self,position:Tuple[int,int]) -> Survolable|Literal[False]:
+    def survol(self,position:tuple[int,int]) -> Survolable|Literal[False]:
         """Renvoie l'élément survolé, ou False sinon (récursif pour d'autres éléments)."""
         if self.touche(position):
             self.marque_survol = True

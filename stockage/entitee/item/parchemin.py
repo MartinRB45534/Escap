@@ -108,9 +108,9 @@ class ParcheminVierge(Entitee):
 
 class ParcheminViergeNivele(EntiteeNivele):
     """Les informations d'un parchemin vierge."""
-    def __init__(self, nom: str, latence_impregne: list[float], taux_cout_caste: list[float],
-                 taux_cout_impregne: list[float], taux_latence_caste: list[float],
-                 taux_latence_impregne: list[float]):
+    def __init__(self, nom: str, latence_impregne:list[float], taux_cout_caste:list[float],
+                 taux_cout_impregne:list[float], taux_latence_caste:list[float],
+                 taux_latence_impregne:list[float]):
         EntiteeNivele.__init__(self, nom)
         self.latence_impregne = latence_impregne
         self.taux_cout_caste = taux_cout_caste

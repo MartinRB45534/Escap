@@ -1,7 +1,7 @@
 """L'affichage principal de l'éditeur."""
 
 from __future__ import annotations
-from typing import Optional, TYPE_CHECKING, List
+from typing import Optional, TYPE_CHECKING
 
 # Imports des classes parentes
 from .wrapper_noeud import WrapperNoeud
@@ -25,8 +25,8 @@ class Onglets(WrapperNoeud):
     def __init__(self,direction: DirectionAff = DirectionAff.UP):
         WrapperNoeud.__init__(self)
         self.onglet = WrapperMarge((0, 0, 0, 0))
-        self.onglets: List[Onglet] = []
-        self.boutons: List[Bouton] = []
+        self.onglets: list[Onglet] = []
+        self.boutons: list[Bouton] = []
         self.contenu = WrapperMarge()
         self.set_direction(direction)
 
@@ -104,7 +104,7 @@ class Onglets(WrapperNoeud):
         if self.tailles != (0,0):
             self.set_tailles(self.tailles)
 
-    def set_onglets(self, onglets: List[Onglet]):
+    def set_onglets(self, onglets: list[Onglet]):
         """Définit les onglets."""
         self.onglets = onglets
         self.boutons = [Bouton(SKIN_SHADE, onglet.nom) for onglet in onglets]

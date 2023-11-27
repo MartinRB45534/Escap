@@ -3,7 +3,7 @@ Les divers types de murs.
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Type, Callable
+from typing import TYPE_CHECKING,  Callable
 import affichage as af
 import carte as crt
 
@@ -135,7 +135,7 @@ class Teleporteur(MurOuvert): # Presque comme un mur ouvert, mais pas tout à fa
 
 class MurAsymetrique(Mur): # Hérite vraiment ?
     """Un mur pas symétrique."""
-    def __init__(self,niveau:int,autre_mur:MurAsymetrique|Type[MurAsymetrique],mur:Mur):
+    def __init__(self,niveau:int,autre_mur:MurAsymetrique|type[MurAsymetrique],mur:Mur):
         Mur.__init__(self,niveau)
         self.mur = mur
         if isinstance(autre_mur,MurAsymetrique):
@@ -159,7 +159,7 @@ class MurAsymetrique(Mur): # Hérite vraiment ?
 
 class PorteALoquet(MurAsymetrique, Porte):
     """Une porte qui peut s'ouvrir sans clé de l'autre côté"""
-    def __init__(self, niveau: int, autre_mur: PorteALoquet | Type[PorteALoquet], mur: Porte, loquet: bool = False):
+    def __init__(self, niveau: int, autre_mur: PorteALoquet | type[PorteALoquet], mur: Porte, loquet: bool = False):
         self.mur = mur
         if isinstance(autre_mur,PorteALoquet):
             self.autre_mur = autre_mur
@@ -186,7 +186,7 @@ class PorteALoquet(MurAsymetrique, Porte):
 
 class Escalier(MurAsymetrique, MurOuvert):
     """Un téléporteur avec une notion graphique de haut et de bas"""
-    def __init__(self, niveau: int, autre_mur: Escalier | Type[Escalier], mur: MurOuvert, direction: af.DirectionAff = af.DirectionAff.NEXT):
+    def __init__(self, niveau: int, autre_mur: Escalier | type[Escalier], mur: MurOuvert, direction: af.DirectionAff = af.DirectionAff.NEXT):
         self.mur = mur
         if isinstance(autre_mur,Escalier):
             self.autre_mur = autre_mur
