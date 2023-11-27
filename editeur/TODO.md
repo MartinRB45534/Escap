@@ -1,0 +1,16 @@
+Ajouter les saisies (créations) de :
+- Espèces (fait)
+- Effets
+- Items
+    - Parchemins (fait)
+    - Potions
+    - Clés
+    - Projectiles
+    - Armes
+    - Boucliers
+    - Anneau
+    - Armures
+    - Heaumes
+- Skills
+- Classes
+- Agissants

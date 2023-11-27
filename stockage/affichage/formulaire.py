@@ -464,14 +464,13 @@ StockageCat = TypeVar("StockageCat", bound=StockageCategorie)
 
 class FormulaireCategorie(af.WrapperNoeud, af.NoeudVertical):
     """Un formulaire pour les catégories. Donne accès aux formulaires des éléments."""
-    def __init__(self, stockage: StockageCategorie, description: str,
-                 acceptor: Callable[[str], bool], avertissement:str,
+    def __init__(self, stockage: StockageCategorie,
                  ajouter: Callable[[StockageUnique|StockageNivele], None]):
         af.WrapperNoeud.__init__(self)
         af.NoeudVertical.__init__(self)
         self.stockage = stockage
 
-        self.texte = af.Pave(description)
+        self.texte = af.Pave(stockage.description)
 
         self.element = af.MenuDeroulant(af.Texte("Choisissez un type"))
         self.element.set_contenu_liste(
@@ -493,10 +492,10 @@ class FormulaireCategorie(af.WrapperNoeud, af.NoeudVertical):
         self.formulaire:Optional[FormulaireUnique|FormulaireNivele] = None
 
         self.formulaires:dict[str, FormulaireUnique|Tuple[FormulaireUnique, FormulaireNivele]] = {
-            nom: (FormulaireUnique(stockage_[0], acceptor, avertissement, ajouter),
-                  FormulaireNivele(stockage_[1], acceptor, avertissement, ajouter))
+            nom: (FormulaireUnique(stockage_[0], stockage.acceptor, stockage.avertissement, ajouter),
+                  FormulaireNivele(stockage_[1], stockage.acceptor, stockage.avertissement, ajouter))
             if isinstance(stockage_, tuple)
-            else FormulaireUnique(stockage_, acceptor, avertissement, ajouter)
+            else FormulaireUnique(stockage_, stockage.acceptor, stockage.avertissement, ajouter)
             for nom, stockage_ in stockage.elements.items()
         }
 

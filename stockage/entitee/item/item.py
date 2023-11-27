@@ -7,7 +7,6 @@ from typing import Optional
 from json import loads as parse
 
 import modele as mdl
-import carte as crt
 
 from ...stockage import Stockage, StockageGlobal
 from .parchemin import Parchemins
@@ -21,15 +20,13 @@ class Items(Stockage):
     def check(self) -> bool:
         return all([item.check() for item in [self.parchemin]])
     
-    def all_noms(self) -> list[str]:
+    def all_noms(self) -> set[str]:
         """Retourne les noms de tous les items."""
-        return [nom for nom in self.parchemin.parchemins.keys()]
+        return {nom for nom in self.parchemin.contenu.keys()}
 
     def stringify(self) -> str:
         return f"""{{
-    "Parchemins": [
-        {self.parchemin.stringify()}
-    ]
+    {self.parchemin.stringify()}
 }}"""
 
     @classmethod
@@ -37,14 +34,15 @@ class Items(Stockage):
         """Retourne l'objet correspondant au JSON."""
         dictionnaire = parse(json)
         item = Items()
-        item.parchemin = Parchemins.parse(dictionnaire["parchemins"][0])
+        item.parchemin = Parchemins.parse(dictionnaire["parchemins"])
         return item
 
-    def make(self, nom: str, labyrinthe: mdl.Labyrinthe, position: crt.Position,
-             niveau:Optional[int]=None) -> mdl.Item:
+    def make(self, nom:str, niveau:Optional[int]=None) -> mdl.Item:
         """Retourne l'item correspondant."""
-        if nom in self.parchemin.parchemins:
-            return self.parchemin.make(nom, labyrinthe, position, niveau)
+        if nom in self.parchemin.contenu:
+            item = self.parchemin.make(nom, niveau)
+            assert isinstance(item, mdl.Item)
+            return item
         else:
             raise ValueError(f"L'item {nom} n'existe pas.")
 

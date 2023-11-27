@@ -5,7 +5,7 @@ from __future__ import annotations
 import affichage as af
 import stockage as stck
 
-from .parchemins import OngletParchemins
+from .onglet_categorie import OngletCategorie
 
 class OngletItems(af.Onglet):
     """L'onglet de création d'items."""
@@ -14,5 +14,5 @@ class OngletItems(af.Onglet):
         af.Onglet.__init__(self, "Items", self.onglets)
         self.stockage = stockage
         self.onglets.set_onglets([
-            OngletParchemins(self.stockage),
+            OngletCategorie(self.stockage.items.parchemin),
         ])

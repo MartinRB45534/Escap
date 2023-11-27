@@ -12,37 +12,11 @@ from .stockage import StockageCategorie, StockageGlobal, StockageUnique, Stockag
 
 class Especes(StockageCategorie):
     """Les informations des espèces."""
-    def __init__(self):
-        StockageCategorie.__init__(self, "Especes")
-        self.especes:dict[str, Espece] = {}
+    nom = "Especes"
+    titre_nouveau = "Nouvelle espèce"
+    description = "Chaque espèce a un nom et un nombre de doigts possiblement nul (nombre d'anneaux qu'elle peut porter). Chaque agissant a une ou plusieurs espèces (seule la première est prise en compte pour les doigts). Certains éléments du jeu interagissent avec les espèces."
+    avertissement = "Il existe déjà une espèce avec ce nom !"
 
-    def check(self) -> bool:
-        return all([espece.check() for espece in self.especes.values()])
-    
-    def stringify(self) -> str:
-        return f"""{{
-    "Especes": [
-        {", ".join([espece.stringify() for espece in self.especes.values()])}
-    ]
-}}"""
-    
-    @classmethod
-    def parse(cls, json: str) -> Especes:
-        dictionnaire = parse(json)
-        especes = Especes()
-        especes.especes = {
-            espece["nom"]: Espece.parse(espece)
-            for espece in dictionnaire["especes"]
-        }
-        return especes
-    
-    def make(self, nom:str) -> mdl.Espece:
-        """Retourne l'espèce correspondante."""
-        if nom in self.especes:
-            return self.especes[nom].make()
-        else:
-            raise ValueError(f"L'espèce {nom} n'existe pas.")
-        
     @classmethod
     @property
     def elements(cls) -> dict[str, Type[StockageUnique]|Tuple[Type[StockageUnique], Type[StockageNivele]]]:

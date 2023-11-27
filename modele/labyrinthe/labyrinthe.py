@@ -170,3 +170,6 @@ class Labyrinthe(crt.Labyrinthe):
             portee = int(portee) + 1
         # On calcule les positions à portée
         return self.extrait(nx.ego_graph(graphe,position,int(portee), distance="poids" if obscurite else None).nodes) # type: ignore
+
+NOWHERE = Labyrinthe()
+"""Le labyrinthe vide."""
