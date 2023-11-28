@@ -4,7 +4,7 @@ Ajouter les saisies (créations) de :
 - Items
     - Parchemins (fait)
     - Potions
-    - Clés
+    - Clés (revenir plus tard)
     - Projectiles
     - Armes
     - Boucliers

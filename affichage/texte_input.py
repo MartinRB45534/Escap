@@ -81,6 +81,10 @@ class TexteInput(Cliquable):
     def accepte(self):
         """Renvoie si la valeur saisie est acceptée."""
         return self.valeur and self.acceptor(self.valeur)
+    
+    def accepte_autre(self, valeur: str):
+        """Renvoie si la valeur saisie est acceptée."""
+        return valeur and self.acceptor(valeur)
 
 class IntInput(TexteInput):
     """Un élément qui permet de saisir un entier."""

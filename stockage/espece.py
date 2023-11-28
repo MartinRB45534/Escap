@@ -41,9 +41,9 @@ class Espece(StockageUnique):
 }}"""
 
     @classmethod
-    def parse(cls, json: str) -> Espece:
+    def parse(cls, json: str):
         dictionnaire = parse(json)
-        return Espece(dictionnaire["nom"], dictionnaire["nb_doigts"])
+        return cls(dictionnaire["nom"], dictionnaire["nb_doigts"])
 
     @classmethod
     @property

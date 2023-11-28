@@ -19,7 +19,7 @@ class MenuDeroulant(Placeheldholder):
     def __init__(self, contenu: Texte):
         Placeheldholder.__init__(self)
         self.liste = ListeMargeVerticale(2, True)
-        self.liste.fond = (200, 200, 200)
+        self.liste.fond = (200, 200, 200, 200)
         self.contenu = contenu
         self.courant = contenu
 
@@ -110,6 +110,10 @@ ne devrait avoir que des TexteMenuDeroulant en courant"""
         """Affiche la liste du menu déroulant."""
         self.liste.position = (self.liste.position[0] + marge[0], self.liste.position[1] + marge[1])
         self.liste.affiche(screen, frame, frame_par_tour)
+
+    def scroll(self, position: tuple[int, int], x: int, y: int):
+        """Scroll la liste du menu déroulant."""
+        return self.liste.scroll(position, x, y)
 
 class TexteMenuDeroulant(Placeholder, Texte):
     """Un item d'un menu déroulant"""

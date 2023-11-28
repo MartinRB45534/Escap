@@ -20,6 +20,7 @@ class Entitee:
         self.position:crt.Position = position
         self._priorite:float = 0
         self.effets:list[Effet] = []
+        self.nom:str = "entitee non nommée"
         if id_ is None:
             # Dans les cas d'héritage multiple, on peut déjà avoir exécuté cet __init__
             # On vérifie donc si on a déjà un ID

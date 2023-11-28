@@ -35,7 +35,7 @@ class StockageUnique(Stockage):
     """Stocke un élément, pas une catégorie d'éléments."""
     @classmethod
     @property
-    def champs(cls) -> dict[str, type[int|str|float]]:
+    def champs(cls) -> dict[str, type[int|str|float|bool|mdl.Element]]:
         """Retourne les champs de l'objet."""
         raise NotImplementedError
 
@@ -59,7 +59,7 @@ class StockageNivele(Stockage):
     """Stocke un élément avec un niveau."""
     @classmethod
     @property
-    def champs(cls) -> dict[str, type[int|str|float]]:
+    def champs(cls) -> dict[str, type[int|str|float|bool|mdl.Element]]:
         """Retourne les champs de l'objet."""
         raise NotImplementedError
 
@@ -169,7 +169,7 @@ class StockageGlobal(Stockage):
 }}"""
 
     @classmethod
-    def parse(cls, json: str) -> StockageGlobal:
+    def parse(cls, json: str) -> Self:
         """Retourne l'objet correspondant au JSON."""
         raise NotImplementedError
 

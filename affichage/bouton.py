@@ -103,3 +103,48 @@ class BoutonPlaceholder(Placeholder, Bouton):
     def __init__(self, placeheldholder:Placeheldholder, placeheld:Optional[Cliquable], skin:Skin, texte:str, fond:tuple[int,int,int]=(255,255,255), fond_marque_survol:tuple[int,int,int]=(200,200,200), fond_marque_actif:Optional[tuple[int,int,int]]=None, fond_marque_courant:Optional[tuple[int,int,int]]=None, fond_est_courant:Optional[tuple[int,int,int]]=None, fond_actif:Optional[tuple[int,int,int]]=None):
         Placeholder.__init__(self, placeheldholder, placeheld)
         Bouton.__init__(self, skin, texte, fond, fond_marque_survol, fond_marque_actif, fond_marque_courant, fond_est_courant, fond_actif)
+
+class BoutonOnOff(Bouton):
+    """Un bouton qui a deux états, et qui change d'état à chaque clic"""
+    def __init__(self, skin_on:Skin, skin_off:Skin, texte_on:str, texte_off:str, fond:tuple[int,int,int]=(255,255,255), fond_marque_survol:tuple[int,int,int]=(200,200,200), fond_marque_actif:Optional[tuple[int,int,int]]=None, fond_marque_courant:Optional[tuple[int,int,int]]=None, fond_est_courant:Optional[tuple[int,int,int]]=None, fond_actif:Optional[tuple[int,int,int]]=None):
+        self.skin_on = skin_on
+        self.skin_off = skin_off
+        self.texte_on = texte_on
+        self.texte_off = texte_off
+        self.on = False
+        self.accepte = True # Pour coller avec les inputs
+        Bouton.__init__(self, skin_off, texte_off, fond, fond_marque_survol, fond_marque_actif, fond_marque_courant, fond_est_courant, fond_actif)
+
+    def set_actif(self):
+        if self.actif:
+            self.on = not self.on
+            if self.on:
+                self.skin = self.skin_on
+                self.texte = self.texte_on
+            else:
+                self.skin = self.skin_off
+                self.texte = self.texte_off
+            self.init()
+        else:
+            Bouton.set_actif(self)
+
+    @property
+    def valeur(self):
+        """Renvoie la valeur du bouton, comme pour les inputs"""
+        return str(self.on)
+
+    @valeur.setter
+    def valeur(self, valeur:str):
+        """Change la valeur du bouton, comme pour les inputs"""
+        self.on = valeur == "True"
+        if self.on:
+            self.skin = self.skin_on
+            self.texte = self.texte_on
+        else:
+            self.skin = self.skin_off
+            self.texte = self.texte_off
+        self.init()
+
+    def accepte_autre(self, valeur: str):
+        """Renvoie si la valeur saisie est acceptée."""
+        return valeur in ("True","False")

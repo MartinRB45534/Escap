@@ -31,10 +31,11 @@ class Parchemins(StockageCategorie):
 
 class ParcheminVierge(Entitee):
     """Les informations d'un parchemin vierge."""
-    def __init__(self, nom: str, latence_impregne:float,
+    def __init__(self, nom: str, fantome: bool, latence_impregne:float,
                  taux_cout_caste: float, taux_cout_impregne: float,
                  taux_latence_caste: float, taux_latence_impregne: float):
         Entitee.__init__(self, nom)
+        self.fantome = fantome
         self.latence_impregne = latence_impregne
         self.taux_cout_caste = taux_cout_caste
         self.taux_cout_impregne = taux_cout_impregne
@@ -53,6 +54,7 @@ class ParcheminVierge(Entitee):
     "type": "parchemin vierge",
     "nivele": false,
     "nom": "{self.nom}",
+    "fantome": {self.fantome},
     "latence_impregne": {self.latence_impregne},
     "taux_cout_caste": {self.taux_cout_caste},
     "taux_cout_impregne": {self.taux_cout_impregne},
@@ -61,14 +63,15 @@ class ParcheminVierge(Entitee):
 }}"""
 
     @classmethod
-    def parse(cls, json: str) -> ParcheminVierge:
+    def parse(cls, json: str):
         dictionnaire = parse(json)
-        return ParcheminVierge(dictionnaire["nom"], dictionnaire["latence_impregne"], dictionnaire["taux_cout_caste"], dictionnaire["taux_cout_impregne"], dictionnaire["taux_latence_caste"], dictionnaire["taux_latence_impregne"])
+        return cls(dictionnaire["nom"], dictionnaire["fantome"], dictionnaire["latence_impregne"], dictionnaire["taux_cout_caste"], dictionnaire["taux_cout_impregne"], dictionnaire["taux_latence_caste"], dictionnaire["taux_latence_impregne"])
 
     @classmethod
     @property
-    def champs(cls) -> dict[str, type[int|str|float]]:
+    def champs(cls) -> dict[str, type[int|str|float|bool|mdl.Element]]:
         return {
+            "fantome": bool,
             "latence_impregne": float,
             "taux_cout_caste": float,
             "taux_cout_impregne": float,
@@ -80,6 +83,7 @@ class ParcheminVierge(Entitee):
     @property
     def acceptors(cls) -> dict[str, Callable[[str], bool]]:
         return {
+            "fantome": lambda _: True,
             "latence_impregne": lambda latence: float(latence) >= 0,
             "taux_cout_caste": lambda taux: float(taux) >= 0,
             "taux_cout_impregne": lambda taux: float(taux) >= 0,
@@ -91,6 +95,7 @@ class ParcheminVierge(Entitee):
     @property
     def avertissements(cls) -> dict[str, str]:
         return {
+            "fantome": "Please file a bug report.",
             "latence_impregne": "La latence d'impregnation doit être positive.",
             "taux_cout_caste": "Le taux de cout de caste doit être positif.",
             "taux_cout_impregne": "Le taux de cout d'impregnation doit être positif.",
@@ -104,14 +109,17 @@ class ParcheminVierge(Entitee):
                              self.taux_cout_impregne, self.taux_cout_caste,
                              self.taux_latence_impregne, self.taux_latence_caste)
         parchemin = mdl.ParcheminVierge(mdl.NOWHERE, effet)
+        parchemin.nom = self.nom
+        parchemin.fantome = self.fantome
         return parchemin
 
 class ParcheminViergeNivele(EntiteeNivele):
     """Les informations d'un parchemin vierge."""
-    def __init__(self, nom: str, latence_impregne:list[float], taux_cout_caste:list[float],
-                 taux_cout_impregne:list[float], taux_latence_caste:list[float],
-                 taux_latence_impregne:list[float]):
+    def __init__(self, nom: str, fantome: bool, latence_impregne:list[float],
+                 taux_cout_caste:list[float], taux_cout_impregne:list[float],
+                 taux_latence_caste:list[float], taux_latence_impregne:list[float]):
         EntiteeNivele.__init__(self, nom)
+        self.fantome = fantome
         self.latence_impregne = latence_impregne
         self.taux_cout_caste = taux_cout_caste
         self.taux_cout_impregne = taux_cout_impregne
@@ -134,6 +142,8 @@ class ParcheminViergeNivele(EntiteeNivele):
         return f"""{{
     "type": "parchemin vierge",
     "nivele": true,
+    "nom": "{self.nom}",
+    "fantome": {self.fantome},
     "latence_impregne": {self.latence_impregne},
     "taux_cout_caste": {self.taux_cout_caste},
     "taux_cout_impregne": {self.taux_cout_impregne},
@@ -142,14 +152,15 @@ class ParcheminViergeNivele(EntiteeNivele):
 }}"""
 
     @classmethod
-    def parse(cls, json: str) -> ParcheminViergeNivele:
+    def parse(cls, json: str):
         dictionnaire = parse(json)
-        return ParcheminViergeNivele(dictionnaire["nom"],  dictionnaire["latence_impregne"], dictionnaire["taux_cout_caste"], dictionnaire["taux_cout_impregne"], dictionnaire["taux_latence_caste"], dictionnaire["taux_latence_impregne"])
+        return cls(dictionnaire["nom"], dictionnaire["fantome"], dictionnaire["latence_impregne"], dictionnaire["taux_cout_caste"], dictionnaire["taux_cout_impregne"], dictionnaire["taux_latence_caste"], dictionnaire["taux_latence_impregne"])
 
     @classmethod
     @property
-    def champs(cls) -> dict[str, type[int|str|float]]:
+    def champs(cls) -> dict[str, type[int|str|float|bool|mdl.Element]]:
         return {
+            "fantome": bool,
             "latence_impregne": float,
             "taux_cout_caste": float,
             "taux_cout_impregne": float,
@@ -161,6 +172,7 @@ class ParcheminViergeNivele(EntiteeNivele):
     @property
     def acceptors(cls) -> dict[str, Callable[[str], bool]]:
         return {
+            "fantome": lambda _: True,
             "latence_impregne": lambda latence: float(latence) >= 0,
             "taux_cout_caste": lambda taux: float(taux) >= 0,
             "taux_cout_impregne": lambda taux: float(taux) >= 0,
@@ -172,6 +184,7 @@ class ParcheminViergeNivele(EntiteeNivele):
     @property
     def avertissements(cls) -> dict[str, str]:
         return {
+            "fantome": "Please file a bug report.",
             "latence_impregne": "La latence d'impregnation doit être positive.",
             "taux_cout_caste": "Le taux de cout de caste doit être positif.",
             "taux_cout_impregne": "Le taux de cout d'impregnation doit être positif.",
@@ -185,5 +198,7 @@ class ParcheminViergeNivele(EntiteeNivele):
                              self.taux_cout_impregne[niveau], self.taux_cout_caste[niveau],
                              self.taux_latence_impregne[niveau], self.taux_latence_caste[niveau])
         parchemin = mdl.ParcheminVierge(mdl.NOWHERE, effet)
+        parchemin.nom = self.nom
+        parchemin.fantome = self.fantome
         return parchemin
         
