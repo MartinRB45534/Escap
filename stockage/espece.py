@@ -8,7 +8,7 @@ from json import loads as parse
 
 import modele as mdl
 
-from .stockage import StockageCategorie, StockageGlobal, StockageUnique, StockageNivele
+from .stockage import StockageCategorie, StockageUnique, StockageNivele
 
 class Especes(StockageCategorie):
     """Les informations des espèces."""
@@ -71,5 +71,3 @@ class Espece(StockageUnique):
         if self.espece is None:
             self.espece = mdl.Espece(self.nom, self.nb_doigts)
         return self.espece # Il faut que ce soit le même objet à chaque fois
-
-StockageGlobal.global_.especes = Especes()

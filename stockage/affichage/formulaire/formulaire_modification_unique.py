@@ -10,16 +10,15 @@ from .formulaire_unique import FormulaireUnique, StockageUn
 
 class FormulaireModificationUnique(FormulaireUnique, af.NoeudVertical):
     """Un formulaire, avec des champs à remplir pour modifier un objet."""
-    def __init__(self, stockage: type[StockageUn], acceptor: Callable[[str], bool],
-                 avertissement:str, modifier: Callable[[StockageUn], None],
+    def __init__(self, stockage: type[StockageUn], modifier: Callable[[StockageUn], None],
                  objet:StockageUn, supprimer: Callable[[StockageUn], None]):
         af.NoeudVertical.__init__(self)
-        FormulaireUnique.__init__(self, stockage,
-                                  lambda nom: acceptor(nom) or nom == objet.nom,
-                                  avertissement, modifier)
+        FormulaireUnique.__init__(self, stockage, modifier)
 
         self.objet = objet
         self.inputs["nom"].valeur = objet.nom
+        self.nom = objet.nom
+
         for key in stockage.champs:
             # Est-ce que c'est pire que d'utiliset la jsonification ?
             self.inputs[key].valeur = str(getattr(objet, key))

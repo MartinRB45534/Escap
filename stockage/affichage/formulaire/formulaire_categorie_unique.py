@@ -24,7 +24,7 @@ class FormulaireCategorieUnique(af.WrapperNoeud,af.NoeudVertical):
 
         self.texte = af.Pave(stockage.description)
 
-        self.formulaire:FormulaireUnique = FormulaireUnique(element, stockage.acceptor, stockage.avertissement, ajouter)
+        self.formulaire:FormulaireUnique = FormulaireUnique(element, ajouter)
 
         self.liste = af.ListeMargeVerticale(shrink=True)
         self.liste.set_contenu([self.texte, self.formulaire])

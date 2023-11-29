@@ -17,27 +17,23 @@ class OngletCategorie(af.Onglet):
         """Crée les onglets."""
         ajout = stck.FormulaireCategorie(
                     self.stockage,
-                    self.ajouter # type: ignore # Pylint can see it but Pylance can't
+                    self.ajouter
                 ) if len(self.stockage.elements) > 1 else stck.FormulaireCategorieNivele(
                     self.stockage,
-                    self.ajouter # type: ignore # Pylint can see it but Pylance can't
+                    self.ajouter
                 ) if isinstance(list(self.stockage.elements.values())[0],
                 tuple) else stck.FormulaireCategorieUnique(
                     self.stockage,
-                    self.ajouter # type: ignore # Pylint can see it but Pylance can't
+                    self.ajouter
                 )
         onglets = [af.Onglet(self.stockage.titre_nouveau, ajout)]
         onglets.extend(af.Onglet(nom, stck.FormulaireModificationUnique(
             type(element),
-            lambda nom_: not nom_ in stck.StockageGlobal.global_.items.all_noms(),
-            "Il existe déjà un item avec ce nom !",
             self.ajouter,
             element,
             self.supprimer
         ) if isinstance(element, stck.StockageUnique) else stck.FormulaireModificationNivele(
             type(element),
-            lambda nom_: not nom_ in stck.StockageGlobal.global_.items.all_noms(),
-            "Il existe déjà un item avec ce nom !",
             self.ajouter,
             element,
             self.supprimer

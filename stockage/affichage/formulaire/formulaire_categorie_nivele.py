@@ -38,8 +38,8 @@ class FormulaireCategorieNivele(af.WrapperNoeud, af.NoeudVertical):
         self.formulaire:Optional[FormulaireUnique|FormulaireNivele] = None
 
         self.formulaires:tuple[FormulaireUnique, FormulaireNivele] = (
-            FormulaireUnique(element[0], stockage.acceptor, stockage.avertissement, ajouter),
-            FormulaireNivele(element[1], stockage.acceptor, stockage.avertissement, ajouter))
+            FormulaireUnique(element[0], ajouter),
+            FormulaireNivele(element[1], ajouter))
 
         self.liste = af.ListeMargeVerticale(shrink=True)
         self.liste.set_contenu(

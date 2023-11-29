@@ -3,15 +3,10 @@ Classes mères des classes de stockage.
 """
 
 from __future__ import annotations
-from typing import Self, Optional,  Callable, TYPE_CHECKING
+from typing import Self, Optional,  Callable
 from json import loads as parse
 
 import modele as mdl
-
-# Imports utilisés uniquement dans les annotations
-if TYPE_CHECKING:
-    from .entitee import Items
-    from .espece import Especes
 
 class Stockage:
     """Classe mère des classes de stockage."""
@@ -100,7 +95,7 @@ class StockageCategorie(Stockage):
     @property
     def all_noms(self) -> set[str]:
         """Retourne tous les noms des éléments."""
-        return set(self.contenu.keys()) # À surdéfinir pour les items
+        return set(self.contenu.keys())
 
     def stringify(self) -> str:
         return f"""{{"{self.nom}" : [
@@ -149,38 +144,67 @@ class StockageCategorie(Stockage):
         type[StockageUnique]|tuple[type[StockageUnique], type[StockageNivele]]]:
         """Retourne les éléments de la catégorie."""
         raise NotImplementedError
+    
+    def warn_nom(self, nom:str) -> str:
+        """Précise qui a déjà ce nom."""
+        for contenu in self.contenu:
+            if contenu == nom:
+                return self.avertissement
+        return ""
 
-class StockageGlobal(Stockage):
-    """Le stockage global, qui devrait tout contenir."""
-    global_:Self
+class StockageSurCategorie(Stockage):
+    """Stocke une catégorie de catégories, pas un élément ni une catégorie d'éléments."""
+    nom:str
+    elements:dict[str, type[StockageCategorie]|type[StockageSurCategorie]]
 
     def __init__(self):
-        Stockage.__init__(self, "Global")
-        self.items:Items
-        self.especes:Especes
+        Stockage.__init__(self, self.nom)
+        self.contenu:dict[str, StockageCategorie|StockageSurCategorie] = {
+            nom: type_()
+            for nom, type_ in self.elements.items()
+        }
 
     def check(self) -> bool:
-        return True
-
+        return all([contenu.check() for contenu in self.contenu.values()])
+    
+    def acceptor(self, nom: str) -> bool:
+        """Vérifie que le nom est valide."""
+        return not nom in self.all_noms
+    
+    @property
+    def all_noms(self) -> set[str]:
+        """Retourne tous les noms des catégories."""
+        return set(sum([list(contenu.all_noms) for contenu in self.contenu.values()], [])) # type: ignore
+    
     def stringify(self) -> str:
-        """Retourne le JSON de l'objet."""
-        return f"""{{
-    "Items": {self.items.stringify()}
+        return f"""{{"{self.nom}" : [
+        {", ".join([contenu.stringify() for contenu in self.contenu.values()])}
+    ]
 }}"""
-
+    
     @classmethod
     def parse(cls, json: str) -> Self:
-        """Retourne l'objet correspondant au JSON."""
-        raise NotImplementedError
+        dictionnaire = parse(json)
+        categorie = cls()
+        for element in dictionnaire[categorie.nom]:
+            for type_element in categorie.elements:
+                if element["type"] == type_element:
+                    categorie.contenu[element["nom"]] = categorie.elements[type_element].parse(element)
+                    break
+        return categorie
 
-    def make_item(self, nom: str, niveau:Optional[int]=None) -> mdl.Item:
-        """Retourne l'item correspondant."""
-        return self.items.make(nom, niveau)
+    def make(self, nom: str, niveau:Optional[int]=None) -> object:
+        """Retourne l'objet correspondant."""
+        for contenu in self.contenu.values():
+            try:
+                return contenu.make(nom, niveau)
+            except ValueError:
+                pass
+        raise ValueError(f"L'élément {nom} n'existe pas.")
     
-    def make_espece(self, nom:str) -> mdl.Espece:
-        """Retourne l'espèce correspondante."""
-        espece = self.especes.make(nom)
-        assert isinstance(espece, mdl.Espece)
-        return espece
-
-StockageGlobal.global_ = StockageGlobal()
+    def warn_nom(self, nom:str) -> str:
+        """Précise qui a déjà ce nom."""
+        warn = ""
+        for contenu in self.contenu.values():
+            warn = warn or contenu.warn_nom(nom)
+        return warn

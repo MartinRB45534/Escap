@@ -8,7 +8,7 @@ from json import loads as parse
 
 import modele as mdl
 
-from ...stockage import StockageCategorie, StockageNivele, StockageUnique, StockageGlobal
+from ...stockage import StockageCategorie, StockageNivele, StockageUnique
 from ..entitee import Entitee, EntiteeNivele
 
 class Parchemins(StockageCategorie):
@@ -16,11 +16,7 @@ class Parchemins(StockageCategorie):
     nom = "Parchemins"
     titre_nouveau = "Nouveau parchemin"
     description = "Les parchemins sont des items consommables qui s'activent avec du mana. Les parchemins vierges n'ont pas encore d'effet placé, tandis que les parchemins préécrits ont besoin d'un effet à la création."
-    avertissement = "Il existe déjà un item avec ce nom !"
-
-    @property
-    def all_noms(self) -> set[str]:
-        return StockageGlobal.global_.items.all_noms()
+    avertissement = "Il existe déjà un parchemin avec ce nom !"
 
     @classmethod
     @property

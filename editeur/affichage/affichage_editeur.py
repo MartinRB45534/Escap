@@ -9,17 +9,15 @@ from affichage.cliquable import Cliquable
 import stockage as stck
 
 # Imports utilisés dans le code
-from .items import OngletItems
-from .onglet_categorie import OngletCategorie
+from .onglet_sur_categorie import OngletSurCategorie
 
 class AffichageEditeur(af.Onglets):
     """L'affichage principal de l'éditeur."""
     def __init__(self):
         af.Onglets.__init__(self,af.DirectionAff.LEFT)
+        stck.StockageGlobal()
         self.set_onglets([
-            OngletCategorie(stck.StockageGlobal.global_.especes),
-            # OngletEffets(self.stockage),
-            OngletItems(stck.StockageGlobal.global_),
+            OngletSurCategorie(stck.StockageGlobal.global_),
         ])
         assert isinstance(self.contenu, af.WrapperMarge)
         self.contenu.marges = (5, 5, 5, 5)

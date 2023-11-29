@@ -7,6 +7,7 @@ import affichage as af
 import modele as mdl
 
 from ...stockage import StockageUnique
+from ...stockageglobal import StockageGlobal
 from ..menu_element import MenuElement
 
 # Le stockage hérite de StockageUnique
@@ -14,22 +15,23 @@ StockageUn = TypeVar("StockageUn", bound=StockageUnique)
 
 class FormulaireUnique(af.WrapperNoeud):
     """Un formulaire, avec des champs à remplir pour créer un objet."""
-    def __init__(self, stockage: type[StockageUn], acceptor: Callable[[str], bool],
-                 avertissement:str, ajouter: Callable[[StockageUn], None]):
+    def __init__(self, stockage: type[StockageUn], ajouter: Callable[[StockageUn], None]):
         af.WrapperNoeud.__init__(self)
         self.stockage = stockage
+
+        self.nom = ""
 
         self.textes:dict[str, af.Texte] = {
             "nom": af.Texte("Nom :"),
         }
         self.inputs:dict[str, af.TexteInput|af.BoutonOnOff|MenuElement] = {
-            "nom": af.TexteInput(acceptor=acceptor),
+            "nom": af.TexteInput(acceptor=lambda nom: nom == self.nom or StockageGlobal.global_.valide_nom(nom)),
         }
         self.avertissements:dict[str, af.TexteCache] = {
             "nom": af.TexteCache(""),
         }
         self.textes_avertissements:dict[str, str] = {
-            "nom": avertissement,
+            "nom": "Le nom doit être unique.",
         }
 
         for key in stockage.champs:
@@ -77,7 +79,13 @@ class FormulaireUnique(af.WrapperNoeud):
             if input_.accepte:
                 self.avertissements[key].set_texte("")
             else:
-                self.avertissements[key].set_texte(self.textes_avertissements[key])
+                if key == "nom":
+                    if input_.valeur:
+                        self.avertissements[key].set_texte(StockageGlobal.global_.warn_nom(input_.valeur))
+                    else:
+                        self.avertissements[key].set_texte("Le nom ne peut pas être vide.")
+                else:
+                    self.avertissements[key].set_texte(self.textes_avertissements[key])
         self.set_tailles(self.tailles)
 
     def update(self):

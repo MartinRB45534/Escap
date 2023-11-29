@@ -12,3 +12,4 @@ from .affichage import *
 from .entitee import *
 from .espece import *
 from .stockage import *
+from .stockageglobal import *

@@ -27,13 +27,13 @@ class MenuElement(af.MenuDeroulant):
     @property
     def valeur(self):
         """Renvoie l'élément sélectionné."""
-        return mdl.Element[self.courant.get_texte()].value
+        return self.courant.get_texte()
 
     @valeur.setter
     def valeur(self, valeur: str):
         """Change l'élément sélectionné."""
         if valeur in mdl.Element:
-            texte = self.liste.contenu[list(mdl.Element).index(mdl.Element[valeur])*2]
+            texte = self.liste.contenu[list(mdl.Element).index(mdl.Element(valeur))*2]
             assert isinstance(texte, af.TexteMenuDeroulant)
             texte.set_actif()
         else:

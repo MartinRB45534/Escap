@@ -7,23 +7,25 @@ import affichage as af
 import modele as mdl
 
 from ...stockage import StockageNivele
+from ...stockageglobal import StockageGlobal
 from ..menu_element import MenuElement
 
 StockageNi = TypeVar("StockageNi", bound=StockageNivele)
 
 class FormulaireNivele(af.WrapperNoeud):
     """Un formulaire, avec des champs à remplir pour créer un objet."""
-    def __init__(self, stockage: type[StockageNi], acceptor: Callable[[str], bool],
-                 avertissement:str, ajouter: Callable[[StockageNi], None]):
+    def __init__(self, stockage: type[StockageNi], ajouter: Callable[[StockageNi], None]):
         af.WrapperNoeud.__init__(self)
         self.stockage = stockage
+
+        self.nom = ""
 
         self.textes:dict[str, af.Texte] = {
             "nom": af.Texte("Nom :"),
             "niveau": af.Texte("Niveau :"),
         }
         self.inputs:dict[str, af.TexteInput|af.BoutonOnOff|MenuElement] = {
-            "nom": af.TexteInput(acceptor=acceptor),
+            "nom": af.TexteInput(acceptor=lambda nom: nom == self.nom or StockageGlobal.global_.valide_nom(nom)),
             "niveau": af.IntInput(texte="1",acceptor=lambda niveau: 1 <= int(niveau) <= 10),
         }
         self.avertissements:dict[str, af.TexteCache] = {
@@ -31,7 +33,7 @@ class FormulaireNivele(af.WrapperNoeud):
             "niveau": af.TexteCache(""),
         }
         self.textes_avertissements:dict[str, str] = {
-            "nom": avertissement,
+            "nom": "Le nom doit être unique.",
             "niveau": "Les niveaux vont de 1 à 10.",
         }
 
@@ -90,7 +92,13 @@ class FormulaireNivele(af.WrapperNoeud):
                     if self.inputs[key].accepte:
                         self.avertissements[key].set_texte("")
                     else:
-                        self.avertissements[key].set_texte(self.textes_avertissements[key])
+                        if key == "nom":
+                            if self.inputs[key].valeur:
+                                self.avertissements[key].set_texte(StockageGlobal.global_.warn_nom(self.inputs[key].valeur))
+                            else:
+                                self.avertissements[key].set_texte("Le nom ne peut pas être vide.")
+                        else:
+                            self.avertissements[key].set_texte(self.textes_avertissements[key])
                 elif not self.inputs[key].accepte_autre(valeurs[niveau]):
                     niveaux_problematiques.add(niveau+1)
         # On met à jour les avertissements

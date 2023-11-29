@@ -10,16 +10,15 @@ from .formulaire_nivele import FormulaireNivele, StockageNi
 
 class FormulaireModificationNivele(FormulaireNivele, af.NoeudVertical):
     """Un formulaire, avec des champs à remplir pour modifier un objet."""
-    def __init__(self, stockage: type[StockageNi], acceptor: Callable[[str], bool],
-                 avertissement:str, modifier: Callable[[StockageNi], None],
+    def __init__(self, stockage: type[StockageNi],  modifier: Callable[[StockageNi], None],
                  objet:StockageNi, supprimer: Callable[[StockageNi], None]):
         af.NoeudVertical.__init__(self)
-        FormulaireNivele.__init__(self, stockage,
-                                  lambda nom: acceptor(nom) or nom == objet.nom,
-                                  avertissement, modifier)
+        FormulaireNivele.__init__(self, stockage, modifier)
 
         self.objet = objet
         self.inputs["nom"].valeur = objet.nom
+        self.nom = objet.nom
+
         for key in stockage.champs:
             # Est-ce que c'est pire que d'utiliser la jsonification ?
             if key in self.valeurs:

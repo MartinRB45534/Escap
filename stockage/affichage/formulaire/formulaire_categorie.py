@@ -42,10 +42,10 @@ class FormulaireCategorie(af.WrapperNoeud, af.NoeudVertical):
         self.formulaire:Optional[FormulaireUnique|FormulaireNivele] = None
 
         self.formulaires:dict[str, FormulaireUnique|tuple[FormulaireUnique, FormulaireNivele]] = {
-            nom: (FormulaireUnique(stockage_[0], stockage.acceptor, stockage.avertissement, ajouter),
-                  FormulaireNivele(stockage_[1], stockage.acceptor, stockage.avertissement, ajouter))
+            nom: (FormulaireUnique(stockage_[0], ajouter),
+                  FormulaireNivele(stockage_[1], ajouter))
             if isinstance(stockage_, tuple)
-            else FormulaireUnique(stockage_, stockage.acceptor, stockage.avertissement, ajouter)
+            else FormulaireUnique(stockage_, ajouter)
             for nom, stockage_ in stockage.elements.items()
         }
 

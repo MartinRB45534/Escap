@@ -8,28 +8,24 @@ from json import loads as parse
 
 import modele as mdl
 
-from ...stockage import StockageCategorie, StockageNivele, StockageUnique, StockageGlobal
+from ...stockage import StockageCategorie, StockageNivele, StockageUnique
 from ..entitee import Entitee, EntiteeNivele
 
 class Projectiles(StockageCategorie):
     """Les informations des projectiles."""
     nom = "Projectiles"
     titre_nouveau = "Nouveau projectile"
-    description = "Les projectiles sont des items consommables qui s'activent avec du mana. Les projectiles vierges n'ont pas encore d'effet placé, tandis que les projectiles préécrits ont besoin d'un effet à la création."
-    avertissement = "Il existe déjà un item avec ce nom !"
-
-    @property
-    def all_noms(self) -> set[str]:
-        return StockageGlobal.global_.items.all_noms()
+    description = "Les projectiles sont destinés à être lancés. Un projectile percant peut traverser un agissant s'il le tue, un projectile fragile se brise à l'impact. Les fleches sont affectées différemment par certains skills et sont toujours percantes. Les explosifs sont affectés différemment par certains skills et devraient théoriquement être fragiles. Les projectiles magiques serviront pour les sorts de création de projectiles et sont toujours evanescent (disparaissent à l'impact ou à l'arrêt), donc fragiles."
+    avertissement = "Il existe déjà un projectile avec ce nom !"
 
     @classmethod
     @property
     def elements(cls) -> dict[str, type[StockageUnique]|tuple[type[StockageUnique], type[StockageNivele]]]:
         return {
-            
+            "ProjectileSimple": (ProjectileSimple, ProjectileSimpleNivele)
         }
 
-class Projectile(Entitee):
+class ProjectileSimple(Entitee):
     """Un projectile."""
     def __init__(self, nom: str, fantome: bool,
                  percant: bool, fleche: bool, explosif: bool, fragile: bool, magique: bool,
@@ -73,9 +69,9 @@ class Projectile(Entitee):
     
     @classmethod
     def parse(cls, json: str):
-        """Parse un json en Projectile."""
+        """Parse un json en ProjectileSimple."""
         dictionnaire = parse(json)
-        return Projectile(dictionnaire["nom"], dictionnaire["fantome"], dictionnaire["percant"], dictionnaire["fleche"], dictionnaire["explosif"], dictionnaire["fragile"], dictionnaire["magique"], dictionnaire["element"], dictionnaire["poids"], dictionnaire["frottements"], dictionnaire["portee"], dictionnaire["degats"])
+        return ProjectileSimple(dictionnaire["nom"], dictionnaire["fantome"], dictionnaire["percant"], dictionnaire["fleche"], dictionnaire["explosif"], dictionnaire["fragile"], dictionnaire["magique"], dictionnaire["element"], dictionnaire["poids"], dictionnaire["frottements"], dictionnaire["portee"], dictionnaire["degats"])
     
     @classmethod
     @property
@@ -128,14 +124,14 @@ class Projectile(Entitee):
             "degats": "Les dégats doivent être positifs."
         }
 
-    def make(self) -> mdl.Projectile:
-        """Crée un Projectile à partir de l'instance."""
+    def make(self) -> mdl.ProjectileSimple:
+        """Crée un ProjectileSimple à partir de l'instance."""
         projectile = mdl.projectiles[(self.percant, self.fleche, self.explosif, self.fragile, self.magique)](mdl.NOWHERE, 0, self.poids, self.frottements, self.portee, self.degats, self.element)
         projectile.nom = self.nom
         projectile.fantome = self.fantome
         return projectile
 
-class ProjectileNivele(EntiteeNivele):
+class ProjectileSimpleNivele(EntiteeNivele):
     """Un projectile nivele."""
     def __init__(self, nom: str, fantome: bool,
                  percant: bool, fleche: bool, explosif: bool, fragile: bool, magique: bool,
@@ -179,9 +175,9 @@ class ProjectileNivele(EntiteeNivele):
     
     @classmethod
     def parse(cls, json: str):
-        """Parse un json en ProjectileNivele."""
+        """Parse un json en ProjectileSimpleNivele."""
         dictionnaire = parse(json)
-        return ProjectileNivele(dictionnaire["nom"], dictionnaire["fantome"], dictionnaire["percant"], dictionnaire["fleche"], dictionnaire["explosif"], dictionnaire["fragile"], dictionnaire["magique"], dictionnaire["element"], dictionnaire["poids"], dictionnaire["frottements"], dictionnaire["portee"], dictionnaire["degats"])
+        return ProjectileSimpleNivele(dictionnaire["nom"], dictionnaire["fantome"], dictionnaire["percant"], dictionnaire["fleche"], dictionnaire["explosif"], dictionnaire["fragile"], dictionnaire["magique"], dictionnaire["element"], dictionnaire["poids"], dictionnaire["frottements"], dictionnaire["portee"], dictionnaire["degats"])
 
     @classmethod
     @property
@@ -234,8 +230,8 @@ class ProjectileNivele(EntiteeNivele):
             "degats": "Les dégats doivent être positifs."
         }
 
-    def make(self, niveau: int) -> mdl.Projectile:
-        """Crée un ProjectileNivele à partir de l'instance."""
+    def make(self, niveau: int) -> mdl.ProjectileSimple:
+        """Crée un ProjectileSimple à partir de l'instance."""
         projectile = mdl.projectiles[(self.percant, self.fleche, self.explosif, self.fragile, self.magique)](mdl.NOWHERE, niveau, self.poids, self.frottements, self.portee, self.degats, self.element)
         projectile.nom = self.nom
         projectile.fantome = self.fantome
