@@ -20,7 +20,7 @@ class Degainable(Equippement):
 
 class Arme(Degainable):
     """La classe des équipements qui augmentent la force d'attaque."""
-    def __init__(self,labyrinthe:Labyrinthe,poids:float,frottements:float,element:Element,tranchant:float,portee:int,position:crt.Position=crt.POSITION_ABSENTE):
+    def __init__(self,labyrinthe:Labyrinthe,poids:float,frottements:float,element:Element,tranchant:float,portee:float,position:crt.Position=crt.POSITION_ABSENTE):
         Degainable.__init__(self,labyrinthe,position)
         self.poids = poids
         self.frottements = frottements

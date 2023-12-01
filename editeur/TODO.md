@@ -2,10 +2,10 @@ Ajouter les saisies (créations) de :
 - Espèces (fait)
 - Effets
 - Items
-    - Parchemins (fait)
+    - Parchemins (fait, revenir après les effets)
     - Potions
     - Clés (revenir plus tard)
-    - Projectiles
+    - Projectiles (fait, revenir pour l'éclair noir)
     - Armes
     - Boucliers
     - Anneau
