@@ -23,8 +23,8 @@ if TYPE_CHECKING:
 
 class MagieAttaqueCorpACorp(MagiesOffensives):
     """Les magies qui créent une attaque au corp à corp."""
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,portee:float,degats:float,element:Element,deplacement:Deplacement,forme:Forme,passage:Passage,latence:float,niveau:int):
-        MagiesOffensives.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau)
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,portee:float,degats:float,element:Element,deplacement:Deplacement,forme:Forme,passage:Passage,latence:float):
+        MagiesOffensives.__init__(self,skill,agissant,gain_xp,cout_pm,latence)
         self.portee = portee
         self.degats = degats
         self.element = element
@@ -39,9 +39,9 @@ class MagieAttaqueCorpACorp(MagiesOffensives):
 
 class MagieAttaqueCorpACorpDirigee(MagieDirigee,MagieAttaqueCorpACorp):
     """Les magies qui créent une attaque au corp à corp dirigée."""
-    def __init__(self,skill:Actif,agissant:Agissant,direction:Optional[crt.Direction],gain_xp:float,cout_pm:float,portee:float,degats:float,element:Element,deplacement:Deplacement,forme:Forme,passage:Passage,latence:float,niveau:int):
-        MagieDirigee.__init__(self,skill,agissant,gain_xp,cout_pm,latence,direction,niveau)
-        MagieAttaqueCorpACorp.__init__(self,skill,agissant,gain_xp,cout_pm,portee,degats,element,deplacement,forme,passage,latence,niveau)
+    def __init__(self,skill:Actif,agissant:Agissant,direction:Optional[crt.Direction],gain_xp:float,cout_pm:float,portee:float,degats:float,element:Element,deplacement:Deplacement,forme:Forme,passage:Passage,latence:float):
+        MagieDirigee.__init__(self,skill,agissant,gain_xp,cout_pm,latence,direction)
+        MagieAttaqueCorpACorp.__init__(self,skill,agissant,gain_xp,cout_pm,portee,degats,element,deplacement,forme,passage,latence)
 
     def action(self):
         if self.direction is None:

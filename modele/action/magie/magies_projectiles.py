@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 class MagieProjectileDecentre(InvocationProjectile,CibleCase,PorteeLimitee):
     """La magie qui invoque une ombre futive."""
     nom = "magie ombre furtive"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,entitee:Projectile,direction:crt.Direction,portee:float,niveau:int,cible:crt.Position=crt.POSITION_ABSENTE):
-        InvocationProjectile.__init__(self,skill,agissant,gain_xp,cout_pm,latence,entitee,direction,niveau)
-        PorteeLimitee.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau,portee)
-        CibleCase.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau,cible)
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,entitee:Projectile,direction:crt.Direction,portee:float,cible:crt.Position=crt.POSITION_ABSENTE):
+        InvocationProjectile.__init__(self,skill,agissant,gain_xp,cout_pm,latence,entitee,direction)
+        PorteeLimitee.__init__(self,skill,agissant,gain_xp,cout_pm,latence,portee)
+        CibleCase.__init__(self,skill,agissant,gain_xp,cout_pm,latence,cible)

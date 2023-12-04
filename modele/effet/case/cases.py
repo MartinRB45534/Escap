@@ -50,12 +50,12 @@ class Opacite(EffetCase):
 
 class Blizzard(TimeLimited, Ralenti): # Un long ralentissement
     """Evenement de blizzard."""
-    def __init__(self,duree:int,gain_latence:float):
+    def __init__(self,duree:float,gain_latence:float):
         TimeLimited.__init__(self,duree)
         Ralenti.__init__(self,gain_latence)
 
 class Obscurite(TimeLimited, Opacite):
     """Evenement d'obscurité."""
-    def __init__(self,duree:int,gain_opacite:float):
+    def __init__(self,duree:float,gain_opacite:float):
         TimeLimited.__init__(self,duree)
         Opacite.__init__(self,gain_opacite)

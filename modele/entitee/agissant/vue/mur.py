@@ -9,7 +9,7 @@ from ....labyrinthe import Mur, MurPlein, MurOuvert, Porte, Barriere, Teleporteu
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...entitee import Entitee
+    from ...entitee import Mobile
 
 class MurVu(crt.Mur):
     """Un mur vu par le joueur."""
@@ -42,7 +42,7 @@ class MurOuvertVu(MurVu):
 
 class BarriereVue(MurOuvertVu):
     """Une barrière qui peut s'ouvrir sous certaines conditions"""
-    def __init__(self,niveau:int,condition:Callable[[Entitee],bool]):
+    def __init__(self,niveau:int,condition:Callable[[Mobile],bool]):
         super().__init__(niveau)
         self.condition = condition
 

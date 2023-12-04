@@ -57,3 +57,13 @@ Le livre pourrait être posé sur une table, et l'ensemble serait un décors ave
 # Conclusion
 On va donner des niveaux à à peu près tout, et essayer de faire coller le lore.
 Au final tout ça n'a d'importance qu'à cause de l'observation, donc c'est peut-être sur ce skill qu'il faut se poser des questions.
+
+### C'est à dire, à peu près tout ?
+En vrai pas tant de choses que ça :
+ - les agissants ;
+ - les skills ;
+ - les items permanents ;
+ - les décors ;
+ - les cases.
+
+Tout le reste n'aura que des références (si il y a lieu) à des objets nivelés.

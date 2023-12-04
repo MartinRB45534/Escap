@@ -13,8 +13,7 @@ if TYPE_CHECKING:
 
 class Aura(EffetCase):
     """Effet qui est placé sur une case."""
-    def __init__(self, niveau: int, responsable: Agissant):
+    def __init__(self, responsable: Agissant):
         EffetCase.__init__(self)
-        self.niveau = niveau
         self.priorite = 0
         self.responsable = responsable

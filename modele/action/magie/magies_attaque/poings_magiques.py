@@ -21,9 +21,9 @@ if TYPE_CHECKING:
 
 class MagieAttaqueContact(MagieDirigee,MagiesOffensives):
     """Les magies qui créent une attaque au contact."""
-    def __init__(self,skill:Actif,agissant:Agissant,direction:Optional[crt.Direction],gain_xp:float,cout_pm:float,portee:float,degats:float,element:Element,latence:float,niveau:int):
-        MagieDirigee.__init__(self,skill,agissant,gain_xp,cout_pm,latence,direction,niveau)
-        MagiesOffensives.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau)
+    def __init__(self,skill:Actif,agissant:Agissant,direction:Optional[crt.Direction],gain_xp:float,cout_pm:float,portee:float,degats:float,element:Element,latence:float):
+        MagieDirigee.__init__(self,skill,agissant,gain_xp,cout_pm,latence,direction)
+        MagiesOffensives.__init__(self,skill,agissant,gain_xp,cout_pm,latence)
         self.portee = portee
         self.degats = degats
         self.element = element

@@ -19,8 +19,8 @@ if TYPE_CHECKING:
 class MagieDopage(Magie):
     """La magie qui crée un effet de dopage sur l'agissant."""
     nom = "magie dopage"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,taux:float,duree:float,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau)
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,taux:float,duree:float):
+        Magie.__init__(self,skill,agissant,gain_xp,cout_pm,latence)
         self.taux = taux
         self.duree = duree
 
@@ -30,8 +30,8 @@ class MagieDopage(Magie):
 class MagieBoost(CibleAgissant):
     """La magie qui crée un effet de dopage sur un autre agissant."""
     nom = "magie boost"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,taux:float,duree:float,niveau:int,cible:Agissant):
-        CibleAgissant.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau,cible)
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,taux:float,duree:float,cible:Agissant):
+        CibleAgissant.__init__(self,skill,agissant,gain_xp,cout_pm,latence,cible)
         self.taux = taux
         self.duree = duree
 
@@ -44,8 +44,8 @@ class MagieBoost(CibleAgissant):
 class MagieMultiBoost(CibleAgissants):
     """La magie qui crée un effet de dopage sur plusieurs autres agissants."""
     nom = "magie multi boost"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,taux:float,duree:float,niveau:int,cible:list[Agissant]):
-        CibleAgissants.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau,cible)
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,taux:float,duree:float,cible:list[Agissant]):
+        CibleAgissants.__init__(self,skill,agissant,gain_xp,cout_pm,latence,cible)
         self.cible:list[Agissant] = cible
         self.taux = taux
         self.duree = duree

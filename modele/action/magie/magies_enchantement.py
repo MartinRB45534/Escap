@@ -21,83 +21,83 @@ if TYPE_CHECKING:
 class MagieEnchantementConfusion(EnchanteAgissant):
     """La magie qui place un enchantement de confusion sur un agissant."""
     nom = "magie confusion"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,taux:float,duree:float,niveau:int,cible:Agissant):
-        EnchanteAgissant.__init__(self,skill,agissant,gain_xp,cout_pm,latence,EnchantementConfusion(duree,taux),cible,niveau)
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,taux:float,duree:float,cible:Agissant):
+        EnchanteAgissant.__init__(self,skill,agissant,gain_xp,cout_pm,latence,EnchantementConfusion(duree,taux),cible)
 
 class MagieEnchantementPochesTrouees(EnchanteAgissant):
     """La magie qui place un enchantement de poches trouees sur un agissant."""
     nom = "magie poches trouees"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,taux:float,duree:float,niveau:int,cible:Agissant):
-        EnchanteAgissant.__init__(self,skill,agissant,gain_xp,cout_pm,latence,EnchantementPochesTrouees(duree,taux),cible,niveau)
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,taux:float,duree:float,cible:Agissant):
+        EnchanteAgissant.__init__(self,skill,agissant,gain_xp,cout_pm,latence,EnchantementPochesTrouees(duree,taux),cible)
 
 class MagieEnchantementForce(EnchanteAgissant):
     """La magie qui place un enchantement de force sur un agissant."""
     nom = "magie force"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,gain:float,duree:float,niveau:int,cible:Agissant):
-        EnchanteAgissant.__init__(self,skill,agissant,gain_xp,cout_pm,latence,EnchantementForce(duree,gain),cible,niveau)
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,gain:float,duree:float,cible:Agissant):
+        EnchanteAgissant.__init__(self,skill,agissant,gain_xp,cout_pm,latence,EnchantementForce(duree,gain),cible)
 
 class MagieEnchantementVision(EnchanteAgissant):
     """La magie qui place un enchantement de vision sur un agissant."""
     nom = "magie vision"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,gain:float,duree:float,niveau:int,cible:Agissant):
-        EnchanteAgissant.__init__(self,skill,agissant,gain_xp,cout_pm,latence,EnchantementVision(duree,gain),cible,niveau)
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,gain:float,duree:float,cible:Agissant):
+        EnchanteAgissant.__init__(self,skill,agissant,gain_xp,cout_pm,latence,EnchantementVision(duree,gain),cible)
 
 class MagieEnchantementVitalite(EnchanteAgissant):
     """La magie qui place un enchantement de vitalité sur un agissant."""
     nom = "magie vitalite"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:int,cout_pm:int,latence:int,duree:int,gain_pv:int,niveau:int,cible:Agissant):
-        EnchanteAgissant.__init__(self,skill,agissant,gain_xp,cout_pm,latence,EnchantementPv(duree,gain_pv),cible,niveau)
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:int,cout_pm:int,latence:int,duree:int,gain_pv:int,cible:Agissant):
+        EnchanteAgissant.__init__(self,skill,agissant,gain_xp,cout_pm,latence,EnchantementPv(duree,gain_pv),cible)
 
 class MagieEnchantementAbsorption(EnchanteAgissant):
     """La magie qui place un enchantement d'absorption sur un agissant."""
     nom = "magie absorption"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:int,cout_pm:int,latence:int,duree:int,gain_pm:int,niveau:int,cible:Agissant):
-        EnchanteAgissant.__init__(self,skill,agissant,gain_xp,cout_pm,latence,EnchantementPm(duree,gain_pm),cible,niveau)
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:int,cout_pm:int,latence:int,duree:int,gain_pm:int,cible:Agissant):
+        EnchanteAgissant.__init__(self,skill,agissant,gain_xp,cout_pm,latence,EnchantementPm(duree,gain_pm),cible)
 
 class MagieEnchantementCelerite(EnchanteAgissant):
     """La magie qui place un enchantement de célérité sur un agissant."""
     nom = "magie celerite"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:int,cout_pm:int,latence:int,duree:int,gain_vitesse:int,niveau:int,cible:Agissant):
-        EnchanteAgissant.__init__(self,skill,agissant,gain_xp,cout_pm,latence,EnchantementVitesse(duree,gain_vitesse),cible,niveau)
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:int,cout_pm:int,latence:int,duree:int,gain_vitesse:int,cible:Agissant):
+        EnchanteAgissant.__init__(self,skill,agissant,gain_xp,cout_pm,latence,EnchantementVitesse(duree,gain_vitesse),cible)
 
 class MagieEnchantementImmunite(EnchanteAgissant):
     """La magie qui place un enchantement d'immunité sur un agissant."""
     nom = "magie immunite"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:int,cout_pm:int,latence:int,duree:int,superiorite:int,niveau:int,cible:Agissant):
-        EnchanteAgissant.__init__(self,skill,agissant,gain_xp,cout_pm,latence,EnchantementImmunite(duree,superiorite),cible,niveau)
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:int,cout_pm:int,latence:int,duree:int,superiorite:int,cible:Agissant):
+        EnchanteAgissant.__init__(self,skill,agissant,gain_xp,cout_pm,latence,EnchantementImmunite(duree,superiorite),cible)
 
 class MagieEnchantementFlamme(EnchanteAgissant):
     """La magie qui place un enchantement de flamme sur un agissant."""
     nom = "magie flamme"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:int,cout_pm:int,latence:int,duree:int,gain_affinite:int,niveau:int,cible:Agissant):
-        EnchanteAgissant.__init__(self,skill,agissant,gain_xp,cout_pm,latence,EnchantementAffinite(duree,gain_affinite,Element.FEU),cible,niveau)
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:int,cout_pm:int,latence:int,duree:int,gain_affinite:int,cible:Agissant):
+        EnchanteAgissant.__init__(self,skill,agissant,gain_xp,cout_pm,latence,EnchantementAffinite(duree,gain_affinite,Element.FEU),cible)
 
 class MagieEnchantementNeige(EnchanteAgissant):
     """La magie qui place un enchantement de neige sur un agissant."""
     nom = "magie neige"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:int,cout_pm:int,latence:int,duree:int,gain_affinite:int,niveau:int,cible:Agissant):
-        EnchanteAgissant.__init__(self,skill,agissant,gain_xp,cout_pm,latence,EnchantementAffinite(duree,gain_affinite,Element.GLACE),cible,niveau)
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:int,cout_pm:int,latence:int,duree:int,gain_affinite:int,cible:Agissant):
+        EnchanteAgissant.__init__(self,skill,agissant,gain_xp,cout_pm,latence,EnchantementAffinite(duree,gain_affinite,Element.GLACE),cible)
 
 class MagieEnchantementSable(EnchanteAgissant):
     """La magie qui place un enchantement de sable sur un agissant."""
     nom = "magie sable"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:int,cout_pm:int,latence:int,duree:int,gain_affinite:int,niveau:int,cible:Agissant):
-        EnchanteAgissant.__init__(self,skill,agissant,gain_xp,cout_pm,latence,EnchantementAffinite(duree,gain_affinite,Element.TERRE),cible,niveau)
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:int,cout_pm:int,latence:int,duree:int,gain_affinite:int,cible:Agissant):
+        EnchanteAgissant.__init__(self,skill,agissant,gain_xp,cout_pm,latence,EnchantementAffinite(duree,gain_affinite,Element.TERRE),cible)
 
 class MagieEnchantementTenebre(EnchanteAgissant):
     """La magie qui place un enchantement de ténèbre sur un agissant."""
     nom = "magie tenebre"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:int,cout_pm:int,latence:int,duree:int,gain_affinite:int,niveau:int,cible:Agissant):
-        EnchanteAgissant.__init__(self,skill,agissant,gain_xp,cout_pm,latence,EnchantementAffinite(duree,gain_affinite,Element.OMBRE),cible,niveau)
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:int,cout_pm:int,latence:int,duree:int,gain_affinite:int,cible:Agissant):
+        EnchanteAgissant.__init__(self,skill,agissant,gain_xp,cout_pm,latence,EnchantementAffinite(duree,gain_affinite,Element.OMBRE),cible)
 
 class MagieEnchantementRenforcement(EnchanteItem):
     """La magie qui place un enchantement de renforcement sur un item."""
     nom = "magie renforcement"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:int,cout_pm:int,latence:int,duree:int,gain_force:int,gain_portee:int,niveau:int,cible:Item):
-        EnchanteItem.__init__(self,skill,agissant,gain_xp,cout_pm,latence,EnchantementArme(duree,gain_force,gain_portee),cible,niveau)
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:int,cout_pm:int,latence:int,duree:int,gain_force:int,gain_portee:int,cible:Item):
+        EnchanteItem.__init__(self,skill,agissant,gain_xp,cout_pm,latence,EnchantementArme(duree,gain_force,gain_portee),cible)
 
 class MagieEnchantementBombe(EnchanteItem):
     """La magie qui place un enchantement de bombe sur un item."""
     nom = "magie bombe"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:int,cout_pm:int,latence:int,duree:int,portee:int,degats:int,niveau:int,cible:Item):
-        EnchanteItem.__init__(self,skill,agissant,gain_xp,cout_pm,latence,EnchantementBombe(duree,portee,degats),cible,niveau)
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:int,cout_pm:int,latence:int,duree:int,portee:int,degats:int,cible:Item):
+        EnchanteItem.__init__(self,skill,agissant,gain_xp,cout_pm,latence,EnchantementBombe(duree,portee,degats),cible)

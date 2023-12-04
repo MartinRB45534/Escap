@@ -22,8 +22,8 @@ if TYPE_CHECKING:
 class MagieReserve(MagieCout):
     """La magie qui fait une réserve de mana."""
     nom = "magie reserve"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,latence:float,taux:float,niveau:int):
-        MagieCout.__init__(self,skill,agissant,gain_xp,0,latence,niveau)
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,latence:float,taux:float):
+        MagieCout.__init__(self,skill,agissant,gain_xp,0,latence)
         self.taux = taux
 
     def action(self):
@@ -32,8 +32,8 @@ class MagieReserve(MagieCout):
 class MagieInvestissement(MagieCout):
     """La magie qui crée un investissement."""
     nom = "magie investissement"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,latence:float,taux:float,duree:float,niveau:int):
-        MagieCout.__init__(self,skill,agissant,gain_xp,0,latence,niveau)
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,latence:float,taux:float,duree:float):
+        MagieCout.__init__(self,skill,agissant,gain_xp,0,latence)
         self.duree = duree
         self.taux = taux
 
@@ -43,9 +43,9 @@ class MagieInvestissement(MagieCout):
 class MagieExplosionDeMana(MagieCout,MagieAttaqueCorpACorp):
     """La magie qui crée une explosion de mana."""
     nom = "magie explosion de mana"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,latence:float,taux_degats:float,portee:float,element:Element,niveau:int):
-        MagieCout.__init__(self,skill,agissant,gain_xp,0,latence,niveau)
-        MagieAttaqueCorpACorp.__init__(self,skill,agissant,gain_xp,0,portee,0,element,Deplacement.MAGIQUE,Forme.CERCLE,Passage(False, True, True, False, True),latence,niveau)
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,latence:float,taux_degats:float,portee:float,element:Element):
+        MagieCout.__init__(self,skill,agissant,gain_xp,0,latence)
+        MagieAttaqueCorpACorp.__init__(self,skill,agissant,gain_xp,0,portee,0,element,Deplacement.MAGIQUE,Forme.CERCLE,Passage(False, True, True, False, True),latence)
         self.taux_degats = taux_degats
 
     def set_cout(self,cout:float):

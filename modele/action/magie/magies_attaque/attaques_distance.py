@@ -21,9 +21,9 @@ if TYPE_CHECKING:
 
 class MagieAttaqueDistance(CibleCase,MagiesOffensives):
     """Les magies qui créent une attaque à distance."""
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,portee:float,degats:float,element:Element,latence:float,niveau:int,cible:crt.Position=crt.POSITION_ABSENTE):
-        CibleCase.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau,cible)
-        MagiesOffensives.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau)
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,portee:float,degats:float,element:Element,latence:float,cible:crt.Position=crt.POSITION_ABSENTE):
+        CibleCase.__init__(self,skill,agissant,gain_xp,cout_pm,latence,cible)
+        MagiesOffensives.__init__(self,skill,agissant,gain_xp,cout_pm,latence)
         self.cible = cible
         self.effets:list[AttaqueCaseDelayee] = []
         self.portee = portee

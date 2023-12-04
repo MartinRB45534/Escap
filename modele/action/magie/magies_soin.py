@@ -23,8 +23,8 @@ if TYPE_CHECKING:
 class MagieSoin(CibleAgissant):
     """La magie qui invoque un effet de soin sur un agissant ciblé."""
     nom = "magie soin"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,gain_pv:float,niveau:int,cible:Agissant):
-        CibleAgissant.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau,cible)
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,gain_pv:float,cible:Agissant):
+        CibleAgissant.__init__(self,skill,agissant,gain_xp,cout_pm,latence,cible)
         self.gain_pv = gain_pv
 
     def action(self):
@@ -36,8 +36,8 @@ class MagieSoin(CibleAgissant):
 class MagieMultiSoin(CibleAgissants):
     """La magie qui invoque un effet de soin sur des agissants ciblés."""
     nom = "magie multi soin"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,gain_pv:float,niveau:int,cible:list[Agissant]):
-        CibleAgissants.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau,cible)
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,gain_pv:float,cible:list[Agissant]):
+        CibleAgissants.__init__(self,skill,agissant,gain_xp,cout_pm,latence,cible)
         self.gain_pv = gain_pv
 
     def action(self):
@@ -47,8 +47,8 @@ class MagieMultiSoin(CibleAgissants):
 class MagieSoinDeZone(CibleCase):
     """La magie qui invoque un effet de soin sur une zone."""
     nom = "magie zone de soin"
-    def __init__(self,niveau:int,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,gain_pv:float,portee:float,case:crt.Position=crt.POSITION_ABSENTE):
-        CibleCase.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau,case)
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,gain_pv:float,portee:float,case:crt.Position=crt.POSITION_ABSENTE):
+        CibleCase.__init__(self,skill,agissant,gain_xp,cout_pm,latence,case)
         self.gain_pv = gain_pv
         self.portee = portee
 
@@ -64,16 +64,15 @@ class MagieSoinDeZone(CibleCase):
 class MagieAutoSoin(Magie):
     """La magie qui invoque un effet de soin sur son self.agissant."""
     nom = "magie auto soin"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,gain_pv:float,niveau:int):
-        Magie.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau)
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,gain_pv:float):
+        Magie.__init__(self,skill,agissant,gain_xp,cout_pm,latence)
         self.gain_pv = gain_pv
-        self.niveau = niveau
 
 class MagieResurection(CibleItem, NonRepetable):
     """La magie qui invoque un effet de resurection."""
     nom = "magie resurection"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,niveau:int,item:Cadavre):
-        CibleItem.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau,item)
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,item:Cadavre):
+        CibleItem.__init__(self,skill,agissant,gain_xp,cout_pm,latence,item)
         NonRepetable.__init__(self,agissant,latence)
 
     def action(self):
@@ -86,9 +85,9 @@ class MagieResurection(CibleItem, NonRepetable):
 class MagieReanimationDeZone(CibleCase,PorteeLimitee):
     """La magie qui invoque un effet de reanimation sur tous les cadavres d'une zone."""
     nom = "magie reanimation"
-    def __init__(self,niveau:int,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,taux_pv:float,portee:float,portee_limite:float,superiorite:int,case:crt.Position=crt.POSITION_ABSENTE):
-        CibleCase.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau,case)
-        PorteeLimitee.__init__(self,skill,agissant,gain_xp,cout_pm,latence,niveau,portee_limite)
+    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,taux_pv:float,portee:float,portee_limite:float,superiorite:int,case:crt.Position=crt.POSITION_ABSENTE):
+        CibleCase.__init__(self,skill,agissant,gain_xp,cout_pm,latence,case)
+        PorteeLimitee.__init__(self,skill,agissant,gain_xp,cout_pm,latence,portee_limite)
         self.taux_pv = taux_pv
         self.portee = portee
         self.superiorite = superiorite

@@ -28,7 +28,7 @@ class Case(crt.Case):
         self.items:set[Item] = set() #On peut avoir des items sur la case
         self.effets:set[Effet] = set() #Les cases ont aussi des effets ! Les auras, par exemple.
         self.auras:set[Aura] = set() #Les auras sont des effets qui s'appliquent à la case, et qui peuvent être de plusieurs types.
-        self.aura_elementale = aura_elementale(self.niveau,responsable) #L'aura élémentale est une aura particulière, qui s'applique à la case et qui peut être de plusieurs types.
+        self.aura_elementale = aura_elementale(responsable) #L'aura élémentale est une aura particulière, qui s'applique à la case et qui peut être de plusieurs types.
     #Découvrons le déroulé d'un tour, avec case-chan :
 
     def debut_tour(self):

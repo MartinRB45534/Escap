@@ -19,11 +19,10 @@ if TYPE_CHECKING:
 
 class ProjectileSimple(Projectile):
     """Un projectile qui se contente d'un effet OnHit."""
-    def __init__(self, labyrinthe:Labyrinthe, niveau:int, poids:float, frottements:float, portee:float, degats:float, element:Element, position:crt.Position=crt.POSITION_ABSENTE):
+    def __init__(self, labyrinthe:Labyrinthe, poids:float, frottements:float, portee:float, degats:float, element:Element, position:crt.Position=crt.POSITION_ABSENTE):
         Projectile.__init__(self,labyrinthe,[OnHit(portee,degats,element)],position)
         self.poids = poids
         self.frottements = frottements
-        self.niveau = niveau
 
 class PercantSimple(Percant, ProjectileSimple):
     """Un projectile percant tout simple."""

@@ -32,15 +32,15 @@ class AuraPermanente(AuraElementale): # Probablement les seuls effets permanents
 
 class AuraTemporaire(TimeLimited,AuraElementale):
     """La classe des effets d'aura élémentales temporaires, celles qui sont appliquées par un agissant."""
-    def __init__(self,niveau:int,responsable:Agissant,temps_restant:float):
+    def __init__(self,responsable:Agissant,temps_restant:float):
         TimeLimited.__init__(self,temps_restant)
-        AuraElementale.__init__(self,niveau,responsable)
+        AuraElementale.__init__(self,responsable)
         self.priorite = 0
 
 class Degressif(AuraTemporaire):
     """Une aura élémentale qui perd en priorité à chaque tour."""
-    def __init__(self,niveau:int,responsable:Agissant,temps_restant:float,perte_priorite:float):
-        AuraTemporaire.__init__(self,niveau,responsable,temps_restant)
+    def __init__(self,responsable:Agissant,temps_restant:float,perte_priorite:float):
+        AuraTemporaire.__init__(self,responsable,temps_restant)
         self.perte_priorite = perte_priorite
 
     def wait(self):
@@ -49,8 +49,8 @@ class Degressif(AuraTemporaire):
 
 class AuraDegatsDegressif(Degressif,DegatsCase):
     """Une aura élémentale qui inflige des dégats, et qui perd en priorité et en dégats à chaque tour."""
-    def __init__(self,niveau:int,responsable:Agissant,temps_restant:float,degats:float,perte_priorite:float,perte_degats:float):
-        Degressif.__init__(self,niveau,responsable,temps_restant,perte_priorite)
+    def __init__(self,responsable:Agissant,temps_restant:float,degats:float,perte_priorite:float,perte_degats:float):
+        Degressif.__init__(self,responsable,temps_restant,perte_priorite)
         DegatsCase.__init__(self,degats,responsable)
         self.perte_degats = perte_degats
 
@@ -61,19 +61,19 @@ class AuraDegatsDegressif(Degressif,DegatsCase):
     
 class AuraDegats(AuraElementale,DegatsCase):
     """Une aura élémentale qui inflige des dégats."""
-    def __init__(self,niveau:int,responsable:Agissant,degats:float):
-        AuraElementale.__init__(self,niveau,responsable)
+    def __init__(self,responsable:Agissant,degats:float):
+        AuraElementale.__init__(self,responsable)
         DegatsCase.__init__(self,degats,responsable)
 
 class AuraRalenti(AuraElementale,Ralenti):
     """Aura élémentale qui ralentit les agissants."""
-    def __init__(self,niveau:int,responsable:Agissant,ralentissement:float):
-        AuraElementale.__init__(self,niveau,responsable)
+    def __init__(self,responsable:Agissant,ralentissement:float):
+        AuraElementale.__init__(self,responsable)
         Ralenti.__init__(self,ralentissement)
 
 class AuraOpacite(AuraElementale,Opacite):
     """L'effet qui applique l'aura d'ombre à une case. Laissé ici par un agissant."""
     element = Element.OMBRE
-    def __init__(self,niveau:int,responsable:Agissant,opacite:float):
-        AuraElementale.__init__(self,niveau,responsable)
+    def __init__(self,responsable:Agissant,opacite:float):
+        AuraElementale.__init__(self,responsable)
         Opacite.__init__(self,opacite)
