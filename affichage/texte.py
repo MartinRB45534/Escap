@@ -55,7 +55,7 @@ class Texte(Cliquable):
 
     def affiche(self,screen:pygame.Surface,frame:int=1,frame_par_tour:int=1):
         texte=POLICE20.render(self.get_texte(True),True,(0,0,0))
-        screen.blit(texte,(self.position[0],self.position[1]-3))
+        screen.blit(texte,(self.position[0],self.position[1]-1))
 
     def get_tailles(self,_tailles:tuple[int,int]) -> tuple[int,int]:
         return (POLICE20.size(self.get_texte())[0],20)

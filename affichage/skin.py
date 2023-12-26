@@ -7,8 +7,8 @@ import pygame
 
 class Illustration:
     """Une image qui peut être affichée."""
-    path = "Affichage/assets/"
-    default = 'Affichage/assets/vide.png'
+    path = "affichage/assets/"
+    default = 'affichage/assets/vide.png'
     def __init__(self,nom_fichier:str):
         try:
             self.image = pygame.image.load(self.path+nom_fichier).convert_alpha()
