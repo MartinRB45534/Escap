@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-from .stockage import StockageCategorie, StockageSurCategorie
+from .stockage import StockageCategorieUnique, StockageCategorieNivelee, StockageSurCategorie
 from .entitee import Items
 from .espece import Especes
 
 class StockageGlobal(StockageSurCategorie):
     """Le stockage global, qui devrait tout contenir."""
     nom:str = "StockageGlobal"
-    elements:dict[str, type[StockageCategorie]|type[StockageSurCategorie]] = {
+    elements:dict[str, type[StockageCategorieUnique]|type[StockageCategorieNivelee]|type[StockageSurCategorie]] = {
         "items": Items,
         "especes": Especes
     }

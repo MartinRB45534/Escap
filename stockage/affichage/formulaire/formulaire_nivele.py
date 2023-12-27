@@ -42,7 +42,7 @@ class FormulaireNivele(af.WrapperNoeud):
 
         for key in stockage.champs:
             self.form(key, stockage.champs[key], stockage.acceptors[key],
-                      stockage.avertissements[key])
+                      stockage.avertissements[key], stockage.niveles[key])
 
         self.liste = af.ListeMargeVerticale(shrink=True)
         self.liste.set_contenu(
@@ -61,7 +61,7 @@ class FormulaireNivele(af.WrapperNoeud):
         self.super_ajouter = ajouter
 
     def form(self, nom:str, type_: type[int|str|float|bool|mdl.Element],
-             acceptor: Callable[[str], bool], avertissement:str):
+             acceptor: Callable[[str], bool], avertissement:str, nivele:bool):
         """Ajoute un champ."""
         self.textes[nom] = af.Texte(nom)
         if type_ is int:
@@ -78,7 +78,7 @@ class FormulaireNivele(af.WrapperNoeud):
             raise TypeError(f"Le type {type_} n'est pas supporté.")
         self.avertissements[nom] = af.TexteCache("")
         self.textes_avertissements[nom] = avertissement
-        if type_ in [int, str, float]:
+        if nivele:
             self.valeurs[nom] = [self.inputs[nom].valeur] * 10
 
     def check(self):

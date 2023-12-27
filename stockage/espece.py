@@ -8,18 +8,17 @@ from json import loads as parse
 
 import modele as mdl
 
-from .stockage import StockageCategorie, StockageUnique, StockageNivele
+from .stockage import StockageCategorieUnique, StockageUnique
 
-class Especes(StockageCategorie):
+class Especes(StockageCategorieUnique):
     """Les informations des espèces."""
     nom = "Especes"
     titre_nouveau = "Nouvelle espèce"
     description = "Chaque espèce a un nom et un nombre de doigts possiblement nul (nombre d'anneaux qu'elle peut porter). Chaque agissant a une ou plusieurs espèces (seule la première est prise en compte pour les doigts). Certains éléments du jeu interagissent avec les espèces."
     avertissement = "Il existe déjà une espèce avec ce nom !"
 
-    @classmethod
     @property
-    def elements(cls) -> dict[str, type[StockageUnique]|tuple[type[StockageUnique], type[StockageNivele]]]:
+    def elements(self) -> dict[str, type[StockageUnique]]:
         return {
             "especes": Espece
         }

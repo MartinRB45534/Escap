@@ -7,73 +7,60 @@ import pygame
 
 import affichage as af
 
-from ...stockage import StockageUnique, StockageNivele, StockageCategorie
+from ...stockage import StockageNivele, StockageCategorieNivelee
 
-from .formulaire_unique import FormulaireUnique
 from .formulaire_nivele import FormulaireNivele
 
 class FormulaireCategorieNivele(af.WrapperNoeud, af.NoeudVertical):
     """Un formulaire pour une catégorie qui n'a qu'un seul type d'élément, nivelé."""
-    def __init__(self, stockage: StockageCategorie,
-                 ajouter: Callable[[StockageUnique|StockageNivele], None]):
+    def __init__(self, stockage: StockageCategorieNivelee,
+                 ajouter: Callable[[StockageNivele], None]):
         af.WrapperNoeud.__init__(self)
         af.NoeudVertical.__init__(self)
         self.stockage = stockage
-        element = list(stockage.elements.values())[0]
-        if not isinstance(element, tuple):
-            raise ValueError("Une catégorie nivelée doit avoir un formulaire double.")
 
         self.texte = af.Pave(stockage.description)
 
-        self.niveau = af.MenuDeroulant(
-            af.Texte("Choisissez si l'élément est unique ou a 10 niveaux")
-        )
-        self.niveau.set_contenu_liste(
-            [
-                af.TexteMenuDeroulant(self.niveau, "Unique"),
-                af.TexteMenuDeroulant(self.niveau, "10 niveaux"),
-            ]
+        self.element = af.MenuDeroulant(af.Texte("Choisissez un type"))
+        self.element.set_contenu_liste(
+            [af.TexteMenuDeroulant(self.element,element) for element in stockage.elements]
         )
 
-        self.formulaire:Optional[FormulaireUnique|FormulaireNivele] = None
+        self.formulaire:Optional[FormulaireNivele] = None
 
-        self.formulaires:tuple[FormulaireUnique, FormulaireNivele] = (
-            FormulaireUnique(element[0], ajouter),
-            FormulaireNivele(element[1], ajouter))
+        self.formulaires:dict[str, FormulaireNivele] = {
+            nom: FormulaireNivele(stockage_, ajouter)
+            for nom, stockage_ in stockage.elements.items()
+        }
 
         self.liste = af.ListeMargeVerticale(shrink=True)
         self.liste.set_contenu(
-            [self.texte, self.niveau]
+            [self.texte, self.element]
         )
 
         self.contenu = af.WrapperMarge()
         self.contenu.set_contenu(self.liste)
 
-        self.courant = self.niveau
+        self.courant = self.element
 
     def set_courant(self, element: af.Cliquable | None):
         self.courant = element
         if element is None:
             self.set_actif()
         elif isinstance(element, af.Noeud):
-            if element is self.niveau:
-                self.change_niveau()
+            if element is self.element:
+                self.change_element()
         else:
             element.set_actif()
 
-    def change_niveau(self):
+    def change_element(self):
         """Change le formulaire."""
-        match self.niveau.courant.get_texte():
-            case "Unique":
-                self.formulaire = self.formulaires[0]
-                self.liste.set_contenu([self.texte, self.niveau, self.formulaire])
-            case "10 niveaux":
-                self.formulaire = self.formulaires[1]
-                self.liste.set_contenu([self.texte, self.niveau, self.formulaire])
-            case "Choisissez si l'élément est unique ou a 10 niveaux":
-                self.liste.set_contenu([self.texte, self.niveau])
-            case _:
-                raise ValueError(f"Le niveau {self.niveau.courant.get_texte()} n'existe pas.")
+        if self.element.courant.get_texte() in self.formulaires:
+            formulaire = self.formulaires[self.element.courant.get_texte()]
+            self.formulaire = formulaire
+            self.liste.set_contenu([self.texte, self.element, self.formulaire])
+        else: # On a sélectionné "Choisissez un type"
+            self.liste.set_contenu([self.texte, self.element])
 
     def in_right(self):
         # On continue vers l'intérieur (pour coller avec le reste)
@@ -81,21 +68,21 @@ class FormulaireCategorieNivele(af.WrapperNoeud, af.NoeudVertical):
 
     def in_up(self):
         match self.courant:
-            case self.niveau:
+            case self.element:
                 return self
             case self.formulaire:
                 assert self.formulaire is not None
                 if not self.formulaire.in_up():
                     self.formulaire.unset_actif()
-                    self.set_courant(self.niveau)
-                    self.niveau.set_actif()
+                    self.set_courant(self.element)
+                    self.element.set_actif()
                 return self
             case _:
                 raise ValueError(f"Qu'est-ce que {self.courant} fait là ?")
 
     def in_down(self):
         match self.courant:
-            case self.niveau:
+            case self.element:
                 if self.formulaire:
                     self.unset_actif()
                     self.set_courant(self.formulaire)
@@ -121,5 +108,5 @@ class FormulaireCategorieNivele(af.WrapperNoeud, af.NoeudVertical):
 
     def affiche(self, screen: pygame.Surface, frame: int = 1, frame_par_tour: int = 1):
         af.WrapperNoeud.affiche(self, screen, frame, frame_par_tour)
-        if self.niveau and self.courant is self.niveau:
-            self.niveau.affiche_liste(screen, (5, 5), frame, frame_par_tour)
+        if self.courant is self.element:
+            self.element.affiche_liste(screen, (5, 5), frame, frame_par_tour)

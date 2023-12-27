@@ -5,7 +5,8 @@ from __future__ import annotations
 import affichage as af
 import stockage as stck
 
-from .onglet_categorie import OngletCategorie
+from .onglet_categorie_unique import OngletCategorieUnique
+from .onglet_categorie_nivelee import OngletCategorieNivelee
 
 class OngletSurCategorie(af.Onglet):
     """L'onglet d'onglets"""
@@ -14,7 +15,9 @@ class OngletSurCategorie(af.Onglet):
         af.Onglet.__init__(self, stockage.nom, self.onglets)
         self.stockage = stockage
         self.onglets.set_onglets([
-            OngletCategorie(contenu)
-            if isinstance(contenu, stck.StockageCategorie) else
+            OngletCategorieUnique(contenu)
+            if isinstance(contenu, stck.StockageCategorieUnique) else
+            OngletCategorieNivelee(contenu)
+            if isinstance(contenu, stck.StockageCategorieNivelee) else
             OngletSurCategorie(contenu) for contenu in self.stockage.contenu.values()
         ])
