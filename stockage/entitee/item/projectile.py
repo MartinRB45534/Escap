@@ -127,6 +127,36 @@ class ProjectileSimpleNivele(EntiteeNivele):
             "portee": "La portée doit être positive.",
             "degats": "Les dégats doivent être positifs."
         }
+    
+    @classmethod
+    @property
+    def conditionnels(cls) -> dict[str, Callable[[dict[str, str]], bool]]:
+        return {
+            "fantome": lambda dictionnaire: True,
+            "percant": lambda dictionnaire: True,
+            "fleche": lambda dictionnaire: True,
+            "explosif": lambda dictionnaire: True,
+            "element": lambda dictionnaire: True,
+            "poids": lambda dictionnaire: True,
+            "frottements": lambda dictionnaire: True,
+            "portee": lambda dictionnaire: True,
+            "degats": lambda dictionnaire: True
+        }
+
+    @classmethod
+    @property
+    def multiple(cls) -> dict[str, bool]:
+        return{
+            "fantome": False,
+            "percant": False,
+            "fleche": False,
+            "explosif": False,
+            "element": False,
+            "poids": False,
+            "frottements": False,
+            "portee": False,
+            "degats": False
+        }
 
     def make(self, niveau: int) -> mdl.ProjectileSimple:
         """Crée un ProjectileSimple à partir de l'instance."""

@@ -48,5 +48,9 @@ class AffichageEditeur(af.Onglets):
                 event.pos[1] <= self.tailles[1]):
                 self.survol(event.pos)
 
+    def update(self):
+        af.Onglets.update(self)
+        self.set_tailles(self.tailles)
+
     def in_out(self) -> Cliquable | Literal[False]:
         return False # Ceci devrait être l'élément parent de toute la hiérarchie

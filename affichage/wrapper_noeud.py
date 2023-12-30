@@ -25,8 +25,8 @@ class WrapperNoeud(Noeud,WrapperCliquable):
         if clique is self:
             self.set_actif()
         elif clique:
-            self.select(clique, droit)
             self.unset_actif()
+            self.select(clique, droit)
             if isinstance(clique, Placeheldholder):
                 res = self.clique_placeholder(clique, droit)
                 if not res:

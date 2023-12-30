@@ -110,6 +110,18 @@ class ArmeNivele(EntiteeNivele):
             "portee": "La portée doit être positive.",
             "tranchant": "Le tranchant doit être positif."
         }
+    
+    @classmethod
+    @property
+    def conditionnels(cls) -> dict[str, Callable[[dict[str, str]], bool]]:
+        return {
+            "fantome": lambda dictionnaire: True,
+            "element": lambda dictionnaire: True,
+            "poids": lambda dictionnaire: True,
+            "frottements": lambda dictionnaire: True,
+            "portee": lambda dictionnaire: True,
+            "tranchant": lambda dictionnaire: True
+        }
 
     def make(self, niveau: int) -> mdl.Arme:
         """Crée un ArmeSimple à partir de l'instance."""

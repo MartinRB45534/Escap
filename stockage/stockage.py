@@ -46,6 +46,18 @@ class StockageUnique(Stockage):
         """Retourne les avertissements des champs."""
         raise NotImplementedError
 
+    @classmethod
+    @property
+    def conditionnels(cls) -> dict[str, Callable[[dict[str, str]], bool]]:
+        """Retourne les fonctions qui déterminent les champs à afficher."""
+        raise NotImplementedError
+    
+    @classmethod
+    @property
+    def multiple(cls) -> dict[str, bool]:
+        """Retourne si les champs sont multiples. Seuls certains champs peuvent être multiples."""
+        raise NotImplementedError
+
     def make(self) -> object:
         """Retourne l'objet correspondant."""
         raise NotImplementedError
@@ -57,7 +69,7 @@ class StockageNivele(Stockage):
     def champs(cls) -> dict[str, type[int|str|float|bool|mdl.Element]]:
         """Retourne les champs de l'objet."""
         raise NotImplementedError
-    
+
     @classmethod
     @property
     def niveles(cls) -> dict[str, bool]:
@@ -75,7 +87,19 @@ class StockageNivele(Stockage):
     def avertissements(cls) -> dict[str, str]:
         """Retourne les avertissements des champs."""
         raise NotImplementedError
+
+    @classmethod
+    @property
+    def conditionnels(cls) -> dict[str, Callable[[dict[str, str]], bool]]:
+        """Retourne les fonctions qui déterminent les champs à afficher."""
+        raise NotImplementedError
     
+    @classmethod
+    @property
+    def multiple(cls) -> dict[str, bool]:
+        """Retourne si les champs sont multiples. Seuls certains champs peuvent être multiples."""
+        raise NotImplementedError
+
     def make(self, niveau: int) -> object:
         """Retourne l'objet correspondant."""
         raise NotImplementedError

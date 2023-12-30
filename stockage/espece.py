@@ -50,19 +50,33 @@ class Espece(StockageUnique):
         return {
             "nb_doigts": int
         }
-    
+
     @classmethod
     @property
     def acceptors(cls) -> dict[str, Callable[[str], bool]]:
         return {
             "nb_doigts": lambda nb_doigts: int(nb_doigts) > 0
         }
-    
+
     @classmethod
     @property
     def avertissements(cls) -> dict[str, str]:
         return {
             "nb_doigts": "Le nombre de doigts doit être strictement positif."
+        }
+
+    @classmethod
+    @property
+    def conditionnels(cls) -> dict[str, Callable[[dict[str, str]], bool]]:
+        return {
+            "nb_doigts": lambda dictionnaire: True
+        }
+
+    @classmethod
+    @property
+    def multiple(cls) -> dict[str, bool]:
+        return{
+            "nb_doigts": False
         }
 
     def make(self) -> mdl.Espece:

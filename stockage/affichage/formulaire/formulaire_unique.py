@@ -39,13 +39,7 @@ class FormulaireUnique(af.WrapperNoeud):
                       stockage.avertissements[key])
 
         self.liste = af.ListeMargeVerticale(shrink=True)
-        self.liste.set_contenu(
-            sum([
-                [texte, self.inputs[key], self.avertissements[key]]
-                for key, texte in self.textes.items()
-            ], []) # type: ignore # Pylance wants me to specify the type if that empty list smh
-            + [af.BoutonFonction(af.SKIN_SHADE, "Ajouter", self.ajouter)]
-        )
+        self.make_contenu()
 
         self.contenu = af.WrapperMarge()
         self.contenu.set_contenu(self.liste)
@@ -53,6 +47,19 @@ class FormulaireUnique(af.WrapperNoeud):
         self.courant = self.inputs["nom"]
 
         self.super_ajouter = ajouter
+
+    def make_contenu(self):
+        """Met à jour le contenu de la liste."""
+        self.liste.set_contenu(
+            sum([
+                [texte, self.inputs[key], self.avertissements[key]]
+                for key, texte in self.textes.items()
+                if key == "nom" or self.stockage.conditionnels[key](
+                    {ke: input_.valeur for ke, input_ in self.inputs.items()}
+                )
+            ], []) # type: ignore # Pylance wants me to specify the type if that empty list smh
+            + [af.BoutonFonction(af.SKIN_SHADE, "Ajouter", self.ajouter)]
+        )
 
     def form(self, nom:str, type_: type[int|str|float|bool|mdl.Element],
              acceptor: Callable[[str], bool], avertissement:str):
@@ -76,19 +83,24 @@ class FormulaireUnique(af.WrapperNoeud):
     def check(self):
         """Met à jour les avertissements"""
         for key, input_ in self.inputs.items():
-            if input_.accepte:
-                self.avertissements[key].set_texte("")
-            else:
-                if key == "nom":
-                    if input_.valeur:
-                        self.avertissements[key].set_texte(StockageGlobal.global_.warn_nom(input_.valeur))
-                    else:
-                        self.avertissements[key].set_texte("Le nom ne peut pas être vide.")
+            if self.stockage.conditionnels[key](
+                {ke: input_.valeur for ke, input_ in self.inputs.items()}
+            ):
+                if input_.accepte:
+                    self.avertissements[key].set_texte("")
                 else:
-                    self.avertissements[key].set_texte(self.textes_avertissements[key])
-        self.set_tailles(self.tailles)
+                    if key == "nom":
+                        if input_.valeur:
+                            self.avertissements[key].set_texte(StockageGlobal.global_.warn_nom(input_.valeur))
+                        else:
+                            self.avertissements[key].set_texte("Le nom ne peut pas être vide.")
+                    else:
+                        self.avertissements[key].set_texte(self.textes_avertissements[key])
+            else:
+                self.avertissements[key].set_texte("")
 
     def update(self):
+        self.make_contenu()
         self.check()
         af.WrapperNoeud.update(self)
 
@@ -119,37 +131,44 @@ class FormulaireUnique(af.WrapperNoeud):
             raise af.NavigationError("Les formulaires devraient toujours avoir un élément courant.")
 
     def in_up(self):
+        self.courant.unset_actif()
         if isinstance(self.courant, (af.TexteInput, af.BoutonOnOff, MenuElement)):
             i = list(self.inputs.values()).index(self.courant)
-            if i == 0:
-                self.courant.unset_actif()
-                return False
-            self.courant.unset_actif()
-            self.courant = list(self.inputs.values())[i-1]
-            self.courant.set_actif()
-            return self
-        self.courant.unset_actif()
-        self.courant = list(self.inputs.values())[-1]
-        self.courant.set_actif()
-        return self
+        else:
+            i = len(self.inputs.values())
+        while i > 0:
+            i -= 1
+            key = list(self.inputs.keys())[i]
+            if key == "nom" or self.stockage.conditionnels[key](
+                {ke: input_.valeur for ke, input_ in self.inputs.items()}
+            ):
+                self.courant = list(self.inputs.values())[i]
+                self.courant.set_actif()
+                return self
+        return False
 
     def in_down(self):
+        self.courant.unset_actif()
         if isinstance(self.courant, (af.TexteInput, af.BoutonOnOff, MenuElement)):
             i = list(self.inputs.values()).index(self.courant)
-            if i == len(self.inputs.values())-1:
-                courant = self.liste.contenu[-1]
-                if isinstance(courant, af.Bouton):
-                    self.courant.unset_actif()
-                    self.courant = courant
-                    self.courant.set_actif()
-                else:
-                    raise ValueError(f"Que fait {self.courant} en dernier élément de la liste ?")
-            else:
-                self.courant.unset_actif()
-                self.courant = list(self.inputs.values())[i+1]
+        else:
+            return False
+        while i < len(self.inputs.values())-1:
+            i += 1
+            key = list(self.inputs.keys())[i]
+            if key == "nom" or self.stockage.conditionnels[key](
+                {ke: input_.valeur for ke, input_ in self.inputs.items()}
+            ):
+                self.courant = list(self.inputs.values())[i]
                 self.courant.set_actif()
+                return self
+        courant = self.liste.contenu[-1]
+        if isinstance(courant, af.Bouton):
+            self.courant = courant
+            self.courant.set_actif()
             return self
-        return False
+        else:
+            raise ValueError(f"Que fait {self.courant} en dernier élément de la liste ?")
 
     def through_out(self):
         self.courant.unset_actif()

@@ -114,6 +114,30 @@ class ParcheminViergeNivele(EntiteeNivele):
             "taux_latence_caste": "Le taux de latence de caste doit être positif.",
             "taux_latence_impregne": "Le taux de latence d'impregnation doit être positif."
         }
+    
+    @classmethod
+    @property
+    def conditionnels(cls) -> dict[str, Callable[[dict[str, str]], bool]]:
+        return {
+            "fantome": lambda dictionnaire: True,
+            "latence_impregne": lambda dictionnaire: True,
+            "taux_cout_caste": lambda dictionnaire: True,
+            "taux_cout_impregne": lambda dictionnaire: True,
+            "taux_latence_caste": lambda dictionnaire: True,
+            "taux_latence_impregne": lambda dictionnaire: True
+        }
+    
+    @classmethod
+    @property
+    def multiple(cls) -> dict[str, bool]:
+        return {
+            "fantome": False,
+            "latence_impregne": False,
+            "taux_cout_caste": False,
+            "taux_cout_impregne": False,
+            "taux_latence_caste": False,
+            "taux_latence_impregne": False
+        }
 
     def make(self, niveau:int) -> mdl.ParcheminVierge:
         """Retourne le parchemin correspondant."""

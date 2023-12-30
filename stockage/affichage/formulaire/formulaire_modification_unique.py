@@ -13,6 +13,10 @@ class FormulaireModificationUnique(FormulaireUnique, af.NoeudVertical):
     def __init__(self, stockage: type[StockageUn], modifier: Callable[[StockageUn], None],
                  objet:StockageUn, supprimer: Callable[[StockageUn], None]):
         af.NoeudVertical.__init__(self)
+
+        self.bouton_modifier = af.BoutonFonction(af.SKIN_SHADE, "Modifier", self.ajouter)
+        self.bouton_supprimer = af.BoutonFonction(af.SKIN_SHADE, "Supprimer", lambda: supprimer(objet))
+
         FormulaireUnique.__init__(self, stockage, modifier)
 
         self.objet = objet
@@ -20,16 +24,20 @@ class FormulaireModificationUnique(FormulaireUnique, af.NoeudVertical):
         self.nom = objet.nom
 
         for key in stockage.champs:
-            # Est-ce que c'est pire que d'utiliset la jsonification ?
+            # Est-ce que c'est pire que d'utiliser la jsonification ?
             self.inputs[key].valeur = str(getattr(objet, key))
 
-        self.bouton_modifier = af.BoutonFonction(af.SKIN_SHADE, "Modifier", self.ajouter)
-        self.bouton_supprimer = af.BoutonFonction(af.SKIN_SHADE, "Supprimer", lambda: supprimer(objet))
+        self.make_contenu()
+        self.check()
 
+    def make_contenu(self):
         self.liste.set_contenu(
             sum([
                 [texte, self.inputs[key], self.avertissements[key]]
                 for key, texte in self.textes.items()
+                if key == "nom" or self.stockage.conditionnels[key](
+                    {ke: input_.valeur for ke, input_ in self.inputs.items()}
+                )
             ], []) # type: ignore # Pylance wants me to specify the type if that empty list smh
             + [self.bouton_modifier, self.bouton_supprimer]
         )
@@ -38,45 +46,49 @@ class FormulaireModificationUnique(FormulaireUnique, af.NoeudVertical):
         # On continue vers l'intérieur (pour coller avec le reste)
         return self.in_in()
 
-    def in_up(self):
-        if isinstance(self.courant, (af.TexteInput, af.BoutonOnOff, MenuElement)):
-            i = list(self.inputs.values()).index(self.courant)
-            if i == 0:
-                self.courant.unset_actif()
-                return False
-            self.courant.unset_actif()
-            self.courant = list(self.inputs.values())[i-1]
-            self.courant.set_actif()
-            return self
-        if self.courant is self.bouton_modifier:
-            self.courant.unset_actif()
-            self.courant = list(self.inputs.values())[-1]
-            self.courant.set_actif()
-            return self
+    def in_up(self): # type: ignore # Pylance somehow can't figure out that this inherits from its parent smh...
         self.courant.unset_actif()
-        self.courant = self.bouton_modifier
-        self.courant.set_actif()
-        return self
-
-    def in_down(self):
+        if self.courant is self.bouton_supprimer:
+            self.courant = self.bouton_modifier
+            self.courant.set_actif()
+            return self
         if isinstance(self.courant, (af.TexteInput, af.BoutonOnOff, MenuElement)):
             i = list(self.inputs.values()).index(self.courant)
-            if i == len(self.inputs.values())-1:
-                courant = self.bouton_modifier
-                self.courant.unset_actif()
-                self.courant = courant
+        else:
+            i = len(self.inputs.values())
+        while i > 0:
+            i -= 1
+            key = list(self.inputs.keys())[i]
+            if key == "nom" or self.stockage.conditionnels[key](
+                {ke: input_.valeur for ke, input_ in self.inputs.items()}
+            ):
+                self.courant = list(self.inputs.values())[i]
                 self.courant.set_actif()
-            else:
-                self.courant.unset_actif()
-                self.courant = list(self.inputs.values())[i+1]
-                self.courant.set_actif()
-            return self
+                return self
+        return False
+
+    def in_down(self): # type: ignore # Pylance somehow can't figure out that this inherits from its parent smh...
+        self.courant.unset_actif()
         if self.courant is self.bouton_modifier:
-            self.courant.unset_actif()
             self.courant = self.bouton_supprimer
             self.courant.set_actif()
             return self
-        return False
+        if isinstance(self.courant, (af.TexteInput, af.BoutonOnOff, MenuElement)):
+            i = list(self.inputs.values()).index(self.courant)
+        else:
+            return False
+        while i < len(self.inputs.values())-1:
+            i += 1
+            key = list(self.inputs.keys())[i]
+            if key == "nom" or self.stockage.conditionnels[key](
+                {ke: input_.valeur for ke, input_ in self.inputs.items()}
+            ):
+                self.courant = list(self.inputs.values())[i]
+                self.courant.set_actif()
+                return self
+        self.courant = self.bouton_modifier
+        self.courant.set_actif()
+        return self
 
     def through_up(self):
         return self.in_up()

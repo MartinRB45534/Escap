@@ -27,12 +27,16 @@ class Boucliers(StockageCategorieNivelee):
 class BouclierNivele(EntiteeNivele):
     """Une bouclier toute simple."""
     def __init__(self, nom: str, fantome: bool,
-                 poids:list[float], frottements:list[float], degats_bloques:list[float], taux_degats:list[float]):
+                 poids:list[float], frottements:list[float], bloque_quantite:bool,
+                 degats_bloques:list[float], bloque_proportion:bool,
+                 taux_degats:list[float]):
         EntiteeNivele.__init__(self, nom)
         self.fantome = fantome
         self.poids = poids
         self.frottements = frottements
+        self.bloque_quantite = bloque_quantite
         self.degats_bloques = degats_bloques
+        self.bloque_proportion = bloque_proportion
         self.taux_degats = taux_degats
 
     def check(self) -> bool:
@@ -49,7 +53,9 @@ class BouclierNivele(EntiteeNivele):
     "fantome": {self.fantome},
     "poids": {self.poids},
     "frottements": {self.frottements},
+    "bloque_quantite": {self.bloque_quantite},
     "degats_bloques": {self.degats_bloques},
+    "bloque_proportion": {self.bloque_proportion},
     "taux_degats": {self.taux_degats}"
 }}"""
 
@@ -57,7 +63,7 @@ class BouclierNivele(EntiteeNivele):
     def parse(cls, json: str):
         """Parse un json en BouclierNivele."""
         dictionnaire = parse(json)
-        return BouclierNivele(dictionnaire["nom"], dictionnaire["fantome"], dictionnaire["poids"], dictionnaire["frottements"], dictionnaire["degats_bloques"], dictionnaire["taux_degats"])
+        return BouclierNivele(dictionnaire["nom"], dictionnaire["fantome"], dictionnaire["poids"], dictionnaire["frottements"], dictionnaire["bloque_quantite"], dictionnaire["degats_bloques"], dictionnaire["bloque_proportion"], dictionnaire["taux_degats"])
 
     @classmethod
     @property
@@ -66,7 +72,9 @@ class BouclierNivele(EntiteeNivele):
             "fantome": bool,
             "poids": float,
             "frottements": float,
+            "bloque_quantite": bool,
             "degats_bloques": float,
+            "bloque_proportion": bool,
             "taux_degats": float
         }
 
@@ -77,7 +85,9 @@ class BouclierNivele(EntiteeNivele):
             "fantome": False,
             "poids": False,
             "frottements": False,
+            "bloque_quantite": False,
             "degats_bloques": True,
+            "bloque_proportion": False,
             "taux_degats": True
         }
 
@@ -88,7 +98,9 @@ class BouclierNivele(EntiteeNivele):
             "fantome": lambda _: True,
             "poids": lambda poids: float(poids) >= 0,
             "frottements": lambda frottements: float(frottements) >= 0,
+            "bloque_quantite": lambda _: True,
             "degats_bloques": lambda degats_bloques: float(degats_bloques) >= 0,
+            "bloque_proportion": lambda _: True,
             "taux_degats": lambda taux_degats: float(taux_degats) >= 0
         }
 
@@ -99,13 +111,28 @@ class BouclierNivele(EntiteeNivele):
             "fantome": "Cet avertissement n'est pas censé apparaître.",
             "poids": "Le poids doit être positif.",
             "frottements": "Le frottement doit être positif.",
+            "bloque_quantite": "Cet avertissement n'est pas censé apparaître.",
             "degats_bloques": "La quantité de dégats bloqués doit être positive.",
+            "bloque_proportion": "Cet avertissement n'est pas censé apparaître.",
             "taux_degats": "Le taux de dégats bloqué doit être positif."
+        }
+    
+    @classmethod
+    @property
+    def conditionnels(cls) -> dict[str, Callable[[dict[str, str]], bool]]:
+        return {
+            "fantome": lambda dictionnaire: True,
+            "poids": lambda dictionnaire: True,
+            "frottements": lambda dictionnaire: True,
+            "bloque_quantite": lambda dictionnaire: True,
+            "degats_bloques": lambda dictionnaire: dictionnaire["bloque_quantite"]=="True",
+            "bloque_proportion": lambda dictionnaire: True,
+            "taux_degats": lambda dictionnaire: dictionnaire["bloque_proportion"]=="True",
         }
 
     def make(self, niveau: int) -> mdl.Bouclier:
         """Crée un BouclierSimple à partir de l'instance."""
-        bouclier = mdl.Bouclier(mdl.NOWHERE, self.poids[niveau], self.frottements[niveau], self.degats_bloques[niveau], self.taux_degats[niveau])
+        bouclier = mdl.Bouclier(mdl.NOWHERE, self.poids[niveau], self.frottements[niveau], self.degats_bloques[niveau] if self.bloque_quantite else 0, self.taux_degats[niveau] if self.bloque_proportion else 0)
         bouclier.nom = self.nom
         bouclier.fantome = self.fantome
         return bouclier

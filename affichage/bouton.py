@@ -83,6 +83,7 @@ class Bouton(WrapperCliquable):
         clique = Wrapper.clique(self,position,droit)
         if clique:
             self.set_actif()
+            assert self.actif
             return self
         return False
 
