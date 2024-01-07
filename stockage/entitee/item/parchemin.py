@@ -117,7 +117,7 @@ class ParcheminViergeNivele(EntiteeNivele):
     
     @classmethod
     @property
-    def conditionnels(cls) -> dict[str, Callable[[dict[str, str]], bool]]:
+    def conditionnels(cls) -> dict[str, Callable[[dict[str, str|list[str]]], bool]]:
         return {
             "fantome": lambda dictionnaire: True,
             "latence_impregne": lambda dictionnaire: True,

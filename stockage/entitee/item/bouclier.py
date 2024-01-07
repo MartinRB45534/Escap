@@ -119,7 +119,7 @@ class BouclierNivele(EntiteeNivele):
     
     @classmethod
     @property
-    def conditionnels(cls) -> dict[str, Callable[[dict[str, str]], bool]]:
+    def conditionnels(cls) -> dict[str, Callable[[dict[str, str|list[str]]], bool]]:
         return {
             "fantome": lambda dictionnaire: True,
             "poids": lambda dictionnaire: True,
@@ -128,6 +128,19 @@ class BouclierNivele(EntiteeNivele):
             "degats_bloques": lambda dictionnaire: dictionnaire["bloque_quantite"]=="True",
             "bloque_proportion": lambda dictionnaire: True,
             "taux_degats": lambda dictionnaire: dictionnaire["bloque_proportion"]=="True",
+        }
+    
+    @classmethod
+    @property
+    def multiple(cls) -> dict[str, bool]:
+        return {
+            "fantome": False,
+            "poids": False,
+            "frottements": False,
+            "bloque_quantite": False,
+            "degats_bloques": False,
+            "bloque_proportion": False,
+            "taux_degats": False,
         }
 
     def make(self, niveau: int) -> mdl.Bouclier:

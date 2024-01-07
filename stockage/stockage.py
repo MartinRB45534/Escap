@@ -48,7 +48,7 @@ class StockageUnique(Stockage):
 
     @classmethod
     @property
-    def conditionnels(cls) -> dict[str, Callable[[dict[str, str]], bool]]:
+    def conditionnels(cls) -> dict[str, Callable[[dict[str, str|list[str]]], bool]]:
         """Retourne les fonctions qui déterminent les champs à afficher."""
         raise NotImplementedError
     
@@ -90,7 +90,7 @@ class StockageNivele(Stockage):
 
     @classmethod
     @property
-    def conditionnels(cls) -> dict[str, Callable[[dict[str, str]], bool]]:
+    def conditionnels(cls) -> dict[str, Callable[[dict[str, str|list[str]]], bool]]:
         """Retourne les fonctions qui déterminent les champs à afficher."""
         raise NotImplementedError
     

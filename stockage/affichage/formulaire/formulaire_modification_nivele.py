@@ -20,25 +20,36 @@ class FormulaireModificationNivele(FormulaireNivele, af.NoeudVertical):
         FormulaireNivele.__init__(self, stockage, modifier)
 
         self.objet = objet
-        self.inputs["nom"].valeur = objet.nom
+        input_nom = self.inputs["nom"]
+        assert isinstance(input_nom, af.TexteInput)
+        input_nom.valeur = objet.nom
         self.nom = objet.nom
 
         for key in stockage.champs:
-            # Est-ce que c'est pire que d'utiliser la jsonification ?
+            # Est-ce que getattr est pire que d'utiliser la jsonification ?
+            input_ = self.inputs[key]
             if key in self.valeurs:
-                self.inputs[key].valeur = str(getattr(objet, key)[0])
+                assert isinstance(input_, af.TexteInput)
+                input_.valeur = str(getattr(objet, key)[0])
                 self.valeurs[key] = [str(attr) for attr in getattr(objet, key)]
+            elif stockage.multiple[key]:
+                assert isinstance(input_, list)
+                for attr in list(getattr(objet, key)[0]):
+                    input_[-1].valeur = str(attr)
+                    input_.append(self.get_multiple_input(stockage.champs[key], stockage.acceptors[key]))
             else:
-                self.inputs[key].valeur = str(getattr(objet, key))
+                assert isinstance(input_, af.TexteInput|af.BoutonOnOff|MenuElement)
+                input_.valeur = str(getattr(objet, key))
+
+        self.make_contenu()
+        self.check_avertissements()
 
     def make_contenu(self):
         self.liste.set_contenu(
             sum([
                 [texte, self.inputs[key], self.avertissements[key]]
                 for key, texte in self.textes.items()
-                if key == "nom" or key == "niveau" or self.stockage.conditionnels[key](
-                    {ke: input_.valeur for ke, input_ in self.inputs.items()}
-                )
+                if key == "nom" or key == "niveau" or self.stockage.conditionnels[key](self.to_dict())
             ], []) # type: ignore # Pylance wants me to specify the type if that empty list smh
             + [self.bouton_modifier, self.bouton_supprimer]
         )
@@ -54,16 +65,27 @@ class FormulaireModificationNivele(FormulaireNivele, af.NoeudVertical):
             self.courant.set_actif()
             return self
         if isinstance(self.courant, (af.TexteInput, af.BoutonOnOff, MenuElement)):
-            i = list(self.inputs.values()).index(self.courant)
+            if self.courant in self.inputs.values():
+                i = list(self.inputs.values()).index(self.courant)
+            else:
+                for i, input_ in enumerate(self.inputs.values()):
+                    if isinstance(input_, list) and self.courant in input_:
+                        j = input_.index(self.courant)
+                        if j > 0:
+                            self.courant = input_[j-1]
+                            self.courant.set_actif()
+                            return self
+                        break
+                else:
+                    raise ValueError(f"On ne trouve pas {self.courant} dans les inputs !")
         else:
             i = len(self.inputs.values())
         while i > 0:
             i -= 1
             key = list(self.inputs.keys())[i]
-            if key == "nom" or key == "niveau" or self.stockage.conditionnels[key](
-                {ke: input_.valeur for ke, input_ in self.inputs.items()}
-            ):
-                self.courant = list(self.inputs.values())[i]
+            if key == "nom" or key == "niveau" or self.stockage.conditionnels[key](self.to_dict()):
+                input_ = self.inputs[key]
+                self.courant = input_ if not isinstance(input_, list) else input_[-1]
                 self.courant.set_actif()
                 return self
         return False
@@ -75,16 +97,27 @@ class FormulaireModificationNivele(FormulaireNivele, af.NoeudVertical):
             self.courant.set_actif()
             return self
         if isinstance(self.courant, (af.TexteInput, af.BoutonOnOff, MenuElement)):
-            i = list(self.inputs.values()).index(self.courant)
+            if self.courant in self.inputs.values():
+                i = list(self.inputs.values()).index(self.courant)
+            else:
+                for i, input_ in enumerate(self.inputs.values()):
+                    if isinstance(input_, list) and self.courant in input_:
+                        j = input_.index(self.courant)
+                        if j < len(input_)-1:
+                            self.courant = input_[j+1]
+                            self.courant.set_actif()
+                            return self
+                        break
+                else:
+                    raise ValueError(f"On ne trouve pas {self.courant} dans les inputs !")
         else:
             return False
         while i < len(self.inputs.values())-1:
             i += 1
             key = list(self.inputs.keys())[i]
-            if key == "nom" or key == "niveau" or self.stockage.conditionnels[key](
-                {ke: input_.valeur for ke, input_ in self.inputs.items()}
-            ):
-                self.courant = list(self.inputs.values())[i]
+            if key == "nom" or key == "niveau" or self.stockage.conditionnels[key](self.to_dict()):
+                input_ = self.inputs[key]
+                self.courant = input_ if not isinstance(input_, list) else input_[0]
                 self.courant.set_actif()
                 return self
         self.courant = self.bouton_modifier

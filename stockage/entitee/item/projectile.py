@@ -130,7 +130,7 @@ class ProjectileSimpleNivele(EntiteeNivele):
     
     @classmethod
     @property
-    def conditionnels(cls) -> dict[str, Callable[[dict[str, str]], bool]]:
+    def conditionnels(cls) -> dict[str, Callable[[dict[str, str|list[str]]], bool]]:
         return {
             "fantome": lambda dictionnaire: True,
             "percant": lambda dictionnaire: True,

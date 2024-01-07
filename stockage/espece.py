@@ -67,7 +67,7 @@ class Espece(StockageUnique):
 
     @classmethod
     @property
-    def conditionnels(cls) -> dict[str, Callable[[dict[str, str]], bool]]:
+    def conditionnels(cls) -> dict[str, Callable[[dict[str, str|list[str]]], bool]]:
         return {
             "nb_doigts": lambda dictionnaire: True
         }
