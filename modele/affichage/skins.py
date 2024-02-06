@@ -2,7 +2,7 @@
 
 import affichage as af
 
-af.Skin.path = "Modele/Affichage/assets/"
+af.Skin.path = "modele/affichage/assets/"
 
 SKIN_POTION = af.Skin("potion.png")
 SKIN_PARCHEMIN = af.Skin("parchemin.png")

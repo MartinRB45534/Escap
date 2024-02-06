@@ -1,6 +1,6 @@
 import affichage as af
 
-af.Skin.path = "Carte/Affichage/assets/"
+af.Skin.path = "carte/affichage/assets/"
 
 SKIN_BROUILLARD = af.Skin("brouillard.png")
 SKIN_MUR_BROUILLARD = af.Skin("brouillard_mur_transparent.png")
