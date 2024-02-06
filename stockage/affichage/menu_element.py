@@ -10,8 +10,9 @@ import modele as mdl
 class MenuElement(af.MenuDeroulant):
     """Le menu d'éléments. Il permet de sélectionner un élément."""
     def __init__(self):
-        af.MenuDeroulant.__init__(self, af.Texte("(Sélectionnez un élément)"))
-        self.set_contenu_liste([
+        defaut = af.TexteMenuDeroulant(self, "(Sélectionnez un élément)")
+        af.MenuDeroulant.__init__(self, defaut)
+        self.set_contenu_liste([defaut] + [
             af.TexteMenuDeroulant(self, element.value) for element in mdl.Element
         ])
 
@@ -19,7 +20,7 @@ class MenuElement(af.MenuDeroulant):
     def accepte(self):
         """Renvoie si la valeur saisie est acceptée."""
         return self.courant.get_texte() != "(Sélectionnez un élément)"
-    
+
     def accepte_autre(self, valeur: str):
         """Renvoie si la valeur saisie est acceptée."""
         return valeur != "(Sélectionnez un élément)"

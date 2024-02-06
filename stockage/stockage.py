@@ -51,7 +51,7 @@ class StockageUnique(Stockage):
     def conditionnels(cls) -> dict[str, Callable[[dict[str, str|list[str]]], bool]]:
         """Retourne les fonctions qui déterminent les champs à afficher."""
         raise NotImplementedError
-    
+
     @classmethod
     @property
     def multiple(cls) -> dict[str, bool]:
@@ -93,7 +93,7 @@ class StockageNivele(Stockage):
     def conditionnels(cls) -> dict[str, Callable[[dict[str, str|list[str]]], bool]]:
         """Retourne les fonctions qui déterminent les champs à afficher."""
         raise NotImplementedError
-    
+
     @classmethod
     @property
     def multiple(cls) -> dict[str, bool]:
@@ -157,7 +157,7 @@ class StockageCategorieUnique(Stockage):
     def elements(self) -> dict[str, type[StockageUnique]]:
         """Retourne les éléments de la catégorie."""
         raise NotImplementedError
-    
+
     def warn_nom(self, nom:str) -> str:
         """Précise qui a déjà ce nom."""
         for contenu in self.contenu:
@@ -218,7 +218,7 @@ class StockageCategorieNivelee(Stockage):
     def elements(self) -> dict[str, type[StockageNivele]]:
         """Retourne les éléments de la catégorie."""
         raise NotImplementedError
-    
+
     def warn_nom(self, nom:str) -> str:
         """Précise qui a déjà ce nom."""
         for contenu in self.contenu:
@@ -240,22 +240,22 @@ class StockageSurCategorie(Stockage):
 
     def check(self) -> bool:
         return all([contenu.check() for contenu in self.contenu.values()])
-    
+
     def acceptor(self, nom: str) -> bool:
         """Vérifie que le nom est valide."""
         return not nom in self.all_noms
-    
+
     @property
     def all_noms(self) -> set[str]:
         """Retourne tous les noms des catégories."""
         return set(sum([list(contenu.all_noms) for contenu in self.contenu.values()], [])) # type: ignore # Sinon mon linter se plaint du [] non typé
-    
+
     def stringify(self) -> str:
         return f"""{{"{self.nom}" : [
         {", ".join([contenu.stringify() for contenu in self.contenu.values()])}
     ]
 }}"""
-    
+
     @classmethod
     def parse(cls, json: str) -> Self:
         dictionnaire = parse(json)
@@ -275,7 +275,7 @@ class StockageSurCategorie(Stockage):
             except ValueError:
                 pass
         raise ValueError(f"L'élément {nom} n'existe pas.")
-    
+
     def warn_nom(self, nom:str) -> str:
         """Précise qui a déjà ce nom."""
         warn = ""
