@@ -45,7 +45,7 @@ class ProjectileSimpleNivele(EntiteeNivele):
                 all([frottements >= 0 for frottements in self.frottements]) and
                 all([portee >= 0 for portee in self.portee]) and
                 all([degats >= 0 for degats in self.degats]))
-    
+
     def stringify(self) -> str:
         return f"""{{
     "type": "projectile",
@@ -61,7 +61,7 @@ class ProjectileSimpleNivele(EntiteeNivele):
     "portee": {self.portee},
     "degats": {self.degats}"
 }}"""
-    
+
     @classmethod
     def parse(cls, json: str):
         """Parse un json en ProjectileSimpleNivele."""
@@ -82,7 +82,7 @@ class ProjectileSimpleNivele(EntiteeNivele):
             "portee": float,
             "degats": float
         }
-    
+
     @classmethod
     @property
     def niveles(cls) -> dict[str, bool]:
@@ -127,7 +127,7 @@ class ProjectileSimpleNivele(EntiteeNivele):
             "portee": "La portée doit être positive.",
             "degats": "Les dégats doivent être positifs."
         }
-    
+
     @classmethod
     @property
     def conditionnels(cls) -> dict[str, Callable[[dict[str, str|list[str]]], bool]]:

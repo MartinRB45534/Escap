@@ -24,8 +24,10 @@ class FormulaireUnique(af.WrapperNoeud):
         self.textes:dict[str, af.Texte] = {
             "nom": af.Texte("Nom :"),
         }
-        self.inputs:dict[str, af.TexteInput|af.BoutonOnOff|MenuElement|list[af.TexteInput|MenuElement]] = {
-            "nom": af.TexteInput(acceptor=lambda nom: nom == self.nom or StockageGlobal.global_.valide_nom(nom)),
+        self.inputs:dict[str, af.TexteInput|af.BoutonOnOff|MenuElement|
+                         list[af.TexteInput|MenuElement]] = {
+            "nom": af.TexteInput(acceptor=lambda nom: nom == self.nom or 
+                                 StockageGlobal.global_.valide_nom(nom)),
         }
         self.avertissements:dict[str, af.TexteCache] = {
             "nom": af.TexteCache(""),
@@ -78,7 +80,8 @@ class FormulaireUnique(af.WrapperNoeud):
         """Retourne si le champ est conditionnel."""
         return key == "nom" or self.stockage.conditionnels[key](self.to_dict())
 
-    def get_input(self, type_: type[int|str|float|bool|mdl.Element], acceptor: Callable[[str], bool]) -> af.TexteInput|af.BoutonOnOff|MenuElement:
+    def get_input(self, type_: type[int|str|float|bool|mdl.Element],
+                  acceptor: Callable[[str], bool]) -> af.TexteInput|af.BoutonOnOff|MenuElement:
         """Retourne un input."""
         if type_ is int:
             return af.IntInput(acceptor=acceptor)
@@ -93,7 +96,8 @@ class FormulaireUnique(af.WrapperNoeud):
         else:
             raise TypeError(f"Le type {type_} n'est pas supporté.")
 
-    def get_multiple_input(self, type_: type[int|str|float|bool|mdl.Element], acceptor: Callable[[str], bool]) -> af.TexteInput|MenuElement:
+    def get_multiple_input(self, type_: type[int|str|float|bool|mdl.Element],
+                           acceptor: Callable[[str], bool]) -> af.TexteInput|MenuElement:
         """Retourne un input multiple."""
         if type_ is int:
             raise ValueError("Input est un champ entier, il ne peut pas être multiple !")
@@ -114,7 +118,8 @@ class FormulaireUnique(af.WrapperNoeud):
         self.textes[nom] = af.Texte(nom)
         if multiple:
             if type_ in (int, float, bool):
-                raise ValueError(f"Input {nom} est un champ {type_}, il ne peut pas être multiple !")
+                raise ValueError(
+                    f"Input {nom} est un champ {type_}, il ne peut pas être multiple !")
             self.inputs[nom] = [self.get_multiple_input(type_, acceptor)]
         else:
             self.inputs[nom] = self.get_input(type_, acceptor)
@@ -134,7 +139,8 @@ class FormulaireUnique(af.WrapperNoeud):
                 elif not input_.accepte:
                     if key == "nom":
                         if input_.valeur:
-                            self.avertissements[key].set_texte(StockageGlobal.global_.warn_nom(input_.valeur))
+                            self.avertissements[key].set_texte(
+                                StockageGlobal.global_.warn_nom(input_.valeur))
                         else:
                             self.avertissements[key].set_texte("Le nom ne peut pas être vide.")
                     else:
@@ -151,7 +157,8 @@ class FormulaireUnique(af.WrapperNoeud):
                     else:
                         input_.pop(i)
                 if input_[-1].accepte: # pylint: disable=unsubscriptable-object # I know it's subscriptable, it's a list
-                    input_.append(self.get_multiple_input(self.stockage.champs[key], self.stockage.acceptors[key]))
+                    input_.append(self.get_multiple_input(self.stockage.champs[key],
+                                                          self.stockage.acceptors[key]))
 
     def update(self):
         self.make_contenu()
@@ -164,8 +171,11 @@ class FormulaireUnique(af.WrapperNoeud):
         self.check_avertissements()
         if all([avertissement.get_texte() == "" for avertissement in self.avertissements.values()]):
             json = f"""{{{
-", ".join([f'"{key}": "{("["+(",".join([inp.valeur for inp in input_]))+"]") if isinstance(input_, list) else input_.valeur}"' for key, input_ in self.inputs.items()])
-}}}""" # pylint: disable=not-an-iterable # I know it's an iterable, it's a list
+        ", ".join([f'"{key}": "{(
+            "["+(",".join([inp.valeur for inp in input_]))+"]" # pylint: disable=not-an-iterable # I know it's an iterable, it's a list
+        ) if isinstance(input_, list) else input_.valeur}"'
+    for key, input_ in self.inputs.items()])
+}}}"""
             self.super_ajouter(self.stockage.parse(json))
 
     def select(self, selection: af.Cliquable, droit:bool=False):

@@ -116,7 +116,7 @@ class BouclierNivele(EntiteeNivele):
             "bloque_proportion": "Cet avertissement n'est pas censé apparaître.",
             "taux_degats": "Le taux de dégats bloqué doit être positif."
         }
-    
+
     @classmethod
     @property
     def conditionnels(cls) -> dict[str, Callable[[dict[str, str|list[str]]], bool]]:
@@ -129,7 +129,7 @@ class BouclierNivele(EntiteeNivele):
             "bloque_proportion": lambda dictionnaire: True,
             "taux_degats": lambda dictionnaire: dictionnaire["bloque_proportion"]=="True",
         }
-    
+
     @classmethod
     @property
     def multiple(cls) -> dict[str, bool]:

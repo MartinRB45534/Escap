@@ -24,8 +24,10 @@ class FormulaireNivele(af.WrapperNoeud):
             "nom": af.Texte("Nom :"),
             "niveau": af.Texte("Niveau :"),
         }
-        self.inputs:dict[str, af.TexteInput|af.BoutonOnOff|MenuElement|list[af.TexteInput|MenuElement]] = {
-            "nom": af.TexteInput(acceptor=lambda nom: nom == self.nom or StockageGlobal.global_.valide_nom(nom)),
+        self.inputs:dict[str, af.TexteInput|af.BoutonOnOff|MenuElement|
+                         list[af.TexteInput|MenuElement]] = {
+            "nom": af.TexteInput(acceptor=lambda nom: nom == self.nom or
+                                 StockageGlobal.global_.valide_nom(nom)),
             "niveau": af.IntInput(texte="1",acceptor=lambda niveau: 1 <= int(niveau) <= 10),
         }
         self.avertissements:dict[str, af.TexteCache] = {
@@ -78,12 +80,13 @@ class FormulaireNivele(af.WrapperNoeud):
             for key, input_
             in self.inputs.items()
         }
-    
+
     def conditionnel(self, key: str) -> bool:
         """Retourne si le champ est conditionnel."""
         return key == "nom" or key == "niveau" or self.stockage.conditionnels[key](self.to_dict())
 
-    def get_input(self, type_: type[int|str|float|bool|mdl.Element], acceptor: Callable[[str], bool]) -> af.TexteInput|af.BoutonOnOff|MenuElement:
+    def get_input(self, type_: type[int|str|float|bool|mdl.Element],
+                  acceptor: Callable[[str], bool]) -> af.TexteInput|af.BoutonOnOff|MenuElement:
         """Retourne un input."""
         if type_ is int:
             return af.IntInput(acceptor=acceptor)
@@ -98,7 +101,8 @@ class FormulaireNivele(af.WrapperNoeud):
         else:
             raise TypeError(f"Le type {type_} n'est pas supporté.")
 
-    def get_multiple_input(self, type_: type[int|str|float|bool|mdl.Element], acceptor: Callable[[str], bool]) -> af.TexteInput|MenuElement:
+    def get_multiple_input(self, type_: type[int|str|float|bool|mdl.Element],
+                           acceptor: Callable[[str], bool]) -> af.TexteInput|MenuElement:
         """Retourne un input multiple."""
         if type_ is int:
             raise ValueError("Input est un champ entier, il ne peut pas être multiple !")
@@ -119,7 +123,8 @@ class FormulaireNivele(af.WrapperNoeud):
         self.textes[nom] = af.Texte(nom)
         if multiple:
             if type_ in (int, float, bool):
-                raise ValueError(f"Input {nom} est un champ {type_}, il ne peut pas être multiple !")
+                raise ValueError(
+                    f"Input {nom} est un champ {type_}, il ne peut pas être multiple !")
             self.inputs[nom] = [self.get_multiple_input(type_, acceptor)]
         else:
             self.inputs[nom] = self.get_input(type_, acceptor)
@@ -156,7 +161,8 @@ class FormulaireNivele(af.WrapperNoeud):
                 elif not input_.accepte:
                     if key == "nom":
                         if input_.valeur:
-                            self.avertissements[key].set_texte(StockageGlobal.global_.warn_nom(input_.valeur))
+                            self.avertissements[key].set_texte(
+                                StockageGlobal.global_.warn_nom(input_.valeur))
                         else:
                             self.avertissements[key].set_texte("Le nom ne peut pas être vide.")
                     else:
@@ -178,7 +184,9 @@ ne sont pas valides.""")
                     else:
                         input_.pop(i) # pylint: disable=no-member # I know it's a list, it has a pop method
                 if input_[-1].accepte:
-                    input_.append(self.get_multiple_input(self.stockage.champs[key], self.stockage.acceptors[key])) # pylint: disable=no-member # I know it's a list, it has an append method
+                    input_.append( # pylint: disable=no-member # I know it's a list, it has an append method
+                        self.get_multiple_input(self.stockage.champs[key],
+                                                self.stockage.acceptors[key]))
 
     def update(self):
         self.make_contenu()
@@ -200,7 +208,12 @@ ne sont pas valides.""")
         self.check_avertissements()
         if all([avertissement.get_texte() == "" for avertissement in self.avertissements.values()]):
             json = f"""{{{
-", ".join([f'"{key}": "{("["+(",".join([inp.valeur for inp in input_]))+"]") if isinstance(input_, list) else ("["+(",".join([str(valeur) for valeur in self.valeurs[key]]))+"]") if key in self.valeurs else input_.valeur}"' for key, input_ in self.inputs.items() if key != "niveau"])
+        ", ".join([f'"{key}": "{(
+            "["+(",".join([inp.valeur for inp in input_]))+"]"
+        ) if isinstance(input_, list) else (
+            "["+(",".join([str(valeur) for valeur in self.valeurs[key]]))+"]"
+        ) if key in self.valeurs else input_.valeur}"'
+    for key, input_ in self.inputs.items() if key != "niveau"])
 }}}"""
             self.super_ajouter(self.stockage.parse(json))
 

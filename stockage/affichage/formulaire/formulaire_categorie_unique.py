@@ -86,7 +86,9 @@ class FormulaireCategorieUnique(af.WrapperNoeud,af.NoeudVertical):
                 if self.formulaire:
                     self.unset_actif()
                     self.set_courant(self.formulaire)
-                    self.formulaire.set_courant(self.formulaire.inputs["nom"])
+                    input_nom = self.formulaire.inputs["nom"]
+                    assert isinstance(input_nom, af.TexteInput)
+                    self.formulaire.set_courant(input_nom)
                     self.formulaire.set_actif()
                 return self
             case self.formulaire:

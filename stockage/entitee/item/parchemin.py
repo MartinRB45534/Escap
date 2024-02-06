@@ -78,7 +78,7 @@ class ParcheminViergeNivele(EntiteeNivele):
             "taux_latence_caste": float,
             "taux_latence_impregne": float
         }
-    
+
     @classmethod
     @property
     def niveles(cls) -> dict[str, bool]:
@@ -114,7 +114,7 @@ class ParcheminViergeNivele(EntiteeNivele):
             "taux_latence_caste": "Le taux de latence de caste doit être positif.",
             "taux_latence_impregne": "Le taux de latence d'impregnation doit être positif."
         }
-    
+
     @classmethod
     @property
     def conditionnels(cls) -> dict[str, Callable[[dict[str, str|list[str]]], bool]]:
@@ -126,7 +126,7 @@ class ParcheminViergeNivele(EntiteeNivele):
             "taux_latence_caste": lambda dictionnaire: True,
             "taux_latence_impregne": lambda dictionnaire: True
         }
-    
+
     @classmethod
     @property
     def multiple(cls) -> dict[str, bool]:
@@ -148,4 +148,3 @@ class ParcheminViergeNivele(EntiteeNivele):
         parchemin.nom = self.nom
         parchemin.fantome = self.fantome
         return parchemin
-        
