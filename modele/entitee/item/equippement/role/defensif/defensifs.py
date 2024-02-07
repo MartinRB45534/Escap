@@ -9,7 +9,7 @@ from .defensif import Defensif
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ......effet.attaque.attaque import AttaqueParticulier
+    from ......effet.agissant.attaque import AttaqueParticulier
     from ......labyrinthe.labyrinthe import Labyrinthe
 
 class DefensifProportion(Defensif):

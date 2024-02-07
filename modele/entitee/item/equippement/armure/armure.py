@@ -16,10 +16,10 @@ if TYPE_CHECKING:
 
 class Armure(Equippement):
     """La classe des équipements de type armure. On ne peut en porter qu'une à la fois."""
-    def __init__(self,labyrinthe:Labyrinthe,position:crt.Position=crt.POSITION_ABSENTE):
+    def __init__(self,labyrinthe:Labyrinthe,poids:float,frottements:float,position:crt.Position=crt.POSITION_ABSENTE):
         Equippement.__init__(self,labyrinthe,position)
-        self.poids = 10 #C'est lourd !
-        self.frottements = 8 #Il y a pire.
+        self.poids = poids
+        self.frottements = frottements
 
     @staticmethod
     def get_image():

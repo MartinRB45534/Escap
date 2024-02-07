@@ -29,7 +29,8 @@ class Armes(StockageCategorieNivelee):
 class ArmeNivele(EntiteeNivele):
     """Une arme toute simple."""
     def __init__(self, nom: str, fantome: bool,
-                 element:mdl.Element, poids:list[float], frottements:list[float], portee:list[float], tranchant:list[float]):
+                 element:mdl.Element, poids:float, frottements:float,
+                 portee:list[float], tranchant:list[float]):
         EntiteeNivele.__init__(self, nom)
         self.fantome = fantome
         self.element = element
@@ -39,10 +40,10 @@ class ArmeNivele(EntiteeNivele):
         self.tranchant = tranchant
 
     def check(self) -> bool:
-        return (all([poids >= 0 for poids in self.poids]) and
-                all([frottements >= 0 for frottements in self.frottements]) and
-                all([portee >= 0 for portee in self.portee]) and
-                all([tranchant >= 0 for tranchant in self.tranchant]))
+        return (self.poids >= 0 and
+                self.frottements >= 0 and
+                all(portee >= 0 for portee in self.portee) and
+                all(tranchant >= 0 for tranchant in self.tranchant))
 
     def stringify(self) -> str:
         return f"""{{
@@ -61,7 +62,7 @@ class ArmeNivele(EntiteeNivele):
     def parse(cls, json: str):
         """Parse un json en ArmeNivele."""
         dictionnaire = parse(json)
-        return ArmeNivele(dictionnaire["nom"], dictionnaire["fantome"], dictionnaire["element"], dictionnaire["poids"], dictionnaire["frottements"], dictionnaire["portee"], dictionnaire["tranchant"])
+        return ArmeNivele(dictionnaire["nom"], dictionnaire["fantome"], mdl.Element(dictionnaire["element"]), dictionnaire["poids"], dictionnaire["frottements"], dictionnaire["portee"], dictionnaire["tranchant"])
 
     @classmethod
     @property
@@ -137,7 +138,7 @@ class ArmeNivele(EntiteeNivele):
 
     def make(self, niveau: int) -> mdl.Arme:
         """Crée un ArmeSimple à partir de l'instance."""
-        arme = mdl.Arme(mdl.NOWHERE, self.poids[niveau], self.frottements[niveau], self.element, self.tranchant[niveau], self.portee[niveau])
+        arme = mdl.Arme(mdl.NOWHERE, self.poids, self.frottements, self.element, self.tranchant[niveau], self.portee[niveau])
         arme.nom = self.nom
         arme.fantome = self.fantome
         return arme
@@ -146,7 +147,7 @@ class EpeeNivele(ArmeNivele):
     """Une épée."""
     def make(self, niveau: int) -> mdl.Epee:
         """Crée une Epee à partir de l'instance."""
-        epee = mdl.Epee(mdl.NOWHERE, self.poids[niveau], self.frottements[niveau], self.element, self.tranchant[niveau], self.portee[niveau])
+        epee = mdl.Epee(mdl.NOWHERE, self.poids, self.frottements, self.element, self.tranchant[niveau], self.portee[niveau])
         epee.nom = self.nom
         epee.fantome = self.fantome
         return epee
@@ -155,7 +156,7 @@ class LanceNivele(ArmeNivele):
     """Une lance."""
     def make(self, niveau: int) -> mdl.Lance:
         """Crée une Lance à partir de l'instance."""
-        lance = mdl.Lance(mdl.NOWHERE, self.poids[niveau], self.frottements[niveau], self.element, self.tranchant[niveau], self.portee[niveau])
+        lance = mdl.Lance(mdl.NOWHERE, self.poids, self.frottements, self.element, self.tranchant[niveau], self.portee[niveau])
         lance.nom = self.nom
         lance.fantome = self.fantome
         return lance

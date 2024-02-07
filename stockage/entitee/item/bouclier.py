@@ -27,7 +27,7 @@ class Boucliers(StockageCategorieNivelee):
 class BouclierNivele(EntiteeNivele):
     """Une bouclier toute simple."""
     def __init__(self, nom: str, fantome: bool,
-                 poids:list[float], frottements:list[float], bloque_quantite:bool,
+                 poids:float, frottements:float, bloque_quantite:bool,
                  degats_bloques:list[float], bloque_proportion:bool,
                  taux_degats:list[float]):
         EntiteeNivele.__init__(self, nom)
@@ -40,10 +40,10 @@ class BouclierNivele(EntiteeNivele):
         self.taux_degats = taux_degats
 
     def check(self) -> bool:
-        return (all([poids >= 0 for poids in self.poids]) and
-                all([frottements >= 0 for frottements in self.frottements]) and
-                all([degats_bloques >= 0 for degats_bloques in self.degats_bloques]) and
-                all([taux_degats >= 0 for taux_degats in self. taux_degats]))
+        return (self.poids >= 0 and
+                self.frottements >= 0 and
+                all(degats_bloques >= 0 for degats_bloques in self.degats_bloques) and
+                all(taux_degats >= 0 for taux_degats in self. taux_degats))
 
     def stringify(self) -> str:
         return f"""{{
@@ -145,7 +145,7 @@ class BouclierNivele(EntiteeNivele):
 
     def make(self, niveau: int) -> mdl.Bouclier:
         """Crée un BouclierSimple à partir de l'instance."""
-        bouclier = mdl.Bouclier(mdl.NOWHERE, self.poids[niveau], self.frottements[niveau], self.degats_bloques[niveau] if self.bloque_quantite else 0, self.taux_degats[niveau] if self.bloque_proportion else 0)
+        bouclier = mdl.Bouclier(mdl.NOWHERE, self.poids, self.frottements, self.degats_bloques[niveau] if self.bloque_quantite else 0, self.taux_degats[niveau] if self.bloque_proportion else 0)
         bouclier.nom = self.nom
         bouclier.fantome = self.fantome
         return bouclier

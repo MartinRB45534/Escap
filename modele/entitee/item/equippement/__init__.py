@@ -6,3 +6,4 @@ from .degainable import *
 from .heaume import *
 from .role import *
 from .equippement import *
+from .equippements import *
