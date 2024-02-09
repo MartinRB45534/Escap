@@ -3,31 +3,70 @@ Fichier contenant la classe de stockage des armes.
 """
 
 from __future__ import annotations
-from typing import Callable
 from json import loads as parse
 
 import modele as mdl
 
-from ...stockage import StockageCategorieNivelee, StockageNivele
+from ...stockage import StockageCategorieNivelee
 from ..entitee import EntiteeNivele
-
-class Armes(StockageCategorieNivelee):
-    """Les informations des armes."""
-    nom = "Armes"
-    titre_nouveau = "Nouvelle arme"
-    description = "Les armes sont destinés à être équippées. Elles permettent d'effectuer des attaques différentes. Les épées et les lances en particulier interagissent avec certains skills."
-    avertissement = "Il existe déjà une arme avec ce nom !"
-
-    @property
-    def elements(self) -> dict[str, type[StockageNivele]]:
-        return {
-            "Epee": EpeeNivele,
-            "Lance": LanceNivele,
-            "Autre": ArmeNivele
-        }
 
 class ArmeNivele(EntiteeNivele):
     """Une arme toute simple."""
+
+    champs = {
+            "fantome": bool,
+            "element": mdl.Element,
+            "poids": float,
+            "frottements": float,
+            "portee": float,
+            "tranchant": float
+        }
+
+    niveles = {
+            "fantome": False,
+            "element": False,
+            "poids": False,
+            "frottements": False,
+            "portee": True,
+            "tranchant": True
+        }
+
+    acceptors = {
+            "fantome": lambda _: True,
+            "element": lambda _: True,
+            "poids": lambda poids: float(poids) >= 0,
+            "frottements": lambda frottements: float(frottements) >= 0,
+            "portee": lambda portee: float(portee) >= 0,
+            "tranchant": lambda tranchant: float(tranchant) >= 0
+        }
+
+    avertissements = {
+            "fantome": "Cet avertissement n'est pas censé apparaître.",
+            "element": "Cet avertissement n'est pas censé apparaître non plus.",
+            "poids": "Le poids doit être positif.",
+            "frottements": "Le frottement doit être positif.",
+            "portee": "La portée doit être positive.",
+            "tranchant": "Le tranchant doit être positif."
+        }
+
+    conditionnels = {
+            "fantome": lambda dictionnaire: True,
+            "element": lambda dictionnaire: True,
+            "poids": lambda dictionnaire: True,
+            "frottements": lambda dictionnaire: True,
+            "portee": lambda dictionnaire: True,
+            "tranchant": lambda dictionnaire: True
+        }
+
+    multiple = {
+            "fantome": False,
+            "element": False,
+            "poids": False,
+            "frottements": False,
+            "portee": False,
+            "tranchant": False
+        }
+
     def __init__(self, nom: str, fantome: bool,
                  element:mdl.Element, poids:float, frottements:float,
                  portee:list[float], tranchant:list[float]):
@@ -64,78 +103,6 @@ class ArmeNivele(EntiteeNivele):
         dictionnaire = parse(json)
         return ArmeNivele(dictionnaire["nom"], dictionnaire["fantome"], mdl.Element(dictionnaire["element"]), dictionnaire["poids"], dictionnaire["frottements"], dictionnaire["portee"], dictionnaire["tranchant"])
 
-    @classmethod
-    @property
-    def champs(cls) -> dict[str, type[int|str|float|bool|mdl.Element]]:
-        return {
-            "fantome": bool,
-            "element": mdl.Element,
-            "poids": float,
-            "frottements": float,
-            "portee": float,
-            "tranchant": float
-        }
-
-    @classmethod
-    @property
-    def niveles(cls) -> dict[str, bool]:
-        return {
-            "fantome": False,
-            "element": False,
-            "poids": False,
-            "frottements": False,
-            "portee": True,
-            "tranchant": True
-        }
-
-    @classmethod
-    @property
-    def acceptors(cls) -> dict[str, Callable[[str], bool]]:
-        return {
-            "fantome": lambda _: True,
-            "element": lambda element: element in mdl.Element,
-            "poids": lambda poids: float(poids) >= 0,
-            "frottements": lambda frottements: float(frottements) >= 0,
-            "portee": lambda portee: float(portee) >= 0,
-            "tranchant": lambda tranchant: float(tranchant) >= 0
-        }
-
-    @classmethod
-    @property
-    def avertissements(cls) -> dict[str, str]:
-        return {
-            "fantome": "Cet avertissement n'est pas censé apparaître.",
-            "element": "Choisissez un élément.",
-            "poids": "Le poids doit être positif.",
-            "frottements": "Le frottement doit être positif.",
-            "portee": "La portée doit être positive.",
-            "tranchant": "Le tranchant doit être positif."
-        }
-
-    @classmethod
-    @property
-    def conditionnels(cls) -> dict[str, Callable[[dict[str, str|list[str]]], bool]]:
-        return {
-            "fantome": lambda dictionnaire: True,
-            "element": lambda dictionnaire: True,
-            "poids": lambda dictionnaire: True,
-            "frottements": lambda dictionnaire: True,
-            "portee": lambda dictionnaire: True,
-            "tranchant": lambda dictionnaire: True
-        }
-
-    @classmethod
-    @property
-    def multiple(cls) -> dict[str, bool]:
-        return {
-            "fantome": False,
-            "element": False,
-            "poids": False,
-            "frottements": False,
-            "portee": False,
-            "tranchant": False
-        }
-
     def make(self, niveau: int) -> mdl.Arme:
         """Crée un ArmeSimple à partir de l'instance."""
         arme = mdl.Arme(mdl.NOWHERE, self.poids, self.frottements, self.element, self.tranchant[niveau], self.portee[niveau])
@@ -160,3 +127,15 @@ class LanceNivele(ArmeNivele):
         lance.nom = self.nom
         lance.fantome = self.fantome
         return lance
+
+class Armes(StockageCategorieNivelee):
+    """Les informations des armes."""
+    nom = "Armes"
+    titre_nouveau = "Nouvelle arme"
+    description = "Les armes sont destinés à être équippées. Elles permettent d'effectuer des attaques différentes. Les épées et les lances en particulier interagissent avec certains skills."
+    avertissement = "Il existe déjà une arme avec ce nom !"
+    elements = {
+        "Epee": EpeeNivele,
+        "Lance": LanceNivele,
+        "Autre": ArmeNivele
+    }

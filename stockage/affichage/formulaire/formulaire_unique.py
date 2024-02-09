@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 from typing import  Callable, TypeVar
+from enum import StrEnum
 
 import affichage as af
-import modele as mdl
 
-from ...stockage import StockageUnique
+from ...stockage import StockageUnique, StockageCategorieUnique, StockageCategorieNivelee, StockageSurCategorie
 from ...stockageglobal import StockageGlobal
-from ..menu_element import MenuElement
+from ..menu_enum import MenuEnum
 
 # Le stockage hérite de StockageUnique
 StockageUn = TypeVar("StockageUn", bound=StockageUnique)
@@ -24,8 +24,8 @@ class FormulaireUnique(af.WrapperNoeud):
         self.textes:dict[str, af.Texte] = {
             "nom": af.Texte("Nom :"),
         }
-        self.inputs:dict[str, af.TexteInput|af.BoutonOnOff|MenuElement|
-                         list[af.TexteInput|MenuElement]] = {
+        self.inputs:dict[str, af.TexteInput|af.BoutonOnOff|MenuEnum|
+                         list[af.TexteInput|MenuEnum]] = {
             "nom": af.TexteInput(acceptor=lambda nom: nom == self.nom or 
                                  StockageGlobal.global_.valide_nom(nom)),
         }
@@ -80,8 +80,8 @@ class FormulaireUnique(af.WrapperNoeud):
         """Retourne si le champ est conditionnel."""
         return key == "nom" or self.stockage.conditionnels[key](self.to_dict())
 
-    def get_input(self, type_: type[int|str|float|bool|mdl.Element],
-                  acceptor: Callable[[str], bool]) -> af.TexteInput|af.BoutonOnOff|MenuElement:
+    def get_input(self, type_: type[int|str|float|bool|StrEnum|StockageCategorieUnique|StockageCategorieNivelee|StockageSurCategorie],
+                  acceptor: Callable[[str], bool]) -> af.TexteInput|af.BoutonOnOff|MenuEnum:
         """Retourne un input."""
         if type_ is int:
             return af.IntInput(acceptor=acceptor)
@@ -91,13 +91,13 @@ class FormulaireUnique(af.WrapperNoeud):
             return af.NumberInput(acceptor=acceptor)
         elif type_ is bool:
             return af.BoutonOnOff(af.SKIN_VALIDER, af.SKIN_ANNULER, "Oui", "Non")
-        elif type_ is mdl.Element:
-            return MenuElement()
+        elif issubclass(type_, StrEnum):
+            return MenuEnum(type_)
         else:
             raise TypeError(f"Le type {type_} n'est pas supporté.")
 
-    def get_multiple_input(self, type_: type[int|str|float|bool|mdl.Element],
-                           acceptor: Callable[[str], bool]) -> af.TexteInput|MenuElement:
+    def get_multiple_input(self, type_: type[int|str|float|bool|StrEnum|StockageCategorieUnique|StockageCategorieNivelee|StockageSurCategorie],
+                           acceptor: Callable[[str], bool]) -> af.TexteInput|MenuEnum:
         """Retourne un input multiple."""
         if type_ is int:
             raise ValueError("Input est un champ entier, il ne peut pas être multiple !")
@@ -107,12 +107,12 @@ class FormulaireUnique(af.WrapperNoeud):
             raise ValueError("Input est un champ flottant, il ne peut pas être multiple !")
         elif type_ is bool:
             raise ValueError("Input est un champ booléen, il ne peut pas être multiple !")
-        elif type_ is mdl.Element:
-            return MenuElement()
+        elif issubclass(type_, StrEnum):
+            return MenuEnum(type_)
         else:
             raise TypeError(f"Le type {type_} n'est pas supporté.")
 
-    def form(self, nom:str, type_: type[int|str|float|bool|mdl.Element],
+    def form(self, nom:str, type_: type[int|str|float|bool|StrEnum|StockageCategorieUnique|StockageCategorieNivelee|StockageSurCategorie],
              acceptor: Callable[[str], bool], avertissement:str, multiple: bool):
         """Ajoute un champ."""
         self.textes[nom] = af.Texte(nom)
@@ -197,7 +197,7 @@ class FormulaireUnique(af.WrapperNoeud):
 
     def in_up(self):
         self.courant.unset_actif()
-        if isinstance(self.courant, (af.TexteInput, af.BoutonOnOff, MenuElement)):
+        if isinstance(self.courant, (af.TexteInput, af.BoutonOnOff, MenuEnum)):
             if self.courant in self.inputs.values():
                 i = list(self.inputs.values()).index(self.courant)
             else:
@@ -225,7 +225,7 @@ class FormulaireUnique(af.WrapperNoeud):
 
     def in_down(self):
         self.courant.unset_actif()
-        if isinstance(self.courant, (af.TexteInput, af.BoutonOnOff, MenuElement)):
+        if isinstance(self.courant, (af.TexteInput, af.BoutonOnOff, MenuEnum)):
             if self.courant in self.inputs.values():
                 i = list(self.inputs.values()).index(self.courant)
             else:

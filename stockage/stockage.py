@@ -5,8 +5,7 @@ Classes mères des classes de stockage.
 from __future__ import annotations
 from typing import Self, Optional,  Callable
 from json import loads as parse
-
-import modele as mdl
+from enum import StrEnum
 
 class Stockage:
     """Classe mère des classes de stockage."""
@@ -28,35 +27,20 @@ class Stockage:
 
 class StockageUnique(Stockage):
     """Stocke un élément, pas une catégorie d'éléments."""
-    @classmethod
-    @property
-    def champs(cls) -> dict[str, type[int|str|float|bool|mdl.Element]]:
-        """Retourne les champs de l'objet."""
-        raise NotImplementedError
+    champs: dict[str, type[int|str|float|bool|StrEnum]]
+    """Retourne les champs de l'objet."""
 
-    @classmethod
-    @property
-    def acceptors(cls) -> dict[str, Callable[[str], bool]]:
-        """Retourne les fonctions de vérification des champs."""
-        raise NotImplementedError
+    acceptors: dict[str, Callable[[str], bool]]
+    """Retourne les fonctions de vérification des champs."""
 
-    @classmethod
-    @property
-    def avertissements(cls) -> dict[str, str]:
-        """Retourne les avertissements des champs."""
-        raise NotImplementedError
+    avertissements: dict[str, str]
+    """Retourne les avertissements des champs."""
 
-    @classmethod
-    @property
-    def conditionnels(cls) -> dict[str, Callable[[dict[str, str|list[str]]], bool]]:
-        """Retourne les fonctions qui déterminent les champs à afficher."""
-        raise NotImplementedError
+    conditionnels: dict[str, Callable[[dict[str, str|list[str]]], bool]]
+    """Retourne les fonctions qui déterminent les champs à afficher."""
 
-    @classmethod
-    @property
-    def multiple(cls) -> dict[str, bool]:
-        """Retourne si les champs sont multiples. Seuls certains champs peuvent être multiples."""
-        raise NotImplementedError
+    multiple: dict[str, bool]
+    """Retourne si les champs sont multiples. Seuls certains champs peuvent être multiples."""
 
     def make(self) -> object:
         """Retourne l'objet correspondant."""
@@ -64,41 +48,23 @@ class StockageUnique(Stockage):
 
 class StockageNivele(Stockage):
     """Stocke un élément avec un niveau."""
-    @classmethod
-    @property
-    def champs(cls) -> dict[str, type[int|str|float|bool|mdl.Element]]:
-        """Retourne les champs de l'objet."""
-        raise NotImplementedError
+    champs: dict[str, type[int|str|float|bool|StrEnum|StockageCategorieUnique|StockageCategorieNivelee|StockageSurCategorie]] = NotImplemented
+    """Retourne les champs de l'objet."""
 
-    @classmethod
-    @property
-    def niveles(cls) -> dict[str, bool]:
-        """Retourne si les champs sont niveles."""
-        raise NotImplementedError
+    niveles: dict[str, bool] = NotImplemented
+    """Retourne si les champs sont niveles."""
 
-    @classmethod
-    @property
-    def acceptors(cls) -> dict[str, Callable[[str], bool]]:
-        """Retourne les fonctions de vérification des champs."""
-        raise NotImplementedError
+    acceptors: dict[str, Callable[[str], bool]] = NotImplemented
+    """Retourne les fonctions de vérification des champs."""
 
-    @classmethod
-    @property
-    def avertissements(cls) -> dict[str, str]:
-        """Retourne les avertissements des champs."""
-        raise NotImplementedError
+    avertissements: dict[str, str] = NotImplemented
+    """Retourne les avertissements des champs."""
 
-    @classmethod
-    @property
-    def conditionnels(cls) -> dict[str, Callable[[dict[str, str|list[str]]], bool]]:
-        """Retourne les fonctions qui déterminent les champs à afficher."""
-        raise NotImplementedError
+    conditionnels: dict[str, Callable[[dict[str, str|list[str]]], bool]] = NotImplemented
+    """Retourne les fonctions qui déterminent les champs à afficher."""
 
-    @classmethod
-    @property
-    def multiple(cls) -> dict[str, bool]:
-        """Retourne si les champs sont multiples. Seuls certains champs peuvent être multiples."""
-        raise NotImplementedError
+    multiple: dict[str, bool] = NotImplemented
+    """Retourne si les champs sont multiples. Seuls certains champs peuvent être multiples."""
 
     def make(self, niveau: int) -> object:
         """Retourne l'objet correspondant."""
@@ -106,10 +72,11 @@ class StockageNivele(Stockage):
 
 class StockageCategorieUnique(Stockage):
     """Stocke une catégorie d'éléments, pas un élément ni une catégorie de catégories."""
-    nom:str
-    titre_nouveau:str
-    description:str
-    avertissement:str
+    nom: str
+    titre_nouveau: str
+    description: str
+    avertissement: str
+    elements: dict[str, type[StockageUnique]]
 
     def __init__(self):
         Stockage.__init__(self, self.nom)
@@ -153,11 +120,6 @@ class StockageCategorieUnique(Stockage):
             )
         return stockage.make()
 
-    @property
-    def elements(self) -> dict[str, type[StockageUnique]]:
-        """Retourne les éléments de la catégorie."""
-        raise NotImplementedError
-
     def warn_nom(self, nom:str) -> str:
         """Précise qui a déjà ce nom."""
         for contenu in self.contenu:
@@ -167,10 +129,11 @@ class StockageCategorieUnique(Stockage):
 
 class StockageCategorieNivelee(Stockage):
     """Stocke une catégorie d'éléments, pas un élément ni une catégorie de catégories."""
-    nom:str
-    titre_nouveau:str
-    description:str
-    avertissement:str
+    nom: str
+    titre_nouveau: str
+    description: str
+    avertissement: str
+    elements: dict[str, type[StockageNivele]]
 
     def __init__(self):
         Stockage.__init__(self, self.nom)
@@ -213,11 +176,6 @@ class StockageCategorieNivelee(Stockage):
                 f"L'élément {nom} est nivele, il faut donc spécifier un niveau."
             )
         return stockage.make(niveau)
-
-    @property
-    def elements(self) -> dict[str, type[StockageNivele]]:
-        """Retourne les éléments de la catégorie."""
-        raise NotImplementedError
 
     def warn_nom(self, nom:str) -> str:
         """Précise qui a déjà ce nom."""

@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import  Callable
 
 import affichage as af
-from ..menu_element import MenuElement
+from ..menu_enum import MenuEnum
 
 from .formulaire_unique import FormulaireUnique, StockageUn
 
@@ -34,7 +34,7 @@ class FormulaireModificationUnique(FormulaireUnique, af.NoeudVertical):
                     input_[-1].valeur = str(attr)
                     input_.append(self.get_multiple_input(stockage.champs[key], stockage.acceptors[key]))
             else:
-                assert isinstance(input_, af.TexteInput|af.BoutonOnOff|MenuElement)
+                assert not isinstance(input_, list)
                 input_.valeur = str(getattr(objet, key))
 
         self.make_contenu()
@@ -60,7 +60,7 @@ class FormulaireModificationUnique(FormulaireUnique, af.NoeudVertical):
             self.courant = self.bouton_modifier
             self.courant.set_actif()
             return self
-        if isinstance(self.courant, (af.TexteInput, af.BoutonOnOff, MenuElement)):
+        if isinstance(self.courant, (af.TexteInput, af.BoutonOnOff, MenuEnum)):
             if self.courant in self.inputs.values():
                 i = list(self.inputs.values()).index(self.courant)
             else:
@@ -92,7 +92,7 @@ class FormulaireModificationUnique(FormulaireUnique, af.NoeudVertical):
             self.courant = self.bouton_supprimer
             self.courant.set_actif()
             return self
-        if isinstance(self.courant, (af.TexteInput, af.BoutonOnOff, MenuElement)):
+        if isinstance(self.courant, (af.TexteInput, af.BoutonOnOff, MenuEnum)):
             if self.courant in self.inputs.values():
                 i = list(self.inputs.values()).index(self.courant)
             else:

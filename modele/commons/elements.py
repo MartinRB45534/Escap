@@ -2,9 +2,9 @@
 Sert à définir les différents éléments du jeu.
 """
 
-from enum import Enum
+from enum import StrEnum
 
-class Element(Enum):
+class Element(StrEnum):
     """Contient les quatre éléments."""
     TERRE = "Terre"
     FEU = "Feu"
