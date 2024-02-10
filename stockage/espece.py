@@ -64,5 +64,5 @@ class Especes(StockageCategorieUnique):
     description = "Chaque espèce a un nom et un nombre de doigts possiblement nul (nombre d'anneaux qu'elle peut porter). Chaque agissant a une ou plusieurs espèces (seule la première est prise en compte pour les doigts). Certains éléments du jeu interagissent avec les espèces."
     avertissement = "Il existe déjà une espèce avec ce nom !"
     elements = {
-            "especes": Espece
-        }
+        "especes": Espece
+    }

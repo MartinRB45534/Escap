@@ -3,12 +3,16 @@ Classes mères des classes de stockage.
 """
 
 from __future__ import annotations
-from typing import Self, Optional,  Callable
+from typing import Self, Optional,  Callable, TypeVar, TYPE_CHECKING
 from json import loads as parse
 from enum import StrEnum
 
+if TYPE_CHECKING:
+    from .stockageglobal import StockageGlobal
+
 class Stockage:
     """Classe mère des classes de stockage."""
+    global_:StockageGlobal
     def __init__(self, nom: str):
         self.nom = nom
 
@@ -27,6 +31,10 @@ class Stockage:
 
 class StockageUnique(Stockage):
     """Stocke un élément, pas une catégorie d'éléments."""
+    def __init__(self, nom:str):
+        Stockage.__init__(self, nom)
+        self.dependants: set[StockageUnique|StockageNivele] = set()
+
     champs: dict[str, type[int|str|float|bool|StrEnum]]
     """Retourne les champs de l'objet."""
 
@@ -46,8 +54,18 @@ class StockageUnique(Stockage):
         """Retourne l'objet correspondant."""
         raise NotImplementedError
 
+    def set_dependances(self):
+        """Se rajoute aux dépendants des objets dont il dépend"""
+
+    def unset_dependances(self):
+        """Se retire des dépendants des objets dont il dépend"""
+
 class StockageNivele(Stockage):
     """Stocke un élément avec un niveau."""
+    def __init__(self, nom: str):
+        Stockage.__init__(self, nom)
+        self.dependants: set[StockageUnique|StockageNivele] = set()
+
     champs: dict[str, type[int|str|float|bool|StrEnum|StockageCategorieUnique|StockageCategorieNivelee|StockageSurCategorie]] = NotImplemented
     """Retourne les champs de l'objet."""
 
@@ -69,6 +87,12 @@ class StockageNivele(Stockage):
     def make(self, niveau: int) -> object:
         """Retourne l'objet correspondant."""
         raise NotImplementedError
+
+    def set_dependances(self):
+        """Se rajoute aux dépendants des objets dont il dépend"""
+
+    def unset_dependances(self):
+        """Se retire des dépendants des objets dont il dépend"""
 
 class StockageCategorieUnique(Stockage):
     """Stocke une catégorie d'éléments, pas un élément ni une catégorie de catégories."""
@@ -119,6 +143,11 @@ class StockageCategorieUnique(Stockage):
                 f"L'élément {nom} n'est pas nivele, il ne faut donc pas spécifier de niveau."
             )
         return stockage.make()
+
+    def set_all_dependances(self):
+        """Set les dépendances de ses éléments"""
+        for contenu in self.contenu.values():
+            contenu.set_dependances()
 
     def warn_nom(self, nom:str) -> str:
         """Précise qui a déjà ce nom."""
@@ -177,6 +206,11 @@ class StockageCategorieNivelee(Stockage):
             )
         return stockage.make(niveau)
 
+    def set_all_dependances(self):
+        """Set les dépendances de ses éléments"""
+        for contenu in self.contenu.values():
+            contenu.set_dependances()
+
     def warn_nom(self, nom:str) -> str:
         """Précise qui a déjà ce nom."""
         for contenu in self.contenu:
@@ -187,7 +221,7 @@ class StockageCategorieNivelee(Stockage):
 class StockageSurCategorie(Stockage):
     """Stocke une catégorie de catégories, pas un élément ni une catégorie d'éléments."""
     nom:str
-    elements:dict[str, type[StockageCategorieUnique]|type[StockageCategorieNivelee]|type[StockageSurCategorie]]
+    elements:dict[str, type[StockageCategorieUnique|StockageCategorieNivelee|StockageSurCategorie]]
 
     def __init__(self):
         Stockage.__init__(self, self.nom)
@@ -233,6 +267,24 @@ class StockageSurCategorie(Stockage):
             except ValueError:
                 pass
         raise ValueError(f"L'élément {nom} n'existe pas.")
+
+    StockageCategorie = TypeVar("StockageCategorie")
+    def trouve_stockage(self, type_:type[StockageCategorie]) -> StockageCategorie:
+        """Renvoie le stockage de ce type."""
+        for contenu in self.contenu.values():
+            if isinstance(contenu, type_):
+                return contenu
+            if isinstance(contenu, StockageSurCategorie):
+                try:
+                    return contenu.trouve_stockage(type_)
+                except ValueError:
+                    pass
+        raise ValueError(f"Le stockage de type {type_} n'existe pas.")
+
+    def set_all_dependances(self):
+        """Set les dépendances des sous-éléments."""
+        for contenu in self.contenu.values():
+            contenu.set_all_dependances()
 
     def warn_nom(self, nom:str) -> str:
         """Précise qui a déjà ce nom."""

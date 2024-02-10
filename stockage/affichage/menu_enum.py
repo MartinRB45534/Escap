@@ -33,7 +33,9 @@ class MenuEnum(af.MenuDeroulant):
     def valeur(self, valeur: str):
         """Change l'élément sélectionné."""
         try:
-            texte = [texte for texte in self.liste.contenu if isinstance(texte, af.TexteMenuDeroulant) and texte.get_texte() == valeur][0]
+            texte = [texte for texte in self.liste.contenu
+                     if isinstance(texte, af.TexteMenuDeroulant)
+                     and texte.get_texte() == valeur][0]
             texte.set_actif()
         except IndexError as e:
             raise ValueError(f"L'élément {valeur} n'existe pas dans l'énumération.") from e

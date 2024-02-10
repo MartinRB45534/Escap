@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from .stockage import StockageCategorieUnique, StockageCategorieNivelee, StockageSurCategorie
+from .stockage import Stockage, StockageCategorieUnique, StockageCategorieNivelee, StockageSurCategorie
 from .entitee import Items
 from .espece import Especes
 
@@ -13,11 +13,10 @@ class StockageGlobal(StockageSurCategorie):
         "items": Items,
         "especes": Especes
     }
-    global_:StockageGlobal
 
     def __init__(self):
         StockageSurCategorie.__init__(self)
-        StockageGlobal.global_ = self
+        Stockage.global_ = self
 
     def valide_nom(self, nom:str) -> bool:
         """Vérifie que le nom est valide."""

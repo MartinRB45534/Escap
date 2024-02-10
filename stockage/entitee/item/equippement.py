@@ -19,12 +19,28 @@ class EquippementNivele(EntiteeNivele):
             "fantome": bool,
             "poids": float,
             "frottements": float,
-            "type_equippement": StrEnum("type_equippement", [("Anneau", "Anneau"), ("Armure", "Armure"), ("Heaume", "Heaume")]),
-            "defensif": StrEnum("defensif", [("non", "Pas d'effet défensif"), ("Plafond", "Dégats plafonnés"), ("Proportionnel", "Réduction proportionnelle des dégats"), ("Seuil", "Nullification des dégats en dessous d'un seuil"), ("Valeur", "Réduction des dégats d'une valeur fixe")]),
+            "type_equippement": StrEnum("type_equippement",
+                                        {"Anneau": "Anneau",
+                                         "Armure": "Armure",
+                                         "Heaume": "Heaume"}),
+            "defensif": StrEnum("defensif",
+                                {"non": "Pas d'effet défensif",
+                                 "Plafond": "Dégats plafonnés",
+                                 "Proportionnel": "Réduction proportionnelle des dégats",
+                                 "Seuil": "Nullification des attaques en dessous d'un seuil",
+                                 "Valeur": "Réduction des dégats d'une valeur fixe"}),
             "_degats": float,
-            "pv": StrEnum("pv", [("non", "Pas d'effet sur les PVs"), ("PompeAPV", "Régénération des PVs d'un montant fixe"), ("RenforceRegenPV", "Augmentation proportionnelle de la régénération des PVs")]),
+            "pv": StrEnum("pv",
+                          {"non": "Pas d'effet sur les PVs",
+                           "PompeAPV": "Régénération des PVs d'un montant fixe",
+                           "RenforceRegenPV":
+                           "Augmentation proportionnelle de la régénération des PVs"}),
             "_pv": float,
-            "pm": StrEnum("pm", [("non", "Pas d'effet sur les PMs"), ("PompeAPM", "Régénération des PMs d'un montant fixe"), ("RenforceRegenPM", "Augmentation proportionnelle de la régénération des PMs")]),
+            "pm": StrEnum("pm",
+                          {"non": "Pas d'effet sur les PMs",
+                           "PompeAPM": "Régénération des PMs d'un montant fixe",
+                           "RenforceRegenPM":
+                           "Augmentation proportionnelle de la régénération des PMs"}),
             "_pm": float,
             "accelerateur": bool,
             "_vitesse": float,
@@ -158,7 +174,7 @@ class EquippementNivele(EntiteeNivele):
                  pv: str, _pv: list[int], pm: str, _pm: list[int],
                  accelerateur: bool, vitesse: list[int], anoblisseur: bool,
                  priorite: list[int], elementaire: bool, element: mdl.Element,
-                 _affinite: list[int], tribal: bool, espece: mdl.Espece,
+                 _affinite: list[int], tribal: bool, espece: str,
                  _taux_stats: list[int]):
         EntiteeNivele.__init__(self, nom)
         self.fantome = fantome
@@ -219,14 +235,27 @@ class EquippementNivele(EntiteeNivele):
     def parse(cls, json: str):
         """Parse un json en EquippementNivele."""
         dictionnaire = parse(json)
-        return EquippementNivele(dictionnaire["nom"], dictionnaire["fantome"], dictionnaire["poids"], dictionnaire["frottements"], dictionnaire["type_equippement"], dictionnaire["defensif"], dictionnaire["degats"], dictionnaire["pv"], dictionnaire["_pv"], dictionnaire["pm"], dictionnaire["_pm"], dictionnaire["accelerateur"], dictionnaire["vitesse"], dictionnaire["anoblisseur"], dictionnaire["priorite"], dictionnaire["elementaire"], mdl.Element(dictionnaire["element"]), dictionnaire["_affinite"], dictionnaire["tribal"], mdl.Espece(dictionnaire["espece"]), dictionnaire["_taux_stats"])
+        return EquippementNivele(dictionnaire["nom"], dictionnaire["fantome"], dictionnaire["poids"], dictionnaire["frottements"], dictionnaire["type_equippement"], dictionnaire["defensif"], dictionnaire["degats"], dictionnaire["pv"], dictionnaire["_pv"], dictionnaire["pm"], dictionnaire["_pm"], dictionnaire["accelerateur"], dictionnaire["vitesse"], dictionnaire["anoblisseur"], dictionnaire["priorite"], dictionnaire["elementaire"], mdl.Element(dictionnaire["element"]), dictionnaire["_affinite"], dictionnaire["tribal"], dictionnaire["espece"], dictionnaire["_taux_stats"])
 
     def make(self, niveau: int) -> mdl.Equippement:
-        """Crée un EquippementSimple à partir de l'instance."""
-        equippement = mdl.equippements[(self.type_equippement, self.defensif, self.pv, self.pm, self.accelerateur, self.anoblisseur, self.elementaire, self.tribal)](mdl.NOWHERE, self.poids, self.frottements, self._degats[niveau] if self.defensif else 0, self._pv[niveau] if self.pv else 0, self._pm[niveau] if self.pm else 0, self._vitesse[niveau] if self.accelerateur else 0, self._priorite[niveau] if self.anoblisseur else 0, self._element if self.elementaire else None, self._affinite[niveau] if self.elementaire else 0, self._espece if self.tribal else None, self._taux_stats[niveau] if self.tribal else 0)
+        """Crée un Equippement à partir de l'instance."""
+        if self.tribal:
+            espece = self.global_.make(self._espece)
+            assert isinstance(espece, mdl.Espece), f"Erreur : {self._espece} n'est pas une espèce !?"
+        else:
+            espece = None
+        equippement = mdl.equippements[(self.type_equippement, self.defensif, self.pv, self.pm, self.accelerateur, self.anoblisseur, self.elementaire, self.tribal)](mdl.NOWHERE, self.poids, self.frottements, self._degats[niveau] if self.defensif else 0, self._pv[niveau] if self.pv else 0, self._pm[niveau] if self.pm else 0, self._vitesse[niveau] if self.accelerateur else 0, self._priorite[niveau] if self.anoblisseur else 0, self._element if self.elementaire else None, self._affinite[niveau] if self.elementaire else 0, espece, self._taux_stats[niveau] if self.tribal else 0)
         equippement.nom = self.nom
         equippement.fantome = self.fantome
         return equippement
+    
+    def set_dependances(self):
+        if self._espece:
+            self.global_.trouve_stockage(Especes).contenu[self._espece].dependants.add(self)
+
+    def unset_dependances(self):
+        if self._espece:
+            self.global_.trouve_stockage(Especes).contenu[self._espece].dependants.remove(self)
 
 class Equippements(StockageCategorieNivelee):
     """Les informations des équippements."""

@@ -33,6 +33,7 @@ class OngletCategorieNivelee(af.Onglet):
     def ajouter(self,element:stck.StockageNivele):
         """Ajoute une nouvelle espèce."""
         self.stockage.contenu[element.nom] = element
+        element.set_dependances()
         self.make_onglets()
         self.set_actif()
         self.onglets.select(self.onglets.boutons[-1])
@@ -40,5 +41,6 @@ class OngletCategorieNivelee(af.Onglet):
     def supprimer(self,element:stck.StockageNivele):
         """Supprime une espèce."""
         self.stockage.contenu.pop(element.nom)
+        element.unset_dependances()
         self.make_onglets()
         self.onglets.select(self.onglets.boutons[0])

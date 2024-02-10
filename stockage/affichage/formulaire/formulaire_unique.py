@@ -6,9 +6,9 @@ from enum import StrEnum
 
 import affichage as af
 
-from ...stockage import StockageUnique, StockageCategorieUnique, StockageCategorieNivelee, StockageSurCategorie
-from ...stockageglobal import StockageGlobal
+from ...stockage import Stockage, StockageUnique, StockageCategorieUnique, StockageCategorieNivelee, StockageSurCategorie
 from ..menu_enum import MenuEnum
+from ..menu_stockage import MenuStockage
 
 # Le stockage hérite de StockageUnique
 StockageUn = TypeVar("StockageUn", bound=StockageUnique)
@@ -27,7 +27,7 @@ class FormulaireUnique(af.WrapperNoeud):
         self.inputs:dict[str, af.TexteInput|af.BoutonOnOff|MenuEnum|
                          list[af.TexteInput|MenuEnum]] = {
             "nom": af.TexteInput(acceptor=lambda nom: nom == self.nom or 
-                                 StockageGlobal.global_.valide_nom(nom)),
+                                 self.stockage.global_.valide_nom(nom)),
         }
         self.avertissements:dict[str, af.TexteCache] = {
             "nom": af.TexteCache(""),
@@ -93,6 +93,8 @@ class FormulaireUnique(af.WrapperNoeud):
             return af.BoutonOnOff(af.SKIN_VALIDER, af.SKIN_ANNULER, "Oui", "Non")
         elif issubclass(type_, StrEnum):
             return MenuEnum(type_)
+        elif issubclass(type_, Stockage):
+            return MenuStockage(type_.global_.trouve_stockage(type_))
         else:
             raise TypeError(f"Le type {type_} n'est pas supporté.")
 
@@ -109,6 +111,8 @@ class FormulaireUnique(af.WrapperNoeud):
             raise ValueError("Input est un champ booléen, il ne peut pas être multiple !")
         elif issubclass(type_, StrEnum):
             return MenuEnum(type_)
+        elif issubclass(type_, Stockage):
+            return MenuStockage(type_.global_.trouve_stockage(type_))
         else:
             raise TypeError(f"Le type {type_} n'est pas supporté.")
 
@@ -140,7 +144,7 @@ class FormulaireUnique(af.WrapperNoeud):
                     if key == "nom":
                         if input_.valeur:
                             self.avertissements[key].set_texte(
-                                StockageGlobal.global_.warn_nom(input_.valeur))
+                                self.stockage.global_.warn_nom(input_.valeur))
                         else:
                             self.avertissements[key].set_texte("Le nom ne peut pas être vide.")
                     else:

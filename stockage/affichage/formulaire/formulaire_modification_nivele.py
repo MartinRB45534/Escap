@@ -15,7 +15,8 @@ class FormulaireModificationNivele(FormulaireNivele, af.NoeudVertical):
         af.NoeudVertical.__init__(self)
 
         self.bouton_modifier = af.BoutonFonction(af.SKIN_SHADE, "Modifier", self.ajouter)
-        self.bouton_supprimer = af.BoutonFonction(af.SKIN_SHADE, "Supprimer", lambda: supprimer(objet))
+        self.bouton_supprimer = af.BoutonFonction(af.SKIN_SHADE, "Supprimer", self.supprimer)
+        self.avertissement_supprimer = af.TexteCache("")
 
         FormulaireNivele.__init__(self, stockage, modifier)
 
@@ -44,6 +45,8 @@ class FormulaireModificationNivele(FormulaireNivele, af.NoeudVertical):
         self.make_contenu()
         self.check_avertissements()
 
+        self.super_supprimer = supprimer
+
     def make_contenu(self):
         self.liste.set_contenu(
             sum([
@@ -51,8 +54,24 @@ class FormulaireModificationNivele(FormulaireNivele, af.NoeudVertical):
                 for key, texte in self.textes.items()
                 if key == "nom" or key == "niveau" or self.stockage.conditionnels[key](self.to_dict())
             ], []) # type: ignore # Pylance wants me to specify the type if that empty list smh
-            + [self.bouton_modifier, self.bouton_supprimer]
+            + [self.bouton_modifier, self.bouton_supprimer, self.avertissement_supprimer]
         )
+
+    def update(self):
+        dependants = self.objet.dependants
+        if dependants:
+            self.avertissement_supprimer.texte = f"Cet objet est utilisé par : {', '.join([dependant.nom for dependant in dependants])}. Il ne peut pas être supprimé."
+            self.bouton_supprimer.skin = af.SKIN_VIDE
+        else:
+            self.avertissement_supprimer.texte = ""
+            self.bouton_supprimer.skin = af.SKIN_SHADE
+        FormulaireNivele.update(self)
+
+    def supprimer(self):
+        """Supprime l'objet s'il n'a pas de dépendants."""
+        if self.objet.dependants:
+            return
+        self.super_supprimer(self.objet)
 
     def in_right(self):
         # On continue vers l'intérieur (pour coller avec le reste)

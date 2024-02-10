@@ -17,7 +17,7 @@ class AffichageEditeur(af.Onglets):
         af.Onglets.__init__(self,af.DirectionAff.LEFT)
         stck.StockageGlobal()
         self.set_onglets([
-            OngletSurCategorie(stck.StockageGlobal.global_),
+            OngletSurCategorie(stck.Stockage.global_),
         ])
         assert isinstance(self.contenu, af.WrapperMarge)
         self.contenu.marges = (5, 5, 5, 5)
