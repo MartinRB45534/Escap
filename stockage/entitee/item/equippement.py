@@ -10,7 +10,7 @@ import modele as mdl
 
 from ...stockage import StockageCategorieNivelee
 from ..entitee import EntiteeNivele
-from ...espece import Especes
+from ...espece import Especes, Espece
 
 class EquippementNivele(EntiteeNivele):
     """Un Equippement tout simple."""
@@ -96,7 +96,7 @@ class EquippementNivele(EntiteeNivele):
             "_element": lambda _: True,
             "_affinite": lambda affinite: float(affinite) >= 0,
             "tribal": lambda _: True,
-            "_espece": lambda _: True,
+            "_espece": lambda espece: espece in Especes.global_.trouve_stockage(Especes).all_noms,
             "_taux_stats": lambda taux_stats: float(taux_stats) >= 0
         }
 
@@ -119,7 +119,7 @@ class EquippementNivele(EntiteeNivele):
             "_element": "Cet avertissement n'est pas censé apparaître non plus.",
             "_affinite": "L'affinité doit être positive.",
             "tribal": "Cet avertissement n'est pas censé apparaître non plus.",
-            "_espece": "Cet avertissement n'est pas censé apparaître non plus.",
+            "_espece": "Il faut choisir une espèce existante (peut-être qu'il n'en existe pas).",
             "_taux_stats": "Le taux de stats doit être positif."
         }
 
@@ -173,8 +173,8 @@ class EquippementNivele(EntiteeNivele):
                  type_equippement: str, defensif: str, degats: list[float],
                  pv: str, _pv: list[int], pm: str, _pm: list[int],
                  accelerateur: bool, vitesse: list[int], anoblisseur: bool,
-                 priorite: list[int], elementaire: bool, element: mdl.Element,
-                 _affinite: list[int], tribal: bool, espece: str,
+                 priorite: list[int], elementaire: bool, element: mdl.Element|None,
+                 _affinite: list[int], tribal: bool, espece: Espece|None,
                  _taux_stats: list[int]):
         EntiteeNivele.__init__(self, nom)
         self.fantome = fantome
@@ -235,7 +235,7 @@ class EquippementNivele(EntiteeNivele):
     def parse(cls, json: str):
         """Parse un json en EquippementNivele."""
         dictionnaire = parse(json)
-        return EquippementNivele(dictionnaire["nom"], dictionnaire["fantome"], dictionnaire["poids"], dictionnaire["frottements"], dictionnaire["type_equippement"], dictionnaire["defensif"], dictionnaire["degats"], dictionnaire["pv"], dictionnaire["_pv"], dictionnaire["pm"], dictionnaire["_pm"], dictionnaire["accelerateur"], dictionnaire["vitesse"], dictionnaire["anoblisseur"], dictionnaire["priorite"], dictionnaire["elementaire"], mdl.Element(dictionnaire["element"]), dictionnaire["_affinite"], dictionnaire["tribal"], dictionnaire["espece"], dictionnaire["_taux_stats"])
+        return EquippementNivele(dictionnaire["nom"], dictionnaire["fantome"], dictionnaire["poids"], dictionnaire["frottements"], dictionnaire["type_equippement"], dictionnaire["defensif"], dictionnaire["_degats"], dictionnaire["pv"], dictionnaire["_pv"], dictionnaire["pm"], dictionnaire["_pm"], dictionnaire["accelerateur"], dictionnaire["_vitesse"], dictionnaire["anoblisseur"], dictionnaire["_priorite"], dictionnaire["elementaire"], mdl.Element.__members__[dictionnaire["_element"]], dictionnaire["_affinite"], dictionnaire["tribal"], cls.global_.trouve_stockage(Especes).contenu[dictionnaire["_espece"]], dictionnaire["_taux_stats"])
 
     def make(self, niveau: int) -> mdl.Equippement:
         """Crée un Equippement à partir de l'instance."""

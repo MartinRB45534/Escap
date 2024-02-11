@@ -18,13 +18,18 @@ class MenuStockage(MenuEnum):
                                  StockageSurCategorie):
         self.stockage = stockage
         self.noms = stockage.all_noms
-        MenuEnum.__init__(self, type(StrEnum("Enum_" + stockage.nom, {nom: nom for nom in sorted(self.noms)})))
+        enum = StrEnum("Enum_" + stockage.nom, {nom: nom for nom in sorted(self.noms)})
+        if len(enum.__members__) == 0: # type: ignore # Pylance is being dumb
+            enum = StrEnum("Enum_" + stockage.nom, {"Pas d'éléments": "Pas d'éléments"})
+        MenuEnum.__init__(self, enum) # type: ignore # Pylance is being dumb
 
     def update(self):
         if self.noms != self.stockage.all_noms:
             self.noms = self.stockage.all_noms
             self.enum = StrEnum("Enum_" + self.stockage.nom,
                                 {nom: nom for nom in sorted(self.noms)})
+            if len(self.enum.__members__) == 0: # type: ignore # Pylance is being dumb
+                self.enum = StrEnum("Enum_" + self.stockage.nom, {"Pas d'éléments": "Pas d'éléments"})
             textes = [af.TexteMenuDeroulant(self, element) for element in self.enum]
             self.set_contenu_liste(textes)
             try:
