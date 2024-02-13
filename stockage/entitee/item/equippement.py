@@ -235,12 +235,15 @@ class EquippementNivele(EntiteeNivele):
     def parse(cls, json: str):
         """Parse un json en EquippementNivele."""
         dictionnaire = parse(json)
-        return EquippementNivele(dictionnaire["nom"], dictionnaire["fantome"], dictionnaire["poids"], dictionnaire["frottements"], dictionnaire["type_equippement"], dictionnaire["defensif"], dictionnaire["_degats"], dictionnaire["pv"], dictionnaire["_pv"], dictionnaire["pm"], dictionnaire["_pm"], dictionnaire["accelerateur"], dictionnaire["_vitesse"], dictionnaire["anoblisseur"], dictionnaire["_priorite"], dictionnaire["elementaire"], mdl.Element.__members__[dictionnaire["_element"]], dictionnaire["_affinite"], dictionnaire["tribal"], cls.global_.trouve_stockage(Especes).contenu[dictionnaire["_espece"]], dictionnaire["_taux_stats"])
+        if dictionnaire["tribal"]:
+            dictionnaire["_espece"] = Especes.global_.trouve_stockage(Especes).contenu[dictionnaire["_espece"]]
+        return EquippementNivele(dictionnaire["nom"], dictionnaire["fantome"], dictionnaire["poids"], dictionnaire["frottements"], dictionnaire["type_equippement"], dictionnaire["defensif"], dictionnaire["_degats"], dictionnaire["pv"], dictionnaire["_pv"], dictionnaire["pm"], dictionnaire["_pm"], dictionnaire["accelerateur"], dictionnaire["_vitesse"], dictionnaire["anoblisseur"], dictionnaire["_priorite"], dictionnaire["elementaire"], mdl.Element.__members__[dictionnaire["_element"]], dictionnaire["_affinite"], dictionnaire["tribal"], dictionnaire["_espece"], dictionnaire["_taux_stats"])
 
     def make(self, niveau: int) -> mdl.Equippement:
         """Crée un Equippement à partir de l'instance."""
         if self.tribal:
-            espece = self.global_.make(self._espece)
+            assert self._espece, "Erreur : il faut une espèce pour un équipement tribal !"
+            espece = self._espece.make()
             assert isinstance(espece, mdl.Espece), f"Erreur : {self._espece} n'est pas une espèce !?"
         else:
             espece = None
@@ -251,11 +254,11 @@ class EquippementNivele(EntiteeNivele):
     
     def set_dependances(self):
         if self._espece:
-            self.global_.trouve_stockage(Especes).contenu[self._espece].dependants.add(self)
+            self._espece.dependants.add(self)
 
     def unset_dependances(self):
         if self._espece:
-            self.global_.trouve_stockage(Especes).contenu[self._espece].dependants.remove(self)
+            self._espece.dependants.remove(self)
 
 class Equippements(StockageCategorieNivelee):
     """Les informations des équippements."""
