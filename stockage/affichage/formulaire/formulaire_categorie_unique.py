@@ -42,6 +42,12 @@ class FormulaireCategorieUnique(af.WrapperNoeud,af.NoeudVertical):
         self.contenu.set_contenu(self.liste)
 
         self.courant = self.element
+        if len(stockage.elements) == 1:
+            courant = self.element.liste.contenu[self.element.liste.courant]
+            assert isinstance(courant, af.TexteMenuDeroulant)
+            self.element.set_contenu(courant)
+            self.set_courant(self.element)
+            self.set_courant(self.formulaire)
 
     def set_courant(self, element: af.Cliquable | None):
         self.courant = element

@@ -251,7 +251,7 @@ class EquippementNivele(EntiteeNivele):
         equippement.nom = self.nom
         equippement.fantome = self.fantome
         return equippement
-    
+
     def set_dependances(self):
         if self._espece:
             self._espece.dependants.add(self)
