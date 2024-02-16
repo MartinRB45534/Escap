@@ -15,6 +15,8 @@ Déjà mentionné, probablement lourd s'il faut encore les faire monter de nivea
 ## Les items uniques
 Certains items (clés, l'objet à voler qui bloque l'un des niveaux de la classe voleur, les éléments de scénario) n'existent qu'en un seul exemplaire.
 Avoir des niveaux sur ces items n'aurait pas de sens (quoique ça pourrait se justifier si c'est fait avec soin).
+## Les ingrédients
+Les ingrédients sont utilisés pour les recettes. Requérir un niveau spécifique d'ingrédient complexifierait beaucoup l'alchimie. Les ingrédients n'ont pas lieu d'avoir des niveaux.
 ## Certains effets
 L'effet de sursis (un item perçant qui peut peut-être continuer sa trajectoire s'il parvient à tuer l'agissant sur sa case) n'a aucune raison d'avoir un niveau.
 L'attaque générée par un projectile lors de l'impact pourrait avoir un niveau lié à celui de l'item (si l'item en a un), ou celui du skill utilisé pour lancer le projectile (si le projectile est lancé par un skill), mais aucun des deux n'est complètement satisfaisant. L'attaque devrait juste renvoyer à l'item.
@@ -53,6 +55,21 @@ Les items uniques pourraient avoir un niveau. Du point de vue du lore, si il se 
 Pour la fin liée à la nouvelle Le goût de la vengeance, le joueur doit trouver un livre. Ce serait bizarre que ce livre ait lui aussi un niveau. Qu'est-ce qu'un livre de niveau 1 ? 6 ? 10 ?
 #### Et si le livre était un décors ?
 Le livre pourrait être posé sur une table, et l'ensemble serait un décors avec lequel le joueur interragirait. Il n'y aurait pas besoin de niveau pour le livre. Mais il faudrait peut-être un niveau pour le décors. Pas parfait mais acceptable s'il y a d'autres tables de niveaux inférieurs précédemment.
+## Question des ingrédients
+Les ingrédients pourraient avoir un niveau. Certains sont trouvés dans le labyrinthe, d'autres peuvent être achetés (produits par le boss du marchant à partir des cadavres qu'on vend, entre autres). Pour ceux trouvés, je peux fixer le niveaux selon l'étage. Pour ceux transformés, le niveau peut être dépendants du niveau du cadavre. Pour les autres vendus, le marchand pourrait en proposer de chaque niveau.
+#### Ça fait un peu beaucoup d'items, là, non ?
+En multipliant par 10, ça fait tout de suite beaucoup plus d'items. Pas top.
+Comme les items non uniques, on peut essayer de limiter le nombre d'items et jouer sur les niveaux pour apporter une progression. Mais si on compte au moins deux items par espèce (peau et dent comme pour les gobelins), avec seulement ombriul, orc, gobelin, on est déjà à 60 ingrédients différents.
+### Quel impact des niveaux sur le gameplay ?
+Contrairement aux items uniques qui n'apparaissent qu'à un niveau dans tout le jeu, les ingrédients devront exister en plusieurs exemplaires de chaque niveau. Il faut que ces niveaux aient un impact sur le gameplay.
+#### Utilisation distincte ?
+Les items pourraient apparaître dans des recettes complètement différentes selon leur niveau. Attention à ce que le joueur ne s'y perde pas. Certaines recettes deviendraient innaccessibles par manque d'ingrédients de bas niveau. Pas top.
+#### Remplaçabilité ?
+Les items de niveau supérieur pourraient remplacer les items de niveau inférieur. Attention à ne pas les gacher par innatention.
+#### Détermine le niveau du produit ?
+Le niveau le plus bas parmis les ingrédients pourrait déterminer le niveau du produit de la recette (limité toujours par le niveau du skill d'alchimie ? à moins que le niveau du skill serve uniquement à déterminer les recettes accessibles).
+#### Temps de ramassage et de préparation de la recette
+Si l'alchimie reste un skill actif, il faudrait qu'elle ait une latence associée. Le niveau des ingrédients pourrait l'impacter. 
 
 # Conclusion
 On va donner des niveaux à à peu près tout, et essayer de faire coller le lore.
