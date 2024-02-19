@@ -25,8 +25,8 @@ class BouclierNivele(EntiteeNivele):
 
     niveles = {
             "fantome": False,
-            "poids": False,
-            "frottements": False,
+            "poids": True,
+            "frottements": True,
             "bloque_quantite": False,
             "degats_bloques": True,
             "bloque_proportion": False,

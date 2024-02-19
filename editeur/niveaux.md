@@ -69,7 +69,7 @@ Les items de niveau supérieur pourraient remplacer les items de niveau inférie
 #### Détermine le niveau du produit ?
 Le niveau le plus bas parmis les ingrédients pourrait déterminer le niveau du produit de la recette (limité toujours par le niveau du skill d'alchimie ? à moins que le niveau du skill serve uniquement à déterminer les recettes accessibles).
 #### Temps de ramassage et de préparation de la recette
-Si l'alchimie reste un skill actif, il faudrait qu'elle ait une latence associée. Le niveau des ingrédients pourrait l'impacter. 
+Si l'alchimie reste un skill actif, il faudrait qu'elle ait une latence associée. Le niveau des ingrédients pourrait l'impacter. Le niveau des ingrédients impacterait aussi leur temps de ramassage.
 
 # Conclusion
 On va donner des niveaux à à peu près tout, et essayer de faire coller le lore.

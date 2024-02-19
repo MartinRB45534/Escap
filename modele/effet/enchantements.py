@@ -15,7 +15,7 @@ from .item.items import EffetPortee, EffetTranchant, EffetBombe
 # Imports des valeurs par défaut des paramètres
 from ..commons import Element
 
-class EnchantementForce(EnchantementAgissant,EffetForce):
+class EnchantementForce(EnchantementAgissant, EffetForce):
     """Les Enchantements qui affectent la force (en positif ou négatif)."""
     def __init__(self,temps_restant:float,gain_force:float):
         EnchantementAgissant.__init__(self,temps_restant)
@@ -24,7 +24,7 @@ class EnchantementForce(EnchantementAgissant,EffetForce):
     def modifie_force(self, force:float) -> float:
         return force + self.gain_force
 
-class EnchantementVision(EnchantementAgissant,EffetVision):
+class EnchantementVision(EnchantementAgissant, EffetVision):
     """Les Enchantements qui affectent le champ de vision (en positif ou négatif)."""
     def __init__(self,temps_restant:float,gain_vision:float):
         EnchantementAgissant.__init__(self,temps_restant)
@@ -33,7 +33,7 @@ class EnchantementVision(EnchantementAgissant,EffetVision):
     def modifie_vision(self, vision:float) -> float:
         return vision + self.gain_vision
 
-class EnchantementPv(EnchantementAgissant,EffetPv):
+class EnchantementPv(EnchantementAgissant, EffetPv):
     """Les Enchantements qui affectent la régénération des PV (en positif ou négatif)."""
     def __init__(self,temps_restant:float,gain_pv:float):
         EnchantementAgissant.__init__(self,temps_restant)
@@ -42,7 +42,7 @@ class EnchantementPv(EnchantementAgissant,EffetPv):
     def modifie_pv(self, pv:float) -> float:
         return pv + self.gain_pv
 
-class EnchantementPm(EnchantementAgissant,EffetPm):
+class EnchantementPm(EnchantementAgissant, EffetPm):
     """Les Enchantements qui affectent la régénération des PM (en positif ou négatif)."""
     def __init__(self,temps_restant:float,gain_pm:float):
         EnchantementAgissant.__init__(self,temps_restant)
@@ -51,19 +51,19 @@ class EnchantementPm(EnchantementAgissant,EffetPm):
     def modifie_pm(self, pm:float) -> float:
         return pm + self.gain_pm
 
-class EnchantementConfusion(EnchantementAgissant,Confusion):
+class EnchantementConfusion(EnchantementAgissant, Confusion):
     """Les Enchantements qui provoque des erreurs de direction."""
     def __init__(self,temps_restant:float,taux_erreur:float):
         EnchantementAgissant.__init__(self,temps_restant)
         Confusion.__init__(self,taux_erreur)
 
-class EnchantementPochesTrouees(EnchantementAgissant,PochesTrouees):
+class EnchantementPochesTrouees(EnchantementAgissant, PochesTrouees):
     """Les Enchantements qui fait droper des items involontairement."""
     def __init__(self,temps_restant:float,taux_drop:float):
         EnchantementAgissant.__init__(self,temps_restant)
         PochesTrouees.__init__(self,taux_drop)
 
-class EnchantementVitesse(EnchantementAgissant,EffetVitesse):
+class EnchantementVitesse(EnchantementAgissant, EffetVitesse):
     """Les Enchantements qui affectent la vitesse (en positif ou négatif)."""
     def __init__(self,temps_restant:float,gain_vitesse:float):
         EnchantementAgissant.__init__(self,temps_restant)
@@ -72,13 +72,13 @@ class EnchantementVitesse(EnchantementAgissant,EffetVitesse):
     def modifie_vitesse(self, vitesse:float) -> float:
         return vitesse + self.gain_vitesse
 
-class EnchantementImmunite(EnchantementAgissant,Immunite):
+class EnchantementImmunite(EnchantementAgissant, Immunite):
     """Enchantement qui confère une immunité aux maladies, à condition de disposer de suffisamment de priorité."""
     def __init__(self,temps_restant:float,superiorite:float):
         EnchantementAgissant.__init__(self,temps_restant)
         Immunite.__init__(self,superiorite)
 
-class EnchantementAffinite(EnchantementAgissant,EffetAffinite):
+class EnchantementAffinite(EnchantementAgissant, EffetAffinite):
     """Enchantement qui augmente l'affinité à l'élément feu."""
     def __init__(self,temps_restant:float,gain_aff:float,element:Element):
         EnchantementAgissant.__init__(self,temps_restant)
@@ -88,7 +88,7 @@ class EnchantementAffinite(EnchantementAgissant,EffetAffinite):
     def modifie_affinite(self, affinite:float) -> float:
         return affinite + self.gain_aff
 
-class EnchantementArme(EnchantementItem,EffetTranchant,EffetPortee):
+class EnchantementArme(EnchantementItem, EffetTranchant, EffetPortee):
     """Enchantement qui modifie les statistiques d'une arme (en positif ou négatif)."""
     def __init__(self,temps_restant:float,gain_force:float,gain_portee:float):
         EnchantementItem.__init__(self,temps_restant)
@@ -101,7 +101,7 @@ class EnchantementArme(EnchantementItem,EffetTranchant,EffetPortee):
     def modifie_tranchant(self, tranchant: float) -> float:
         return tranchant + self.gain_force
 
-class EnchantementBombe(EnchantementItem,EffetBombe):
+class EnchantementBombe(EnchantementItem, EffetBombe):
     """Enchantement qui confère des propriétés explosives à un item."""
     def __init__(self,temps_restant:float,portee:float,degats:float,element:Element=Element.TERRE):
         EnchantementItem.__init__(self,temps_restant)

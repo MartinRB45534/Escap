@@ -25,8 +25,8 @@ class ArmeNivele(EntiteeNivele):
     niveles = {
             "fantome": False,
             "element": False,
-            "poids": False,
-            "frottements": False,
+            "poids": True,
+            "frottements": True,
             "portee": True,
             "tranchant": True
         }

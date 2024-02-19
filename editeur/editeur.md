@@ -40,3 +40,5 @@ Classe Jeu avec :
 - Les skills (liste des informations : nom, niveau, classe, autres paramètres)
 - Les classes (liste des informations : nom, niveau, classe, autres paramètres)
 - Les agissants (liste des informations : nom, niveau, espece(s), equipement, (autres items), classes, skills, stats, autres paramètres)
+
+TODO : valeur par défaut

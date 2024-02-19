@@ -56,8 +56,8 @@ class EquippementNivele(EntiteeNivele):
 
     niveles = {
             "fantome": False,
-            "poids": False,
-            "frottements": False,
+            "poids": True,
+            "frottements": True,
             "type_equippement": False,
             "defensif": False,
             "_degats": True,

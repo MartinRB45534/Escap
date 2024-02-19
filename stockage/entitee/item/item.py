@@ -10,6 +10,7 @@ from .projectile import Projectiles
 from .arme import Armes
 from .bouclier import Boucliers
 from .equippement import Equippements
+from .ingredient import Ingredients
 
 class Items(StockageSurCategorie):
     """Les informations des parchemins."""
@@ -20,4 +21,5 @@ class Items(StockageSurCategorie):
         "arme": Armes,
         "bouclier": Boucliers,
         "equippement": Equippements,
+        "ingredient": Ingredients,
     }

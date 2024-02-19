@@ -132,6 +132,10 @@ class Consommable(Item):
 
 class Ingredient(Item):
     """La classe des ingrédients d'alchimie."""
+    def __init__(self,labyrinthe:Labyrinthe, poid:float, frottement:float, position:crt.Position = crt.POSITION_ABSENTE):
+        Item.__init__(self,labyrinthe,position)
+        self.poids = poid
+        self.frottements = frottement
     def get_classe(self):
         """Se limite aux catégories de l'inventaire."""
         return Ingredient
