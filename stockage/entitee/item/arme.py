@@ -90,7 +90,7 @@ class ArmeNivele(EntiteeNivele):
     "nivele": true,
     "nom": "{self.nom}",
     "fantome": {self.fantome},
-    "element": "{self.element},
+    "element": "{self.element}",
     "poids": {self.poids},
     "frottements": {self.frottements},
     "portee": {self.portee},

@@ -11,5 +11,6 @@ Utilisé par le jeu pour charger les niveaux.
 from .affichage import *
 from .entitee import *
 from .espece import *
+from .magie import *
 from .stockage import *
 from .stockageglobal import *

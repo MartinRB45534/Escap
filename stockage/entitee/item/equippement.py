@@ -169,7 +169,7 @@ class EquippementNivele(EntiteeNivele):
             "_taux_stats": False
         }
 
-    def __init__(self, nom: str, fantome: bool, poids:float, frottements:float,
+    def __init__(self, nom: str, fantome: bool, poids: list[float], frottements: list[float],
                  type_equippement: str, defensif: str, degats: list[float],
                  pv: str, _pv: list[int], pm: str, _pm: list[int],
                  accelerateur: bool, vitesse: list[int], anoblisseur: bool,
@@ -199,10 +199,19 @@ class EquippementNivele(EntiteeNivele):
         self._taux_stats = _taux_stats
 
     def check(self) -> bool:
-        return (self.poids >= 0 and
-                self.frottements >= 0 and
+        return (all([poid >= 0 for poid in self.poids]) and
+                all([frottement >= 0 for frottement in self.frottements]) and
                 self.type_equippement in ["Anneau", "Armure", "Heaume"] and
-                all([degats >= 0 for degats in self._degats]))
+                all([degats >= 0 for degats in self._degats]) and
+                all([pv >= 0 for pv in self._pv]) and
+                all([pm >= 0 for pm in self._pm]) and
+                all([vitesse >= 0 for vitesse in self._vitesse]) and
+                all([priorite >= 0 for priorite in self._priorite]) and
+                all([affinite >= 0 for affinite in self._affinite]) and
+                all([taux_stats >= 0 for taux_stats in self._taux_stats]) and
+                (not self.elementaire or bool(self._element)) and
+                (not self.tribal or bool(self._espece)) and
+                all([taux >= 0 for taux in self._taux_stats]))
 
     def stringify(self) -> str:
         return f"""{{
@@ -247,7 +256,7 @@ class EquippementNivele(EntiteeNivele):
             assert isinstance(espece, mdl.Espece), f"Erreur : {self._espece} n'est pas une espèce !?"
         else:
             espece = None
-        equippement = mdl.equippements[(self.type_equippement, self.defensif, self.pv, self.pm, self.accelerateur, self.anoblisseur, self.elementaire, self.tribal)](mdl.NOWHERE, self.poids, self.frottements, self._degats[niveau] if self.defensif else 0, self._pv[niveau] if self.pv else 0, self._pm[niveau] if self.pm else 0, self._vitesse[niveau] if self.accelerateur else 0, self._priorite[niveau] if self.anoblisseur else 0, self._element if self.elementaire else None, self._affinite[niveau] if self.elementaire else 0, espece, self._taux_stats[niveau] if self.tribal else 0)
+        equippement = mdl.equippements[(self.type_equippement, self.defensif, self.pv, self.pm, self.accelerateur, self.anoblisseur, self.elementaire, self.tribal)](mdl.NOWHERE, self.poids[niveau], self.frottements[niveau], self._degats[niveau] if self.defensif else 0, self._pv[niveau] if self.pv else 0, self._pm[niveau] if self.pm else 0, self._vitesse[niveau] if self.accelerateur else 0, self._priorite[niveau] if self.anoblisseur else 0, self._element if self.elementaire else None, self._affinite[niveau] if self.elementaire else 0, espece, self._taux_stats[niveau] if self.tribal else 0)
         equippement.nom = self.nom
         equippement.fantome = self.fantome
         return equippement

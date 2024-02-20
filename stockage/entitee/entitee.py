@@ -7,16 +7,10 @@ from __future__ import annotations
 
 import modele as mdl
 
-from ..stockage import StockageUnique, StockageNivele
-
-class Entitee(StockageUnique):
-    """Classe mère des classes de stockage d'entitées."""
-    def make(self) -> mdl.Entitee:
-        """Retourne l'entité correspondante."""
-        raise NotImplementedError
+from ..stockage import StockageNivele
 
 class EntiteeNivele(StockageNivele):
-    """Classe mère des classes de stockage d'entitées de niveau."""
+    """Classe mère des classes de stockage d'entitées."""
     def make(self, niveau: int) -> mdl.Entitee:
         """Retourne l'entité correspondante."""
         raise NotImplementedError

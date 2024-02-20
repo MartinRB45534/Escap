@@ -1,8 +1,8 @@
 """Définition de l'énumération Deplacement."""
 
-from enum import Enum
+from enum import StrEnum
 
-class Deplacement(Enum):
+class Deplacement(StrEnum):
     """Enumération des types de déplacement."""
     SPATIAL = "SPATIAL"
     MAGIQUE = "MAGIQUE"
