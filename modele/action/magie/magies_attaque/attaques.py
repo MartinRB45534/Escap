@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 import carte as crt
 
 # Imports des classes parentes
-from ..magie import MagieDirigee, MagiesOffensives, CibleCase
+from ..magie import ActionMagieDirigee, ActionMagiesOffensives, CibleCase
 
 # Imports utilisés dans le code
 from ....effet import AttaqueCase, AttaqueCaseDelayee
@@ -16,15 +16,15 @@ from ....commons import Element
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ....entitee.agissant.agissant import Agissant
-    from ....systeme.skill.actif import Actif
+    from ....systeme import Actif, Magie
     from ....commons import Deplacement
     from ....commons import Forme
     from ....commons import Passage
 
-class MagieAttaque(MagiesOffensives):
+class ActionMagieAttaque(ActionMagiesOffensives):
     """Les magies qui créent une attaque."""
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,portee:float,degats:float,element:Element,deplacement:Deplacement,forme:Forme,passage:Passage,latence:float,taux_perce:float,inverse:bool):
-        MagiesOffensives.__init__(self,skill,agissant,gain_xp,cout_pm,latence)
+    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,portee:float,degats:float,element:Element,deplacement:Deplacement,forme:Forme,passage:Passage,latence:float,taux_perce:float,inverse:bool):
+        ActionMagiesOffensives.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
         self.portee = portee
         self.degats = degats
         self.element = element
@@ -40,11 +40,11 @@ class MagieAttaque(MagiesOffensives):
             case = self.agissant.labyrinthe.get_case(case)
             case.effets.add(AttaqueCase(self.agissant,self.degats,self.element,self.direction,self.taux_perce,self.inverse))
 
-class MagieAttaqueDistance(CibleCase,MagieAttaque):
+class ActionMagieAttaqueDistance(CibleCase,ActionMagieAttaque):
     """Les magies qui créent une attaque à distance."""
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,portee:float,degats:float,element:Element,deplacement:Deplacement,forme:Forme,passage:Passage,latence:float,taux_perce:float,inverse:bool):
-        CibleCase.__init__(self,skill,agissant,gain_xp,cout_pm,latence)
-        MagieAttaque.__init__(self,skill,agissant,gain_xp,cout_pm,portee,degats,element,deplacement,forme,passage,latence,taux_perce,inverse)
+    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,portee:float,degats:float,element:Element,deplacement:Deplacement,forme:Forme,passage:Passage,latence:float,taux_perce:float,inverse:bool):
+        CibleCase.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
+        ActionMagieAttaque.__init__(self,skill,magie,agissant,gain_xp,cout_pm,portee,degats,element,deplacement,forme,passage,latence,taux_perce,inverse)
         self.effets:list[AttaqueCaseDelayee] = []
 
     def action(self):
@@ -60,11 +60,11 @@ class MagieAttaqueDistance(CibleCase,MagieAttaque):
             for effet in self.effets:
                 effet.attente = False
 
-class MagieAttaqueDirigee(MagieDirigee,MagieAttaque):
+class ActionMagieAttaqueDirigee(ActionMagieDirigee,ActionMagieAttaque):
     """Les magies qui créent une attaque au corp à corp dirigée."""
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,portee:float,degats:float,element:Element,deplacement:Deplacement,forme:Forme,passage:Passage,latence:float,taux_perce:float,inverse:bool):
-        MagieDirigee.__init__(self,skill,agissant,gain_xp,cout_pm,latence,None)
-        MagieAttaque.__init__(self,skill,agissant,gain_xp,cout_pm,portee,degats,element,deplacement,forme,passage,latence,taux_perce,inverse)
+    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,portee:float,degats:float,element:Element,deplacement:Deplacement,forme:Forme,passage:Passage,latence:float,taux_perce:float,inverse:bool):
+        ActionMagieDirigee.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,None)
+        ActionMagieAttaque.__init__(self,skill,magie,agissant,gain_xp,cout_pm,portee,degats,element,deplacement,forme,passage,latence,taux_perce,inverse)
 
     def action(self):
         if self.direction is None:
@@ -74,11 +74,11 @@ class MagieAttaqueDirigee(MagieDirigee,MagieAttaque):
                 case = self.agissant.labyrinthe.get_case(case)
                 case.effets.add(AttaqueCase(self.agissant,self.degats,self.element,self.direction,self.taux_perce,self.inverse))
 
-class MagieAttaqueDistanceDirigee(MagieAttaqueDirigee,MagieAttaqueDistance):
+class ActionMagieAttaqueDistanceDirigee(ActionMagieAttaqueDirigee,ActionMagieAttaqueDistance):
     """Les magies qui créent une attaque à distance dirigée."""
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,portee:float,degats:float,element:Element,deplacement:Deplacement,forme:Forme,passage:Passage,latence:float,taux_perce:float,inverse:bool):
-        MagieAttaqueDirigee.__init__(self,skill,agissant,gain_xp,cout_pm,portee,degats,element,deplacement,forme,passage,latence,taux_perce,inverse)
-        MagieAttaqueDistance.__init__(self,skill,agissant,gain_xp,cout_pm,portee,degats,element,deplacement,forme,passage,latence,taux_perce,inverse)
+    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,portee:float,degats:float,element:Element,deplacement:Deplacement,forme:Forme,passage:Passage,latence:float,taux_perce:float,inverse:bool):
+        ActionMagieAttaqueDirigee.__init__(self,skill,magie,agissant,gain_xp,cout_pm,portee,degats,element,deplacement,forme,passage,latence,taux_perce,inverse)
+        ActionMagieAttaqueDistance.__init__(self,skill,magie,agissant,gain_xp,cout_pm,portee,degats,element,deplacement,forme,passage,latence,taux_perce,inverse)
 
     def action(self):
         if self.direction is None:

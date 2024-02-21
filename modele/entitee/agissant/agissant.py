@@ -7,12 +7,12 @@ import carte as crt
 from ..entitee import NonSuperposable, Mobile
 
 # Imports utilisés dans le code (il y en a beaucoup !!!)
-from ...action import Deplace, Attaque, Action, Magie
+from ...action import Deplace, Attaque, Action, ActionMagie
 from ...effet import OnDebutTourAgissant, OnPostDecisionAgissant, OnPostActionAgissant, OnFinTourAgissant, TimeLimited, Protection, AttaqueParticulier, ReserveMana, Dopage
 from .vue.vue import voit_vue
 from ...commons import EtatsAgissants
 from ..item import Cadavre, Defensif
-from ...systeme import SkillIntrasec, SkillExtra, SkillAttaqueArme, SkillAttaque, SkillDeplacement, SkillEcrasement, SkillsMagiques, SkillMagieInfinie, SkillDefense, SkillImmortel, SkillEssenceMagique, SkillVision, SkillAura, trouve_skill, ClassePrincipale
+from ...systeme import SkillIntrasec, SkillExtra, SkillAttaqueArme, SkillAttaque, SkillDeplacement, SkillEcrasement, SkillsMagiques, SkillActionMagieInfinie, SkillDefense, SkillImmortel, SkillEssenceMagique, SkillVision, SkillAura, trouve_skill, ClassePrincipale
 from .statistiques import Statistiques
 from .inventaire import Inventaire
 
@@ -29,7 +29,7 @@ if TYPE_CHECKING:
 
 class Agissant(NonSuperposable,Mobile):
     """La classe des entitées animées. Capable de décision, de différentes actions, etc. Les principales caractéristiques sont l'ID, les stats, et la classe principale."""
-    def __init__(self,identite:str,labyrinthe:Labyrinthe,cond_evo:list[float],skills_intrasecs:set[SkillIntrasec],skills:set[SkillExtra],niveau:int,pv_max:float,regen_pv_max:float,regen_pv_min:float,restauration_regen_pv:float,pm_max:float,regen_pm:float,force:float,priorite:float,vitesse:float,affinites:dict[Element,float],immunites:set[Element],espece:Espece,oubli:float,resolution:int,forme:str,forme_tete:str,nb_doigts:int,magies:list[type[Magie]],items:list[type[Item]],position:crt.Position,ID: Optional[int]=None):
+    def __init__(self,identite:str,labyrinthe:Labyrinthe,cond_evo:list[float],skills_intrasecs:set[SkillIntrasec],skills:set[SkillExtra],niveau:int,pv_max:float,regen_pv_max:float,regen_pv_min:float,restauration_regen_pv:float,pm_max:float,regen_pm:float,force:float,priorite:float,vitesse:float,affinites:dict[Element,float],immunites:set[Element],espece:Espece,oubli:float,resolution:int,forme:str,forme_tete:str,nb_doigts:int,magies:list[type[ActionMagie]],items:list[type[Item]],position:crt.Position,ID: Optional[int]=None):
         Mobile.__init__(self,position,ID)
         NonSuperposable.__init__(self,position,ID)
         self.identite = identite
@@ -196,7 +196,7 @@ class Agissant(NonSuperposable,Mobile):
 
     def peut_payer(self,cout:float):
         """Retourne si l'agissant peut payer un certain cout."""
-        skill = trouve_skill(self.classe_principale,SkillMagieInfinie)
+        skill = trouve_skill(self.classe_principale,SkillActionMagieInfinie)
         res = True
         if skill is None:
             res = self.get_total_pm() >= cout

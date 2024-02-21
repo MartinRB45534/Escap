@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from ..entitee.item.parchemin.parchemin import Parchemin
     from ..entitee.item.parchemin.parchemins import ParcheminVierge
     from ..effet import Effet
-    from .magie.magie import Magie
+    from .magie.magie import ActionMagie
 
 class PlaceEffet(ActionFinal, NonRepetable):
     """
@@ -89,7 +89,7 @@ class Impregne(Lit,ActionFinal,CasteFinal):
         self.taux_cout_caste = taux_cout_caste
         self.taux_latence_impregne = taux_latence_impregne
         self.taux_latence_caste = taux_latence_caste
-        self.magie:Optional[Magie] = None
+        self.magie:Optional[ActionMagie] = None
 
     def action(self):
         """L'action est terminée."""
@@ -104,7 +104,7 @@ class Impregne(Lit,ActionFinal,CasteFinal):
         self.item.etat = EtatsItems.INTACT
         self.magie = None
 
-    def set_magie(self,magie:Magie):
+    def set_magie(self,magie:ActionMagie):
         """Définit la magie à imprégner."""
         self.magie = magie
         self.cout = magie.cout*self.taux_cout_impregne

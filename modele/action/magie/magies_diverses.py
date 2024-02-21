@@ -4,11 +4,10 @@ Quelques magies diverses.
 
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
-import carte as crt
 
 # Imports des classes parentes
 from ..action import NonRepetable
-from .magie import Magie, CibleAgissant, CibleAgissants, CibleCases
+from .magie import ActionMagie, CibleAgissant, CibleAgissants, CibleCases
 
 # Imports utilisés dans le code
 from ...effet import Instakill, Blizzard, Obscurite, ProtectionElement
@@ -16,16 +15,15 @@ from ...commons import Deplacement, Forme, Passage, Element
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...entitee.agissant.agissant import Agissant
-    from ...entitee.item.item import Item
-    from ...systeme.skill.actif import Actif
-    from ...labyrinthe.case import Case
+    from ...entitee import Agissant, Item
+    from ...systeme import Actif, Magie
+    from ...labyrinthe import Case
 
-class MagieBlizzard(Magie):
+class ActionMagieBlizzard(ActionMagie):
     """La magie qui crée un effet de blizzard autour de l'agissant."""
     nom = "magie blizzard"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,portee:float,duree:float,gain_latence:float):
-        Magie.__init__(self,skill,agissant,gain_xp,cout_pm,latence)
+    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,portee:float,duree:float,gain_latence:float):
+        ActionMagie.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
         self.portee = portee
         self.duree = duree
         self.gain_latence = gain_latence
@@ -36,11 +34,11 @@ class MagieBlizzard(Magie):
             case = self.agissant.labyrinthe.get_case(position)
             case.effets.add(Blizzard(self.duree,self.gain_latence))
 
-class MagieObscurite(Magie):
+class ActionMagieObscurite(ActionMagie):
     """La magie qui crée un effet d'obscurite autour de l'agissant."""
     nom = "magie obscurite"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,portee:float,duree:float,gain_opacite:float):
-        Magie.__init__(self,skill,agissant,gain_xp,cout_pm,latence)
+    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,portee:float,duree:float,gain_opacite:float):
+        ActionMagie.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
         self.portee = portee
         self.duree = duree
         self.gain_opacite = gain_opacite
@@ -51,11 +49,11 @@ class MagieObscurite(Magie):
             case = self.agissant.labyrinthe.get_case(position)
             case.effets.add(Obscurite(self.duree,self.gain_opacite))
 
-class MagieInstakill(CibleAgissant, NonRepetable):
+class ActionMagieInstakill(CibleAgissant, NonRepetable):
     """La magie qui crée un effet d'instakill sur un agissant."""
     nom = "magie instakill"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,superiorite:float,cible:Agissant):
-        CibleAgissant.__init__(self,skill,agissant,gain_xp,cout_pm,latence,cible)
+    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,superiorite:float):
+        CibleAgissant.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
         NonRepetable.__init__(self,agissant,latence)
         self.superiorite = superiorite
 
@@ -65,30 +63,30 @@ class MagieInstakill(CibleAgissant, NonRepetable):
         else:
             self.cible.effets.append(Instakill(self.agissant,self.agissant.priorite - self.superiorite))
 
-class MagieProtectionSacree(CibleAgissants):
+class ActionMagieProtectionSacree(CibleAgissants):
     """La magie qui crée un effet de protection sacrée sur des agissants."""
     nom = "magie protection sacrée"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,duree:float,pv:float,cible:list[Agissant]):
-        CibleAgissants.__init__(self,skill,agissant,gain_xp,cout_pm,latence,cible)
+    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,duree:float,pv:float):
+        CibleAgissants.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
         self.duree = duree
         self.pv = pv
 
     def action(self):
-        if self.cible == []:
+        if not self.cible: # [] is falsy
             self.interrompt()
         else:
             for cible in self.cible:
                 cible.effets.append(ProtectionElement(self.duree,self.pv,Element.OMBRE)) #Ajouter une direction ?
 
-class MagieTeleportation(CibleCases, NonRepetable):
+class ActionMagieTeleportation(CibleCases, NonRepetable):
     """La magie qui téléporte des entitées."""
     nom = "magie téléportation"
-    def __init__(self,skill:Actif,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,cases:list[crt.Position]):
-        CibleCases.__init__(self,skill,agissant,gain_xp,cout_pm,latence,cases)
+    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float):
+        CibleCases.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
         NonRepetable.__init__(self,agissant,latence)
 
     def action(self):
-        if self.cible == []:
+        if not self.cible: # [] is falsy
             self.interrompt()
         else:
             agissants : list[Optional[Agissant]] = []
@@ -103,7 +101,7 @@ class MagieTeleportation(CibleCases, NonRepetable):
                 case.agissant = None
                 items.append(case.items)
                 case.items = set()
-            
+
             for i in range(len(cases)):
                 agissant = agissants[i]
                 if agissant is not None:

@@ -12,12 +12,12 @@ from .timings import OnFinTourAgissant
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ...entitee.agissant.agissant import Agissant
-    from ...action.magie.magie import Magie
+    from ...action.magie.magie import ActionMagie
     from ...entitee.agissant.role.mage import Mage
 
 class Enseignement(EffetAgissant):
     """Effet qui enseigne une magie au joueur."""
-    def __init__(self,magie:type[Magie]):
+    def __init__(self,magie:type[ActionMagie]):
         self.magie = magie
 
     def enseigne(self,agissant:Mage):

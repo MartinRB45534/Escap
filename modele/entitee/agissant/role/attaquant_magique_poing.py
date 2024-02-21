@@ -17,7 +17,7 @@ class Attaquant_magique_poing(Mage):
         if self.peut_frapper():
             skill = self.get_skill_magique()
             action = skill.fait(self,self.frappe())
-            assert isinstance(action,MagieAttaqueContact)
+            assert isinstance(action,ActionMagieAttaqueContact)
             action.direction = direction
             self.fait(action)
         else:
@@ -25,4 +25,4 @@ class Attaquant_magique_poing(Mage):
 
 # Imports utilisés dans le code
 from ..agissant import Agissant
-from ....action.magie.magies_attaque.poings_magiques import MagieAttaqueContact
+from ....action.magie.magies_attaque.poings_magiques import ActionMagieAttaqueContact
