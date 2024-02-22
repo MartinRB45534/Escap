@@ -8,8 +8,8 @@ from typing import TYPE_CHECKING
 from ..timings import OnPostActionAgissant
 
 # Imports utilisés dans le code
-from ....commons.etats_agissant import EtatsAgissants
-from .protections import ProtectionMur
+from ....commons import EtatsAgissants, Element
+from .protections import ProtectionMur, ProtectionElement
 
 if TYPE_CHECKING:
     from ....entitee.agissant.agissant import Agissant
@@ -31,3 +31,19 @@ class ProtectionGroupe(OnPostActionAgissant):
         for cible in cibles:
             if cible.etat == EtatsAgissants.VIVANT:
                 cible.effets.append(ProtectionMur(self.duree,self.degats))
+
+class ProtectionGroupeElement(ProtectionGroupe):
+    """Effet de protection d'un groupe contre un élément."""
+    def __init__(self,duree:float,degats:float,element:Element):
+        ProtectionGroupe.__init__(self,duree,degats)
+        self.element = element
+
+    def post_action(self,porteur:Agissant):
+        cibles = []
+        if porteur.esprit:
+            cibles = porteur.esprit.corps
+        else:
+            cibles = [porteur]
+        for cible in cibles:
+            if cible.etat == EtatsAgissants.VIVANT:
+                cible.effets.append(ProtectionElement(self.duree,self.degats,self.element))

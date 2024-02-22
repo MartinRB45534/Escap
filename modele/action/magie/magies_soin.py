@@ -191,7 +191,8 @@ class ActionMagieReanimationDeZone(CibleCase,PorteeLimitee):
                         if item.priorite+self.superiorite < self.agissant.priorite:
                             item.effets.append(Reanimation(self.taux_pv,self.agissant.esprit))
 
-magies_reanimation: dict[tuple[bool, bool], type[ActionMagie]] = {
+magies_reanimation: dict[tuple[bool, bool],
+    type[ActionMagieReanimation|ActionMagieReanimationCase|ActionMagieReanimationDeZone]] = {
     (False, False): ActionMagieReanimation,
     (True, False): ActionMagieReanimationCase,
     (True, True): ActionMagieReanimationDeZone,

@@ -124,7 +124,7 @@ class NoThing(Item):
 
     def __equal__(self,other:Any):
         return isinstance(other,NoThing)
-    
+
 NOTHING = NoThing()
 
 class Consommable(Item):

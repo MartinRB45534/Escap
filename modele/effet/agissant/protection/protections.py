@@ -10,8 +10,8 @@ from .protection import Protection
 from ..timings import TimeLimited
 
 if TYPE_CHECKING:
-    from ...attaque.attaque import AttaqueParticulier
-    from ....commons.elements import Element
+    from ..attaque import AttaqueParticulier
+    from ....commons import Element
 
 class ProtectionMur(Protection, TimeLimited):
     """Une protection qui agit comme un 'mur' autour de l'agissant, c'est à dire qu'elle absorbe les dégats jusqu'à se briser."""
@@ -32,18 +32,19 @@ class ProtectionMur(Protection, TimeLimited):
 
 class ProtectionElement(ProtectionMur):
     """Particulièrement efficace contre un élément spécifique."""
-    def __init__(self,temps_restant:float,pv:float,element:Element):
+    def __init__(self,temps_restant:float,pv:float,element:Element,taux:float):
         ProtectionMur.__init__(self,temps_restant,pv)
         self.element = element
+        self.taux = taux
 
     def protege(self,attaque:AttaqueParticulier):
         if attaque.element == self.element:
-            if 2*self.pv < attaque.degats:
-                attaque.degats -= 2*self.pv
+            if self.pv < attaque.degats*self.taux:
+                attaque.degats -= self.pv/self.taux
                 self.pv = 0
                 self.termine()
             else:
                 attaque.degats = 0
-                self.pv -= attaque.degats
+                self.pv -= attaque.degats*self.taux
         else:
             ProtectionMur.protege(self,attaque)

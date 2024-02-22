@@ -83,7 +83,18 @@ class ActionMagieEnchantementBombe(EnchanteItem):
     def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,duree:float,degats:float,portee:float):
         EnchanteItem.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,EnchantementBombe(duree,portee,degats))
 
-magies_enchantement: dict[str, type[EnchanteAgissant|EnchanteItem]] = {
+magies_enchantement: dict[str, type[
+    ActionMagieEnchantementAbsorption|
+    ActionMagieEnchantementAffinite|
+    ActionMagieEnchantementBombe|
+    ActionMagieEnchantementCelerite|
+    ActionMagieEnchantementConfusion|
+    ActionMagieEnchantementForce|
+    ActionMagieEnchantementImmunite|
+    ActionMagieEnchantementPochesTrouees|
+    ActionMagieEnchantementRenforcement|
+    ActionMagieEnchantementVitalite|
+    ActionMagieEnchantementVision]] = {
     "confusion": ActionMagieEnchantementConfusion,
     "poches_trouees": ActionMagieEnchantementPochesTrouees,
     "force": ActionMagieEnchantementForce,

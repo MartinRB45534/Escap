@@ -11,13 +11,12 @@ from .timings import OnFinTourAgissant
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...entitee.agissant.agissant import Agissant
-    from ...action.magie.magie import ActionMagie
-    from ...entitee.agissant.role.mage import Mage
+    from ...entitee import Agissant, Mage
+    from ...systeme import Magie
 
 class Enseignement(EffetAgissant):
     """Effet qui enseigne une magie au joueur."""
-    def __init__(self,magie:type[ActionMagie]):
+    def __init__(self,magie:type[Magie]):
         self.magie = magie
 
     def enseigne(self,agissant:Mage):
@@ -36,7 +35,7 @@ class Dopage(EffetAgissant):
         return taux*self.taux_degats
 
 class Instakill(OnFinTourAgissant):
-    """L'effet d'instakill. S'il réussit, la victime voit ses PV descendre à 0. Sinon, rien.""" #Comment retirer aussi les PM, si la victime a la persévérance (essence magique) ?
+    """L'effet d'instakill. S'il réussit, la victime voit ses PVs descendre à 0. Sinon, rien.""" #Comment retirer aussi les PM, si la victime a la persévérance (essence magique) ?
     def __init__(self,responsable:Agissant,priorite:float):
         self.responsable = responsable
         self.priorite = priorite

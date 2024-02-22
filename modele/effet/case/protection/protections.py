@@ -48,18 +48,19 @@ class ProtectionCaseMur(ProtectionCase,TimeLimited):
 
 class ProtectionCaseElement(ProtectionCaseMur):
     """Particulièrement efficace contre un élément spécifique."""
-    def __init__(self,temps_restant:float,pv:float,element:Element):
+    def __init__(self,temps_restant:float,pv:float,element:Element,taux:float):
         ProtectionCaseMur.__init__(self,temps_restant,pv)
         self.element = element
+        self.taux = taux
 
     def protege(self,attaque:AttaqueCase):
         if attaque.element == self.element:
-            if 2*self.pv < attaque.degats:
-                attaque.degats -= 2*self.pv
+            if self.pv < attaque.degats*self.taux:
+                attaque.degats -= self.pv/self.taux
                 self.pv = 0
                 self.termine()
             else:
                 attaque.degats = 0 #Une attaque perçante peut quand même passer
-                self.pv -= attaque.degats//2
+                self.pv -= attaque.degats*self.taux
         else:
             ProtectionCaseMur.protege(self,attaque)

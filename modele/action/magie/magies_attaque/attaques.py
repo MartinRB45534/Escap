@@ -63,7 +63,7 @@ class ActionMagieAttaqueDistance(CibleCase,ActionMagieAttaque):
 class ActionMagieAttaqueDirigee(ActionMagieDirigee,ActionMagieAttaque):
     """Les magies qui créent une attaque au corp à corp dirigée."""
     def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,portee:float,degats:float,element:Element,deplacement:Deplacement,forme:Forme,passage:Passage,latence:float,taux_perce:float,inverse:bool):
-        ActionMagieDirigee.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,None)
+        ActionMagieDirigee.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
         ActionMagieAttaque.__init__(self,skill,magie,agissant,gain_xp,cout_pm,portee,degats,element,deplacement,forme,passage,latence,taux_perce,inverse)
 
     def action(self):

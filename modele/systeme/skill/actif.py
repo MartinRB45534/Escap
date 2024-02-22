@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Any
 import carte as crt
 
 # Imports utilisés uniquement dans les annotations
@@ -167,3 +167,12 @@ class SkillAlchimie(Actif):
     def fait(self,agissant:Agissant,recette:str) -> Alchimie:
         """Fait l'alchimie"""
         raise NotImplementedError
+
+class SkillIssue(Actif):
+    def __init__(self):
+        pass
+
+    def __equal__(self, other:Any):
+        return isinstance(other, SkillIssue)
+
+SKILL_ISSUE = SkillIssue()

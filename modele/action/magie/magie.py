@@ -3,7 +3,7 @@ Les classes de base des magies.
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 import carte as crt
 
 # Imports des classes parentes
@@ -32,9 +32,9 @@ class ActionMagiesOffensives(ActionMagie):
 
 class ActionMagieDirigee(ActionMagie) :
     """La classe des magies qui nécessitent une direction."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,direction:Optional[crt.Direction]):
+    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float):
         ActionMagie.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
-        self.direction = direction
+        self.direction:crt.Direction|None = None
 
 class ActionMagieCout(ActionMagie, NonRepetable):
     """La classe des magies dont le coût peut varier."""
@@ -108,10 +108,10 @@ class Invocation(ActionMagie):
 
 class InvocationProjectile(Invocation,ActionMagieDirigee):
     """La classe des magies qui créent une entitée avec un attribut direction."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,entitee:Projectile,direction:Optional[crt.Direction]):
+    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,entitee:Projectile):
         self.entitee:Projectile
         Invocation.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,entitee)
-        ActionMagieDirigee.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,direction)
+        ActionMagieDirigee.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
 
     def invoque(self) -> Projectile:
         return self.entitee

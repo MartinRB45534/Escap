@@ -194,7 +194,7 @@ class ParcheminMagieNivele(EntiteeNivele):
     def make(self, niveau:int) -> mdl.ParcheminVierge:
         """Retourne le parchemin correspondant."""
         magie = self.magie.make(niveau)
-        parchemin = mdl.ParcheminVierge(mdl.NOWHERE, magie)
+        parchemin = mdl.ParcheminVierge(mdl.NOWHERE, magie.genere(mdl.SKILL_ISSUE, mdl.NOONE, niveau))
         parchemin.nom = self.nom
         parchemin.fantome = self.fantome
         return parchemin
