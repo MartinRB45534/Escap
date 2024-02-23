@@ -81,6 +81,7 @@ En vrai pas tant de choses que ça :
  - les skills ;
  - les items permanents ;
  - les décors ;
- - les cases.
+ - les cases ;
+ - les magies.
 
 Tout le reste n'aura que des références (si il y a lieu) à des objets nivelés.

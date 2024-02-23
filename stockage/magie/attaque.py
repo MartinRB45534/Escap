@@ -220,32 +220,25 @@ class MagieAttaqueNivele(MagieNivele):
         dictionnaire = parse(json)
         return MagieAttaqueNivele(dictionnaire["nom"], dictionnaire["dirigee"], dictionnaire["distance"], dictionnaire["latence"], dictionnaire["gain_xp"], dictionnaire["cout_variable"], dictionnaire["cout"], dictionnaire["taux_degats"], dictionnaire["degats"], dictionnaire["portee"], mdl.Element(dictionnaire["element"]), mdl.Deplacement(dictionnaire["deplacement"]), mdl.Forme(dictionnaire["forme"]), dictionnaire["passe_mur"], dictionnaire["passe_teleporteur"], dictionnaire["passe_escalier"], dictionnaire["passe_barriere"], dictionnaire["passe_porte"], dictionnaire["perce"], dictionnaire["taux_perce"], dictionnaire["inverse"])
 
-    def make(self, niveau: int) -> mdl.Magie:
+    def make(self, niveau: int):
         """Crée une magie à partir de l'instance."""
-        class GenerateurMagieAttaque(mdl.Magie):
-            """Un "générateur", c'est-à-dire une classe qui génère des instances de Magie."""
-            nom = self.nom
-            dirigee = self.dirigee
-            distance = self.distance
-            latence = self.latence
-            gain_xp = self.gain_xp
-            cout_variable = self.cout_variable
-            cout = self.cout
-            taux_degats = self.taux_degats
-            degats = self.degats
-            portee = self.portee
+        classe = mdl.magies_attaque[(self.dirigee, self.distance, self.cout_variable)]
+        class MagieAttaqueNiveau(classe, mdl.Nomme):
+            """Une magie d'attaque."""
+            portee = self.portee[niveau]
+            degats = self.degats[niveau]
             element = self.element
             deplacement = self.deplacement
             forme = self.forme
-            passe_mur = self.passe_mur
-            passe_teleporteur = self.passe_teleporteur
-            passe_escalier = self.passe_escalier
-            passe_barriere = self.passe_barriere
-            passe_porte = self.passe_porte
-            perce = self.perce
-            taux_perce = self.taux_perce
+            passage = mdl.Passage(self.passe_mur, self.passe_teleporteur, self.passe_escalier,
+                                  self.passe_barriere, self.passe_porte)
+            taux_perce = self.taux_perce[niveau]
             inverse = self.inverse
-
-            def genere(self, skill: mdl.Actif, agissant: mdl.Agissant, niveau: int) -> mdl.ActionMagieAttaque:
-                return mdl.magies_attaque[(self.dirigee, self.distance, self.cout_variable)](skill, self, agissant, self.gain_xp[niveau], self.cout[niveau], self.portee[niveau], self.degats[niveau], self.element, self.deplacement, self.forme, mdl.Passage(self.passe_mur, self.passe_teleporteur, self.passe_escalier, self.passe_barriere, self.passe_porte), self.latence[niveau], self.taux_perce[niveau], self.inverse)
-        return GenerateurMagieAttaque()
+            latence_max = self.latence[niveau]
+            gain_xp = self.gain_xp[niveau]
+            cout = self.cout[niveau]
+            if self.cout_variable:
+                taux_degats = self.taux_degats[niveau]
+        MagieAttaqueNiveau.nom = self.nom
+        MagieAttaqueNiveau.niveau = niveau
+        return MagieAttaqueNiveau

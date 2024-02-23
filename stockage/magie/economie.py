@@ -76,19 +76,16 @@ class MagieReserveNivelee(MagieNivele):
         dictionnaire = parse(json)
         return MagieReserveNivelee(dictionnaire["nom"], dictionnaire["latence"], dictionnaire["gain_xp"], dictionnaire["taux_pm"])
 
-    def make(self, niveau: int) -> mdl.Magie:
+    def make(self, niveau: int):
         """Crée une magie à partir de l'instance."""
-        class GenerateurMagieReserve(mdl.Magie):
-            """Un "générateur", c'est-à-dire une classe qui génère des instances de Magie."""
-            nom = self.nom
-            latence = self.latence
-            gain_xp = self.gain_xp
-            taux_pm = self.taux_pm
-
-            def genere(self, skill: mdl.Actif, agissant: mdl.Agissant, niveau: int) -> mdl.ActionMagieReserve:
-                return mdl.ActionMagieReserve(skill, self, agissant, self.gain_xp[niveau], self.latence[niveau], self.taux_pm[niveau])
-            
-        return GenerateurMagieReserve()
+        class MagieReserveNiveau(mdl.MagieReserve, mdl.Nomme):
+            """Une magie de réserve."""
+            taux = self.taux_pm[niveau]
+            latence_max = self.latence[niveau]
+            gain_xp = self.gain_xp[niveau]
+        MagieReserveNiveau.nom = self.nom
+        MagieReserveNiveau.niveau = niveau
+        return MagieReserveNiveau
 
 class MagieInvestissementNivelee(MagieNivele):
     """Une magie d'investissement."""
@@ -166,17 +163,14 @@ class MagieInvestissementNivelee(MagieNivele):
         dictionnaire = parse(json)
         return MagieInvestissementNivelee(dictionnaire["nom"], dictionnaire["latence"], dictionnaire["gain_xp"], dictionnaire["taux_pm"], dictionnaire["duree"])
     
-    def make(self, niveau: int) -> mdl.Magie:
+    def make(self, niveau: int):
         """Crée une magie à partir de l'instance."""
-        class GenerateurMagieInvestissement(mdl.Magie):
-            """Un "générateur", c'est-à-dire une classe qui génère des instances de Magie."""
-            nom = self.nom
-            latence = self.latence
-            gain_xp = self.gain_xp
-            taux_pm = self.taux_pm
-            duree = self.duree
-
-            def genere(self, skill: mdl.Actif, agissant: mdl.Agissant, niveau: int) -> mdl.ActionMagieInvestissement:
-                return mdl.ActionMagieInvestissement(skill, self, agissant, self.gain_xp[niveau], self.latence[niveau], self.taux_pm[niveau], self.duree[niveau])
-            
-        return GenerateurMagieInvestissement()
+        class MagieInvestissementNiveau(mdl.MagieInvestissement, mdl.Nomme):
+            """Une magie d'investissement."""
+            taux = self.taux_pm[niveau]
+            latence_max = self.latence[niveau]
+            gain_xp = self.gain_xp[niveau]
+            duree = self.duree[niveau]
+        MagieInvestissementNiveau.nom = self.nom
+        MagieInvestissementNiveau.niveau = niveau
+        return MagieInvestissementNiveau

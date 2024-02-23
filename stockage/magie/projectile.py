@@ -171,32 +171,25 @@ class MagieProjectileNivelee(MagieNivele):
         dictionnaire = parse(json)
         return MagieProjectileNivelee(dictionnaire["nom"], dictionnaire["latence"], dictionnaire["gain_xp"], dictionnaire["cout_pm"], dictionnaire["fantome"], dictionnaire["percant"], dictionnaire["fleche"], dictionnaire["explosif"], mdl.Element(dictionnaire["element"]), dictionnaire["poids"], dictionnaire["frottements"], dictionnaire["portee"], dictionnaire["degats"], dictionnaire["decentree"], dictionnaire["portee_limite"])
 
-    def make(self, niveau: int) -> mdl.Magie:
+    def make(self, niveau: int):
         """Crée une magie à partir de l'instance."""
-        class GenerateurMagieEnchantement(mdl.Magie):
-            """Un "générateur", c'est-à-dire une classe qui génère des instances de Magie."""
-            nom = self.nom
-            latence = self.latence
-            gain_xp = self.gain_xp
-            cout_pm = self.cout_pm
+        classe: type[mdl.InvocationProjectile] = mdl.magies_projectiles[self.decentree]
+        class MagieProjectileNiveau(classe, mdl.Nomme):
+            """Une magie de projectile."""
             fantome = self.fantome
             percant = self.percant
             fleche = self.fleche
             explosif = self.explosif
             element = self.element
-            poids = self.poids
-            frottements = self.frottements
-            portee = self.portee
-            degats = self.degats
-            decentree = self.decentree
-            portee_limite = self.portee_limite
-
-            def genere(self, skill: mdl.Actif, agissant: mdl.Agissant, niveau: int) -> mdl.InvocationProjectile:
-                projectile = mdl.projectiles[(self.percant, self.fleche, self.explosif, False, True)](mdl.NOWHERE, self.poids[niveau], self.frottements[niveau], self.portee[niveau], self.degats[niveau], self.element)
-                projectile.nom = self.nom
-                projectile.fantome = self.fantome
-                if self.decentree:
-                    return mdl.ActionMagieProjectileDecentre(skill, self, agissant, self.gain_xp[niveau], self.cout_pm[niveau], self.latence[niveau], projectile, self.portee_limite[niveau])
-                else:
-                    return mdl.InvocationProjectile(skill, self, agissant, self.gain_xp[niveau], self.cout_pm[niveau], self.latence[niveau], projectile)
-        return GenerateurMagieEnchantement()
+            poids = self.poids[niveau]
+            frottements = self.frottements[niveau]
+            portee = self.portee[niveau]
+            degats = self.degats[niveau]
+            latence = self.latence[niveau]
+            gain_xp = self.gain_xp[niveau]
+            cout = self.cout_pm[niveau]
+            if self.decentree:
+                portee_limite = self.portee_limite
+        MagieProjectileNiveau.nom = self.nom
+        MagieProjectileNiveau.niveau = niveau
+        return MagieProjectileNiveau

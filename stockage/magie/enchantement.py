@@ -235,38 +235,44 @@ class MagieEnchantementNivele(MagieNivele):
         """Parse un json en BouclierNivele."""
         dictionnaire = parse(json)
         return MagieEnchantementNivele(dictionnaire["nom"], dictionnaire["latence"], dictionnaire["gain_xp"], dictionnaire["cout_pm"], dictionnaire["duree"], dictionnaire["enchantement"], dictionnaire["taux_confusion"], dictionnaire["taux_poches_trouees"], dictionnaire["gain_force"], dictionnaire["gain_vision"], dictionnaire["gain_pv"], dictionnaire["gain_pm"], dictionnaire["gain_vitesse"], dictionnaire["superiorite"], dictionnaire["affinite"], dictionnaire["element"], dictionnaire["gain_tranchant"], dictionnaire["gain_portee"], dictionnaire["degats"], dictionnaire["portee"])
-    
-    def make(self, niveau: int) -> mdl.Magie:
-        """Crée une magie à partir de l'instance."""
-        class GenerateurMagieEnchantement(mdl.Magie):
-            """Un "générateur", c'est-à-dire une classe qui génère des instances de Magie."""
-            nom = self.nom
-            latence = self.latence
-            gain_xp = self.gain_xp
-            cout_pm = self.cout_pm
-            duree = self.duree
-            enchantement = self.enchantement
-            taux_confusion = self.taux_confusion
-            taux_poches_trouees = self.taux_poches_trouees
-            gain_force = self.gain_force
-            gain_vision = self.gain_vision
-            gain_pv = self.gain_pv
-            gain_pm = self.gain_pm
-            gain_vitesse = self.gain_vitesse
-            superiorite = self.superiorite
-            affinite = self.affinite
-            element = self.element
-            gain_tranchant = self.gain_tranchant
-            gain_portee = self.gain_portee
-            degats = self.degats
-            portee = self.portee
 
-            def genere(self, skill: mdl.Actif, agissant: mdl.Agissant, niveau: int) -> mdl.ActionMagie:
-                magie_enchantement = mdl.magies_enchantement[self.enchantement]
-                if issubclass(magie_enchantement, mdl.ActionMagieEnchantementAffinite):
-                    return magie_enchantement(skill, self, agissant, self.gain_xp[niveau], self.cout_pm[niveau], self.latence[niveau], self.duree[niveau], self.affinite[niveau], self.element)
-                elif issubclass(magie_enchantement, mdl.EnchanteAgissant):
-                    return magie_enchantement(skill, self, agissant, self.gain_xp[niveau], self.cout_pm[niveau], self.latence[niveau], self.duree[niveau], self.taux_confusion[niveau] if self.enchantement=="confusion" else self.taux_poches_trouees[niveau] if self.enchantement=="poches_trouees" else self.gain_force[niveau] if self.enchantement=="force" else self.gain_vision[niveau] if self.enchantement=="vision" else self.gain_pv[niveau] if self.enchantement=="vitalite" else self.gain_pm[niveau] if self.enchantement=="absorption" else self.gain_vitesse[niveau] if self.enchantement=="celerite" else self.superiorite[niveau] if self.enchantement=="immunite" else NotImplemented)
-                else:
-                    return magie_enchantement(skill, self, agissant, self.gain_xp[niveau], self.cout_pm[niveau], self.latence[niveau], self.duree[niveau], self.gain_tranchant[niveau] if self.enchantement=="renforcement" else self.degats[niveau], self.gain_portee[niveau] if self.enchantement=="renforcement" else self.portee[niveau])
-        return GenerateurMagieEnchantement()
+    def make(self, niveau: int):
+        """Crée une magie à partir de l'instance."""
+        classe = mdl.magies_enchantement[self.enchantement]
+        class MagieEnchantementNiveau(classe, mdl.Nomme):
+            """Une magie d'enchantement."""
+            duree = self.duree[niveau]
+            latence_max = self.latence[niveau]
+            gain_xp = self.gain_xp[niveau]
+            cout = self.cout_pm[niveau]
+            match self.enchantement:
+                case "confusion":
+                    taux_confusion = self.taux_confusion[niveau]
+                case "poches_trouees":
+                    taux_pertes = self.taux_poches_trouees[niveau]
+                case "force":
+                    gain_force = self.gain_force[niveau]
+                case "vision":
+                    gain_vision = self.gain_vision[niveau]
+                case "vitalite":
+                    gain_pv = self.gain_pv[niveau]
+                case "absorption":
+                    gain_pm = self.gain_pm[niveau]
+                case "celerite":
+                    gain_vitesse = self.gain_vitesse[niveau]
+                case "immunite":
+                    superiorite = self.superiorite[niveau]
+                case "affinite":
+                    gain_affinite = self.affinite[niveau]
+                    element = self.element
+                case "renforcement":
+                    gain_force = self.gain_tranchant[niveau]
+                    gain_portee = self.gain_portee[niveau]
+                case "bombe":
+                    portee = self.portee[niveau]
+                    degats = self.degats[niveau]
+                case _:
+                    raise ValueError(f"Enchantement inconnu : {self.enchantement}")
+        MagieEnchantementNiveau.nom = self.nom
+        MagieEnchantementNiveau.niveau = niveau
+        return MagieEnchantementNiveau

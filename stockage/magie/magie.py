@@ -10,6 +10,6 @@ from ..stockage import StockageNivele
 
 class MagieNivele(StockageNivele):
     """Classe mère des classes de stockage de magie."""
-    def make(self, niveau: int) -> mdl.Magie:
+    def make(self, niveau: int) -> type[mdl.Magie]:
         """Retourne l'entité correspondante."""
         raise NotImplementedError

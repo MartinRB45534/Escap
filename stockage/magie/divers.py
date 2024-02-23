@@ -102,22 +102,19 @@ class MagieBlizzardNivelee(MagieNivele):
         dictionnaire = parse(json)
         return MagieBlizzardNivelee(dictionnaire["nom"], dictionnaire["latence"], dictionnaire["gain_xp"], dictionnaire["cout_pm"], dictionnaire["portee"], dictionnaire["duree"], dictionnaire["gain_latence"])
 
-    def make(self, niveau: int) -> mdl.Magie:
+    def make(self, niveau: int):
         """Crée une magie à partir de l'instance."""
-        class GenerateurMagieBlizzard(mdl.Magie):
-            """Générateur de magie de blizzard."""
-            nom = self.nom
-            latence = self.latence
-            gain_xp = self.gain_xp
-            cout_pm = self.cout_pm
-            portee = self.portee
-            duree = self.duree
-            gain_latence = self.gain_latence
-
-            def genere(self, skill: mdl.Actif, agissant: mdl.Agissant, niveau:int) -> mdl.ActionMagieBlizzard:
-                """Génère une action de magie de blizzard."""
-                return mdl.ActionMagieBlizzard(skill, self, agissant, self.gain_xp[niveau], self.cout_pm[niveau], self.latence[niveau], self.portee[niveau], self.duree[niveau], self.gain_latence[niveau])
-        return GenerateurMagieBlizzard()
+        class MagieBlizzardNiveau(mdl.MagieBlizzard, mdl.Nomme):
+            """Une magie de blizzard."""
+            portee = self.portee[niveau]
+            duree = self.duree[niveau]
+            gain_latence = self.gain_latence[niveau]
+            latence_max = self.latence[niveau]
+            cout = self.cout_pm[niveau]
+            gain_xp = self.gain_xp[niveau]
+        MagieBlizzardNiveau.nom = self.nom
+        MagieBlizzardNiveau.niveau = niveau
+        return MagieBlizzardNiveau
 
 class MagieObscuriteNivelee(MagieNivele):
     """Classe de stockage des magies d'obscurité."""
@@ -212,22 +209,19 @@ class MagieObscuriteNivelee(MagieNivele):
         dictionnaire = parse(json)
         return MagieObscuriteNivelee(dictionnaire["nom"], dictionnaire["latence"], dictionnaire["gain_xp"], dictionnaire["cout_pm"], dictionnaire["portee"], dictionnaire["duree"], dictionnaire["gain_opacite"])
 
-    def make(self, niveau: int) -> mdl.Magie:
+    def make(self, niveau: int):
         """Crée une magie à partir de l'instance."""
-        class GenerateurMagieObscurite(mdl.Magie):
-            """Générateur de magie d'obscurité."""
-            nom = self.nom
-            latence = self.latence
-            gain_xp = self.gain_xp
-            cout_pm = self.cout_pm
-            portee = self.portee
-            duree = self.duree
-            gain_opacite = self.gain_opacite
-
-            def genere(self, skill: mdl.Actif, agissant: mdl.Agissant, niveau:int) -> mdl.ActionMagieObscurite:
-                """Génère une action de magie d'obscurité."""
-                return mdl.ActionMagieObscurite(skill, self, agissant, self.gain_xp[niveau], self.cout_pm[niveau], self.latence[niveau], self.portee[niveau], self.duree[niveau], self.gain_opacite[niveau])
-        return GenerateurMagieObscurite()
+        class MagieObscuriteNiveau(mdl.MagieObscurite, mdl.Nomme):
+            """Une magie d'obscurité."""
+            portee = self.portee[niveau]
+            duree = self.duree[niveau]
+            gain_opacite = self.gain_opacite[niveau]
+            latence_max = self.latence[niveau]
+            cout = self.cout_pm[niveau]
+            gain_xp = self.gain_xp[niveau]
+        MagieObscuriteNiveau.nom = self.nom
+        MagieObscuriteNiveau.niveau = niveau
+        return MagieObscuriteNiveau
     
 class MagieInstakillNivelee(MagieNivele):
     """Classe de stockage des magies d'instakill."""
@@ -303,20 +297,17 @@ class MagieInstakillNivelee(MagieNivele):
         dictionnaire = parse(json)
         return MagieInstakillNivelee(dictionnaire["nom"], dictionnaire["latence"], dictionnaire["gain_xp"], dictionnaire["cout_pm"], dictionnaire["superiorite"])
 
-    def make(self, niveau: int) -> mdl.Magie:
+    def make(self, niveau: int):
         """Crée une magie à partir de l'instance."""
-        class GenerateurMagieInstakill(mdl.Magie):
-            """Générateur de magie d'instakill."""
-            nom = self.nom
-            latence = self.latence
-            gain_xp = self.gain_xp
-            cout_pm = self.cout_pm
-            superiorite = self.superiorite
-
-            def genere(self, skill: mdl.Actif, agissant: mdl.Agissant, niveau:int) -> mdl.ActionMagieInstakill:
-                """Génère une action de magie d'instakill."""
-                return mdl.ActionMagieInstakill(skill, self, agissant, self.gain_xp[niveau], self.cout_pm[niveau], self.latence[niveau], self.superiorite[niveau])
-        return GenerateurMagieInstakill()
+        class MagieInstakillNiveau(mdl.MagieInstakill, mdl.Nomme):
+            """Une magie d'instakill."""
+            superiorite = self.superiorite[niveau]
+            latence = self.latence[niveau]
+            cout = self.cout_pm[niveau]
+            gain_xp = self.gain_xp[niveau]
+        MagieInstakillNiveau.nom = self.nom
+        MagieInstakillNiveau.niveau = niveau
+        return MagieInstakillNiveau
     
 class MagieTeleportationNivelee(MagieNivele):
     """Classe de stockage des magies de téléportation."""
@@ -383,16 +374,13 @@ class MagieTeleportationNivelee(MagieNivele):
         dictionnaire = parse(json)
         return MagieTeleportationNivelee(dictionnaire["nom"], dictionnaire["latence"], dictionnaire["gain_xp"], dictionnaire["cout_pm"])
 
-    def make(self, niveau: int) -> mdl.Magie:
+    def make(self, niveau: int):
         """Crée une magie à partir de l'instance."""
-        class GenerateurMagieTeleportation(mdl.Magie):
-            """Générateur de magie de téléportation."""
-            nom = self.nom
-            latence = self.latence
-            gain_xp = self.gain_xp
-            cout_pm = self.cout_pm
-
-            def genere(self, skill: mdl.Actif, agissant: mdl.Agissant, niveau:int) -> mdl.ActionMagieTeleportation:
-                """Génère une action de magie de téléportation."""
-                return mdl.ActionMagieTeleportation(skill, self, agissant, self.gain_xp[niveau], self.cout_pm[niveau], self.latence[niveau])
-        return GenerateurMagieTeleportation()
+        class MagieTeleportationNiveau(mdl.MagieTeleportation, mdl.Nomme):
+            """Une magie de téléportation."""
+            latence = self.latence[niveau]
+            cout = self.cout_pm[niveau]
+            gain_xp = self.gain_xp[niveau]
+        MagieTeleportationNiveau.nom = self.nom
+        MagieTeleportationNiveau.niveau = niveau
+        return MagieTeleportationNiveau

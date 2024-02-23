@@ -153,32 +153,21 @@ class MagieProtectionNivelee(MagieNivele):
         dictionnaire = parse(json)
         return MagieProtectionNivelee(dictionnaire["nom"], dictionnaire["cible"], dictionnaire["cible_multiple"], dictionnaire["zone"], dictionnaire["latence"], dictionnaire["gain_xp"], dictionnaire["cout_pm"], dictionnaire["duree"], dictionnaire["pv"], dictionnaire["portee"], dictionnaire["resistance_elementaire"], mdl.Element(dictionnaire["element"]), dictionnaire["taux_pv"])
 
-    def make(self, niveau: int) -> mdl.Magie:
+    def make(self, niveau: int):
         """Crée une magie à partir de l'instance."""
-        class GenerateurMagieProtection(mdl.Magie):
-            """Un "générateur", c'est-à-dire une classe qui génère des instances de Magie."""
-            nom = self.nom
-            cible = self.cible
-            cible_multiple = self.cible_multiple
-            zone = self.zone
-            latence = self.latence
-            gain_xp = self.gain_xp
-            cout_pm = self.cout_pm
-            duree = self.duree
-            pv = self.pv
-            portee = self.portee
-            resistance_elementaire = self.resistance_elementaire
-            element = self.element
-            taux_pv = self.taux_pv
-
-            def genere(self, skill: mdl.Actif, agissant: mdl.Agissant, niveau: int) -> mdl.ActionMagieAutoProtection:
-                protection = mdl.magies_protection[(self.cible, self.cible_multiple, self.zone, self.resistance_elementaire)]
-                if issubclass(protection, mdl.ActionMagieProtectionZoneElement):
-                    return protection(skill, self, agissant, self.gain_xp[niveau], self.cout_pm[niveau], self.duree[niveau], self.duree[niveau], self.pv[niveau], self.element, self.taux_pv[niveau], self.portee[niveau])
-                elif issubclass(protection, mdl.ActionMagieAutoProtectionElement):
-                    return protection(skill, self, agissant, self.gain_xp[niveau], self.cout_pm[niveau], self.duree[niveau], self.duree[niveau], self.pv[niveau], self.element, self.taux_pv[niveau])
-                elif issubclass(protection, mdl.ActionMagieProtectionZone):
-                    return protection(skill, self, agissant, self.gain_xp[niveau], self.cout_pm[niveau], self.duree[niveau], self.duree[niveau], self.pv[niveau], self.portee[niveau])
-                else:
-                    return protection(skill, self, agissant, self.gain_xp[niveau], self.cout_pm[niveau], self.duree[niveau], self.duree[niveau], self.pv[niveau])
-        return GenerateurMagieProtection()
+        classe = mdl.magies_protection[(self.cible, self.cible_multiple, self.zone, self.resistance_elementaire)]
+        class MagieProtectionNiveau(classe, mdl.Nomme):
+            """Une magie de protection."""
+            duree = self.duree[niveau]
+            pv = self.pv[niveau]
+            latence_max = self.latence[niveau]
+            gain_xp = self.gain_xp[niveau]
+            cout = self.cout_pm[niveau]
+            if self.zone:
+                portee = self.portee
+            if self.resistance_elementaire:
+                element = self.element
+                taux = self.taux_pv[niveau]
+        MagieProtectionNiveau.nom = self.nom
+        MagieProtectionNiveau.niveau = niveau
+        return MagieProtectionNiveau

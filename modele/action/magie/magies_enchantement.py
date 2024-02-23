@@ -6,7 +6,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 # Imports des classes parentes
-from .magie import EnchanteAgissant, EnchanteItem
+from .magie import Enchante, EnchanteAgissant, EnchanteItem
 
 # Imports utilisés dans le code
 from ...effet import EnchantementConfusion, EnchantementPochesTrouees, EnchantementForce, EnchantementVision, EnchantementPv, EnchantementPm, EnchantementVitesse, EnchantementImmunite, EnchantementAffinite, EnchantementArme, EnchantementBombe
@@ -15,97 +15,100 @@ from ...commons import Element
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ...entitee import Agissant
-    from ...systeme import Actif, Magie
+    from ...systeme import Actif
 
-class ActionMagieEnchantementConfusion(EnchanteAgissant):
+class MagieEnchantementConfusion(EnchanteAgissant):
     """La magie qui place un enchantement de confusion sur un agissant."""
-    nom = "magie confusion"
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,duree:float,taux_confusion:float):
-        EnchanteAgissant.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,EnchantementConfusion(duree,taux_confusion))
+    taux_confusion: float
+    def __init__(self,skill:Actif,agissant:Agissant):
+        EnchanteAgissant.__init__(self,skill,agissant)
+        self.enchantement = EnchantementConfusion(self.duree,self.taux_confusion)
 
-class ActionMagieEnchantementPochesTrouees(EnchanteAgissant):
+class MagieEnchantementPochesTrouees(EnchanteAgissant):
     """La magie qui place un enchantement de poches trouees sur un agissant."""
-    nom = "magie poches trouees"
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,duree:float,taux_perte:float):
-        EnchanteAgissant.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,EnchantementPochesTrouees(duree,taux_perte))
+    taux_perte: float
+    def __init__(self,skill:Actif,agissant:Agissant):
+        EnchanteAgissant.__init__(self,skill,agissant)
+        self.enchantement = EnchantementPochesTrouees(self.duree,self.taux_perte)
 
-class ActionMagieEnchantementForce(EnchanteAgissant):
+class MagieEnchantementForce(EnchanteAgissant):
     """La magie qui place un enchantement de force sur un agissant."""
-    nom = "magie force"
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,duree:float,gain_force:float):
-        EnchanteAgissant.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,EnchantementForce(duree,gain_force))
+    gain_force: float
+    def __init__(self,skill:Actif,agissant:Agissant):
+        EnchanteAgissant.__init__(self,skill,agissant)
+        self.enchantement = EnchantementForce(self.duree,self.gain_force)
 
-class ActionMagieEnchantementVision(EnchanteAgissant):
+class MagieEnchantementVision(EnchanteAgissant):
     """La magie qui place un enchantement de vision sur un agissant."""
-    nom = "magie vision"
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,duree:float,gain_vision:float):
-        EnchanteAgissant.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,EnchantementVision(duree,gain_vision))
+    gain_vision: float
+    def __init__(self,skill:Actif,agissant:Agissant):
+        EnchanteAgissant.__init__(self,skill,agissant)
+        self.enchantement = EnchantementVision(self.duree,self.gain_vision)
 
-class ActionMagieEnchantementVitalite(EnchanteAgissant):
+class MagieEnchantementVitalite(EnchanteAgissant):
     """La magie qui place un enchantement de vitalité sur un agissant."""
-    nom = "magie vitalite"
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,duree:float,gain_pv:float):
-        EnchanteAgissant.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,EnchantementPv(duree,gain_pv))
+    gain_pv: float
+    def __init__(self,skill:Actif,agissant:Agissant):
+        EnchanteAgissant.__init__(self,skill,agissant)
+        self.enchantement = EnchantementPv(self.duree,self.gain_pv)
 
-class ActionMagieEnchantementAbsorption(EnchanteAgissant):
+class MagieEnchantementAbsorption(EnchanteAgissant):
     """La magie qui place un enchantement d'absorption sur un agissant."""
-    nom = "magie absorption"
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,duree:float,gain_pm:float):
-        EnchanteAgissant.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,EnchantementPm(duree,gain_pm))
+    gain_pm: float
+    def __init__(self,skill:Actif,agissant:Agissant):
+        EnchanteAgissant.__init__(self,skill,agissant)
+        self.enchantement = EnchantementPm(self.duree,self.gain_pm)
 
-class ActionMagieEnchantementCelerite(EnchanteAgissant):
+class MagieEnchantementCelerite(EnchanteAgissant):
     """La magie qui place un enchantement de célérité sur un agissant."""
-    nom = "magie celerite"
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,duree:float,gain_vitesse:float):
-        EnchanteAgissant.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,EnchantementVitesse(duree,gain_vitesse))
+    gain_vitesse: float
+    def __init__(self,skill:Actif,agissant:Agissant):
+        EnchanteAgissant.__init__(self,skill,agissant)
+        self.enchantement = EnchantementVitesse(self.duree,self.gain_vitesse)
 
-class ActionMagieEnchantementImmunite(EnchanteAgissant):
+class MagieEnchantementImmunite(EnchanteAgissant):
     """La magie qui place un enchantement d'immunité sur un agissant."""
-    nom = "magie immunite"
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,duree:float,superiorite:float):
-        EnchanteAgissant.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,EnchantementImmunite(duree,superiorite))
+    superiorite: float
+    def __init__(self,skill:Actif,agissant:Agissant):
+        EnchanteAgissant.__init__(self,skill,agissant)
+        self.enchantement = EnchantementImmunite(self.duree,self.superiorite)
 
-class ActionMagieEnchantementAffinite(EnchanteAgissant):
+class MagieEnchantementAffinite(EnchanteAgissant):
     """La magie qui place un enchantement d'affinité élémentale sur un agissant."""
-    nom = "magie flamme"
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,duree:float,gain_affinite:float,element:Element):
-        EnchanteAgissant.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,EnchantementAffinite(duree,gain_affinite,element))
+    gain_affinite: float
+    element: Element
+    def __init__(self,skill:Actif,agissant:Agissant):
+        EnchanteAgissant.__init__(self,skill,agissant)
+        self.enchantement = EnchantementAffinite(self.duree,self.gain_affinite,self.element)
 
-class ActionMagieEnchantementRenforcement(EnchanteItem):
+class MagieEnchantementRenforcement(EnchanteItem):
     """La magie qui place un enchantement de renforcement sur un item."""
-    nom = "magie renforcement"
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,duree:float,gain_force:float,gain_portee:float):
-        EnchanteItem.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,EnchantementArme(duree,gain_force,gain_portee))
+    gain_force: float
+    gain_portee: float
+    def __init__(self,skill:Actif,agissant:Agissant):
+        EnchanteItem.__init__(self,skill,agissant)
+        self.enchantement = EnchantementArme(self.duree,self.gain_force,self.gain_portee)
 
-class ActionMagieEnchantementBombe(EnchanteItem):
+class MagieEnchantementBombe(EnchanteItem):
     """La magie qui place un enchantement de bombe sur un item."""
-    nom = "magie bombe"
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,duree:float,degats:float,portee:float):
-        EnchanteItem.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,EnchantementBombe(duree,portee,degats))
+    portee: float
+    degats: float
+    def __init__(self,skill:Actif,agissant:Agissant):
+        EnchanteItem.__init__(self,skill,agissant)
+        self.enchantement = EnchantementBombe(self.duree,self.portee,self.degats)
 
-magies_enchantement: dict[str, type[
-    ActionMagieEnchantementAbsorption|
-    ActionMagieEnchantementAffinite|
-    ActionMagieEnchantementBombe|
-    ActionMagieEnchantementCelerite|
-    ActionMagieEnchantementConfusion|
-    ActionMagieEnchantementForce|
-    ActionMagieEnchantementImmunite|
-    ActionMagieEnchantementPochesTrouees|
-    ActionMagieEnchantementRenforcement|
-    ActionMagieEnchantementVitalite|
-    ActionMagieEnchantementVision]] = {
-    "confusion": ActionMagieEnchantementConfusion,
-    "poches_trouees": ActionMagieEnchantementPochesTrouees,
-    "force": ActionMagieEnchantementForce,
-    "vision": ActionMagieEnchantementVision,
-    "vitalite": ActionMagieEnchantementVitalite,
-    "absorption": ActionMagieEnchantementAbsorption,
-    "celerite": ActionMagieEnchantementCelerite,
-    "immunite": ActionMagieEnchantementImmunite,
-    "affinite": ActionMagieEnchantementAffinite,
-    "renforcement": ActionMagieEnchantementRenforcement,
-    "bombe": ActionMagieEnchantementBombe
+magies_enchantement: dict[str, type[Enchante]] = {
+    "confusion": MagieEnchantementConfusion,
+    "poches_trouees": MagieEnchantementPochesTrouees,
+    "force": MagieEnchantementForce,
+    "vision": MagieEnchantementVision,
+    "vitalite": MagieEnchantementVitalite,
+    "absorption": MagieEnchantementAbsorption,
+    "celerite": MagieEnchantementCelerite,
+    "immunite": MagieEnchantementImmunite,
+    "affinite": MagieEnchantementAffinite,
+    "renforcement": MagieEnchantementRenforcement,
+    "bombe": MagieEnchantementBombe
 }
 """
 nom -> Enchantement

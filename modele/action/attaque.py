@@ -33,16 +33,15 @@ class AttaqueSimple(Attaque):
     """
     Une attaque qui n'inflige qu'un seul coup.
     """
-    def __init__(self,agissant:Agissant,latence:float,skill:Actif,xp:float,taux:float,direction:crt.Direction,portee:int,element:Element,deplacement:Deplacement,forme:Forme,passage:Passage,distance:str="contact"):
-        super().__init__(agissant,latence,skill,xp)
-        self.taux = taux
-        self.direction = direction
-        self.portee = portee
-        self.element = element
-        self.deplacement = deplacement
-        self.forme = forme
-        self.passage = passage
-        self.distance = distance
+    taux:float
+    direction:crt.Direction
+    portee:float
+    element:Element
+    deplacement:Deplacement
+    forme:Forme
+    passage:Passage
+    def __init__(self, agissant: Agissant, skill: Actif):
+        Attaque.__init__(self, agissant, skill)
 
     def dope(self,dopage:Dopage):
         self.taux = dopage.dope(self.taux)
@@ -50,31 +49,81 @@ class AttaqueSimple(Attaque):
     def action(self):
         degats = self.agissant.force*self.taux*self.agissant.affinite(self.element)
         position = self.agissant.position
-        zone = self.agissant.labyrinthe.a_portee(position,self.portee,self.deplacement,self.forme,self.passage,self.direction)
+        zone = self.agissant.labyrinthe.a_portee(
+            position,self.portee,self.deplacement,self.forme,self.passage,self.direction)
         for position in zone:
-            self.agissant.labyrinthe.get_case(position).effets.add(AttaqueCase(self.agissant,degats,self.element,self.distance,self.direction))
+            self.agissant.labyrinthe.get_case(position).effets.add(
+                AttaqueCase(self.agissant,degats,self.element,self.direction))
 
 class AttaqueFinal(ActionFinal,AttaqueSimple):
     """
     Une attaque qui se fait à la fin de la latence.
     """
-    # L'attaque la plus courante, correspond aussi au stomp
+    def __init__(self, agissant: Agissant, skill: Actif, latence: float, xp: float, taux: float,
+                 direction: crt.Direction, portee: float, element: Element,
+                 deplacement: Deplacement, forme: Forme, passage: Passage):
+        ActionFinal.__init__(self, agissant)
+        AttaqueSimple.__init__(self, agissant, skill)
+        self.latence_max = latence
+        self.xp = xp
+        self.taux = taux
+        self.direction = direction
+        self.portee = portee
+        self.element = element
+        self.deplacement = deplacement
+        self.forme = forme
+        self.passage = passage
+
+class AttaqueMultiple(ActionParcellaire,Attaque):
+    """
+    Une attaque complexe avec plusieurs coups.
+    """
+    def __init__(self, agissant: Agissant, skill: Actif, latences: list[float], xp: float,
+                 taux: list[float], directions: list[crt.Direction], portees: list[float],
+                 element: Element, deplacement: Deplacement, formes: list[Forme],
+                 passages: list[Passage]):
+        ActionParcellaire.__init__(self, agissant)
+        Attaque.__init__(self, agissant, skill)
+        self.latence_max = sum(latences)
+        self.latences = latences
+        self.xp = xp
+        self.taux = taux
+        self.directions = directions
+        self.portees = portees
+        self.element = element
+        self.deplacement = deplacement
+        self.formes = formes
+        self.passages = passages
+
+    def dope(self,dopage:Dopage):
+        self.taux = [dopage.dope(taux) for taux in self.taux]
+
+    def action(self):
+        degats = self.agissant.force*self.taux[self.rempli]*self.agissant.affinite(self.element)
+        position = self.agissant.position
+        zone = self.agissant.labyrinthe.a_portee(
+            position,self.portees[self.rempli],self.deplacement,
+            self.formes[self.rempli],self.passages[self.rempli],
+            self.directions[self.rempli])
+        for position in zone:
+            self.agissant.labyrinthe.get_case(position).effets.add(
+                AttaqueCase(self.agissant,degats,self.element,self.directions[self.rempli]))
 
 class AttaqueArme(Attaque):
     """
     L'action d'attaquer avec une arme.
     """
-    def __init__(self,agissant:Agissant,latence:float,skill:Actif,xp:float,arme:Arme):
-        Attaque.__init__(self,agissant,latence,skill,xp)
-        self.arme = arme
+    arme:Arme
+    def __init__(self,agissant:Agissant,skill:Actif):
+        Attaque.__init__(self,agissant,skill)
 
 class AttaqueArmeSimple(AttaqueArme,AttaqueSimple):
     """
     Une attaque avec une arme qui n'inflige qu'un seul coup.
     """
-    def __init__(self,agissant:Agissant,latence:float,skill:Actif,xp:float,taux:float,direction:crt.Direction,arme:Arme,deplacement:Deplacement,forme:Forme,passage:Passage,distance:str="contact"):
-        AttaqueSimple.__init__(self,agissant,latence,skill,xp,taux,direction,arme.portee,arme.element,deplacement,forme,passage,distance)
-        AttaqueArme.__init__(self,agissant,latence,skill,xp,arme)
+    def __init__(self,agissant:Agissant,skill:Actif):
+        AttaqueSimple.__init__(self,agissant,skill)
+        AttaqueArme.__init__(self,agissant,skill)
 
     def action(self):
         element,tranchant,portee = self.arme.get_stats_attaque()
@@ -82,21 +131,35 @@ class AttaqueArmeSimple(AttaqueArme,AttaqueSimple):
         position = self.agissant.position
         zone = self.agissant.labyrinthe.a_portee(position,portee,self.deplacement,self.forme,self.passage,self.direction)
         for position in zone:
-            self.agissant.labyrinthe.get_case(position).effets.add(AttaqueCase(self.agissant,degats,element,self.distance,self.direction))
+            self.agissant.labyrinthe.get_case(position).effets.add(AttaqueCase(self.agissant,degats,element,self.direction))
 
 class AttaqueArmeFinal(ActionFinal,AttaqueArmeSimple):
     """
     Une attaque avec une arme qui se fait à la fin de la latence.
     """
-    # L'attaque avec une arme la plus courante (correspond aux attaques de base à l'épée et la lance)
+    def __init__(self,agissant:Agissant,latence:float,skill:Actif,xp:float,taux:float,direction:crt.Direction,arme:Arme,deplacement:Deplacement,forme:Forme,passage:Passage):
+        ActionFinal.__init__(self,agissant)
+        AttaqueArmeSimple.__init__(self,agissant,skill)
+        self.latence_max = latence
+        self.xp = xp
+        self.taux = taux
+        self.direction = direction
+        self.arme = arme
+        self.deplacement = deplacement
+        self.forme = forme
+        self.passage = passage
 
-class AttaqueMultiple(ActionParcellaire,AttaqueArme): # Les attaques sans arme ne peuvent pas être multiples
+class AttaqueArmeMultiple(ActionParcellaire,AttaqueArme):
     """
     Une attaque complexe avec plusieurs coups.
     """
-    def __init__(self,agissant:Agissant,latences:list[float],skill:Actif,xp:float,taux:list[float],directions:list[crt.Direction],arme:Arme,deplacement:Deplacement,formes:list[Forme],passage:Passage,distance:str="contact"):
-        ActionParcellaire.__init__(self,agissant,latences)
-        AttaqueArme.__init__(self,agissant,sum(latences),skill,xp,arme)
+    def __init__(self,agissant:Agissant,latences:list[float],skill:Actif,xp:float,taux:list[float],directions:list[crt.Direction],arme:Arme,deplacement:Deplacement,formes:list[Forme],passage:Passage):
+        ActionParcellaire.__init__(self,agissant)
+        AttaqueArme.__init__(self,agissant,skill)
+        self.latence_max = sum(latences)
+        self.latences = latences
+        self.xp = xp
+        self.arme = arme
         self.taux = taux
         self.directions = directions
         self.portee = arme.portee
@@ -104,7 +167,6 @@ class AttaqueMultiple(ActionParcellaire,AttaqueArme): # Les attaques sans arme n
         self.deplacement = deplacement
         self.formes = formes
         self.passage = passage
-        self.distance = distance
 
     def dope(self,dopage:Dopage):
         self.taux = [dopage.dope(taux) for taux in self.taux]
@@ -115,4 +177,14 @@ class AttaqueMultiple(ActionParcellaire,AttaqueArme): # Les attaques sans arme n
         position = self.agissant.position
         zone = self.agissant.labyrinthe.a_portee(position,portee,self.deplacement,self.formes[self.rempli],self.passage,self.directions[self.rempli])
         for position in zone:
-            self.agissant.labyrinthe.get_case(position).effets.add(AttaqueCase(self.agissant,degats,element,self.distance,self.directions[self.rempli]))
+            self.agissant.labyrinthe.get_case(position).effets.add(AttaqueCase(self.agissant,degats,element,self.directions[self.rempli]))
+
+attaques: dict[tuple[bool, bool], type[Attaque]] = {
+    (False, False): AttaqueFinal,
+    (False, True): AttaqueMultiple,
+    (True, False): AttaqueArmeFinal,
+    (True, True): AttaqueArmeMultiple
+}
+"""
+(arme, multiple) -> attaque
+"""

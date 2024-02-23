@@ -19,10 +19,10 @@ class Caste(Action):
     """
     L'action de caster (un parchemin ou une magie)
     """
-    def __init__(self,agissant:Agissant,latence:float):
-        super().__init__(agissant,latence)
-        self.mana:float = 0
-        self.cout:float
+    cout: float
+    def __init__(self, agissant: Agissant):
+        Action.__init__(self, agissant)
+        self.mana: float = 0
 
     def paye(self):
         """On essaye de payer le coût du sort."""
@@ -82,8 +82,8 @@ class CasteFractionnaire(Caste):
     """
     Lorsque le mana est absorbé par fractions.
     """
-    def __init__(self, agissant: Agissant, latence: float):
-        super().__init__(agissant, latence)
+    def __init__(self, agissant: Agissant):
+        Caste.__init__(self, agissant)
         self.parts: int = 1
 
     def paye(self):

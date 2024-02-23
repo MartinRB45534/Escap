@@ -15,7 +15,8 @@ from ....effet import OnHit
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ....labyrinthe.labyrinthe import Labyrinthe
+    from ....labyrinthe import Labyrinthe
+    from ....action import InvocationProjectile
 
 class ProjectileSimple(Projectile):
     """Un projectile qui se contente d'un effet OnHit."""
@@ -58,6 +59,7 @@ class FlecheExplosiveFragile(FlecheExplosive,Fragile):
     """Une flèche explosive qui se brise à l'impact."""
 
 class ProjectileMagique(ProjectileSimple,Evanescent):
+    magie: InvocationProjectile
     """La classe des projectiles créés par magie."""
 
 class MagiePercante(Percant,ProjectileMagique):

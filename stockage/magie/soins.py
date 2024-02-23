@@ -118,27 +118,20 @@ class MagieSoinNivelee(MagieNivele):
         dictionnaire = parse(json)
         return MagieSoinNivelee(dictionnaire["nom"], dictionnaire["cible"], dictionnaire["cible_multiple"], dictionnaire["zone"], dictionnaire["latence"], dictionnaire["gain_xp"], dictionnaire["cout_pm"], dictionnaire["gain_pv"], dictionnaire["portee"])
 
-    def make(self, niveau: int) -> mdl.Magie:
+    def make(self, niveau: int):
         """Crée une magie à partir de l'instance."""
-        class GenerateurMagieSoin(mdl.Magie):
-            """Un "générateur", c'est-à-dire une classe qui génère des instances de Magie."""
-            nom = self.nom
-            cible = self.cible
-            cible_multiple = self.cible_multiple
-            zone = self.zone
-            latence = self.latence
-            gain_xp = self.gain_xp
-            cout_pm = self.cout_pm
-            gain_pv = self.gain_pv
-            portee = self.portee
-
-            def genere(self, skill: mdl.Actif, agissant: mdl.Agissant, niveau: int) -> mdl.ActionMagieAutoSoin:
-                magie_soin = mdl.magies_soin[(self.cible, self.cible_multiple, self.zone)]
-                if issubclass(magie_soin, mdl.ActionMagieSoinDeZone):
-                    return magie_soin(skill, self, agissant, self.gain_xp[niveau], self.cout_pm[niveau], self.latence[niveau], self.gain_pv[niveau], self.portee[niveau])
-                else:
-                    return magie_soin(skill, self, agissant, self.gain_xp[niveau], self.cout_pm[niveau], self.latence[niveau], self.gain_pv[niveau])
-        return GenerateurMagieSoin()
+        classe = mdl.magies_soin[(self.cible, self.cible_multiple, self.zone)]
+        class MagieSoinNiveau(classe, mdl.Nomme):
+            """Une magie de soin."""
+            gain_pv = self.gain_pv[niveau]
+            latence = self.latence[niveau]
+            gain_xp = self.gain_xp[niveau]
+            cout = self.cout_pm[niveau]
+            if self.zone:
+                portee = self.portee
+        MagieSoinNiveau.nom = self.nom
+        MagieSoinNiveau.niveau = niveau
+        return MagieSoinNiveau
 
 class MagieResurectionNivele(MagieNivele):
     """Une magie de résurection."""
@@ -246,28 +239,21 @@ class MagieResurectionNivele(MagieNivele):
         dictionnaire = parse(json)
         return MagieResurectionNivele(dictionnaire["nom"], dictionnaire["case"], dictionnaire["zone"], dictionnaire["latence"], dictionnaire["gain_xp"], dictionnaire["cout_pm"], dictionnaire["portee_limite"], dictionnaire["portee"])
 
-    def make(self, niveau: int) -> mdl.Magie:
+    def make(self, niveau: int):
         """Crée une magie à partir de l'instance."""
-        class GenerateurMagieResurection(mdl.Magie):
-            """Un "générateur", c'est-à-dire une classe qui génère des instances de Magie."""
-            nom = self.nom
-            case = self.case
-            zone = self.zone
-            latence = self.latence
-            gain_xp = self.gain_xp
-            cout_pm = self.cout_pm
-            portee_limite = self.portee_limite
-            portee = self.portee
-
-            def genere(self, skill: mdl.Actif, agissant: mdl.Agissant, niveau: int) -> mdl.ActionMagie:
-                magie_resurection = mdl.magies_resurection[(self.case, self.zone)]
-                if issubclass(magie_resurection, mdl.ActionMagieResurection):
-                    return magie_resurection(skill, self, agissant, self.gain_xp[niveau], self.cout_pm[niveau], self.latence[niveau])
-                elif issubclass(magie_resurection, mdl.ActionMagieResurectionCase):
-                    return magie_resurection(skill, self, agissant, self.gain_xp[niveau], self.cout_pm[niveau], self.latence[niveau], self.portee_limite[niveau])
-                else:
-                    return magie_resurection(skill, self, agissant, self.gain_xp[niveau], self.cout_pm[niveau], self.latence[niveau], self.portee_limite[niveau], self.portee[niveau])
-        return GenerateurMagieResurection()
+        classe = mdl.magies_resurection[(self.case, self.zone)]
+        class MagieResurectionNiveau(classe, mdl.Nomme):
+            """Une magie de résurection."""
+            latence = self.latence[niveau]
+            gain_xp = self.gain_xp[niveau]
+            cout = self.cout_pm[niveau]
+            if self.case:
+                portee_limite = self.portee_limite
+            if self.zone:
+                portee = self.portee
+        MagieResurectionNiveau.nom = self.nom
+        MagieResurectionNiveau.niveau = niveau
+        return MagieResurectionNiveau
 
 class MagieReanimationNivele(MagieNivele):
     """Une magie de réanimation."""
@@ -390,27 +376,20 @@ class MagieReanimationNivele(MagieNivele):
         dictionnaire = parse(json)
         return MagieReanimationNivele(dictionnaire["nom"], dictionnaire["case"], dictionnaire["zone"], dictionnaire["latence"], dictionnaire["gain_xp"], dictionnaire["cout_pm"], dictionnaire["taux_pv"], dictionnaire["superiorite"], dictionnaire["portee_limite"], dictionnaire["portee"])
 
-    def make(self, niveau: int) -> mdl.Magie:
+    def make(self, niveau: int):
         """Crée une magie à partir de l'instance."""
-        class GenerateurMagieReanimation(mdl.Magie):
-            """Un "générateur", c'est-à-dire une classe qui génère des instances de Magie."""
-            nom = self.nom
-            case = self.case
-            zone = self.zone
-            latence = self.latence
-            gain_xp = self.gain_xp
-            cout_pm = self.cout_pm
-            taux_pv = self.taux_pv
-            superiorite = self.superiorite
-            portee_limite = self.portee_limite
-            portee = self.portee
-
-            def genere(self, skill: mdl.Actif, agissant: mdl.Agissant, niveau: int) -> mdl.ActionMagie:
-                magie_reanimation = mdl.magies_reanimation[(self.case, self.zone)]
-                if issubclass(magie_reanimation, mdl.ActionMagieReanimation):
-                    return magie_reanimation(skill, self, agissant, self.gain_xp[niveau], self.cout_pm[niveau], self.latence[niveau], self.taux_pv[niveau], self.superiorite[niveau])
-                elif issubclass(magie_reanimation, mdl.ActionMagieReanimationCase):
-                    return magie_reanimation(skill, self, agissant, self.gain_xp[niveau], self.cout_pm[niveau], self.latence[niveau], self.taux_pv[niveau], self.superiorite[niveau], self.portee_limite[niveau])
-                else:
-                    return magie_reanimation(skill, self, agissant, self.gain_xp[niveau], self.cout_pm[niveau], self.latence[niveau], self.taux_pv[niveau], self.superiorite[niveau], self.portee_limite[niveau], self.portee[niveau])
-        return GenerateurMagieReanimation()
+        classe = mdl.magies_reanimation[(self.case, self.zone)]
+        class MagieReanimationNiveau(classe, mdl.Nomme):
+            """Une magie de réanimation."""
+            taux_pv = self.taux_pv[niveau]
+            superiorite = self.superiorite[niveau]
+            latence = self.latence[niveau]
+            gain_xp = self.gain_xp[niveau]
+            cout = self.cout_pm[niveau]
+            if self.case:
+                portee_limite = self.portee_limite
+            if self.zone:
+                portee = self.portee
+        MagieReanimationNiveau.nom = self.nom
+        MagieReanimationNiveau.niveau = niveau
+        return MagieReanimationNiveau

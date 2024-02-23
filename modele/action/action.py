@@ -13,13 +13,14 @@ if TYPE_CHECKING:
 
 class Action:
     """
-    Les actions sont ce que les agissants font. Elles sont appelées par le controleur jusqu'à être terminées, puis retirées.
+    Les actions sont ce que les agissants font.
+    Elles sont appelées par le controleur jusqu'à être terminées, puis retirées.
     """
-    def __init__(self,agissant:Agissant,latence:float):
+    latence_max: float
+    def __init__(self, agissant: Agissant):
         self.agissant = agissant # Pour ne pas avoir à repasser l'agissant en paramètre à chaque fois
-        self.latence:float = 0 # Le temps écoulé depuis le début de l'action
-        self.latence_max = latence # Le temps que l'action doit durer
-        self.taux_vitesse:dict[str,float] = {} # Les taux de vitesse de l'agissant
+        self.latence: float = 0 # Le temps écoulé depuis le début de l'action
+        self.taux_vitesse: dict[str,float] = {} # Les taux de vitesse de l'agissant
         self.repete = False # Si l'action doit être répétée
         self.repetitions = 0 # Le nombre de fois que l'action a été répétée
 
@@ -85,7 +86,7 @@ class ActionFinal(Action):
     """
     def termine(self):
         """L'action est terminée."""
-        res = super().termine()
+        res = Action.termine(self)
         self.action()
         return res
 
@@ -97,7 +98,7 @@ class ActionInitial(Action):
         """L'action est appelée à chaque tour."""
         if self.latence == 0:
             self.action()
-        return super().execute()
+        return Action.execute(self)
 
 class ActionContinu(Action):
     """
@@ -115,9 +116,9 @@ class ActionFractionnaire(Action):
     """
     Action qui se fait un nombre fixe de fois, régulièrement.
     """
-    def __init__(self,agissant:Agissant,latence:float,parts:int):
-        super().__init__(agissant,latence)
-        self.parts = parts # Le nombre de fois que l'action doit être faite
+    parts: int
+    def __init__(self, agissant: Agissant):
+        Action.__init__(self, agissant)
         self.rempli = 0 # Le nombre de fois que l'action a été faite
 
     def execute(self):
@@ -134,15 +135,15 @@ class ActionFractionnaire(Action):
     def reinit(self):
         """L'action est réinitialisée."""
         self.rempli = 0
-        super().reinit()
+        Action.reinit(self)
 
 class ActionParcellaire(Action):
     """
     Action qui se fait un nombre fixe de fois, irrégulièrement.
     """
-    def __init__(self,agissant:Agissant,latences:list[float]):
-        super().__init__(agissant,sum(latences))
-        self.latences = latences # Les latences entre chaque action
+    latences: list[float]
+    def __init__(self,agissant:Agissant):
+        Action.__init__(self, agissant)
         self.rempli = 0 # Le nombre de fois que l'action a été faite
 
     def execute(self):
@@ -158,4 +159,4 @@ class ActionParcellaire(Action):
     def reinit(self):
         """L'action est réinitialisée."""
         self.rempli = 0
-        super().reinit()
+        Action.reinit(self)

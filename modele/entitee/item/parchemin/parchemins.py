@@ -10,7 +10,7 @@ from .parchemin import Parchemin
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ....action.non_skill import Impregne
-    from ....action.magie.magie import ActionMagie
+    from ....action.magie.magie import Magie
     from ....labyrinthe.labyrinthe import Labyrinthe
     from ....effet.agissant.agissant import EffetAgissant
 
@@ -24,11 +24,11 @@ class ParcheminPreEcrit(Parchemin):
 
 class ParcheminVierge(Parchemin):
     """Un parchemin qui peut être imprégné d'une magie."""
-    def __init__(self,labyrinthe:Labyrinthe,impregne:Impregne|ActionMagie,position:crt.Position=crt.POSITION_ABSENTE):
+    def __init__(self,labyrinthe:Labyrinthe,impregne:Impregne|Magie,position:crt.Position=crt.POSITION_ABSENTE):
         Parchemin.__init__(self,labyrinthe,position)
         if isinstance(impregne,Impregne):
             impregne.item = self
-        self.action_portee:Impregne|ActionMagie = impregne
+        self.action_portee:Impregne|Magie = impregne
 
 class NoWritting(ParcheminVierge):
     def __init__(self):

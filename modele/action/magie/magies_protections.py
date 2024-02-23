@@ -6,7 +6,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 # Imports des classes parentes
-from .magie import ActionMagie, CibleAgissant, CibleAgissants, CibleCase
+from .magie import Magie, CibleAgissant, CibleAgissants, CibleCase
 
 # Imports utilisés dans le code
 from ...effet import ProtectionElement, ProtectionMur, ProtectionCaseMur, ProtectionCaseElement
@@ -15,23 +15,23 @@ from ...commons import Element, Deplacement, Forme, Passage
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ...entitee import Agissant
-    from ...systeme import Actif, Magie
+    from ...systeme import Actif
 
-class ActionMagieAutoProtection(ActionMagie):
+class MagieAutoProtection(Magie):
     """La magie qui crée un effet de protection sur l'agissant."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,duree:float,pv:float):
-        ActionMagie.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
-        self.duree = duree
-        self.pv = pv
+    duree: float
+    pv: float
+    def __init__(self,skill:Actif,agissant:Agissant):
+        Magie.__init__(self,skill,agissant)
 
     def action(self):
         self.agissant.effets.append(ProtectionMur(self.duree,self.pv))
 
-class ActionMagieProtection(CibleAgissant, ActionMagieAutoProtection):
+class MagieProtection(CibleAgissant, MagieAutoProtection):
     """La magie qui crée un effet de protection sur un agissant."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,duree:float,pv:float):
-        CibleAgissant.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
-        ActionMagieAutoProtection.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,duree,pv)
+    def __init__(self,skill:Actif,agissant:Agissant):
+        CibleAgissant.__init__(self,skill,agissant)
+        MagieAutoProtection.__init__(self,skill,agissant)
 
     def action(self):
         if not self.cible:
@@ -39,11 +39,11 @@ class ActionMagieProtection(CibleAgissant, ActionMagieAutoProtection):
         else:
             self.cible.effets.append(ProtectionMur(self.duree,self.pv))
 
-class ActionMagieMultiProtection(CibleAgissants, ActionMagieAutoProtection):
+class MagieMultiProtection(CibleAgissants, MagieAutoProtection):
     """La magie qui crée un effet de protection sur des agissants."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,duree:float,pv:float):
-        CibleAgissants.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
-        ActionMagieAutoProtection.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,duree,pv)
+    def __init__(self,skill:Actif,agissant:Agissant):
+        CibleAgissants.__init__(self,skill,agissant)
+        MagieAutoProtection.__init__(self,skill,agissant)
 
     def action(self):
         if not self.cible: # [] is falsy
@@ -52,21 +52,21 @@ class ActionMagieMultiProtection(CibleAgissants, ActionMagieAutoProtection):
             for cible in self.cible:
                 cible.effets.append(ProtectionMur(self.duree,self.pv))
 
-class ActionMagieProtectionGroupe(ActionMagieAutoProtection):
+class MagieProtectionGroupe(MagieAutoProtection):
     """La magie qui crée un effet de protection sur des agissants."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,duree:float,pv:float):
-        ActionMagieAutoProtection.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,duree,pv)
+    def __init__(self,skill:Actif,agissant:Agissant):
+        MagieAutoProtection.__init__(self,skill,agissant)
 
     def action(self):
         for agissant in self.agissant.esprit.corps:
             agissant.effets.append(ProtectionMur(self.duree,self.pv))
 
-class ActionMagieProtectionZone(CibleCase, ActionMagieAutoProtection):
+class MagieProtectionZone(CibleCase, MagieAutoProtection):
     """La magie qui crée un effet de protection sur une zone."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,duree:float,pv:float,portee:float):
-        CibleCase.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
-        ActionMagieAutoProtection.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,duree,pv)
-        self.portee = portee
+    portee: float
+    def __init__(self,skill:Actif,agissant:Agissant):
+        CibleCase.__init__(self,skill,agissant)
+        MagieAutoProtection.__init__(self,skill,agissant)
 
     def action(self):
         if not self.cible:
@@ -77,21 +77,21 @@ class ActionMagieProtectionZone(CibleCase, ActionMagieAutoProtection):
                 case = self.agissant.labyrinthe.get_case(position)
                 case.effets.add(ProtectionCaseMur(self.duree,self.pv))
 
-class ActionMagieAutoProtectionElement(ActionMagieAutoProtection):
+class MagieAutoProtectionElement(MagieAutoProtection):
     """La magie qui crée un effet de protection élémentaire sur l'agissant."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,duree:float,pv:float,element:Element,taux:float):
-        ActionMagieAutoProtection.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,duree,pv)
-        self.element = element
-        self.taux = taux
+    element: Element
+    taux: float
+    def __init__(self,skill:Actif,agissant:Agissant):
+        MagieAutoProtection.__init__(self,skill,agissant)
 
     def action(self):
         self.agissant.effets.append(ProtectionElement(self.duree,self.pv,self.element,self.taux))
 
-class ActionMagieProtectionElement(CibleAgissant, ActionMagieAutoProtectionElement):
+class MagieProtectionElement(CibleAgissant, MagieAutoProtectionElement):
     """La magie qui crée un effet de protection élémentaire sur un agissant."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,duree:float,pv:float,element:Element,taux:float):
-        CibleAgissant.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
-        ActionMagieAutoProtectionElement.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,duree,pv,element,taux)
+    def __init__(self,skill:Actif,agissant:Agissant):
+        CibleAgissant.__init__(self,skill,agissant)
+        MagieAutoProtectionElement.__init__(self,skill,agissant)
 
     def action(self):
         if not self.cible:
@@ -99,11 +99,11 @@ class ActionMagieProtectionElement(CibleAgissant, ActionMagieAutoProtectionEleme
         else:
             self.cible.effets.append(ProtectionElement(self.duree,self.pv,self.element,self.taux))
 
-class ActionMagieMultiProtectionElement(CibleAgissants, ActionMagieAutoProtectionElement):
+class MagieMultiProtectionElement(CibleAgissants, MagieAutoProtectionElement):
     """La magie qui crée un effet de protection élémentaire sur des agissants."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,duree:float,pv:float,element:Element,taux:float):
-        CibleAgissants.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
-        ActionMagieAutoProtectionElement.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,duree,pv,element,taux)
+    def __init__(self,skill:Actif,agissant:Agissant):
+        CibleAgissants.__init__(self,skill,agissant)
+        MagieAutoProtectionElement.__init__(self,skill,agissant)
 
     def action(self):
         if not self.cible: # [] is falsy
@@ -112,21 +112,21 @@ class ActionMagieMultiProtectionElement(CibleAgissants, ActionMagieAutoProtectio
             for cible in self.cible:
                 cible.effets.append(ProtectionElement(self.duree,self.pv,self.element,self.taux))
 
-class ActionMagieProtectionGroupeElement(ActionMagieAutoProtectionElement):
+class MagieProtectionGroupeElement(MagieAutoProtectionElement):
     """La magie qui crée un effet de protection élémentaire sur des agissants."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,duree:float,pv:float,element:Element,taux:float):
-        ActionMagieAutoProtectionElement.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,duree,pv,element,taux)
+    def __init__(self,skill:Actif,agissant:Agissant):
+        MagieAutoProtectionElement.__init__(self,skill,agissant)
 
     def action(self):
         for agissant in self.agissant.esprit.corps:
             agissant.effets.append(ProtectionElement(self.duree,self.pv,self.element,self.taux))
 
-class ActionMagieProtectionZoneElement(CibleCase, ActionMagieAutoProtectionElement):
+class MagieProtectionZoneElement(CibleCase, MagieAutoProtectionElement):
     """La magie qui crée un effet de protection élémentaire sur une zone."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,duree:float,pv:float,element:Element,taux:float,portee:float):
-        CibleCase.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
-        ActionMagieAutoProtectionElement.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,duree,pv,element,taux)
-        self.portee = portee
+    portee: float
+    def __init__(self,skill:Actif,agissant:Agissant):
+        CibleCase.__init__(self,skill,agissant)
+        MagieAutoProtectionElement.__init__(self,skill,agissant)
 
     def action(self):
         if not self.cible:
@@ -137,24 +137,24 @@ class ActionMagieProtectionZoneElement(CibleCase, ActionMagieAutoProtectionEleme
                 case = self.agissant.labyrinthe.get_case(position)
                 case.effets.add(ProtectionCaseElement(self.duree,self.pv,self.element,self.taux))
 
-magies_protection: dict[tuple[bool, bool, bool, bool],type[ActionMagieAutoProtection]] = {
-    (False, False, False, False): ActionMagieAutoProtection,
-    (True, False, False, False): ActionMagieProtection,
-    (True, True, False, False): ActionMagieMultiProtection,
-    (False, True, False, False): ActionMagieProtectionGroupe,
-    (False, False, True, False): ActionMagieProtectionZone,
-    (True, False, True, False): ActionMagieAutoProtection, # Pas possible
-    (False, True, True, False): ActionMagieAutoProtection, # Pas possible
-    (True, True, True, False): ActionMagieAutoProtection, # Pas possible
-    (False, False, False, True): ActionMagieAutoProtectionElement,
-    (True, False, False, True): ActionMagieProtectionElement,
-    (True, True, False, True): ActionMagieMultiProtectionElement,
-    (False, True, False, True): ActionMagieProtectionGroupeElement,
-    (False, False, True, True): ActionMagieProtectionZoneElement,
-    (True, False, True, True): ActionMagieAutoProtectionElement, # Pas possible
-    (False, True, True, True): ActionMagieAutoProtectionElement, # Pas possible
-    (True, True, True, True): ActionMagieAutoProtectionElement # Pas possible
+magies_protection: dict[tuple[bool, bool, bool, bool],type[MagieAutoProtection]] = {
+    (False, False, False, False): MagieAutoProtection,
+    (True, False, False, False): MagieProtection,
+    (True, True, False, False): MagieMultiProtection,
+    (False, True, False, False): MagieProtectionGroupe,
+    (False, False, True, False): MagieProtectionZone,
+    (True, False, True, False): MagieAutoProtection, # Pas possible
+    (False, True, True, False): MagieAutoProtection, # Pas possible
+    (True, True, True, False): MagieAutoProtection, # Pas possible
+    (False, False, False, True): MagieAutoProtectionElement,
+    (True, False, False, True): MagieProtectionElement,
+    (True, True, False, True): MagieMultiProtectionElement,
+    (False, True, False, True): MagieProtectionGroupeElement,
+    (False, False, True, True): MagieProtectionZoneElement,
+    (True, False, True, True): MagieAutoProtectionElement, # Pas possible
+    (False, True, True, True): MagieAutoProtectionElement, # Pas possible
+    (True, True, True, True): MagieAutoProtectionElement # Pas possible
 }
 """
-(cible, cible_multiple, zone, resistance_elementaire) -> ActionMagieAutoProtection|ActionMagieAutoProtectionElement
+(cible, cible_multiple, zone, resistance_elementaire) -> MagieAutoProtection|MagieAutoProtectionElement
 """

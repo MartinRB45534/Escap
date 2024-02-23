@@ -13,136 +13,110 @@ from ..action_skill import ActionSkill
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...entitee import Entitee, Agissant, Projectile, Item
-    from ...effet import Effet, Enchantement, EnchantementAgissant, EnchantementCase, EnchantementItem
-    from ...systeme import Actif, Magie
+    from ...entitee import Agissant, Item
+    from ...effet import EnchantementAgissant, EnchantementItem
+    from ...systeme import Actif
 
-class ActionMagie(Caste,ActionSkill):
+class Magie(Caste,ActionSkill):
     """La classe des magies. Précédemment un effet."""
-    nom = "magie" # Vraiment utile ?
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float): #Toutes ces caractéristiques sont déterminées par la sous-classe au moment de l'instanciation, en fonction de la magie utilisée et du niveau.
-        Caste.__init__(self,agissant,latence)
-        ActionSkill.__init__(self,agissant,latence,skill,gain_xp)
-        self.magie = magie
-        self.gain_xp = gain_xp
-        self.cout = cout_pm
+    gain_xp: float
+    def __init__(self,skill:Actif,agissant:Agissant):
+        Caste.__init__(self,agissant)
+        ActionSkill.__init__(self,agissant,skill)
 
-class ActionMagiesOffensives(ActionMagie):
-    """Les magies qui produisent un effet d'attaque"""
-
-class ActionMagieDirigee(ActionMagie) :
+class MagieDirigee(Magie) :
     """La classe des magies qui nécessitent une direction."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float):
-        ActionMagie.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
-        self.direction:crt.Direction|None = None
+    direction:crt.Direction|None = None
+    def __init__(self,skill:Actif,agissant:Agissant):
+        Magie.__init__(self,skill,agissant)
 
-class ActionMagieCout(ActionMagie, NonRepetable):
+class MagieCout(Magie, NonRepetable):
     """La classe des magies dont le coût peut varier."""
+    def __init__(self,skill:Actif,agissant:Agissant):
+        Magie.__init__(self,skill,agissant)
+        NonRepetable.__init__(self,agissant)
+        self.cout = 0
 
     def set_cout(self,cout:float):
         """Change le coût de la magie."""
         self.cout = cout
     
-class ActionMagieCible(ActionMagie) :
+class MagieCible(Magie) :
     """La classe des magies qui nécessitent une (ou parfois plusieurs) cible(s)."""
 
-class MultiCible(ActionMagieCible) :
+class MultiCible(MagieCible) :
     """La classe des magies qui nécessitent plusieurs cibles."""
 
-class ActionMagieCibleDirigee(ActionMagieCible,ActionMagieDirigee):
+class MagieCibleDirigee(MagieCible,MagieDirigee):
     """La classe des magies qui nécessitent une direction et une cible."""
 
-class PorteeLimitee(ActionMagieCible) :
+class PorteeLimitee(MagieCible) :
     """La classe des magies qui ciblent quelque chose dans la proximité du joueur avec une portée limitée (sinon elles peuvent viser tout ce qui est dans le champ de vision du joueur)."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,portee_limite:float):
-        ActionMagieCible.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
-        self.portee_limite = portee_limite
+    portee_limite:float
+    def __init__(self,skill:Actif,agissant:Agissant):
+        MagieCible.__init__(self,skill,agissant)
 
-class CibleAgissant(ActionMagieCible):
+class CibleAgissant(MagieCible):
     """La classe des magies qui ciblent des agissants."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float):
-        ActionMagieCible.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
-        self.cible:Agissant|None = None
+    cible:Agissant|None = None
+    def __init__(self,skill:Actif,agissant:Agissant):
+        MagieCible.__init__(self,skill,agissant)
 
 class CibleAgissants(MultiCible):
     """La classe des magies qui ciblent plusieurs agissants."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float):
-        MultiCible.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
+    def __init__(self,skill:Actif,agissant:Agissant):
+        MultiCible.__init__(self,skill,agissant)
         self.cible:list[Agissant] = []
 
-class CibleItem(ActionMagieCible):
+class CibleItem(MagieCible):
     """La classe des magies qui ciblent des items."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float):
-        ActionMagieCible.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
-        self.cible:Item|None = None
+    cible:Item|None = None
+    def __init__(self,skill:Actif,agissant:Agissant):
+        MagieCible.__init__(self,skill,agissant)
 
 class CibleItems(MultiCible):
     """La classe des magies qui ciblent plusieurs items."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float):
-        MultiCible.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
+    def __init__(self,skill:Actif,agissant:Agissant):
+        MultiCible.__init__(self,skill,agissant)
         self.cible:list[Item] = []
 
-class CibleCase(ActionMagieCible):
+class CibleCase(MagieCible):
     """La classe des magies qui ciblent une case. (Si si, une case. Pour une explosion par exemple, vous n'avez pas envie d'être au centre ! Vraiment !)"""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float):
-        ActionMagieCible.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
-        self.cible:crt.Position = crt.POSITION_ABSENTE
+    cible:crt.Position = crt.POSITION_ABSENTE
+    def __init__(self,skill:Actif,agissant:Agissant):
+        MagieCible.__init__(self,skill,agissant)
 
 class CibleCases(MultiCible):
     """La classe des magies qui ciblent plusieurs cases."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float):
-        MultiCible.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
+    def __init__(self,skill:Actif,agissant:Agissant):
+        MultiCible.__init__(self,skill,agissant)
         self.cible:list[crt.Position] = []
 
 # Normalement on en a fini avec les magies ciblées
 
-class Invocation(ActionMagie):
-    """La classe des magies qui créent une entitée (un agissant pour se battre à vos côtés, un projectile magique pour attaquer les ennemis, un item à utiliser plus tard..."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,entitee:Entitee):
-        ActionMagie.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
-        self.entitee = entitee
+class InvocationAgissant(Magie):
+    """La classe des magies qui créent un agissant."""
+    def __init__(self,skill:Actif,agissant:Agissant,agissant_invoque:Agissant):
+        Magie.__init__(self,skill,agissant)
+        self.agissant_invoque = agissant_invoque
 
-    def invoque(self) -> Entitee:
-        """Renvoie l'entitée invoquée."""
-        return self.entitee
+    def invoque(self) -> Agissant:
+        """Renvoie l'agissant invoquée."""
+        return self.agissant_invoque
 
-class InvocationProjectile(Invocation,ActionMagieDirigee):
-    """La classe des magies qui créent une entitée avec un attribut direction."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,entitee:Projectile):
-        self.entitee:Projectile
-        Invocation.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,entitee)
-        ActionMagieDirigee.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
-
-    def invoque(self) -> Projectile:
-        return self.entitee
-
-class CreationEffet(ActionMagie):
-    """La classe des magies qui créent un effet (un effet sur le long terme, comme les enchantement, ou sur le court terme, comme un boost ou déboost passager)."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,effet:Effet):
-        ActionMagie.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
-        self.effet = effet
-
-    def get_effet(self):
-        """Renvoie l'effet créé."""
-        return self.effet
-
-class Enchante(CreationEffet, ActionMagieCible, NonRepetable):
+class Enchante(MagieCible, NonRepetable):
     """La classe des magies qui créent des enchantements (des effets sur le très, très long terme)."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,enchantement:Enchantement):
-        CreationEffet.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,enchantement)
-        ActionMagieCible.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
-        NonRepetable.__init__(self,agissant,latence)
-        self.enchantement = enchantement
-
-    def get_enchantement(self):
-        """Renvoie l'enchantement créé."""
-        return self.enchantement
+    duree: float
+    def __init__(self,skill:Actif,agissant:Agissant):
+        MagieCible.__init__(self,skill,agissant)
+        NonRepetable.__init__(self,agissant)
 
 class EnchanteItem(Enchante, CibleItem):
     """La classe des magies qui enchantent un item."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,enchantement:EnchantementItem):
-        Enchante.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,enchantement)
-        CibleItem.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
+    enchantement:EnchantementItem
+    def __init__(self,skill:Actif,agissant:Agissant):
+        Enchante.__init__(self,skill,agissant)
+        CibleItem.__init__(self,skill,agissant)
 
     def action(self):
         if not self.cible: # NOTHING is falsy
@@ -150,24 +124,12 @@ class EnchanteItem(Enchante, CibleItem):
         else:
             self.cible.effets.append(self.enchantement)
 
-class EnchanteCases(Enchante, CibleCases):
-    """La classe des magies qui enchantent des cases."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,enchantement:EnchantementCase):
-        Enchante.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,enchantement)
-        CibleCases.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
-
-    def action(self):
-        if not self.cible: # [] is falsy
-            self.interrompt()
-        else:
-            for case in self.cible:
-                self.agissant.labyrinthe.get_case(case).effets.add(self.enchantement)
-
 class EnchanteAgissant(Enchante, CibleAgissant):
     """La classe des magies qui enchantent un agissant."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,enchantement:EnchantementAgissant):
-        Enchante.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,enchantement)
-        CibleAgissant.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
+    enchantement:EnchantementAgissant
+    def __init__(self,skill:Actif,agissant:Agissant):
+        Enchante.__init__(self,skill,agissant)
+        CibleAgissant.__init__(self,skill,agissant)
 
     def action(self):
         if not self.cible: # NOONE is falsy

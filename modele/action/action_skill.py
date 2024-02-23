@@ -27,26 +27,28 @@ class ActionSkill(Action):
     """
     Les actions provoquées par un skill.
     """
-    def __init__(self,agissant:Agissant,latence:float,skill:Actif,xp:float):
-        super().__init__(agissant,latence)
+    xp: float
+    def __init__(self, agissant: Agissant, skill: Actif):
+        Action.__init__(self, agissant)
         self.skill = skill
-        self.xp = xp
 
     def termine(self):
         """L'action est terminée."""
         self.skill.xp_new += self.xp
-        return super().termine()
-
-
+        return Action.termine(self)
 
 class Ramasse(ActionSkill, ActionParcellaire, NonRepetable):
     """
     L'action de ramasser les items d'une case.
     """
-    def __init__(self,agissant:Agissant,latences:list[float],skill:Actif,xp:float,items:list[Item]):
-        ActionSkill.__init__(self,agissant,sum(latences),skill,xp)
-        ActionParcellaire.__init__(self,agissant,latences)
-        NonRepetable.__init__(self,agissant,sum(latences))
+    def __init__(self, agissant: Agissant, skill: Actif, latences: list[float], xp: float,
+                 items: list[Item]):
+        ActionSkill.__init__(self,agissant,skill)
+        ActionParcellaire.__init__(self,agissant)
+        NonRepetable.__init__(self,agissant)
+        self.latences = latences
+        self.latence_max = sum(latences)
+        self.xp = xp
         self.items = items
 
     def action(self):
@@ -56,8 +58,12 @@ class Derobe(ActionSkill, NonRepetable):
     """
     L'action de dérober un item.
     """
-    def __init__(self,agissant:Agissant,latence:float,skill:Actif,xp:float,item:Item,possesseur:Agissant):
-        super().__init__(agissant,latence,skill,xp)
+    def __init__(self, agissant: Agissant, skill: Actif, latence: float, xp: float, item: Item,
+                 possesseur: Agissant):
+        ActionSkill.__init__(self, agissant, skill)
+        NonRepetable.__init__(self, agissant)
+        self.latence_max = latence
+        self.xp = xp
         self.item = item
         self.possesseur = possesseur
 
@@ -69,22 +75,28 @@ class Blocage(ActionSkill):
     """
     L'action de bloquer avec un bouclier.
     """
-    def __init__(self, agissant: Agissant, latence: float, skill: Actif, xp: float, taux: float, direction: crt.Direction, bouclier: Bouclier):
-        super().__init__(agissant, latence, skill, xp)
+    def __init__(self, agissant: Agissant, skill: Actif, latence: float, xp: float, taux: float,
+                 direction: crt.Direction, bouclier: Bouclier):
+        ActionSkill.__init__(self, agissant, skill)
+        self.latence_max = latence
+        self.xp = xp
         self.taux = taux
         self.direction = direction
         self.bouclier = bouclier
 
     def action(self):
         self.bouclier.taux_degats = self.taux
-        self.agissant.labyrinthe.get_case(self.agissant.position).effets.add(ProtectionCaseBouclier(1,self.bouclier,[dir for dir in crt.Direction]))
+        self.agissant.labyrinthe.get_case(self.agissant.position).effets.add(
+            ProtectionCaseBouclier(1,self.bouclier,[dir for dir in crt.Direction]))
 
 class BlocageZone(Blocage):
     """
     L'action de bloquer avec un bouclier sur une zone.
     """
-    def __init__(self, agissant: Agissant, latence: float, skill: Actif, xp: float, taux: float, direction: crt.Direction, bouclier: Bouclier, portee: int, deplacement: Deplacement, forme: Forme, passage: Passage):
-        super().__init__(agissant, latence, skill, xp, taux, direction, bouclier)
+    def __init__(self, agissant: Agissant, skill: Actif, latence: float, xp: float, taux: float,
+                 direction: crt.Direction, bouclier: Bouclier, portee: int,
+                 deplacement: Deplacement, forme: Forme, passage: Passage):
+        Blocage.__init__(self, agissant, skill, latence, xp, taux, direction, bouclier)
         self.portee = portee
         self.deplacement = deplacement
         self.forme = forme
@@ -93,16 +105,20 @@ class BlocageZone(Blocage):
     def action(self):
         self.bouclier.taux_degats = self.taux
         position = self.agissant.position
-        zone = self.agissant.labyrinthe.a_portee(position,self.portee,self.deplacement,self.forme,self.passage)
+        zone = self.agissant.labyrinthe.a_portee(
+            position,self.portee,self.deplacement,self.forme,self.passage)
         for pos in zone:
-            self.agissant.labyrinthe.get_case(pos).effets.add(ProtectionCaseBouclier(1,self.bouclier,[dir for dir in crt.Direction]))
+            self.agissant.labyrinthe.get_case(pos).effets.add(
+                ProtectionCaseBouclier(1,self.bouclier,[dir for dir in crt.Direction]))
 
 class CreeItem(ActionSkill):
     """
     L'action de créer un item.
     """
-    def __init__(self, agissant: Agissant, latence: float, skill: Actif, xp: float, item: Item):
-        super().__init__(agissant, latence, skill, xp)
+    def __init__(self, agissant: Agissant, skill: Actif, latence: float, xp: float, item: Item):
+        ActionSkill.__init__(self, agissant, skill)
+        self.latence_max = latence
+        self.xp = xp
         self.item = item
 
     def action(self):
@@ -112,8 +128,10 @@ class Alchimie(CreeItem, NonRepetable):
     """
     L'action de créer un item par alchimie.
     """
-    def __init__(self, agissant: Agissant, latence: float, skill: Actif, xp: float, item: Item, ingredients: list[Item]):
-        super().__init__(agissant, latence, skill, xp, item)
+    def __init__(self, agissant: Agissant, skill: Actif, latence: float, xp: float, item: Item,
+                 ingredients: list[Item]):
+        CreeItem.__init__(self, agissant, skill, latence, xp, item)
+        NonRepetable.__init__(self, agissant)
         self.ingredients = ingredients
 
     def action(self):

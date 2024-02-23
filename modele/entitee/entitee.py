@@ -10,8 +10,8 @@ import carte as crt
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..effet.effet import Effet
-    from ..labyrinthe.mur import Mur
+    from ..effet import Effet
+    from ..labyrinthe import Mur
 
 class Entitee:
     """La classe des entitées"""

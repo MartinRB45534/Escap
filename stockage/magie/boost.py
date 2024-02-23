@@ -111,19 +111,16 @@ class MagieBoostNivele(MagieNivele):
         dictionnaire = parse(json)
         return MagieBoostNivele(dictionnaire["nom"], dictionnaire["cible"], dictionnaire["cible_multiple"], dictionnaire["latence"], dictionnaire["gain_xp"], dictionnaire["cout"], dictionnaire["taux_degats"], dictionnaire["duree"])
 
-    def make(self, niveau: int) -> mdl.Magie:
+    def make(self, niveau: int):
         """Crée une magie à partir de l'instance."""
-        class GenerateurMagieBoost(mdl.Magie):
-            """Un "générateur", c'est-à-dire une classe qui génère des instances de Magie."""
-            nom = self.nom
-            cible = self.cible
-            cible_multiple = self.cible_multiple
-            latence = self.latence
-            gain_xp = self.gain_xp
-            cout = self.cout
-            taux_degats = self.taux_degats
-            duree = self.duree
-
-            def genere(self, skill: mdl.Actif, agissant: mdl.Agissant, niveau: int) -> mdl.ActionMagieDopage:
-                return mdl.magies_boost[(self.cible, self.cible_multiple)](skill, self, agissant, self.gain_xp[niveau], self.cout[niveau], self.latence[niveau], self.taux_degats[niveau], self.duree[niveau])
-        return GenerateurMagieBoost()
+        classe = mdl.magies_boost[(self.cible, self.cible_multiple)]
+        class MagieBoostNiveau(classe, mdl.Nomme):
+            """Une magie de boost."""
+            taux = self.taux_degats[niveau]
+            duree = self.duree[niveau]
+            latence_max = self.latence[niveau]
+            cout = self.cout[niveau]
+            gain_xp = self.gain_xp[niveau]
+        MagieBoostNiveau.nom = self.nom
+        MagieBoostNiveau.niveau = niveau
+        return MagieBoostNiveau

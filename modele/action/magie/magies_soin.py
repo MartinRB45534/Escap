@@ -8,7 +8,7 @@ import carte as crt
 
 # Imports des classes parentes
 from ..action import NonRepetable
-from .magie import CibleAgissant,CibleCase,CibleItem,PorteeLimitee,ActionMagie,CibleAgissants
+from .magie import CibleAgissant,CibleCase,CibleItem,PorteeLimitee,Magie,CibleAgissants
 
 # Imports utilisés dans le code
 from ...entitee.item.cadavre import Cadavre
@@ -18,22 +18,22 @@ from ...commons import Deplacement, Forme, Passage
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ...entitee import Agissant
-    from ...systeme import Actif, Magie
+    from ...systeme import Actif
 
-class ActionMagieAutoSoin(ActionMagie):
+class MagieAutoSoin(Magie):
     """La magie qui invoque un effet de soin sur son self.agissant."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,gain_pv:float):
-        ActionMagie.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
-        self.gain_pv = gain_pv
+    gain_pv: float
+    def __init__(self,skill:Actif,agissant:Agissant):
+        Magie.__init__(self,skill,agissant)
 
     def action(self):
         self.agissant.effets.append(Soin(self.agissant,self.gain_pv))
 
-class ActionMagieSoin(ActionMagieAutoSoin, CibleAgissant):
+class MagieSoin(MagieAutoSoin, CibleAgissant):
     """La magie qui invoque un effet de soin sur un agissant ciblé."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,gain_pv:float):
-        ActionMagieAutoSoin.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,gain_pv)
-        CibleAgissant.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
+    def __init__(self,skill:Actif,agissant:Agissant):
+        MagieAutoSoin.__init__(self,skill,agissant)
+        CibleAgissant.__init__(self,skill,agissant)
 
     def action(self):
         if not self.cible: # NOONE is falsy
@@ -41,21 +41,21 @@ class ActionMagieSoin(ActionMagieAutoSoin, CibleAgissant):
         else:
             self.cible.effets.append(Soin(self.agissant,self.gain_pv))
 
-class ActionMagieMultiSoin(ActionMagieAutoSoin, CibleAgissants):
+class MagieMultiSoin(MagieAutoSoin, CibleAgissants):
     """La magie qui invoque un effet de soin sur des agissants ciblés."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,gain_pv:float):
-        ActionMagieAutoSoin.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,gain_pv)
-        CibleAgissants.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
+    def __init__(self,skill:Actif,agissant:Agissant):
+        MagieAutoSoin.__init__(self,skill,agissant)
+        CibleAgissants.__init__(self,skill,agissant)
 
     def action(self):
         for cible in self.cible:
             cible.effets.append(Soin(self.agissant,self.gain_pv))
 
-class ActionMagieSoinDeZone(ActionMagieAutoSoin, CibleCase):
+class MagieSoinDeZone(MagieAutoSoin, CibleCase):
     """La magie qui invoque un effet de soin sur une zone."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,gain_pv:float,portee:float):
-        ActionMagieAutoSoin.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,gain_pv)
-        CibleCase.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
+    def __init__(self,skill:Actif,agissant:Agissant,portee:float):
+        MagieAutoSoin.__init__(self,skill,agissant)
+        CibleCase.__init__(self,skill,agissant)
         self.portee = portee
 
     def action(self):
@@ -67,25 +67,29 @@ class ActionMagieSoinDeZone(ActionMagieAutoSoin, CibleCase):
                 case = self.agissant.labyrinthe.get_case(pos)
                 case.effets.add(SoinCase(self.gain_pv,self.agissant))
 
-magies_soin: dict[tuple[bool, bool, bool], type[ActionMagieAutoSoin]] = {
-    (False, False, False): ActionMagieAutoSoin,
-    (True, False, False): ActionMagieSoin,
-    (True, True, False): ActionMagieMultiSoin,
-    (False, True, False): ActionMagieAutoSoin, # Pas possible
-    (True, False, True): ActionMagieSoin, # Pas possible
-    (False, False, True): ActionMagieSoinDeZone,
-    (True, True, True): ActionMagieAutoSoin, # Pas possible
-    (False, True, True): ActionMagieAutoSoin # Pas possible
+magies_soin: dict[tuple[bool, bool, bool], type[MagieAutoSoin]] = {
+    (False, False, False): MagieAutoSoin,
+    (True, False, False): MagieSoin,
+    (True, True, False): MagieMultiSoin,
+    (False, True, False): MagieAutoSoin, # Pas possible
+    (True, False, True): MagieSoin, # Pas possible
+    (False, False, True): MagieSoinDeZone,
+    (True, True, True): MagieAutoSoin, # Pas possible
+    (False, True, True): MagieAutoSoin # Pas possible
 }
 """
-(cible, cible_multiple, zone) -> ActionMagieAutoSoin
+(cible, cible_multiple, zone) -> MagieAutoSoin
 """
 
-class ActionMagieResurection(CibleItem, NonRepetable):
+class MagieResurection(Magie):
     """La magie qui invoque un effet de resurection."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float):
-        CibleItem.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
-        NonRepetable.__init__(self,agissant,latence)
+
+class MagieResurectionItem(MagieResurection, CibleItem, NonRepetable):
+    """La magie qui invoque un effet de resurection."""
+    def __init__(self,skill:Actif,agissant:Agissant):
+        MagieResurection.__init__(self,skill,agissant)
+        CibleItem.__init__(self,skill,agissant)
+        NonRepetable.__init__(self,agissant)
 
     def action(self):
         if not self.cible: # NOTHING is falsy
@@ -94,11 +98,12 @@ class ActionMagieResurection(CibleItem, NonRepetable):
             assert isinstance(self.cible, Cadavre)
             self.cible.effets.append(Resurection())
 
-class ActionMagieResurectionCase(CibleCase,PorteeLimitee):
+class MagieResurectionCase(MagieResurection, CibleCase, PorteeLimitee):
     """La magie qui invoque un effet de resurection sur une case."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,portee_limite:float):
-        CibleCase.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
-        PorteeLimitee.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,portee_limite)
+    def __init__(self,skill:Actif,agissant:Agissant):
+        MagieResurection.__init__(self,skill,agissant)
+        CibleCase.__init__(self,skill,agissant)
+        PorteeLimitee.__init__(self,skill,agissant)
 
     def action(self):
         if self.cible == crt.POSITION_ABSENTE:
@@ -109,12 +114,13 @@ class ActionMagieResurectionCase(CibleCase,PorteeLimitee):
                 if isinstance(item,Cadavre):
                     item.effets.append(Resurection())
 
-class ActionMagieResurectionDeZone(CibleCase,PorteeLimitee):
+class MagieResurectionDeZone(MagieResurection, CibleCase, PorteeLimitee):
     """La magie qui invoque un effet de resurection sur tous les cadavres d'une zone."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,portee:float,portee_limite:float):
-        CibleCase.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
-        PorteeLimitee.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,portee_limite)
-        self.portee = portee
+    portee: float
+    def __init__(self,skill:Actif,agissant:Agissant):
+        MagieResurection.__init__(self,skill,agissant)
+        CibleCase.__init__(self,skill,agissant)
+        PorteeLimitee.__init__(self,skill,agissant)
 
     def action(self):
         if self.cible == crt.POSITION_ABSENTE:
@@ -127,23 +133,27 @@ class ActionMagieResurectionDeZone(CibleCase,PorteeLimitee):
                         item.effets.append(Resurection())
 
 magies_resurection: dict[tuple[bool, bool],
-    type[ActionMagieResurection|ActionMagieResurectionCase|ActionMagieResurectionDeZone]] = {
-    (False, False): ActionMagieResurection,
-    (True, False): ActionMagieResurectionCase,
-    (True, True): ActionMagieResurectionDeZone,
-    (False, True): ActionMagieResurection # Pas possible
+    type[MagieResurection]] = {
+    (False, False): MagieResurectionItem,
+    (True, False): MagieResurectionCase,
+    (True, True): MagieResurectionDeZone,
+    (False, True): MagieResurectionItem # Pas possible
 }
 """
-(case, zone) -> ActionMagieResurection
+(case, zone) -> MagieResurection
 """
 
-class ActionMagieReanimation(CibleItem, NonRepetable):
+class MagieReanimation(Magie):
     """La magie qui invoque un effet de reanimation."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,taux_pv:float,superiorite:float):
-        CibleItem.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
-        NonRepetable.__init__(self,agissant,latence)
-        self.taux_pv = taux_pv
-        self.superiorite = superiorite
+    taux_pv: float
+    superiorite: float
+
+class MagieReanimationItem(MagieReanimation, CibleItem, NonRepetable):
+    """La magie qui invoque un effet de reanimation."""
+    def __init__(self,skill:Actif,agissant:Agissant):
+        MagieReanimation.__init__(self,skill,agissant)
+        CibleItem.__init__(self,skill,agissant)
+        NonRepetable.__init__(self,agissant)
 
     def action(self):
         if not self.cible: # NOTHING is falsy
@@ -153,13 +163,12 @@ class ActionMagieReanimation(CibleItem, NonRepetable):
             if self.cible.priorite+self.superiorite < self.agissant.priorite:
                 self.cible.effets.append(Reanimation(self.taux_pv,self.agissant.esprit))
 
-class ActionMagieReanimationCase(CibleCase,PorteeLimitee):
+class MagieReanimationCase(MagieReanimation, CibleCase, PorteeLimitee):
     """La magie qui invoque un effet de reanimation sur une case."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,taux_pv:float,superiorite:float,portee_limite:float):
-        CibleCase.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
-        PorteeLimitee.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,portee_limite)
-        self.taux_pv = taux_pv
-        self.superiorite = superiorite
+    def __init__(self,skill:Actif,agissant:Agissant):
+        MagieReanimation.__init__(self,skill,agissant)
+        CibleCase.__init__(self,skill,agissant)
+        PorteeLimitee.__init__(self,skill,agissant)
 
     def action(self):
         if self.cible == crt.POSITION_ABSENTE:
@@ -171,14 +180,13 @@ class ActionMagieReanimationCase(CibleCase,PorteeLimitee):
                     if item.priorite+self.superiorite < self.agissant.priorite:
                         item.effets.append(Reanimation(self.taux_pv,self.agissant.esprit))
 
-class ActionMagieReanimationDeZone(CibleCase,PorteeLimitee):
+class MagieReanimationDeZone(MagieReanimation, CibleCase, PorteeLimitee):
     """La magie qui invoque un effet de reanimation sur tous les cadavres d'une zone."""
-    def __init__(self,skill:Actif,magie:Magie,agissant:Agissant,gain_xp:float,cout_pm:float,latence:float,taux_pv:float,portee:float,portee_limite:float,superiorite:float):
-        CibleCase.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence)
-        PorteeLimitee.__init__(self,skill,magie,agissant,gain_xp,cout_pm,latence,portee_limite)
-        self.taux_pv = taux_pv
-        self.portee = portee
-        self.superiorite = superiorite
+    portee: float
+    def __init__(self,skill:Actif,agissant:Agissant):
+        MagieReanimation.__init__(self,skill,agissant)
+        CibleCase.__init__(self,skill,agissant)
+        PorteeLimitee.__init__(self,skill,agissant)
 
     def action(self):
         if self.cible == crt.POSITION_ABSENTE:
@@ -192,12 +200,12 @@ class ActionMagieReanimationDeZone(CibleCase,PorteeLimitee):
                             item.effets.append(Reanimation(self.taux_pv,self.agissant.esprit))
 
 magies_reanimation: dict[tuple[bool, bool],
-    type[ActionMagieReanimation|ActionMagieReanimationCase|ActionMagieReanimationDeZone]] = {
-    (False, False): ActionMagieReanimation,
-    (True, False): ActionMagieReanimationCase,
-    (True, True): ActionMagieReanimationDeZone,
-    (False, True): ActionMagieReanimation # Pas possible
+    type[MagieReanimation]] = {
+    (False, False): MagieReanimationItem,
+    (True, False): MagieReanimationCase,
+    (True, True): MagieReanimationDeZone,
+    (False, True): MagieReanimationItem # Pas possible
 }
 """
-(case, zone) -> ActionMagieReanimation
+(case, zone) -> MagieReanimation
 """
