@@ -16,9 +16,8 @@ if TYPE_CHECKING:
 
 class Cadavre(Item):
     """Les restes d'un agissant. Peut être ressuscité ou réanimé. Certains monstres se vendent aussi à bon prix."""
-    def __init__(self,agissant:Agissant,position:crt.Position=crt.POSITION_ABSENTE):
-        Item.__init__(self,agissant.labyrinthe,position)
-        self.poids = 1
+    def __init__(self,agissant:Agissant,position:crt.Position):
+        Item.__init__(self,position)
         self.agissant = agissant
 
     @staticmethod

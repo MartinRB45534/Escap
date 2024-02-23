@@ -10,35 +10,17 @@ from ..commons import EtatsItems
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..entitee import Agissant, Consommable, Potion, Parchemin, ParcheminVierge
+    from ..entitee import Agissant, Potion, Parchemin, ParcheminVierge
     from ..effet import Effet
     from .magie import Magie
 
-class PlaceEffet(ActionFinal, NonRepetable):
-    """
-    L'action d'utilisation d'un consommable (potion ou parchemin)
-    lorsque celui-ci se contente de placer un effet.
-    """
-    item: Consommable
-    effet: Effet
-    def __init__(self, agissant: Agissant):
-        ActionFinal.__init__(self, agissant)
-        NonRepetable.__init__(self, agissant)
-
-    def action(self):
-        self.agissant.effets.append(self.effet)
-        self.item.etat = EtatsItems.BRISE
-
-    def interrompt(self):
-        """L'action est interrompue."""
-        self.item.etat = EtatsItems.BRISE
-
-class Boit(PlaceEffet):
+class Boit(ActionFinal, NonRepetable):
     """
     L'action de boire une potion.
     """
     def __init__(self, agissant: Agissant, latence: float, item: Potion, effet: Effet):
-        PlaceEffet.__init__(self, agissant)
+        ActionFinal.__init__(self, agissant)
+        NonRepetable.__init__(self, agissant)
         self.latence_max = latence
         self.item = item
         self.effet = effet
@@ -57,13 +39,13 @@ class Lit(Caste, NonRepetable):
     def get_skin(self):
         pass
 
-class LitEffet(Lit, PlaceEffet):
+class LitEffet(Lit, NonRepetable):
     """
     L'action de caster un parchemin qui place un effet.
     """
     def __init__(self, agissant: Agissant, item: Parchemin):
         Lit.__init__(self, agissant, item)
-        PlaceEffet.__init__(self, agissant)
+        NonRepetable.__init__(self, agissant)
 
 class LitEffetFinal(LitEffet, CasteFinal):
     """Un parchemin qui place un effet, en caste final."""

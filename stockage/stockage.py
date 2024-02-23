@@ -65,6 +65,7 @@ class StockageNivele(Stockage):
     def __init__(self, nom: str):
         Stockage.__init__(self, nom)
         self.dependants: set[StockageUnique|StockageNivele] = set()
+        self.classe = None
 
     champs: dict[str, type[int|str|float|bool|StrEnum|StockageCategorieUnique|StockageCategorieNivelee|StockageSurCategorie]] = NotImplemented
     """Retourne les champs de l'objet."""
@@ -84,9 +85,15 @@ class StockageNivele(Stockage):
     multiple: dict[str, bool] = NotImplemented
     """Retourne si les champs sont multiples. Seuls certains champs peuvent être multiples."""
 
-    def make(self, niveau: int) -> object:
+    def make(self, niveau: int) -> type:
         """Retourne l'objet correspondant."""
         raise NotImplementedError
+
+    def remake(self, niveau: int) -> type:
+        """Pour assurer l'unicité."""
+        if not self.classe:
+            self.classe = self.make(niveau)
+        return self.classe
 
     def set_dependances(self):
         """Se rajoute aux dépendants des objets dont il dépend"""
@@ -204,7 +211,7 @@ class StockageCategorieNivelee(Stockage):
             raise ValueError(
                 f"L'élément {nom} est nivele, il faut donc spécifier un niveau."
             )
-        return stockage.make(niveau)
+        return stockage.remake(niveau)
 
     def set_all_dependances(self):
         """Set les dépendances de ses éléments"""

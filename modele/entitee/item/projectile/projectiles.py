@@ -15,15 +15,16 @@ from ....effet import OnHit
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ....labyrinthe import Labyrinthe
     from ....action import InvocationProjectile
 
 class ProjectileSimple(Projectile):
     """Un projectile qui se contente d'un effet OnHit."""
-    def __init__(self, labyrinthe:Labyrinthe, poids:float, frottements:float, portee:float, degats:float, element:Element, position:crt.Position=crt.POSITION_ABSENTE):
-        Projectile.__init__(self,labyrinthe,[OnHit(portee,degats,element)],position)
-        self.poids = poids
-        self.frottements = frottements
+    portee: float
+    degats: float
+    element: Element
+    def __init__(self, position:crt.Position):
+        Projectile.__init__(self,position)
+        self.effets.add(OnHit(self.portee, self.degats, self.element))
 
 class PercantSimple(Percant, ProjectileSimple):
     """Un projectile percant tout simple."""
@@ -59,8 +60,18 @@ class FlecheExplosiveFragile(FlecheExplosive,Fragile):
     """Une flèche explosive qui se brise à l'impact."""
 
 class ProjectileMagique(ProjectileSimple,Evanescent):
-    magie: InvocationProjectile
     """La classe des projectiles créés par magie."""
+    magie: InvocationProjectile
+    def __init__(self, poids: float, frottements: float,
+                 portee: float, degats: float, element: Element,
+                 position: crt.Position):
+        ProjectileSimple.__init__(self, position)
+        Evanescent.__init__(self, position)
+        self.poids = poids
+        self.frottements = frottements
+        self.portee = portee
+        self.degats = degats
+        self.element = element
 
 class MagiePercante(Percant,ProjectileMagique):
     """La classe des projectiles percants créés par magie."""

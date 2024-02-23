@@ -122,7 +122,7 @@ class EnchanteItem(Enchante, CibleItem):
         if not self.cible: # NOTHING is falsy
             self.interrompt()
         else:
-            self.cible.effets.append(self.enchantement)
+            self.cible.effets.add(self.enchantement)
 
 class EnchanteAgissant(Enchante, CibleAgissant):
     """La classe des magies qui enchantent un agissant."""
@@ -135,4 +135,4 @@ class EnchanteAgissant(Enchante, CibleAgissant):
         if not self.cible: # NOONE is falsy
             self.interrompt()
         else:
-            self.cible.effets.append(self.enchantement)
+            self.cible.effets.add(self.enchantement)

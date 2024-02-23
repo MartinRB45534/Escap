@@ -16,9 +16,8 @@ if TYPE_CHECKING:
 
 class Oeuf(Item):
     """Un item qui transporte un agissant. Va éclore avec le temps."""
-    def __init__(self,agissant:Agissant,position:crt.Position=crt.POSITION_ABSENTE):
-        Item.__init__(self,agissant.labyrinthe,position)
-        self.poids = 1
+    def __init__(self,agissant:Agissant,position:crt.Position):
+        Item.__init__(self,position)
         self.agissant = agissant
 
     @staticmethod

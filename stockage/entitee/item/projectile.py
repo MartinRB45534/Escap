@@ -127,12 +127,20 @@ class ProjectileSimpleNivele(EntiteeNivele):
         dictionnaire = parse(json)
         return ProjectileSimpleNivele(dictionnaire["nom"], dictionnaire["fantome"], dictionnaire["percant"], dictionnaire["fleche"], dictionnaire["explosif"], mdl.Element(dictionnaire["element"]), dictionnaire["poids"], dictionnaire["frottements"], dictionnaire["portee"], dictionnaire["degats"])
 
-    def make(self, niveau: int) -> mdl.ProjectileSimple:
+    def make(self, niveau: int):
         """Crée un ProjectileSimple à partir de l'instance."""
-        projectile = mdl.projectiles[(self.percant, self.fleche, self.explosif, False, False)](mdl.NOWHERE, self.poids[niveau], self.frottements[niveau], self.portee[niveau], self.degats[niveau], self.element)
-        projectile.nom = self.nom
-        projectile.fantome = self.fantome
-        return projectile
+        classe = mdl.projectiles[(self.percant, self.fleche, self.explosif, False, False)]
+        class ProjectileSimpleNiveau(classe, mdl.Nomme):
+            """Un projectile."""
+            poids = self.poids[niveau]
+            frottements = self.frottements[niveau]
+            portee = self.portee[niveau]
+            degats = self.degats[niveau]
+            element = self.element
+            fantome = self.fantome
+        ProjectileSimpleNiveau.nom = self.nom
+        ProjectileSimpleNiveau.niveau = niveau
+        return ProjectileSimpleNiveau
 
 class Projectiles(StockageCategorieNivelee):
     """Les informations des projectiles."""

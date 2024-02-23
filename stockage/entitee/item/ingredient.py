@@ -76,12 +76,16 @@ class IngredientNivele(EntiteeNivele):
         dictionnaire = parse(json)
         return IngredientNivele(dictionnaire["nom"], dictionnaire["fantome"], dictionnaire["poids"], dictionnaire["frottements"])
 
-    def make(self, niveau: int) -> mdl.Ingredient:
+    def make(self, niveau: int) -> type[mdl.Ingredient]:
         """Crée un IngredientSimple à partir de l'instance."""
-        arme = mdl.Ingredient(mdl.NOWHERE, self.poids[niveau], self.frottements[niveau])
-        arme.nom = self.nom
-        arme.fantome = self.fantome
-        return arme
+        class IngredientNiveau(mdl.Ingredient, mdl.Nomme):
+            """Un ingrédient."""
+            poids = self.poids[niveau]
+            frottements = self.frottements[niveau]
+            fantome = self.fantome
+        IngredientNiveau.nom = self.nom
+        IngredientNiveau.niveau = niveau
+        return IngredientNiveau
 
 class Ingredients(StockageCategorieNivelee):
     """Les informations des ingredients."""

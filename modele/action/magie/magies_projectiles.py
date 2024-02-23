@@ -1,6 +1,8 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
+import carte as crt
+
 # Imports des classes parentes
 from .magie import MagieDirigee, CibleCase, PorteeLimitee
 from ...entitee import projectiles, ProjectileMagique
@@ -24,11 +26,14 @@ class InvocationProjectile(MagieDirigee):
     fantome: bool
     def __init__(self,skill:Actif,agissant:Agissant):
         MagieDirigee.__init__(self,skill,agissant)
-        self.projectile = projectiles[
+        classe = projectiles[
             (self.percant, self.fleche, self.explosif, False, True)
-            ](agissant.labyrinthe, self.poids, self.frottements, self.portee, self.degats, self.element)
+            ]
+        assert issubclass(classe, ProjectileMagique)
+        self.projectile = classe(self.poids, self.frottements,
+                                 self.portee, self.degats, self.element,
+                                 crt.POSITION_ABSENTE)
         self.projectile.fantome = self.fantome
-        assert isinstance(self.projectile, ProjectileMagique)
         self.projectile.magie = self
 
     def invoque(self) -> Projectile:

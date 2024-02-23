@@ -11,6 +11,6 @@ from ..stockage import StockageNivele
 
 class EntiteeNivele(StockageNivele):
     """Classe mère des classes de stockage d'entitées."""
-    def make(self, niveau: int) -> mdl.Entitee:
+    def make(self, niveau: int) -> type[mdl.Entitee]:
         """Retourne l'entité correspondante."""
         raise NotImplementedError

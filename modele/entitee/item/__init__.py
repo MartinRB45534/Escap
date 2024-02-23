@@ -9,4 +9,5 @@ from .projectile import *
 from .cadavre import *
 from .cle import *
 from .item import *
+from .ingredient import *
 from .oeuf import *

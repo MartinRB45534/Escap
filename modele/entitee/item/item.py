@@ -12,27 +12,25 @@ from ..entitee import Mobile
 
 # Imports utilisés dans le code
 from ...commons import EtatsItems
-from ...affichage import SKIN_INGREDIENT
 from ...effet import OnDebutTourItem, OnFinTourItem, TimeLimited, OnHit
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...action.deplacement import Plane
-    from ...labyrinthe.labyrinthe import Labyrinthe
+    from ...action import Plane
 
 class Item(Mobile):
-    """La classe des entitées inanimées. Peuvent se situer dans un inventaire. Peuvent être lancés (déconseillé pour les non-projectiles)."""
-    def __init__(self,labyrinthe:Labyrinthe,position:crt.Position, ID: Optional[int]=None):
-        Mobile.__init__(self,position,ID)
-        self.labyrinthe = labyrinthe
+    """La classe des entitées inanimées. Peuvent se situer dans un inventaire.
+       Peuvent être lancés (déconseillé pour les non-projectiles)."""
+    poids:float
+    frottements:float
+    _priorite:float
+    def __init__(self,position:crt.Position):
+        Mobile.__init__(self,position)
         self.etat = EtatsItems.INTACT #Le niveau l'évacuera s'il n'est plus intact.
         self._priorite = 0 #Pour avoir le droit de la ramasser.
-        self.action:Optional[Plane] = None #Utile uniquement quand l'item est lancé. Les items ne peuvent que voler
-        self.direction:Optional[crt.Direction] = None #Utile uniquement quand l'item se déplace.
-        self.poids:float = 10 #Utile uniquement quand l'item est lancé. Détermine le temps qu'il faut à l'agissant pour le lancer et le temps que l'item se déplacera.
-        self.frottements:float = 10 #Utile uniquement quand l'item se déplace. Détermine la latence à chaque déplacement.
-        self.hauteur:float = 0 #Utile uniquement quand l'item se déplace. Diminue à chaque tour. L'item s'immobilise à 0 (éventuellement déclenche des effets).
-        self.nom:str = "item"
+        self.action:Optional[Plane] = None
+        self.direction:Optional[crt.Direction] = None
+        self.hauteur:float = 0
 
     def get_direction(self):
         if self.direction is not None:
@@ -126,20 +124,3 @@ class NoThing(Item):
         return isinstance(other,NoThing)
 
 NOTHING = NoThing()
-
-class Consommable(Item):
-    """La classe des items qui peuvent être consommés. Ajoute à l'agissant un effet. Disparait après usage."""
-
-class Ingredient(Item):
-    """La classe des ingrédients d'alchimie."""
-    def __init__(self,labyrinthe:Labyrinthe, poid:float, frottement:float, position:crt.Position = crt.POSITION_ABSENTE):
-        Item.__init__(self,labyrinthe,position)
-        self.poids = poid
-        self.frottements = frottement
-    def get_classe(self):
-        """Se limite aux catégories de l'inventaire."""
-        return Ingredient
-
-    @staticmethod
-    def get_image():
-        return SKIN_INGREDIENT

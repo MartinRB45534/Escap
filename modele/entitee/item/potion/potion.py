@@ -2,25 +2,24 @@
 
 from __future__ import annotations
 from typing import TYPE_CHECKING
+
 import carte as crt
 
 # Imports des classes parentes
-from ..item import Consommable
+from ..item import Item
 
 # Imports utilisés dans le code
 from ....affichage import SKIN_POTION
 
-# Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ....labyrinthe.labyrinthe import Labyrinthe
-    from ....effet.agissant.agissant import EffetAgissant
+    from ....action import Boit
 
-class Potion(Consommable):
-    """La classe des consommables qui peuvent se boire (ne requièrent pas de magie pour être activés)."""
-    def __init__(self,labyrinthe:Labyrinthe,effet:EffetAgissant,duree:float,position:crt.Position=crt.POSITION_ABSENTE):
-        Consommable.__init__(self,labyrinthe,position)
-        self.duree = duree
-        self.effet = effet
+class Potion(Item):
+    """La classe des consommables qui peuvent se boire
+       (ne requièrent pas de mana pour être activés)."""
+    def __init__(self, position: crt.Position, action_portee: Boit):
+        Item.__init__(self, position)
+        self.action_portee = action_portee
 
     @staticmethod
     def get_image():
