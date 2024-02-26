@@ -85,7 +85,6 @@ class ActionFinal(Action):
     Action qui se fait à la fin.
     """
     def termine(self):
-        """L'action est terminée."""
         res = Action.termine(self)
         self.action()
         return res
@@ -95,7 +94,6 @@ class ActionInitial(Action):
     Action qui se fait au début.
     """
     def execute(self):
-        """L'action est appelée à chaque tour."""
         if self.latence == 0:
             self.action()
         return Action.execute(self)
@@ -105,7 +103,6 @@ class ActionContinu(Action):
     Action qui se fait à chaque tour.
     """
     def execute(self):
-        """L'action est appelée à chaque tour."""
         self.latence += self.get_vitesse()
         self.action()
         if self.latence >= self.latence_max:
@@ -122,7 +119,6 @@ class ActionFractionnaire(Action):
         self.rempli = 0 # Le nombre de fois que l'action a été faite
 
     def execute(self):
-        """L'action est appelée à chaque tour."""
         self.latence += self.get_vitesse()
         new_rempli = int(self.latence / self.latence_max * self.parts)
         while self.rempli < new_rempli:
@@ -133,7 +129,6 @@ class ActionFractionnaire(Action):
         return False
 
     def reinit(self):
-        """L'action est réinitialisée."""
         self.rempli = 0
         Action.reinit(self)
 
@@ -147,7 +142,6 @@ class ActionParcellaire(Action):
         self.rempli = 0 # Le nombre de fois que l'action a été faite
 
     def execute(self):
-        """L'action est appelée à chaque tour."""
         self.latence += self.get_vitesse()
         while self.latence >= sum(self.latences[:self.rempli+1]):
             self.rempli += 1
@@ -157,6 +151,5 @@ class ActionParcellaire(Action):
         return False
 
     def reinit(self):
-        """L'action est réinitialisée."""
         self.rempli = 0
         Action.reinit(self)

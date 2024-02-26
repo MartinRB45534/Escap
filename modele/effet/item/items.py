@@ -36,7 +36,7 @@ class OnHit(EffetItem):
             raise ValueError("L'item frappe sans être en vol !")
         zone = item.labyrinthe.a_portee(item.position,self.portee,Deplacement.SPATIAL,Forme.CERCLE,Passage(False,False,False,True,False))
         for position in zone:
-            item.labyrinthe.get_case(position).effets.add(AttaqueCase(item.action.lanceur,self.degats,self.element,"distance"))
+            item.labyrinthe.get_case(position).effets.add(AttaqueCase(item.action.lanceur,self.degats,self.element))
 
 class EffetTranchant(EffetArme):
     """Effet qui modifie le tranchant d'une arme (en positif ou négatif)."""

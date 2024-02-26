@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 # Imports des classes parentes
 from .action import ActionFinal, NonRepetable
 from .caste import Caste, CasteContinu, CasteFinal, CasteInitial, CasteFractionnaire
+from ..effet import EffetCase
 
 # Imports utilisés dans le code
 from ..commons import EtatsItems
@@ -11,20 +12,35 @@ from ..commons import EtatsItems
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ..entitee import Agissant, Potion, Parchemin, ParcheminVierge
-    from ..effet import Effet
+    from ..effet import EffetAgissant
     from .magie import Magie
 
 class Boit(ActionFinal, NonRepetable):
     """
     L'action de boire une potion.
     """
-    def __init__(self, agissant: Agissant, latence: float, item: Potion, effet: Effet):
+    def __init__(self, agissant: Agissant, latence: float, item: Potion, effet: EffetAgissant):
         ActionFinal.__init__(self, agissant)
         NonRepetable.__init__(self, agissant)
         self.latence_max = latence
         self.item = item
         self.effet = effet
         self.item.etat = EtatsItems.UTILISE
+
+    def action(self):
+        self.agissant.effets.add(self.effet)
+        self.item.etat = EtatsItems.BRISE
+
+    def interrompt(self):
+        self.item.etat = EtatsItems.INTACT
+
+    def eclabousse(self):
+        """La potion a été lancée et se brise."""
+        case = self.item.labyrinthe.get_case(self.item.position)
+        if case.agissant is not None:
+            case.agissant.effets.add(self.effet)
+        elif isinstance(self.effet, EffetCase):
+            case.effets.add(self.effet)
 
 class Lit(Caste, NonRepetable):
     """
@@ -49,7 +65,7 @@ class LitEffet(Lit, NonRepetable):
 
 class LitEffetFinal(LitEffet, CasteFinal):
     """Un parchemin qui place un effet, en caste final."""
-    def __init__(self, agissant: Agissant, item: Parchemin, latence: float, effet: Effet):
+    def __init__(self, agissant: Agissant, item: Parchemin, latence: float, effet: EffetAgissant):
         LitEffet.__init__(self, agissant, item)
         CasteFinal.__init__(self, agissant)
         self.latence_max = latence
@@ -57,7 +73,7 @@ class LitEffetFinal(LitEffet, CasteFinal):
 
 class LitEffetInitial(LitEffet, CasteInitial):
     """Un parchemin qui place un effet, en caste initial."""
-    def __init__(self, agissant: Agissant, item: Parchemin, latence: float, effet: Effet):
+    def __init__(self, agissant: Agissant, item: Parchemin, latence: float, effet: EffetAgissant):
         LitEffet.__init__(self,agissant,item)
         CasteInitial.__init__(self,agissant)
         self.latence_max = latence
@@ -65,7 +81,7 @@ class LitEffetInitial(LitEffet, CasteInitial):
 
 class LitEffetContinu(LitEffet, CasteContinu):
     """Un parchemin qui place un effet, en caste continu."""
-    def __init__(self, agissant: Agissant, item: Parchemin, latence: float, effet: Effet):
+    def __init__(self, agissant: Agissant, item: Parchemin, latence: float, effet: EffetAgissant):
         LitEffet.__init__(self, agissant, item)
         CasteContinu.__init__(self, agissant)
         self.latence_max = latence
@@ -73,7 +89,7 @@ class LitEffetContinu(LitEffet, CasteContinu):
 
 class LitEffetFractionnaire(LitEffet, CasteFractionnaire):
     """Un parchemin qui place un effet, en caste fractionnaire."""
-    def __init__(self, agissant: Agissant, item: Parchemin, latence: float, effet: Effet,
+    def __init__(self, agissant: Agissant, item: Parchemin, latence: float, effet: EffetAgissant,
                  parts: int):
         LitEffet.__init__(self,agissant,item)
         CasteFractionnaire.__init__(self,agissant)
@@ -92,7 +108,6 @@ class Impregne(Lit, ActionFinal, CasteFinal):
         ActionFinal.__init__(self, agissant)
         CasteFinal.__init__(self, agissant)
         self.latence_max = latence
-        self.item: ParcheminVierge
         self.taux_cout_impregne = taux_cout_impregne
         self.taux_cout_caste = taux_cout_caste
         self.taux_latence_impregne = taux_latence_impregne

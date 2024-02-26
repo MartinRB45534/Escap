@@ -10,19 +10,34 @@ import carte as crt
 from ..action import NonRepetable
 from ..caste import Caste
 from ..action_skill import ActionSkill
+from ...commons import EtatsItems
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...entitee import Agissant, Item
+    from ...entitee import Agissant, Item, Parchemin
     from ...effet import EnchantementAgissant, EnchantementItem
     from ...systeme import Actif
 
 class Magie(Caste,ActionSkill):
     """La classe des magies. Précédemment un effet."""
     gain_xp: float
+    item: Parchemin|None = None
     def __init__(self,skill:Actif,agissant:Agissant):
         Caste.__init__(self,agissant)
         ActionSkill.__init__(self,agissant,skill)
+
+    def interrompt(self):
+        Caste.interrompt(self)
+        if self.item:
+            self.item.etat = EtatsItems.BRISE
+
+    def termine(self):
+        if self.item:
+            self.item.etat = EtatsItems.BRISE
+            return True
+        else:
+            return ActionSkill.termine(self)
+
 
 class MagieDirigee(Magie) :
     """La classe des magies qui nécessitent une direction."""

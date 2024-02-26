@@ -3,12 +3,12 @@ from typing import TYPE_CHECKING, Optional
 import carte as crt
 
 # Imports des classes parentes
-from ..agissant.agissant import EffetAgissant
+from ..agissant import EffetAgissant
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...entitee.agissant.agissant import Agissant
-    from ...commons.elements import Element
+    from ...entitee import Agissant
+    from ...commons import Element
 
 class AttaqueParticulier(EffetAgissant):
     """L'effet d'attaque dans sa version particulière. Créée par une attaque (version intermèdiaire), chargé d'infligé les dégats, en passant d'abord les défenses de l'agissant. Attachée à la victime."""

@@ -21,6 +21,10 @@ class Potion(Item):
         Item.__init__(self, position)
         self.action_portee = action_portee
 
+    def frappe(self):
+        self.action_portee.eclabousse()
+        Item.frappe(self)
+
     @staticmethod
     def get_image():
         return SKIN_POTION

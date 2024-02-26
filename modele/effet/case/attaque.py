@@ -6,13 +6,13 @@ import carte as crt
 
 # Imports des classes parentes
 from .case import EffetCase
-from ..agissant.attaque import AttaqueParticulier
+from ..agissant import AttaqueParticulier
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...entitee.agissant.agissant import Agissant
-    from ...labyrinthe.case import Case
-    from ...commons.elements import Element
+    from ...entitee import Agissant
+    from ...labyrinthe import Case
+    from ...commons import Element
 
 # Un attaque se déroule en trois temps : l'action (sur l'attaquant), l'attaque (sur les cases), et l'attaque particulière (sur les agissants).
 
@@ -30,8 +30,11 @@ class AttaqueCase(EffetCase):
     def attaque(self,case:Case):
         """L'attaque est lancée sur la case."""
         victime_potentielle = case.agissant
-        if victime_potentielle is not None and victime_potentielle not in self.responsable.esprit.corps:
-            victime_potentielle.effets.append(AttaqueParticulier(self.responsable,self.degats,self.element,self.direction,self.taux_perce,self.inverse))
+        if (victime_potentielle is not None and
+            victime_potentielle not in self.responsable.esprit.corps):
+            victime_potentielle.effets.add(
+                AttaqueParticulier(self.responsable,self.degats,self.element,
+                                   self.direction,self.taux_perce,self.inverse))
 
 class AttaqueCaseDelayee(AttaqueCase):
     """L'attaque est délayée, c'est à dire qu'elle ne s'effectue pas tout de suite. Elle sera déclenchée par un autre effet."""

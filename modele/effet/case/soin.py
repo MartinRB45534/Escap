@@ -27,12 +27,12 @@ class SoinCase(OnPostActionCase):
         cible_potentielle = case.agissant
         if cible_potentielle is not None:
             if not self.responsable: #Pas de responsable. Sérieusement ?
-                cible_potentielle.effets.append(Soin(self.responsable,self.gain_pv))
+                cible_potentielle.effets.add(Soin(self.responsable,self.gain_pv))
             else:
                 esprit = self.responsable.esprit
                 if not esprit: #Pas d'esprit ? Sérieusement ?
-                    cible_potentielle.effets.append(Soin(self.responsable,self.gain_pv))
+                    cible_potentielle.effets.add(Soin(self.responsable,self.gain_pv))
                 elif self.cible == "alliés" and cible_potentielle in esprit.corps:
-                    cible_potentielle.effets.append(Soin(self.responsable,self.gain_pv))
+                    cible_potentielle.effets.add(Soin(self.responsable,self.gain_pv))
                 elif self.cible == "neutres" and not cible_potentielle in esprit.corps:
-                    cible_potentielle.effets.append(Soin(self.responsable,self.gain_pv))
+                    cible_potentielle.effets.add(Soin(self.responsable,self.gain_pv))

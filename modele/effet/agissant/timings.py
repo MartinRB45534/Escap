@@ -13,22 +13,22 @@ if TYPE_CHECKING:
 
 class OnDebutTourAgissant(EffetAgissant):
     """La classe des effets appelés au début du tour d'un agissant."""
-    def debut_tour(self,_agissant:Agissant) -> None:
+    def debut_tour(self,agissant:Agissant) -> None:
         """L'effet est appelé au début du tour de l'agissant."""
 
 class OnPostDecisionAgissant(EffetAgissant): #Un modificateur de comportement (un seul pour l'instant)
     """La classe des effets appelés entre les décisions et les actions."""
-    def post_decision(self,_agissant:Agissant) -> None:
+    def post_decision(self,agissant:Agissant) -> None:
         """L'effet est appelé entre les décisions et les actions de l'agissant."""
 
 class OnPostActionAgissant(EffetAgissant): #Pas sûr que ça soit utile
     """La classe des effets appelés après les actions d'un agissant."""
-    def post_action(self,_agissant:Agissant) -> None:
+    def post_action(self,agissant:Agissant) -> None:
         """L'effet est appelé après les actions de l'agissant."""
 
 class OnFinTourAgissant(EffetAgissant): #Maladies par exemple
     """La classe des effets appelés à la fin du tour."""
-    def fin_tour(self,_agissant:Agissant) -> None:
+    def fin_tour(self,agissant:Agissant) -> None:
         """L'effet est appelé à la fin du tour de l'agissant."""
 
 class TimeLimitedAgissant(EffetAgissant, TimeLimited):

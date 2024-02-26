@@ -3,16 +3,27 @@ Contient les classes des maladies.
 """
 
 from __future__ import annotations
-import random
+from typing import TYPE_CHECKING
 
-# Pas d'imports utilisés uniquement dans les annotations
+import random
+from enum import StrEnum
 
 # Imports des classes parentes
 from .maladie import Maladie
 from ...statistiques import EffetStats
 from ...timings import OnDebutTourAgissant
 
-class Tirnogose(Maladie, OnDebutTourAgissant):
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from .....entitee import Agissant
+
+class TypesMaladies(StrEnum):
+    """Enumération des types de maladies."""
+    TIRGNOGOSE = "Tirgnogose"
+    FIBALUSE = "Fibaluse"
+    IBSUTIOMIALGIE = "Ibsutiomialgie"
+
+class Tirgnogose(Maladie, OnDebutTourAgissant):
     """Maladie qui cause une perte progressive de PV. Peut se transmettre aux voisins."""
 
     def debut_tour(self, agissant: Agissant):
@@ -21,7 +32,7 @@ class Tirnogose(Maladie, OnDebutTourAgissant):
 class Fibaluse(Maladie, EffetStats):
     """Maladie qui réduit les statistiques. Peut se transmettre aux voisins."""
 
-    def modifie_stats(self, stat:float) -> float:
+    def modifie_stats(self, stat: float):
         return stat * (self.virulence)
 
 class Ibsutiomialgie(Maladie, OnDebutTourAgissant):

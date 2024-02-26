@@ -27,7 +27,7 @@ class MagieAutoSoin(Magie):
         Magie.__init__(self,skill,agissant)
 
     def action(self):
-        self.agissant.effets.append(Soin(self.agissant,self.gain_pv))
+        self.agissant.effets.add(Soin(self.agissant,self.gain_pv))
 
 class MagieSoin(MagieAutoSoin, CibleAgissant):
     """La magie qui invoque un effet de soin sur un agissant ciblé."""
@@ -39,7 +39,7 @@ class MagieSoin(MagieAutoSoin, CibleAgissant):
         if not self.cible: # NOONE is falsy
             self.interrompt()
         else:
-            self.cible.effets.append(Soin(self.agissant,self.gain_pv))
+            self.cible.effets.add(Soin(self.agissant,self.gain_pv))
 
 class MagieMultiSoin(MagieAutoSoin, CibleAgissants):
     """La magie qui invoque un effet de soin sur des agissants ciblés."""
@@ -49,7 +49,7 @@ class MagieMultiSoin(MagieAutoSoin, CibleAgissants):
 
     def action(self):
         for cible in self.cible:
-            cible.effets.append(Soin(self.agissant,self.gain_pv))
+            cible.effets.add(Soin(self.agissant,self.gain_pv))
 
 class MagieSoinDeZone(MagieAutoSoin, CibleCase):
     """La magie qui invoque un effet de soin sur une zone."""
@@ -96,7 +96,7 @@ class MagieResurectionItem(MagieResurection, CibleItem, NonRepetable):
             self.interrompt()
         else:
             assert isinstance(self.cible, Cadavre)
-            self.cible.effets.append(Resurection())
+            self.cible.effets.add(Resurection())
 
 class MagieResurectionCase(MagieResurection, CibleCase, PorteeLimitee):
     """La magie qui invoque un effet de resurection sur une case."""
@@ -112,7 +112,7 @@ class MagieResurectionCase(MagieResurection, CibleCase, PorteeLimitee):
             case = self.agissant.labyrinthe.get_case(self.cible)
             for item in case.items:
                 if isinstance(item,Cadavre):
-                    item.effets.append(Resurection())
+                    item.effets.add(Resurection())
 
 class MagieResurectionDeZone(MagieResurection, CibleCase, PorteeLimitee):
     """La magie qui invoque un effet de resurection sur tous les cadavres d'une zone."""
@@ -130,7 +130,7 @@ class MagieResurectionDeZone(MagieResurection, CibleCase, PorteeLimitee):
             for position in zone:
                 for item in self.agissant.labyrinthe.get_case(position).items:
                     if isinstance(item,Cadavre):
-                        item.effets.append(Resurection())
+                        item.effets.add(Resurection())
 
 magies_resurection: dict[tuple[bool, bool],
     type[MagieResurection]] = {
@@ -161,7 +161,7 @@ class MagieReanimationItem(MagieReanimation, CibleItem, NonRepetable):
         else:
             assert isinstance(self.cible, Cadavre)
             if self.cible.priorite+self.superiorite < self.agissant.priorite:
-                self.cible.effets.append(Reanimation(self.taux_pv,self.agissant.esprit))
+                self.cible.effets.add(Reanimation(self.taux_pv,self.agissant.esprit))
 
 class MagieReanimationCase(MagieReanimation, CibleCase, PorteeLimitee):
     """La magie qui invoque un effet de reanimation sur une case."""
@@ -178,7 +178,7 @@ class MagieReanimationCase(MagieReanimation, CibleCase, PorteeLimitee):
             for item in case.items:
                 if isinstance(item,Cadavre):
                     if item.priorite+self.superiorite < self.agissant.priorite:
-                        item.effets.append(Reanimation(self.taux_pv,self.agissant.esprit))
+                        item.effets.add(Reanimation(self.taux_pv,self.agissant.esprit))
 
 class MagieReanimationDeZone(MagieReanimation, CibleCase, PorteeLimitee):
     """La magie qui invoque un effet de reanimation sur tous les cadavres d'une zone."""
@@ -197,7 +197,7 @@ class MagieReanimationDeZone(MagieReanimation, CibleCase, PorteeLimitee):
                 for item in self.agissant.labyrinthe.get_case(position).items:
                     if isinstance(item,Cadavre):
                         if item.priorite+self.superiorite < self.agissant.priorite:
-                            item.effets.append(Reanimation(self.taux_pv,self.agissant.esprit))
+                            item.effets.add(Reanimation(self.taux_pv,self.agissant.esprit))
 
 magies_reanimation: dict[tuple[bool, bool],
     type[MagieReanimation]] = {

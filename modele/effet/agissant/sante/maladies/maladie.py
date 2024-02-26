@@ -18,20 +18,21 @@ if TYPE_CHECKING:
 
 class Maladie(OnFinTourAgissant):
     """L'effet de maladie. Applique un déboost à l'agissant. Peut se transmettre aux voisins. Il existe différentes maladies."""
-    def __init__(self,contagiosite:float,distance:float,persistence:float,virulence:float):
-        self.contagiosite = contagiosite
-        self.distance = distance
-        self.persistence = persistence
-        self.virulence = virulence
+    contagiosite:float
+    distance:float
+    persistence:float
+    virulence:float
+    def __init__(self):
         self.immunite = 0
 
     def fin_tour(self,agissant:Agissant):
-        zone = agissant.labyrinthe.a_portee(agissant.position,self.distance,Deplacement.SPATIAL,Forme.CERCLE,Passage(False,False,False,True,False))
+        zone = agissant.labyrinthe.a_portee(
+            agissant.position,self.distance,Deplacement.SPATIAL,Forme.CERCLE,Passage(False,False,False,True,False))
         for position in zone :
             voisin = agissant.labyrinthe.get_case(position).agissant
             if voisin:
                 if random.random() < self.contagiosite and (not isinstance(effet, self.__class__) for effet in voisin.effets): #On ne tombe pas deux fois malade de la même maladie simultanément
-                    voisin.effets.append(self.__class__(self.contagiosite,self.distance,self.persistence,self.virulence)) #Nid à problèmes très potentiel !
+                    voisin.effets.add(self.__class__()) #Nid à problèmes très potentiel !
         self.immunite += 1
 
     def termine(self) -> bool:
