@@ -25,15 +25,16 @@ if TYPE_CHECKING:
     from ...labyrinthe import Labyrinthe, Mur
     from ...commons import Element
     from .vue import Vue
+    from ...effet import Maladie, FamilleMaladie
 
 class Agissant(NonSuperposable,Mobile):
     """La classe des entitées animées. Capable de décision, de différentes actions, etc. Les principales caractéristiques sont l'ID, les stats, et la classe principale."""
-    def __init__(self,identite:str,labyrinthe:Labyrinthe,cond_evo:list[float],skills_intrasecs:set[SkillIntrasec],skills:set[SkillExtra],niveau:int,pv_max:float,regen_pv_max:float,regen_pv_min:float,restauration_regen_pv:float,pm_max:float,regen_pm:float,force:float,priorite:float,vitesse:float,affinites:dict[Element,float],immunites:set[Element],espece:Espece,oubli:float,resolution:int,forme:str,forme_tete:str,nb_doigts:int,magies:list[type[Magie]],items:list[type[Item]],position:crt.Position,ID: Optional[int]=None):
+    def __init__(self,identite:str,labyrinthe:Labyrinthe,cond_evo:list[float],skills_intrasecs:set[SkillIntrasec],skills:set[SkillExtra],niveau:int,pv_max:float,regen_pv_max:float,regen_pv_min:float,restauration_regen_pv:float,pm_max:float,regen_pm:float,force:float,priorite:float,vitesse:float,affinites:dict[Element,float],immunites:set[Element],non_contagieux:dict[type[Maladie]|FamilleMaladie,float],non_infectable:dict[type[Maladie]|FamilleMaladie,float],non_affecte:dict[type[Maladie]|FamilleMaladie,float],espece:Espece,oubli:float,resolution:int,forme:str,forme_tete:str,nb_doigts:int,magies:list[type[Magie]],items:list[type[Item]],position:crt.Position,ID: Optional[int]=None):
         Mobile.__init__(self,position,ID)
         NonSuperposable.__init__(self,position,ID)
         self.identite = identite
         self.labyrinthe = labyrinthe
-        self.statistiques = Statistiques(self,priorite,vitesse,force,pv_max,regen_pv_max,regen_pv_min,restauration_regen_pv,pm_max,regen_pm,affinites,immunites)
+        self.statistiques = Statistiques(self,priorite,vitesse,force,pv_max,regen_pv_max,regen_pv_min,restauration_regen_pv,pm_max,regen_pm,affinites,immunites,non_contagieux,non_infectable,non_affecte)
         self.espece = espece
         self.classe_principale = ClassePrincipale(cond_evo,skills_intrasecs,skills,niveau)
         self.niveau = self.classe_principale.niveau
@@ -59,7 +60,7 @@ class Agissant(NonSuperposable,Mobile):
         #Pour lancer des magies
         self.talent = 1
 
-        self.magie = Cadavre(self)
+        self.magie = Cadavre(self,crt.POSITION_ABSENTE)
 
         if magies:
             skill:Optional[SkillsMagiques] = trouve_skill(self.classe_principale,SkillsMagiques)
@@ -70,7 +71,7 @@ class Agissant(NonSuperposable,Mobile):
         if items:
             new_items:set[Item] = set()
             for item in items:
-                new_items.add(item(labyrinthe,crt.POSITION_ABSENTE))
+                new_items.add(item(crt.POSITION_ABSENTE))
             self.inventaire.equippe(new_items)
 
     @property
@@ -280,7 +281,7 @@ class Agissant(NonSuperposable,Mobile):
     def meurt(self):
         """L'agissant meurt."""
         self.etat = EtatsAgissants.MORT
-        self.effets = []
+        self.effets = set() # TODO : On en garde vraiment aucun ?
         case = self.labyrinthe.get_case(self.position)
         self.inventaire.drop_all(case)
         case.agissant = None
@@ -312,11 +313,10 @@ class Agissant(NonSuperposable,Mobile):
             for skill in skills :
                 if isinstance(skill,SkillAura):
                     effet = skill.utilise()
-                    self.effets.append(effet)
+                    self.effets.add(effet)
                 # Quels autres skills peuvent tomber dans cette catégorie ?
             #Et les effets. Vous les voyez tous les beaux enchantements qui nous renforcent ?
-            for i in range(len(self.effets)-1,-1,-1) :
-                effet = self.effets[i]
+            for effet in [*self.effets]:
                 if isinstance(effet,TimeLimited):
                     effet.wait()
                 if isinstance(effet,OnDebutTourAgissant):
@@ -404,8 +404,7 @@ class Agissant(NonSuperposable,Mobile):
         """L'agissant finit son tour."""
         if self.etat == EtatsAgissants.VIVANT:
             #Quelques effets avant la fin du tour (maladie, soin, tout ça tout ça...)
-            for i in range(len(self.effets)-1,-1,-1) :
-                effet = self.effets[i]
+            for effet in [*self.effets]:
                 if isinstance(effet,OnFinTourAgissant):
                     effet.fin_tour(self)
             #Il est temps de voir si on peut encore recoller les morceaux.

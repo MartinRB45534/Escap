@@ -2,6 +2,8 @@
 Contient la classe Statistiques.
 """
 
+# TODO : Les statistiques devraient aussi dépendre des skills
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
@@ -13,7 +15,7 @@ from ..item.equippement.role.accelerateur import Accelerateur
 from ..item.equippement.role.anoblisseur import Anoblisseur
 from ..item.equippement.role.reparateur.reparateur import Reparateur
 from ..item.equippement.role.reparateur_magique.reparateur_magique import ReparateurMagique
-from ...effet import EffetForce, EffetAffinite, EffetVision, EffetPv, EffetPm, EffetVitesse
+from ...effet import EffetForce, EffetAffinite, EffetVision, EffetPv, EffetPm, EffetVitesse, Maladie, FamilleMaladie, EffetNonContagieux, EffetNonInfectable, EffetNonAffecte
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
@@ -21,10 +23,10 @@ if TYPE_CHECKING:
 
 class Statistiques:
     """Les statistiques d'un agissant."""
-    def __init__(self,possesseur:Agissant, priorite:float, vitesse:float, force:float, pv:float, regen_pv_max:float, regen_pv_min:float, restauration_regen_pv:float, pm:float, regen_pm:float, affinites:dict[Element,float], immunites:set[Element]):
+    def __init__(self,possesseur:Agissant, priorite:float, vitesse:float, force:float, pv:float, regen_pv_max:float, regen_pv_min:float, restauration_regen_pv:float, pm:float, regen_pm:float, affinites:dict[Element,float], immunites:set[Element], non_contagieux:dict[type[Maladie]|FamilleMaladie,float], non_infectable:dict[type[Maladie]|FamilleMaladie,float], non_affecte:dict[type[Maladie]|FamilleMaladie,float]):
         self.possesseur = possesseur #Entité possédant ces statistiques (utilisé pour chercher des effets par exemple)
 
-        self.priorite = priorite #La priorité sert à bloquer ou forcer certains actions (ex: le vol, l'instakill, etc.)
+        self.priorite = priorite #La priorité sert à bloquer ou forcer certaines actions (ex: le vol, l'instakill, etc.)
 
         self.vitesse = vitesse #Vitesse d'action (encore utilisé ?)
         self.force = force #Force d'attaques physiques
@@ -41,6 +43,10 @@ class Statistiques:
 
         self.affinites = affinites #Affinités élémentaires
         self.immunites = immunites #Immunites élémentaires
+
+        self.non_contagieux = non_contagieux #Maladies qui ne peuvent pas être transmises
+        self.non_infectable = non_infectable #Maladies qui ne peuvent pas être attrapées
+        self.non_affecte = non_affecte #Maladies qui n'ont pas d'effet sur l'agissant
 
     def get_vitesse(self) -> float:
         """Retourne la vitesse de l'agissant."""
@@ -111,6 +117,33 @@ class Statistiques:
             if isinstance(effet, EffetPm):
                 regen_pm = effet.modifie_pm(regen_pm)
         return regen_pm
+    
+    def get_non_contagieux(self, maladie:type[Maladie]) -> float:
+        """Retourne la priorité de l'immunité à la contagion de la maladie donnée."""
+        priorite = max(self.non_contagieux.get(maladie, 0), self.non_contagieux.get(maladie.famille, 0))
+        for effet in self.possesseur.effets:
+            if isinstance(effet, EffetNonContagieux):
+                if effet.maladie == maladie or effet.maladie == maladie.famille:
+                    priorite = max(priorite, effet.priorite)
+        return priorite
+    
+    def get_non_infectable(self, maladie:type[Maladie]) -> float:
+        """Retourne la priorité de l'immunité à l'infection de la maladie donnée."""
+        priorite = max(self.non_infectable.get(maladie, 0), self.non_infectable.get(maladie.famille, 0))
+        for effet in self.possesseur.effets:
+            if isinstance(effet, EffetNonInfectable):
+                if effet.maladie == maladie or effet.maladie == maladie.famille:
+                    priorite = max(priorite, effet.priorite)
+        return priorite
+    
+    def get_non_affecte(self, maladie:type[Maladie]) -> float:
+        """Retourne la priorité de l'immunité à l'effet de la maladie donnée."""
+        priorite = max(self.non_affecte.get(maladie, 0), self.non_affecte.get(maladie.famille, 0))
+        for effet in self.possesseur.effets:
+            if isinstance(effet, EffetNonAffecte):
+                if effet.maladie == maladie or effet.maladie == maladie.famille:
+                    priorite = max(priorite, effet.priorite)
+        return priorite
 
     def soigne(self, pv:float):
         """Soigne l'agissant de pv points de vie."""
@@ -124,11 +157,11 @@ class Statistiques:
 
     def debut_tour(self):
         """L'agissant commence son tour."""
-        self.pv += self.regen_pv
+        self.pv += self.get_regen_pv()
         self.pv = min(self.pv, self.pv_max)
         self.regen_pv += self.restauration_regen_pv
         self.regen_pv = min(self.regen_pv, self.regen_pv_max)
-        self.pm += self.regen_pm
+        self.pm += self.get_regen_pm()
         self.pm = min(self.pm, self.pm_max)
 
     def depense_pm(self, pm:float):

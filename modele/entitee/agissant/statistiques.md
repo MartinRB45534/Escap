@@ -1,0 +1,1 @@
+Ils y a des skills influencent les statistique, il ne faudra pas les oublier !
