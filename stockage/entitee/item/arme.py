@@ -4,11 +4,13 @@ Fichier contenant la classe de stockage des armes.
 
 from __future__ import annotations
 from json import loads as parse
+from enum import StrEnum
 
 import modele as mdl
 
 from ...stockage import StockageCategorieNivelee
 from ..entitee import EntiteeNivele
+from ...espece import Especes, Espece
 
 class ArmeNivele(EntiteeNivele):
     """Une arme toute simple."""
@@ -18,8 +20,15 @@ class ArmeNivele(EntiteeNivele):
             "element": mdl.Element,
             "poids": float,
             "frottements": float,
+            "type_arme": StrEnum("type_arme",
+                                 {"Epee": "Epee",
+                                  "Lance": "Lance",
+                                  "Autre": "Autre"}),
             "portee": float,
-            "tranchant": float
+            "tranchant": float,
+            "tribal": bool,
+            "_espece": Especes,
+            "_taux_stats": float
         }
 
     niveles = {
@@ -27,8 +36,12 @@ class ArmeNivele(EntiteeNivele):
             "element": False,
             "poids": True,
             "frottements": True,
+            "type_arme": False,
             "portee": True,
-            "tranchant": True
+            "tranchant": True,
+            "tribal": False,
+            "_espece": False,
+            "_taux_stats": True
         }
 
     acceptors = {
@@ -36,8 +49,12 @@ class ArmeNivele(EntiteeNivele):
             "element": lambda _: True,
             "poids": lambda poids: float(poids) >= 0,
             "frottements": lambda frottements: float(frottements) >= 0,
+            "type_arme": lambda _: True,
             "portee": lambda portee: float(portee) >= 0,
-            "tranchant": lambda tranchant: float(tranchant) >= 0
+            "tranchant": lambda tranchant: float(tranchant) >= 0,
+            "tribal": lambda _: True,
+            "_espece": lambda espece: espece in Especes.global_.trouve_stockage(Especes).all_noms,
+            "_taux_stats": lambda taux_stats: float(taux_stats) >= 0
         }
 
     avertissements = {
@@ -45,8 +62,12 @@ class ArmeNivele(EntiteeNivele):
             "element": "Cet avertissement n'est pas censé apparaître non plus.",
             "poids": "Le poids doit être positif.",
             "frottements": "Le frottement doit être positif.",
+            "type_arme": "Cet avertissement n'est pas censé apparaître.",
             "portee": "La portée doit être positive.",
-            "tranchant": "Le tranchant doit être positif."
+            "tranchant": "Le tranchant doit être positif.",
+            "tribal": "Cet avertissement n'est pas censé apparaître non plus.",
+            "_espece": "Il faut choisir une espèce existante (peut-être qu'il n'en existe pas).",
+            "_taux_stats": "Le taux de stats doit être positif."
         }
 
     conditionnels = {
@@ -54,8 +75,12 @@ class ArmeNivele(EntiteeNivele):
             "element": lambda dictionnaire: True,
             "poids": lambda dictionnaire: True,
             "frottements": lambda dictionnaire: True,
+            "type_arme": lambda dictionnaire: True,
             "portee": lambda dictionnaire: True,
-            "tranchant": lambda dictionnaire: True
+            "tranchant": lambda dictionnaire: True,
+            "tribal": lambda dictionnaire: True,
+            "_espece": lambda dictionnaire: dictionnaire["tribal"]=="True",
+            "_taux_stats": lambda dictionnaire: dictionnaire["tribal"]=="True"
         }
 
     multiple = {
@@ -63,26 +88,38 @@ class ArmeNivele(EntiteeNivele):
             "element": False,
             "poids": False,
             "frottements": False,
+            "type_arme": False,
             "portee": False,
-            "tranchant": False
+            "tranchant": False,
+            "tribal": False,
+            "_espece": False,
+            "_taux_stats": False
         }
 
     def __init__(self, nom: str, fantome: bool,
-                 element:mdl.Element, poids:float, frottements:float,
-                 portee:list[float], tranchant:list[float]):
+                 element:mdl.Element, poids: list[float], frottements: list[float],
+                 type_arme:str, portee:list[float], tranchant:list[float],
+                 tribal: bool, espece: Espece|None, _taux_stats: list[int]):
         EntiteeNivele.__init__(self, nom)
         self.fantome = fantome
         self.element = element
         self.poids = poids
         self.frottements = frottements
+        self.type_arme = type_arme
         self.portee = portee
         self.tranchant = tranchant
+        self.tribal = tribal
+        self._espece = espece
+        self._taux_stats = _taux_stats
 
     def check(self) -> bool:
-        return (self.poids >= 0 and
-                self.frottements >= 0 and
+        return (all([poid >= 0 for poid in self.poids]) and
+                all([frottement >= 0 for frottement in self.frottements]) and
+                self.type_arme in ["Epee", "Lance", "Autre"] and
                 all(portee >= 0 for portee in self.portee) and
-                all(tranchant >= 0 for tranchant in self.tranchant))
+                all(tranchant >= 0 for tranchant in self.tranchant) and
+                (not self.tribal or bool(self._espece)) and
+                all([taux >= 0 for taux in self._taux_stats]))
 
     def stringify(self) -> str:
         return f"""{{
@@ -93,40 +130,42 @@ class ArmeNivele(EntiteeNivele):
     "element": "{self.element}",
     "poids": {self.poids},
     "frottements": {self.frottements},
+    "type_arme": "{self.type_arme}",
     "portee": {self.portee},
-    "tranchant": {self.tranchant}"
+    "tranchant": {self.tranchant},
+    "tribal": {self.tribal},
+    "_espece": "{self._espece}",
+    "_taux_stats": {self._taux_stats}
 }}"""
 
     @classmethod
     def parse(cls, json: str):
         """Parse un json en ArmeNivele."""
         dictionnaire = parse(json)
-        return ArmeNivele(dictionnaire["nom"], dictionnaire["fantome"], mdl.Element(dictionnaire["element"]), dictionnaire["poids"], dictionnaire["frottements"], dictionnaire["portee"], dictionnaire["tranchant"])
+        return ArmeNivele(dictionnaire["nom"], dictionnaire["fantome"], mdl.Element(dictionnaire["element"]), dictionnaire["poids"], dictionnaire["frottements"], dictionnaire["type_arme"], dictionnaire["portee"], dictionnaire["tranchant"], dictionnaire["tribal"], dictionnaire["_espece"], dictionnaire["_taux_stats"])
 
-    def make(self, niveau: int) -> mdl.Arme:
-        """Crée un ArmeSimple à partir de l'instance."""
-        arme = mdl.Arme(mdl.NOWHERE, self.poids, self.frottements, self.element, self.tranchant[niveau], self.portee[niveau])
-        arme.nom = self.nom
-        arme.fantome = self.fantome
-        return arme
-
-class EpeeNivele(ArmeNivele):
-    """Une épée."""
-    def make(self, niveau: int) -> mdl.Epee:
-        """Crée une Epee à partir de l'instance."""
-        epee = mdl.Epee(mdl.NOWHERE, self.poids, self.frottements, self.element, self.tranchant[niveau], self.portee[niveau])
-        epee.nom = self.nom
-        epee.fantome = self.fantome
-        return epee
-
-class LanceNivele(ArmeNivele):
-    """Une lance."""
-    def make(self, niveau: int) -> mdl.Lance:
-        """Crée une Lance à partir de l'instance."""
-        lance = mdl.Lance(mdl.NOWHERE, self.poids, self.frottements, self.element, self.tranchant[niveau], self.portee[niveau])
-        lance.nom = self.nom
-        lance.fantome = self.fantome
-        return lance
+    def make(self, niveau: int):
+        """Crée une ArmeSimple à partir de l'instance."""
+        classe = mdl.armes[(self.type_arme, self.tribal)]
+        if self.tribal:
+            assert self._espece, "Erreur : il faut une espèce pour un équipement tribal !"
+            _espece = self._espece.make()
+            assert isinstance(_espece, mdl.Espece), f"Erreur : {self._espece} n'est pas une espèce !?"
+        else:
+            _espece = None
+        class ArmeNiveau(classe, mdl.Nomme):
+            """Une arme."""
+            poids = self.poids[niveau]
+            frottements = self.frottements[niveau]
+            element = self.element
+            tranchant = self.tranchant[niveau]
+            portee = self.portee[niveau]
+            espece = _espece
+            taux = self._taux_stats[niveau] if self.tribal else 0
+            fantome = self.fantome
+        ArmeNiveau.nom = self.nom
+        ArmeNiveau.niveau = niveau
+        return ArmeNiveau
 
 class Armes(StockageCategorieNivelee):
     """Les informations des armes."""
@@ -135,7 +174,5 @@ class Armes(StockageCategorieNivelee):
     description = "Les armes sont destinés à être équippées. Elles permettent d'effectuer des attaques différentes. Les épées et les lances en particulier interagissent avec certains skills."
     avertissement = "Il existe déjà une arme avec ce nom !"
     elements = {
-        "Epee": EpeeNivele,
-        "Lance": LanceNivele,
-        "Autre": ArmeNivele
+        "Arme": ArmeNivele
     }

@@ -129,7 +129,7 @@ class ProjectileSimpleNivele(EntiteeNivele):
 
     def make(self, niveau: int):
         """Crée un ProjectileSimple à partir de l'instance."""
-        classe = mdl.projectiles[(self.percant, self.fleche, self.explosif, False, False)]
+        classe = mdl.projectiles[(self.percant, self.fleche, self.explosif)]
         class ProjectileSimpleNiveau(classe, mdl.Nomme):
             """Un projectile."""
             poids = self.poids[niveau]

@@ -1,29 +1,20 @@
 """Contient la classe Bouclier."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING
-import carte as crt
 
 # Imports des classes parentes
 from ..degainable import Degainable
+from ...role import EquippementTribal
 
 # Imports utilisés dans le code
 from ......affichage import SKIN_BOUCLIER
 from ......effet import AttaqueCase
 
-# Imports utilisés uniquement dans les annotations
-if TYPE_CHECKING:
-    from ......labyrinthe.labyrinthe import Labyrinthe
-
 class Bouclier(Degainable):
     """La classe des boucliers. Permettent de se protéger des attaques lorsqu'ils sont utilisés."""
-    def __init__(self,labyrinthe:Labyrinthe,poids:float,frottements:float,degats_bloques:float,taux_degats:float,position:crt.Position=crt.POSITION_ABSENTE):
-        Degainable.__init__(self,labyrinthe,position)
-        self.degats_bloques = degats_bloques
-        self.taux_degats = taux_degats
-        self.taux_stats = {}
-        self.poids = poids
-        self.frottements = frottements
+    degats_bloques:float
+    taux_degats:float
+
 
     def intercepte(self,attaque:AttaqueCase):
         """Intercepte une attaque."""
@@ -38,3 +29,14 @@ class Bouclier(Degainable):
     @staticmethod
     def get_image():
         return SKIN_BOUCLIER
+    
+class BouclierTribal(Bouclier, EquippementTribal):
+    """Un bouclier tribal. Réduit ses statistiques si l'espèce n'est pas la bonne."""
+
+boucliers: dict[tuple[bool], type[Bouclier]] = {
+    (False,): Bouclier,
+    (True,): BouclierTribal,
+}
+"""
+(tribal,) -> classe du bouclier
+"""

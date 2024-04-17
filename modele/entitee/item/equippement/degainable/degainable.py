@@ -12,7 +12,6 @@ from .....affichage import SKIN_ARME
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from .....labyrinthe.labyrinthe import Labyrinthe
     from .....commons.elements import Element
 
 class Degainable(Equippement):
@@ -20,16 +19,13 @@ class Degainable(Equippement):
 
 class Arme(Degainable):
     """La classe des équipements qui augmentent la force d'attaque."""
-    def __init__(self,labyrinthe:Labyrinthe,poids:float,frottements:float,element:Element,tranchant:float,portee:float,position:crt.Position=crt.POSITION_ABSENTE):
-        Degainable.__init__(self,labyrinthe,position)
-        self.poids = poids
-        self.frottements = frottements
-        self.element = element
-        self.tranchant = tranchant
+    element:Element
+    tranchant:float
+    portee:float
+    def __init__(self,position:crt.Position=crt.POSITION_ABSENTE):
+        Degainable.__init__(self,position)
         self.taux_tranchant:dict[str, float] = {}
-        self.portee = portee
         self.taux_portee:dict[str, float] = {}
-        self.taux_stats:dict[str, float] = {}
 
     def get_stats_attaque(self):
         """Renvoie les stats de l'arme."""

@@ -44,9 +44,7 @@ class EffetVitesse(EffetAgissant):
 
 class EffetAffinite(EffetAgissant):
     """Effet qui augmente l'affinité à un élément."""
-    def __init__(self,element:Element):
-        self.element = element
-
+    element:Element
     def modifie_affinite(self, affinite:float) -> float:
         """Modifie l'affinité à l'élément de l'agissant."""
         raise NotImplementedError

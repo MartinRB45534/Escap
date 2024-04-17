@@ -144,6 +144,33 @@ class Statistiques:
                 if effet.maladie == maladie or effet.maladie == maladie.famille:
                     priorite = max(priorite, effet.priorite)
         return priorite
+    
+    def set_non_contagieux(self, maladie:type[Maladie]|FamilleMaladie, priorite:float):
+        """Définit la priorité de l'immunité à la contagion de la maladie donnée."""
+        if priorite > self.non_contagieux.get(maladie, 0):
+            self.non_contagieux[maladie] = priorite
+
+    def set_non_infectable(self, maladie:type[Maladie]|FamilleMaladie, priorite:float):
+        """Définit la priorité de l'immunité à l'infection de la maladie donnée."""
+        if priorite > self.non_infectable.get(maladie, 0):
+            self.non_infectable[maladie] = priorite
+
+    def set_non_affecte(self, maladie:type[Maladie]|FamilleMaladie, priorite:float):
+        """Définit la priorité de l'immunité à l'effet de la maladie donnée."""
+        if priorite > self.non_affecte.get(maladie, 0):
+            self.non_affecte[maladie] = priorite
+
+    def augmente_non_contagieux(self, maladie:type[Maladie]|FamilleMaladie, priorite:float):
+        """Augmente la priorité de l'immunité à la contagion de la maladie donnée."""
+        self.set_non_contagieux(maladie, self.non_contagieux.get(maladie, 0) + priorite)
+
+    def augmente_non_infectable(self, maladie:type[Maladie]|FamilleMaladie, priorite:float):
+        """Augmente la priorité de l'immunité à l'infection de la maladie donnée."""
+        self.set_non_infectable(maladie, self.non_infectable.get(maladie, 0) + priorite)
+
+    def augmente_non_affecte(self, maladie:type[Maladie]|FamilleMaladie, priorite:float):
+        """Augmente la priorité de l'immunité à l'effet de la maladie donnée."""
+        self.set_non_affecte(maladie, self.non_affecte.get(maladie, 0) + priorite)
 
     def soigne(self, pv:float):
         """Soigne l'agissant de pv points de vie."""

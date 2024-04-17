@@ -44,22 +44,22 @@ class FlecheExplosive(Fleche,Explosif):
 class FragileSimple(Fragile,ProjectileSimple):
     """Un fragile tout simple."""
 
-class FragilePercant(ProjectileSimple, Percant, Fragile):
+class FragilePercant(FragileSimple, Percant):
     """Un fragile percant."""
 
-class FlecheFragile(Fleche,Fragile):
+class FlecheFragile(Fleche, FragileSimple):
     """Une flèche plus fragile que la normale."""
 
-class ExplosifFragile(Explosif,Fragile):
+class ExplosifFragile(Explosif, FragileSimple):
     """Un explosif qui se brise à l'impact."""
 
-class ExplosifFragilePercant(ExplosifFragile,Percant):
+class ExplosifFragilePercant(ExplosifFragile, FragilePercant):
     """Un explosif qui se brise à l'impact et qui est percant."""
 
-class FlecheExplosiveFragile(FlecheExplosive,Fragile):
+class FlecheExplosiveFragile(FlecheExplosive, FragileSimple):
     """Une flèche explosive qui se brise à l'impact."""
 
-class ProjectileMagique(ProjectileSimple,Evanescent):
+class ProjectileMagique(ProjectileSimple, Evanescent):
     """La classe des projectiles créés par magie."""
     magie: InvocationProjectile
     def __init__(self, poids: float, frottements: float,
@@ -73,57 +73,60 @@ class ProjectileMagique(ProjectileSimple,Evanescent):
         self.degats = degats
         self.element = element
 
-class MagiePercante(Percant,ProjectileMagique):
+class MagiePercante(Percant, ProjectileMagique):
     """La classe des projectiles percants créés par magie."""
 
-class MagieExplosive(Explosif,ProjectileMagique):
+class MagieExplosive(Explosif, ProjectileMagique):
     """La classe des projectiles explosifs créés par magie."""
 
-class FlecheMagique(Fleche,ProjectileMagique):
+class FlecheMagique(Fleche, ProjectileMagique):
     """La classe des flèches créées par magie."""
 
-class FlecheExplosiveMagique(FlecheExplosive,ProjectileMagique):
+class FlecheExplosiveMagique(FlecheExplosive, ProjectileMagique):
     """La classe des flèches explosives créées par magie."""
 
-class MagieExplosivePercante(MagieExplosive,Percant):
+class MagieExplosivePercante(MagieExplosive, Percant):
     """La classe des projectiles explosifs perçant créés par magie."""
 
-projectiles: dict[tuple[bool, bool, bool, bool, bool], type[ProjectileSimple]] = {
-    (False, False, False, False, False): ProjectileSimple,
-    (True, False, False, False, False): PercantSimple,
-    (False, True, False, False, False): Fleche,
-    (True, True, False, False, False): Fleche,
-    (False, False, True, False, False): Explosif,
-    (True, False, True, False, False): ExplosifPercant,
-    (False, True, True, False, False): FlecheExplosive,
-    (True, True, True, False, False): FlecheExplosive,
-    (False, False, False, True, False): FragileSimple,
-    (True, False, False, True, False): FragilePercant,
-    (False, True, False, True, False): FlecheFragile,
-    (True, True, False, True, False): FlecheFragile,
-    (False, False, True, True, False): ExplosifFragile,
-    (True, False, True, True, False): ExplosifFragilePercant,
-    (False, True, True, True, False): FlecheExplosiveFragile,
-    (True, True, True, True, False): FlecheExplosiveFragile,
-    (False, False, False, False, True): ProjectileMagique,
-    (True, False, False, False, True): MagiePercante,
-    (False, True, False, False, True): FlecheMagique,
-    (True, True, False, False, True): FlecheMagique,
-    (False, False, True, False, True): MagieExplosive,
-    (True, False, True, False, True): MagieExplosivePercante,
-    (False, True, True, False, True): FlecheExplosiveMagique,
-    (True, True, True, False, True): FlecheExplosiveMagique,
-    (False, False, False, True, True): MagiePercante,
-    (True, False, False, True, True): MagiePercante,
-    (False, True, False, True, True): FlecheMagique,
-    (True, True, False, True, True): FlecheMagique,
-    (False, False, True, True, True): MagieExplosivePercante,
-    (True, False, True, True, True): MagieExplosivePercante,
-    (False, True, True, True, True): FlecheExplosiveMagique,
-    (True, True, True, True, True): FlecheExplosiveMagique
-}
+projectiles: dict[tuple[bool, bool, bool], type[ProjectileSimple]] = {
+    (False, False, False): ProjectileSimple,
+    (True, False, False): PercantSimple,
+    (False, True, False): Fleche,
+    (True, True, False): Fleche,
+    (False, False, True): Explosif,
+    (True, False, True): ExplosifPercant,
+    (False, True, True): FlecheExplosive,
+    (True, True, True): FlecheExplosive,
+} # Les projectiles "permanents"
 """
-(percant, fleche, explosif, fragile, magique)
+(percant, fleche, explosif)
 percant est ignoré si fleche est True
-fragile est ignoré si magique est True
+"""
+projectiles_fragiles: dict[tuple[bool, bool, bool], type[FragileSimple]] = {
+    (False, False, False): FragileSimple,
+    (True, False, False): FragilePercant,
+    (False, True, False): FlecheFragile,
+    (True, True, False): FlecheFragile,
+    (False, False, True): ExplosifFragile,
+    (True, False, True): ExplosifFragilePercant,
+    (False, True, True): FlecheExplosiveFragile,
+    (True, True, True): FlecheExplosiveFragile,
+} # Les projectiles fragiles, créés par des skills
+"""
+(percant, fleche, explosif)
+percant est ignoré si fleche est True
+"""
+projectiles_magiques: dict[tuple[bool, bool, bool], type[ProjectileMagique]] = {
+    (False, False, False): ProjectileMagique,
+    (True, False, False): MagiePercante,
+    (False, True, False): FlecheMagique,
+    (True, True, False): FlecheMagique,
+    (False, False, True): MagieExplosive,
+    (True, False, True): MagieExplosivePercante,
+    (False, True, True): FlecheExplosiveMagique,
+    (True, True, True): FlecheExplosiveMagique,
+} # Les projectiles magiques, créés par des magies
+"""
+(percant, fleche, explosif)
+percant est ignoré si fleche est True
 """

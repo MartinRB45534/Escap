@@ -27,7 +27,6 @@ class Item(Mobile):
     def __init__(self,position:crt.Position):
         Mobile.__init__(self,position)
         self.etat = EtatsItems.INTACT #Le niveau l'évacuera s'il n'est plus intact.
-        self._priorite = 0 #Pour avoir le droit de la ramasser.
         self.action:Optional[Plane] = None
         self.direction:Optional[crt.Direction] = None
         self.hauteur:float = 0

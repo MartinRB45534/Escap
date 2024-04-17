@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 from typing import TYPE_CHECKING
-import carte as crt
 
 # Imports des classes parentes
 from .defensif import Defensif
@@ -10,13 +9,10 @@ from .defensif import Defensif
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ......effet.agissant.attaque import AttaqueParticulier
-    from ......labyrinthe.labyrinthe import Labyrinthe
 
 class DefensifProportion(Defensif):
     """Bloque une proportion des dégats (le plus courant)."""
-    def __init__(self,labyrinthe:Labyrinthe,position:crt.Position,taux_degats:float):
-        Defensif.__init__(self,labyrinthe,position)
-        self.taux_degats = taux_degats
+    taux_degats:float
 
     def intercepte(self,attaque:AttaqueParticulier):
         degats_bloques = self.taux_degats
@@ -26,9 +22,7 @@ class DefensifProportion(Defensif):
 
 class DefensifSeuil(Defensif):
     """Bloque les dégats s'ils sont en dessous d'un seuil (utile contre les stratégies d'attaques nombreuses et rapides mais faibles)."""
-    def __init__(self,labyrinthe:Labyrinthe,position:crt.Position,degats:float):
-        Defensif.__init__(self,labyrinthe,position)
-        self.degats = degats
+    degats:float
 
     def intercepte(self,attaque:AttaqueParticulier):
         degats = self.degats
@@ -39,9 +33,7 @@ class DefensifSeuil(Defensif):
 
 class DefensifPlafond(Defensif):
     """Limite les dégats à un plafond (utile contre les stratégies d'attaques peu nombreuses mais puissantes)."""
-    def __init__(self,labyrinthe:Labyrinthe,position:crt.Position,degats:float):
-        Defensif.__init__(self,labyrinthe,position)
-        self.degats = degats
+    degats:float
 
     def intercepte(self,attaque:AttaqueParticulier):
         degats = self.degats
@@ -52,9 +44,7 @@ class DefensifPlafond(Defensif):
 
 class DefensifValeur(Defensif):
     """Bloque une valeur fixe de dégats (utile contre les stratégies d'attaques nombreuses et rapides mais faibles, et moins inutile que le DefensifSeuil contre les attaques puissantes)."""
-    def __init__(self,labyrinthe:Labyrinthe,position:crt.Position,degats:float):
-        Defensif.__init__(self,labyrinthe,position)
-        self.degats = degats
+    degats:float
 
     def intercepte(self,attaque:AttaqueParticulier):
         degats = self.degats
@@ -64,4 +54,3 @@ class DefensifValeur(Defensif):
             attaque.degats -= degats
         else:
             attaque.degats = 0
-#On suppose pour l'instant qu'un item défensif n'appartient qu'à une seule de ces catégories

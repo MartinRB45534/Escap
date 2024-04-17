@@ -248,18 +248,33 @@ class EquippementNivele(EntiteeNivele):
             dictionnaire["_espece"] = Especes.global_.trouve_stockage(Especes).contenu[dictionnaire["_espece"]]
         return EquippementNivele(dictionnaire["nom"], dictionnaire["fantome"], dictionnaire["poids"], dictionnaire["frottements"], dictionnaire["type_equippement"], dictionnaire["defensif"], dictionnaire["_degats"], dictionnaire["pv"], dictionnaire["_pv"], dictionnaire["pm"], dictionnaire["_pm"], dictionnaire["accelerateur"], dictionnaire["_vitesse"], dictionnaire["anoblisseur"], dictionnaire["_priorite"], dictionnaire["elementaire"], mdl.Element.__members__[dictionnaire["_element"]], dictionnaire["_affinite"], dictionnaire["tribal"], dictionnaire["_espece"], dictionnaire["_taux_stats"])
 
-    def make(self, niveau: int) -> mdl.Equippement:
+    def make(self, niveau: int):
         """Crée un Equippement à partir de l'instance."""
+        classe = mdl.equippements[(self.type_equippement, self.defensif, self.pv, self.pm, self.accelerateur, self.anoblisseur, self.elementaire, self.tribal)]
         if self.tribal:
             assert self._espece, "Erreur : il faut une espèce pour un équipement tribal !"
-            espece = self._espece.make()
-            assert isinstance(espece, mdl.Espece), f"Erreur : {self._espece} n'est pas une espèce !?"
+            _espece = self._espece.make()
+            assert isinstance(_espece, mdl.Espece), f"Erreur : {self._espece} n'est pas une espèce !?"
         else:
-            espece = None
-        equippement = mdl.equippements[(self.type_equippement, self.defensif, self.pv, self.pm, self.accelerateur, self.anoblisseur, self.elementaire, self.tribal)](mdl.NOWHERE, self.poids[niveau], self.frottements[niveau], self._degats[niveau] if self.defensif else 0, self._pv[niveau] if self.pv else 0, self._pm[niveau] if self.pm else 0, self._vitesse[niveau] if self.accelerateur else 0, self._priorite[niveau] if self.anoblisseur else 0, self._element if self.elementaire else None, self._affinite[niveau] if self.elementaire else 0, espece, self._taux_stats[niveau] if self.tribal else 0)
-        equippement.nom = self.nom
-        equippement.fantome = self.fantome
-        return equippement
+            _espece = None
+        class EquippementNiveau(classe, mdl.Nomme):
+            """Un equippement."""
+            poids = self.poids[niveau]
+            frottements = self.frottements[niveau]
+            defensif = self.defensif
+            degats = self._degats[niveau] if self.defensif else 0
+            pv = self._pv[niveau] if self.pv else 0
+            pm = self._pm[niveau] if self.pm else 0
+            accelerateur = self._vitesse[niveau] if self.accelerateur else 0
+            anoblisseur = self._priorite[niveau] if self.anoblisseur else 0
+            element = self._element if self.elementaire else None
+            affinite = self._affinite[niveau] if self.elementaire else 0
+            espece = _espece
+            taux = self._taux_stats[niveau] if self.tribal else 0
+            fantome = self.fantome
+        EquippementNiveau.nom = self.nom
+        EquippementNiveau.niveau = niveau
+        return EquippementNiveau
 
     def set_dependances(self):
         if self._espece:

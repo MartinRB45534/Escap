@@ -5,7 +5,7 @@ import carte as crt
 
 # Imports des classes parentes
 from .magie import MagieDirigee, CibleCase, PorteeLimitee
-from ...entitee import projectiles, ProjectileMagique
+from ...entitee import projectiles_magiques, ProjectileMagique
 from ...commons import Element
 
 # Imports utilisés uniquement dans les annotations
@@ -26,9 +26,7 @@ class InvocationProjectile(MagieDirigee):
     fantome: bool
     def __init__(self,skill:Actif,agissant:Agissant):
         MagieDirigee.__init__(self,skill,agissant)
-        classe = projectiles[
-            (self.percant, self.fleche, self.explosif, False, True)
-            ]
+        classe = projectiles_magiques[(self.percant, self.fleche, self.explosif)]
         assert issubclass(classe, ProjectileMagique)
         self.projectile = classe(self.poids, self.frottements,
                                  self.portee, self.degats, self.element,
