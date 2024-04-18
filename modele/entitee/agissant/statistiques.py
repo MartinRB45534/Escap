@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 
 class Statistiques:
     """Les statistiques d'un agissant."""
-    def __init__(self,possesseur:Agissant, priorite:float, vitesse:float, force:float, pv:float, regen_pv_max:float, regen_pv_min:float, restauration_regen_pv:float, pm:float, regen_pm:float, affinites:dict[Element,float], immunites:set[Element], non_contagieux:dict[type[Maladie]|FamilleMaladie,float], non_infectable:dict[type[Maladie]|FamilleMaladie,float], non_affecte:dict[type[Maladie]|FamilleMaladie,float]):
+    def __init__(self,possesseur:Agissant, priorite:float, vitesse:float, force:float, pv:float, regen_pv_max:float, regen_pv_min:float, restauration_regen_pv:float, pm:float, regen_pm:float, affinites:dict[Element,float], immunites:set[Element], non_contagieux:dict[str,float], non_infectable:dict[str,float], non_affecte:dict[str,float]):
         self.possesseur = possesseur #Entité possédant ces statistiques (utilisé pour chercher des effets par exemple)
 
         self.priorite = priorite #La priorité sert à bloquer ou forcer certaines actions (ex: le vol, l'instakill, etc.)
@@ -120,7 +120,7 @@ class Statistiques:
     
     def get_non_contagieux(self, maladie:type[Maladie]) -> float:
         """Retourne la priorité de l'immunité à la contagion de la maladie donnée."""
-        priorite = max(self.non_contagieux.get(maladie, 0), self.non_contagieux.get(maladie.famille, 0))
+        priorite = max(self.non_contagieux.get(maladie.nom, 0), self.non_contagieux.get(maladie.famille.nom, 0))
         for effet in self.possesseur.effets:
             if isinstance(effet, EffetNonContagieux):
                 if effet.maladie == maladie or effet.maladie == maladie.famille:
@@ -129,7 +129,7 @@ class Statistiques:
     
     def get_non_infectable(self, maladie:type[Maladie]) -> float:
         """Retourne la priorité de l'immunité à l'infection de la maladie donnée."""
-        priorite = max(self.non_infectable.get(maladie, 0), self.non_infectable.get(maladie.famille, 0))
+        priorite = max(self.non_infectable.get(maladie.nom, 0), self.non_infectable.get(maladie.famille.nom, 0))
         for effet in self.possesseur.effets:
             if isinstance(effet, EffetNonInfectable):
                 if effet.maladie == maladie or effet.maladie == maladie.famille:
@@ -138,7 +138,7 @@ class Statistiques:
     
     def get_non_affecte(self, maladie:type[Maladie]) -> float:
         """Retourne la priorité de l'immunité à l'effet de la maladie donnée."""
-        priorite = max(self.non_affecte.get(maladie, 0), self.non_affecte.get(maladie.famille, 0))
+        priorite = max(self.non_affecte.get(maladie.nom, 0), self.non_affecte.get(maladie.famille.nom, 0))
         for effet in self.possesseur.effets:
             if isinstance(effet, EffetNonAffecte):
                 if effet.maladie == maladie or effet.maladie == maladie.famille:
@@ -147,30 +147,30 @@ class Statistiques:
     
     def set_non_contagieux(self, maladie:type[Maladie]|FamilleMaladie, priorite:float):
         """Définit la priorité de l'immunité à la contagion de la maladie donnée."""
-        if priorite > self.non_contagieux.get(maladie, 0):
-            self.non_contagieux[maladie] = priorite
+        if priorite > self.non_contagieux.get(maladie.nom, 0):
+            self.non_contagieux[maladie.nom] = priorite
 
     def set_non_infectable(self, maladie:type[Maladie]|FamilleMaladie, priorite:float):
         """Définit la priorité de l'immunité à l'infection de la maladie donnée."""
-        if priorite > self.non_infectable.get(maladie, 0):
-            self.non_infectable[maladie] = priorite
+        if priorite > self.non_infectable.get(maladie.nom, 0):
+            self.non_infectable[maladie.nom] = priorite
 
     def set_non_affecte(self, maladie:type[Maladie]|FamilleMaladie, priorite:float):
         """Définit la priorité de l'immunité à l'effet de la maladie donnée."""
-        if priorite > self.non_affecte.get(maladie, 0):
-            self.non_affecte[maladie] = priorite
+        if priorite > self.non_affecte.get(maladie.nom, 0):
+            self.non_affecte[maladie.nom] = priorite
 
     def augmente_non_contagieux(self, maladie:type[Maladie]|FamilleMaladie, priorite:float):
         """Augmente la priorité de l'immunité à la contagion de la maladie donnée."""
-        self.set_non_contagieux(maladie, self.non_contagieux.get(maladie, 0) + priorite)
+        self.set_non_contagieux(maladie, self.non_contagieux.get(maladie.nom, 0) + priorite)
 
     def augmente_non_infectable(self, maladie:type[Maladie]|FamilleMaladie, priorite:float):
         """Augmente la priorité de l'immunité à l'infection de la maladie donnée."""
-        self.set_non_infectable(maladie, self.non_infectable.get(maladie, 0) + priorite)
+        self.set_non_infectable(maladie, self.non_infectable.get(maladie.nom, 0) + priorite)
 
     def augmente_non_affecte(self, maladie:type[Maladie]|FamilleMaladie, priorite:float):
         """Augmente la priorité de l'immunité à l'effet de la maladie donnée."""
-        self.set_non_affecte(maladie, self.non_affecte.get(maladie, 0) + priorite)
+        self.set_non_affecte(maladie, self.non_affecte.get(maladie.nom, 0) + priorite)
 
     def soigne(self, pv:float):
         """Soigne l'agissant de pv points de vie."""

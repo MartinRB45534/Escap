@@ -28,67 +28,36 @@ class BouclierNivele(EntiteeNivele):
         }
 
     niveles = {
-            "fantome": False,
             "poids": True,
             "frottements": True,
-            "bloque_quantite": False,
             "degats_bloques": True,
-            "bloque_proportion": False,
             "taux_degats": True,
-            "_espece": False,
-            "_taux_stats": True
+            "_taux_stats": True,
         }
 
     acceptors = {
-            "fantome": lambda _: True,
             "poids": lambda poids: float(poids) >= 0,
             "frottements": lambda frottements: float(frottements) >= 0,
-            "bloque_quantite": lambda _: True,
             "degats_bloques": lambda degats_bloques: float(degats_bloques) >= 0,
-            "bloque_proportion": lambda _: True,
             "taux_degats": lambda taux_degats: float(taux_degats) >= 0,
-            "tribal": lambda _: True,
             "_espece": lambda espece: espece in Especes.global_.trouve_stockage(Especes).all_noms,
-            "_taux_stats": lambda taux_stats: float(taux_stats) >= 0
+            "_taux_stats": lambda taux_stats: float(taux_stats) >= 0,
         }
 
     avertissements = {
-            "fantome": "Cet avertissement n'est pas censé apparaître.",
             "poids": "Le poids doit être positif.",
             "frottements": "Le frottement doit être positif.",
-            "bloque_quantite": "Cet avertissement n'est pas censé apparaître.",
             "degats_bloques": "La quantité de dégats bloqués doit être positive.",
-            "bloque_proportion": "Cet avertissement n'est pas censé apparaître.",
             "taux_degats": "Le taux de dégats bloqué doit être positif.",
-            "tribal": "Cet avertissement n'est pas censé apparaître non plus.",
             "_espece": "Il faut choisir une espèce existante (peut-être qu'il n'en existe pas).",
-            "_taux_stats": "Le taux de stats doit être positif."
+            "_taux_stats": "Le taux de stats doit être positif.",
         }
 
     conditionnels = {
-            "fantome": lambda dictionnaire: True,
-            "poids": lambda dictionnaire: True,
-            "frottements": lambda dictionnaire: True,
-            "bloque_quantite": lambda dictionnaire: True,
             "degats_bloques": lambda dictionnaire: dictionnaire["bloque_quantite"]=="True",
-            "bloque_proportion": lambda dictionnaire: True,
             "taux_degats": lambda dictionnaire: dictionnaire["bloque_proportion"]=="True",
-            "tribal": lambda dictionnaire: True,
             "_espece": lambda dictionnaire: dictionnaire["tribal"]=="True",
-            "_taux_stats": lambda dictionnaire: dictionnaire["tribal"]=="True"
-        }
-
-    multiple = {
-            "fantome": False,
-            "poids": False,
-            "frottements": False,
-            "bloque_quantite": False,
-            "degats_bloques": False,
-            "bloque_proportion": False,
-            "taux_degats": False,
-            "tribal": False,
-            "_espece": False,
-            "_taux_stats": False
+            "_taux_stats": lambda dictionnaire: dictionnaire["tribal"]=="True",
         }
 
     def __init__(self, nom: str, fantome: bool,

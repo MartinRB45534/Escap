@@ -9,12 +9,13 @@ import random
 
 # Imports des classes parentes
 from .maladie import Maladie
-from ...statistiques import EffetStats, EffetForce, EffetVision, EffetPv, EffetPm, EffetVitesse, EffetAffinite
+from ...statistiques import EffetStats, EffetForce, EffetVision, EffetPv, EffetPm, EffetVitesse, EffetAffinites
 from ...timings import OnDebutTourAgissant
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from .....entitee import Agissant
+    from .....commons import Element
 
 class Tirgnonose(Maladie, OnDebutTourAgissant):
     """Une maladie qui grignote (tirgnone) les pvs de l'agissant."""
@@ -51,10 +52,13 @@ class FibaluseVitesse(Fibaluse, EffetVitesse):
     def modifie_vitesse(self, vitesse: float) -> float:
         return max(0, vitesse - self._virulence)
 
-class FibaluseAffinite(Fibaluse, EffetAffinite):
+class FibaluseAffinite(Fibaluse, EffetAffinites):
     """Une maladie qui rend faible (fibale) l'agissant en diminuant son affinité à un élément."""
-    def modifie_affinite(self, affinite: float) -> float:
-        return max(0, affinite - self._virulence)
+    elements: set[Element]
+    def modifie_affinite(self, affinite: float, elements: Element) -> float:
+        if elements in self.elements:
+            return max(0, affinite - self._virulence)
+        return affinite
 
 class Ibsutiomialgie(Maladie, OnDebutTourAgissant):
     """Une maladie qui peut tuer l'agissant de façon subite (ibsute)."""

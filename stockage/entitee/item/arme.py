@@ -28,72 +28,38 @@ class ArmeNivele(EntiteeNivele):
             "tranchant": float,
             "tribal": bool,
             "_espece": Especes,
-            "_taux_stats": float
+            "_taux_stats": float,
         }
 
     niveles = {
-            "fantome": False,
-            "element": False,
             "poids": True,
             "frottements": True,
-            "type_arme": False,
             "portee": True,
             "tranchant": True,
-            "tribal": False,
-            "_espece": False,
-            "_taux_stats": True
+            "_taux_stats": True,
         }
 
     acceptors = {
-            "fantome": lambda _: True,
-            "element": lambda _: True,
             "poids": lambda poids: float(poids) >= 0,
             "frottements": lambda frottements: float(frottements) >= 0,
-            "type_arme": lambda _: True,
             "portee": lambda portee: float(portee) >= 0,
             "tranchant": lambda tranchant: float(tranchant) >= 0,
-            "tribal": lambda _: True,
             "_espece": lambda espece: espece in Especes.global_.trouve_stockage(Especes).all_noms,
-            "_taux_stats": lambda taux_stats: float(taux_stats) >= 0
+            "_taux_stats": lambda taux_stats: float(taux_stats) >= 0,
         }
 
     avertissements = {
-            "fantome": "Cet avertissement n'est pas censé apparaître.",
-            "element": "Cet avertissement n'est pas censé apparaître non plus.",
             "poids": "Le poids doit être positif.",
             "frottements": "Le frottement doit être positif.",
-            "type_arme": "Cet avertissement n'est pas censé apparaître.",
             "portee": "La portée doit être positive.",
             "tranchant": "Le tranchant doit être positif.",
-            "tribal": "Cet avertissement n'est pas censé apparaître non plus.",
             "_espece": "Il faut choisir une espèce existante (peut-être qu'il n'en existe pas).",
-            "_taux_stats": "Le taux de stats doit être positif."
+            "_taux_stats": "Le taux de stats doit être positif.",
         }
 
     conditionnels = {
-            "fantome": lambda dictionnaire: True,
-            "element": lambda dictionnaire: True,
-            "poids": lambda dictionnaire: True,
-            "frottements": lambda dictionnaire: True,
-            "type_arme": lambda dictionnaire: True,
-            "portee": lambda dictionnaire: True,
-            "tranchant": lambda dictionnaire: True,
-            "tribal": lambda dictionnaire: True,
             "_espece": lambda dictionnaire: dictionnaire["tribal"]=="True",
             "_taux_stats": lambda dictionnaire: dictionnaire["tribal"]=="True"
-        }
-
-    multiple = {
-            "fantome": False,
-            "element": False,
-            "poids": False,
-            "frottements": False,
-            "type_arme": False,
-            "portee": False,
-            "tranchant": False,
-            "tribal": False,
-            "_espece": False,
-            "_taux_stats": False
         }
 
     def __init__(self, nom: str, fantome: bool,

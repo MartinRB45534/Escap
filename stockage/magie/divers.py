@@ -18,7 +18,7 @@ class MagieBlizzardNivelee(MagieNivele):
         "cout_pm": float,
         "portee": float,
         "duree": float,
-        "gain_latence": float
+        "gain_latence": float,
     }
 
     niveles = {
@@ -27,7 +27,7 @@ class MagieBlizzardNivelee(MagieNivele):
         "cout_pm": True,
         "portee": True,
         "duree": True,
-        "gain_latence": True
+        "gain_latence": True,
     }
 
     acceptors = {
@@ -36,7 +36,7 @@ class MagieBlizzardNivelee(MagieNivele):
         "cout_pm": lambda cout_pm: float(cout_pm) >= 0,
         "portee": lambda portee: float(portee) >= 0,
         "duree": lambda duree: float(duree) >= 0,
-        "gain_latence": lambda gain_latence: float(gain_latence) >= 0
+        "gain_latence": lambda gain_latence: float(gain_latence) >= 0,
     }
 
     avertissements = {
@@ -45,25 +45,7 @@ class MagieBlizzardNivelee(MagieNivele):
         "cout_pm": "Le coût en points de mana doit être positif.",
         "portee": "La portée doit être positive.",
         "duree": "La durée doit être positive.",
-        "gain_latence": "Le gain de latence doit être positif."
-    }
-
-    conditionnels = {
-        "latence": lambda dictionnaire: True,
-        "gain_xp": lambda dictionnaire: True,
-        "cout_pm": lambda dictionnaire: True,
-        "portee": lambda dictionnaire: True,
-        "duree": lambda dictionnaire: True,
-        "gain_latence": lambda dictionnaire: True
-    }
-
-    multiple = {
-        "latence": False,
-        "gain_xp": False,
-        "cout_pm": False,
-        "portee": False,
-        "duree": False,
-        "gain_latence": False
+        "gain_latence": "Le gain de latence doit être positif.",
     }
 
     def __init__(self, nom: str, latence: list[float], gain_xp: list[float],
@@ -125,7 +107,7 @@ class MagieObscuriteNivelee(MagieNivele):
         "cout_pm": float,
         "portee": float,
         "duree": float,
-        "gain_opacite": float
+        "gain_opacite": float,
     }
 
     niveles = {
@@ -134,7 +116,7 @@ class MagieObscuriteNivelee(MagieNivele):
         "cout_pm": True,
         "portee": True,
         "duree": True,
-        "gain_opacite": True
+        "gain_opacite": True,
     }
 
     acceptors = {
@@ -143,7 +125,7 @@ class MagieObscuriteNivelee(MagieNivele):
         "cout_pm": lambda cout_pm: float(cout_pm) >= 0,
         "portee": lambda portee: float(portee) >= 0,
         "duree": lambda duree: float(duree) >= 0,
-        "gain_opacite": lambda gain_opacite: float(gain_opacite) >= 0
+        "gain_opacite": lambda gain_opacite: float(gain_opacite) >= 0,
     }
 
     avertissements = {
@@ -152,25 +134,7 @@ class MagieObscuriteNivelee(MagieNivele):
         "cout_pm": "Le coût en points de mana doit être positif.",
         "portee": "La portée doit être positive.",
         "duree": "La durée doit être positive.",
-        "gain_opacite": "Le gain d'opacité doit être positif."
-    }
-
-    conditionnels = {
-        "latence": lambda dictionnaire: True,
-        "gain_xp": lambda dictionnaire: True,
-        "cout_pm": lambda dictionnaire: True,
-        "portee": lambda dictionnaire: True,
-        "duree": lambda dictionnaire: True,
-        "gain_opacite": lambda dictionnaire: True
-    }
-
-    multiple = {
-        "latence": False,
-        "gain_xp": False,
-        "cout_pm": False,
-        "portee": False,
-        "duree": False,
-        "gain_opacite": False
+        "gain_opacite": "Le gain d'opacité doit être positif.",
     }
 
     def __init__(self, nom: str, latence: list[float], gain_xp: list[float],
@@ -230,42 +194,28 @@ class MagieInstakillNivelee(MagieNivele):
         "latence": float,
         "gain_xp": float,
         "cout_pm": float,
-        "superiorite": float
+        "superiorite": float,
     }
 
     niveles = {
         "latence": True,
         "gain_xp": True,
         "cout_pm": True,
-        "superiorite": True
+        "superiorite": True,
     }
 
     acceptors = {
         "latence": lambda latence: float(latence) >= 0,
         "gain_xp": lambda gain_xp: float(gain_xp) >= 0,
         "cout_pm": lambda cout_pm: float(cout_pm) >= 0,
-        "superiorite": lambda superiorite: float(superiorite) >= 0
+        "superiorite": lambda superiorite: float(superiorite) >= 0,
     }
 
     avertissements = {
         "latence": "La latence doit être positive.",
         "gain_xp": "Le gain d'expérience doit être positif.",
         "cout_pm": "Le coût en points de mana doit être positif.",
-        "superiorite": "La supériorité doit être positive."
-    }
-
-    conditionnels = {
-        "latence": lambda dictionnaire: True,
-        "gain_xp": lambda dictionnaire: True,
-        "cout_pm": lambda dictionnaire: True,
-        "superiorite": lambda dictionnaire: True
-    }
-
-    multiple = {
-        "latence": False,
-        "gain_xp": False,
-        "cout_pm": False,
-        "superiorite": False
+        "superiorite": "La supériorité doit être positive.",
     }
 
     def __init__(self, nom: str, latence: list[float], gain_xp: list[float],
@@ -315,37 +265,25 @@ class MagieTeleportationNivelee(MagieNivele):
     champs = {
         "latence": float,
         "gain_xp": float,
-        "cout_pm": float
+        "cout_pm": float,
     }
 
     niveles = {
         "latence": True,
         "gain_xp": True,
-        "cout_pm": True
+        "cout_pm": True,
     }
 
     acceptors = {
         "latence": lambda latence: float(latence) >= 0,
         "gain_xp": lambda gain_xp: float(gain_xp) >= 0,
-        "cout_pm": lambda cout_pm: float(cout_pm) >= 0
+        "cout_pm": lambda cout_pm: float(cout_pm) >= 0,
     }
 
     avertissements = {
         "latence": "La latence doit être positive.",
         "gain_xp": "Le gain d'expérience doit être positif.",
-        "cout_pm": "Le coût en points de mana doit être positif."
-    }
-
-    conditionnels = {
-        "latence": lambda dictionnaire: True,
-        "gain_xp": lambda dictionnaire: True,
-        "cout_pm": lambda dictionnaire: True
-    }
-
-    multiple = {
-        "latence": False,
-        "gain_xp": False,
-        "cout_pm": False
+        "cout_pm": "Le coût en points de mana doit être positif.",
     }
 
     def __init__(self, nom: str, latence: list[float], gain_xp: list[float],

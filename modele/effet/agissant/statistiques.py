@@ -49,6 +49,12 @@ class EffetAffinite(EffetAgissant):
         """Modifie l'affinité à l'élément de l'agissant."""
         raise NotImplementedError
 
+class EffetAffinites(EffetAgissant):
+    """Effet qui modifie les affinités à plusieurs éléments."""
+    def modifie_affinite(self, affinite:float, elements:Element) -> float:
+        """Modifie l'affinité à l'élément de l'agissant."""
+        raise NotImplementedError
+
 class EffetStats(EffetAgissant):
     """Effet qui modifie toutes les statistiques."""
     def modifie_stats(self, stat:float) -> float:

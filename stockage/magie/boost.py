@@ -19,57 +19,35 @@ class MagieBoostNivele(MagieNivele):
             "gain_xp": float,
             "cout": float,
             "taux_degats": float,
-            "duree": float
+            "duree": float,
         }
 
     niveles = {
-            "cible": False,
-            "cible_multiple": False,
             "latence": True,
             "gain_xp": True,
             "cout": True,
             "taux_degats": True,
-            "duree": True
+            "duree": True,
         }
 
     acceptors = {
-            "cible": lambda _: True,
-            "cible_multiple": lambda _: True,
             "latence": lambda latence: float(latence) >= 0,
             "gain_xp": lambda gain_xp: float(gain_xp) >= 0,
             "cout": lambda cout: float(cout) >= 0,
             "taux_degats": lambda taux_degats: float(taux_degats) >= 0,
-            "duree": lambda duree: float(duree) >= 0
+            "duree": lambda duree: float(duree) >= 0,
         }
 
     avertissements = {
-            "cible": "Cet avertissement n'est pas censé apparaître.",
-            "cible_multiple": "Cet avertissement n'est pas censé apparaître.",
             "latence": "La latence doit être positive.",
             "gain_xp": "Le gain d'expérience doit être positif.",
             "cout": "Le coût doit être positif.",
             "taux_degats": "Le taux de dégâts doit être positif.",
-            "duree": "La durée doit être positive."
+            "duree": "La durée doit être positive.",
         }
 
     conditionnels = {
-            "cible": lambda dictionnaire: True,
             "cible_multiple": lambda dictionnaire: dictionnaire["cible"]=="True",
-            "latence": lambda dictionnaire: True,
-            "gain_xp": lambda dictionnaire: True,
-            "cout": lambda dictionnaire: True,
-            "taux_degats": lambda dictionnaire: True,
-            "duree": lambda dictionnaire: True
-        }
-
-    multiple = {
-            "cible": False,
-            "cible_multiple": False,
-            "latence": False,
-            "gain_xp": False,
-            "cout": False,
-            "taux_degats": False,
-            "duree": False
         }
 
     def __init__(self, nom: str, cible: bool, cible_multiple: bool, latence: list[float],

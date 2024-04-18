@@ -35,20 +35,23 @@ class StockageUnique(Stockage):
         Stockage.__init__(self, nom)
         self.dependants: set[StockageUnique|StockageNivele] = set()
 
-    champs: dict[str, type[int|str|float|bool|StrEnum]]
+    champs: dict[str, type[int|str|float|bool|StrEnum|StockageCategorieUnique|StockageCategorieNivelee|StockageSurCategorie]]
     """Retourne les champs de l'objet."""
 
-    acceptors: dict[str, Callable[[str], bool]]
-    """Retourne les fonctions de vérification des champs."""
+    acceptors: dict[str, Callable[[str], bool]] = {}
+    """Retourne les fonctions de vérification des champs. Si le champ n'est pas dans acceptors, il est accepté."""
 
-    avertissements: dict[str, str]
-    """Retourne les avertissements des champs."""
+    avertissements: dict[str, str] = {}
+    """Retourne les avertissements des champs. Si le champ n'est pas dans avertissements, l'avertissement est "Cet averissement ne devrait pas apparaître." """
 
-    conditionnels: dict[str, Callable[[dict[str, str|list[str]]], bool]]
-    """Retourne les fonctions qui déterminent les champs à afficher."""
+    conditionnels: dict[str, Callable[[dict[str, str|list[str]]], bool]] = {}
+    """Retourne les fonctions qui déterminent les champs à afficher. Si le champ n'est pas dans conditionnels, il est toujours affiché."""
 
-    multiple: dict[str, bool]
-    """Retourne si les champs sont multiples. Seuls certains champs peuvent être multiples."""
+    multiple: dict[str, bool] = {}
+    """Retourne si les champs sont multiples. Seuls certains champs peuvent être multiples. Si le champ n'est pas dans multiple, il n'est pas multiple."""
+
+    comultiple: dict[str, list[str]] = {}
+    """Retourne le champ avec lequel le champ est multiple. Si le champ n'est pas dans comultiple, il n'est pas multiple avec un autre champ."""
 
     def make(self) -> object:
         """Retourne l'objet correspondant."""
@@ -67,23 +70,26 @@ class StockageNivele(Stockage):
         self.dependants: set[StockageUnique|StockageNivele] = set()
         self.classe = None
 
-    champs: dict[str, type[int|str|float|bool|StrEnum|StockageCategorieUnique|StockageCategorieNivelee|StockageSurCategorie]] = NotImplemented
+    champs: dict[str, type[int|str|float|bool|StrEnum|StockageCategorieUnique|StockageCategorieNivelee|StockageSurCategorie]]
     """Retourne les champs de l'objet."""
 
-    niveles: dict[str, bool] = NotImplemented
-    """Retourne si les champs sont niveles."""
+    niveles: dict[str, bool] = {}
+    """Retourne si les champs sont niveles. Si le champ n'est pas dans niveles, il n'est pas nivele."""
 
-    acceptors: dict[str, Callable[[str], bool]] = NotImplemented
-    """Retourne les fonctions de vérification des champs."""
+    acceptors: dict[str, Callable[[str], bool]] = {}
+    """Retourne les fonctions de vérification des champs. Si le champ n'est pas dans acceptors, il est accepté."""
 
-    avertissements: dict[str, str] = NotImplemented
-    """Retourne les avertissements des champs."""
+    avertissements: dict[str, str] = {}
+    """Retourne les avertissements des champs. Si le champ n'est pas dans avertissements, l'avertissement est "Cet averissement ne devrait pas apparaître." """
 
-    conditionnels: dict[str, Callable[[dict[str, str|list[str]]], bool]] = NotImplemented
-    """Retourne les fonctions qui déterminent les champs à afficher."""
+    conditionnels: dict[str, Callable[[dict[str, str|list[str]]], bool]] = {}
+    """Retourne les fonctions qui déterminent les champs à afficher. Si le champ n'est pas dans conditionnels, il est toujours affiché."""
 
-    multiple: dict[str, bool] = NotImplemented
-    """Retourne si les champs sont multiples. Seuls certains champs peuvent être multiples."""
+    multiple: dict[str, bool] = {}
+    """Retourne si les champs sont multiples. Seuls certains champs peuvent être multiples. Si le champ n'est pas dans multiple, il n'est pas multiple."""
+
+    comultiple: dict[str, list[str]] = {}
+    """Retourne le champ avec lequel le champ est multiple. Si le champ n'est pas dans comultiple, il n'est pas multiple avec un autre champ."""
 
     def make(self, niveau: int) -> type:
         """Retourne l'objet correspondant."""

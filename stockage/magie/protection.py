@@ -28,78 +28,39 @@ class MagieProtectionNivelee(MagieNivele):
         }
 
     niveles = {
-            "cible": False,
-            "cible_multiple": False,
-            "zone": False,
             "latence": True,
             "gain_xp": True,
             "cout_pm": True,
             "duree": True,
             "pv": True,
-            "portee": False,
-            "resistance_elementaire": False,
-            "element": False,
-            "taux_pv": True
+            "taux_pv": True,
         }
 
     acceptors = {
-            "cible": lambda _: True,
-            "cible_multiple": lambda _: True,
-            "zone": lambda _: True,
             "latence": lambda latence: float(latence) >= 0,
             "gain_xp": lambda gain_xp: float(gain_xp) >= 0,
             "cout_pm": lambda cout_pm: float(cout_pm) >= 0,
             "duree": lambda duree: float(duree) >= 0,
             "pv": lambda pv: float(pv) >= 0,
             "portee": lambda portee: float(portee) >= 0,
-            "resistance_elementaire": lambda _: True,
-            "element": lambda element: True,
-            "taux_pv": lambda taux_pv: 0 <= float(taux_pv) <= 1
+            "taux_pv": lambda taux_pv: 0 <= float(taux_pv) <= 1,
         }
 
     avertissements = {
-            "cible": "Cet avertissement n'est pas censé apparaître.",
-            "cible_multiple": "Cet avertissement n'est pas censé apparaître.",
-            "zone": "Cet avertissement n'est pas censé apparaître.",
             "latence": "La latence doit être positive.",
             "gain_xp": "Le gain d'expérience doit être positif.",
             "cout_pm": "Le coût en points de mana doit être positif.",
             "duree": "La durée doit être positive.",
             "pv": "Le gain de points de vie doit être positif.",
             "portee": "La portée doit être positive.",
-            "resistance_elementaire": "Cet avertissement n'est pas censé apparaître.",
-            "element": "Cet avertissement n'est pas censé apparaître.",
-            "taux_pv": "Le taux de points de vie doit être compris entre 0 et 1."
+            "taux_pv": "Le taux de points de vie doit être compris entre 0 et 1.",
         }
 
     conditionnels = {
-            "cible": lambda dictionnaire: True,
-            "cible_multiple": lambda dictionnaire: True,
             "zone": lambda dictionnaire: dictionnaire["cible"]=="False" and dictionnaire["cible_multiple"]=="False",
-            "latence": lambda dictionnaire: True,
-            "gain_xp": lambda dictionnaire: True,
-            "cout_pm": lambda dictionnaire: True,
-            "duree": lambda dictionnaire: True,
-            "pv": lambda dictionnaire: True,
             "portee": lambda dictionnaire: dictionnaire["zone"]=="True",
-            "resistance_elementaire": lambda dictionnaire: True,
             "element": lambda dictionnaire: dictionnaire["resistance_elementaire"]=="True",
             "taux_pv": lambda dictionnaire: dictionnaire["resistance_elementaire"]=="True"
-        }
-
-    multiple = {
-            "cible": False,
-            "cible_multiple": False,
-            "zone": False,
-            "latence": False,
-            "gain_xp": False,
-            "cout_pm": False,
-            "duree": False,
-            "pv": False,
-            "portee": False,
-            "resistance_elementaire": False,
-            "element": False,
-            "taux_pv": False
         }
 
     def __init__(self, nom: str, cible: bool, cible_multiple: bool, zone: bool,

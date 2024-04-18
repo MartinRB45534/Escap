@@ -19,21 +19,23 @@ if TYPE_CHECKING:
 
 class FamilleMaladie:
     """Une famille qui regroupe plusieurs maladies."""
-    maladies:set[type[Maladie]]
-    def __init__(self, maladies:set[type[Maladie]]):
-        self.maladies = maladies
+    def __init__(self, nom:str):
+        self.nom = nom
 
 class Maladie(OnFinTourAgissant, Nomme):
     """L'effet de maladie. Applique un déboost à l'agissant. Peut se transmettre aux voisins. Il existe différentes maladies."""
+    famille:FamilleMaladie
     contagiosite:float
     infectabilite:float
     persistence:float
     distance:float
     virulence:float
-    famille:FamilleMaladie
     perte_contagiosite:float
     perte_infectabilite:float
     perte_persistence:float
+    perte_contagiosite_famille:float
+    perte_infectabilite_famille:float
+    perte_persistence_famille:float
     guerit_sans_contagiosite:bool
     guerit_sans_infectabilite:bool
     guerit_sans_persistence:bool
@@ -47,6 +49,9 @@ class Maladie(OnFinTourAgissant, Nomme):
         agissant.statistiques.augmente_non_contagieux(self.__class__,self.perte_contagiosite)
         agissant.statistiques.augmente_non_infectable(self.__class__,self.perte_infectabilite)
         agissant.statistiques.augmente_non_affecte(self.__class__,self.perte_persistence)
+        agissant.statistiques.augmente_non_contagieux(self.famille,self.perte_contagiosite_famille)
+        agissant.statistiques.augmente_non_infectable(self.famille,self.perte_infectabilite_famille)
+        agissant.statistiques.augmente_non_affecte(self.famille,self.perte_persistence_famille)
         self.set_virulence(agissant)
         if (
             (self.guerit_sans_contagiosite or self.contagieux(agissant) == 0) and

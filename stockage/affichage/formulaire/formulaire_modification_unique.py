@@ -34,6 +34,11 @@ class FormulaireModificationUnique(FormulaireUnique, af.NoeudVertical):
                 for attr in list(getattr(objet, key)[0]):
                     input_[-1].valeur = str(attr)
                     input_.append(self.get_multiple_input(stockage.champs[key], stockage.acceptors[key]))
+            elif key in sum([stockage.comultiple[key] for key in stockage.comultiple], []): # type: ignore # Pylance wants me to specify the type if that empty list smh
+                assert isinstance(input_, list)
+                for attr in list(getattr(objet, key)):
+                    input_[-1].valeur = str(attr)
+                    input_.append(self.get_input(stockage.champs[key], stockage.acceptors[key]))
             else:
                 assert not isinstance(input_, list)
                 input_.valeur = str(getattr(objet, key))

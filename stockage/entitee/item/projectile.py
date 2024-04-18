@@ -22,67 +22,30 @@ class ProjectileSimpleNivele(EntiteeNivele):
         "poids": float,
         "frottements": float,
         "portee": float,
-        "degats": float
+        "degats": float,
     }
 
     niveles = {
-        "fantome": False,
-        "percant": False,
-        "fleche": False,
-        "explosif": False,
-        "element": False,
         "poids": True,
         "frottements": True,
         "portee": True,
-        "degats": True
+        "degats": True,
     }
 
     acceptors = {
-        "fantome": lambda _: True,
-        "percant": lambda _: True,
-        "fleche": lambda _: True,
-        "explosif": lambda _: True,
         "element": lambda element: element in mdl.Element,
         "poids": lambda poids: float(poids) >= 0,
         "frottements": lambda frottements: float(frottements) >= 0,
         "portee": lambda portee: float(portee) >= 0,
-        "degats": lambda degats: float(degats) >= 0
+        "degats": lambda degats: float(degats) >= 0,
     }
 
     avertissements = {
-        "fantome": "Cet avertissement n'est pas censé apparaître.",
-        "percant": "Cet avertissement n'est pas censé apparaître.",
-        "fleche": "Cet avertissement n'est pas censé apparaître.",
-        "explosif": "Cet avertissement n'est pas censé apparaître.",
         "element": "Choisissez un élément.",
         "poids": "Le poids doit être positif.",
         "frottements": "Le frottement doit être positif.",
         "portee": "La portée doit être positive.",
-        "degats": "Les dégats doivent être positifs."
-    }
-
-    conditionnels = {
-        "fantome": lambda dictionnaire: True,
-        "percant": lambda dictionnaire: True,
-        "fleche": lambda dictionnaire: True,
-        "explosif": lambda dictionnaire: True,
-        "element": lambda dictionnaire: True,
-        "poids": lambda dictionnaire: True,
-        "frottements": lambda dictionnaire: True,
-        "portee": lambda dictionnaire: True,
-        "degats": lambda dictionnaire: True
-    }
-
-    multiple = {
-        "fantome": False,
-        "percant": False,
-        "fleche": False,
-        "explosif": False,
-        "element": False,
-        "poids": False,
-        "frottements": False,
-        "portee": False,
-        "degats": False
+        "degats": "Les dégats doivent être positifs.",
     }
 
     def __init__(self, nom: str, fantome: bool,

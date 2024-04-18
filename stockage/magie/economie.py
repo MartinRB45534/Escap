@@ -15,37 +15,25 @@ class MagieReserveNivelee(MagieNivele):
     champs = {
             "latence": float,
             "gain_xp": float,
-            "taux_pm": float
+            "taux_pm": float,
         }
 
     niveles = {
             "latence": True,
             "gain_xp": True,
-            "taux_pm": True
+            "taux_pm": True,
         }
 
     acceptors = {
             "latence": lambda latence: float(latence) >= 0,
             "gain_xp": lambda gain_xp: float(gain_xp) >= 0,
-            "taux_pm": lambda taux_pm: 0 <= float(taux_pm) <= 1
+            "taux_pm": lambda taux_pm: 0 <= float(taux_pm) <= 1,
         }
 
     avertissements = {
             "latence": "La latence doit être positive.",
             "gain_xp": "Le gain d'expérience doit être positif.",
-            "taux_pm": "Le taux de points de mana doit être compris entre 0 et 1."
-        }
-
-    conditionnels = {
-            "latence": lambda dictionnaire: True,
-            "gain_xp": lambda dictionnaire: True,
-            "taux_pm": lambda dictionnaire: True
-        }
-
-    multiple = {
-            "latence": False,
-            "gain_xp": False,
-            "taux_pm": False
+            "taux_pm": "Le taux de points de mana doit être compris entre 0 et 1.",
         }
 
     def __init__(self, nom: str, latence: list[float], gain_xp: list[float],
@@ -94,21 +82,21 @@ class MagieInvestissementNivelee(MagieNivele):
             "latence": float,
             "gain_xp": float,
             "taux_pm": float,
-            "duree": float
+            "duree": float,
         }
-    
+
     niveles = {
             "latence": True,
             "gain_xp": True,
             "taux_pm": True,
-            "duree": True
+            "duree": True,
         }
 
     acceptors = {
             "latence": lambda latence: float(latence) >= 0,
             "gain_xp": lambda gain_xp: float(gain_xp) >= 0,
             "taux_pm": lambda taux_pm: float(taux_pm) >= 1,
-            "duree": lambda duree: float(duree) >= 0
+            "duree": lambda duree: float(duree) >= 0,
         }
 
     avertissements = {
@@ -116,20 +104,6 @@ class MagieInvestissementNivelee(MagieNivele):
             "gain_xp": "Le gain d'expérience doit être positif.",
             "taux_pm": "Le taux d'invesstissement doit être supérieur ou égal à 1.",
             "duree": "La durée doit être positive."
-        }
-
-    conditionnels = {
-            "latence": lambda dictionnaire: True,
-            "gain_xp": lambda dictionnaire: True,
-            "taux_pm": lambda dictionnaire: True,
-            "duree": lambda dictionnaire: True
-        }
-
-    multiple = {
-            "latence": False,
-            "gain_xp": False,
-            "taux_pm": False,
-            "duree": False
         }
 
     def __init__(self, nom: str, latence: list[float], gain_xp: list[float],

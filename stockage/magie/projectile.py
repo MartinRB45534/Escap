@@ -26,92 +26,43 @@ class MagieProjectileNivelee(MagieNivele):
         "portee": float,
         "degats": float,
         "decentree": bool,
-        "portee_limite": float
+        "portee_limite": float,
     }
 
     niveles = {
         "latence": True,
         "gain_xp": True,
         "cout_pm": True,
-        "fantome": False,
-        "percant": False,
-        "fleche": False,
-        "explosif": False,
-        "element": False,
         "poids": True,
         "frottements": True,
         "portee": True,
         "degats": True,
-        "decentree": False,
-        "portee_limite": True
+        "portee_limite": True,
     }
 
     acceptors = {
         "latence": lambda latence: float(latence) >= 0,
         "gain_xp": lambda gain_xp: float(gain_xp) >= 0,
         "cout_pm": lambda cout_pm: float(cout_pm) >= 0,
-        "fantome": lambda _: True,
-        "percant": lambda _: True,
-        "fleche": lambda _: True,
-        "explosif": lambda _: True,
         "element": lambda element: element in mdl.Element,
         "poids": lambda poids: float(poids) >= 0,
         "frottements": lambda frottements: float(frottements) >= 0,
         "portee": lambda portee: float(portee) >= 0,
         "degats": lambda degats: float(degats) >= 0,
         "decentree": lambda _: True,
-        "portee_limite": lambda portee_limite: float(portee_limite) >= 0
+        "portee_limite": lambda portee_limite: float(portee_limite) >= 0,
     }
 
     avertissements = {
         "latence": "La latence doit être positive.",
         "gain_xp": "Le gain d'expérience doit être positif.",
         "cout_pm": "Le coût en points de mana doit être positif.",
-        "fantome": "Cet avertissement n'est pas censé apparaître.",
-        "percant": "Cet avertissement n'est pas censé apparaître.",
-        "fleche": "Cet avertissement n'est pas censé apparaître.",
-        "explosif": "Cet avertissement n'est pas censé apparaître.",
         "element": "Choisissez un élément.",
         "poids": "Le poids doit être positif.",
         "frottements": "Le frottement doit être positif.",
         "portee": "La portée doit être positive.",
         "degats": "Les dégats doivent être positifs.",
-        "decentree": "Cet avertissement n'est pas censé apparaître.",
-        "portee_limite": "La portée doit être positive."
-    }
-
-    conditionnels = {
-        "latence": lambda dictionnaire: True,
-        "gain_xp": lambda dictionnaire: True,
-        "cout_pm": lambda dictionnaire: True,
-        "fantome": lambda dictionnaire: True,
-        "percant": lambda dictionnaire: True,
-        "fleche": lambda dictionnaire: True,
-        "explosif": lambda dictionnaire: True,
-        "element": lambda dictionnaire: True,
-        "poids": lambda dictionnaire: True,
-        "frottements": lambda dictionnaire: True,
-        "portee": lambda dictionnaire: True,
-        "degats": lambda dictionnaire: True,
-        "decentree": lambda dictionnaire: True,
-        "portee_limite": lambda dictionnaire: True
-    }
-
-    multiple = {
-        "latence": False,
-        "gain_xp": False,
-        "cout_pm": False,
-        "fantome": False,
-        "percant": False,
-        "fleche": False,
-        "explosif": False,
-        "element": False,
-        "poids": False,
-        "frottements": False,
-        "portee": False,
-        "degats": False,
-        "decentree": False,
-        "portee_limite": False
+        "portee_limite": "La portée doit être positive.",
     }
 
     def __init__(self, nom: str, latence: list[float], gain_xp: list[float], cout_pm: list[float],

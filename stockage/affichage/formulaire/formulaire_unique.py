@@ -20,25 +20,22 @@ class FormulaireUnique(af.WrapperNoeud):
         self.stockage = stockage
 
         self.nom = ""
+        self.input_nom = af.TexteInput(acceptor=lambda nom: nom == self.nom or
+                                       self.stockage.global_.valide_nom(nom))
 
         self.textes:dict[str, af.Texte] = {
             "nom": af.Texte("Nom :"),
         }
         self.inputs:dict[str, af.TexteInput|af.BoutonOnOff|MenuEnum|
-                         list[af.TexteInput|MenuEnum]] = {
-            "nom": af.TexteInput(acceptor=lambda nom: nom == self.nom or 
-                                 self.stockage.global_.valide_nom(nom)),
+                         list[af.TexteInput|af.BoutonOnOff|MenuEnum]] = {
+            "nom": self.input_nom,
         }
         self.avertissements:dict[str, af.TexteCache] = {
             "nom": af.TexteCache(""),
         }
-        self.textes_avertissements:dict[str, str] = {
-            "nom": "Le nom doit être unique.",
-        }
 
         for key in stockage.champs:
-            self.form(key, stockage.champs[key], stockage.acceptors[key],
-                      stockage.avertissements[key], stockage.multiple[key])
+            self.form(key)
 
         self.bouton_ajouter = af.BoutonFonction(af.SKIN_SHADE, "Ajouter", self.ajouter)
 
@@ -56,29 +53,58 @@ class FormulaireUnique(af.WrapperNoeud):
 
     def make_contenu(self):
         """Met à jour le contenu de la liste."""
-        self.liste.set_contenu(
-            sum([
-                [texte, self.inputs[key], self.avertissements[key]]
-                for key, texte in self.textes.items()
-                if self.conditionnel(key)
-            ], []) # type: ignore # Pylance wants me to specify the type of that empty list smh
-            + [self.bouton_ajouter]
-        )
+        contenu:list[af.Affichable] = [
+            self.textes["nom"],
+            self.input_nom,
+            self.avertissements["nom"],
+        ]
+        for key in self.stockage.champs:
+            if self.conditionnel(key):
+                contenu.append(self.textes[key])
+                input_ = self.inputs[key]
+                if self.stockage.multiple.get(key, False):
+                    assert isinstance(input_, list)
+                    noms_comultiples = self.stockage.comultiple.get(key, [])
+                    comultiples: list[list[af.TexteInput|af.BoutonOnOff|MenuEnum]] = []
+                    for nom_comultiple in noms_comultiples:
+                        input_comultiple = self.inputs[nom_comultiple]
+                        assert isinstance(input_comultiple, list)
+                        comultiples.append(input_comultiple)
+                    for i, inp in enumerate(input_[:-1]):
+                        contenu.append(inp)
+                        for j, comultiple in enumerate(comultiples):
+                            contenu.append(self.textes[noms_comultiples[j]])
+                            contenu.append(comultiple[i])
+                            contenu.append(self.avertissements[noms_comultiples[j]])
+                    contenu.append(input_[-1])
+                else:
+                    assert isinstance(input_, af.TexteInput|af.BoutonOnOff|MenuEnum)
+                    contenu.append(input_)
+                contenu.append(self.avertissements[key])
+        contenu.append(self.bouton_ajouter)
+        self.liste.set_contenu(contenu)
 
     def to_dict(self) -> dict[str, str|list[str]]:
         """Retourne un dictionnaire avec les valeurs des champs."""
-        return {
-            key:
-            [inp.valeur for inp in input_] # pylint: disable=not-an-iterable # I know it's an iterable, it's a list
-            if isinstance(input_, list) # like seriously, why can't pylance just read this line?
-            else input_.valeur
-            for key, input_
-            in self.inputs.items()
+        dict_:dict[str, str|list[str]] = {
+            "nom": self.input_nom.valeur,
         }
+        for key in self.stockage.champs:
+            input_ = self.inputs[key]
+            if key in sum([self.stockage.comultiple[key_] for key_ in self.stockage.comultiple], []): # type: ignore # Pylance wants me to specify the type of that empty list smh
+                assert isinstance(input_, list)
+                dict_[key] = [inp.valeur for inp in input_]
+            elif self.stockage.multiple.get(key, False):
+                assert isinstance(input_, list)
+                dict_[key] = [inp.valeur for inp in input_[:-1]]
+            else:
+                assert isinstance(input_, af.TexteInput|af.BoutonOnOff|MenuEnum)
+                dict_[key] = input_.valeur
+        return dict_
 
     def conditionnel(self, key:str) -> bool:
-        """Retourne si le champ est conditionnel."""
-        return key == "nom" or self.stockage.conditionnels[key](self.to_dict())
+        """Retourne si le champ doit être affiché."""
+        return key == "nom" or self.stockage.conditionnels.get(key, lambda _: True)(self.to_dict())
 
     def get_input(self, type_: type[int|str|float|bool|StrEnum|StockageCategorieUnique|StockageCategorieNivelee|StockageSurCategorie],
                   acceptor: Callable[[str], bool]) -> af.TexteInput|af.BoutonOnOff|MenuEnum:
@@ -116,19 +142,21 @@ class FormulaireUnique(af.WrapperNoeud):
         else:
             raise TypeError(f"Le type {type_} n'est pas supporté.")
 
-    def form(self, nom:str, type_: type[int|str|float|bool|StrEnum|StockageCategorieUnique|StockageCategorieNivelee|StockageSurCategorie],
-             acceptor: Callable[[str], bool], avertissement:str, multiple: bool):
+    def form(self, nom:str):
         """Ajoute un champ."""
         self.textes[nom] = af.Texte(nom)
-        if multiple:
-            if type_ in (int, float, bool):
+        type_ = self.stockage.champs[nom]
+        acceptor = self.stockage.acceptors.get(nom, lambda _: True)
+        if nom in sum(self.stockage.comultiple.values(), []): # type: ignore # Pylance wants me to specify the type of that empty list smh
+            self.inputs[nom] = []
+        elif self.stockage.multiple.get(nom, False):
+            if type_ in (int, float, bool): # Il faut que le champs puisse avoir une absence de valeur
                 raise ValueError(
                     f"Input {nom} est un champ {type_}, il ne peut pas être multiple !")
             self.inputs[nom] = [self.get_multiple_input(type_, acceptor)]
         else:
             self.inputs[nom] = self.get_input(type_, acceptor)
         self.avertissements[nom] = af.TexteCache("")
-        self.textes_avertissements[nom] = avertissement
 
     def check_avertissements(self):
         """Met à jour les avertissements"""
@@ -138,7 +166,7 @@ class FormulaireUnique(af.WrapperNoeud):
                 if isinstance(input_, list):
                     for inp in input_: # pylint: disable=not-an-iterable # I know it's an iterable, it's a list
                         if not inp.accepte:
-                            self.avertissements[key].set_texte(self.textes_avertissements[key])
+                            self.avertissements[key].set_texte(self.stockage.avertissements.get(key, "Cet avertissement ne devrait pas apparaître."))
                             break
                 elif not input_.accepte:
                     if key == "nom":
@@ -148,21 +176,32 @@ class FormulaireUnique(af.WrapperNoeud):
                         else:
                             self.avertissements[key].set_texte("Le nom ne peut pas être vide.")
                     else:
-                        self.avertissements[key].set_texte(self.textes_avertissements[key])
+                        self.avertissements[key].set_texte(self.stockage.avertissements.get(key, "Cet avertissement ne devrait pas apparaître."))
 
     def check_multiples(self):
         """Met à jour les inputs multiples."""
         for key, input_ in self.inputs.items():
             if isinstance(input_, list):
+                noms_comultiples = self.stockage.comultiple.get(key, [])
+                comultiples: list[list[af.TexteInput|af.BoutonOnOff|MenuEnum]] = []     
+                for nom_comultiple in noms_comultiples:
+                    input_comultiple = self.inputs[nom_comultiple]
+                    assert isinstance(input_comultiple, list)
+                    comultiples.append(input_comultiple)
                 i = 0
                 while i < len(input_)-1:
                     if input_[i].accepte: # pylint: disable=unsubscriptable-object # I know it's subscriptable, it's a list
                         i += 1
                     else:
                         input_.pop(i)
+                        for comultiple in comultiples:
+                            comultiple.pop(i)
                 if input_[-1].accepte: # pylint: disable=unsubscriptable-object # I know it's subscriptable, it's a list
                     input_.append(self.get_multiple_input(self.stockage.champs[key],
                                                           self.stockage.acceptors[key]))
+                    for comultiple in comultiples:
+                        comultiple.append(self.get_input(self.stockage.champs[key],
+                                                         self.stockage.acceptors[key]))
 
     def update(self):
         self.make_contenu()

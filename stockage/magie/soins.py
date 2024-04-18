@@ -24,9 +24,6 @@ class MagieSoinNivelee(MagieNivele):
         }
 
     niveles = {
-            "cible": False,
-            "cible_multiple": False,
-            "zone": False,
             "latence": True,
             "gain_xp": True,
             "cout_pm": True,
@@ -35,47 +32,24 @@ class MagieSoinNivelee(MagieNivele):
         }
 
     acceptors = {
-            "cible": lambda _: True,
-            "cible_multiple": lambda _: True,
-            "zone": lambda _: True,
             "latence": lambda latence: float(latence) >= 0,
             "gain_xp": lambda gain_xp: float(gain_xp) >= 0,
             "cout_pm": lambda cout_pm: float(cout_pm) >= 0,
             "gain_pv": lambda gain_pv: float(gain_pv) >= 0,
-            "portee": lambda portee: float(portee) >= 0
+            "portee": lambda portee: float(portee) >= 0,
         }
 
     avertissements = {
-            "cible": "Cet avertissement n'est pas censé apparaître.",
-            "cible_multiple": "Cet avertissement n'est pas censé apparaître.",
-            "zone": "Cet avertissement n'est pas censé apparaître.",
             "latence": "La latence doit être positive.",
             "gain_xp": "Le gain d'expérience doit être positif.",
             "cout_pm": "Le coût en points de mana doit être positif.",
             "gain_pv": "Le gain de points de vie doit être positif.",
-            "portee": "La portée doit être positive."
+            "portee": "La portée doit être positive.",
         }
 
     conditionnels = {
-            "cible": lambda dictionnaire: True,
             "cible_multiple": lambda dictionnaire: dictionnaire["cible"]=="True",
             "zone": lambda dictionnaire: dictionnaire["cible"]=="False",
-            "latence": lambda dictionnaire: True,
-            "gain_xp": lambda dictionnaire: True,
-            "cout_pm": lambda dictionnaire: True,
-            "gain_pv": lambda dictionnaire: True,
-            "portee": lambda dictionnaire: True
-        }
-
-    multiple = {
-            "cible": False,
-            "cible_multiple": False,
-            "zone": False,
-            "latence": False,
-            "gain_xp": False,
-            "cout_pm": False,
-            "gain_pv": False,
-            "portee": False
         }
 
     def __init__(self, nom: str, cible: bool, cible_multiple: bool, zone: bool, latence: list[float],

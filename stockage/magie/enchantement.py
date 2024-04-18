@@ -44,7 +44,7 @@ class MagieEnchantementNivele(MagieNivele):
             "gain_tranchant": float,
             "gain_portee": float,
             "degats": float,
-            "portee": float
+            "portee": float,
     }
 
     niveles = {
@@ -52,7 +52,6 @@ class MagieEnchantementNivele(MagieNivele):
             "gain_xp": True,
             "cout_pm": True,
             "duree": True,
-            "enchantement": False,
             "taux_confusion": True,
             "taux_poches_trouees": True,
             "gain_force": True,
@@ -62,11 +61,10 @@ class MagieEnchantementNivele(MagieNivele):
             "gain_vitesse": True,
             "superiorite": True,
             "affinite": True,
-            "element": False,
             "gain_tranchant": True,
             "gain_portee": True,
             "degats": True,
-            "portee": True
+            "portee": True,
     }
 
     acceptors = {
@@ -74,7 +72,6 @@ class MagieEnchantementNivele(MagieNivele):
             "gain_xp": lambda gain_xp: float(gain_xp) >= 0,
             "cout_pm": lambda cout_pm: float(cout_pm) >= 0,
             "duree": lambda duree: float(duree) >= 0,
-            "enchantement": lambda enchantement: True,
             "taux_confusion": lambda taux_confusion: 0 <= float(taux_confusion) <= 1,
             "taux_poches_trouees": lambda taux_poches_trouees: 0 <= float(taux_poches_trouees) <= 1,
             "gain_force": lambda gain_force: float(gain_force) >= 0,
@@ -84,11 +81,10 @@ class MagieEnchantementNivele(MagieNivele):
             "gain_vitesse": lambda gain_vitesse: float(gain_vitesse) >= 0,
             "superiorite": lambda superiorite: float(superiorite) >= 0,
             "affinite": lambda affinite: float(affinite) >= 0,
-            "element": lambda element: True,
             "gain_tranchant": lambda gain_tranchant: float(gain_tranchant) >= 0,
             "gain_portee": lambda gain_portee: float(gain_portee) >= 0,
             "degats": lambda degats: float(degats) >= 0,
-            "portee": lambda portee: float(portee) >= 0
+            "portee": lambda portee: float(portee) >= 0,
         }
 
     avertissements = {
@@ -96,7 +92,6 @@ class MagieEnchantementNivele(MagieNivele):
             "gain_xp": "Le gain d'expérience doit être positif.",
             "cout_pm": "Le coût en points de mana doit être positif.",
             "duree": "La durée doit être positive.",
-            "enchantement": "Cet avertissement n'est pas censé apparaître.",
             "taux_confusion": "Le taux de confusion doit être compris entre 0 et 1.",
             "taux_poches_trouees": "Le taux de poches trouées doit être compris entre 0 et 1.",
             "gain_force": "Le gain de force doit être positif.",
@@ -106,19 +101,13 @@ class MagieEnchantementNivele(MagieNivele):
             "gain_vitesse": "Le gain de vitesse doit être positif.",
             "superiorite": "La supériorité doit être positive.",
             "affinite": "L'affinité élémentale doit être positive.",
-            "element": "Cet avertissement n'est pas censé apparaître.",
             "gain_tranchant": "Le gain de tranchant doit être positif.",
             "gain_portee": "Le gain de portée doit être positif.",
             "degats": "Les dégâts doivent être positifs.",
-            "portee": "La portée doit être positive."
+            "portee": "La portée doit être positive.",
         }
 
     conditionnels = {
-            "latence": lambda dictionnaire: True,
-            "gain_xp": lambda dictionnaire: True,
-            "cout_pm": lambda dictionnaire: True,
-            "duree": lambda dictionnaire: True,
-            "enchantement": lambda dictionnaire: True,
             "taux_confusion": lambda dictionnaire: dictionnaire["enchantement"]=="confusion",
             "taux_poches_trouees": lambda dictionnaire: dictionnaire["enchantement"]=="poches_trouees",
             "gain_force": lambda dictionnaire: dictionnaire["enchantement"]=="force",
@@ -132,29 +121,7 @@ class MagieEnchantementNivele(MagieNivele):
             "gain_tranchant": lambda dictionnaire: dictionnaire["enchantement"]=="renforcement",
             "gain_portee": lambda dictionnaire: dictionnaire["enchantement"]=="renforcement",
             "degats": lambda dictionnaire: dictionnaire["enchantement"]=="bombe",
-            "portee": lambda dictionnaire: dictionnaire["enchantement"]=="bombe"
-        }
-
-    multiple = {
-            "latence": False,
-            "gain_xp": False,
-            "cout_pm": False,
-            "duree": False,
-            "enchantement": False,
-            "taux_confusion": False,
-            "taux_poches_trouees": False,
-            "gain_force": False,
-            "gain_vision": False,
-            "gain_pv": False,
-            "gain_pm": False,
-            "gain_vitesse": False,
-            "superiorite": False,
-            "affinite": False,
-            "element": False,
-            "gain_tranchant": False,
-            "gain_portee": False,
-            "degats": False,
-            "portee": False
+            "portee": lambda dictionnaire: dictionnaire["enchantement"]=="bombe",
         }
 
     def __init__(self, nom: str, latence: list[float], gain_xp: list[float], cout_pm: list[float],

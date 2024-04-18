@@ -36,118 +36,40 @@ class MagieAttaqueNivele(MagieNivele):
         }
 
     niveles = {
-            "dirigee": False,
-            "distance": False,
             "latence": True,
             "gain_xp": True,
-            "cout_variable": False,
             "cout": True,
             "taux_degats": True,
             "degats": True,
             "portee": True,
-            "element": False,
-            "deplacement": False,
-            "forme": False,
-            "passe_mur": False,
-            "passe_teleporteur": False,
-            "passe_escalier": False,
-            "passe_barriere": False,
-            "passe_porte": False,
-            "perce": False,
             "taux_perce": True,
-            "inverse": False
         }
 
     acceptors = {
-            "dirigee": lambda _: True,
-            "distance": lambda _: True,
             "latence": lambda latence: float(latence) >= 0,
             "gain_xp": lambda gain_xp: float(gain_xp) >= 0,
-            "cout_variable": lambda _: True,
             "cout": lambda cout: float(cout) >= 0,
             "taux_degats": lambda taux_degats: float(taux_degats) >= 0,
             "degats": lambda degats: float(degats) >= 0,
             "portee": lambda portee: float(portee) >= 0,
-            "element": lambda element: True,
-            "deplacement": lambda deplacement: True,
-            "forme": lambda forme: True,
-            "passe_mur": lambda _: True,
-            "passe_teleporteur": lambda _: True,
-            "passe_escalier": lambda _: True,
-            "passe_barriere": lambda _: True,
-            "passe_porte": lambda _: True,
-            "perce": lambda _: True,
             "taux_perce": lambda taux_perce: 0 <= float(taux_perce) <= 1,
-            "inverse": lambda _: True
         }
 
     avertissements = {
-            "dirigee": "Cet avertissement n'est pas censé apparaître.",
-            "distance": "Cet avertissement n'est pas censé apparaître.",
             "latence": "La latence doit être positive.",
             "gain_xp": "Le gain d'expérience doit être positif.",
-            "cout_variable": "Cet avertissement n'est pas censé apparaître.",
             "cout": "Le coût doit être positif.",
             "taux_degats": "Le taux de dégâts doit être positif.",
             "degats": "Les dégâts doivent être positifs.",
             "portee": "La portée doit être positive.",
-            "element": "Cet avertissement n'est pas censé apparaître.",
-            "deplacement": "Cet avertissement n'est pas censé apparaître.",
-            "forme": "Cet avertissement n'est pas censé apparaître.",
-            "passe_mur": "Cet avertissement n'est pas censé apparaître.",
-            "passe_teleporteur": "Cet avertissement n'est pas censé apparaître.",
-            "passe_escalier": "Cet avertissement n'est pas censé apparaître.",
-            "passe_barriere": "Cet avertissement n'est pas censé apparaître.",
-            "passe_porte": "Cet avertissement n'est pas censé apparaître.",
-            "perce": "Cet avertissement n'est pas censé apparaître.",
             "taux_perce": "Le taux de percement doit être compris entre 0 et 1.",
-            "inverse": "Cet avertissement n'est pas censé apparaître."
         }
 
     conditionnels = {
-            "dirigee": lambda dictionnaire: True,
-            "distance": lambda dictionnaire: True,
-            "latence": lambda dictionnaire: True,
-            "gain_xp": lambda dictionnaire: True,
-            "cout_variable": lambda dictionnaire: True,
             "cout": lambda dictionnaire: dictionnaire["cout_variable"]=="False",
             "taux_degats": lambda dictionnaire: dictionnaire["cout_variable"]=="True",
             "degats": lambda dictionnaire: dictionnaire["cout_variable"]=="False",
-            "portee": lambda dictionnaire: True,
-            "element": lambda dictionnaire: True,
-            "deplacement": lambda dictionnaire: True,
-            "forme": lambda dictionnaire: True,
-            "passe_mur": lambda dictionnaire: True,
-            "passe_teleporteur": lambda dictionnaire: True,
-            "passe_escalier": lambda dictionnaire: True,
-            "passe_barriere": lambda dictionnaire: True,
-            "passe_porte": lambda dictionnaire: True,
-            "perce": lambda dictionnaire: True,
             "taux_perce": lambda dictionnaire: dictionnaire["perce"]=="True",
-            "inverse": lambda dictionnaire: True
-        }
-
-    multiple = {
-            "dirigee": False,
-            "distance": False,
-            "latence": False,
-            "gain_xp": False,
-            "cout_variable": False,
-            "cout": False,
-            "taux_degats": False,
-            "degats": False,
-            "portee": False,
-            "element": False,
-            "deplacement": False,
-            "forme": False,
-            "passe_mur": False,
-            "passe_teleporteur": False,
-            "passe_escalier": False,
-            "passe_barriere": False,
-            "passe_porte": False,
-            "perce": False,
-            "taux_perce": False,
-            "inverse": False
         }
 
     def __init__(self, nom: str, dirigee: bool, distance: bool, latence: list[float],

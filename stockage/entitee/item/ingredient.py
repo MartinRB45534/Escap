@@ -20,33 +20,18 @@ class IngredientNivele(EntiteeNivele):
         }
 
     niveles = {
-            "fantome": False,
             "poids": True,
             "frottements": True,
         }
 
     acceptors = {
-            "fantome": lambda _: True,
             "poids": lambda poids: float(poids) >= 0,
             "frottements": lambda frottements: float(frottements) >= 0,
         }
 
     avertissements = {
-            "fantome": "Cet avertissement n'est pas censé apparaître.",
             "poids": "Le poids doit être positif.",
             "frottements": "Le frottement doit être positif.",
-        }
-
-    conditionnels = {
-            "fantome": lambda dictionnaire: True,
-            "poids": lambda dictionnaire: True,
-            "frottements": lambda dictionnaire: True,
-        }
-
-    multiple = {
-            "fantome": False,
-            "poids": False,
-            "frottements": False,
         }
 
     def __init__(self, nom: str, fantome: bool,

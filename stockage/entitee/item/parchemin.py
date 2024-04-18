@@ -23,62 +23,37 @@ class ParcheminViergeNivele(EntiteeNivele):
             "taux_cout_caste": float,
             "taux_cout_impregne": float,
             "taux_latence_caste": float,
-            "taux_latence_impregne": float
+            "taux_latence_impregne": float,
         }
 
     niveles = {
-            "fantome": False,
             "poids": True,
             "frottements": True,
             "latence_impregne": True,
             "taux_cout_caste": True,
             "taux_cout_impregne": True,
             "taux_latence_caste": True,
-            "taux_latence_impregne": True
+            "taux_latence_impregne": True,
         }
 
     acceptors = {
-            "fantome": lambda _: True,
             "poids": lambda poids: float(poids) >= 0,
             "frottements": lambda frottements: float(frottements) >= 0,
             "latence_impregne": lambda latence: float(latence) >= 0,
             "taux_cout_caste": lambda taux: float(taux) >= 0,
             "taux_cout_impregne": lambda taux: float(taux) >= 0,
             "taux_latence_caste": lambda taux: float(taux) >= 0,
-            "taux_latence_impregne": lambda taux: float(taux) >= 0
+            "taux_latence_impregne": lambda taux: float(taux) >= 0,
         }
 
     avertissements = {
-            "fantome": "Please file a bug report.",
             "poids": "Le poids doit être positif.",
             "frottements": "Le frottement doit être positif.",
             "latence_impregne": "La latence d'impregnation doit être positive.",
             "taux_cout_caste": "Le taux de cout de caste doit être positif.",
             "taux_cout_impregne": "Le taux de cout d'impregnation doit être positif.",
             "taux_latence_caste": "Le taux de latence de caste doit être positif.",
-            "taux_latence_impregne": "Le taux de latence d'impregnation doit être positif."
-        }
-
-    conditionnels = {
-            "fantome": lambda dictionnaire: True,
-            "poids": lambda dictionnaire: True,
-            "frottements": lambda dictionnaire: True,
-            "latence_impregne": lambda dictionnaire: True,
-            "taux_cout_caste": lambda dictionnaire: True,
-            "taux_cout_impregne": lambda dictionnaire: True,
-            "taux_latence_caste": lambda dictionnaire: True,
-            "taux_latence_impregne": lambda dictionnaire: True
-        }
-
-    multiple = {
-            "fantome": False,
-            "poids": False,
-            "frottements": False,
-            "latence_impregne": False,
-            "taux_cout_caste": False,
-            "taux_cout_impregne": False,
-            "taux_latence_caste": False,
-            "taux_latence_impregne": False
+            "taux_latence_impregne": "Le taux de latence d'impregnation doit être positif.",
         }
 
     def __init__(self, nom: str, poids: list[float], frottements: list[float],
