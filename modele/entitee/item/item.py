@@ -24,6 +24,7 @@ class Item(Mobile):
     poids:float
     frottements:float
     _priorite:float
+    cadavre=False
     def __init__(self,position:crt.Position):
         Mobile.__init__(self,position)
         self.etat = EtatsItems.INTACT #Le niveau l'évacuera s'il n'est plus intact.
@@ -99,8 +100,7 @@ class Item(Mobile):
     def vole(self):
         #On voooole (si on a été lancé)
         if self.action is not None:
-            if self.action.execute(): #Le vol devrait toujours être répétable
-                raise ValueError("L'item a fini son vol ?! C'est pas normal !")
+            self.action.execute()
         if self.hauteur <= 0:
             self.atterit()
 

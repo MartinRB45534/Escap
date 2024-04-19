@@ -6,7 +6,6 @@ from __future__ import annotations
 from json import loads as parse
 
 import modele as mdl
-import carte as crt
 
 from ...stockage import StockageCategorieNivelee
 from ...magie import Magies, MagieNivele
@@ -99,18 +98,21 @@ class ParcheminViergeNivele(EntiteeNivele):
         dictionnaire = parse(json)
         return cls(dictionnaire["nom"], dictionnaire["fantome"], dictionnaire["poids"], dictionnaire["frottements"], dictionnaire["latence_impregne"], dictionnaire["taux_cout_caste"], dictionnaire["taux_cout_impregne"], dictionnaire["taux_latence_caste"], dictionnaire["taux_latence_impregne"])
 
-    def make(self, niveau:int) -> type[mdl.ParcheminVierge]:
+    def make(self, niveau:int) -> type[mdl.Parchemin]:
         """Retourne le parchemin correspondant."""
-        class ParcheminViergeNiveau(mdl.ParcheminVierge, mdl.Nomme):
+        class Impregne(mdl.Impregne):
+            """L'action d'imprégner un parchemin."""
+            latence_max = self.latence_impregne[niveau]
+            taux_cout_impregne = self.taux_cout_impregne[niveau]
+            taux_cout_caste = self.taux_cout_caste[niveau]
+            taux_latence_impregne = self.taux_latence_impregne[niveau]
+            taux_latence_caste = self.taux_latence_caste[niveau]
+        class ParcheminViergeNiveau(mdl.Parchemin, mdl.Nomme):
             """Un parchemin vierge."""
             poids = self.poids[niveau]
             frottements = self.frottements[niveau]
-            latence_impregne = self.latence_impregne[niveau]
-            taux_cout_caste = self.taux_cout_caste[niveau]
-            taux_cout_impregne = self.taux_cout_impregne[niveau]
-            taux_latence_caste = self.taux_latence_caste[niveau]
-            taux_latence_impregne = self.taux_latence_impregne[niveau]
             fantome = self.fantome
+            impregne = Impregne
         ParcheminViergeNiveau.nom = self.nom
         ParcheminViergeNiveau.niveau = niveau
         return ParcheminViergeNiveau
@@ -206,19 +208,16 @@ class ParcheminMagieNivele(EntiteeNivele):
         dictionnaire = parse(json)
         return cls(dictionnaire["nom"], dictionnaire["fantome"], dictionnaire["poids"], dictionnaire["frottements"], dictionnaire["magie"], dictionnaire["taux_cout_caste"], dictionnaire["taux_latence_caste"])
 
-    def make(self, niveau:int) -> type[mdl.ParcheminImpregne]:
+    def make(self, niveau:int) -> type[mdl.Parchemin]:
         """Retourne le parchemin correspondant."""
-        class ParcheminMagieNiveau(mdl.ParcheminImpregne, mdl.Nomme):
+        class ParcheminMagieNiveau(mdl.Parchemin, mdl.Nomme):
             """Un parchemin avec une magie préécrite."""
             poids = self.poids[niveau]
             frottements = self.frottements[niveau]
-            magie = self.magie.remake(niveau)
             taux_cout_caste = self.taux_cout_caste[niveau]
             taux_latence_caste = self.taux_latence_caste[niveau]
             fantome = self.fantome
-            def __init__(self, position: crt.Position):
-                mdl.ParcheminImpregne.__init__(self, position)
-                self.action_portee = self.magie(mdl.SKILL_ISSUE, mdl.NOONE)
+            action_portee = self.magie.make(niveau)(mdl.SKILL_ISSUE, mdl.NOONE)
         ParcheminMagieNiveau.nom = self.nom
         ParcheminMagieNiveau.niveau = niveau
         return ParcheminMagieNiveau

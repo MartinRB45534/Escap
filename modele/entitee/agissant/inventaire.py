@@ -8,9 +8,8 @@ import carte as crt
 
 
 # Imports utilisés dans le code (il y en a beaucoup !!!)
-from ...action import Impregne
 from ...commons import EtatsItems
-from ..item import Item, Consommable, Potion, Parchemin, Cle, Equippement, Arme, Bouclier, Armure, Heaume, Anneau, Projectile, Ingredient, Cadavre, Oeuf, ParcheminVierge
+from ..item import Item, Potion, Parchemin, Cle, Equippement, Arme, Bouclier, Armure, Heaume, Anneau, Projectile, Ingredient, Cadavre, Oeuf
 
 # Imports utilisés pour les paramètres par défaut
 from ...labyrinthe.absent import CASE_ABSENTE
@@ -35,11 +34,6 @@ class Inventaire:
         self.doigts = nb_doigts #Le nombre d'anneaux que l'on peut équiper
 
     # Les items peuvent être de plusieurs catégories :
-
-    @property
-    def consommables(self) -> set[Item]:
-        """Les consommables regroupent les potions et les parchemins"""
-        return {item for item in self.items if isinstance(item,Consommable)}
 
     @property
     def potions(self) -> set[Potion]:
@@ -294,14 +288,12 @@ class Inventaire:
 
     def a_parchemin_vierge(self):
         for parchemin in self.parchemins:
-            if isinstance(parchemin,ParcheminVierge):
-                if isinstance(parchemin.action_portee,Impregne) and parchemin.action_portee.magie is None:
-                    return True
+            if parchemin.impregne is not None:
+                return True
         return False
 
     def get_parchemin_vierge(self):
         for parchemin in self.parchemins:
-            if isinstance(parchemin,ParcheminVierge):
-                if isinstance(parchemin.action_portee,Impregne) and parchemin.action_portee.magie is None:
-                    return parchemin
+            if parchemin.impregne is not None:
+                return parchemin
         return None

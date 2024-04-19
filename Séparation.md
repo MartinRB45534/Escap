@@ -10,3 +10,17 @@ Les menus appelleraient les deux.
 
 Peut-être une version simplifiée du labyrinthe, utilisée dans le moteur pour définir le labyrinthe actuel ? Qu'est-ce qu'il y a dans le labyrinthe qui serve au déroulé du jeu ? Beaucoup de choses.
 
+Structure, par ordre d'importation (théoriquement personne n'appelle au-dessus de soi)
+
+affichage
+carte
+modele
+├ commons
+├ effets
+├ labyrinthe
+├ action
+├ entitee ?
+├ esprit ?
+└ systeme ?
+stockage
+editeur

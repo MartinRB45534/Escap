@@ -36,10 +36,6 @@ class FormulaireNivele(af.WrapperNoeud):
             "nom": af.TexteCache(""),
             "niveau": af.TexteCache(""),
         }
-        self.textes_avertissements:dict[str, str] = {
-            "nom": "Le nom doit être unique.",
-            "niveau": "Les niveaux vont de 1 à 10.",
-        }
 
         self.niveau = 1
         self.valeurs:dict[str, list[str|list[str]]] = {}
@@ -117,7 +113,7 @@ class FormulaireNivele(af.WrapperNoeud):
 
     def conditionnel(self, key: str) -> bool:
         """Retourne si le champ est conditionnel."""
-        return key == "nom" or key == "niveau" or self.stockage.conditionnels[key](self.to_dict())
+        return key == "nom" or key == "niveau" or self.stockage.conditionnels.get(key, lambda _: True)(self.to_dict())
 
     def get_input(self, type_: type[int|str|float|bool|StrEnum|StockageCategorieUnique|StockageCategorieNivelee|StockageSurCategorie],
                   acceptor: Callable[[str], bool]) -> af.TexteInput|af.BoutonOnOff|MenuEnum:
@@ -159,7 +155,7 @@ class FormulaireNivele(af.WrapperNoeud):
         """Ajoute un champ."""
         self.textes[nom] = af.Texte(nom)
         type_ = self.stockage.champs[nom]
-        acceptor = self.stockage.acceptors[nom]
+        acceptor = self.stockage.acceptors.get(nom, lambda _: True)
         comultiple = nom in sum(self.stockage.comultiple.values(), []) # type: ignore # Pylance wants me to specify the type of that empty list smh
         multiple = self.stockage.multiple.get(nom, False)
         if comultiple:
@@ -195,12 +191,12 @@ class FormulaireNivele(af.WrapperNoeud):
                             if niveau == self.niveau-1:
                                 for inp in input_:
                                     if not inp.accepte:
-                                        self.avertissements[key].set_texte(self.textes_avertissements[key])
+                                        self.avertissements[key].set_texte(self.stockage.avertissements.get(key, "Cet avertissement n'est pas censé apparaître."))
                             else:
                                 valeurs_niveau = valeurs[niveau]
                                 assert isinstance(valeurs_niveau, list)
                                 # input_ peut être une liste vide...
-                                inp = self.get_input(self.stockage.champs[key], self.stockage.acceptors[key])
+                                inp = self.get_input(self.stockage.champs[key], self.stockage.acceptors.get(key, lambda _: True))
                                 if any([not inp.accepte_autre(valeur) for valeur in valeurs_niveau]):
                                     niveaux_problematiques.add(niveau+1)
                     else:
@@ -208,7 +204,7 @@ class FormulaireNivele(af.WrapperNoeud):
                         for niveau in range(10):
                             if niveau == self.niveau-1:
                                 if not input_.accepte:
-                                    self.avertissements[key].set_texte(self.textes_avertissements[key])
+                                    self.avertissements[key].set_texte(self.stockage.avertissements.get(key, "Cet avertissement n'est pas censé apparaître."))
                             else:
                                 valeurs_niveau = valeurs[niveau]
                                 assert not isinstance(valeurs_niveau, list)
@@ -217,7 +213,7 @@ class FormulaireNivele(af.WrapperNoeud):
                 elif isinstance(input_, list):
                     for inp in input_:
                         if not inp.accepte:
-                            self.avertissements[key].set_texte(self.textes_avertissements[key])
+                            self.avertissements[key].set_texte(self.stockage.avertissements.get(key, "Cet avertissement n'est pas censé apparaître."))
                             break
                 elif not input_.accepte:
                     if key == "nom":
@@ -227,7 +223,7 @@ class FormulaireNivele(af.WrapperNoeud):
                         else:
                             self.avertissements[key].set_texte("Le nom ne peut pas être vide.")
                     else:
-                        self.avertissements[key].set_texte(self.textes_avertissements[key])
+                        self.avertissements[key].set_texte(self.stockage.avertissements.get(key, "Cet avertissement n'est pas censé apparaître."))
         # On met à jour les avertissements
         if niveaux_problematiques:
             self.avertissements["niveau"].set_texte(
@@ -237,7 +233,9 @@ ne sont pas valides.""")
     def check_multiples(self):
         """Met à jour les inputs multiples."""
         for key, input_ in self.inputs.items():
-            if isinstance(input_, list):
+            if key in sum([self.stockage.comultiple[key_] for key_ in self.stockage.comultiple], []): # type: ignore # Pylance wants me to specify the type of that empty list smh
+                pass # On ne fait rien pour les comultiples
+            elif isinstance(input_, list):
                 noms_comultiples = self.stockage.comultiple.get(key, [])
                 comultiples: list[list[af.TexteInput|af.BoutonOnOff|MenuEnum]] = []     
                 for nom_comultiple in noms_comultiples:
@@ -254,10 +252,10 @@ ne sont pas valides.""")
                             comultiple.pop(i)
                 if input_[-1].accepte: # pylint: disable=unsubscriptable-object # I know it's subscriptable, it's a list
                     input_.append(self.get_multiple_input(self.stockage.champs[key], # pylint: disable=no-member # I know append is a member, it's a list!
-                                                          self.stockage.acceptors[key]))
+                                                          self.stockage.acceptors.get(key, lambda _: True)))
                     for comultiple in comultiples:
                         comultiple.append(self.get_input(self.stockage.champs[key],
-                                                         self.stockage.acceptors[key]))
+                                                         self.stockage.acceptors.get(key, lambda _: True)))
 
     def update(self):
         self.make_contenu()
@@ -275,12 +273,12 @@ ne sont pas valides.""")
                     if self.stockage.multiple.get(key, False):
                         for val in valeur_niveau:
                             input_.append(self.get_multiple_input(self.stockage.champs[key],
-                                                                  self.stockage.acceptors[key]))
+                                                                  self.stockage.acceptors.get(key, lambda _: True)))
                             input_[-1].valeur = val
                     else: # comultiple
                         for val in valeur_niveau:
                             input_.append(self.get_input(self.stockage.champs[key],
-                                                        self.stockage.acceptors[key]))
+                                                        self.stockage.acceptors.get(key, lambda _: True)))
                             input_[-1].valeur = val
                 else:
                     assert not isinstance(input_, list)
@@ -295,7 +293,11 @@ ne sont pas valides.""")
         if all([avertissement.get_texte() == "" for avertissement in self.avertissements.values()]):
             json = f"""{{{
         ", ".join([f'"{key}": "{(
-            "["+(",".join([str(valeur) for valeur in self.valeurs[key]]))+"]"
+            "["+
+                ", ".join([(
+                    "[" + ", ".join(valeur) + "]"
+                ) if isinstance(valeur, list) else valeur
+            for valeur in self.valeurs[key]]) +"]"
         ) if key in self.valeurs else (
             "["+(",".join([inp.valeur for inp in input_]))+"]"
         ) if isinstance(input_, list) else input_.valeur}"'

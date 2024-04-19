@@ -5,33 +5,18 @@ import carte as crt
 
 # Imports des classes parentes
 from .magie import MagieDirigee, CibleCase, PorteeLimitee
-from ...entitee import projectiles_magiques, ProjectileMagique
-from ...commons import Element
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...entitee import Agissant, Projectile
+    from ...entitee import Agissant, Projectile, ProjectileMagique
     from ...systeme import Actif
 
 class InvocationProjectile(MagieDirigee):
     """La classe des magies qui créent un projectile (avec une direction associée)."""
-    percant: bool
-    fleche: bool
-    explosif: bool
-    poids: float
-    frottements: float
-    portee: float
-    degats: float
-    element: Element
-    fantome: bool
+    classe: type[ProjectileMagique]
     def __init__(self,skill:Actif,agissant:Agissant):
         MagieDirigee.__init__(self,skill,agissant)
-        classe = projectiles_magiques[(self.percant, self.fleche, self.explosif)]
-        assert issubclass(classe, ProjectileMagique)
-        self.projectile = classe(self.poids, self.frottements,
-                                 self.portee, self.degats, self.element,
-                                 crt.POSITION_ABSENTE)
-        self.projectile.fantome = self.fantome
+        self.projectile = self.classe(crt.POSITION_ABSENTE)
         self.projectile.magie = self
 
     def invoque(self) -> Projectile:

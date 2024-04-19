@@ -20,8 +20,8 @@ class Deplace(Action):
     """
     L'action de déplacement (item ou agissant).
     """
-    def __init__(self,agissant:Agissant,latence:float,direction:crt.Direction):
-        super().__init__(agissant,latence)
+    def __init__(self,agissant:Agissant,direction:crt.Direction):
+        Action.__init__(self,agissant)
         self.direction = direction
 
     def action(self):
@@ -31,10 +31,10 @@ class Marche(Deplace,ActionSkill,ActionFinal):
     """
     L'action des agissants qui se déplacent.
     """
-    def __init__(self,agissant:Agissant,latence:float,skill:Actif,xp:float,direction:crt.Direction):
-        Deplace.__init__(self,agissant,latence,direction)
-        ActionSkill.__init__(self,agissant,latence,skill,xp)
-        ActionFinal.__init__(self,agissant,latence)
+    def __init__(self,agissant:Agissant,skill:Actif,direction:crt.Direction):
+        Deplace.__init__(self,agissant,direction)
+        ActionSkill.__init__(self,agissant,skill)
+        ActionFinal.__init__(self,agissant)
 
 class Plane:
     """
@@ -47,7 +47,6 @@ class Plane:
         self.latence_max = latence
         self.taux_vitesse:dict[str,float] = {}
         self.direction = direction
-        self.repete = True
 
     def action(self):
         """L'action est appelée à certains moments."""

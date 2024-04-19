@@ -24,6 +24,13 @@ class MenuStockage(MenuEnum):
             enum = StrEnum("Enum_" + stockage.nom, {"default": default})
         MenuEnum.__init__(self, enum) # type: ignore # Pylance is being dumb
 
+    @property
+    def accepte(self):
+        """Renvoie si la valeur saisie est acceptée."""
+        if self.courant.get_texte() == self.default:
+            return False
+        return super().accepte
+
     def update(self):
         if self.noms != self.stockage.all_noms:
             self.noms = self.stockage.all_noms

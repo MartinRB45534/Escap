@@ -62,16 +62,6 @@ class FlecheExplosiveFragile(FlecheExplosive, FragileSimple):
 class ProjectileMagique(ProjectileSimple, Evanescent):
     """La classe des projectiles créés par magie."""
     magie: InvocationProjectile
-    def __init__(self, poids: float, frottements: float,
-                 portee: float, degats: float, element: Element,
-                 position: crt.Position):
-        ProjectileSimple.__init__(self, position)
-        Evanescent.__init__(self, position)
-        self.poids = poids
-        self.frottements = frottements
-        self.portee = portee
-        self.degats = degats
-        self.element = element
 
 class MagiePercante(Percant, ProjectileMagique):
     """La classe des projectiles percants créés par magie."""

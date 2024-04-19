@@ -125,17 +125,18 @@ class MagieProjectileNivelee(MagieNivele):
     def make(self, niveau: int):
         """Crée une magie à partir de l'instance."""
         classe: type[mdl.InvocationProjectile] = mdl.magies_projectiles[self.decentree]
-        class MagieProjectileNiveau(classe, mdl.Nomme):
-            """Une magie de projectile."""
+        classe_projectile = mdl.projectiles_magiques[(self.percant, self.fleche, self.explosif)]
+        class ProjectileMagique(classe_projectile):
+            """Un projectile magique."""
             fantome = self.fantome
-            percant = self.percant
-            fleche = self.fleche
-            explosif = self.explosif
             element = self.element
             poids = self.poids[niveau]
             frottements = self.frottements[niveau]
             portee = self.portee[niveau]
             degats = self.degats[niveau]
+        class MagieProjectileNiveau(classe, mdl.Nomme):
+            """Une magie de projectile."""
+            classe = ProjectileMagique
             latence = self.latence[niveau]
             gain_xp = self.gain_xp[niveau]
             cout = self.cout_pm[niveau]

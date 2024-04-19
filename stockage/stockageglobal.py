@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from .stockage import Stockage, StockageCategorieUnique, StockageCategorieNivelee, StockageSurCategorie
+from .maladie import MaladiesEtFamilles
 from .entitee import Items
 from .espece import Especes
 from .magie import Magies
@@ -11,9 +12,10 @@ class StockageGlobal(StockageSurCategorie):
     """Le stockage global, qui devrait tout contenir."""
     nom:str = "StockageGlobal"
     elements:dict[str, type[StockageCategorieUnique]|type[StockageCategorieNivelee]|type[StockageSurCategorie]] = {
+        "maladies": MaladiesEtFamilles,
+        "especes": Especes,
         "magies": Magies,
         "items": Items,
-        "especes": Especes
     }
 
     def __init__(self):

@@ -3,8 +3,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-import carte as crt
-
 # Imports des classes parentes
 from ..item import Item
 
@@ -17,9 +15,7 @@ if TYPE_CHECKING:
 class Potion(Item):
     """La classe des consommables qui peuvent se boire
        (ne requièrent pas de mana pour être activés)."""
-    def __init__(self, position: crt.Position, action_portee: Boit):
-        Item.__init__(self, position)
-        self.action_portee = action_portee
+    action_portee: Boit
 
     def frappe(self):
         self.action_portee.eclabousse()

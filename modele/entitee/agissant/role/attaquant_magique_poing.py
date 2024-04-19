@@ -1,8 +1,15 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING
+
 import carte as crt
 
 # Imports des classes parentes
 from .mage import Mage
+from ..agissant import Agissant
+
+# Imports utilisés uniquement dans les annotations
+if TYPE_CHECKING:
+    from ....action import MagieAttaqueDirigee
 
 class Attaquant_magique_poing(Mage):
     """Les mages qui ont des attaques magiques de corps à corps si nécessaire."""
@@ -17,12 +24,9 @@ class Attaquant_magique_poing(Mage):
         if self.peut_frapper():
             skill = self.get_skill_magique()
             action = skill.fait(self,self.frappe())
-            assert isinstance(action,MagieAttaqueContact)
+            if TYPE_CHECKING:
+                assert isinstance(action,MagieAttaqueDirigee)
             action.direction = direction
             self.fait(action)
         else:
             Agissant.attaque(self,direction)
-
-# Imports utilisés dans le code
-from ..agissant import Agissant
-from ....action.magie.magies_attaque.poings_magiques import MagieAttaqueContact

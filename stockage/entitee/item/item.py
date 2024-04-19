@@ -13,7 +13,7 @@ from .equippement import Equippements
 from .ingredient import Ingredients
 
 class Items(StockageSurCategorie):
-    """Les informations des parchemins."""
+    """Les informations des items."""
     nom = "Items"
     elements = {
         "parchemin": Parchemins,

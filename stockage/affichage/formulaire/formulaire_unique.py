@@ -77,8 +77,9 @@ class FormulaireUnique(af.WrapperNoeud):
                             contenu.append(comultiple[i])
                             contenu.append(self.avertissements[noms_comultiples[j]])
                     contenu.append(input_[-1])
+                elif isinstance(input_, list):
+                    pass # C'est un comultiple
                 else:
-                    assert isinstance(input_, af.TexteInput|af.BoutonOnOff|MenuEnum)
                     contenu.append(input_)
                 contenu.append(self.avertissements[key])
         contenu.append(self.bouton_ajouter)
@@ -181,7 +182,9 @@ class FormulaireUnique(af.WrapperNoeud):
     def check_multiples(self):
         """Met à jour les inputs multiples."""
         for key, input_ in self.inputs.items():
-            if isinstance(input_, list):
+            if key in sum(self.stockage.comultiple.values(), []): # type: ignore # Pylance wants me to specify the type of that empty list smh
+                pass # C'est un comultiple
+            elif isinstance(input_, list):
                 noms_comultiples = self.stockage.comultiple.get(key, [])
                 comultiples: list[list[af.TexteInput|af.BoutonOnOff|MenuEnum]] = []     
                 for nom_comultiple in noms_comultiples:
@@ -198,10 +201,10 @@ class FormulaireUnique(af.WrapperNoeud):
                             comultiple.pop(i)
                 if input_[-1].accepte: # pylint: disable=unsubscriptable-object # I know it's subscriptable, it's a list
                     input_.append(self.get_multiple_input(self.stockage.champs[key],
-                                                          self.stockage.acceptors[key]))
+                                                          self.stockage.acceptors.get(key, lambda _: True)))
                     for comultiple in comultiples:
                         comultiple.append(self.get_input(self.stockage.champs[key],
-                                                         self.stockage.acceptors[key]))
+                                                         self.stockage.acceptors.get(key, lambda _: True)))
 
     def update(self):
         self.make_contenu()

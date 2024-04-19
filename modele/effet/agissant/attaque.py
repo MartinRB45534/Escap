@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Optional
 import carte as crt
 
 # Imports des classes parentes
-from ..agissant import EffetAgissant
+from .agissant import EffetAgissant
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:

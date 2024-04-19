@@ -11,7 +11,7 @@ from ..commons import EtatsItems
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..entitee import Agissant, Potion, Parchemin, ParcheminVierge
+    from ..entitee import Agissant, Potion, Parchemin
     from ..effet import EffetAgissant
     from .magie import Magie
 
@@ -101,23 +101,21 @@ class Impregne(Lit, ActionFinal, CasteFinal):
     """
     L'action d'imprégner une magie sur un parchemin.
     """
-    def __init__(self, agissant: Agissant, latence: float, item: ParcheminVierge,
-                 taux_cout_impregne: float, taux_cout_caste: float,
-                 taux_latence_impregne: float, taux_latence_caste: float):
+    taux_cout_impregne: float
+    taux_cout_caste: float
+    taux_latence_impregne: float
+    taux_latence_caste: float
+    def __init__(self, agissant: Agissant, item: Parchemin):
         Lit.__init__(self, agissant, item)
         ActionFinal.__init__(self, agissant)
         CasteFinal.__init__(self, agissant)
-        self.latence_max = latence
-        self.taux_cout_impregne = taux_cout_impregne
-        self.taux_cout_caste = taux_cout_caste
-        self.taux_latence_impregne = taux_latence_impregne
-        self.taux_latence_caste = taux_latence_caste
         self.magie: Magie|None = None
 
     def action(self):
         """L'action est terminée."""
         if self.magie is not None:
             self.item.action_portee = self.magie # Le parchemin est imprégné de la magie
+            self.item.impregne = None
             self.item.etat = EtatsItems.INTACT
         else:
             self.interrompt()

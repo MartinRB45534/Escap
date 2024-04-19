@@ -11,7 +11,6 @@ from ..action import NonRepetable
 from .magie import CibleAgissant,CibleCase,CibleItem,PorteeLimitee,Magie,CibleAgissants
 
 # Imports utilisés dans le code
-from ...entitee.item.cadavre import Cadavre
 from ...effet import Reanimation, Resurection, Soin, SoinCase
 from ...commons import Deplacement, Forme, Passage
 
@@ -95,7 +94,6 @@ class MagieResurectionItem(MagieResurection, CibleItem, NonRepetable):
         if not self.cible: # NOTHING is falsy
             self.interrompt()
         else:
-            assert isinstance(self.cible, Cadavre)
             self.cible.effets.add(Resurection())
 
 class MagieResurectionCase(MagieResurection, CibleCase, PorteeLimitee):
@@ -111,7 +109,7 @@ class MagieResurectionCase(MagieResurection, CibleCase, PorteeLimitee):
         else:
             case = self.agissant.labyrinthe.get_case(self.cible)
             for item in case.items:
-                if isinstance(item,Cadavre):
+                if item.cadavre:
                     item.effets.add(Resurection())
 
 class MagieResurectionDeZone(MagieResurection, CibleCase, PorteeLimitee):
@@ -129,7 +127,7 @@ class MagieResurectionDeZone(MagieResurection, CibleCase, PorteeLimitee):
             zone = self.agissant.labyrinthe.a_portee(self.cible,self.portee,Deplacement.SPATIAL,Forme.CERCLE,Passage(True, False, False, True, True))
             for position in zone:
                 for item in self.agissant.labyrinthe.get_case(position).items:
-                    if isinstance(item,Cadavre):
+                    if item.cadavre:
                         item.effets.add(Resurection())
 
 magies_resurection: dict[tuple[bool, bool],
@@ -159,7 +157,6 @@ class MagieReanimationItem(MagieReanimation, CibleItem, NonRepetable):
         if not self.cible: # NOTHING is falsy
             self.interrompt()
         else:
-            assert isinstance(self.cible, Cadavre)
             if self.cible.priorite+self.superiorite < self.agissant.priorite:
                 self.cible.effets.add(Reanimation(self.taux_pv,self.agissant.esprit))
 
@@ -176,7 +173,7 @@ class MagieReanimationCase(MagieReanimation, CibleCase, PorteeLimitee):
         else:
             case = self.agissant.labyrinthe.get_case(self.cible)
             for item in case.items:
-                if isinstance(item,Cadavre):
+                if item.cadavre:
                     if item.priorite+self.superiorite < self.agissant.priorite:
                         item.effets.add(Reanimation(self.taux_pv,self.agissant.esprit))
 
@@ -195,7 +192,7 @@ class MagieReanimationDeZone(MagieReanimation, CibleCase, PorteeLimitee):
             zone = self.agissant.labyrinthe.a_portee(self.cible,self.portee,Deplacement.SPATIAL,Forme.CERCLE,Passage(True, False, False, True, True))
             for position in zone:
                 for item in self.agissant.labyrinthe.get_case(position).items:
-                    if isinstance(item,Cadavre):
+                    if item.cadavre:
                         if item.priorite+self.superiorite < self.agissant.priorite:
                             item.effets.add(Reanimation(self.taux_pv,self.agissant.esprit))
 

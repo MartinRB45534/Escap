@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..entitee.agissant.agissant import Agissant
+    from ..entitee import Agissant
 
 # Pas de classe parente
 

@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...item.parchemin.parchemins import ParcheminVierge
+    from ...item.parchemin import Parchemin
 
 # Imports des classes parentes
 from ..agissant import Agissant
@@ -29,16 +29,15 @@ class Mage(Agissant):
         assert skill is not None
         return skill
 
-    def impregne(self,nom:str,parch:ParcheminVierge):
+    def impregne(self,nom:str,parch:Parchemin):
         skill = self.get_skill_magique()
         magie = skill.fait(self,nom)
-        if isinstance(parch.action_portee,Impregne) and parch.action_portee.magie is None:
-            parch.action_portee.set_magie(magie)
-        else:
+        if parch.impregne is None:
             return False
         if self.action is not None:
             self.action.interrompt()
-        self.action = parch.action_portee
+        self.action = parch.impregne(self,parch)
+        self.action.set_magie(magie)
         return True
 
 class Multi_mage(Mage):
@@ -55,4 +54,3 @@ class Multi_mage(Mage):
 
 from ....systeme.classe.classes import trouve_skill
 from ....systeme.skill.actif import SkillsMagiques
-from ....action.non_skill import Impregne

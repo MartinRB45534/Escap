@@ -33,11 +33,11 @@ class FormulaireModificationNivele(FormulaireNivele, af.NoeudVertical):
                 assert isinstance(input_, af.TexteInput)
                 input_.valeur = str(getattr(objet, key)[0])
                 self.valeurs[key] = [str(attr) for attr in getattr(objet, key)]
-            elif stockage.multiple[key]:
+            elif stockage.multiple.get(key, False):
                 assert isinstance(input_, list)
                 for attr in list(getattr(objet, key)[0]):
                     input_[-1].valeur = str(attr)
-                    input_.append(self.get_multiple_input(stockage.champs[key], stockage.acceptors[key]))
+                    input_.append(self.get_multiple_input(stockage.champs[key], stockage.acceptors.get(key, lambda _: True)))
             else:
                 assert not isinstance(input_, list)
                 input_.valeur = str(getattr(objet, key))
@@ -52,7 +52,7 @@ class FormulaireModificationNivele(FormulaireNivele, af.NoeudVertical):
             sum([
                 [texte, self.inputs[key], self.avertissements[key]]
                 for key, texte in self.textes.items()
-                if key == "nom" or key == "niveau" or self.stockage.conditionnels[key](self.to_dict())
+                if key == "nom" or key == "niveau" or self.stockage.conditionnels.get(key, lambda _: True)(self.to_dict())
             ], []) # type: ignore # Pylance wants me to specify the type if that empty list smh
             + [self.bouton_modifier, self.bouton_supprimer, self.avertissement_supprimer]
         )
@@ -102,7 +102,7 @@ class FormulaireModificationNivele(FormulaireNivele, af.NoeudVertical):
         while i > 0:
             i -= 1
             key = list(self.inputs.keys())[i]
-            if key == "nom" or key == "niveau" or self.stockage.conditionnels[key](self.to_dict()):
+            if key == "nom" or key == "niveau" or self.stockage.conditionnels.get(key, lambda _: True)(self.to_dict()):
                 input_ = self.inputs[key]
                 self.courant = input_ if not isinstance(input_, list) else input_[-1]
                 self.courant.set_actif()
@@ -134,7 +134,7 @@ class FormulaireModificationNivele(FormulaireNivele, af.NoeudVertical):
         while i < len(self.inputs.values())-1:
             i += 1
             key = list(self.inputs.keys())[i]
-            if key == "nom" or key == "niveau" or self.stockage.conditionnels[key](self.to_dict()):
+            if key == "nom" or key == "niveau" or self.stockage.conditionnels.get(key, lambda _: True)(self.to_dict()):
                 input_ = self.inputs[key]
                 self.courant = input_ if not isinstance(input_, list) else input_[0]
                 self.courant.set_actif()
