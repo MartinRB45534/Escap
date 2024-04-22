@@ -1,12 +1,8 @@
-"""
-Les enchantements d'items.
-"""
+from __future__ import annotations
 
+# Imports des classes parentes
 from .item import EffetItem
-from ..enchantement import Enchantement
+from ..time_limited import TimeLimited
 
-class EnchantementItem(EffetItem,Enchantement):
-    """Un effet (temporaire) qui enchante un item."""
-    def __init__(self,temps_restant:float):
-        Enchantement.__init__(self,temps_restant)
-        EffetItem.__init__(self)
+class EnchantementItem(TimeLimited, EffetItem):
+    """Les enchantements qui affectent les items."""

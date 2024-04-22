@@ -148,30 +148,11 @@ class ParcheminMagieNivele(EntiteeNivele):
         }
     
     avertissements = {
-            "fantome": "Please file a bug report.",
             "poids": "Le poids doit être positif.",
             "frottements": "Le frottement doit être positif.",
             "magie": "La magie n'existe pas.",
             "taux_cout_caste": "Le taux de cout de caste doit être positif.",
             "taux_latence_caste": "Le taux de latence de caste doit être positif."
-        }
-    
-    conditionnels = {
-            "fantome": lambda dictionnaire: True,
-            "poids": lambda dictionnaire: True,
-            "frottements": lambda dictionnaire: True,
-            "magie": lambda dictionnaire: True,
-            "taux_cout_caste": lambda dictionnaire: True,
-            "taux_latence_caste": lambda dictionnaire: True
-        }
-    
-    multiple = {
-            "fantome": False,
-            "poids": False,
-            "frottements": False,
-            "magie": False,
-            "taux_cout_caste": False,
-            "taux_latence_caste": False
         }
     
     def __init__(self, nom: str, fantome: bool, poids: list[float], frottements: list[float],
@@ -202,7 +183,7 @@ class ParcheminMagieNivele(EntiteeNivele):
     "taux_cout_caste": {self.taux_cout_caste},
     "taux_latence_caste": {self.taux_latence_caste}
 }}"""
-    
+
     @classmethod
     def parse(cls, json: str):
         dictionnaire = parse(json)
@@ -214,10 +195,10 @@ class ParcheminMagieNivele(EntiteeNivele):
             """Un parchemin avec une magie préécrite."""
             poids = self.poids[niveau]
             frottements = self.frottements[niveau]
-            taux_cout_caste = self.taux_cout_caste[niveau]
-            taux_latence_caste = self.taux_latence_caste[niveau]
             fantome = self.fantome
             action_portee = self.magie.make(niveau)(mdl.SKILL_ISSUE, mdl.NOONE)
+            action_portee.cout *= self.taux_cout_caste[niveau]
+            action_portee.latence *= self.taux_latence_caste[niveau]
         ParcheminMagieNiveau.nom = self.nom
         ParcheminMagieNiveau.niveau = niveau
         return ParcheminMagieNiveau

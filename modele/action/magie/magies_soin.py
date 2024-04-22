@@ -3,7 +3,6 @@ Les magies de soin (et de résurection/réanimation).
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING
 import carte as crt
 
 # Imports des classes parentes
@@ -14,25 +13,15 @@ from .magie import CibleAgissant,CibleCase,CibleItem,PorteeLimitee,Magie,CibleAg
 from ...effet import Reanimation, Resurection, Soin, SoinCase
 from ...commons import Deplacement, Forme, Passage
 
-# Imports utilisés uniquement dans les annotations
-if TYPE_CHECKING:
-    from ...entitee import Agissant
-    from ...systeme import Actif
-
 class MagieAutoSoin(Magie):
     """La magie qui invoque un effet de soin sur son self.agissant."""
     gain_pv: float
-    def __init__(self,skill:Actif,agissant:Agissant):
-        Magie.__init__(self,skill,agissant)
 
     def action(self):
         self.agissant.effets.add(Soin(self.agissant,self.gain_pv))
 
 class MagieSoin(MagieAutoSoin, CibleAgissant):
     """La magie qui invoque un effet de soin sur un agissant ciblé."""
-    def __init__(self,skill:Actif,agissant:Agissant):
-        MagieAutoSoin.__init__(self,skill,agissant)
-        CibleAgissant.__init__(self,skill,agissant)
 
     def action(self):
         if not self.cible: # NOONE is falsy
@@ -42,9 +31,6 @@ class MagieSoin(MagieAutoSoin, CibleAgissant):
 
 class MagieMultiSoin(MagieAutoSoin, CibleAgissants):
     """La magie qui invoque un effet de soin sur des agissants ciblés."""
-    def __init__(self,skill:Actif,agissant:Agissant):
-        MagieAutoSoin.__init__(self,skill,agissant)
-        CibleAgissants.__init__(self,skill,agissant)
 
     def action(self):
         for cible in self.cible:
@@ -52,10 +38,7 @@ class MagieMultiSoin(MagieAutoSoin, CibleAgissants):
 
 class MagieSoinDeZone(MagieAutoSoin, CibleCase):
     """La magie qui invoque un effet de soin sur une zone."""
-    def __init__(self,skill:Actif,agissant:Agissant,portee:float):
-        MagieAutoSoin.__init__(self,skill,agissant)
-        CibleCase.__init__(self,skill,agissant)
-        self.portee = portee
+    portee: float
 
     def action(self):
         if self.cible == crt.POSITION_ABSENTE:
@@ -85,10 +68,6 @@ class MagieResurection(Magie):
 
 class MagieResurectionItem(MagieResurection, CibleItem, NonRepetable):
     """La magie qui invoque un effet de resurection."""
-    def __init__(self,skill:Actif,agissant:Agissant):
-        MagieResurection.__init__(self,skill,agissant)
-        CibleItem.__init__(self,skill,agissant)
-        NonRepetable.__init__(self,agissant)
 
     def action(self):
         if not self.cible: # NOTHING is falsy
@@ -98,10 +77,6 @@ class MagieResurectionItem(MagieResurection, CibleItem, NonRepetable):
 
 class MagieResurectionCase(MagieResurection, CibleCase, PorteeLimitee):
     """La magie qui invoque un effet de resurection sur une case."""
-    def __init__(self,skill:Actif,agissant:Agissant):
-        MagieResurection.__init__(self,skill,agissant)
-        CibleCase.__init__(self,skill,agissant)
-        PorteeLimitee.__init__(self,skill,agissant)
 
     def action(self):
         if self.cible == crt.POSITION_ABSENTE:
@@ -115,10 +90,6 @@ class MagieResurectionCase(MagieResurection, CibleCase, PorteeLimitee):
 class MagieResurectionDeZone(MagieResurection, CibleCase, PorteeLimitee):
     """La magie qui invoque un effet de resurection sur tous les cadavres d'une zone."""
     portee: float
-    def __init__(self,skill:Actif,agissant:Agissant):
-        MagieResurection.__init__(self,skill,agissant)
-        CibleCase.__init__(self,skill,agissant)
-        PorteeLimitee.__init__(self,skill,agissant)
 
     def action(self):
         if self.cible == crt.POSITION_ABSENTE:
@@ -148,10 +119,6 @@ class MagieReanimation(Magie):
 
 class MagieReanimationItem(MagieReanimation, CibleItem, NonRepetable):
     """La magie qui invoque un effet de reanimation."""
-    def __init__(self,skill:Actif,agissant:Agissant):
-        MagieReanimation.__init__(self,skill,agissant)
-        CibleItem.__init__(self,skill,agissant)
-        NonRepetable.__init__(self,agissant)
 
     def action(self):
         if not self.cible: # NOTHING is falsy
@@ -162,10 +129,6 @@ class MagieReanimationItem(MagieReanimation, CibleItem, NonRepetable):
 
 class MagieReanimationCase(MagieReanimation, CibleCase, PorteeLimitee):
     """La magie qui invoque un effet de reanimation sur une case."""
-    def __init__(self,skill:Actif,agissant:Agissant):
-        MagieReanimation.__init__(self,skill,agissant)
-        CibleCase.__init__(self,skill,agissant)
-        PorteeLimitee.__init__(self,skill,agissant)
 
     def action(self):
         if self.cible == crt.POSITION_ABSENTE:
@@ -180,10 +143,6 @@ class MagieReanimationCase(MagieReanimation, CibleCase, PorteeLimitee):
 class MagieReanimationDeZone(MagieReanimation, CibleCase, PorteeLimitee):
     """La magie qui invoque un effet de reanimation sur tous les cadavres d'une zone."""
     portee: float
-    def __init__(self,skill:Actif,agissant:Agissant):
-        MagieReanimation.__init__(self,skill,agissant)
-        CibleCase.__init__(self,skill,agissant)
-        PorteeLimitee.__init__(self,skill,agissant)
 
     def action(self):
         if self.cible == crt.POSITION_ABSENTE:

@@ -63,8 +63,6 @@ class Mobile(Entitee):
     """La classe des entitées qui peuvent se déplacer (par elles-mêmes pour les agissants, en étant lancées pour les items)."""
     labyrinthe:Labyrinthe
     fantome:bool = False
-    def __init__(self,position: crt.Position, id_: Optional[int]=None):
-        Entitee.__init__(self,position,id_)
 
     def passe(self,_mur:Mur) -> bool:
         """Renvoie True si l'entitée peut passer à travers le mur (fermé)."""

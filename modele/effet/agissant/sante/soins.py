@@ -25,10 +25,12 @@ class Antidote(OnFinTourAgissant):
 
 class Medicament(OnFinTourAgissant):
     """Effet qui supprime les effets de maladie de l'agissant."""
+    maladie: str
     def fin_tour(self, agissant:Agissant):
         for effet in agissant.effets:
-            if isinstance(effet,Maladie): # Créer des médicaments différents selon les maladies ?
-                agissant.effets.remove(effet)
+            if isinstance(effet,Maladie):
+                if effet.nom == self.maladie or effet.famille.nom == self.maladie:
+                    agissant.effets.remove(effet)
 
 class Purification(OnFinTourAgissant):
     """Effet qui supprime les effets de poison ou maladie de l'agissant"""
@@ -39,18 +41,22 @@ class Purification(OnFinTourAgissant):
 
 class Soin(OnFinTourAgissant):
     """Un effet de soin. Généralement placé sur l'agissant par une magie de soin, de soin de zone, ou d'auto-soin."""
-    def __init__(self,responsable:Agissant,gain_pv:float):
-        self.responsable = responsable
-        self.gain_pv = gain_pv
-
+    gain_pv:float
     def fin_tour(self, agissant:Agissant):
         agissant.soigne(self.gain_pv)
 
+class Vaccin(OnFinTourAgissant):
+    """Effet qui immunise l'agissant contre une maladie."""
+    maladie: str
+    immunite: float
+    def fin_tour(self, agissant:Agissant):
+        agissant.statistiques.set_non_affecte(self.maladie,self.immunite)
+        agissant.statistiques.set_non_contagieux(self.maladie,self.immunite)
+        agissant.statistiques.set_non_infectable(self.maladie,self.immunite)
+
 class Immunite(OnFinTourAgissant):
     """Enchantement qui confère une immunité aux maladies, à condition de disposer de suffisamment de priorité."""
-    def __init__(self,superiorite:float):
-        self.superiorite = superiorite
-
+    superiorite:float
     def fin_tour(self, agissant:Agissant):
         for effet in agissant.effets :
             if isinstance(effet,Maladie):

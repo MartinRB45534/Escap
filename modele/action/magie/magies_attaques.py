@@ -15,8 +15,6 @@ from ...commons import Element
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...entitee.agissant.agissant import Agissant
-    from ...systeme import Actif
     from ...commons import Deplacement
     from ...commons import Forme
     from ...commons import Passage
@@ -32,8 +30,6 @@ class MagieAttaque(Magie):
     direction: crt.Direction|None
     taux_perce: float
     inverse: bool
-    def __init__(self,skill:Actif,agissant:Agissant):
-        Magie.__init__(self,skill,agissant)
 
     def action(self):
         for case in self.agissant.labyrinthe.a_portee(self.agissant.position,self.portee,self.deplacement,self.forme,self.passage):
@@ -42,15 +38,13 @@ class MagieAttaque(Magie):
 
 class MagieAttaqueDistance(CibleCase,MagieAttaque):
     """Les magies qui créent une attaque à distance."""
-    def __init__(self,skill:Actif,agissant:Agissant):
-        CibleCase.__init__(self,skill,agissant)
-        MagieAttaque.__init__(self,skill,agissant)
-        self.effets:list[AttaqueCaseDelayee] = []
+    effets:list[AttaqueCaseDelayee] = []
 
     def action(self):
         if self.cible == crt.POSITION_ABSENTE:
             self.interrompt()
         elif not self.effets:
+            self.effets = [] # On ne veut pas que les effets soient partagés entre les instances
             for position in self.agissant.labyrinthe.a_portee(self.cible,self.portee,self.deplacement,self.forme,self.passage):
                 case = self.agissant.labyrinthe.get_case(position)
                 effet = AttaqueCaseDelayee(self.agissant,self.degats,self.element,self.direction,self.taux_perce,self.inverse)
@@ -62,10 +56,6 @@ class MagieAttaqueDistance(CibleCase,MagieAttaque):
 
 class MagieAttaqueDirigee(MagieDirigee,MagieAttaque):
     """Les magies qui créent une attaque au corp à corp dirigée."""
-    def __init__(self,skill:Actif,agissant:Agissant):
-        MagieDirigee.__init__(self,skill,agissant)
-        MagieAttaque.__init__(self,skill,agissant)
-
     def action(self):
         if self.direction is None:
             self.interrompt()
@@ -76,10 +66,6 @@ class MagieAttaqueDirigee(MagieDirigee,MagieAttaque):
 
 class MagieAttaqueDistanceDirigee(MagieAttaqueDirigee,MagieAttaqueDistance):
     """Les magies qui créent une attaque à distance dirigée."""
-    def __init__(self,skill:Actif,agissant:Agissant):
-        MagieAttaqueDirigee.__init__(self,skill,agissant)
-        MagieAttaqueDistance.__init__(self,skill,agissant)
-
     def action(self):
         if self.direction is None:
             self.interrompt()

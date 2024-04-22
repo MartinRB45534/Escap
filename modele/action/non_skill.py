@@ -19,12 +19,12 @@ class Boit(ActionFinal, NonRepetable):
     """
     L'action de boire une potion.
     """
-    def __init__(self, agissant: Agissant, latence: float, item: Potion, effet: EffetAgissant):
+    type_effet: type[EffetAgissant]
+    def __init__(self, agissant: Agissant, item: Potion):
         ActionFinal.__init__(self, agissant)
         NonRepetable.__init__(self, agissant)
-        self.latence_max = latence
         self.item = item
-        self.effet = effet
+        self.effet = self.type_effet()
         self.item.etat = EtatsItems.UTILISE
 
     def action(self):
@@ -34,13 +34,16 @@ class Boit(ActionFinal, NonRepetable):
     def interrompt(self):
         self.item.etat = EtatsItems.INTACT
 
-    def eclabousse(self):
+    @classmethod
+    def eclabousse(cls, item: Potion):
         """La potion a été lancée et se brise."""
-        case = self.item.labyrinthe.get_case(self.item.position)
+        case = item.labyrinthe.get_case(item.position)
         if case.agissant is not None:
-            case.agissant.effets.add(self.effet)
-        elif isinstance(self.effet, EffetCase):
-            case.effets.add(self.effet)
+            case.agissant.effets.add(cls.type_effet())
+        elif issubclass(cls.type_effet, EffetCase):
+            cases = item.labyrinthe.a_portee(item.position, effet.portee)
+            for case in cases:
+                case.effets.add(cls.type_effet())
 
 class Lit(Caste, NonRepetable):
     """

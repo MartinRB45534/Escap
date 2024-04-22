@@ -10,7 +10,7 @@ import modele as mdl
 
 from .magie import MagieNivele
 
-class MagieEnchantementNivele(MagieNivele):
+class MagieEnchantementAgissantNivele(MagieNivele):
     """Une magie d'enchantement."""
 
     champs = {
@@ -27,9 +27,7 @@ class MagieEnchantementNivele(MagieNivele):
                                      "absorption": "Absorption (régénération de points de mana)",
                                      "celerite": "Célérité",
                                      "immunite": "Immunité (résistance aux maladies)",
-                                     "affinite": "Affinité élémentale",
-                                     "renforcement": "Renforcement d'arme",
-                                     "bombe": "Bombe (rend l'item explosif)"
+                                     "affinite": "Affinité élémentale"
                                     }),
             "taux_confusion": float,
             "taux_poches_trouees": float,
@@ -41,10 +39,6 @@ class MagieEnchantementNivele(MagieNivele):
             "superiorite": float,
             "affinite": float,
             "element": mdl.Element,
-            "gain_tranchant": float,
-            "gain_portee": float,
-            "degats": float,
-            "portee": float,
     }
 
     niveles = {
@@ -61,10 +55,6 @@ class MagieEnchantementNivele(MagieNivele):
             "gain_vitesse": True,
             "superiorite": True,
             "affinite": True,
-            "gain_tranchant": True,
-            "gain_portee": True,
-            "degats": True,
-            "portee": True,
     }
 
     acceptors = {
@@ -81,10 +71,6 @@ class MagieEnchantementNivele(MagieNivele):
             "gain_vitesse": lambda gain_vitesse: float(gain_vitesse) >= 0,
             "superiorite": lambda superiorite: float(superiorite) >= 0,
             "affinite": lambda affinite: float(affinite) >= 0,
-            "gain_tranchant": lambda gain_tranchant: float(gain_tranchant) >= 0,
-            "gain_portee": lambda gain_portee: float(gain_portee) >= 0,
-            "degats": lambda degats: float(degats) >= 0,
-            "portee": lambda portee: float(portee) >= 0,
         }
 
     avertissements = {
@@ -101,10 +87,6 @@ class MagieEnchantementNivele(MagieNivele):
             "gain_vitesse": "Le gain de vitesse doit être positif.",
             "superiorite": "La supériorité doit être positive.",
             "affinite": "L'affinité élémentale doit être positive.",
-            "gain_tranchant": "Le gain de tranchant doit être positif.",
-            "gain_portee": "Le gain de portée doit être positif.",
-            "degats": "Les dégâts doivent être positifs.",
-            "portee": "La portée doit être positive.",
         }
 
     conditionnels = {
@@ -118,19 +100,13 @@ class MagieEnchantementNivele(MagieNivele):
             "superiorite": lambda dictionnaire: dictionnaire["enchantement"]=="immunite",
             "affinite": lambda dictionnaire: dictionnaire["enchantement"]=="affinite",
             "element": lambda dictionnaire: dictionnaire["enchantement"]=="affinite",
-            "gain_tranchant": lambda dictionnaire: dictionnaire["enchantement"]=="renforcement",
-            "gain_portee": lambda dictionnaire: dictionnaire["enchantement"]=="renforcement",
-            "degats": lambda dictionnaire: dictionnaire["enchantement"]=="bombe",
-            "portee": lambda dictionnaire: dictionnaire["enchantement"]=="bombe",
         }
 
     def __init__(self, nom: str, latence: list[float], gain_xp: list[float], cout_pm: list[float],
                  duree: list[float], enchantement: str, taux_confusion: list[float],
                  taux_poches_trouees: list[float], gain_force: list[float], gain_vision: list[float],
                  gain_pv: list[float], gain_pm: list[float], gain_vitesse: list[float],
-                 superiorite: list[float], affinite: list[float], element: mdl.Element,
-                 gain_tranchant: list[float], gain_portee: list[float], degats: list[float],
-                 portee: list[float]):
+                 superiorite: list[float], affinite: list[float], element: mdl.Element):
         MagieNivele.__init__(self, nom)
         self.latence = latence
         self.gain_xp = gain_xp
@@ -147,10 +123,6 @@ class MagieEnchantementNivele(MagieNivele):
         self.superiorite = superiorite
         self.affinite = affinite
         self.element = element
-        self.gain_tranchant = gain_tranchant
-        self.gain_portee = gain_portee
-        self.degats = degats
-        self.portee = portee
 
     def check(self) -> bool:
         return (all(latence >= 0 for latence in self.latence) and
@@ -165,11 +137,7 @@ class MagieEnchantementNivele(MagieNivele):
                 all(gain >= 0 for gain in self.gain_pm) and
                 all(gain >= 0 for gain in self.gain_vitesse) and
                 all(superiorite >= 0 for superiorite in self.superiorite) and
-                all(affinite >= 0 for affinite in self.affinite) and
-                all(gain >= 0 for gain in self.gain_tranchant) and
-                all(gain >= 0 for gain in self.gain_portee) and
-                all(gain >= 0 for gain in self.degats) and
-                all(portee >= 0 for portee in self.portee))
+                all(affinite >= 0 for affinite in self.affinite))
 
     def stringify(self) -> str:
         return f"""{{
@@ -190,28 +158,20 @@ class MagieEnchantementNivele(MagieNivele):
     "gain_vitesse": {self.gain_vitesse},
     "superiorite": {self.superiorite},
     "affinite": {self.affinite},
-    "element": "{self.element}",
-    "gain_tranchant": {self.gain_tranchant},
-    "gain_portee": {self.gain_portee},
-    "degats": {self.degats},
-    "portee": {self.portee}
+    "element": "{self.element}"
 }}"""
 
     @classmethod
     def parse(cls, json: str):
         """Parse un json en BouclierNivele."""
         dictionnaire = parse(json)
-        return MagieEnchantementNivele(dictionnaire["nom"], dictionnaire["latence"], dictionnaire["gain_xp"], dictionnaire["cout_pm"], dictionnaire["duree"], dictionnaire["enchantement"], dictionnaire["taux_confusion"], dictionnaire["taux_poches_trouees"], dictionnaire["gain_force"], dictionnaire["gain_vision"], dictionnaire["gain_pv"], dictionnaire["gain_pm"], dictionnaire["gain_vitesse"], dictionnaire["superiorite"], dictionnaire["affinite"], dictionnaire["element"], dictionnaire["gain_tranchant"], dictionnaire["gain_portee"], dictionnaire["degats"], dictionnaire["portee"])
+        return MagieEnchantementAgissantNivele(dictionnaire["nom"], dictionnaire["latence"], dictionnaire["gain_xp"], dictionnaire["cout_pm"], dictionnaire["duree"], dictionnaire["enchantement"], dictionnaire["taux_confusion"], dictionnaire["taux_poches_trouees"], dictionnaire["gain_force"], dictionnaire["gain_vision"], dictionnaire["gain_pv"], dictionnaire["gain_pm"], dictionnaire["gain_vitesse"], dictionnaire["superiorite"], dictionnaire["affinite"], dictionnaire["element"])
 
     def make(self, niveau: int):
         """Crée une magie à partir de l'instance."""
-        classe = mdl.magies_enchantement[self.enchantement]
-        class MagieEnchantementNiveau(classe, mdl.Nomme):
-            """Une magie d'enchantement."""
-            duree = self.duree[niveau]
-            latence_max = self.latence[niveau]
-            gain_xp = self.gain_xp[niveau]
-            cout = self.cout_pm[niveau]
+        enchantement = mdl.enchantements_agissants[self.enchantement]
+        class EnchantementAgissant(enchantement):
+            """Un enchantement agissant."""
             match self.enchantement:
                 case "confusion":
                     taux_confusion = self.taux_confusion[niveau]
@@ -232,6 +192,130 @@ class MagieEnchantementNivele(MagieNivele):
                 case "affinite":
                     gain_affinite = self.affinite[niveau]
                     element = self.element
+                case _:
+                    raise ValueError(f"Enchantement inconnu : {self.enchantement}")
+        class MagieEnchantementAgissantNiveau(mdl.EnchanteAgissant, mdl.Nomme):
+            """Une magie d'enchantement."""
+            enchantement = EnchantementAgissant
+            duree = self.duree[niveau]
+            latence_max = self.latence[niveau]
+            gain_xp = self.gain_xp[niveau]
+            cout = self.cout_pm[niveau]
+        MagieEnchantementAgissantNiveau.nom = self.nom
+        MagieEnchantementAgissantNiveau.niveau = niveau
+        return MagieEnchantementAgissantNiveau
+
+class MagieEnchantementItemNivele(MagieNivele):
+    """Une magie d'enchantement."""
+
+    champs = {
+            "latence": float,
+            "gain_xp": float,
+            "cout_pm": float,
+            "duree": float,
+            "enchantement": StrEnum("enchantement",
+                                    {"renforcement": "Renforcement d'arme",
+                                     "bombe": "Bombe (rend l'item explosif)"
+                                    }),
+            "gain_tranchant": float,
+            "gain_portee": float,
+            "degats": float,
+            "portee": float,
+    }
+
+    niveles = {
+            "latence": True,
+            "gain_xp": True,
+            "cout_pm": True,
+            "duree": True,
+            "gain_tranchant": True,
+            "gain_portee": True,
+            "degats": True,
+            "portee": True,
+    }
+
+    acceptors = {
+            "latence": lambda latence: float(latence) >= 0,
+            "gain_xp": lambda gain_xp: float(gain_xp) >= 0,
+            "cout_pm": lambda cout_pm: float(cout_pm) >= 0,
+            "duree": lambda duree: float(duree) >= 0,
+            "gain_tranchant": lambda gain_tranchant: float(gain_tranchant) >= 0,
+            "gain_portee": lambda gain_portee: float(gain_portee) >= 0,
+            "degats": lambda degats: float(degats) >= 0,
+            "portee": lambda portee: float(portee) >= 0,
+        }
+
+    avertissements = {
+            "latence": "La latence doit être positive.",
+            "gain_xp": "Le gain d'expérience doit être positif.",
+            "cout_pm": "Le coût en points de mana doit être positif.",
+            "duree": "La durée doit être positive.",
+            "gain_tranchant": "Le gain de tranchant doit être positif.",
+            "gain_portee": "Le gain de portée doit être positif.",
+            "degats": "Les dégâts doivent être positifs.",
+            "portee": "La portée doit être positive.",
+        }
+
+    conditionnels = {
+            "gain_tranchant": lambda dictionnaire: dictionnaire["enchantement"]=="renforcement",
+            "gain_portee": lambda dictionnaire: dictionnaire["enchantement"]=="renforcement",
+            "degats": lambda dictionnaire: dictionnaire["enchantement"]=="bombe",
+            "portee": lambda dictionnaire: dictionnaire["enchantement"]=="bombe",
+        }
+
+    def __init__(self, nom: str, latence: list[float], gain_xp: list[float], cout_pm: list[float],
+                 duree: list[float], enchantement: str,
+                 gain_tranchant: list[float], gain_portee: list[float], degats: list[float],
+                 portee: list[float]):
+        MagieNivele.__init__(self, nom)
+        self.latence = latence
+        self.gain_xp = gain_xp
+        self.cout_pm = cout_pm
+        self.duree = duree
+        self.enchantement = enchantement
+        self.gain_tranchant = gain_tranchant
+        self.gain_portee = gain_portee
+        self.degats = degats
+        self.portee = portee
+
+    def check(self) -> bool:
+        return (all(latence >= 0 for latence in self.latence) and
+                all(gain >= 0 for gain in self.gain_xp) and
+                all(cout_pm >= 0 for cout_pm in self.cout_pm) and
+                all(duree >= 0 for duree in self.duree) and
+                all(gain >= 0 for gain in self.gain_tranchant) and
+                all(gain >= 0 for gain in self.gain_portee) and
+                all(gain >= 0 for gain in self.degats) and
+                all(portee >= 0 for portee in self.portee))
+
+    def stringify(self) -> str:
+        return f"""{{
+    "type": "magie_enchantement",
+    "nivele": true,
+    "nom": "{self.nom}",
+    "latence": {self.latence},
+    "gain_xp": {self.gain_xp},
+    "cout_pm": {self.cout_pm},
+    "duree": {self.duree},
+    "enchantement": "{self.enchantement}",
+    "gain_tranchant": {self.gain_tranchant},
+    "gain_portee": {self.gain_portee},
+    "degats": {self.degats},
+    "portee": {self.portee}
+}}"""
+
+    @classmethod
+    def parse(cls, json: str):
+        """Parse un json en BouclierNivele."""
+        dictionnaire = parse(json)
+        return MagieEnchantementItemNivele(dictionnaire["nom"], dictionnaire["latence"], dictionnaire["gain_xp"], dictionnaire["cout_pm"], dictionnaire["duree"], dictionnaire["enchantement"], dictionnaire["gain_tranchant"], dictionnaire["gain_portee"], dictionnaire["degats"], dictionnaire["portee"])
+
+    def make(self, niveau: int):
+        """Crée une magie à partir de l'instance."""
+        enchantement = mdl.enchantements_items[self.enchantement]
+        class EnchantementItem(enchantement):
+            """Un enchantement d'item."""
+            match self.enchantement:
                 case "renforcement":
                     gain_force = self.gain_tranchant[niveau]
                     gain_portee = self.gain_portee[niveau]
@@ -240,6 +324,13 @@ class MagieEnchantementNivele(MagieNivele):
                     degats = self.degats[niveau]
                 case _:
                     raise ValueError(f"Enchantement inconnu : {self.enchantement}")
-        MagieEnchantementNiveau.nom = self.nom
-        MagieEnchantementNiveau.niveau = niveau
-        return MagieEnchantementNiveau
+        class MagieEnchantementItemNiveau(mdl.EnchanteItem, mdl.Nomme):
+            """Une magie d'enchantement."""
+            enchantement = EnchantementItem
+            duree = self.duree[niveau]
+            latence_max = self.latence[niveau]
+            gain_xp = self.gain_xp[niveau]
+            cout = self.cout_pm[niveau]
+        MagieEnchantementItemNiveau.nom = self.nom
+        MagieEnchantementItemNiveau.niveau = niveau
+        return MagieEnchantementItemNiveau

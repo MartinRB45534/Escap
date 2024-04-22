@@ -51,7 +51,7 @@ class EffetAffinite(EffetAgissant):
 
 class EffetAffinites(EffetAgissant):
     """Effet qui modifie les affinités à plusieurs éléments."""
-    def modifie_affinite(self, affinite:float, elements:Element) -> float:
+    def modifie_affinite(self, affinite:float, element:Element) -> float:
         """Modifie l'affinité à l'élément de l'agissant."""
         raise NotImplementedError
 

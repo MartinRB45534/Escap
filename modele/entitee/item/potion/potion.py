@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 class Potion(Item):
     """La classe des consommables qui peuvent se boire
        (ne requièrent pas de mana pour être activés)."""
-    action_portee: Boit
+    action_portee: type[Boit]
 
     def frappe(self):
         self.action_portee.eclabousse()

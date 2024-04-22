@@ -23,13 +23,9 @@ class Sursis(OnFinTourItem):
 
 class OnHit(EffetItem):
     """La classe des effets qui se déclenchent quand un projectile heurte un agissant ou un mur."""
-    def __init__(self,portee:float,degats:float,element:Element=Element.TERRE):
-        EffetItem.__init__(self)
-        self.affiche = False
-        self.portee = portee
-        self.degats = degats
-        self.element = element
-
+    portee:float
+    degats:float
+    element:Element
     def hit(self,item:Item):
         """L'effet est déclenché quand l'item heurte un agissant ou un mur."""
         if item.action is None:
@@ -52,5 +48,3 @@ class EffetPortee(EffetArme):
 
 class EffetBombe(OnHit):
     """Enchantement qui confère des propriétés explosives à un item."""
-    def __init__(self,portee:float,degats:float,element:Element=Element.TERRE):
-        OnHit.__init__(self,portee,degats,element)

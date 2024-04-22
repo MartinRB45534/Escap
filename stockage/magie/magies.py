@@ -11,7 +11,7 @@ from .boost import MagieBoostNivele
 from .protection import MagieProtectionNivelee
 from .projectile import MagieProjectileNivelee
 from .soins import MagieSoinNivelee, MagieResurectionNivele, MagieReanimationNivele
-from .enchantement import MagieEnchantementNivele
+from .enchantement import MagieEnchantementAgissantNivele, MagieEnchantementItemNivele
 from .economie import MagieReserveNivelee, MagieInvestissementNivelee
 from .divers import MagieBlizzardNivelee, MagieObscuriteNivelee, MagieInstakillNivelee, MagieTeleportationNivelee
 
@@ -28,7 +28,8 @@ class Magies(StockageCategorieNivelee):
         "MagieSoinNivelee": MagieSoinNivelee,
         "MagieResurectionNivele": MagieResurectionNivele,
         "MagieReanimationNivele": MagieReanimationNivele,
-        "MagieEnchantementNivele": MagieEnchantementNivele,
+        "MagieEnchantementAgissantNivele": MagieEnchantementAgissantNivele,
+        "MagieEnchantementItemNivele": MagieEnchantementItemNivele,
         "MagieProjectileNivelee": MagieProjectileNivelee,
         "MagieReserveNivelee": MagieReserveNivelee,
         "MagieInvestissementNivelee": MagieInvestissementNivelee,
