@@ -29,6 +29,9 @@ class PotionNivele(EntiteeNivele):
                               "vaccin": "Vaccin (immunise contre une maladie ou une famille de maladies)",
                               "boost": "Boost (augmente une statistique)",
                              }),
+            "mixte": bool,
+            "portee": float,
+            "duree_max": float,
             "maladie": Maladies,
             "famille_maladie": FamillesMaladies,
             "progression": float,
@@ -57,6 +60,8 @@ class PotionNivele(EntiteeNivele):
             "poids": True,
             "frottements": True,
             "latence_boit": True,
+            "portee": True,
+            "duree_max": True,
             "progression": True,
             "degats_max": True,
             "gain_pv": True,
@@ -68,6 +73,8 @@ class PotionNivele(EntiteeNivele):
             "poids": lambda poids: float(poids) >= 0,
             "frottements": lambda frottements: float(frottements) >= 0,
             "latence_boit": lambda latence_boit: float(latence_boit) >= 0,
+            "portee": lambda portee: float(portee) > 0,
+            "duree_max": lambda duree_max: float(duree_max) > 0,
             "maladie": lambda maladie: maladie in Maladies.global_.trouve_stockage(Maladies).all_noms,
             "famille_maladie": lambda famille_maladie: famille_maladie in FamillesMaladies.global_.trouve_stockage(FamillesMaladies).all_noms,
             "progression": lambda progression: float(progression) >= 0,
@@ -81,6 +88,8 @@ class PotionNivele(EntiteeNivele):
             "poids": "Le poids doit être positif.",
             "frottements": "Le frottement doit être positif.",
             "latence_boit": "La latence doit être positive.",
+            "portee": "La portée des éclaboussures doit être positive.",
+            "duree_max": "La durée maximale de survit des éclaboussures doit être positive.",
             "maladie": "Il faut choisir une maladie existante (peut-être qu'il n'en existe pas encore).",
             "famille_maladie": "Il faut choisir une famille de maladies existante (peut-être qu'il n'en existe pas encore).",
             "progression": "La progression doit être positive.",
@@ -91,6 +100,9 @@ class PotionNivele(EntiteeNivele):
         }
     
     conditionnels = {
+            "mixte": lambda dictionnaire: dictionnaire["effet"] != "maladie",
+            "portee": lambda dictionnaire: dictionnaire["mixte"] == "True",
+            "duree_max": lambda dictionnaire: dictionnaire["mixte"] == "True",
             "maladie": lambda dictionnaire: dictionnaire["effet"] == "maladie" or dictionnaire["effet"] == "medicament" or dictionnaire["effet"] == "vaccin",
             "famille_maladie": lambda dictionnaire: dictionnaire["effet"] == "medicament" or dictionnaire["effet"] == "vaccin",
             "progression": lambda dictionnaire: dictionnaire["effet"] == "poison",
@@ -107,17 +119,20 @@ class PotionNivele(EntiteeNivele):
         }
 
     def __init__(self, nom: str, poids: list[float], frottements: list[float],
-                 fantome: bool, latence_boit: list[float], effet: str, maladie: str,
-                 famille_maladie: str, progression: list[float],
-                 degats_max: list[float], gain_pv: list[float], immunite: list[float],
-                 statistique_boostee: str, element: mdl.Element, terre: bool, feu: bool,
-                 glace: bool, ombre: bool, multiplicateur: list[float]):
+                 fantome: bool, latence_boit: list[float], effet: str, mixte: bool,
+                 portee: list[float], duree_max: list[float], maladie: str, famille_maladie: str,
+                 progression: list[float], degats_max: list[float], gain_pv: list[float],
+                 immunite: list[float], statistique_boostee: str, element: mdl.Element,
+                 terre: bool, feu: bool, glace: bool, ombre: bool, multiplicateur: list[float]):
         EntiteeNivele.__init__(self, nom)
         self.fantome = fantome
         self.poids = poids
         self.frottements = frottements
         self.latence_boit = latence_boit
         self.effet = effet
+        self.mixte = mixte
+        self.portee = portee
+        self.duree_max = duree_max
         self.maladie = maladie
         self.famille_maladie = famille_maladie
         self.progression = progression
@@ -138,6 +153,8 @@ class PotionNivele(EntiteeNivele):
                 all([latence >= 0 for latence in self.latence_boit]) and
                 all([poids >= 0 for poids in self.poids]) and
                 all([frottements >= 0 for frottements in self.frottements]) and
+                all([portee > 0 for portee in self.portee]) and
+                all([duree_max > 0 for duree_max in self.duree_max]) and
                 all([progression >= 0 for progression in self.progression]) and
                 all([degats >= 0 for degats in self.degats_max]) and
                 all([gain >= 0 for gain in self.gain_pv]) and
@@ -154,6 +171,9 @@ class PotionNivele(EntiteeNivele):
     "frottements": {self.frottements},
     "latence_impregne": {self.latence_boit},
     "effet": "{self.effet}",
+    "mixte": {self.mixte},
+    "portee": {self.portee},
+    "duree_max": {self.duree_max},
     "maladie": "{self.maladie}",
     "famille_maladie": "{self.famille_maladie}",
     "progression": {self.progression},
@@ -172,39 +192,38 @@ class PotionNivele(EntiteeNivele):
     @classmethod
     def parse(cls, json: str):
         dictionnaire = parse(json)
-        return cls(dictionnaire["nom"], dictionnaire["fantome"], dictionnaire["poids"], dictionnaire["frottements"], dictionnaire["latence_boit"], dictionnaire["effet"], dictionnaire["maladie"], dictionnaire["famille_maladie"], dictionnaire["progression"], dictionnaire["degats_max"], dictionnaire["gain_pv"], dictionnaire["immunite"], dictionnaire["statistique_boostee"], dictionnaire["element"], dictionnaire["terre"], dictionnaire["feu"], dictionnaire["glace"], dictionnaire["ombre"], dictionnaire["multiplicateur"])
+        return cls(dictionnaire["nom"], dictionnaire["fantome"], dictionnaire["poids"], dictionnaire["frottements"], dictionnaire["latence_boit"], dictionnaire["effet"], dictionnaire["mixte"], dictionnaire["portee"], dictionnaire["duree_max"], dictionnaire["maladie"], dictionnaire["famille_maladie"], dictionnaire["progression"], dictionnaire["degats_max"], dictionnaire["gain_pv"], dictionnaire["immunite"], dictionnaire["statistique_boostee"], dictionnaire["element"], dictionnaire["terre"], dictionnaire["feu"], dictionnaire["glace"], dictionnaire["ombre"], dictionnaire["multiplicateur"])
 
     def make(self, niveau:int) -> type[mdl.Potion]:
         """Retourne le potion correspondant."""
-        match self.effet:
-            case "maladie":
-                maladie = Maladies.global_.make(self.maladie, niveau)
-                assert isinstance(maladie, type) and issubclass(maladie, mdl.Maladie)
-                effet = maladie
-            case "poison":
-                class Poison(mdl.Poison):
+        effet: type[mdl.EffetAgissant]
+        if self.effet == "maladie":
+            maladie = Maladies.global_.make(self.maladie, niveau)
+            assert isinstance(maladie, type) and issubclass(maladie, mdl.EffetAgissant)
+            effet = maladie
+        elif self.effet == "boost":
+            effet = mdl.effets_boosts[(self.statistique_boostee, self.mixte)]
+        else:
+            effet = mdl.effets_potions[(self.effet, self.mixte)]
+        class EffetPotion(effet):
+            """L'effet de la potion."""
+            if self.mixte and self.effet != "maladie": # Les maladies mixtes ont déjà une portée et une durée.
+                portee = self.portee[niveau]
+                duree_max = self.duree_max[niveau]
+            match self.effet:
+                case "poison":
                     progression = self.progression[niveau]
                     degats_max = self.degats_max[niveau]
-                effet = Poison
-            case "soin":
-                class Soin(mdl.Soin):
+                case "soin":
                     gain_pv = self.gain_pv[niveau]
-                effet = Soin
-            case "antidote":
-                class Antidote(mdl.Antidote):
-                    pass
-                effet = Antidote
-            case "medicament":
-                class Medicament(mdl.Medicament):
+                case "medicament":
                     if self.maladie:
                         maladie = self.maladie
                     elif self.famille_maladie:
                         famille = self.famille_maladie
                     else:
                         raise ValueError("Il faut choisir une maladie ou une famille de maladies.")
-                effet = Medicament
-            case "vaccin":
-                class Vaccin(mdl.Vaccin):
+                case "vaccin":
                     if self.maladie:
                         maladie = self.maladie
                     elif self.famille_maladie:
@@ -212,48 +231,12 @@ class PotionNivele(EntiteeNivele):
                     else:
                         raise ValueError("Il faut choisir une maladie ou une famille de maladies.")
                     immunite = self.immunite[niveau]
-                effet = Vaccin
-            case "boost":
-                match self.statistique_boostee:
-                    case "force":
-                        class BoostForce(mdl.EffetForce):
+                case "boost":
+                    multiplicateur = self.multiplicateur[niveau]
+                    match self.statistique_boostee:
+                        case "affinite":
                             multiplicateur = self.multiplicateur[niveau]
-                            def modifie_force(self, force: float) -> float:
-                                return force * self.multiplicateur
-                        effet = BoostForce
-                    case "vision":
-                        class BoostVision(mdl.EffetVision):
-                            multiplicateur = self.multiplicateur[niveau]
-                            def modifie_vision(self, vision: float) -> float:
-                                return vision * self.multiplicateur
-                        effet = BoostVision
-                    case "pv":
-                        class BoostPv(mdl.EffetPv):
-                            multiplicateur = self.multiplicateur[niveau]
-                            def modifie_pv(self, pv: float) -> float:
-                                return pv * self.multiplicateur
-                        effet = BoostPv
-                    case "pm":
-                        class BoostPm(mdl.EffetPm):
-                            multiplicateur = self.multiplicateur[niveau]
-                            def modifie_pm(self, pm: float) -> float:
-                                return pm * self.multiplicateur
-                        effet = BoostPm
-                    case "vitesse":
-                        class BoostVitesse(mdl.EffetVitesse):
-                            multiplicateur = self.multiplicateur[niveau]
-                            def modifie_vitesse(self, vitesse: float) -> float:
-                                return vitesse * self.multiplicateur
-                        effet = BoostVitesse
-                    case "affinite":
-                        class BoostAffinite(mdl.EffetAffinite):
-                            element = self.element
-                            multiplicateur = self.multiplicateur[niveau]
-                            def modifie_affinite(self, affinite: float) -> float:
-                                return affinite * self.multiplicateur
-                        effet = BoostAffinite
-                    case "affinites":
-                        class BoostAffinites(mdl.EffetAffinites):
+                        case "affinites":
                             element: set[mdl.Element] = set()
                             if self.terre:
                                 element.add(mdl.Element.TERRE)
@@ -263,22 +246,13 @@ class PotionNivele(EntiteeNivele):
                                 element.add(mdl.Element.GLACE)
                             if self.ombre:
                                 element.add(mdl.Element.OMBRE)
-                            multiplicateur = self.multiplicateur[niveau]
-                            def modifie_affinite(self, affinite: float, element: mdl.Element) -> float:
-                                if element in self.element:
-                                    return affinite * self.multiplicateur
-                                return affinite
-                        effet = BoostAffinites
-                    case "stats":
-                        class BoostStats(mdl.EffetStats):
-                            multiplicateur = self.multiplicateur[niveau]
-                            def modifie_stats(self, stat: float) -> float:
-                                return stat * self.multiplicateur
-                        effet = BoostStats
-                    case _:
-                        raise ValueError("Il faut choisir une statistique à booster.")
+                        case _:
+                            pass
+                case _:
+                    pass
         class BoitPotion(mdl.Boit):
-            type_effet = effet
+            """L'action de boire une potion."""
+            type_effet = EffetPotion
             latence_max = self.latence_boit[niveau]
         class PotionNiveau(mdl.Potion, mdl.Nomme):
             """Une potion."""

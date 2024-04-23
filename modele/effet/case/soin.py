@@ -18,8 +18,8 @@ if TYPE_CHECKING:
 
 class SoinCase(OnPostActionCase):
     """Un effet de soin. À répercuter sur les occupants éventuels de la case."""
-    def __init__(self,gain_pv:float,responsable:Agissant,cible:str="alliés"):
-        self.gain_pv = gain_pv
+    def __init__(self,soin:type[Soin], responsable: Agissant, cible:str="alliés"):
+        self.soin = soin
         self.responsable = responsable
         self.cible = cible
 
@@ -27,12 +27,12 @@ class SoinCase(OnPostActionCase):
         cible_potentielle = case.agissant
         if cible_potentielle is not None:
             if not self.responsable: #Pas de responsable. Sérieusement ?
-                cible_potentielle.effets.add(Soin(self.responsable,self.gain_pv))
+                cible_potentielle.effets.add(self.soin())
             else:
                 esprit = self.responsable.esprit
                 if not esprit: #Pas d'esprit ? Sérieusement ?
-                    cible_potentielle.effets.add(Soin(self.responsable,self.gain_pv))
+                    cible_potentielle.effets.add(self.soin())
                 elif self.cible == "alliés" and cible_potentielle in esprit.corps:
-                    cible_potentielle.effets.add(Soin(self.responsable,self.gain_pv))
+                    cible_potentielle.effets.add(self.soin())
                 elif self.cible == "neutres" and not cible_potentielle in esprit.corps:
-                    cible_potentielle.effets.add(Soin(self.responsable,self.gain_pv))
+                    cible_potentielle.effets.add(self.soin())

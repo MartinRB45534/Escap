@@ -95,9 +95,12 @@ class MagieSoinNivelee(MagieNivele):
     def make(self, niveau: int):
         """Crée une magie à partir de l'instance."""
         classe = mdl.magies_soin[(self.cible, self.cible_multiple, self.zone)]
+        class Soin(mdl.Soin):
+            """Un effet de soin."""
+            gain_pv = self.gain_pv[niveau]
         class MagieSoinNiveau(classe, mdl.Nomme):
             """Une magie de soin."""
-            gain_pv = self.gain_pv[niveau]
+            soin = Soin
             latence = self.latence[niveau]
             gain_xp = self.gain_xp[niveau]
             cout = self.cout_pm[niveau]

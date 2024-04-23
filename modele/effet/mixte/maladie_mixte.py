@@ -9,21 +9,19 @@ import random
 
 # Imports des classes parentes
 from ..agissant import Maladie
-from ..case import OnPostActionCase
+from .potion import EffetMixte
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
     from ...labyrinthe import Case
     from ...entitee import Agissant
 
-class MaladieMixte(OnPostActionCase, Maladie):
+class MaladieMixte(EffetMixte, Maladie):
     """Maladie qui peut survivre sur une case. Peut se transmettre à un agissant qui passe dessus."""
     transmissibilite:float
-    portee:float
-    duree_max:int
     def __init__(self):
+        EffetMixte.__init__(self)
         Maladie.__init__(self)
-        self.duree = self.duree_max
 
     def post_action(self, case: Case):
         malade_potentiel = case.agissant
@@ -47,4 +45,6 @@ class MaladieMixte(OnPostActionCase, Maladie):
         return min(1, max(0, 10 - non_infectable)/10)
 
     def termine(self) -> bool:
-        return self.duree <= 0
+        if self.on_case:
+            return self.duree <= 0
+        return Maladie.termine(self)

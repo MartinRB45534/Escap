@@ -4,10 +4,10 @@ from typing import TYPE_CHECKING
 # Imports des classes parentes
 from .action import ActionFinal, NonRepetable
 from .caste import Caste, CasteContinu, CasteFinal, CasteInitial, CasteFractionnaire
-from ..effet import EffetCase
+from ..effet import EffetMixte
 
 # Imports utilisés dans le code
-from ..commons import EtatsItems
+from ..commons import EtatsItems, Deplacement, Forme, Passage
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
@@ -40,10 +40,12 @@ class Boit(ActionFinal, NonRepetable):
         case = item.labyrinthe.get_case(item.position)
         if case.agissant is not None:
             case.agissant.effets.add(cls.type_effet())
-        elif issubclass(cls.type_effet, EffetCase):
-            cases = item.labyrinthe.a_portee(item.position, effet.portee)
-            for case in cases:
-                case.effets.add(cls.type_effet())
+        elif issubclass(cls.type_effet, EffetMixte):
+            cases = item.labyrinthe.a_portee(item.position, cls.type_effet.portee, Deplacement.SPATIAL, Forme.CERCLE, Passage(False, False, False, False, False))
+            for position in cases:
+                effet = cls.type_effet()
+                effet.on_case = True
+                item.labyrinthe.get_case(position).effets.add(effet)
 
 class Lit(Caste, NonRepetable):
     """

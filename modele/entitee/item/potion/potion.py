@@ -18,7 +18,7 @@ class Potion(Item):
     action_portee: type[Boit]
 
     def frappe(self):
-        self.action_portee.eclabousse()
+        self.action_portee.eclabousse(self)
         Item.frappe(self)
 
     @staticmethod

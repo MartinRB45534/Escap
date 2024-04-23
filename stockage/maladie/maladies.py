@@ -10,7 +10,7 @@ from .maladie import Maladies
 
 class MaladiesEtFamilles(StockageSurCategorie):
     """Les informations des maladies."""
-    nom = "Items"
+    nom = "Maladies"
     elements = {
         "famille": FamillesMaladies,
         "maladie": Maladies,

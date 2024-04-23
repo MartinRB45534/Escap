@@ -15,31 +15,30 @@ from ...commons import Deplacement, Forme, Passage
 
 class MagieAutoSoin(Magie):
     """La magie qui invoque un effet de soin sur son self.agissant."""
-    gain_pv: float
-
+    soin: type[Soin]
     def action(self):
-        self.agissant.effets.add(Soin(self.agissant,self.gain_pv))
+        self.agissant.effets.add(self.soin())
 
 class MagieSoin(MagieAutoSoin, CibleAgissant):
     """La magie qui invoque un effet de soin sur un agissant ciblé."""
-
+    soin: type[Soin]
     def action(self):
         if not self.cible: # NOONE is falsy
             self.interrompt()
         else:
-            self.cible.effets.add(Soin(self.agissant,self.gain_pv))
+            self.cible.effets.add(self.soin())
 
 class MagieMultiSoin(MagieAutoSoin, CibleAgissants):
     """La magie qui invoque un effet de soin sur des agissants ciblés."""
-
+    soin: type[Soin]
     def action(self):
         for cible in self.cible:
-            cible.effets.add(Soin(self.agissant,self.gain_pv))
+            cible.effets.add(self.soin())
 
 class MagieSoinDeZone(MagieAutoSoin, CibleCase):
     """La magie qui invoque un effet de soin sur une zone."""
     portee: float
-
+    soin: type[Soin]
     def action(self):
         if self.cible == crt.POSITION_ABSENTE:
             self.interrompt()
@@ -47,7 +46,7 @@ class MagieSoinDeZone(MagieAutoSoin, CibleCase):
             poss = self.agissant.labyrinthe.a_portee(self.cible,self.portee,Deplacement.SPATIAL,Forme.CERCLE,Passage(True, False, False, True, True))
             for pos in poss:
                 case = self.agissant.labyrinthe.get_case(pos)
-                case.effets.add(SoinCase(self.gain_pv,self.agissant))
+                case.effets.add(SoinCase(self.soin,self.agissant))
 
 magies_soin: dict[tuple[bool, bool, bool], type[MagieAutoSoin]] = {
     (False, False, False): MagieAutoSoin,
