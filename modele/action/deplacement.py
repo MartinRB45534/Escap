@@ -40,11 +40,11 @@ class Plane:
     """
     L'action des items qui volent. (Ce n'est pas techniquement une action, mais ça se comporte comme un déplacement.)
     """
-    def __init__(self,item:Item,lanceur:Agissant,latence:float,direction:crt.Direction):
+    latence_max:float
+    def __init__(self,item:Item,lanceur:Agissant,direction:crt.Direction):
         self.item = item
         self.lanceur = lanceur
         self.latence:float = 0
-        self.latence_max = latence
         self.taux_vitesse:dict[str,float] = {}
         self.direction = direction
 

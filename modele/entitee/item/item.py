@@ -26,7 +26,7 @@ class Item(Mobile):
     _priorite:float
     cadavre=False
     def __init__(self,position:crt.Position):
-        Mobile.__init__(self,position)
+        Mobile.__init__(self,position,None)
         self.etat = EtatsItems.INTACT #Le niveau l'évacuera s'il n'est plus intact.
         self.action:Optional[Plane] = None
         self.direction:Optional[crt.Direction] = None

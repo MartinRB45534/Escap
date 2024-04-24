@@ -3,66 +3,51 @@ Contient les classes mères des skills
 """
 
 from __future__ import annotations
-import affichage as af
-
-# Pas d'import utilisés uniquement dans les annotations
-
-# Pas d'import des classes parentes
 
 class Skill:
-    """!!! Skill != skille !!! (Vieille private joke)"""
+    """Les skills se répartissent en plusieurs catégories."""
+    propagation: float
+    gain_xp: float
     def __init__(self):
-        self.niveau=0 #Le niveau devrais passer à 1 lorsqu'on acquiert le skill
-        self.xp_new:float=0 #Contabilise l'xp obtenue pendant le tour, pour la propagation
-        self.propagation=0.5 #Certains skills ont un taux de propagation plus important (?)
-        self.nom="Skill anonyme"
+        self.niveau = 1
+        self.xp_new: float = 0
 
     def gagne_xp(self):
-        """fonction qui propage l'xp accumulé au cours du tour vers la classe mère"""
-        #On propage l'xp accumulé au cours du tour vers la classe mère
+        """Propage l'xp accumulé au cours du tour vers la classe mère"""
         res = self.xp_new*self.propagation
         self.xp_new=0
         return res
-
-    def evo(self,nb_evo:int=1):
-        """fonction qui procède à l'évolution"""
-        for _ in range(nb_evo):
-            self.niveau+=1
-
-    def get_skin(self):
-        """Renvoie le skin du skill"""
-        return af.SKIN_MYSTERE
 
 class SkillIntrasec(Skill):
     """
-    Les skills intrinsèques sont des skills qui sont liés à une classe. Ils évoluent avec la classe.
+    Les skills intrinsèques sont des skills qui sont liés à une classe. Ils évoluent avec la classe (pas d'xp propre donc).
     """
-    def gagne_xp(self):
-        #On propage l'xp accumulé au cours du tour vers la classe mère
-        res = self.xp_new*self.propagation
-        self.xp_new=0
-        return res
 
 class SkillExtra(Skill):
     """
     Les skills extrinsèques sont indépendants de la classe. Ils évoluent selon leur propre utilisation, et peuvent changer de classe.
     """
-    def __init__(self,conditions_evo:list[float]=[0,10,20,30,40,50,60,70,80,90]):
-        super().__init__()
-        self.cond_evo=conditions_evo
-        self.xp=0 #L'xp commence à 0, évidemment
+    conditions_evo: list[float|bool]
+    def __init__(self):
+        Skill.__init__(self)
+        self.xp: float = 0
 
     def gagne_xp(self):
-        #On propage l'xp accumulé au cours du tour vers la classe mère
-        res = self.xp_new*self.propagation
-        #On l'ajoute aussi à son propre xp
-        self.xp+=self.xp_new
-        self.xp_new=0
-        #On en profite pour vérifier si on peut évoluer
-        self.check_evo()
+        """Propage l'xp accumulé au cours du tour vers la classe mère, et en garde une partie pour lui-même."""
+        res = self.xp_new * self.propagation
+        self.xp += self.xp_new
+        self.xp_new = 0
+        if self.check_evo():
+            self.evo()
         return res
 
     def check_evo(self):
-        """fonction qui vérifie que les conditions d'évolution sont vérifiées"""
-        if self.niveau<len(self.cond_evo) and self.cond_evo[self.niveau]>0 and self.xp>=self.cond_evo[self.niveau]:
-            self.evo()
+        """Vérifie que les conditions d'évolution sont vérifiées - procède à l'évolution le cas échéant."""
+        condition = self.conditions_evo[self.niveau-1]
+        if isinstance(condition, bool):
+            return condition
+        return self.xp >= condition
+    
+    def evo(self):
+        """Procède à l'évolution du skill."""
+        self.niveau += 1

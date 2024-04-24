@@ -118,7 +118,7 @@ class Agissant(NonSuperposable,Mobile):
             return True
         ecrasement = trouve_skill(self.classe_principale,SkillEcrasement)
         if ecrasement is not None:
-            passage = ecrasement.utilise(mur.niveau,self.priorite)
+            passage = ecrasement.ecrase(mur.niveau,self.priorite)
             if passage:
                 mur.casser()
             return passage
@@ -128,7 +128,7 @@ class Agissant(NonSuperposable,Mobile):
         """Renvoie True si l'agissant peut arriver sur la case (occupée par un agissant)."""
         ecrasement = trouve_skill(self.classe_principale,SkillEcrasement)
         if ecrasement is not None:
-            passage = ecrasement.utilise(agissant.priorite,self.priorite)
+            passage = ecrasement.ecrase(agissant.priorite,self.priorite)
             if passage:
                 agissant.ecrase(self)
             return passage
@@ -138,7 +138,7 @@ class Agissant(NonSuperposable,Mobile):
         """Renvoie True si l'agissant peut arriver sur la case (occupée par un décors)."""
         ecrasement = trouve_skill(self.classe_principale,SkillEcrasement)
         if ecrasement is not None:
-            passage = ecrasement.utilise(decors.priorite,self.priorite)
+            passage = ecrasement.ecrase(decors.priorite,self.priorite)
             if passage:
                 decors.ecrase()
             return passage

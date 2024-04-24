@@ -15,7 +15,6 @@ class Bouclier(Degainable):
     degats_bloques:float
     taux_degats:float
 
-
     def intercepte(self,attaque:AttaqueCase):
         """Intercepte une attaque."""
         attaque.degats -= self.degats_bloques

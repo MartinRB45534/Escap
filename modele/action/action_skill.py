@@ -15,13 +15,10 @@ from ..effet import ProtectionCaseBouclier
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..entitee.agissant.agissant import Agissant
-    from ..systeme.skill.actif import Actif
-    from ..entitee.item.item import Item
-    from ..entitee.item.equippement.degainable.bouclier.bouclier import Bouclier
-    from ..commons import Deplacement
-    from ..commons import Forme
-    from ..commons import Passage
+    from .deplacement import Plane
+    from ..systeme import Actif
+    from ..entitee import Agissant, Item, Bouclier
+    from ..commons import Deplacement, Forme, Passage
 
 class ActionSkill(Action):
     """
@@ -138,3 +135,22 @@ class Alchimie(CreeItem, NonRepetable):
         for item in self.ingredients:
             self.agissant.inventaire.drop(item)
         self.agissant.inventaire.ajoute(self.item)
+
+class LancerItem(ActionSkill, NonRepetable):
+    """
+    L'action de lancer un item.
+    """
+    plane: type[Plane]
+    def __init__(self, agissant: Agissant, skill: Actif, latence: float, xp: float, item: Item,
+                 direction: crt.Direction):
+        ActionSkill.__init__(self, agissant, skill)
+        NonRepetable.__init__(self, agissant)
+        self.latence_max = latence
+        self.xp = xp
+        self.item = item
+        self.direction = direction
+
+    def action(self):
+        self.item.action = self.plane(self.item,self.agissant,self.direction)
+        self.agissant.inventaire.drop(self.item)
+        self.agissant.labyrinthe.item_veut_passer(self.item,self.direction)
