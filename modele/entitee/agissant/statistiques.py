@@ -23,30 +23,25 @@ if TYPE_CHECKING:
 
 class Statistiques:
     """Les statistiques d'un agissant."""
-    def __init__(self,possesseur:Agissant, priorite:float, vitesse:float, force:float, pv:float, regen_pv_max:float, regen_pv_min:float, restauration_regen_pv:float, pm:float, regen_pm:float, affinites:dict[Element,float], immunites:set[Element], non_contagieux:dict[str,float], non_infectable:dict[str,float], non_affecte:dict[str,float]):
+    priorite: float
+    vitesse: float
+    force: float
+    pv_max: float
+    regen_pv_max: float
+    regen_pv_min: float
+    restauration_regen_pv: float
+    pm_max: float
+    regen_pm: float
+    affinites: dict[Element,float]
+    immunites: set[Element]
+    non_contagieux: dict[str,float]
+    non_infectable: dict[str,float]
+    non_affecte: dict[str,float]
+    def __init__(self,possesseur:Agissant):
         self.possesseur = possesseur #Entité possédant ces statistiques (utilisé pour chercher des effets par exemple)
-
-        self.priorite = priorite #La priorité sert à bloquer ou forcer certaines actions (ex: le vol, l'instakill, etc.)
-
-        self.vitesse = vitesse #Vitesse d'action (encore utilisé ?)
-        self.force = force #Force d'attaques physiques
-
-        self.pv_max = pv #Points de vie max
-        self.pv = pv #Points de vie
-        self.regen_pv_max = regen_pv_max #Régénération de points de vie quand on a pas pris de dégâts depuis longtemps
-        self.regen_pv_min = regen_pv_min #Régénération de points de vie quand on a pris des dégâts récemment
-        self.regen_pv = regen_pv_max #Régénération de points de vie actuelle
-        self.restauration_regen_pv = restauration_regen_pv #Restauration de la régénération de points de vie
-        self.pm_max = pm #Points de magie max
-        self.pm = pm #Points de magie
-        self.regen_pm = regen_pm #Régénération de points de magie
-
-        self.affinites = affinites #Affinités élémentaires
-        self.immunites = immunites #Immunites élémentaires
-
-        self.non_contagieux = non_contagieux #Maladies qui ne peuvent pas être transmises
-        self.non_infectable = non_infectable #Maladies qui ne peuvent pas être attrapées
-        self.non_affecte = non_affecte #Maladies qui n'ont pas d'effet sur l'agissant
+        self.pv = self.pv_max
+        self.regen_pv = self.regen_pv_max
+        self.pm = self.pm_max
 
     def get_vitesse(self) -> float:
         """Retourne la vitesse de l'agissant."""
@@ -89,7 +84,7 @@ class Statistiques:
     def get_vision(self) -> float:
         """Retourne la vision de l'agissant."""
         skill = self.possesseur.get_skill_vision()
-        vision = skill.portee
+        vision = skill.get_portee()
         vision *= self.possesseur.affinite(Element.OMBRE) # La vision est augmentée par l'affinité à l'ombre
         for effet in self.possesseur.effets:
             if isinstance(effet, EffetVision):
@@ -147,6 +142,7 @@ class Statistiques:
     
     def set_non_contagieux(self, maladie:type[Maladie]|FamilleMaladie|str, priorite:float):
         """Définit la priorité de l'immunité à la contagion de la maladie donnée."""
+        self.non_contagieux = self.non_contagieux.copy()
         if not isinstance(maladie, str):
             maladie = maladie.nom
         if priorite > self.non_contagieux.get(maladie, 0):
@@ -154,6 +150,7 @@ class Statistiques:
 
     def set_non_infectable(self, maladie:type[Maladie]|FamilleMaladie|str, priorite:float):
         """Définit la priorité de l'immunité à l'infection de la maladie donnée."""
+        self.non_infectable = self.non_infectable.copy()
         if not isinstance(maladie, str):
             maladie = maladie.nom
         if priorite > self.non_infectable.get(maladie, 0):
@@ -161,6 +158,7 @@ class Statistiques:
 
     def set_non_affecte(self, maladie:type[Maladie]|FamilleMaladie|str, priorite:float):
         """Définit la priorité de l'immunité à l'effet de la maladie donnée."""
+        self.non_affecte = self.non_affecte.copy()
         if not isinstance(maladie, str):
             maladie = maladie.nom
         if priorite > self.non_affecte.get(maladie, 0):
@@ -168,18 +166,21 @@ class Statistiques:
 
     def augmente_non_contagieux(self, maladie:type[Maladie]|FamilleMaladie|str, priorite:float):
         """Augmente la priorité de l'immunité à la contagion de la maladie donnée."""
+        self.non_contagieux = self.non_contagieux.copy()
         if not isinstance(maladie, str):
             maladie = maladie.nom
         self.set_non_contagieux(maladie, self.non_contagieux.get(maladie, 0) + priorite)
 
     def augmente_non_infectable(self, maladie:type[Maladie]|FamilleMaladie|str, priorite:float):
         """Augmente la priorité de l'immunité à l'infection de la maladie donnée."""
+        self.non_infectable = self.non_infectable.copy()
         if not isinstance(maladie, str):
             maladie = maladie.nom
         self.set_non_infectable(maladie, self.non_infectable.get(maladie, 0) + priorite)
 
     def augmente_non_affecte(self, maladie:type[Maladie]|FamilleMaladie|str, priorite:float):
         """Augmente la priorité de l'immunité à l'effet de la maladie donnée."""
+        self.non_affecte = self.non_affecte.copy()
         if not isinstance(maladie, str):
             maladie = maladie.nom
         self.set_non_affecte(maladie, self.non_affecte.get(maladie, 0) + priorite)

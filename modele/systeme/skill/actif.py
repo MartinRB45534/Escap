@@ -1,6 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, Any
-import carte as crt
+from typing import TYPE_CHECKING, Any
 from modele.action import ActionSkill
 
 # Imports des classes parentes
@@ -8,14 +7,13 @@ from .skill import Skill
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...entitee import Agissant, Arme
-    from ...action import Magie, ActionSkill, Derobe, Blocage, Alchimie, Attaque, AttaqueArme, Marche, Ramasse, LancerItem
+    from ...action import Magie, ActionSkill, Derobe, Blocage, Alchimie, Attaque, Marche, Ramasse, LancerItem
 
 class Actif(Skill):
     """
     Les skills qui genèrent les actions.
     """
-    def fait(self) -> type[ActionSkill]:
+    def fait(self, nom:str="") -> type[ActionSkill]:
         """Fait l'action"""
         raise NotImplementedError
 
@@ -23,42 +21,73 @@ class SkillsOffensifs(Actif):
     """
     Un skill qui genère une attaque (hors attaque magique).
     """
-    def fait(self) -> type[Attaque]:
+    attaques: list[dict[str, type[Attaque]]]
+    def fait(self, nom:str="") -> type[Attaque]:
         """Fait l'attaque"""
-        raise NotImplementedError
+        return self.attaques[self.niveau - 1][nom]
 
 class SkillsProjectiles(Actif):
     """
     Un skill qui lance un objet.
     """
-
-    def fait(self) -> type[LancerItem]:
+    lancers: list[dict[str, type[LancerItem]]]
+    def fait(self, nom:str="") -> type[LancerItem]:
         """Utilise le skill, et renvoie l'objet lancé"""
-        raise NotImplementedError
+        return self.lancers[self.niveau - 1][nom]
 
 class SkillsMagiques(Actif):
     """
     Un skill qui permet de lancer des magies.
     """
-    def fait(self) -> type[Magie]:
+    magies: list[dict[str, type[Magie]]]
+    def fait(self, nom:str="") -> type[Magie]:
         """Fait la magie"""
-        raise NotImplementedError
+        return self.magies[self.niveau - 1][nom]
 
 class SkillDeplacement(Actif):
     """
     Un skill qui permet de se déplacer vers une case adjacente.
     """
-    def fait(self) -> type[Marche]:
+    deplacements: list[dict[str, type[Marche]]]
+    def fait(self, nom:str="") -> type[Marche]:
         """Fait le déplacement"""
-        raise NotImplementedError
+        return self.deplacements[self.niveau - 1][nom]
 
 class SkillRamasse(Actif):
     """
     Un skill qui permet de ramasser des objets sur sa case.
     """
-    def fait(self) -> type[Ramasse]:
+    ramasses: list[dict[str, type[Ramasse]]]
+    def fait(self, nom:str="") -> type[Ramasse]:
         """Fait le ramassage"""
-        raise NotImplementedError
+        return self.ramasses[self.niveau - 1][nom]
+    
+class SkillDerobe(Actif):
+    """
+    Un skill qui permet de voler un objet à un autre agissant.
+    """
+    derobes: list[dict[str, type[Derobe]]]
+    def fait(self, nom:str="") -> type[Derobe]:
+        """Fait le dérobage"""
+        return self.derobes[self.niveau - 1][nom]
+    
+class SkillBlocage(Actif):
+    """
+    Un skill qui permet de bloquer les attaques avec un bouclier.
+    """
+    blocages: list[dict[str, type[Blocage]]]
+    def fait(self, nom:str="") -> type[Blocage]:
+        """Fait le blocage"""
+        return self.blocages[self.niveau - 1][nom]
+    
+class SkillAlchimie(Actif):
+    """
+    Un skill qui permet de fabriquer des objets.
+    """
+    alchimies: list[dict[str, type[Alchimie]]]
+    def fait(self, nom:str="") -> type[Alchimie]:
+        """Fait l'alchimie"""
+        return self.alchimies[self.niveau - 1][nom]
 
 # TODO : réfléchir aux skills des slimes
 # class SkillMerge(Actif):
@@ -87,5 +116,9 @@ class SkillIssue(Actif):
     """The absence of a skill."""
     def __equal__(self, other:Any):
         return isinstance(other, SkillIssue)
+    
+    def fait(self, nom:str="") -> type[ActionSkill]:
+        """Fait l'action"""
+        raise NotImplementedError
 
 SKILL_ISSUE = SkillIssue()

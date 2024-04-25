@@ -22,6 +22,7 @@ class SkillIntrasec(Skill):
     """
     Les skills intrinsèques sont des skills qui sont liés à une classe. Ils évoluent avec la classe (pas d'xp propre donc).
     """
+    niveau_min: int
 
 class SkillExtra(Skill):
     """

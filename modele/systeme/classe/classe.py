@@ -1,98 +1,92 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
-import affichage as af
+from typing import TYPE_CHECKING, TypeVar, Optional
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ..skill.skill import SkillIntrasec, SkillExtra
-    from ..skill.actif import Actif
-    from ..skill.passif import SkillDebutTour
+    from ..skill import Skill, SkillIntrasec, SkillExtra, Actif
 
 # Pas de classe parente
 
 # Valeurs par défaut des paramètres
 
 class Classe:
-    """!!! Classe != class !!! Correspond aux classes avec des niveaux, qui évoluent, contiennent des skills, etc."""
-    def __init__(self,conditions_evo:list[float]=[0,10,20,30,40,50,60,70,80,90],skills_intrasecs:set[SkillIntrasec]=set(),skills:set[SkillExtra]=set()):
+    """Correspond aux classes avec des niveaux, qui évoluent, contiennent des skills, etc."""
+    types_intrasecs:set[type[SkillIntrasec]]
+    types_extrasecs:set[type[SkillExtra]]
+    types_sous_classes:set[type[Classe]]
+    conditions_evo: list[float|bool]
+    propagation: float
+    def __init__(self):
         """conditions_evo : les conditions d'évolution de la classe au niveau supérieur ; si c'est un nombre, indique l'xp nécessaire à l'évolution, si c'est une chaine de caractère, indique la fonction capable d'évaluer la condition
            skills_intrasecs : les skills obtenus automatiquement avec la classe
            cadeux_evo : les récompenses d'évolution ; peuvent être des skills, des classes ou de l'xp""" #Plus vraiment, en fait... À rafraichir
-        self.skills=skills
-        self.skills_intrasecs=skills_intrasecs
-        self.sous_classes:set[Classe]=set() #Une classe peut posséder des sous-classes, qui contribueront à son évolution moins qu'à celle de la classe principale
-        self.niveau=0 #Le niveau devrais passer à 1 lorsqu'on acquiert la classe
-        self.cond_evo=conditions_evo
-        self.xp=0 #L'xp commence à 0, évidemment
-        self.xp_new=0 #Contabilise l'xp obtenue pendant le tour, pour la propagation
-        self.propagation=0.1 #Certaines classes ont un taux de propagation plus important
-        self.nom = "classe anonyme"
+        self.skills = {skill() for skill in self.types_extrasecs}
+        self.skills_intrasecs = {skill() for skill in self.types_intrasecs}
+        self.sous_classes = {classe() for classe in self.types_sous_classes}
+        self.niveau = 1
+        self.xp: float = 0
+        self.xp_new: float = 0
 
     def gagne_xp(self) -> float:
         """fonction qui propage l'xp accumulé au cours du tour vers la classe mère"""
-        #On récupère l'xp propagé par les skills,
-        for skill in self.skills:
-            self.xp_new+=skill.gagne_xp()
-        #les skills intrasecs
-        for skill in self.skills_intrasecs:
-            self.xp_new+=skill.gagne_xp()
-        #et par les sous-classes
+        for skill in self.skills | self.skills_intrasecs:
+            self.xp_new += skill.gagne_xp()
         for classe in self.sous_classes:
-            self.xp_new+=classe.gagne_xp()
-        #Qu'on propage vers la classe supérieure
-        res = self.xp_new*self.propagation
-        #On l'ajoute aussi à son propre xp
-        self.xp+=self.xp_new
-        self.xp_new=0
-        #On en profite pour vérifier si on peut évoluer
-        self.check_evo()
+            self.xp_new += classe.gagne_xp()
+        res = self.xp_new * self.propagation
+        self.xp += self.xp_new
+        self.xp_new = 0
+        if self.check_evo():
+            self.evo()
         return res
 
     def vire_xp(self):
         """fonction qui supprime l'xp accumulé au cours du tour"""
-        for skill in self.skills:
-            skill.xp_new = 0
-        for skill in self.skills_intrasecs:
+        for skill in self.skills | self.skills_intrasecs:
             skill.xp_new = 0
         for classe in self.sous_classes:
             classe.vire_xp()
-        self.xp_new=0 #Pas nécessaire, je suppose ?
+        self.xp_new=0
 
     def check_evo(self):
         """fonction qui vérifie que les conditions d'évolution sont vérifiées"""
-        if self.niveau<len(self.cond_evo) and self.cond_evo[self.niveau]>0 and self.xp>=self.cond_evo[self.niveau]:
-            self.evo()
+        condition = self.conditions_evo[self.niveau-1]
+        if isinstance(condition, bool):
+            return condition
+        return self.xp >= condition
 
-    def evo(self,nb_evo:int=1):
+    def evo(self):
         """fonction qui procède à l'évolution"""
-        for _ in range(nb_evo):
-            self.niveau+=1
-            for skill in self.skills_intrasecs:
-                skill.evo()
+        self.niveau+=1
+        for skill in self.skills_intrasecs:
+            skill.niveau+=1
 
     def get_skills_actifs(self) -> set[Actif]:
         """Fonction qui renvoie tous les skills actifs de la classe et de ses sous-classes"""
         skills:set[Actif] = set()
-        for skill in self.skills | self.skills_intrasecs:
+        for skill in self.skills:
             if isinstance(skill,Actif):
-                skills.add(skill) #Ne prend pas en compte la création d'items pour l'instant !
+                skills.add(skill)
+        for skill in self.skills_intrasecs:
+            if isinstance(skill,Actif) and skill.niveau >= skill.niveau_min: # En dessous du niveau min, on fait comme si le skill n'existait pas
+                skills.add(skill)
         for classe in self.sous_classes:
             skills |= classe.get_skills_actifs()
         return skills
 
-    def debut_tour(self) -> set[SkillDebutTour]:
-        """Fonction qui renvoie tous les skills qui ont besoin d'être appelés au début du tour (juste les auras pour l'instant)."""
-        skills:set[SkillDebutTour] = set()
-        for skill in self.skills | self.skills_intrasecs:
-            if isinstance(skill,SkillDebutTour):
-                skills.add(skill)
-        for classe in self.sous_classes:
-            skills |= classe.debut_tour()
-        return skills
+    # T is a type, and must be a subclass of Skill
+    if TYPE_CHECKING:
+        T = TypeVar('T', bound=Skill)
 
-    def get_skin(self):
-        return af.SKIN_MYSTERE
-
-# Imports utilisés dans le code
-from ..skill.actif import Actif
-from ..skill.passif import SkillDebutTour
+    def trouve_skill(self,type_skill:type[T]) -> Optional[T]:
+        """Fonction qui renvoie le skill de la classe de type type_skill, ou None si il n'y en a pas."""
+        for skill in self.skills:
+            if isinstance(skill,type_skill): #On ne devrait pas avoir de skill a 0 mais on ne sait jamais.
+                return skill
+        for skill in self.skills_intrasecs:
+            if isinstance(skill,type_skill) and skill.niveau > skill.niveau_min: #On ne devrait pas avoir de skill a 0 mais on ne sait jamais.
+                return skill
+        for sous_classe in self.sous_classes: #On récurse la recherche dans les sous-classes.
+            trouve_bis = sous_classe.trouve_skill(type_skill)
+            if trouve_bis is not None:
+                return trouve_bis

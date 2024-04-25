@@ -25,22 +25,26 @@ if TYPE_CHECKING:
     from ...labyrinthe import Labyrinthe, Mur
     from ...commons import Element
     from .vue import Vue
+    from ...systeme import Classe
 
 class Agissant(NonSuperposable,Mobile):
     """La classe des entitées animées. Capable de décision, de différentes actions, etc. Les principales caractéristiques sont l'ID, les stats, et la classe principale."""
-    def __init__(self,identite:str,labyrinthe:Labyrinthe,cond_evo:list[float],skills_intrasecs:set[SkillIntrasec],skills:set[SkillExtra],niveau:int,pv_max:float,regen_pv_max:float,regen_pv_min:float,restauration_regen_pv:float,pm_max:float,regen_pm:float,force:float,priorite:float,vitesse:float,affinites:dict[Element,float],immunites:set[Element],non_contagieux:dict[str,float],non_infectable:dict[str,float],non_affecte:dict[str,float],espece:Espece,oubli:float,resolution:int,forme:str,forme_tete:str,nb_doigts:int,magies:list[type[Magie]],items:list[type[Item]],position:crt.Position,ID: Optional[int]=None):
+    type_classe: type[Classe]
+    type_statistiques: type[Statistiques]
+    espece: Espece
+    oubli: float
+    resolution: int
+    forme: str
+    forme_tete: str
+    talent: int
+    def __init__(self,identite:str,labyrinthe:Labyrinthe,position:crt.Position,ID: Optional[int]=None):
         Mobile.__init__(self,position,ID)
         NonSuperposable.__init__(self,position,ID)
         self.identite = identite
         self.labyrinthe = labyrinthe
-        self.statistiques = Statistiques(self,priorite,vitesse,force,pv_max,regen_pv_max,regen_pv_min,restauration_regen_pv,pm_max,regen_pm,affinites,immunites,non_contagieux,non_infectable,non_affecte)
-        self.espece = espece
-        self.classe_principale = ClassePrincipale(cond_evo,skills_intrasecs,skills,niveau)
+        self.statistiques = self.type_statistiques(self)
+        self.classe_principale = self.type_classe()
         self.niveau = self.classe_principale.niveau
-        self.oubli = oubli
-        self.resolution = resolution
-        self.forme = forme
-        self.forme_tete = forme_tete
         self.statut = "attente"
         self.etat = EtatsAgissants.VIVANT
 
@@ -50,28 +54,13 @@ class Agissant(NonSuperposable,Mobile):
         self.esprit:Esprit=NOBODY
 
         #possessions de l'agissant
-        self.inventaire = Inventaire(self,nb_doigts)
+        self.inventaire = Inventaire(self,self.espece.nb_doigts)
 
         #la direction du regard
         self.dir_regard = crt.Direction.HAUT
         self.action:Optional[Action] = None
 
-        #Pour lancer des magies
-        self.talent = 1
-
-        self.magie = Cadavre(self,crt.POSITION_ABSENTE)
-
-        if magies:
-            skill:Optional[SkillsMagiques] = trouve_skill(self.classe_principale,SkillsMagiques)
-            if skill is None:
-                raise ValueError("Pas de skill magique pour l'entitée")
-            for magie in magies:
-                skill.ajoute(magie)
-        if items:
-            new_items:set[Item] = set()
-            for item in items:
-                new_items.add(item(crt.POSITION_ABSENTE))
-            self.inventaire.equippe(new_items)
+        self.cadavre = Cadavre(self,crt.POSITION_ABSENTE)
 
     @property
     def equipement(self):
@@ -96,27 +85,27 @@ class Agissant(NonSuperposable,Mobile):
     def attaque(self,direction:crt.Direction):
         """Fait attaquer l'agissant dans une direction."""
         self.regarde(direction)
-        skill = trouve_skill(self.classe_principale,SkillAttaqueArme)
+        skill = self.classe_principale.trouve_skill(SkillAttaqueArme)
         arme = self.arme
         if skill and arme:
             self.fait(skill.fait(self,arme,direction))
         else:
-            skill = trouve_skill(self.classe_principale,SkillAttaque)
+            skill = self.classe_principale.trouve_skill(SkillAttaque)
             assert skill is not None
             self.fait(skill.fait(self,direction))
 
     def va(self,direction:crt.Direction):
         """Fait se déplacer l'agissant dans une direction."""
         self.regarde(direction)
-        skill = trouve_skill(self.classe_principale,SkillDeplacement)
+        skill = self.classe_principale.trouve_skill(SkillDeplacement)
         assert skill is not None
-        self.fait(skill.fait(self,direction))
+        self.fait(skill.fait("marche")(self,skill,direction))
 
     def passe(self,mur:Mur):
         """Renvoie True si l'agissant peut passer le mur (fermé)."""
         if self.fantome:
             return True
-        ecrasement = trouve_skill(self.classe_principale,SkillEcrasement)
+        ecrasement = self.classe_principale.trouve_skill(SkillEcrasement)
         if ecrasement is not None:
             passage = ecrasement.ecrase(mur.niveau,self.priorite)
             if passage:
@@ -126,7 +115,7 @@ class Agissant(NonSuperposable,Mobile):
     
     def arrive_agissant(self,agissant:Agissant):
         """Renvoie True si l'agissant peut arriver sur la case (occupée par un agissant)."""
-        ecrasement = trouve_skill(self.classe_principale,SkillEcrasement)
+        ecrasement = self.classe_principale.trouve_skill(SkillEcrasement)
         if ecrasement is not None:
             passage = ecrasement.ecrase(agissant.priorite,self.priorite)
             if passage:
@@ -136,7 +125,7 @@ class Agissant(NonSuperposable,Mobile):
     
     def arrive_decors(self,decors:Decors):
         """Renvoie True si l'agissant peut arriver sur la case (occupée par un décors)."""
-        ecrasement = trouve_skill(self.classe_principale,SkillEcrasement)
+        ecrasement = self.classe_principale.trouve_skill(SkillEcrasement)
         if ecrasement is not None:
             passage = ecrasement.ecrase(decors.priorite,self.priorite)
             if passage:
@@ -195,7 +184,7 @@ class Agissant(NonSuperposable,Mobile):
 
     def peut_payer(self,cout:float):
         """Retourne si l'agissant peut payer un certain cout."""
-        skill = trouve_skill(self.classe_principale,SkillMagieInfinie)
+        skill = self.classe_principale.trouve_skill(SkillMagieInfinie)
         res = True
         if skill is None:
             res = self.get_total_pm() >= cout
@@ -262,7 +251,7 @@ class Agissant(NonSuperposable,Mobile):
 
     def instakill(self,_responsable:Agissant):
         """L'agissant meurt instantanément."""
-        immortel = trouve_skill(self.classe_principale,SkillImmortel)
+        immortel = self.classe_principale.trouve_skill(SkillImmortel)
         if immortel is not None:
             if self.statistiques.pv > 0:
                 self.statistiques.pv = 0 #Et ça s'arrète là
@@ -284,8 +273,8 @@ class Agissant(NonSuperposable,Mobile):
         case = self.labyrinthe.get_case(self.position)
         self.inventaire.drop_all(case)
         case.agissant = None
-        case.items.add(self.magie)
-        self.magie.position = self.position
+        case.items.add(self.cadavre)
+        self.cadavre.position = self.position
         self.position = crt.POSITION_ABSENTE
 
     def get_esprit(self):
@@ -294,7 +283,7 @@ class Agissant(NonSuperposable,Mobile):
 
     def get_skill_vision(self) -> SkillVision:
         """Retourne le skill de vision de l'agissant."""
-        skill = trouve_skill(self.classe_principale,SkillVision)
+        skill = self.classe_principale.trouve_skill(SkillVision)
         if skill is None:
             raise ValueError("Un agissant n'a pas de skill de vision !")
         return skill
@@ -381,20 +370,18 @@ class Agissant(NonSuperposable,Mobile):
                 on_attaques.append(effet)
             elif isinstance(effet,AttaqueParticulier):
                 attaques.append(effet)
-        skill:Optional[SkillDefense] = trouve_skill(self.classe_principale,SkillDefense)
-        taux = 1
-        if skill is not None :
-            taux *= skill.utilise()
+        skill:Optional[SkillDefense] = self.classe_principale.trouve_skill(SkillDefense)
         items:list[Defensif] = []
         for item in self.inventaire.get_equippement():
             if isinstance(item,Defensif):
                 items.append(item)
         for attaque in attaques :
-            attaque.degats *= taux
             for on_attaque in on_attaques:
                 on_attaque.protege(attaque)
             for item in items:
                 item.intercepte(attaque)
+            if skill is not None:
+                skill.intercepte(attaque)
             attaque.attaque(self)
 
     # Les autres subissent aussi des attaques.
@@ -411,13 +398,13 @@ class Agissant(NonSuperposable,Mobile):
             raise ValueError("Oups, je ne suis pas vivant, je ne peux pas finir mon tour !")
         if self.etat == EtatsAgissants.VIVANT:
             if self.statistiques.pv <= 0 :
-                immortel:Optional[SkillImmortel] = trouve_skill(self.classe_principale,SkillImmortel)
+                immortel:Optional[SkillImmortel] = self.classe_principale.trouve_skill(SkillImmortel)
                 if immortel is not None :
                     immortel.utilise()
                 else :
-                    essence:Optional[SkillEssenceMagique] = trouve_skill(self.classe_principale,SkillEssenceMagique)
+                    essence:Optional[SkillEssenceMagique] = self.classe_principale.trouve_skill(SkillEssenceMagique)
                     if essence is not None :
-                        cout = essence.utilise(self.statistiques.pv)
+                        cout = essence.get_taux() * -self.statistiques.pv
                         if self.peut_payer(cout):
                             self.paye(cout)
                             self.statistiques.pv = 0
@@ -428,10 +415,7 @@ class Agissant(NonSuperposable,Mobile):
             self.inventaire.fin_tour()
             self.classe_principale.gagne_xp()
             if self.niveau != self.classe_principale.niveau : #On a gagné un niveau
-                if self.classe_principale.evolutif:
-                    self.level_up()
-                else:
-                    raise ValueError(f"Le niveau de {self} est {self.niveau} alors que celui de sa classe est {self.classe_principale.niveau} !")
+                self.level_up()
         else:
             raise ValueError("Oups, je ne suis pas vivant, je ne peux pas finir mon tour !")
 
