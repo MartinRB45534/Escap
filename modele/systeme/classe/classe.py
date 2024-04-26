@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, TypeVar, Optional
+from typing import TYPE_CHECKING, TypeVar
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
@@ -78,15 +78,15 @@ class Classe:
     if TYPE_CHECKING:
         T = TypeVar('T', bound=Skill)
 
-    def trouve_skill(self,type_skill:type[T]) -> Optional[T]:
+    def trouve_skill(self,type_skill:type[T]) -> set[T]:
         """Fonction qui renvoie le skill de la classe de type type_skill, ou None si il n'y en a pas."""
+        res:set[type_skill] = set()
         for skill in self.skills:
             if isinstance(skill,type_skill): #On ne devrait pas avoir de skill a 0 mais on ne sait jamais.
-                return skill
+                res.add(skill)
         for skill in self.skills_intrasecs:
             if isinstance(skill,type_skill) and skill.niveau > skill.niveau_min: #On ne devrait pas avoir de skill a 0 mais on ne sait jamais.
-                return skill
+                res.add(skill)
         for sous_classe in self.sous_classes: #On récurse la recherche dans les sous-classes.
-            trouve_bis = sous_classe.trouve_skill(type_skill)
-            if trouve_bis is not None:
-                return trouve_bis
+            res |= sous_classe.trouve_skill(type_skill)
+        return res

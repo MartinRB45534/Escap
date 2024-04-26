@@ -37,6 +37,7 @@ class Agissant(NonSuperposable,Mobile):
     forme: str
     forme_tete: str
     talent: int
+    esprit:Esprit
     def __init__(self,identite:str,labyrinthe:Labyrinthe,position:crt.Position,ID: Optional[int]=None):
         Mobile.__init__(self,position,ID)
         NonSuperposable.__init__(self,position,ID)
@@ -50,8 +51,6 @@ class Agissant(NonSuperposable,Mobile):
 
         #vue de l'agissant
         self.vue:Vue = voit_vue(labyrinthe.extrait({self.position}))
-
-        self.esprit:Esprit=NOBODY
 
         #possessions de l'agissant
         self.inventaire = Inventaire(self,self.espece.nb_doigts)
@@ -81,56 +80,56 @@ class Agissant(NonSuperposable,Mobile):
         """Retourne la position de l'impact de l'attaque de l'agissant."""
         return self.position+self.dir_regard
 
-    # Les actions de l'agissant
-    def attaque(self,direction:crt.Direction):
-        """Fait attaquer l'agissant dans une direction."""
-        self.regarde(direction)
-        skill = self.classe_principale.trouve_skill(SkillAttaqueArme)
-        arme = self.arme
-        if skill and arme:
-            self.fait(skill.fait(self,arme,direction))
-        else:
-            skill = self.classe_principale.trouve_skill(SkillAttaque)
-            assert skill is not None
-            self.fait(skill.fait(self,direction))
+    # # Les actions de l'agissant
+    # def attaque(self,direction:crt.Direction):
+    #     """Fait attaquer l'agissant dans une direction."""
+    #     self.regarde(direction)
+    #     skill = self.classe_principale.trouve_skill(SkillAttaqueArme)
+    #     arme = self.arme
+    #     if skill and arme:
+    #         self.fait(skill.fait(self,arme,direction))
+    #     else:
+    #         skill = self.classe_principale.trouve_skill(SkillAttaque)
+    #         assert skill is not None
+    #         self.fait(skill.fait(self,direction))
 
-    def va(self,direction:crt.Direction):
-        """Fait se déplacer l'agissant dans une direction."""
-        self.regarde(direction)
-        skill = self.classe_principale.trouve_skill(SkillDeplacement)
-        assert skill is not None
-        self.fait(skill.fait("marche")(self,skill,direction))
+    # def va(self,direction:crt.Direction):
+    #     """Fait se déplacer l'agissant dans une direction."""
+    #     self.regarde(direction)
+    #     skill = self.classe_principale.trouve_skill(SkillDeplacement)
+    #     assert skill is not None
+    #     self.fait(skill.fait("marche")(self,skill,direction))
 
     def passe(self,mur:Mur):
         """Renvoie True si l'agissant peut passer le mur (fermé)."""
         if self.fantome:
             return True
-        ecrasement = self.classe_principale.trouve_skill(SkillEcrasement)
-        if ecrasement is not None:
-            passage = ecrasement.ecrase(mur.niveau,self.priorite)
-            if passage:
-                mur.casser()
-            return passage
+        ecrasements = self.classe_principale.trouve_skill(SkillEcrasement)
+        if ecrasements:
+            for ecrasement in ecrasements:
+                if ecrasement.ecrase(mur.niveau,self.priorite):
+                    mur.casser()
+                    return True
         return False
     
     def arrive_agissant(self,agissant:Agissant):
         """Renvoie True si l'agissant peut arriver sur la case (occupée par un agissant)."""
-        ecrasement = self.classe_principale.trouve_skill(SkillEcrasement)
-        if ecrasement is not None:
-            passage = ecrasement.ecrase(agissant.priorite,self.priorite)
-            if passage:
-                agissant.ecrase(self)
-            return passage
+        ecrasements = self.classe_principale.trouve_skill(SkillEcrasement)
+        if ecrasements:
+            for ecrasement in ecrasements:
+                if ecrasement.ecrase(agissant.priorite,self.priorite):
+                    agissant.ecrase(self)
+                    return True
         return False
     
     def arrive_decors(self,decors:Decors):
         """Renvoie True si l'agissant peut arriver sur la case (occupée par un décors)."""
-        ecrasement = self.classe_principale.trouve_skill(SkillEcrasement)
-        if ecrasement is not None:
-            passage = ecrasement.ecrase(decors.priorite,self.priorite)
-            if passage:
-                decors.ecrase()
-            return passage
+        ecrasements = self.classe_principale.trouve_skill(SkillEcrasement)
+        if ecrasements:
+            for ecrasement in ecrasements:
+                if ecrasement.ecrase(decors.priorite,self.priorite):
+                    decors.ecrase()
+                    return True
         return False
 
     def agit_en_vue(self,defaut:str = ""): #Par défaut, on n'a pas d'action à distance
@@ -184,9 +183,9 @@ class Agissant(NonSuperposable,Mobile):
 
     def peut_payer(self,cout:float):
         """Retourne si l'agissant peut payer un certain cout."""
-        skill = self.classe_principale.trouve_skill(SkillMagieInfinie)
+        skills = self.classe_principale.trouve_skill(SkillMagieInfinie)
         res = True
-        if skill is None:
+        if skills:
             res = self.get_total_pm() >= cout
         return res
 
@@ -251,8 +250,8 @@ class Agissant(NonSuperposable,Mobile):
 
     def instakill(self,_responsable:Agissant):
         """L'agissant meurt instantanément."""
-        immortel = self.classe_principale.trouve_skill(SkillImmortel)
-        if immortel is not None:
+        immortels = self.classe_principale.trouve_skill(SkillImmortel)
+        if immortels:
             if self.statistiques.pv > 0:
                 self.statistiques.pv = 0 #Et ça s'arrète là
         else:
