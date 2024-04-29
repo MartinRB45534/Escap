@@ -1,6 +1,11 @@
-from enum import Enum
+"""
+Fichier contenant l'énumération des états des items.
+"""
 
-class EtatsItems(Enum):
-    INTACT = "INTACT"
-    BRISE = "BRISE"
-    UTILISE = "UTILISE"
+from enum import StrEnum
+
+class EtatsItems(StrEnum):
+    """Enumération des états des items."""
+    INTACT = "INTACT" # Item en bon état
+    BRISE = "BRISE" # Item brisé (à évacuer bientôt)
+    UTILISE = "UTILISE" # Item en cours d'utilisation

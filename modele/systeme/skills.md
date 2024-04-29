@@ -61,7 +61,7 @@ Le joueur est le seul à véritablement gagner des skills en cours de partie (le
 
 ### En cas de montée de niveau :
 
-Ond evrait avoir calculé pour ne pas donner de skills redondants au joueur. N'empêche qu'ils s'ajoutent...
+On devrait avoir calculé pour ne pas donner de skills redondants au joueur. N'empêche qu'ils s'ajoutent...
 
 ### En cas de vol :
 
@@ -86,3 +86,15 @@ Mais il faut faire confiance à l'éditeur...
 #### Faire une exception pour la classe voleur
 
 On va supposer que seule la classe voleur peut posséder le skill de vol de skills (comment s'en assurer !?) et charger la classe de stocker tous les skills, y compris en double. Le joueur décide lequel est utilisé et peut changer lorsqu'il le souhaite.
+
+#### Le skill de vol de compétence stocke les skills volés
+
+Le skill garde en mémoire les skills volés (et l'équivalent qu'on possède, s'il y en avait un ou qu'on l'a gagné plus tard), et permet d'échanger un skill lorsqu'on le souhaite.
+
+# Conclusion
+
+Chaque classe a un dictionnaire de skills qu'elle accepte (avec les valeurs de l'enum en clé et le skill ou None en valeur).
+
+Pour le joueur, on propose à l'ajout d'une classe de lui transférer les skills qu'elle peut accepter de sa classe principale.
+
+Il y a aussi un dictionnaire pour les skills intrasecs (il s'agit d'un enum différent) qui n'accepte pas None en valeur.

@@ -12,7 +12,7 @@ from .....affichage import SKIN_ARME
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from .....commons.elements import Element
+    from .....commons import Element, CategoriesArmes
 
 class Degainable(Equippement):
     """La classe des items qui doivent être dégainés. Sont utilisés en complément d'un skill, n'ont pas d'effet le reste du temps."""
@@ -22,6 +22,7 @@ class Arme(Degainable):
     element:Element
     tranchant:float
     portee:float
+    categorie:CategoriesArmes
     def __init__(self,position:crt.Position=crt.POSITION_ABSENTE):
         Degainable.__init__(self,position)
         self.taux_tranchant:dict[str, float] = {}
