@@ -4,7 +4,7 @@ Contient les classes mères des skills
 
 from __future__ import annotations
 
-from ...commons import TypesCompetencesGeneriques, TypesCompetencesArmes, TypesCompetencesElements, TypesCompetencesIntraseques, TypesCompetencesIntrasequesArmes, TypesCompetencesIntrasequesElements, Element, CategoriesArmes
+from ...commons import TypesCompetencesGeneriques, TypesCompetencesArmes, TypesCompetencesElements, CategoriesArmes, Element
 
 class Skill:
     """Les skills se répartissent en plusieurs catégories."""
@@ -25,26 +25,6 @@ class SkillIntrasec(Skill):
     Les skills intrinsèques sont des skills qui sont liés à une classe. Ils évoluent avec la classe (pas d'xp propre donc).
     """
     niveau_min: int
-
-class SkillIntrasecGenerique(SkillIntrasec):
-    """
-    Les skills intrinsèques génériques sont des skills qui sont liés à une classe. Ils évoluent avec la classe (pas d'xp propre donc).
-    """
-    type_competence: TypesCompetencesIntraseques
-
-class SkillIntrasecElement(SkillIntrasec):
-    """
-    Les skills intrinsèques élémentaires sont des skills qui sont liés à une classe et à un élément. Ils évoluent avec la classe (pas d'xp propre donc).
-    """
-    element: Element
-    type_competence: TypesCompetencesIntrasequesElements
-
-class SkillIntrasecArme(SkillIntrasec):
-    """
-    Les skills intrinsèques d'arme sont des skills qui sont liés à une classe et à une arme. Ils évoluent avec la classe (pas d'xp propre donc).
-    """
-    arme: CategoriesArmes
-    type_competence: TypesCompetencesIntrasequesArmes
 
 class SkillExtra(Skill):
     """
@@ -75,22 +55,16 @@ class SkillExtra(Skill):
         """Procède à l'évolution du skill."""
         self.niveau += 1
 
-class SkillExtraGenerique(SkillExtra):
-    """
-    Les skills extrinsèques génériques sont des skills qui sont liés à une classe. Ils évoluent avec la classe (pas d'xp propre donc).
-    """
+class SkillGenerique(Skill):
+    """Les skills extrinsèques génériques."""
     type_competence: TypesCompetencesGeneriques
 
-class SkillExtraElement(SkillExtra):
-    """
-    Les skills extrinsèques élémentaires sont des skills qui sont liés à une classe et à un élément. Ils évoluent avec la classe (pas d'xp propre donc).
-    """
-    element: Element
-    type_competence: TypesCompetencesElements
-
-class SkillExtraArme(SkillExtra):
-    """
-    Les skills extrinsèques d'arme sont des skills qui sont liés à une classe et à une arme. Ils évoluent avec la classe (pas d'xp propre donc).
-    """
-    arme: CategoriesArmes
+class SkillArme(Skill):
+    """Les skills extrinsèques d'armes."""
     type_competence: TypesCompetencesArmes
+    type_arme: CategoriesArmes
+
+class SkillElement(Skill):
+    """Les skills extrinsèques élémentaires."""
+    type_competence: TypesCompetencesElements
+    type_element: Element

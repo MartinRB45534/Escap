@@ -2,8 +2,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 # Imports des classes parentes
-from .skill import Skill, SkillExtraGenerique, SkillExtraElement, SkillIntrasecGenerique, SkillIntrasecElement, SkillIntrasecArme
-from ...commons import TypesCompetencesIntrasequesGeneriques, TypesCompetencesIntrasequesElements, TypesCompetencesIntrasequesArmes, TypesCompetencesGeneriques, TypesCompetencesElements, CategoriesArmes
+from .skill import Skill, SkillExtra, SkillIntrasec ,SkillGenerique, SkillElement, SkillArme
+from ...commons import TypesCompetencesGeneriques, TypesCompetencesElements, CategoriesArmes
 
 # Variables de classe
 
