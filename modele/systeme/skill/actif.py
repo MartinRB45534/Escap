@@ -3,12 +3,11 @@ from typing import TYPE_CHECKING, Any
 from modele.action import ActionSkill
 
 # Imports des classes parentes
-from .skill import Skill, SkillGenerique, SkillArme
-from ...commons import TypesCompetencesGeneriques, TypesCompetencesArmes
+from .skill import Skill
 
 # Imports utilisés uniquement dans les annotations
 if TYPE_CHECKING:
-    from ...action import Magie, ActionSkill, Derobe, Blocage, Alchimie, Attaque, AttaqueArme, Marche, Ramasse, LancerItem
+    from ...action import Magie, ActionSkill, DerobeItem, DerobeSkill, DerobeStat, DerobeMagie, Blocage, Alchimie, Attaque, AttaqueArme, Marche, Ramasse, LancerItem
 
 class Actif(Skill):
     """
@@ -17,128 +16,110 @@ class Actif(Skill):
     def fait(self, nom:str="") -> type[ActionSkill]:
         """Fait l'action"""
         raise NotImplementedError
-    
-class ActifGenerique(SkillGenerique, Actif):
-    """Les skills actifs génériques."""
 
-class ActifArme(SkillArme, Actif):
-    """Les skills actifs d'arme."""
-
-class SkillDeplacement(ActifGenerique):
+class SkillDeplacement(Actif):
     """
     Un skill qui permet de se déplacer vers une case adjacente.
     """
-    type_competence = TypesCompetencesGeneriques.DEPLACEMENT
     deplacements: list[dict[str, type[Marche]]]
     def fait(self, nom:str="") -> type[Marche]:
         """Fait le déplacement"""
         return self.deplacements[self.niveau - 1][nom]
 
-class SkillRamasse(ActifGenerique):
+class SkillRamasse(Actif):
     """
     Un skill qui permet de ramasser des objets sur sa case.
     """
-    type_competence = TypesCompetencesGeneriques.RAMASSE
     ramasses: list[dict[str, type[Ramasse]]]
     def fait(self, nom:str="") -> type[Ramasse]:
         """Fait le ramassage"""
         return self.ramasses[self.niveau - 1][nom]
 
-class SkillAttaque(ActifGenerique):
+class SkillAttaque(Actif):
     """
     Un skill qui genère une attaque (hors attaque magique).
     """
-    type_competence = TypesCompetencesGeneriques.ATTAQUE
     attaques: list[dict[str, type[Attaque]]]
     def fait(self, nom:str="") -> type[Attaque]:
         """Fait l'attaque"""
         return self.attaques[self.niveau - 1][nom]
 
-class SkillAttaqueArme(ActifArme):
+class SkillAttaqueArme(Actif):
     """
     Un skill qui genère une attaque (hors attaque magique) avec une arme.
     """
-    type_competence = TypesCompetencesArmes.ATTAQUE
     attaques: list[dict[str, type[AttaqueArme]]]
     def fait(self, nom:str="") -> type[AttaqueArme]:
         """Fait l'attaque"""
         return self.attaques[self.niveau - 1][nom]
 
-class SkillMagie(ActifGenerique):
+class SkillMagie(Actif):
     """
     Un skill qui permet de lancer des magies.
     """
-    type_competence = TypesCompetencesGeneriques.MAGIE
     magies: list[dict[str, type[Magie]]]
     def fait(self, nom:str="") -> type[Magie]:
         """Fait la magie"""
         return self.magies[self.niveau - 1][nom]
 
-class SkillLancer(ActifGenerique):
+class SkillLancer(Actif):
     """
     Un skill qui lance un objet.
     """
-    type_competence = TypesCompetencesGeneriques.LANCER
     lancers: list[dict[str, type[LancerItem]]]
     def fait(self, nom:str="") -> type[LancerItem]:
         """Utilise le skill, et renvoie l'objet lancé"""
         return self.lancers[self.niveau - 1][nom]
 
-class SkillVolSkill(ActifGenerique):
+class SkillVolItem(Actif):
     """
     Un skill qui permet de voler un objet à un autre agissant.
     """
-    type_competence = TypesCompetencesGeneriques.VOL_ITEM
-    derobes: list[dict[str, type[Derobe]]]
-    def fait(self, nom:str="") -> type[Derobe]:
+    derobes: list[dict[str, type[DerobeItem]]]
+    def fait(self, nom:str="") -> type[DerobeItem]:
         """Fait le dérobage"""
         return self.derobes[self.niveau - 1][nom]
 
-class SkillVolMagie(ActifGenerique):
+class SkillVolMagie(Actif):
     """
-    Un skill qui permet de voler un objet à un autre agissant.
+    Un skill qui permet de voler une magie à un autre agissant.
     """
-    type_competence = TypesCompetencesGeneriques.VOL_ITEM
-    derobes: list[dict[str, type[Derobe]]]
-    def fait(self, nom:str="") -> type[Derobe]:
+    derobes: list[dict[str, type[DerobeMagie]]]
+    def fait(self, nom:str="") -> type[DerobeMagie]:
         """Fait le dérobage"""
         return self.derobes[self.niveau - 1][nom]
 
-class SkillVolStat(ActifGenerique):
+class SkillVolStat(Actif):
     """
-    Un skill qui permet de voler un objet à un autre agissant.
+    Un skill qui permet de voler une statistique à un autre agissant.
     """
-    type_competence = TypesCompetencesGeneriques.VOL_ITEM
-    derobes: list[dict[str, type[Derobe]]]
-    def fait(self, nom:str="") -> type[Derobe]:
+    derobes: list[dict[str, type[DerobeStat]]]
+    def fait(self, nom:str="") -> type[DerobeStat]:
         """Fait le dérobage"""
         return self.derobes[self.niveau - 1][nom]
 
-class SkillVolItem(ActifGenerique):
+class SkillVolSkill(Actif):
     """
-    Un skill qui permet de voler un objet à un autre agissant.
+    Un skill qui permet de voler un skill à un autre agissant.
     """
-    type_competence = TypesCompetencesGeneriques.VOL_ITEM
-    derobes: list[dict[str, type[Derobe]]]
-    def fait(self, nom:str="") -> type[Derobe]:
+    derobes: list[dict[str, type[DerobeSkill]]]
+    def fait(self, nom:str="") -> type[DerobeSkill]:
         """Fait le dérobage"""
         return self.derobes[self.niveau - 1][nom]
     
-class SkillBlocage(ActifExtraGenerique):
+class SkillBlocage(Actif):
     """
     Un skill qui permet de bloquer les attaques avec un bouclier.
     """
-    type_competence = TypesCompetencesGeneriques.BLOQUE
     blocages: list[dict[str, type[Blocage]]]
     def fait(self, nom:str="") -> type[Blocage]:
         """Fait le blocage"""
         return self.blocages[self.niveau - 1][nom]
     
-class SkillAlchimie(ActifExtraGenerique):
+class SkillAlchimie(Actif):
     """
     Un skill qui permet de fabriquer des objets.
     """
-    type_competence = TypesCompetencesGeneriques.ALCHIMIE
     alchimies: list[dict[str, type[Alchimie]]]
     def fait(self, nom:str="") -> type[Alchimie]:
         """Fait l'alchimie"""
@@ -169,9 +150,9 @@ class SkillAlchimie(ActifExtraGenerique):
 
 class SkillIssue(Actif):
     """The absence of a skill."""
-    def __equal__(self, other:Any):
-        return isinstance(otherIssue)
-    
+    def __equal__(self, other: Any):
+        return isinstance(other, SkillIssue)
+
     def fait(self, nom:str="") -> type[ActionSkill]:
         """Fait l'action"""
         raise NotImplementedError

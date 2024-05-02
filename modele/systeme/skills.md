@@ -13,7 +13,7 @@ Et le joueur pourrait les voler. S'ils sont eux-mêmes différents entre eux, le
 
 #### Skill d'écrasement
 
-Seul le joueur peut l'avoir donc pas de risque de dédoublement, mais en termes de logique s'il y a dédoublemebt ça peut poser problème.
+Seul le joueur peut l'avoir donc pas de risque de dédoublement, mais en termes de logique s'il y a dédoublement ça peut poser problème.
 
 #### Skill de magie
 
@@ -98,3 +98,35 @@ Chaque classe a un dictionnaire de skills qu'elle accepte (avec les valeurs de l
 Pour le joueur, on propose à l'ajout d'une classe de lui transférer les skills qu'elle peut accepter de sa classe principale.
 
 Il y a aussi un dictionnaire pour les skills intrasecs (il s'agit d'un enum différent) qui n'accepte pas None en valeur.
+
+# Après réflexion sur les stats
+
+Les dédoublements de skills de modification de stats par le joueur sont facilement gérables.
+
+## Quels skills posent vraiment problème ?
+
+### Immortalité
+
+Comment savoir auquel se référer pour les modifications de stats ?
+
+#### Idée de solution
+
+Un seul skill d'immortalité hors joueur.
+
+Lors du vol d'un skill, si on a déjà le même, on garde celui de plus haut niveau.
+
+Ou alors, l'immortalité est intrasec. Ça semble plus logique.
+
+### Magie
+
+Les magies seraient réparties sur plusieurs skills magiques.
+
+#### Idée de solution
+
+Avec les modifications récentes de la logique des magies, le skill lui-même ne sert plus qu'à fournir un niveau et gagner de l'xp. On pourrait stocker les magies ailleurs, dans une sorte de mémoire.
+
+Est-ce qu'il y aurait même un intérêt à voler le skill magie d'autrui ?
+
+# Nouvelle conclusion
+
+Pas besoin des enums de types de compétence.

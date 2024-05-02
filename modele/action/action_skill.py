@@ -51,7 +51,7 @@ class Ramasse(ActionSkill, ActionParcellaire, NonRepetable):
     def action(self):
         self.agissant.inventaire.ajoute(self.items[self.rempli-1])
 
-class Derobe(ActionSkill, NonRepetable):
+class DerobeItem(ActionSkill, NonRepetable):
     """
     L'action de dérober un item.
     """
@@ -67,6 +67,57 @@ class Derobe(ActionSkill, NonRepetable):
     def action(self):
         self.possesseur.inventaire.drop(self.item)
         self.agissant.inventaire.ajoute(self.item)
+
+class DerobeSkill(ActionSkill, NonRepetable):
+    """
+    L'action de dérober un skill.
+    """
+    def __init__(self, agissant: Agissant, skill: Actif, latence: float, xp: float, skill_derobe: Actif,
+                 possesseur: Agissant):
+        ActionSkill.__init__(self, agissant, skill)
+        NonRepetable.__init__(self, agissant)
+        self.latence_max = latence
+        self.xp = xp
+        self.skill_derobe = skill_derobe
+        self.possesseur = possesseur
+
+    def action(self):
+        self.possesseur.classe_principale.perd_skill(self.skill_derobe)
+        self.agissant.classe_principale.gagne_skill(self.skill_derobe)
+
+class DerobeMagie(ActionSkill, NonRepetable):
+    """
+    L'action de dérober une magie.
+    """
+    def __init__(self, agissant: Agissant, skill: Actif, latence: float, xp: float, magie_derobee: Actif,
+                 possesseur: Agissant):
+        ActionSkill.__init__(self, agissant, skill)
+        NonRepetable.__init__(self, agissant)
+        self.latence_max = latence
+        self.xp = xp
+        self.magie_derobee = magie_derobee
+        self.possesseur = possesseur
+
+    def action(self):
+        self.possesseur.classe_principale.perd_magie(self.magie_derobee)
+        self.agissant.classe_principale.gagne_magie(self.magie_derobee)
+
+class DerobeStat(ActionSkill, NonRepetable):
+    """
+    L'action de dérober une statistique.
+    """
+    def __init__(self, agissant: Agissant, skill: Actif, latence: float, xp: float, stat: str,
+                 possesseur: Agissant):
+        ActionSkill.__init__(self, agissant, skill)
+        NonRepetable.__init__(self, agissant)
+        self.latence_max = latence
+        self.xp = xp
+        self.stat = stat
+        self.possesseur = possesseur
+
+    def action(self):
+        self.possesseur.statistiques.perd_stat(self.stat)
+        self.agissant.statistiques.gagne_stat(self.stat)
 
 class Blocage(ActionSkill):
     """

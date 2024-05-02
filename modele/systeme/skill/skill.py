@@ -4,8 +4,6 @@ Contient les classes mères des skills
 
 from __future__ import annotations
 
-from ...commons import TypesCompetencesGeneriques, TypesCompetencesArmes, TypesCompetencesElements, CategoriesArmes, Element
-
 class Skill:
     """Les skills se répartissent en plusieurs catégories."""
     propagation: float
@@ -54,17 +52,3 @@ class SkillExtra(Skill):
     def evo(self):
         """Procède à l'évolution du skill."""
         self.niveau += 1
-
-class SkillGenerique(Skill):
-    """Les skills extrinsèques génériques."""
-    type_competence: TypesCompetencesGeneriques
-
-class SkillArme(Skill):
-    """Les skills extrinsèques d'armes."""
-    type_competence: TypesCompetencesArmes
-    type_arme: CategoriesArmes
-
-class SkillElement(Skill):
-    """Les skills extrinsèques élémentaires."""
-    type_competence: TypesCompetencesElements
-    type_element: Element
